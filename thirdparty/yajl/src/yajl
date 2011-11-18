@@ -1,0 +1,33 @@
+/**
+\example reformatter/json_reformat.c
+\example example/parse_config.c
+*/
+
+/*!
+    \mainpage Yet Another JSON Library (YAJL)
+    \author Lloyd Hilaiel
+    \date 2007-2011
+
+Yet Another JSON Library (YAJL) is a small event-driven (SAX-style)
+JSON parser written in ANSI C, and a small validating JSON
+generator. YAJL is released under the permissive ISC license.
+
+\section features Features
+
+   -# Stream (incremental) parsing and generation of JSON
+   -# ANSI C
+   -# Human readable error messages with context
+   -# tiny
+   -# event driven
+   -# support for generating "beautified" JSON 
+   -# includes 
+It also includes a small simplified tree interface for 
+simplified parsing and extraction of data from smallish JSON documents.
+
+\section usage Usage
+
+See <a href="reformatter_2json_reformat_8c-example.html">json_reformat.c</a> for a complete example of stream based parsing
+and generation of JSON.  See <a href="example_2parse_config_8c-example.html">parse_config.c</a> for an example of the
+simplified tree interface.
+
+*/
