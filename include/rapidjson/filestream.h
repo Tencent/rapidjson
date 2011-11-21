@@ -34,10 +34,8 @@ private:
 			current_ = (char)c;
 			count_++;
 		}
-		else if (current_ != '\0') {
+		else if (current_ != '\0')
 			current_ = '\0';
-			count_++;
-		}
 	}
 
 	FILE* fp_;

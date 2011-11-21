@@ -1,6 +1,7 @@
 #include "unittest.h"
 #include "rapidjson/filestream.h"
 #include "rapidjson/filereadstream.h"
+#include "rapidjson/filewritestream.h"
 
 using namespace rapidjson;
 
@@ -17,7 +18,6 @@ class FileStreamTest : public ::testing::Test {
 		json_ = (char*)malloc(length_ + 1);
 		fread(json_, 1, length_, fp);
 		json_[length_] = '\0';
-		length_++;	// include the null terminator
 		fclose(fp);
 	}
 
@@ -31,7 +31,7 @@ protected:
 	size_t length_;
 };
 
-TEST_F(FileStreamTest, Read) {
+TEST_F(FileStreamTest, FileStream_Read) {
 	FILE *fp = fopen(filename_, "rb");
 	ASSERT_TRUE(fp != 0);
 	FileStream s(fp);
@@ -48,22 +48,46 @@ TEST_F(FileStreamTest, Read) {
 	fclose(fp);
 }
 
-TEST_F(FileStreamTest, BufferedRead) {
+TEST_F(FileStreamTest, FileReadStream) {
 	FILE *fp = fopen(filename_, "rb");
 	ASSERT_TRUE(fp != 0);
 	char buffer[65536];
 	FileReadStream s(fp, buffer, sizeof(buffer));
 
 	for (size_t i = 0; i < length_; i++) {
-		if (json_[i] != s.Peek())
-			__asm int 3;
-		ASSERT_EQ(json_[i], s.Peek());
-		ASSERT_EQ(json_[i], s.Peek());	// 2nd time should be the same
-		ASSERT_EQ(json_[i], s.Take());
+		EXPECT_EQ(json_[i], s.Peek());
+		EXPECT_EQ(json_[i], s.Peek());	// 2nd time should be the same
+		EXPECT_EQ(json_[i], s.Take());
 	}
 
 	EXPECT_EQ(length_, s.Tell());
 	EXPECT_EQ('\0', s.Peek());
 
 	fclose(fp);
+}
+
+TEST_F(FileStreamTest, FileWriteStream) {
+	char filename[L_tmpnam];
+	tmpnam(filename);
+
+	FILE *fp = fopen(filename, "wb");
+	char buffer[65536];
+	FileWriteStream os(fp, buffer, sizeof(buffer));
+	for (size_t i = 0; i < length_; i++)
+		os.Put(json_[i]);
+	os.Flush();
+	fclose(fp);
+
+	// Read it back to verify
+	fp = fopen(filename, "rb");
+	FileReadStream is(fp, buffer, sizeof(buffer));
+
+	for (size_t i = 0; i < length_; i++)
+		EXPECT_EQ(json_[i], is.Take());
+
+	EXPECT_EQ(length_, is.Tell());
+	fclose(fp);
+
+	//std::cout << filename << std::endl;
+	remove(filename);
 }

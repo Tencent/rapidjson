@@ -46,7 +46,6 @@ private:
 			if (readCount_ < bufferSize_) {
 				buffer_[readCount_] = '\0';
 				++bufferLast_;
-				++count_;
 				eof_ = true;
 			}
 		}
