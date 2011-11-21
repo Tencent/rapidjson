@@ -33,9 +33,9 @@
 class PerfTest : public ::testing::Test {
 public:
 	virtual void SetUp() {
-		FILE *fp = fopen("data/sample.json", "rb");
-		if (!fp)
-			fp = fopen("../../bin/data/sample.json", "rb");
+		FILE *fp = fopen(filename_ = "data/sample.json", "rb");
+		if (!fp) 
+			fp = fopen(filename_ = "../../bin/data/sample.json", "rb");
 		ASSERT_TRUE(fp != 0);
 
 		fseek(fp, 0, SEEK_END);
@@ -69,6 +69,7 @@ public:
 	}
 
 protected:
+	const char* filename_;
 	char *json_;
 	size_t length_;
 	char *whitespace_;

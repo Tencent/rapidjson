@@ -1,14 +1,16 @@
 #ifndef RAPIDJSON_FILESTREAM_H_
 #define RAPIDJSON_FILESTREAM_H_
 
+#include "rapidjson.h"
 #include <cstdio>
 
 namespace rapidjson {
 
-//! Wrapper of C file stream for input or output.
+//! (Depreciated) Wrapper of C file stream for input or output.
 /*!
 	This simple wrapper does not check the validity of the stream.
 	\implements Stream
+	\deprecated { This was only for basic testing in version 0.1, it is found that the performance is very low by using fgetc(). Use FileReadStream instead. }
 */
 class FileStream {
 public:
@@ -32,8 +34,10 @@ private:
 			current_ = (char)c;
 			count_++;
 		}
-		else
+		else if (current_ != '\0') {
 			current_ = '\0';
+			count_++;
+		}
 	}
 
 	FILE* fp_;

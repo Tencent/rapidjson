@@ -7,6 +7,7 @@
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/filestream.h"
+#include "rapidjson/filereadstream.h"
 #include <cmath>
 
 #ifdef RAPIDJSON_SSE2
@@ -55,6 +56,15 @@ TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseInsitu_NullHandler)) {
 		BaseReaderHandler<> h;
 		Reader reader;
 		reader.Parse<kParseInsituFlag>(s, h);
+	}
+}
+
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_NullHandler)) {
+	for (int i = 0; i < kTrialCount; i++) {
+		StringStream s(json_);
+		BaseReaderHandler<> h;
+		Reader reader;
+		reader.Parse<0>(s, h);
 	}
 }
 
@@ -229,6 +239,52 @@ TEST_F(RapidJson, SIMD_SUFFIX(Whitespace)) {
 		Document doc;
 		ASSERT_TRUE(doc.Parse<0>(whitespace_).IsArray());
 	}		
+}
+
+
+TEST_F(RapidJson, fread) {
+	for (int i = 0; i < kTrialCount; i++) {
+		FILE *fp = fopen(filename_, "rb");
+		fread(temp_, 1, length_, fp);
+		temp_[length_] = '\0';
+		for (char *p = temp_; *p; ++p)
+			;
+		fclose(fp);
+	}
+}
+
+// Depreciated.
+//TEST_F(RapidJson, FileStream_Read) {
+//	for (int i = 0; i < kTrialCount; i++) {
+//		FILE *fp = fopen(filename_, "rb");
+//		FileStream s(fp);
+//		while (s.Take() != '\0')
+//			;
+//		fclose(fp);
+//	}
+//}
+
+TEST_F(RapidJson, FileReadStream) {
+	for (int i = 0; i < kTrialCount; i++) {
+		FILE *fp = fopen(filename_, "rb");
+		char buffer[65536];
+		FileReadStream s(fp, buffer, sizeof(buffer));
+		while (s.Take() != '\0')
+			;
+		fclose(fp);
+	}
+}
+
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_NullHandler_FileReadStream)) {
+	for (int i = 0; i < kTrialCount; i++) {
+		FILE *fp = fopen(filename_, "rb");
+		char buffer[65536];
+		FileReadStream s(fp, buffer, sizeof(buffer));
+		BaseReaderHandler<> h;
+		Reader reader;
+		reader.Parse<0>(s, h);
+		fclose(fp);
+	}
 }
 
 #endif // TEST_RAPIDJSON
