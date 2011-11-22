@@ -27,7 +27,8 @@ namespace rapidjson {
 //! Combination of parseFlags
 enum ParseFlag {
 	kParseDefaultFlags = 0,			//!< Default parse flags. Non-destructive parsing. Text strings are decoded into allocated buffer.
-	kParseInsituFlag = 1			//!< In-situ(destructive) parsing.
+	kParseInsituFlag = 1,			//!< In-situ(destructive) parsing.
+	kParseValidateEncodingFlag = 2,	//!< Validate encoding of JSON strings.
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -401,8 +402,9 @@ private:
 	} while(false)
 
 		for (;;) {
-			Ch c = s.Take();
+			Ch c = s.Peek();
 			if (c == '\\') {	// Escape
+				s.Take();
 				Ch e = s.Take();
 				if ((sizeof(Ch) == 1 || e < 256) && escape[(unsigned char)e])
 					RAPIDJSON_PUT(escape[(unsigned char)e]);
@@ -438,6 +440,7 @@ private:
 				}
 			}
 			else if (c == '"') {	// Closing double quote
+				s.Take();
 				if (parseFlags & kParseInsituFlag) {
 					size_t length = s.PutEnd(head);
 					RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
@@ -459,8 +462,29 @@ private:
 				RAPIDJSON_PARSE_ERROR("Incorrect unescaped character in string", stream.Tell() - 1);
 				return;
 			}
-			else
-				RAPIDJSON_PUT(c);	// Normal character, just copy
+			else if (parseFlags & kParseValidateEncodingFlag) {
+				Ch buffer[4];
+				Ch* end = Encoding::Validate(&buffer[0], s);
+				if (end == NULL) {
+					RAPIDJSON_PARSE_ERROR("Invalid encoding", s.Tell());
+					return;
+				}
+
+				if (parseFlags & kParseInsituFlag)
+					for (Ch* p = &buffer[0]; p != end; ++p)
+						s.Put(*p);
+				else {
+					SizeType l = SizeType(end - &buffer[0]);
+					Ch* q = stack_.template Push<Ch>(l);
+					for (Ch* p = &buffer[0]; p != end; ++p)
+						*q++ = *p;
+					len += l;
+				}
+
+			}
+			else {
+				RAPIDJSON_PUT(s.Take());	// Normal character, just copy
+			}
 		}
 #undef RAPIDJSON_PUT
 	}

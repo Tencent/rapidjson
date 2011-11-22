@@ -16,8 +16,10 @@
 #ifdef _MSC_VER
 typedef __int64 int64_t;
 typedef unsigned __int64 uint64_t;
+#define RAPIDJSON_FORCEINLINE __forceinline
 #else
 #include <inttypes.h>
+#define RAPIDJSON_FORCEINLINE
 #endif
 #endif // RAPIDJSON_NO_INT64TYPEDEF
 
@@ -343,6 +345,47 @@ struct UTF8 {
 		}
 		return buffer;
 	}
+
+	template <typename Stream>
+	RAPIDJSON_FORCEINLINE static Ch* Validate(Ch *buffer, Stream& s) {
+#define X1 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+#define X5 5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5
+		static const char utf8[256] = {
+			X1,X1,X1,X1,X1,X1,X1,X1,			// 00-7F 1 byte
+			X5,X5,X5,X5,						// 80-BF Continuation
+			0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,	// C0-C1: invalid, C2-CF: 2 bytes
+			2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,	// D0-DF: 2 bytes
+			3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,	// E0-EF: 3 bytes
+			4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,	// F0-F4: 4 bytes
+		};
+#undef X1
+#undef X5
+
+#define TAIL() c = *buffer++ = s.Take(); if ((c & 0xC0) != 0x80) return NULL;
+
+		Ch c = *buffer++ = s.Take();
+		if ((unsigned char)c < 0x80u)
+			return buffer;
+
+		switch(utf8[(unsigned char)c]) {
+		case 2:
+			TAIL();
+			return buffer;
+
+		case 3:
+			TAIL();
+			TAIL();
+			return buffer;
+
+		case 4:
+			TAIL();
+			TAIL();
+			TAIL();
+			return buffer;
+		}
+		return NULL;
+#undef TAIL
+	}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -370,6 +413,21 @@ struct UTF16 {
 		}
 		return buffer;
 	}
+
+	template <typename Stream>
+	static Ch* Validate(Ch *buffer, Stream& s) {
+		Ch c = *buffer++ = s.Take();
+		if (c < 0xD800 || c > 0xDFFF)
+			;
+		else if (c < 0xDBFF) {
+			Ch c = *buffer++ = s.Take();
+			if (c < 0xDC00 || c > 0xDFFF)
+				return NULL;
+		}
+		else
+			return NULL;
+		return buffer;
+	}
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -388,6 +446,12 @@ struct UTF32 {
 		RAPIDJSON_ASSERT(codepoint <= 0x10FFFF);
 		*buffer++ = codepoint;
 		return buffer;
+	}
+
+	template <typename Stream>
+	static Ch* Validate(Ch *buffer, Stream& s) {
+		Ch c = *buffer++ = s.Take();
+		return c <= 0x10FFFF ? buffer : 0;
 	}
 };
 

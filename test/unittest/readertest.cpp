@@ -204,7 +204,7 @@ TEST(Reader, ParseString) {
 		GenericInsituStringStream<Encoding> is(buffer); \
 		ParseStringHandler<Encoding> h; \
 		GenericReader<Encoding> reader; \
-		reader.ParseString<kParseInsituFlag>(is, h); \
+		reader.ParseString<kParseInsituFlag | kParseValidateEncodingFlag>(is, h); \
 		EXPECT_EQ(0, StrCmp<Encoding::Ch>(e, h.str_)); \
 		EXPECT_EQ(StrLen(e), h.length_); \
 		free(buffer); \
@@ -286,7 +286,6 @@ TEST(Reader, ParseString_NonDestructive) {
 	EXPECT_EQ(11, h.length_);
 }
 
-#ifdef RAPIDJSON_USE_EXCEPTION
 TEST(Reader, ParseString_Error) {
 #define TEST_STRING_ERROR(str) \
 	{ \
@@ -295,18 +294,28 @@ TEST(Reader, ParseString_Error) {
 		InsituStringStream s(buffer); \
 		BaseReaderHandler<> h; \
 		Reader reader; \
-		EXPECT_ERROR(reader.ParseString<0>(s, h), ParseException); \
+		EXPECT_FALSE(reader.Parse<kParseValidateEncodingFlag>(s, h)); \
 	}
 
-	TEST_STRING_ERROR("\"\\a\"");				// Unknown escape character
-	TEST_STRING_ERROR("\"\\uABCG\"");			// Incorrect hex digit after \\u escape
-	TEST_STRING_ERROR("\"\\uD800X\"");			// Missing the second \\u in surrogate pair
-	TEST_STRING_ERROR("\"\\uD800\\uFFFF\"");	// The second \\u in surrogate pair is invalid
-	TEST_STRING_ERROR("\"Test");				// lacks ending quotation before the end of string
+#define ARRAY(...) { __VA_ARGS__ }
+#define TEST_STRINGARRAY_ERROR(Encoding, array) \
+	{ \
+		static const Encoding::Ch e[] = array; \
+		TEST_STRING_ERROR(e); \
+	}
 
+	TEST_STRING_ERROR("[\"\\a\"]");				// Unknown escape character
+	TEST_STRING_ERROR("[\"\\uABCG\"]");			// Incorrect hex digit after \\u escape
+	TEST_STRING_ERROR("[\"\\uD800X\"]");		// Missing the second \\u in surrogate pair
+	TEST_STRING_ERROR("[\"\\uD800\\uFFFF\"]");	// The second \\u in surrogate pair is invalid
+	TEST_STRING_ERROR("[\"Test]");				// lacks ending quotation before the end of string
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', 0x80u, ']'));			// Incorrect UTF8 sequence
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', 0xC0u, 0x40, ']'));	// Incorrect UTF8 sequence
+
+#undef ARRAY
+#undef TEST_STRINGARRAY_ERROR
 #undef TEST_STRING_ERROR
 }
-#endif // RAPIDJSON_USE_EXCEPTION
 
 template <unsigned count>
 struct ParseArrayHandler : BaseReaderHandler<> {
@@ -340,7 +349,6 @@ TEST(Reader, ParseArray) {
 	free(json);
 }
 
-#ifdef RAPIDJSON_USE_EXCEPTION
 TEST(Reader, ParseArray_Error) {
 #define TEST_ARRAY_ERROR(str) \
 	{ \
@@ -348,8 +356,8 @@ TEST(Reader, ParseArray_Error) {
 		strncpy(buffer, str, 1000); \
 		InsituStringStream s(buffer); \
 		BaseReaderHandler<> h; \
-		Reader<UTF8<>, CrtAllocator> reader; \
-		EXPECT_ERROR(reader.ParseArray<0>(s, h), ParseException); \
+		GenericReader<UTF8<>, CrtAllocator> reader; \
+		EXPECT_FALSE(reader.Parse<0>(s, h)); \
 	}
 
 	// Must be a comma or ']' after an array element.
@@ -359,7 +367,6 @@ TEST(Reader, ParseArray_Error) {
 
 #undef TEST_ARRAY_ERROR
 }
-#endif // RAPIDJSON_USE_EXCEPTION
 
 struct ParseObjectHandler : BaseReaderHandler<> {
 	ParseObjectHandler() : step_(0) {}
@@ -446,7 +453,6 @@ TEST(Reader, Parse_EmptyObject) {
 	EXPECT_EQ(2, h.step_);
 }
 
-#ifdef RAPIDJSON_USE_EXCEPTION 
 TEST(Reader, ParseObject_Error) {
 #define TEST_OBJECT_ERROR(str) \
 	{ \
@@ -454,8 +460,8 @@ TEST(Reader, ParseObject_Error) {
 		strncpy(buffer, str, 1000); \
 		InsituStringStream s(buffer); \
 		BaseReaderHandler<> h; \
-		Reader<UTF8<>, CrtAllocator> reader; \
-		EXPECT_ERROR(reader.ParseObject<0>(s, h), ParseException); \
+		GenericReader<UTF8<>, CrtAllocator> reader; \
+		EXPECT_FALSE(reader.Parse<0>(s, h)); \
 	}
 
 	// Name of an object member must be a string
@@ -477,9 +483,7 @@ TEST(Reader, ParseObject_Error) {
 
 #undef TEST_OBJECT_ERROR
 }
-#endif // RAPIDJSON_USE_EXCEPTION
 
-#ifdef RAPIDJSON_USE_EXCEPTION
 TEST(Reader, Parse_Error) {
 #define TEST_ERROR(str) \
 	{ \
@@ -488,7 +492,7 @@ TEST(Reader, Parse_Error) {
 		InsituStringStream s(buffer); \
 		BaseReaderHandler<> h; \
 		Reader reader; \
-		EXPECT_ERROR(reader.Parse<0>(s, h), ParseException); \
+		EXPECT_FALSE(reader.Parse<0>(s, h)); \
 	}
 
 	// Text only contains white space(s)
@@ -514,4 +518,3 @@ TEST(Reader, Parse_Error) {
 
 #undef TEST_ERROR
 }
-#endif // RAPIDJSON_USE_EXCEPTION

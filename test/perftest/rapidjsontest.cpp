@@ -41,22 +41,41 @@ protected:
 	Document doc_;
 };
 
-TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseInsitu_NullHandler)) {
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseInsitu_DummyHandler)) {
 	for (int i = 0; i < kTrialCount; i++) {
 		memcpy(temp_, json_, length_ + 1);
 		InsituStringStream s(temp_);
 		BaseReaderHandler<> h;
 		Reader reader;
-		reader.Parse<kParseInsituFlag>(s, h);
+		EXPECT_TRUE(reader.Parse<kParseInsituFlag>(s, h));
 	}
 }
 
-TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_NullHandler)) {
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseInsitu_DummyHandler_ValidateEncoding)) {
+	for (int i = 0; i < kTrialCount; i++) {
+		memcpy(temp_, json_, length_ + 1);
+		InsituStringStream s(temp_);
+		BaseReaderHandler<> h;
+		Reader reader;
+		EXPECT_TRUE(reader.Parse<kParseInsituFlag | kParseValidateEncodingFlag>(s, h));
+	}
+}
+
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler)) {
 	for (int i = 0; i < kTrialCount; i++) {
 		StringStream s(json_);
 		BaseReaderHandler<> h;
 		Reader reader;
-		reader.Parse<0>(s, h);
+		EXPECT_TRUE(reader.Parse<0>(s, h));
+	}
+}
+
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_ValidateEncoding)) {
+	for (int i = 0; i < kTrialCount; i++) {
+		StringStream s(json_);
+		BaseReaderHandler<> h;
+		Reader reader;
+		EXPECT_TRUE(reader.Parse<kParseValidateEncodingFlag>(s, h));
 	}
 }
 
@@ -235,7 +254,7 @@ TEST_F(RapidJson, FileReadStream) {
 	}
 }
 
-TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_NullHandler_FileReadStream)) {
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_FileReadStream)) {
 	for (int i = 0; i < kTrialCount; i++) {
 		FILE *fp = fopen(filename_, "rb");
 		char buffer[65536];
