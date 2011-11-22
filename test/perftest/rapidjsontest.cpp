@@ -160,9 +160,10 @@ TEST_F(RapidJson, DocumentAccept) {
 }
 
 struct NullStream {
-	NullStream() : length_(0) {}
-	void Put(char c) { ++length_; }
-	size_t length_;
+	NullStream() /*: length_(0)*/ {}
+	void Put(char c) { /*++length_;*/ }
+	void Flush() {}
+	//size_t length_;
 };
 
 TEST_F(RapidJson, Writer_NullStream) {
