@@ -109,7 +109,7 @@ TEST_F(Platform, read) {
 #else
 TEST_F(Platform, read) {
 	for (int i = 0; i < kTrialCount; i++) {
-		int fd = open(filename_, O_BINARY | O_RDONLY);
+		int fd = open(filename_, O_RDONLY);
 		ASSERT_NE(-1, fd);
 		ASSERT_EQ(length_, read(fd, temp_, length_));
 		EXPECT_EQ(checkSum_, CheckSum());
@@ -138,7 +138,7 @@ TEST_F(Platform, MapViewOfFile) {
 #ifdef _POSIX_MAPPED_FILES
 TEST_F(Platform, mmap) {
 	for (int i = 0; i < kTrialCount; i++) {
-		int fd = open(filename_, _O_BINARY | _O_RDONLY);
+		int fd = open(filename_, O_RDONLY);
 		ASSERT_NE(-1, fd);
 		void *p = mmap(NULL, length_, PROT_READ, MAP_PRIVATE, fd, 0);
 		ASSERT_TRUE(p != NULL);

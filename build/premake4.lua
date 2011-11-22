@@ -67,6 +67,9 @@ solution "test"
 
 	project "gtest"
 		kind "StaticLib"
+		
+		defines { "GTEST_HAS_PTHREAD=0" }
+
 		files { 
 			"../thirdparty/gtest/src/gtest-all.cc",
 			"../thirdparty/gtest/src/**.h",

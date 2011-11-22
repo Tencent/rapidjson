@@ -85,7 +85,11 @@ yajl_gen_status GenVal(yajl_gen g, yajl_val v) {
 			size_t len;
 			//if (YAJL_IS_INTEGER(v)) // buggy
 			if (v->u.number.flags & YAJL_NUMBER_INT_VALID)
-				len = sprintf(num, "%d", YAJL_GET_INTEGER(v));
+#if _MSC_VER
+				len = sprintf(num, "%I64d", YAJL_GET_INTEGER(v));
+#else
+				len = sprintf(num, "%lld", YAJL_GET_INTEGER(v));
+#endif
 			//else if (YAJL_IS_DOUBLE(v))	// buggy
 			else if (v->u.number.flags & YAJL_NUMBER_DOUBLE_VALID)
 				len = sprintf(num, "%g", YAJL_GET_DOUBLE(v));
