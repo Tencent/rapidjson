@@ -1,10 +1,10 @@
 #ifndef PERFTEST_H_
 #define PERFTEST_H_
 
-#define TEST_RAPIDJSON	1
-#define TEST_JSONCPP	1
-#define TEST_YAJL		1
-
+#define TEST_RAPIDJSON	0
+#define TEST_JSONCPP	0
+#define TEST_YAJL		0
+#define TEST_PLATFORM   1
 #if TEST_RAPIDJSON
 //#define RAPIDJSON_SSE2
 //#define RAPIDJSON_SSE42
@@ -44,7 +44,6 @@ public:
 		json_ = (char*)malloc(length_ + 1);
 		fread(json_, 1, length_, fp);
 		json_[length_] = '\0';
-		length_++;	// include the null terminator
 		fclose(fp);
 
 		// whitespace test

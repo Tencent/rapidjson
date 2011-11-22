@@ -21,6 +21,7 @@ public:
 	char Take() { char c = current_; Read(); return c; }
 	size_t Tell() const { return count_; }
 	void Put(char c) { fputc(c, fp_); }
+	void Flush() { fflush(fp_); }
 
 	// Not implemented
 	char* PutBegin() { return 0; }

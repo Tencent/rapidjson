@@ -24,6 +24,5 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	os.Flush();
 	return 0;
 }

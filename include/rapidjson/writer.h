@@ -59,6 +59,8 @@ public:
 		RAPIDJSON_ASSERT(!level_stack_.template Top<Level>()->inArray);
 		level_stack_.template Pop<Level>(1);
 		WriteEndObject();
+		if (level_stack_.Empty())	// end of json text
+			stream_.Flush();
 		return *this;
 	}
 
@@ -74,6 +76,8 @@ public:
 		RAPIDJSON_ASSERT(level_stack_.template Top<Level>()->inArray);
 		level_stack_.template Pop<Level>(1);
 		WriteEndArray();
+		if (level_stack_.Empty())	// end of json text
+			stream_.Flush();
 		return *this;
 	}
 	//@}

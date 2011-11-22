@@ -19,6 +19,7 @@ struct GenericStringBuffer {
 	GenericStringBuffer(Allocator* allocator = 0, size_t capacity = kDefaultCapacity) : stack_(allocator, capacity) {}
 
 	void Put(Ch c) { *stack_.template Push<Ch>() = c; }
+	void Flush() {}
 
 	void Clear() { stack_.Clear(); }
 

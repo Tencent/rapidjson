@@ -397,9 +397,9 @@ struct UTF32 {
 /*! \class rapidjson::Stream
 	\brief Concept for reading and writing characters.
 
-	For read-only stream, no need to implement PutBegin(), Put() and PutEnd().
+	For read-only stream, no need to implement PutBegin(), Put(), Flush() and PutEnd().
 
-	For write-only stream, only need to implement Put().
+	For write-only stream, only need to implement Put() and Flush().
 
 \code
 concept Stream {
@@ -421,6 +421,9 @@ concept Stream {
 
 	//! Write a character.
 	void Put(Ch c);
+
+	//! Flush the buffer.
+	void Flush();
 
 	//! End the writing operation.
 	//! \param begin The begin write pointer returned by PutBegin().
@@ -455,6 +458,7 @@ struct GenericStringStream {
 
 	Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
 	void Put(Ch c) { RAPIDJSON_ASSERT(false); }
+	void Flush() { RAPIDJSON_ASSERT(false); }
 	size_t PutEnd(Ch* begin) { RAPIDJSON_ASSERT(false); return 0; }
 
 	const Ch* src_;		//!< Current read position.
@@ -484,6 +488,7 @@ struct GenericInsituStringStream {
 	// Write
 	Ch* PutBegin() { return dst_ = src_; }
 	void Put(Ch c) { RAPIDJSON_ASSERT(dst_ != 0); *dst_++ = c; }
+	void Flush() {}
 	size_t PutEnd(Ch* begin) { return dst_ - begin; }
 
 	Ch* src_;

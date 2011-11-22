@@ -25,6 +25,7 @@ public:
 
 	// Not implemented
 	void Put(char c) { RAPIDJSON_ASSERT(false); }
+	void Flush() { RAPIDJSON_ASSERT(false); } 
 	char* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
 	size_t PutEnd(char*) { RAPIDJSON_ASSERT(false); return 0; }
 
