@@ -47,12 +47,14 @@ TEST(Document, Parse) {
 		EXPECT_EQ(i + 1, a[i].GetUint());
 }
 
+// This should be slow due to assignment in inner-loop.
 struct OutputStringStream : public std::ostringstream {
 	typedef char Ch;
 
 	void Put(char c) {
 		put(c);
 	}
+	void Flush() {}
 };
 
 TEST(Document, AcceptWriter) {

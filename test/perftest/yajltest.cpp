@@ -53,10 +53,10 @@ static yajl_callbacks nullcallbacks = {
 TEST_F(Yajl, yajl_parse_nullcallbacks) {
 	for (int i = 0; i < kTrialCount; i++) {
 		yajl_handle hand = yajl_alloc(&nullcallbacks, NULL, NULL);
-		yajl_status stat = yajl_parse(hand, (unsigned char*)json_, length_ - 1);
+		yajl_status stat = yajl_parse(hand, (unsigned char*)json_, length_);
 		//ASSERT_EQ(yajl_status_ok, stat);
 		if (stat != yajl_status_ok) {
-			unsigned char * str = yajl_get_error(hand, 1, (unsigned char*)json_, length_ + 1);
+			unsigned char * str = yajl_get_error(hand, 1, (unsigned char*)json_, length_);
 			fprintf(stderr, "%s", (const char *) str);
 		}
 		stat = yajl_complete_parse(hand);

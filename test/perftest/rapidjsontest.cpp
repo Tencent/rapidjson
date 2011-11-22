@@ -8,7 +8,6 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/filestream.h"
 #include "rapidjson/filereadstream.h"
-#include <cmath>
 
 #ifdef RAPIDJSON_SSE2
 #define SIMD_SUFFIX(name) name##_SSE2
@@ -42,16 +41,9 @@ protected:
 	Document doc_;
 };
 
-TEST_F(RapidJson, strlen) {
-	for (int i = 0; i < kTrialCount; i++) {
-		size_t l = strlen(json_);
-		EXPECT_EQ(length_, l + 1);
-	}
-}
-
 TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseInsitu_NullHandler)) {
 	for (int i = 0; i < kTrialCount; i++) {
-		memcpy(temp_, json_, length_);
+		memcpy(temp_, json_, length_ + 1);
 		InsituStringStream s(temp_);
 		BaseReaderHandler<> h;
 		Reader reader;
@@ -73,7 +65,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(DoucmentParseInsitu_MemoryPoolAllocator)) {
 	//char* userBuffer = (char*)malloc(userBufferSize);
 
 	for (int i = 0; i < kTrialCount; i++) {
-		memcpy(temp_, json_, length_);
+		memcpy(temp_, json_, length_ + 1);
 		//MemoryPoolAllocator<> allocator(userBuffer, userBufferSize);
 		//Document doc(&allocator);
 		Document doc;
@@ -115,7 +107,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(DoucmentParse_MemoryPoolAllocator)) {
 
 TEST_F(RapidJson, SIMD_SUFFIX(DoucmentParse_CrtAllocator)) {
 	for (int i = 0; i < kTrialCount; i++) {
-		memcpy(temp_, json_, length_);
+		memcpy(temp_, json_, length_ + 1);
 		GenericDocument<UTF8<>, CrtAllocator> doc;
 		doc.Parse<0>(temp_);
 		ASSERT_TRUE(doc.IsObject());
@@ -206,13 +198,6 @@ TEST_F(RapidJson, PrettyWriter_StringBuffer) {
 	}
 }
 
-TEST_F(RapidJson, pow) {
-	double sum = 0;
-	for (int i = 0; i < kTrialCount * kTrialCount; i++)
-		sum += pow(10.0, i & 255);
-	EXPECT_GT(sum, 0.0);
-}
-
 TEST_F(RapidJson, internal_Pow10) {
 	double sum = 0;
 	for (int i = 0; i < kTrialCount * kTrialCount; i++)
@@ -220,37 +205,11 @@ TEST_F(RapidJson, internal_Pow10) {
 	EXPECT_GT(sum, 0.0);
 }
 
-TEST_F(RapidJson, Whitespace_strlen) {
-	for (int i = 0; i < kTrialCount; i++) {
-		size_t l = strlen(whitespace_);
-		EXPECT_GT(l, whitespace_length_);
-	}		
-}
-
-TEST_F(RapidJson, Whitespace_strspn) {
-	for (int i = 0; i < kTrialCount; i++) {
-		size_t l = strspn(whitespace_, " \n\r\t");
-		EXPECT_EQ(whitespace_length_, l);
-	}		
-}
-
 TEST_F(RapidJson, SIMD_SUFFIX(Whitespace)) {
 	for (int i = 0; i < kTrialCount; i++) {
 		Document doc;
 		ASSERT_TRUE(doc.Parse<0>(whitespace_).IsArray());
 	}		
-}
-
-
-TEST_F(RapidJson, fread) {
-	for (int i = 0; i < kTrialCount; i++) {
-		FILE *fp = fopen(filename_, "rb");
-		fread(temp_, 1, length_, fp);
-		temp_[length_] = '\0';
-		for (char *p = temp_; *p; ++p)
-			;
-		fclose(fp);
-	}
 }
 
 // Depreciated.
