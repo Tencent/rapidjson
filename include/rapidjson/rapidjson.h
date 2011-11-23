@@ -381,7 +381,7 @@ struct UTF8 {
 		};
 		Ch c;
 		os.Put(c = is.Take());
-		if ((unsigned char) c <= 0x80)
+		if ((unsigned char) c < 0x80)
 			return true;
 
 		unsigned type = utf8d[(unsigned char)c];

@@ -286,35 +286,82 @@ TEST(Reader, ParseString_NonDestructive) {
 	EXPECT_EQ(11, h.length_);
 }
 
-TEST(Reader, ParseString_Error) {
-#define TEST_STRING_ERROR(str) \
-	{ \
-		char buffer[1001]; \
-		strncpy(buffer, str, 1000); \
-		InsituStringStream s(buffer); \
-		BaseReaderHandler<> h; \
-		Reader reader; \
-		EXPECT_FALSE(reader.Parse<kParseValidateEncodingFlag>(s, h)); \
-	}
+bool TestString(const char* str) {
+	StringStream s(str);
+	BaseReaderHandler<> h;
+	Reader reader;
+	return reader.Parse<kParseValidateEncodingFlag>(s, h);
+}
 
+TEST(Reader, ParseString_Error) {
 #define ARRAY(...) { __VA_ARGS__ }
 #define TEST_STRINGARRAY_ERROR(Encoding, array) \
 	{ \
 		static const Encoding::Ch e[] = array; \
-		TEST_STRING_ERROR(e); \
+		EXPECT_FALSE(TestString(e)); \
 	}
 
-	TEST_STRING_ERROR("[\"\\a\"]");				// Unknown escape character
-	TEST_STRING_ERROR("[\"\\uABCG\"]");			// Incorrect hex digit after \\u escape
-	TEST_STRING_ERROR("[\"\\uD800X\"]");		// Missing the second \\u in surrogate pair
-	TEST_STRING_ERROR("[\"\\uD800\\uFFFF\"]");	// The second \\u in surrogate pair is invalid
-	TEST_STRING_ERROR("[\"Test]");				// lacks ending quotation before the end of string
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', 0x80u, ']'));			// Incorrect UTF8 sequence
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', 0xC0u, 0x40, ']'));	// Incorrect UTF8 sequence
+	EXPECT_FALSE(TestString("[\"\\a\"]"));				// Unknown escape character
+	EXPECT_FALSE(TestString("[\"\\uABCG\"]"));			// Incorrect hex digit after \\u escape
+	EXPECT_FALSE(TestString("[\"\\uD800X\"]"));			// Missing the second \\u in surrogate pair
+	EXPECT_FALSE(TestString("[\"\\uD800\\uFFFF\"]"));	// The second \\u in surrogate pair is invalid
+	EXPECT_FALSE(TestString("[\"Test]"));				// lacks ending quotation before the end of string
+
+	// http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
+
+	// 3  Malformed sequences 
+
+	// 3.1 Unexpected continuation bytes
+	{
+		 char e[] = { '[', '\"', 0, '\"', ']', '\0' };
+		 for (unsigned char c = 0x80u; c <= 0xBFu; c++) {
+			e[2] = c;
+			bool b;
+			EXPECT_FALSE(b = TestString(e));
+			if (b)
+				std::cout << (unsigned)(unsigned char)c << std::endl;
+		 }
+	}
+
+	// 3.2 Lonely start characters, 3.5 Impossible bytes
+	{
+		char e[] = { '[', '\"', 0, ' ', '\"', ']', '\0' };
+		for (unsigned c = 0xC0u; c <= 0xFFu; c++) {
+			e[2] = (char)c;
+			EXPECT_FALSE(TestString(e));
+		}
+	}
+
+	// 4  Overlong sequences 
+
+	// 4.1  Examples of an overlong ASCII character
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xC0u, 0xAFu, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xE0u, 0x80u, 0xAFu, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0xAFu, '\"', ']', '\0'));
+
+	// 4.2  Maximum overlong sequences 
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xC1u, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xE0u, 0x9Fu, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xF0u, 0x8Fu, 0xBFu, 0xBFu, '\"', ']', '\0'));
+
+	// 4.3  Overlong representation of the NUL character 
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xC0u, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xE0u, 0x80u, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0x80u, '\"', ']', '\0'));
+
+	// 5  Illegal code positions
+
+	// 5.1 Single UTF-16 surrogates
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xEDu, 0xA0u, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xEDu, 0xADu, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xEDu, 0xAEu, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xEDu, 0xAFu, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xEDu, 0xB0u, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xEDu, 0xBEu, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xEDu, 0xBFu, 0xBFu, '\"', ']', '\0'));
 
 #undef ARRAY
 #undef TEST_STRINGARRAY_ERROR
-#undef TEST_STRING_ERROR
 }
 
 template <unsigned count>
