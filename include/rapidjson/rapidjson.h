@@ -357,46 +357,41 @@ struct UTF8 {
 
 	template <typename InputStream, typename OutputStream>
 	RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
-		// http://bjoern.hoehrmann.de/utf-8/decoder/dfa/
-		static const unsigned char utf8d[] = {
-			//! \todo optimization
-			// The first part of the table maps bytes to character classes that
-			// to reduce the size of the transition table and create bitmasks.
+		// Referring to DFA of http://bjoern.hoehrmann.de/utf-8/decoder/dfa/
+		// With new mapping 1 -> 0x10, 7 -> 0x20, 9 -> 0x40, such that AND operation can test multiple types.
+		static const unsigned char type[] = {
 			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
-			7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,  7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+			0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,0x10,
+			0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40,
+			0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,
+			0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,
 			8,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
 			10,3,3,3,3,3,3,3,3,3,3,3,3,4,3,3, 11,6,6,6,5,8,8,8,8,8,8,8,8,8,8,8,
-
-			// The second part is a transition table that maps a combination
-			// of a state of the automaton and a character class to a state.
-			0,12,24,36,60,96,84,12,12,12,48,72, 12,12,12,12,12,12,12,12,12,12,12,12,
-			12, 0,12,12,12,12,12, 0,12, 0,12,12, 12,24,12,12,12,12,12,24,12,24,12,12,
-			12,12,12,12,12,12,12,24,12,12,12,12, 12,24,12,12,12,12,12,12,12,24,12,12,
-			12,12,12,12,12,12,12,36,12,36,12,12, 12,36,12,12,12,12,12,36,12,36,12,12,
-			12,36,12,12,12,12,12,12,12,12,12,12, 
 		};
+#define COPY() os.Put(c = is.Take())
+#define TRANS(mask) if (!(type[(unsigned char)c] & mask)) return false
+#define TAIL() COPY(); TRANS(0x70)
 		Ch c;
-		os.Put(c = is.Take());
-		if ((unsigned char) c < 0x80)
+		COPY();
+		if (!(c & 0x80))
 			return true;
 
-		unsigned type = utf8d[(unsigned char)c];
-		unsigned state = utf8d[256 + type];
-		if (state == 12)
-			return false;
-
-		while (state) {
-			os.Put(c = is.Take());
-			unsigned type = utf8d[(unsigned char)c];
-			state = utf8d[256 + state + type];
-			if (state == 12)
-				return false;
-		};
-		return true;
+		switch (type[(unsigned char)c]) {
+		case 2:	TAIL(); return true;
+		case 3:	TAIL(); TAIL(); return true;
+		case 4:	COPY(); TRANS(0x50); TAIL(); return true;
+		case 5:	COPY(); TRANS(0x10); COPY(); TAIL(); return true;
+		case 6: TAIL(); TAIL(); TAIL(); return true;
+		case 10: COPY(); TRANS(0x20); TAIL(); return true;
+		case 11: COPY(); TRANS(0x60); TAIL(); return true;
+		default: return false;
+		}
+#undef COPY
+#undef TRANS
+#undef TAIL
 	}
 };
 

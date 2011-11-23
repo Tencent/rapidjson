@@ -31,7 +31,7 @@ struct GenericStringBuffer {
 		return stack_.template Bottom<Ch>();
 	}
 
-	size_t Size() const { return stack_.Size(); }
+	size_t GetSize() const { return stack_.GetSize(); }
 
 	static const size_t kDefaultCapacity = 256;
 	mutable internal::Stack<Allocator> stack_;

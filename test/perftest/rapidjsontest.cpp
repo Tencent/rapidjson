@@ -232,6 +232,18 @@ TEST_F(RapidJson, SIMD_SUFFIX(Whitespace)) {
 	}		
 }
 
+TEST_F(RapidJson, UTF8_Validate) {
+	StringBuffer os(0, length_ + 1);
+
+	for (int i = 0; i < kTrialCount; i++) {
+		StringStream is(json_);
+		os.Clear();
+		while (is.Peek() != '\0')
+			UTF8<>::Validate(is, os);
+		EXPECT_EQ(length_, os.GetSize());
+	}
+}
+
 // Depreciated.
 //TEST_F(RapidJson, FileStream_Read) {
 //	for (int i = 0; i < kTrialCount; i++) {
