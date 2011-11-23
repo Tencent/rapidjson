@@ -226,7 +226,7 @@ public:
 			switch (stream.Peek()) {
 				case '{': ParseObject<parseFlags>(stream, handler); break;
 				case '[': ParseArray<parseFlags>(stream, handler); break;
-				default: RAPIDJSON_PARSE_ERROR("Expect either an object or array at root", stream.Tell()); return false;
+				default: RAPIDJSON_PARSE_ERROR("Expect either an object or array at root", stream.Tell());
 			}
 			SkipWhitespace(stream);
 
@@ -257,18 +257,15 @@ private:
 		}
 
 		for (SizeType memberCount = 0;;) {
-			if (stream.Peek() != '"') {
+			if (stream.Peek() != '"')
 				RAPIDJSON_PARSE_ERROR("Name of an object member must be a string", stream.Tell());
-				break;
-			}
 
 			ParseString<parseFlags>(stream, handler);
 			SkipWhitespace(stream);
 
-			if (stream.Take() != ':') {
+			if (stream.Take() != ':')
 				RAPIDJSON_PARSE_ERROR("There must be a colon after the name of object member", stream.Tell());
-				break;
-			}
+
 			SkipWhitespace(stream);
 
 			ParseValue<parseFlags>(stream, handler);
@@ -359,10 +356,8 @@ private:
 				codepoint -= 'A' - 10;
 			else if (c >= 'a' && c <= 'f')
 				codepoint -= 'a' - 10;
-			else {
+			else
 				RAPIDJSON_PARSE_ERROR("Incorrect hex digit after \\u escape", s.Tell() - 1);
-				return 0;
-			}
 		}
 		stream = s; // Restore stream
 		return codepoint;
@@ -382,7 +377,7 @@ private:
 	template<unsigned parseFlags, typename Stream, typename Handler>
 	void ParseString(Stream& stream, Handler& handler) {
 #define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-		static const Ch escape[256] = {
+		static const char escape[256] = {
 			Z16, Z16, 0, 0,'\"', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,'/', 
 			Z16, Z16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,'\\', 0, 0, 0, 
 			0, 0,'\b', 0, 0, 0,'\f', 0, 0, 0, 0, 0, 0, 0,'\n', 0, 
@@ -394,22 +389,16 @@ private:
 		Stream s = stream;	// Use a local copy for optimization
 		RAPIDJSON_ASSERT(s.Peek() == '\"');
 		s.Take();	// Skip '\"'
+
+		// With kParseInsituFlag
 		Ch *head;
-		SizeType len;
 		if (parseFlags & kParseInsituFlag)
 			head = s.PutBegin();
-		else
-			len = 0;
 
+		// Without kParseInsituFlag
 		StackStream stackStream(stack_);
-#define RAPIDJSON_PUT(x) \
-	do { \
-		if (parseFlags & kParseInsituFlag) \
-			s.Put(x); \
-		else { \
-			stackStream.Put(x); \
-		} \
-	} while(false)
+
+#define RAPIDJSON_PUT(x) (parseFlags & kParseInsituFlag ? s.Put(x) : stackStream.Put(x))
 
 		for (;;) {
 			Ch c = s.Peek();
@@ -420,28 +409,23 @@ private:
 					RAPIDJSON_PUT(escape[(unsigned char)e]);
 				else if (e == 'u') {	// Unicode
 					unsigned codepoint = ParseHex4(s);
-					if (codepoint >= 0xD800 && codepoint <= 0xDBFF) { // Handle UTF-16 surrogate pair
-						if (s.Take() != '\\' || s.Take() != 'u') {
+					if (codepoint >= 0xD800 && codepoint <= 0xDBFF) {
+						// Handle UTF-16 surrogate pair
+						if (s.Take() != '\\' || s.Take() != 'u')
 							RAPIDJSON_PARSE_ERROR("Missing the second \\u in surrogate pair", s.Tell() - 2);
-							return;
-						}
 						unsigned codepoint2 = ParseHex4(s);
-						if (codepoint2 < 0xDC00 || codepoint2 > 0xDFFF) {
+						if (codepoint2 < 0xDC00 || codepoint2 > 0xDFFF)
 							RAPIDJSON_PARSE_ERROR("The second \\u in surrogate pair is invalid", s.Tell() - 2);
-							return;
-						}
 						codepoint = (((codepoint - 0xD800) << 10) | (codepoint2 - 0xDC00)) + 0x10000;
 					}
 
-					if (parseFlags & kParseInsituFlag) 
+					if (parseFlags & kParseInsituFlag)
 						Encoding::Encode(s, codepoint);
 					else
 						Encoding::Encode(stackStream, codepoint);
 				}
-				else {
+				else
 					RAPIDJSON_PARSE_ERROR("Unknown escape character", stream.Tell() - 1);
-					return;
-				}
 			}
 			else if (c == '"') {	// Closing double quote
 				s.Take();
@@ -458,32 +442,16 @@ private:
 				stream = s;	// restore stream
 				return;
 			}
-			else if (c == '\0') {
+			else if (c == '\0')
 				RAPIDJSON_PARSE_ERROR("lacks ending quotation before the end of string", stream.Tell() - 1);
-				return;
-			}
-			else if ((unsigned)c < 0x20) {	// RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
+			else if ((unsigned)c < 0x20) // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
 				RAPIDJSON_PARSE_ERROR("Incorrect unescaped character in string", stream.Tell() - 1);
-				return;
-			}
 			else if (parseFlags & kParseValidateEncodingFlag) {
-				if (parseFlags & kParseInsituFlag) {
-					if (!Encoding::Validate(s, s)) {
-						RAPIDJSON_PARSE_ERROR("Invalid encoding", s.Tell());
-						return;
-					}
-				}
-				else
-				{
-					if (!Encoding::Validate(s, stackStream)) {
-						RAPIDJSON_PARSE_ERROR("Invalid encoding", s.Tell());
-						return;
-					}
-				}
+				if ((parseFlags & kParseInsituFlag) ? !Encoding::Validate(s, s) : !Encoding::Validate(s, stackStream))
+					RAPIDJSON_PARSE_ERROR("Invalid encoding", s.Tell());
 			}
-			else {
+			else
 				RAPIDJSON_PUT(s.Take());	// Normal character, just copy
-			}
 		}
 #undef RAPIDJSON_PUT
 	}
@@ -529,10 +497,8 @@ private:
 					i = i * 10 + (s.Take() - '0');
 				}
 		}
-		else {
+		else
 			RAPIDJSON_PARSE_ERROR("Expect a value here.", stream.Tell());
-			return;
-		}
 
 		// Parse 64bit int
 		uint64_t i64;
@@ -564,10 +530,8 @@ private:
 		if (useDouble) {
 			d = (double)i64;
 			while (s.Peek() >= '0' && s.Peek() <= '9') {
-				if (d >= 1E307) {
+				if (d >= 1E307)
 					RAPIDJSON_PARSE_ERROR("Number too big to store in double", stream.Tell());
-					return;
-				}
 				d = d * 10 + (s.Take() - '0');
 			}
 		}
@@ -585,10 +549,8 @@ private:
 				d = d * 10 + (s.Take() - '0');
 				--expFrac;
 			}
-			else {
+			else
 				RAPIDJSON_PARSE_ERROR("At least one digit in fraction part", stream.Tell());
-				return;
-			}
 
 			while (s.Peek() >= '0' && s.Peek() <= '9') {
 				if (expFrac > -16) {
@@ -620,16 +582,12 @@ private:
 				exp = s.Take() - '0';
 				while (s.Peek() >= '0' && s.Peek() <= '9') {
 					exp = exp * 10 + (s.Take() - '0');
-					if (exp > 308) {
+					if (exp > 308)
 						RAPIDJSON_PARSE_ERROR("Number too big to store in double", stream.Tell());
-						return;
-					}
 				}
 			}
-			else {
+			else
 				RAPIDJSON_PARSE_ERROR("At least one digit in exponent", s.Tell());
-				return;
-			}
 
 			if (expMinus)
 				exp = -exp;
