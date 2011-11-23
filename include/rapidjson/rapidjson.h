@@ -303,11 +303,19 @@ private:
 concept Encoding {
 	typename Ch;	//! Type of character.
 
-	//! \brief Encode a Unicode codepoint to a buffer.
-	//! \param buffer pointer to destination buffer to store the result. It should have sufficient size of encoding one character.
+	//! \brief Encode a Unicode codepoint to a stream.
+	//! \param os Output stream.
 	//! \param codepoint An unicode codepoint, ranging from 0x0 to 0x10FFFF inclusively.
-	//! \returns the pointer to the next character after the encoded data.
-	static Ch* Encode(Ch *buffer, unsigned codepoint);
+	template<typename OutputStream>
+	static void Encode(OutputStream& os, unsigned codepoint) {
+
+	//! \brief Validate one Unicode codepoint from an encoded stream.
+	//! \param is Input stream to obtain codepoint.
+	//! \param os Output for copying one codepoint.
+	//! \return true if it is valid.
+	//! \note This function just validating and copying the codepoint without actually decode it.
+	template <typename InputStream, typename OutputStream>
+	RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
 };
 \endcode
 */
@@ -317,6 +325,7 @@ concept Encoding {
 
 //! UTF-8 encoding.
 /*! http://en.wikipedia.org/wiki/UTF-8
+	http://tools.ietf.org/html/rfc3629
 	\tparam CharType Type for storing 8-bit UTF-8 data. Default is char.
 	\implements Encoding
 */
@@ -324,67 +333,70 @@ template<typename CharType = char>
 struct UTF8 {
 	typedef CharType Ch;
 
-	static Ch* Encode(Ch *buffer, unsigned codepoint) {
+	template<typename OutputStream>
+	static void Encode(OutputStream& os, unsigned codepoint) {
 		if (codepoint <= 0x7F) 
-			*buffer++ = codepoint & 0xFF;
+			os.Put(codepoint & 0xFF);
 		else if (codepoint <= 0x7FF) {
-			*buffer++ = 0xC0 | ((codepoint >> 6) & 0xFF);
-			*buffer++ = 0x80 | ((codepoint & 0x3F));
+			os.Put(0xC0 | ((codepoint >> 6) & 0xFF));
+			os.Put(0x80 | ((codepoint & 0x3F)));
 		}
 		else if (codepoint <= 0xFFFF) {
-			*buffer++ = 0xE0 | ((codepoint >> 12) & 0xFF);
-			*buffer++ = 0x80 | ((codepoint >> 6) & 0x3F);
-			*buffer++ = 0x80 | (codepoint & 0x3F);
+			os.Put(0xE0 | ((codepoint >> 12) & 0xFF));
+			os.Put(0x80 | ((codepoint >> 6) & 0x3F));
+			os.Put(0x80 | (codepoint & 0x3F));
 		}
 		else {
 			RAPIDJSON_ASSERT(codepoint <= 0x10FFFF);
-			*buffer++ = 0xF0 | ((codepoint >> 18) & 0xFF);
-			*buffer++ = 0x80 | ((codepoint >> 12) & 0x3F);
-			*buffer++ = 0x80 | ((codepoint >> 6) & 0x3F);
-			*buffer++ = 0x80 | (codepoint & 0x3F);
+			os.Put(0xF0 | ((codepoint >> 18) & 0xFF));
+			os.Put(0x80 | ((codepoint >> 12) & 0x3F));
+			os.Put(0x80 | ((codepoint >> 6) & 0x3F));
+			os.Put(0x80 | (codepoint & 0x3F));
 		}
-		return buffer;
 	}
 
-	template <typename Stream>
-	RAPIDJSON_FORCEINLINE static Ch* Validate(Ch *buffer, Stream& s) {
-#define X1 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-#define X5 5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5
-		static const char utf8[256] = {
-			X1,X1,X1,X1,X1,X1,X1,X1,			// 00-7F 1 byte
-			X5,X5,X5,X5,						// 80-BF Continuation
-			0,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,	// C0-C1: invalid, C2-CF: 2 bytes
-			2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,	// D0-DF: 2 bytes
-			3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,	// E0-EF: 3 bytes
-			4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,	// F0-F4: 4 bytes
+	template <typename InputStream, typename OutputStream>
+	RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
+		// http://bjoern.hoehrmann.de/utf-8/decoder/dfa/
+		static const unsigned char utf8d[] = {
+			//! \todo optimization
+			// The first part of the table maps bytes to character classes that
+			// to reduce the size of the transition table and create bitmasks.
+			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+			1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+			7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,  7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+			8,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+			10,3,3,3,3,3,3,3,3,3,3,3,3,4,3,3, 11,6,6,6,5,8,8,8,8,8,8,8,8,8,8,8,
+
+			// The second part is a transition table that maps a combination
+			// of a state of the automaton and a character class to a state.
+			0,12,24,36,60,96,84,12,12,12,48,72, 12,12,12,12,12,12,12,12,12,12,12,12,
+			12, 0,12,12,12,12,12, 0,12, 0,12,12, 12,24,12,12,12,12,12,24,12,24,12,12,
+			12,12,12,12,12,12,12,24,12,12,12,12, 12,24,12,12,12,12,12,12,12,24,12,12,
+			12,12,12,12,12,12,12,36,12,36,12,12, 12,36,12,12,12,12,12,36,12,36,12,12,
+			12,36,12,12,12,12,12,12,12,12,12,12, 
 		};
-#undef X1
-#undef X5
+		Ch c;
+		os.Put(c = is.Take());
+		if ((unsigned char) c <= 0x80)
+			return true;
 
-#define TAIL() c = *buffer++ = s.Take(); if ((c & 0xC0) != 0x80) return NULL;
+		unsigned type = utf8d[(unsigned char)c];
+		unsigned state = utf8d[256 + type];
+		if (state == 12)
+			return false;
 
-		Ch c = *buffer++ = s.Take();
-		if ((unsigned char)c < 0x80u)
-			return buffer;
-
-		switch(utf8[(unsigned char)c]) {
-		case 2:
-			TAIL();
-			return buffer;
-
-		case 3:
-			TAIL();
-			TAIL();
-			return buffer;
-
-		case 4:
-			TAIL();
-			TAIL();
-			TAIL();
-			return buffer;
-		}
-		return NULL;
-#undef TAIL
+		while (state) {
+			os.Put(c = is.Take());
+			unsigned type = utf8d[(unsigned char)c];
+			state = utf8d[256 + state + type];
+			if (state == 12)
+				return false;
+		};
+		return true;
 	}
 };
 
@@ -393,6 +405,7 @@ struct UTF8 {
 
 //! UTF-16 encoding.
 /*! http://en.wikipedia.org/wiki/UTF-16
+	http://tools.ietf.org/html/rfc2781
 	\tparam CharType Type for storing 16-bit UTF-16 data. Default is wchar_t. C++11 may use char16_t instead.
 	\implements Encoding
 */
@@ -400,33 +413,32 @@ template<typename CharType = wchar_t>
 struct UTF16 {
 	typedef CharType Ch;
 
-	static Ch* Encode(Ch* buffer, unsigned codepoint) {
+	template<typename OutputStream>
+	static void Encode(OutputStream& os, unsigned codepoint) {
 		if (codepoint <= 0xFFFF) {
 			RAPIDJSON_ASSERT(codepoint < 0xD800 || codepoint > 0xDFFF); // Code point itself cannot be surrogate pair 
-			*buffer++ = codepoint;
+			os.Put(codepoint);
 		}
 		else {
 			RAPIDJSON_ASSERT(codepoint <= 0x10FFFF);
 			unsigned v = codepoint - 0x10000;
-			*buffer++ = (v >> 10) + 0xD800;
-			*buffer++ = (v & 0x3FF) + 0xDC00;
+			os.Put((v >> 10) + 0xD800);
+			os.Put((v & 0x3FF) + 0xDC00);
 		}
-		return buffer;
 	}
 
-	template <typename Stream>
-	static Ch* Validate(Ch *buffer, Stream& s) {
-		Ch c = *buffer++ = s.Take();
+	template <typename InputStream, typename OutputStream>
+	RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
+		Ch c;
+		os.Put(c = is.Take());
 		if (c < 0xD800 || c > 0xDFFF)
-			;
+			return true;
 		else if (c < 0xDBFF) {
-			Ch c = *buffer++ = s.Take();
-			if (c < 0xDC00 || c > 0xDFFF)
-				return NULL;
+			os.Put(c = is.Take());
+			return c >= 0xDC00 && c <= 0xDFFF;
 		}
 		else
-			return NULL;
-		return buffer;
+			return false;
 	}
 };
 
@@ -442,16 +454,17 @@ template<typename CharType = unsigned>
 struct UTF32 {
 	typedef CharType Ch;
 
-	static Ch *Encode(Ch* buffer, unsigned codepoint) {
+	template<typename OutputStream>
+	static void Encode(OutputStream& os, unsigned codepoint) {
 		RAPIDJSON_ASSERT(codepoint <= 0x10FFFF);
-		*buffer++ = codepoint;
-		return buffer;
+		os.Put(codepoint);
 	}
 
-	template <typename Stream>
-	static Ch* Validate(Ch *buffer, Stream& s) {
-		Ch c = *buffer++ = s.Take();
-		return c <= 0x10FFFF ? buffer : 0;
+	template <typename InputStream, typename OutputStream>
+	RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
+		Ch c;
+		os.Put(c = is.Take());
+		return c <= 0x10FFFF;
 	}
 };
 

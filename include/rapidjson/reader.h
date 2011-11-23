@@ -368,6 +368,16 @@ private:
 		return codepoint;
 	}
 
+	struct StackStream {
+		StackStream(internal::Stack<Allocator>& stack) : stack_(stack), length_(0) {}
+		void Put(Ch c) {
+			*stack_.template Push<Ch>() = c;
+			++length_;
+		}
+		internal::Stack<Allocator>& stack_;
+		SizeType length_;
+	};
+
 	// Parse string, handling the prefix and suffix double quotes and escaping.
 	template<unsigned parseFlags, typename Stream, typename Handler>
 	void ParseString(Stream& stream, Handler& handler) {
@@ -391,13 +401,13 @@ private:
 		else
 			len = 0;
 
+		StackStream stackStream(stack_);
 #define RAPIDJSON_PUT(x) \
 	do { \
 		if (parseFlags & kParseInsituFlag) \
 			s.Put(x); \
 		else { \
-			*stack_.template Push<Ch>() = x; \
-			++len; \
+			stackStream.Put(x); \
 		} \
 	} while(false)
 
@@ -423,16 +433,10 @@ private:
 						codepoint = (((codepoint - 0xD800) << 10) | (codepoint2 - 0xDC00)) + 0x10000;
 					}
 
-					Ch buffer[4];
-					SizeType count = SizeType(Encoding::Encode(buffer, codepoint) - &buffer[0]);
-
 					if (parseFlags & kParseInsituFlag) 
-						for (SizeType i = 0; i < count; i++)
-							s.Put(buffer[i]);
-					else {
-						memcpy(stack_.template Push<Ch>(count), buffer, count * sizeof(Ch));
-						len += count;
-					}
+						Encoding::Encode(s, codepoint);
+					else
+						Encoding::Encode(stackStream, codepoint);
 				}
 				else {
 					RAPIDJSON_PARSE_ERROR("Unknown escape character", stream.Tell() - 1);
@@ -449,7 +453,7 @@ private:
 				}
 				else {
 					RAPIDJSON_PUT('\0');
-					handler.String(stack_.template Pop<Ch>(len), len - 1, true);
+					handler.String(stack_.template Pop<Ch>(stackStream.length_), stackStream.length_ - 1, true);
 				}
 				stream = s;	// restore stream
 				return;
@@ -463,24 +467,19 @@ private:
 				return;
 			}
 			else if (parseFlags & kParseValidateEncodingFlag) {
-				Ch buffer[4];
-				Ch* end = Encoding::Validate(&buffer[0], s);
-				if (end == NULL) {
-					RAPIDJSON_PARSE_ERROR("Invalid encoding", s.Tell());
-					return;
+				if (parseFlags & kParseInsituFlag) {
+					if (!Encoding::Validate(s, s)) {
+						RAPIDJSON_PARSE_ERROR("Invalid encoding", s.Tell());
+						return;
+					}
 				}
-
-				if (parseFlags & kParseInsituFlag)
-					for (Ch* p = &buffer[0]; p != end; ++p)
-						s.Put(*p);
-				else {
-					SizeType l = SizeType(end - &buffer[0]);
-					Ch* q = stack_.template Push<Ch>(l);
-					for (Ch* p = &buffer[0]; p != end; ++p)
-						*q++ = *p;
-					len += l;
+				else
+				{
+					if (!Encoding::Validate(s, stackStream)) {
+						RAPIDJSON_PARSE_ERROR("Invalid encoding", s.Tell());
+						return;
+					}
 				}
-
 			}
 			else {
 				RAPIDJSON_PUT(s.Take());	// Normal character, just copy
