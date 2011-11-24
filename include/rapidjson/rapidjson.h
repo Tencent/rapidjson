@@ -372,21 +372,22 @@ struct UTF8 {
 			10,3,3,3,3,3,3,3,3,3,3,3,3,4,3,3, 11,6,6,6,5,8,8,8,8,8,8,8,8,8,8,8,
 		};
 #define COPY() os.Put(c = is.Take())
-#define TRANS(mask) if (!(type[(unsigned char)c] & mask)) return false
+#define TRANS(mask) result &= ((type[(unsigned char)c] & mask) != 0)
 #define TAIL() COPY(); TRANS(0x70)
 		Ch c;
 		COPY();
 		if (!(c & 0x80))
 			return true;
 
+		bool result = true;
 		switch (type[(unsigned char)c]) {
-		case 2:	TAIL(); return true;
-		case 3:	TAIL(); TAIL(); return true;
-		case 4:	COPY(); TRANS(0x50); TAIL(); return true;
-		case 5:	COPY(); TRANS(0x10); COPY(); TAIL(); return true;
-		case 6: TAIL(); TAIL(); TAIL(); return true;
-		case 10: COPY(); TRANS(0x20); TAIL(); return true;
-		case 11: COPY(); TRANS(0x60); TAIL(); return true;
+		case 2:	TAIL(); return result;
+		case 3:	TAIL(); TAIL(); return result;
+		case 4:	COPY(); TRANS(0x50); TAIL(); return result;
+		case 5:	COPY(); TRANS(0x10); COPY(); TAIL(); return result;
+		case 6: TAIL(); TAIL(); TAIL(); return result;
+		case 10: COPY(); TRANS(0x20); TAIL(); return result;
+		case 11: COPY(); TRANS(0x60); TAIL(); return result;
 		default: return false;
 		}
 #undef COPY
