@@ -233,14 +233,14 @@ TEST_F(RapidJson, SIMD_SUFFIX(Whitespace)) {
 }
 
 TEST_F(RapidJson, UTF8_Validate) {
-	StringBuffer os(0, length_ + 1);
+	NullStream os;
 
 	for (int i = 0; i < kTrialCount; i++) {
 		StringStream is(json_);
-		os.Clear();
+		bool result = true;
 		while (is.Peek() != '\0')
-			UTF8<>::Validate(is, os);
-		EXPECT_EQ(length_, os.GetSize());
+			result &= UTF8<>::Validate(is, os);
+		EXPECT_TRUE(result);
 	}
 }
 

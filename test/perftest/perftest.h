@@ -6,6 +6,7 @@
 #define TEST_YAJL		0
 #define TEST_ULTRAJSON  0
 #define TEST_PLATFORM   0
+#define TEST_MISC		1
 
 #if TEST_RAPIDJSON
 //#define RAPIDJSON_SSE2
