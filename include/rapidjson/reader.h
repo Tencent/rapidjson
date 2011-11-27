@@ -373,9 +373,29 @@ private:
 		SizeType length_;
 	};
 
-	// Parse string, handling the prefix and suffix double quotes and escaping.
+	// Parse string and generate String event. Different code paths for kParseInsituFlag.
 	template<unsigned parseFlags, typename Stream, typename Handler>
 	void ParseString(Stream& stream, Handler& handler) {
+		Stream s = stream;	// Local copy for optimization
+		if (parseFlags & kParseInsituFlag) {
+			Ch *head = s.PutBegin();
+			ParseStringToStream<parseFlags>(s, s);
+			size_t length = s.PutEnd(head) - 1;
+			RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
+			handler.String(head, SizeType(length), false);
+		}
+		else {
+			StackStream stackStream(stack_);
+			ParseStringToStream<parseFlags>(s, stackStream);
+			handler.String(stack_.template Pop<Ch>(stackStream.length_), stackStream.length_ - 1, true);
+		}
+		stream = s;		// Restore stream
+	}
+
+	// Parse string to an output stream
+	// This function handles the prefix/suffix double quotes, escaping, and optional encoding validation.
+	template<unsigned parseFlags, typename InputStream, typename OutputStream>
+	RAPIDJSON_FORCEINLINE void ParseStringToStream(InputStream& input, OutputStream& output) {
 #define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 		static const char escape[256] = {
 			Z16, Z16, 0, 0,'\"', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,'/', 
@@ -386,74 +406,48 @@ private:
 		};
 #undef Z16
 
-		Stream s = stream;	// Use a local copy for optimization
-		RAPIDJSON_ASSERT(s.Peek() == '\"');
-		s.Take();	// Skip '\"'
-
-		// With kParseInsituFlag
-		Ch *head;
-		if (parseFlags & kParseInsituFlag)
-			head = s.PutBegin();
-
-		// Without kParseInsituFlag
-		StackStream stackStream(stack_);
-
-#define RAPIDJSON_PUT(x) (parseFlags & kParseInsituFlag ? s.Put(x) : stackStream.Put(x))
+		RAPIDJSON_ASSERT(input.Peek() == '\"');
+		input.Take();	// Skip '\"'
 
 		for (;;) {
-			Ch c = s.Peek();
+			Ch c = input.Peek();
 			if (c == '\\') {	// Escape
-				s.Take();
-				Ch e = s.Take();
+				input.Take();
+				Ch e = input.Take();
 				if ((sizeof(Ch) == 1 || e < 256) && escape[(unsigned char)e])
-					RAPIDJSON_PUT(escape[(unsigned char)e]);
+					output.Put(escape[(unsigned char)e]);
 				else if (e == 'u') {	// Unicode
-					unsigned codepoint = ParseHex4(s);
+					unsigned codepoint = ParseHex4(input);
 					if (codepoint >= 0xD800 && codepoint <= 0xDBFF) {
 						// Handle UTF-16 surrogate pair
-						if (s.Take() != '\\' || s.Take() != 'u')
-							RAPIDJSON_PARSE_ERROR("Missing the second \\u in surrogate pair", s.Tell() - 2);
-						unsigned codepoint2 = ParseHex4(s);
+						if (input.Take() != '\\' || input.Take() != 'u')
+							RAPIDJSON_PARSE_ERROR("Missing the second \\u in surrogate pair", input.Tell() - 2);
+						unsigned codepoint2 = ParseHex4(input);
 						if (codepoint2 < 0xDC00 || codepoint2 > 0xDFFF)
-							RAPIDJSON_PARSE_ERROR("The second \\u in surrogate pair is invalid", s.Tell() - 2);
+							RAPIDJSON_PARSE_ERROR("The second \\u in surrogate pair is invalid", input.Tell() - 2);
 						codepoint = (((codepoint - 0xD800) << 10) | (codepoint2 - 0xDC00)) + 0x10000;
 					}
-
-					if (parseFlags & kParseInsituFlag)
-						Encoding::Encode(s, codepoint);
-					else
-						Encoding::Encode(stackStream, codepoint);
+					Encoding::Encode(output, codepoint);
 				}
 				else
-					RAPIDJSON_PARSE_ERROR("Unknown escape character", stream.Tell() - 1);
+					RAPIDJSON_PARSE_ERROR("Unknown escape character", input.Tell() - 1);
 			}
 			else if (c == '"') {	// Closing double quote
-				s.Take();
-				if (parseFlags & kParseInsituFlag) {
-					size_t length = s.PutEnd(head);
-					RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
-					RAPIDJSON_PUT('\0');	// null-terminate the string
-					handler.String(head, SizeType(length), false);
-				}
-				else {
-					RAPIDJSON_PUT('\0');
-					handler.String(stack_.template Pop<Ch>(stackStream.length_), stackStream.length_ - 1, true);
-				}
-				stream = s;	// restore stream
+				input.Take();
+				output.Put('\0');	// null-terminate the string
 				return;
 			}
 			else if (c == '\0')
-				RAPIDJSON_PARSE_ERROR("lacks ending quotation before the end of string", stream.Tell() - 1);
+				RAPIDJSON_PARSE_ERROR("lacks ending quotation before the end of string", input.Tell() - 1);
 			else if ((unsigned)c < 0x20) // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
-				RAPIDJSON_PARSE_ERROR("Incorrect unescaped character in string", stream.Tell() - 1);
+				RAPIDJSON_PARSE_ERROR("Incorrect unescaped character in string", input.Tell() - 1);
 			else if (parseFlags & kParseValidateEncodingFlag) {
-				if ((parseFlags & kParseInsituFlag) ? !Encoding::Validate(s, s) : !Encoding::Validate(s, stackStream))
-					RAPIDJSON_PARSE_ERROR("Invalid encoding", s.Tell());
+				if (!Encoding::Validate(input, output))
+					RAPIDJSON_PARSE_ERROR("Invalid encoding", input.Tell());
 			}
 			else
-				RAPIDJSON_PUT(s.Take());	// Normal character, just copy
+				output.Put(input.Take());	// Normal character, just copy
 		}
-#undef RAPIDJSON_PUT
 	}
 
 	template<unsigned parseFlags, typename Stream, typename Handler>
