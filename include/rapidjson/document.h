@@ -697,11 +697,11 @@ public:
 		\param stream Input stream to be parsed.
 		\return The document itself for fluent API.
 	*/
-	template <unsigned parseFlags, typename Stream>
-	GenericDocument& ParseStream(Stream& stream) {
+	template <unsigned parseFlags, typename SourceEncoding, typename InputStream>
+	GenericDocument& ParseStream(InputStream& is) {
 		ValueType::SetNull(); // Remove existing root if exist
-		GenericReader<Encoding> reader;
-		if (reader.Parse<parseFlags>(stream, *this)) {
+		GenericReader<SourceEncoding, Encoding> reader;
+		if (reader.Parse<parseFlags>(is, *this)) {
 			RAPIDJSON_ASSERT(stack_.GetSize() == sizeof(ValueType)); // Got one and only one root object
 			RawAssign(*stack_.template Pop<ValueType>(1));
 			parseError_ = 0;
@@ -720,21 +720,31 @@ public:
 		\param str Mutable zero-terminated string to be parsed.
 		\return The document itself for fluent API.
 	*/
-	template <unsigned parseFlags>
+	template <unsigned parseFlags, typename SourceEncoding>
 	GenericDocument& ParseInsitu(Ch* str) {
 		GenericInsituStringStream<Encoding> s(str);
-		return ParseStream<parseFlags | kParseInsituFlag>(s);
+		return ParseStream<parseFlags | kParseInsituFlag, SourceEncoding>(s);
+	}
+
+	template <unsigned parseFlags>
+	GenericDocument& ParseInsitu(Ch* str) {
+		return ParseInsitu<parseFlags, Encoding>(str);
 	}
 
 	//! Parse JSON text from a read-only string.
 	/*! \tparam parseFlags Combination of ParseFlag (must not contain kParseInsituFlag).
 		\param str Read-only zero-terminated string to be parsed.
 	*/
-	template <unsigned parseFlags>
+	template <unsigned parseFlags, typename SourceEncoding>
 	GenericDocument& Parse(const Ch* str) {
 		RAPIDJSON_ASSERT(!(parseFlags & kParseInsituFlag));
-		GenericStringStream<Encoding> s(str);
-		return ParseStream<parseFlags>(s);
+		GenericStringStream<SourceEncoding> s(str);
+		return ParseStream<parseFlags, SourceEncoding>(s);
+	}
+
+	template <unsigned parseFlags>
+	GenericDocument& Parse(const Ch* str) {
+		return Parse<parseFlags, Encoding>(str);
 	}
 
 	//! Whether a parse error was occured in the last parsing.
@@ -752,8 +762,8 @@ public:
 	//! Get the capacity of stack in bytes.
 	size_t GetStackCapacity() const { return stack_.GetCapacity(); }
 
-private:
-	friend class GenericReader<Encoding>;	// for Reader to call the following private handler functions
+//private:
+	//friend class GenericReader<Encoding>;	// for Reader to call the following private handler functions
 
 	// Implementation of Handler
 	void Null()	{ new (stack_.template Push<ValueType>()) ValueType(); }
@@ -785,6 +795,7 @@ private:
 		stack_.template Top<ValueType>()->SetArrayRaw(elements, elementCount, GetAllocator());
 	}
 
+private:
 	void ClearStack() {
 		if (Allocator::kNeedFree)
 			while (stack_.GetSize() > 0)	// Here assumes all elements in stack array are GenericValue (Member is actually 2 GenericValue objects)

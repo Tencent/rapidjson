@@ -189,10 +189,10 @@ template<> inline void SkipWhitespace(StringStream& stream) {
     \tparam Encoding Encoding of both the stream and the parse output.
     \tparam Allocator Allocator type for stack.
 */
-template <typename Encoding, typename Allocator = MemoryPoolAllocator<> >
+template <typename SourceEncoding, typename TargetEncoding, typename Allocator = MemoryPoolAllocator<> >
 class GenericReader {
 public:
-	typedef typename Encoding::Ch Ch;
+	typedef typename SourceEncoding::Ch Ch;
 
 	//! Constructor.
 	/*! \param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
@@ -365,8 +365,8 @@ private:
 
 	struct StackStream {
 		StackStream(internal::Stack<Allocator>& stack) : stack_(stack), length_(0) {}
-		void Put(Ch c) {
-			*stack_.template Push<Ch>() = c;
+		void Put(typename TargetEncoding::Ch c) {
+			*stack_.template Push<typename TargetEncoding::Ch>() = c;
 			++length_;
 		}
 		internal::Stack<Allocator>& stack_;
@@ -382,12 +382,12 @@ private:
 			ParseStringToStream<parseFlags>(s, s);
 			size_t length = s.PutEnd(head) - 1;
 			RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
-			handler.String(head, SizeType(length), false);
+			handler.String((typename TargetEncoding::Ch*)head, SizeType(length), false);
 		}
 		else {
 			StackStream stackStream(stack_);
 			ParseStringToStream<parseFlags>(s, stackStream);
-			handler.String(stack_.template Pop<Ch>(stackStream.length_), stackStream.length_ - 1, true);
+			handler.String(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, true);
 		}
 		stream = s;		// Restore stream
 	}
@@ -427,7 +427,7 @@ private:
 							RAPIDJSON_PARSE_ERROR("The second \\u in surrogate pair is invalid", input.Tell() - 2);
 						codepoint = (((codepoint - 0xD800) << 10) | (codepoint2 - 0xDC00)) + 0x10000;
 					}
-					Encoding::Encode(output, codepoint);
+					TargetEncoding::Encode(output, codepoint);
 				}
 				else
 					RAPIDJSON_PARSE_ERROR("Unknown escape character", input.Tell() - 1);
@@ -441,12 +441,12 @@ private:
 				RAPIDJSON_PARSE_ERROR("lacks ending quotation before the end of string", input.Tell() - 1);
 			else if ((unsigned)c < 0x20) // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
 				RAPIDJSON_PARSE_ERROR("Incorrect unescaped character in string", input.Tell() - 1);
-			else if (parseFlags & kParseValidateEncodingFlag) {
-				if (!Encoding::Validate(input, output))
+			else {
+				if (parseFlags & kParseValidateEncodingFlag ? 
+					!Transcoder<SourceEncoding, TargetEncoding>::Validate(input, output) : 
+					!Transcoder<SourceEncoding, TargetEncoding>::Transcode(input, output))
 					RAPIDJSON_PARSE_ERROR("Invalid encoding", input.Tell());
 			}
-			else
-				output.Put(input.Take());	// Normal character, just copy
 		}
 	}
 
@@ -632,7 +632,7 @@ private:
 }; // class GenericReader
 
 //! Reader with UTF8 encoding and default allocator.
-typedef GenericReader<UTF8<> > Reader;
+typedef GenericReader<UTF8<>, UTF8<> > Reader;
 
 } // namespace rapidjson
 

@@ -203,14 +203,14 @@ TEST(Reader, ParseString) {
 		Encoding::Ch* buffer = StrDup(x); \
 		GenericInsituStringStream<Encoding> is(buffer); \
 		ParseStringHandler<Encoding> h; \
-		GenericReader<Encoding> reader; \
+		GenericReader<Encoding, Encoding> reader; \
 		reader.ParseString<kParseInsituFlag | kParseValidateEncodingFlag>(is, h); \
 		EXPECT_EQ(0, StrCmp<Encoding::Ch>(e, h.str_)); \
 		EXPECT_EQ(StrLen(e), h.length_); \
 		free(buffer); \
 		GenericStringStream<Encoding> s(x); \
 		ParseStringHandler<Encoding> h2; \
-		GenericReader<Encoding> reader2; \
+		GenericReader<Encoding, Encoding> reader2; \
 		reader2.ParseString<0>(s, h2); \
 		EXPECT_EQ(0, StrCmp<Encoding::Ch>(e, h2.str_)); \
 		EXPECT_EQ(StrLen(e), h2.length_); \
@@ -275,6 +275,17 @@ TEST(Reader, ParseString) {
 		EXPECT_EQ(0, memcmp(e, h.str_, h.length_ + 1));
 		EXPECT_EQ(11, h.length_);
 	}
+}
+
+TEST(Reader, ParseString_Transcoding) {
+	const char* x = "\"Hello\"";
+	const wchar_t* e = L"Hello";
+	GenericStringStream<UTF8<> > is(x);
+	GenericReader<UTF8<>, UTF16<> > reader;
+	ParseStringHandler<UTF16<> > h;
+	reader.ParseString<0>(is, h);
+	EXPECT_EQ(0, StrCmp<UTF16<>::Ch>(e, h.str_));
+	EXPECT_EQ(StrLen(e), h.length_);
 }
 
 TEST(Reader, ParseString_NonDestructive) {
@@ -403,7 +414,7 @@ TEST(Reader, ParseArray_Error) {
 		strncpy(buffer, str, 1000); \
 		InsituStringStream s(buffer); \
 		BaseReaderHandler<> h; \
-		GenericReader<UTF8<>, CrtAllocator> reader; \
+		GenericReader<UTF8<>, UTF8<>, CrtAllocator> reader; \
 		EXPECT_FALSE(reader.Parse<0>(s, h)); \
 	}
 
@@ -507,7 +518,7 @@ TEST(Reader, ParseObject_Error) {
 		strncpy(buffer, str, 1000); \
 		InsituStringStream s(buffer); \
 		BaseReaderHandler<> h; \
-		GenericReader<UTF8<>, CrtAllocator> reader; \
+		GenericReader<UTF8<>, UTF8<>, CrtAllocator> reader; \
 		EXPECT_FALSE(reader.Parse<0>(s, h)); \
 	}
 

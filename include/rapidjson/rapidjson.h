@@ -355,8 +355,62 @@ struct UTF8 {
 		}
 	}
 
+	template <typename InputStream>
+	static bool Decode(InputStream& is, unsigned* codepoint) {
+#define COPY() c = is.Take(); *codepoint = (*codepoint << 6) | ((unsigned char)c & 0x3Fu)
+#define TRANS(mask) result &= ((GetType(c) & mask) != 0)
+#define TAIL() COPY(); TRANS(0x70)
+		Ch c = is.Take();
+		if (!(c & 0x80)) {
+			*codepoint = (unsigned char)c;
+			return true;
+		}
+
+		unsigned char type = GetType(c);
+		*codepoint = (0xFF >> type) & (unsigned char)c;
+		bool result = true;
+		switch (type) {
+		case 2:	TAIL(); return result;
+		case 3:	TAIL(); TAIL(); return result;
+		case 4:	COPY(); TRANS(0x50); TAIL(); return result;
+		case 5:	COPY(); TRANS(0x10); COPY(); TAIL(); return result;
+		case 6: TAIL(); TAIL(); TAIL(); return result;
+		case 10: COPY(); TRANS(0x20); TAIL(); return result;
+		case 11: COPY(); TRANS(0x60); TAIL(); return result;
+		default: return false;
+		}
+#undef COPY
+#undef TRANS
+#undef TAIL
+	}
+
 	template <typename InputStream, typename OutputStream>
 	RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
+#define COPY() os.Put(c = is.Take())
+#define TRANS(mask) result &= ((GetType(c) & mask) != 0)
+#define TAIL() COPY(); TRANS(0x70)
+		Ch c;
+		COPY();
+		if (!(c & 0x80))
+			return true;
+
+		bool result = true;
+		switch (GetType(c)) {
+		case 2:	TAIL(); return result;
+		case 3:	TAIL(); TAIL(); return result;
+		case 4:	COPY(); TRANS(0x50); TAIL(); return result;
+		case 5:	COPY(); TRANS(0x10); COPY(); TAIL(); return result;
+		case 6: TAIL(); TAIL(); TAIL(); return result;
+		case 10: COPY(); TRANS(0x20); TAIL(); return result;
+		case 11: COPY(); TRANS(0x60); TAIL(); return result;
+		default: return false;
+		}
+#undef COPY
+#undef TRANS
+#undef TAIL
+	}
+
+	RAPIDJSON_FORCEINLINE static unsigned char GetType(unsigned char c) {
 		// Referring to DFA of http://bjoern.hoehrmann.de/utf-8/decoder/dfa/
 		// With new mapping 1 -> 0x10, 7 -> 0x20, 9 -> 0x40, such that AND operation can test multiple types.
 		static const unsigned char type[] = {
@@ -371,28 +425,7 @@ struct UTF8 {
 			8,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
 			10,3,3,3,3,3,3,3,3,3,3,3,3,4,3,3, 11,6,6,6,5,8,8,8,8,8,8,8,8,8,8,8,
 		};
-#define COPY() os.Put(c = is.Take())
-#define TRANS(mask) result &= ((type[(unsigned char)c] & mask) != 0)
-#define TAIL() COPY(); TRANS(0x70)
-		Ch c;
-		COPY();
-		if (!(c & 0x80))
-			return true;
-
-		bool result = true;
-		switch (type[(unsigned char)c]) {
-		case 2:	TAIL(); return result;
-		case 3:	TAIL(); TAIL(); return result;
-		case 4:	COPY(); TRANS(0x50); TAIL(); return result;
-		case 5:	COPY(); TRANS(0x10); COPY(); TAIL(); return result;
-		case 6: TAIL(); TAIL(); TAIL(); return result;
-		case 10: COPY(); TRANS(0x20); TAIL(); return result;
-		case 11: COPY(); TRANS(0x60); TAIL(); return result;
-		default: return false;
-		}
-#undef COPY
-#undef TRANS
-#undef TAIL
+		return type[c];
 	}
 };
 
@@ -461,6 +494,41 @@ struct UTF32 {
 		Ch c;
 		os.Put(c = is.Take());
 		return c <= 0x10FFFF;
+	}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// Transcoder
+
+template<typename SourceEncoding, typename TargetEncoding>
+struct Transcoder {
+	template<typename InputStream, typename OutputStream>
+	static bool Transcode(InputStream& is, OutputStream& os) {
+		unsigned codepoint;
+		if (!SourceEncoding::Decode(is, &codepoint))
+			return false;
+		TargetEncoding::Encode(os, codepoint);
+		return true;
+	}
+
+	template<typename InputStream, typename OutputStream>
+	static bool Validate(InputStream& is, OutputStream& os) {
+		return Transcode(is, os);
+	}
+};
+
+//! Specialization of Transcoder with same source and target encoding.
+template<typename Encoding>
+struct Transcoder<Encoding, Encoding> {
+	template<typename InputStream, typename OutputStream>
+	static bool Transcode(InputStream& is, OutputStream& os) {
+		os.Put(is.Take());
+		return true;
+	}
+	
+	template<typename InputStream, typename OutputStream>
+	static bool Validate(InputStream& is, OutputStream& os) {
+		return Encoding::Validate(is, os);
 	}
 };
 
