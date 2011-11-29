@@ -2,6 +2,7 @@
 #include "rapidjson/filestream.h"
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/filewritestream.h"
+#include "rapidjson/encodedstream.h"
 
 using namespace rapidjson;
 
@@ -31,22 +32,23 @@ protected:
 	size_t length_;
 };
 
-TEST_F(FileStreamTest, FileStream_Read) {
-	FILE *fp = fopen(filename_, "rb");
-	ASSERT_TRUE(fp != 0);
-	FileStream s(fp);
-
-	for (size_t i = 0; i < length_; i++) {
-		EXPECT_EQ(json_[i], s.Peek());
-		EXPECT_EQ(json_[i], s.Peek());	// 2nd time should be the same
-		EXPECT_EQ(json_[i], s.Take());
-	}
-
-	EXPECT_EQ(length_, s.Tell());
-	EXPECT_EQ('\0', s.Peek());
-
-	fclose(fp);
-}
+// Depreciated
+//TEST_F(FileStreamTest, FileStream_Read) {
+//	FILE *fp = fopen(filename_, "rb");
+//	ASSERT_TRUE(fp != 0);
+//	FileStream s(fp);
+//
+//	for (size_t i = 0; i < length_; i++) {
+//		EXPECT_EQ(json_[i], s.Peek());
+//		EXPECT_EQ(json_[i], s.Peek());	// 2nd time should be the same
+//		EXPECT_EQ(json_[i], s.Take());
+//	}
+//
+//	EXPECT_EQ(length_, s.Tell());
+//	EXPECT_EQ('\0', s.Peek());
+//
+//	fclose(fp);
+//}
 
 TEST_F(FileStreamTest, FileReadStream) {
 	FILE *fp = fopen(filename_, "rb");

@@ -5,6 +5,7 @@
 // Version 0.1
 
 #include "rapidjson.h"
+#include "encodings.h"
 #include "internal/pow10.h"
 #include "internal/stack.h"
 #include <csetjmp>
