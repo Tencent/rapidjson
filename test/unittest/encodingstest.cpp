@@ -121,7 +121,7 @@ protected:
 		AutoUTFOutputStream<unsigned, FileWriteStream> eos(os, type, putBOM);
 		StringStream s(json_);
 		while (s.Peek() != '\0') {
-			bool success = Transcoder<UTF8<>, AutoUTF<unsigned>>::Transcode(s, eos);
+			bool success = Transcoder<UTF8<>, AutoUTF<unsigned> >::Transcode(s, eos);
 			EXPECT_TRUE(success);
 		}
 		eos.Flush();
@@ -136,16 +136,16 @@ protected:
 };
 
 TEST_F(EncodingsTest, EncodedInputStream) {
-	TestEncodedInputStream<UTF8<>, UTF8<>>("utf8.json");
-	TestEncodedInputStream<UTF8<>, UTF8<>>("utf8bom.json");
-	TestEncodedInputStream<UTF16LE<>, UTF16<>>("utf16le.json");
-	TestEncodedInputStream<UTF16LE<>, UTF16<>>("utf16lebom.json");
-	TestEncodedInputStream<UTF16BE<>, UTF16<>>("utf16be.json");
-	TestEncodedInputStream<UTF16BE<>, UTF16<>>("utf16bebom.json");
-	TestEncodedInputStream<UTF32LE<>, UTF32<>>("utf32le.json");
-	TestEncodedInputStream<UTF32LE<>, UTF32<>>("utf32lebom.json");
-	TestEncodedInputStream<UTF32BE<>, UTF32<>>("utf32be.json");
-	TestEncodedInputStream<UTF32BE<>, UTF32<>>("utf32bebom.json");
+	TestEncodedInputStream<UTF8<>,	  UTF8<>  >("utf8.json");
+	TestEncodedInputStream<UTF8<>,	  UTF8<>  >("utf8bom.json");
+	TestEncodedInputStream<UTF16LE<>, UTF16<> >("utf16le.json");
+	TestEncodedInputStream<UTF16LE<>, UTF16<> >("utf16lebom.json");
+	TestEncodedInputStream<UTF16BE<>, UTF16<> >("utf16be.json");
+	TestEncodedInputStream<UTF16BE<>, UTF16<> >("utf16bebom.json");
+	TestEncodedInputStream<UTF32LE<>, UTF32<> >("utf32le.json");
+	TestEncodedInputStream<UTF32LE<>, UTF32<> >("utf32lebom.json");
+	TestEncodedInputStream<UTF32BE<>, UTF32<> >("utf32be.json");
+	TestEncodedInputStream<UTF32BE<>, UTF32<> >("utf32bebom.json");
 }
 
 TEST_F(EncodingsTest, AutoUTFInputStream) {
@@ -158,16 +158,16 @@ TEST_F(EncodingsTest, AutoUTFInputStream) {
 }
 
 TEST_F(EncodingsTest, EncodedOutputStream) {
-	TestEncodedOutputStream<UTF8<>,		UTF8<>>("utf8.json",		false);
-	TestEncodedOutputStream<UTF8<>,		UTF8<>>("utf8bom.json",		true);
-	TestEncodedOutputStream<UTF16LE<>,	UTF16<>>("utf16le.json",	false);
-	TestEncodedOutputStream<UTF16LE<>,	UTF16<>>("utf16lebom.json",	true);
-	TestEncodedOutputStream<UTF16BE<>,	UTF16<>>("utf16be.json",	false);
-	TestEncodedOutputStream<UTF16BE<>,	UTF16<>>("utf16bebom.json",	true);
-	TestEncodedOutputStream<UTF32LE<>,	UTF32<>>("utf32le.json",	false);
-	TestEncodedOutputStream<UTF32LE<>,	UTF32<>>("utf32lebom.json",	true);
-	TestEncodedOutputStream<UTF32BE<>,	UTF32<>>("utf32be.json",	false);
-	TestEncodedOutputStream<UTF32BE<>,	UTF32<>>("utf32bebom.json",	true);
+	TestEncodedOutputStream<UTF8<>,		UTF8<>	>("utf8.json",		false);
+	TestEncodedOutputStream<UTF8<>,		UTF8<>	>("utf8bom.json",		true);
+	TestEncodedOutputStream<UTF16LE<>,	UTF16<> >("utf16le.json",	false);
+	TestEncodedOutputStream<UTF16LE<>,	UTF16<> >("utf16lebom.json",	true);
+	TestEncodedOutputStream<UTF16BE<>,	UTF16<> >("utf16be.json",	false);
+	TestEncodedOutputStream<UTF16BE<>,	UTF16<> >("utf16bebom.json",	true);
+	TestEncodedOutputStream<UTF32LE<>,	UTF32<> >("utf32le.json",	false);
+	TestEncodedOutputStream<UTF32LE<>,	UTF32<> >("utf32lebom.json",	true);
+	TestEncodedOutputStream<UTF32BE<>,	UTF32<> >("utf32be.json",	false);
+	TestEncodedOutputStream<UTF32BE<>,	UTF32<> >("utf32bebom.json",	true);
 }
 
 TEST_F(EncodingsTest, AutoUTFOutputStream) {

@@ -247,7 +247,7 @@ struct UTF16LE : UTF16<CharType> {
 	}
 
 	template <typename OutputStream>
-	static void Put(OutputStream& os, Ch c) {
+	static void Put(OutputStream& os, CharType c) {
 		os.Put(c & 0xFFu);
 		os.Put((c >> 8) & 0xFFu);
 	}
@@ -274,7 +274,7 @@ struct UTF16BE : UTF16<CharType> {
 	}
 
 	template <typename OutputStream>
-	static void Put(OutputStream& os, Ch c) {
+	static void Put(OutputStream& os, CharType c) {
 		os.Put((c >> 8) & 0xFFu);
 		os.Put(c & 0xFFu);
 	}
@@ -336,7 +336,7 @@ struct UTF32LE : UTF32<CharType> {
 	}
 
 	template <typename OutputStream>
-	static void Put(OutputStream& os, Ch c) {
+	static void Put(OutputStream& os, CharType c) {
 		os.Put(c & 0xFFu);
 		os.Put((c >> 8) & 0xFFu);
 		os.Put((c >> 16) & 0xFFu);
@@ -367,7 +367,7 @@ struct UTF32BE : UTF32<CharType> {
 	}
 
 	template <typename OutputStream>
-	static void Put(OutputStream& os, Ch c) {
+	static void Put(OutputStream& os, CharType c) {
 		os.Put((c >> 24) & 0xFFu);
 		os.Put((c >> 16) & 0xFFu);
 		os.Put((c >> 8) & 0xFFu);
