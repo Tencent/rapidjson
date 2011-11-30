@@ -7,7 +7,16 @@ using namespace rapidjson;
 
 class EncodingsTest : public ::testing::Test {
 public:
-	FILE* Open(const char* filename) {
+	virtual void SetUp() {
+		json_ = ReadFile("utf8.json", true, &length_);
+	}
+
+	virtual void TearDown() {
+		free(json_);
+	}
+
+protected:
+	static FILE* Open(const char* filename) {
 		char buffer[1024];
 		sprintf(buffer, "encodings/%s", filename);
 		FILE *fp = fopen(buffer, "rb");
@@ -18,105 +27,158 @@ public:
 		return fp;
 	}
 
-	virtual void SetUp() {
-		FILE *fp = Open("utf8.json");
-		ASSERT_TRUE(fp != 0);
+	static char *ReadFile(const char* filename, bool appendPath, size_t* outLength) {
+		FILE *fp = appendPath ? Open(filename) : fopen(filename, "rb");
+
+		if (!fp) {
+			*outLength = 0;
+			return 0;
+		}
 
 		fseek(fp, 0, SEEK_END);
-		length_ = (size_t)ftell(fp);
+		*outLength = (size_t)ftell(fp);
 		fseek(fp, 0, SEEK_SET);
-		json_ = (char*)malloc(length_ + 1);
-		fread(json_, 1, length_, fp);
-		json_[length_] = '\0';
+		char* buffer = (char*)malloc(*outLength + 1);
+		fread(buffer, 1, *outLength, fp);
+		buffer[*outLength] = '\0';
+		fclose(fp);
+		return buffer;
+	}
+
+	template <typename FileEncoding, typename MemoryEncoding>
+	void TestEncodedInputStream(const char* filename) {
+		char buffer[16];
+		FILE *fp = Open(filename);
+		ASSERT_TRUE(fp != 0);
+		FileReadStream fs(fp, buffer, sizeof(buffer));
+		EncodedInputStream<FileEncoding, FileReadStream> eis(fs);
+		StringStream s(json_);
+
+		while (eis.Peek() != '\0') {
+			unsigned expected, actual;
+			EXPECT_TRUE(UTF8<>::Decode(s, &expected));
+			EXPECT_TRUE(MemoryEncoding::Decode(eis, &actual));
+			EXPECT_EQ(expected, actual);
+		}
+		EXPECT_EQ('\0', s.Peek());
 		fclose(fp);
 	}
 
-	virtual void TearDown() {
-		free(json_);
+	void TestAutoUTFInputStream(const char *filename) {
+		char buffer[16];
+		FILE *fp = Open(filename);
+		ASSERT_TRUE(fp != 0);
+		FileReadStream fs(fp, buffer, sizeof(buffer));
+		AutoUTFInputStream<unsigned, FileReadStream> eis(fs);
+		StringStream s(json_);
+		while (eis.Peek() != '\0') {
+			unsigned expected, actual;
+			EXPECT_TRUE(UTF8<>::Decode(s, &expected));
+			EXPECT_TRUE(AutoUTF<unsigned>::Decode(eis, &actual));
+			EXPECT_EQ(expected, actual);
+		}
+		EXPECT_EQ('\0', s.Peek());
+		fclose(fp);
 	}
 
-protected:
+	template <typename FileEncoding, typename MemoryEncoding>
+	void TestEncodedOutputStream(const char* expectedFilename, bool putBOM) {
+		char filename[L_tmpnam];
+		tmpnam(filename);
+
+		FILE *fp = fopen(filename, "wb");
+		char buffer[16];
+		FileWriteStream os(fp, buffer, sizeof(buffer));
+		EncodedOutputStream<FileEncoding, FileWriteStream> eos(os, putBOM);
+		StringStream s(json_);
+		while (s.Peek() != '\0') {
+			bool success = Transcoder<UTF8<>, MemoryEncoding>::Transcode(s, eos);
+			EXPECT_TRUE(success);
+		}
+		eos.Flush();
+		fclose(fp);
+		EXPECT_TRUE(CompareFile(filename, expectedFilename));
+		remove(filename);
+	}
+
+	bool CompareFile(char * filename, const char* expectedFilename) {
+		size_t actualLength, expectedLength;
+		char* actualBuffer = ReadFile(filename, false, &actualLength);
+		char* expectedBuffer = ReadFile(expectedFilename, true, &expectedLength);
+		bool ret = (expectedLength == actualLength) && memcmp(expectedBuffer, actualBuffer, actualLength) == 0;
+		free(actualBuffer);
+		free(expectedBuffer);
+		return ret;
+	}
+
+	void TestAutoUTFOutputStream(UTFType type, bool putBOM, const char *expectedFilename) {
+		char filename[L_tmpnam];
+		tmpnam(filename);
+
+		FILE *fp = fopen(filename, "wb");
+		char buffer[16];
+		FileWriteStream os(fp, buffer, sizeof(buffer));
+		AutoUTFOutputStream<unsigned, FileWriteStream> eos(os, type, putBOM);
+		StringStream s(json_);
+		while (s.Peek() != '\0') {
+			bool success = Transcoder<UTF8<>, AutoUTF<unsigned>>::Transcode(s, eos);
+			EXPECT_TRUE(success);
+		}
+		eos.Flush();
+		fclose(fp);
+		EXPECT_TRUE(CompareFile(filename, expectedFilename));
+		remove(filename);
+	}
+
 	const char* filename_;
 	char *json_;
 	size_t length_;
 };
 
-TEST_F(EncodingsTest, EncodedInputStream_UTF8BOM) {
-	char buffer[16];
-	FILE *fp = Open("utf8bom.json");
-	ASSERT_TRUE(fp != 0);
-	FileReadStream fs(fp, buffer, sizeof(buffer));
-	EncodedInputStream<UTF8<>, FileReadStream> eis(fs);
-	StringStream s(json_);
-
-	while (eis.Peek() != '\0') {
-		unsigned expected, actual;
-		UTF8<>::Decode(s, &expected);
-		UTF8<>::Decode(eis, &actual);
-		EXPECT_EQ(expected, actual);
-	}
-	EXPECT_EQ('\0', s.Peek());
-	fclose(fp);
-}
-
-TEST_F(EncodingsTest, EncodedInputStream_UTF16LEBOM) {
-	char buffer[16];
-	FILE *fp = Open("utf16lebom.json");
-	ASSERT_TRUE(fp != 0);
-	FileReadStream fs(fp, buffer, sizeof(buffer));
-	EncodedInputStream<UTF16LE<>, FileReadStream> eis(fs);
-	StringStream s(json_);
-
-	while (eis.Peek() != '\0') {
-		unsigned expected, actual;
-		UTF8<>::Decode(s, &expected);
-		UTF16<>::Decode(eis, &actual);
-		EXPECT_EQ(expected, actual);
-	}
-	EXPECT_EQ('\0', s.Peek());
-	fclose(fp);
-}
-
-TEST_F(EncodingsTest, EncodedInputStream_UTF16BEBOM) {
-	char buffer[16];
-	FILE *fp = Open("utf16bebom.json");
-	ASSERT_TRUE(fp != 0);
-	FileReadStream fs(fp, buffer, sizeof(buffer));
-	EncodedInputStream<UTF16BE<>, FileReadStream> eis(fs);
-	StringStream s(json_);
-
-	while (eis.Peek() != '\0') {
-		unsigned expected, actual;
-		UTF8<>::Decode(s, &expected);
-		UTF16<>::Decode(eis, &actual);
-		EXPECT_EQ(expected, actual);
-	}
-	EXPECT_EQ('\0', s.Peek());
-	fclose(fp);
+TEST_F(EncodingsTest, EncodedInputStream) {
+	TestEncodedInputStream<UTF8<>, UTF8<>>("utf8.json");
+	TestEncodedInputStream<UTF8<>, UTF8<>>("utf8bom.json");
+	TestEncodedInputStream<UTF16LE<>, UTF16<>>("utf16le.json");
+	TestEncodedInputStream<UTF16LE<>, UTF16<>>("utf16lebom.json");
+	TestEncodedInputStream<UTF16BE<>, UTF16<>>("utf16be.json");
+	TestEncodedInputStream<UTF16BE<>, UTF16<>>("utf16bebom.json");
+	TestEncodedInputStream<UTF32LE<>, UTF32<>>("utf32le.json");
+	TestEncodedInputStream<UTF32LE<>, UTF32<>>("utf32lebom.json");
+	TestEncodedInputStream<UTF32BE<>, UTF32<>>("utf32be.json");
+	TestEncodedInputStream<UTF32BE<>, UTF32<>>("utf32bebom.json");
 }
 
 TEST_F(EncodingsTest, AutoUTFInputStream) {
-#define TEST_FILE(filename) \
-	{ \
-		char buffer[16]; \
-		FILE *fp = Open(filename); \
-		ASSERT_TRUE(fp != 0); \
-		FileReadStream fs(fp, buffer, sizeof(buffer)); \
-		AutoUTFInputStream<wchar_t, FileReadStream> eis(fs); \
-		StringStream s(json_); \
-		while (eis.Peek() != '\0') { \
-			unsigned expected, actual; \
-			UTF8<>::Decode(s, &expected); \
-			AutoUTF<wchar_t>::Decode(eis, &actual); \
-			EXPECT_EQ(expected, actual); \
-		} \
-		EXPECT_EQ('\0', s.Peek()); \
-		fclose(fp); \
-	}
+	TestAutoUTFInputStream("utf8.json");
+	TestAutoUTFInputStream("utf8bom.json");
+	TestAutoUTFInputStream("utf16lebom.json");
+	TestAutoUTFInputStream("utf16bebom.json");
+	TestAutoUTFInputStream("utf32lebom.json");
+	TestAutoUTFInputStream("utf32bebom.json");
+}
 
-	TEST_FILE("utf8.json");
-	TEST_FILE("utf8bom.json");
-	TEST_FILE("utf16lebom.json");
-	TEST_FILE("utf16bebom.json");
-#undef TEST_FILE
+TEST_F(EncodingsTest, EncodedOutputStream) {
+	TestEncodedOutputStream<UTF8<>,		UTF8<>>("utf8.json",		false);
+	TestEncodedOutputStream<UTF8<>,		UTF8<>>("utf8bom.json",		true);
+	TestEncodedOutputStream<UTF16LE<>,	UTF16<>>("utf16le.json",	false);
+	TestEncodedOutputStream<UTF16LE<>,	UTF16<>>("utf16lebom.json",	true);
+	TestEncodedOutputStream<UTF16BE<>,	UTF16<>>("utf16be.json",	false);
+	TestEncodedOutputStream<UTF16BE<>,	UTF16<>>("utf16bebom.json",	true);
+	TestEncodedOutputStream<UTF32LE<>,	UTF32<>>("utf32le.json",	false);
+	TestEncodedOutputStream<UTF32LE<>,	UTF32<>>("utf32lebom.json",	true);
+	TestEncodedOutputStream<UTF32BE<>,	UTF32<>>("utf32be.json",	false);
+	TestEncodedOutputStream<UTF32BE<>,	UTF32<>>("utf32bebom.json",	true);
+}
+
+TEST_F(EncodingsTest, AutoUTFOutputStream) {
+	TestAutoUTFOutputStream(kUTF8,		false,	"utf8.json");
+	TestAutoUTFOutputStream(kUTF8,		true,	"utf8bom.json");
+	TestAutoUTFOutputStream(kUTF16LE,	false,	"utf16le.json");
+	TestAutoUTFOutputStream(kUTF16LE,	true,	"utf16lebom.json");
+	TestAutoUTFOutputStream(kUTF16BE,	false,	"utf16be.json");
+	TestAutoUTFOutputStream(kUTF16BE,	true,	"utf16bebom.json");
+	TestAutoUTFOutputStream(kUTF32LE,	false,	"utf32le.json");
+	TestAutoUTFOutputStream(kUTF32LE,	true,	"utf32lebom.json");
+	TestAutoUTFOutputStream(kUTF32BE,	false,	"utf32be.json");
+	TestAutoUTFOutputStream(kUTF32BE,	true,	"utf32bebom.json");
 }

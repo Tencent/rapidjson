@@ -141,18 +141,30 @@ struct UTF8 {
 	}
 
 	template <typename InputStream>
-	static void TakeBOM(InputStream& is) {
-		if ((unsigned char)is.Peek() != 0xEF) return;
-		is.Take();
-		if ((unsigned char)is.Peek() != 0xBB) return;
-		is.Take();
-		if ((unsigned char)is.Peek() != 0xBF) return;
-		is.Take();
+	static CharType TakeBOM(InputStream& is) {
+		Ch c = Take(is);
+		if ((unsigned char)c != 0xEFu) return c;
+		c = is.Take();
+		if ((unsigned char)c != 0xBBu) return c;
+		c = is.Take();
+		if ((unsigned char)c != 0xBFu) return c;
+		c = is.Take();
+		return c;
 	}
 
 	template <typename InputStream>
 	RAPIDJSON_FORCEINLINE static Ch Take(InputStream& is) {
 		return is.Take();
+	}
+
+	template <typename OutputStream>
+	static void PutBOM(OutputStream& os) {
+		os.Put(0xEFu); os.Put(0xBBu); os.Put(0xBFu);
+	}
+
+	template <typename OutputStream>
+	static void Put(OutputStream& os, Ch c) {
+		os.Put(c);
 	}
 };
 
@@ -217,11 +229,9 @@ struct UTF16 {
 template<typename CharType = wchar_t>
 struct UTF16LE : UTF16<CharType> {
 	template <typename InputStream>
-	static void TakeBOM(InputStream& is) {
-		if ((unsigned char)is.Peek() != 0xFF) return;
-		is.Take();
-		if ((unsigned char)is.Peek() != 0xFE) return;
-		is.Take();
+	static CharType TakeBOM(InputStream& is) {
+		CharType c = Take(is);
+		return (unsigned short)c == 0xFEFFu ? Take(is) : c;
 	}
 
 	template <typename InputStream>
@@ -230,16 +240,25 @@ struct UTF16LE : UTF16<CharType> {
 		c |= (unsigned char)is.Take() << 8;
 		return c;
 	}
+
+	template <typename OutputStream>
+	static void PutBOM(OutputStream& os) {
+		os.Put(0xFFu); os.Put(0xFEu);
+	}
+
+	template <typename OutputStream>
+	static void Put(OutputStream& os, Ch c) {
+		os.Put(c & 0xFFu);
+		os.Put((c >> 8) & 0xFFu);
+	}
 };
 
 template<typename CharType = wchar_t>
 struct UTF16BE : UTF16<CharType> {
 	template <typename InputStream>
-	static void TakeBOM(InputStream& is) {
-		if ((unsigned char)is.Peek() != 0xFE) return;
-		is.Take();
-		if ((unsigned char)is.Peek() != 0xFF) return;
-		is.Take();
+	static CharType TakeBOM(InputStream& is) {
+		CharType c = Take(is);
+		return (unsigned short)c == 0xFEFFu ? Take(is) : c;
 	}
 
 	template <typename InputStream>
@@ -247,6 +266,17 @@ struct UTF16BE : UTF16<CharType> {
 		CharType c = (unsigned char)is.Take() << 8;
 		c |= (unsigned char)is.Take();
 		return c;
+	}
+
+	template <typename OutputStream>
+	static void PutBOM(OutputStream& os) {
+		os.Put(0xFEu); os.Put(0xFFu);
+	}
+
+	template <typename OutputStream>
+	static void Put(OutputStream& os, Ch c) {
+		os.Put((c >> 8) & 0xFFu);
+		os.Put(c & 0xFFu);
 	}
 };
 
@@ -286,15 +316,9 @@ struct UTF32 {
 template<typename CharType = unsigned>
 struct UTF32LE : UTF32<CharType> {
 	template <typename InputStream>
-	static void TakeBOM(InputStream& is) {
-		if ((unsigned char)is.Peek() != 0xFF) return;
-		is.Take();
-		if ((unsigned char)is.Peek() != 0xFE) return;
-		is.Take();
-		if ((unsigned char)is.Peek() != 0x00) return;
-		is.Take();
-		if ((unsigned char)is.Peek() != 0x00) return;
-		is.Take();
+	static CharType TakeBOM(InputStream& is) {
+		CharType c = Take(is);
+		return (unsigned)c == 0x0000FEFFu ? Take(is) : c;
 	}
 
 	template <typename InputStream>
@@ -305,20 +329,27 @@ struct UTF32LE : UTF32<CharType> {
 		c |= (unsigned char)is.Take() << 24;
 		return c;
 	}
+
+	template <typename OutputStream>
+	static void PutBOM(OutputStream& os) {
+		os.Put(0xFFu); os.Put(0xFEu); os.Put(0x00u); os.Put(0x00u);
+	}
+
+	template <typename OutputStream>
+	static void Put(OutputStream& os, Ch c) {
+		os.Put(c & 0xFFu);
+		os.Put((c >> 8) & 0xFFu);
+		os.Put((c >> 16) & 0xFFu);
+		os.Put((c >> 24) & 0xFFu);
+	}
 };
 
 template<typename CharType = unsigned>
 struct UTF32BE : UTF32<CharType> {
 	template <typename InputStream>
-	static void TakeBOM(InputStream& is) {
-		if ((unsigned char)is.Peek() != 0x00) return;
-		is.Take();
-		if ((unsigned char)is.Peek() != 0x00) return;
-		is.Take();
-		if ((unsigned char)is.Peek() != 0xFE) return;
-		is.Take();
-		if ((unsigned char)is.Peek() != 0xFF) return;
-		is.Take();
+	static CharType TakeBOM(InputStream& is) {
+		CharType c = Take(is);
+		return (unsigned)c == 0x0000FEFFu ? Take(is) : c; 
 	}
 
 	template <typename InputStream>
@@ -328,6 +359,19 @@ struct UTF32BE : UTF32<CharType> {
 		c |= (unsigned char)is.Take() << 8;
 		c |= (unsigned char)is.Take();
 		return c;
+	}
+
+	template <typename OutputStream>
+	static void PutBOM(OutputStream& os) {
+		os.Put(0x00u); os.Put(0x00u); os.Put(0xFEu); os.Put(0xFFu);
+	}
+
+	template <typename OutputStream>
+	static void Put(OutputStream& os, Ch c) {
+		os.Put((c >> 24) & 0xFFu);
+		os.Put((c >> 16) & 0xFFu);
+		os.Put((c >> 8) & 0xFFu);
+		os.Put(c & 0xFFu);
 	}
 };
 
@@ -347,44 +391,30 @@ template<typename CharType>
 struct AutoUTF {
 	typedef CharType Ch;
 
+#define ENCODINGS_FUNC(x) UTF8<Ch>::x, UTF16LE<Ch>::x, UTF16BE<Ch>::x, UTF32LE<Ch>::x, UTF32BE<Ch>::x
+
 	template<typename OutputStream>
 	RAPIDJSON_FORCEINLINE static void Encode(OutputStream& os, unsigned codepoint) {
 		typedef void (*EncodeFunc)(OutputStream&, unsigned);
-		static const EncodeFunc f[] = {
-			UTF8<Ch>::Encode,
-			UTF16<Ch>::Encode,
-			UTF16<Ch>::Encode,
-			UTF32<Ch>::Encode,
-			UTF32<Ch>::Encode,
-		};
+		static const EncodeFunc f[] = { ENCODINGS_FUNC(Encode) };
 		(*f[os.type_])(os, codepoint);
 	}
 
 	template <typename InputStream>
 	RAPIDJSON_FORCEINLINE static bool Decode(InputStream& is, unsigned* codepoint) {
 		typedef bool (*DecodeFunc)(InputStream&, unsigned*);
-		static const DecodeFunc f[] = {
-			UTF8<Ch>::Decode,
-			UTF16<Ch>::Decode,
-			UTF16<Ch>::Decode,
-			UTF32<Ch>::Decode,
-			UTF32<Ch>::Decode,
-		};
+		static const DecodeFunc f[] = { ENCODINGS_FUNC(Decode) };
 		return (*f[is.type_])(is, codepoint);
 	}
 
 	template <typename InputStream, typename OutputStream>
 	RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
 		typedef bool (*ValidateFunc)(InputStream&, unsigned*);
-		static const ValidateFunc f[] = {
-			UTF8<Ch>::Decode,
-			UTF16<Ch>::Decode,
-			UTF16<Ch>::Decode,
-			UTF32<Ch>::Decode,
-			UTF32<Ch>::Decode,
-		};
+		static const ValidateFunc f[] = { ENCODINGS_FUNC(Validate) };
 		return (*f[is.type_])(is, os);
 	}
+
+#undef ENCODINGS_FUNC
 };
 
 ///////////////////////////////////////////////////////////////////////////////
