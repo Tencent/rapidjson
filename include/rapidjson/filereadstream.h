@@ -16,6 +16,7 @@ public:
 
 	FileReadStream(FILE* fp, char* buffer, size_t bufferSize) : fp_(fp), buffer_(buffer), bufferSize_(bufferSize), bufferLast_(0), current_(buffer_), readCount_(0), count_(0), eof_(false) { 
 		RAPIDJSON_ASSERT(fp_ != 0);
+		RAPIDJSON_ASSERT(bufferSize >= 4);
 		Read();
 	}
 
@@ -28,6 +29,11 @@ public:
 	void Flush() { RAPIDJSON_ASSERT(false); } 
 	char* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
 	size_t PutEnd(char*) { RAPIDJSON_ASSERT(false); return 0; }
+
+	// For encoding detection only.
+	const char* Peek4() const {
+		return (current_ + 4 <= bufferLast_) ? current_ : 0;
+	}
 
 private:
 	void Read() {

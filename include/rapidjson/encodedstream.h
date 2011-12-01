@@ -63,12 +63,16 @@ public:
 	typedef CharType Ch;
 
 	AutoUTFInputStream(InputStream& is, UTFType type = kUTF8) : is_(is), type_(type) {
-		TakeBOM(is);
-		Read();
+		DetectType(is);
+		static const TakeFunc f[] = { ENCODINGS_FUNC(Take) };
+		takeFunc_ = f[type_];
+		current_ = takeFunc_(is_);
 	}
 
+	UTFType GetType() const { return type_; }
+
 	Ch Peek() const { return current_; }
-	Ch Take() { Ch c = current_; Read(); return c; }
+	Ch Take() { Ch c = current_; current_ = takeFunc_(is_); return c; }
 	size_t Tell() const { is_.Tell(); }
 
 	// Not implemented
@@ -78,21 +82,47 @@ public:
 	size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:
-	friend struct AutoUTF<Ch>;
+	// Detect encoding type with BOM or RFC 4627
+	void DetectType(InputStream& is) {
+		// BOM (Byte Order Mark):
+		// 00 00 FE FF  UTF-32BE
+		// FF FE 00 00  UTF-32LE
+		// FE FF		UTF-16BE
+		// FF FE		UTF-16LE
+		// EF BB BF		UTF-8
 
-	void TakeBOM(InputStream& is) {
-#define ASSUME(x) if ((unsigned char)is.Peek() != x) break; is.Take()
-		switch ((unsigned char)is.Peek()) {
-		case 0x00: is.Take(); ASSUME(0x00); ASSUME(0xFE); ASSUME(0xFF); type_ = kUTF32BE; break;
-		case 0xEF: is.Take(); ASSUME(0xBB); ASSUME(0xBF); type_ = kUTF8; break;
-		case 0xFE: is.Take(); ASSUME(0xFF); type_ = kUTF16BE; break;
-		case 0xFF: is.Take(); ASSUME(0xFE); 
-			if (is.Peek() == 0x00) {
-				is.Take(); ASSUME(0x00); type_ = kUTF32LE; break;
-			}
-			type_ = kUTF16LE;
+		const unsigned char* c = (const unsigned char *)is.Peek4();
+		if (!c)
+			return;
+
+		unsigned bom = c[0] | (c[1] << 8) | (c[2] << 16) | (c[3] << 24);
+		if (bom == 0xFFFE0000)					{ type_ = kUTF32BE; is.Take(); is.Take(); is.Take(); is.Take(); goto sizecheck; }
+		else if (bom == 0x0000FEFF)				{ type_ = kUTF32LE;	is.Take(); is.Take(); is.Take(); is.Take();	goto sizecheck;	}
+		else if ((bom & 0xFFFF) == 0xFFFE)		{ type_ = kUTF16BE; is.Take(); is.Take();						goto sizecheck; }
+		else if ((bom & 0xFFFF) == 0xFEFF)		{ type_ = kUTF16LE; is.Take(); is.Take();						goto sizecheck; }
+		else if ((bom & 0xFFFFFF) == 0xBFBBEF)	{ type_ = kUTF8;	is.Take(); is.Take(); is.Take();			goto sizecheck; }
+
+		// RFC 4627: Section 3
+		// "Since the first two characters of a JSON text will always be ASCII
+		// characters [RFC0020], it is possible to determine whether an octet
+		// stream is UTF-8, UTF-16 (BE or LE), or UTF-32 (BE or LE) by looking
+		// at the pattern of nulls in the first four octets."
+		// 00 00 00 xx  UTF-32BE
+		// 00 xx 00 xx  UTF-16BE
+		// xx 00 00 00  UTF-32LE
+		// xx 00 xx 00  UTF-16LE
+		// xx xx xx xx  UTF-8
+
+		unsigned pattern = (c[0] ? 1 : 0) | (c[1] ? 2 : 0) | (c[2] ? 4 : 0) | (c[3] ? 8 : 0);
+		switch (pattern) {
+		case 0x08: type_ = kUTF32BE; break;
+		case 0x0A: type_ = kUTF16BE; break;
+		case 0x01: type_ = kUTF32LE; break;
+		case 0x05: type_ = kUTF16LE; break;
+		case 0x0F: type_ = kUTF8;    break;
 		}
-#undef ASSUME
+
+	sizecheck:
 		// RUntime check whether the size of character type is sufficient. It only perform checks with assertion.
 		switch (type_) {
 		case kUTF16LE:
@@ -106,15 +136,11 @@ private:
 		}
 	}
 
-	void Read() {
-		typedef Ch (*TakeFunc)(InputStream& is);
-		static const TakeFunc f[] = { ENCODINGS_FUNC(Take) };
-		current_ = f[type_](is_);
-	}
-
+	typedef Ch (*TakeFunc)(InputStream& is);
 	InputStream& is_;
 	UTFType type_;
 	Ch current_;
+	TakeFunc takeFunc_;
 };
 
 template <typename CharType, typename OutputStream>
@@ -135,14 +161,17 @@ public:
 			break;
 		}
 
+		static const PutFunc f[] = { ENCODINGS_FUNC(Put) };
+		putFunc_ = f[type_];
+
 		if (putBOM)
 			PutBOM();
 	}
 
+	UTFType GetType() const { return type_; }
+
 	void Put(Ch c) { 
-		typedef void (*PutFunc)(OutputStream&, Ch);
-		static const PutFunc f[] = { ENCODINGS_FUNC(Put) };
-		f[type_](os_, c);
+		putFunc_(os_, c);
 	}
 
 	void Flush() { os_.Flush(); } 
@@ -155,17 +184,17 @@ public:
 	size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:
-	friend struct AutoUTF<Ch>;
-
 	void PutBOM() { 
 		typedef void (*PutBOMFunc)(OutputStream&);
 		static const PutBOMFunc f[] = { ENCODINGS_FUNC(PutBOM) };
 		f[type_](os_);
 	}
 
+	typedef void (*PutFunc)(OutputStream&, Ch);
 
 	OutputStream& os_;
 	UTFType type_;
+	PutFunc putFunc_;
 };
 
 #undef ENCODINGS_FUNC

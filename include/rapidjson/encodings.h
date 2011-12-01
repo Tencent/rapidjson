@@ -99,7 +99,7 @@ struct UTF8 {
 	template <typename InputStream, typename OutputStream>
 	RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
 #define COPY() os.Put(c = is.Take())
-#define TRANS(mask) result &= ((GetType(c) & mask) != 0)
+#define TRANS(mask) result &= ((GetType((unsigned char)c) & mask) != 0)
 #define TAIL() COPY(); TRANS(0x70)
 		Ch c;
 		COPY();
@@ -107,7 +107,7 @@ struct UTF8 {
 			return true;
 
 		bool result = true;
-		switch (GetType(c)) {
+		switch (GetType((unsigned char)c)) {
 		case 2:	TAIL(); return result;
 		case 3:	TAIL(); TAIL(); return result;
 		case 4:	COPY(); TRANS(0x50); TAIL(); return result;
@@ -397,21 +397,21 @@ struct AutoUTF {
 	RAPIDJSON_FORCEINLINE static void Encode(OutputStream& os, unsigned codepoint) {
 		typedef void (*EncodeFunc)(OutputStream&, unsigned);
 		static const EncodeFunc f[] = { ENCODINGS_FUNC(Encode) };
-		(*f[os.type_])(os, codepoint);
+		(*f[os.GetType()])(os, codepoint);
 	}
 
 	template <typename InputStream>
 	RAPIDJSON_FORCEINLINE static bool Decode(InputStream& is, unsigned* codepoint) {
 		typedef bool (*DecodeFunc)(InputStream&, unsigned*);
 		static const DecodeFunc f[] = { ENCODINGS_FUNC(Decode) };
-		return (*f[is.type_])(is, codepoint);
+		return (*f[is.GetType()])(is, codepoint);
 	}
 
 	template <typename InputStream, typename OutputStream>
 	RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
 		typedef bool (*ValidateFunc)(InputStream&, unsigned*);
 		static const ValidateFunc f[] = { ENCODINGS_FUNC(Validate) };
-		return (*f[is.type_])(is, os);
+		return (*f[is.GetType()])(is, os);
 	}
 
 #undef ENCODINGS_FUNC
