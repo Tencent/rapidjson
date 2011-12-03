@@ -1,4 +1,5 @@
 // JSON pretty formatting example
+// This example can only handle UTF-8. For handling other encodings, see prettyauto example.
 
 #include "rapidjson/reader.h"
 #include "rapidjson/prettywriter.h"

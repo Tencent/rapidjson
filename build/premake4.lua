@@ -157,6 +157,11 @@ solution "example"
 		files "../example/pretty/*"
 		setTargetObjDir("../bin")
 
+	project "prettyauto"
+		kind "ConsoleApp"
+		files "../example/prettyauto/*"
+		setTargetObjDir("../bin")
+
 	project "tutorial"
 		kind "ConsoleApp"
 		files "../example/tutorial/*"

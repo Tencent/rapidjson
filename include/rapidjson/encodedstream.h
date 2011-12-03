@@ -83,19 +83,19 @@ public:
 		\param is input stream to be wrapped.
 		\param type UTF encoding type if it is not detected from the stream.
 	*/
-	AutoUTFInputStream(InputByteStream& is, UTFType type = kUTF8) : is_(is), type_(type), hasBOM_(false) {
-		DetectType(is);
+	AutoUTFInputStream(InputByteStream& is, UTFType type = kUTF8) : is_(&is), type_(type), hasBOM_(false) {
+		DetectType();
 		static const TakeFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Take) };
 		takeFunc_ = f[type_];
-		current_ = takeFunc_(is_);
+		current_ = takeFunc_(*is_);
 	}
 
 	UTFType GetType() const { return type_; }
 	bool HasBOM() const { return hasBOM_; }
 
 	Ch Peek() const { return current_; }
-	Ch Take() { Ch c = current_; current_ = takeFunc_(is_); return c; }
-	size_t Tell() const { is_.Tell(); }
+	Ch Take() { Ch c = current_; current_ = takeFunc_(*is_); return c; }
+	size_t Tell() const { return is_->Tell(); }
 
 	// Not implemented
 	void Put(Ch c) { RAPIDJSON_ASSERT(false); }
@@ -105,7 +105,7 @@ public:
 
 private:
 	// Detect encoding type with BOM or RFC 4627
-	void DetectType(InputByteStream& is) {
+	void DetectType() {
 		// BOM (Byte Order Mark):
 		// 00 00 FE FF  UTF-32BE
 		// FF FE 00 00  UTF-32LE
@@ -113,17 +113,17 @@ private:
 		// FF FE		UTF-16LE
 		// EF BB BF		UTF-8
 
-		const unsigned char* c = (const unsigned char *)is.Peek4();
+		const unsigned char* c = (const unsigned char *)is_->Peek4();
 		if (!c)
 			return;
 
 		unsigned bom = c[0] | (c[1] << 8) | (c[2] << 16) | (c[3] << 24);
 		hasBOM_ = false;
-		if (bom == 0xFFFE0000)					{ type_ = kUTF32BE; is.Take(); is.Take(); is.Take(); is.Take(); hasBOM_ = true; }
-		else if (bom == 0x0000FEFF)				{ type_ = kUTF32LE;	is.Take(); is.Take(); is.Take(); is.Take();	hasBOM_ = true;	}
-		else if ((bom & 0xFFFF) == 0xFFFE)		{ type_ = kUTF16BE; is.Take(); is.Take();						hasBOM_ = true; }
-		else if ((bom & 0xFFFF) == 0xFEFF)		{ type_ = kUTF16LE; is.Take(); is.Take();						hasBOM_ = true; }
-		else if ((bom & 0xFFFFFF) == 0xBFBBEF)	{ type_ = kUTF8;	is.Take(); is.Take(); is.Take();			hasBOM_ = true; }
+		if (bom == 0xFFFE0000)					{ type_ = kUTF32BE; hasBOM_ = true; is_->Take(); is_->Take(); is_->Take(); is_->Take(); }
+		else if (bom == 0x0000FEFF)				{ type_ = kUTF32LE;	hasBOM_ = true;	is_->Take(); is_->Take(); is_->Take(); is_->Take();	}
+		else if ((bom & 0xFFFF) == 0xFFFE)		{ type_ = kUTF16BE; hasBOM_ = true; is_->Take(); is_->Take();							}
+		else if ((bom & 0xFFFF) == 0xFEFF)		{ type_ = kUTF16LE; hasBOM_ = true; is_->Take(); is_->Take();							}
+		else if ((bom & 0xFFFFFF) == 0xBFBBEF)	{ type_ = kUTF8;	hasBOM_ = true; is_->Take(); is_->Take(); is_->Take();				}
 
 		// RFC 4627: Section 3
 		// "Since the first two characters of a JSON text will always be ASCII
@@ -161,7 +161,7 @@ private:
 	}
 
 	typedef Ch (*TakeFunc)(InputByteStream& is);
-	InputByteStream& is_;
+	InputByteStream* is_;
 	UTFType type_;
 	Ch current_;
 	TakeFunc takeFunc_;
@@ -185,7 +185,7 @@ public:
 		\param type UTF encoding type.
 		\param putBOM Whether to write BOM at the beginning of the stream.
 	*/
-	AutoUTFOutputStream(OutputByteStream& os, UTFType type, bool putBOM) : os_(os), type_(type) {
+	AutoUTFOutputStream(OutputByteStream& os, UTFType type, bool putBOM) : os_(&os), type_(type) {
 		// RUntime check whether the size of character type is sufficient. It only perform checks with assertion.
 		switch (type_) {
 		case kUTF16LE:
@@ -207,8 +207,8 @@ public:
 
 	UTFType GetType() const { return type_; }
 
-	void Put(Ch c) { putFunc_(os_, c); }
-	void Flush() { os_.Flush(); } 
+	void Put(Ch c) { putFunc_(*os_, c); }
+	void Flush() { os_->Flush(); } 
 
 	// Not implemented
 	Ch Peek() const { RAPIDJSON_ASSERT(false); }
@@ -221,12 +221,12 @@ private:
 	void PutBOM() { 
 		typedef void (*PutBOMFunc)(OutputByteStream&);
 		static const PutBOMFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(PutBOM) };
-		f[type_](os_);
+		f[type_](*os_);
 	}
 
 	typedef void (*PutFunc)(OutputByteStream&, Ch);
 
-	OutputByteStream& os_;
+	OutputByteStream* os_;
 	UTFType type_;
 	PutFunc putFunc_;
 };
