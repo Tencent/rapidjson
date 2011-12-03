@@ -6,7 +6,7 @@
 
 using namespace rapidjson;
 
-class EncodingsTest : public ::testing::Test {
+class EncodedStreamTest : public ::testing::Test {
 public:
 	virtual void SetUp() {
 		json_ = ReadFile("utf8.json", true, &length_);
@@ -136,7 +136,7 @@ protected:
 	size_t length_;
 };
 
-TEST_F(EncodingsTest, EncodedInputStream) {
+TEST_F(EncodedStreamTest, EncodedInputStream) {
 	TestEncodedInputStream<UTF8<>,	  UTF8<>  >("utf8.json");
 	TestEncodedInputStream<UTF8<>,	  UTF8<>  >("utf8bom.json");
 	TestEncodedInputStream<UTF16LE<>, UTF16<> >("utf16le.json");
@@ -149,7 +149,7 @@ TEST_F(EncodingsTest, EncodedInputStream) {
 	TestEncodedInputStream<UTF32BE<>, UTF32<> >("utf32bebom.json");
 }
 
-TEST_F(EncodingsTest, AutoUTFInputStream) {
+TEST_F(EncodedStreamTest, AutoUTFInputStream) {
 	TestAutoUTFInputStream("utf8.json");
 	TestAutoUTFInputStream("utf8bom.json");
 	TestAutoUTFInputStream("utf16le.json");
@@ -162,7 +162,7 @@ TEST_F(EncodingsTest, AutoUTFInputStream) {
 	TestAutoUTFInputStream("utf32bebom.json");
 }
 
-TEST_F(EncodingsTest, EncodedOutputStream) {
+TEST_F(EncodedStreamTest, EncodedOutputStream) {
 	TestEncodedOutputStream<UTF8<>,		UTF8<>	>("utf8.json",		false);
 	TestEncodedOutputStream<UTF8<>,		UTF8<>	>("utf8bom.json",	true);
 	TestEncodedOutputStream<UTF16LE<>,	UTF16<> >("utf16le.json",	false);
@@ -175,7 +175,7 @@ TEST_F(EncodingsTest, EncodedOutputStream) {
 	TestEncodedOutputStream<UTF32BE<>,	UTF32<> >("utf32bebom.json",true);
 }
 
-TEST_F(EncodingsTest, AutoUTFOutputStream) {
+TEST_F(EncodedStreamTest, AutoUTFOutputStream) {
 	TestAutoUTFOutputStream(kUTF8,		false,	"utf8.json");
 	TestAutoUTFOutputStream(kUTF8,		true,	"utf8bom.json");
 	TestAutoUTFOutputStream(kUTF16LE,	false,	"utf16le.json");
