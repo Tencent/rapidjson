@@ -70,7 +70,7 @@ struct UTF8 {
 	template <typename InputStream>
 	RAPIDJSON_FORCEINLINE static bool Decode(InputStream& is, unsigned* codepoint) {
 #define COPY() c = is.Take(); *codepoint = (*codepoint << 6) | ((unsigned char)c & 0x3Fu)
-#define TRANS(mask) result &= ((GetType((unsigned char)c) & mask) != 0)
+#define TRANS(mask) result &= ((GetRange((unsigned char)c) & mask) != 0)
 #define TAIL() COPY(); TRANS(0x70)
 		Ch c = is.Take();
 		if (!(c & 0x80)) {
@@ -78,17 +78,17 @@ struct UTF8 {
 			return true;
 		}
 
-		unsigned char type = GetType((unsigned char)c);
+		unsigned char type = GetRange((unsigned char)c);
 		*codepoint = (0xFF >> type) & (unsigned char)c;
 		bool result = true;
 		switch (type) {
 		case 2:	TAIL(); return result;
 		case 3:	TAIL(); TAIL(); return result;
 		case 4:	COPY(); TRANS(0x50); TAIL(); return result;
-		case 5:	COPY(); TRANS(0x10); COPY(); TAIL(); return result;
+		case 5:	COPY(); TRANS(0x10); TAIL(); TAIL(); return result;
 		case 6: TAIL(); TAIL(); TAIL(); return result;
 		case 10: COPY(); TRANS(0x20); TAIL(); return result;
-		case 11: COPY(); TRANS(0x60); TAIL(); return result;
+		case 11: COPY(); TRANS(0x60); TAIL(); TAIL(); return result;
 		default: return false;
 		}
 #undef COPY
@@ -99,7 +99,7 @@ struct UTF8 {
 	template <typename InputStream, typename OutputStream>
 	RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
 #define COPY() os.Put(c = is.Take())
-#define TRANS(mask) result &= ((GetType((unsigned char)c) & mask) != 0)
+#define TRANS(mask) result &= ((GetRange((unsigned char)c) & mask) != 0)
 #define TAIL() COPY(); TRANS(0x70)
 		Ch c;
 		COPY();
@@ -107,14 +107,14 @@ struct UTF8 {
 			return true;
 
 		bool result = true;
-		switch (GetType((unsigned char)c)) {
+		switch (GetRange((unsigned char)c)) {
 		case 2:	TAIL(); return result;
 		case 3:	TAIL(); TAIL(); return result;
 		case 4:	COPY(); TRANS(0x50); TAIL(); return result;
-		case 5:	COPY(); TRANS(0x10); COPY(); TAIL(); return result;
+		case 5:	COPY(); TRANS(0x10); TAIL(); TAIL(); return result;
 		case 6: TAIL(); TAIL(); TAIL(); return result;
 		case 10: COPY(); TRANS(0x20); TAIL(); return result;
-		case 11: COPY(); TRANS(0x60); TAIL(); return result;
+		case 11: COPY(); TRANS(0x60); TAIL(); TAIL(); return result;
 		default: return false;
 		}
 #undef COPY
@@ -122,7 +122,7 @@ struct UTF8 {
 #undef TAIL
 	}
 
-	RAPIDJSON_FORCEINLINE static unsigned char GetType(unsigned char c) {
+	RAPIDJSON_FORCEINLINE static unsigned char GetRange(unsigned char c) {
 		// Referring to DFA of http://bjoern.hoehrmann.de/utf-8/decoder/dfa/
 		// With new mapping 1 -> 0x10, 7 -> 0x20, 9 -> 0x40, such that AND operation can test multiple types.
 		static const unsigned char type[] = {
@@ -202,7 +202,7 @@ struct UTF16 {
 			*codepoint = c;
 			return true;
 		}
-		else if (c < 0xDBFF) {
+		else if (c <= 0xDBFF) {
 			*codepoint = (c & 0x3FF) << 10;
 			c = is.Take();
 			*codepoint |= (c & 0x3FF);
@@ -218,7 +218,7 @@ struct UTF16 {
 		os.Put(c = is.Take());
 		if (c < 0xD800 || c > 0xDFFF)
 			return true;
-		else if (c < 0xDBFF) {
+		else if (c <= 0xDBFF) {
 			os.Put(c = is.Take());
 			return c >= 0xDC00 && c <= 0xDFFF;
 		}

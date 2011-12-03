@@ -23,7 +23,7 @@ struct GenericStringBuffer {
 
 	void Clear() { stack_.Clear(); }
 
-	const char* GetString() const {
+	const Ch* GetString() const {
 		// Push and pop a null terminator. This is safe.
 		*stack_.template Push<Ch>() = '\0';
 		stack_.template Pop<Ch>(1);
