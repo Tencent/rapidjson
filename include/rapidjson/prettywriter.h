@@ -7,23 +7,23 @@ namespace rapidjson {
 
 //! Writer with indentation and spacing.
 /*!
-	\tparam Stream Type of ouptut stream.
+	\tparam OutputStream Type of ouptut os.
 	\tparam Encoding Encoding of both source strings and output.
 	\tparam Allocator Type of allocator for allocating memory of stack.
 */
-template<typename Stream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename Allocator = MemoryPoolAllocator<> >
-class PrettyWriter : public Writer<Stream, SourceEncoding, TargetEncoding, Allocator> {
+template<typename OutputStream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename Allocator = MemoryPoolAllocator<> >
+class PrettyWriter : public Writer<OutputStream, SourceEncoding, TargetEncoding, Allocator> {
 public:
-	typedef Writer<Stream, SourceEncoding, TargetEncoding, Allocator> Base;
+	typedef Writer<OutputStream, SourceEncoding, TargetEncoding, Allocator> Base;
 	typedef typename Base::Ch Ch;
 
 	//! Constructor
-	/*! \param stream Output stream.
+	/*! \param os Output os.
 		\param allocator User supplied allocator. If it is null, it will create a private one.
 		\param levelDepth Initial capacity of 
 	*/
-	PrettyWriter(Stream& stream, Allocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
-		Base(stream, allocator, levelDepth), indentChar_(' '), indentCharCount_(4) {}
+	PrettyWriter(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
+		Base(os, allocator, levelDepth), indentChar_(' '), indentCharCount_(4) {}
 
 	//! Set custom indentation.
 	/*! \param indentChar		Character for indentation. Must be whitespace character (' ', '\t', '\n', '\r').
@@ -67,12 +67,12 @@ public:
 		bool empty = Base::level_stack_.template Pop<typename Base::Level>(1)->valueCount == 0;
 
 		if (!empty) {
-			Base::stream_.Put('\n');
+			Base::os_.Put('\n');
 			WriteIndent();
 		}
 		Base::WriteEndObject();
 		if (Base::level_stack_.Empty())	// end of json text
-			Base::stream_.Flush();
+			Base::os_.Flush();
 		return *this;
 	}
 
@@ -89,12 +89,12 @@ public:
 		bool empty = Base::level_stack_.template Pop<typename Base::Level>(1)->valueCount == 0;
 
 		if (!empty) {
-			Base::stream_.Put('\n');
+			Base::os_.Put('\n');
 			WriteIndent();
 		}
 		Base::WriteEndArray();
 		if (Base::level_stack_.Empty())	// end of json text
-			Base::stream_.Flush();
+			Base::os_.Flush();
 		return *this;
 	}
 
@@ -110,26 +110,26 @@ protected:
 
 			if (level->inArray) {
 				if (level->valueCount > 0) {
-					Base::stream_.Put(','); // add comma if it is not the first element in array
-					Base::stream_.Put('\n');
+					Base::os_.Put(','); // add comma if it is not the first element in array
+					Base::os_.Put('\n');
 				}
 				else
-					Base::stream_.Put('\n');
+					Base::os_.Put('\n');
 				WriteIndent();
 			}
 			else {	// in object
 				if (level->valueCount > 0) {
 					if (level->valueCount % 2 == 0) {
-						Base::stream_.Put(',');
-						Base::stream_.Put('\n');
+						Base::os_.Put(',');
+						Base::os_.Put('\n');
 					}
 					else {
-						Base::stream_.Put(':');
-						Base::stream_.Put(' ');
+						Base::os_.Put(':');
+						Base::os_.Put(' ');
 					}
 				}
 				else
-					Base::stream_.Put('\n');
+					Base::os_.Put('\n');
 
 				if (level->valueCount % 2 == 0)
 					WriteIndent();
@@ -144,7 +144,7 @@ protected:
 
 	void WriteIndent()  {
 		size_t count = (Base::level_stack_.GetSize() / sizeof(typename Base::Level)) * indentCharCount_;
-		PutN(Base::stream_, indentChar_, count);
+		PutN(Base::os_, indentChar_, count);
 	}
 
 	Ch indentChar_;

@@ -6,32 +6,38 @@
 
 namespace rapidjson {
 
-//! Wrapper of C file stream for input using fread().
+//! File byte stream for input using fread().
 /*!
 	\implements Stream
 */
 class FileReadStream {
 public:
-	typedef char Ch;	//!< Character type. Only support char.
+	typedef char Ch;	//!< Character type (byte).
 
+	//! Constructor.
+	/*!
+		\param fp File pointer opened for read.
+		\param buffer user-supplied buffer.
+		\param bufferSize size of buffer in bytes. Must >=4 bytes.
+	*/
 	FileReadStream(FILE* fp, char* buffer, size_t bufferSize) : fp_(fp), buffer_(buffer), bufferSize_(bufferSize), bufferLast_(0), current_(buffer_), readCount_(0), count_(0), eof_(false) { 
 		RAPIDJSON_ASSERT(fp_ != 0);
 		RAPIDJSON_ASSERT(bufferSize >= 4);
 		Read();
 	}
 
-	char Peek() const { return *current_; }
-	char Take() { char c = *current_; Read(); return c; }
+	Ch Peek() const { return *current_; }
+	Ch Take() { Ch c = *current_; Read(); return c; }
 	size_t Tell() const { return count_ + (current_ - buffer_); }
 
 	// Not implemented
-	void Put(char c) { RAPIDJSON_ASSERT(false); }
+	void Put(Ch c) { RAPIDJSON_ASSERT(false); }
 	void Flush() { RAPIDJSON_ASSERT(false); } 
-	char* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
-	size_t PutEnd(char*) { RAPIDJSON_ASSERT(false); return 0; }
+	Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
+	size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
 	// For encoding detection only.
-	const char* Peek4() const {
+	const Ch* Peek4() const {
 		return (current_ + 4 <= bufferLast_) ? current_ : 0;
 	}
 
@@ -39,12 +45,7 @@ private:
 	void Read() {
 		if (current_ < bufferLast_)
 			++current_;
-		else
-			FillBuffer();
-	}
-	
-	void FillBuffer() {
-		if (!eof_) {
+		else if (!eof_) {
 			count_ += readCount_;
 			readCount_ = fread(buffer_, 1, bufferSize_, fp_);
 			bufferLast_ = buffer_ + readCount_ - 1;
@@ -59,10 +60,10 @@ private:
 	}
 
 	FILE* fp_;
-	char *buffer_;
+	Ch *buffer_;
 	size_t bufferSize_;
-	char *bufferLast_;
-	char *current_;
+	Ch *bufferLast_;
+	Ch *current_;
 	size_t readCount_;
 	size_t count_;	//!< Number of characters read
 	bool eof_;

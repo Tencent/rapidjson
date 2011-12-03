@@ -89,12 +89,12 @@ struct BaseReaderHandler {
 /*! \param stream A input stream for skipping white spaces.
 	\note This function has SSE2/SSE4.2 specialization.
 */
-template<typename Stream>
-void SkipWhitespace(Stream& stream) {
-	Stream s = stream;	// Use a local copy for optimization
+template<typename InputStream>
+void SkipWhitespace(InputStream& is) {
+	InputStream s = is;	// Use a local copy for optimization
 	while (s.Peek() == ' ' || s.Peek() == '\n' || s.Peek() == '\r' || s.Peek() == '\t')
 		s.Take();
-	stream = s;
+	is = s;
 }
 
 #ifdef RAPIDJSON_SSE42
@@ -162,13 +162,13 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
 
 #ifdef RAPIDJSON_SIMD
 //! Template function specialization for InsituStringStream
-template<> inline void SkipWhitespace(InsituStringStream& stream) { 
-	stream.src_ = const_cast<char*>(SkipWhitespace_SIMD(stream.src_));
+template<> inline void SkipWhitespace(InsituStringStream& is) { 
+	is.src_ = const_cast<char*>(SkipWhitespace_SIMD(is.src_));
 }
 
 //! Template function specialization for StringStream
-template<> inline void SkipWhitespace(StringStream& stream) {
-	stream.src_ = SkipWhitespace_SIMD(stream.src_);
+template<> inline void SkipWhitespace(StringStream& is) {
+	is.src_ = SkipWhitespace_SIMD(is.src_);
 }
 #endif // RAPIDJSON_SIMD
 
@@ -187,7 +187,8 @@ template<> inline void SkipWhitespace(StringStream& stream) {
 
     A GenericReader object can be reused for parsing multiple JSON text.
     
-    \tparam Encoding Encoding of both the stream and the parse output.
+    \tparam SourceEncoding Encoding of the input stream.
+	\tparam TargetEncoding Encoding of the parse output.
     \tparam Allocator Allocator type for stack.
 */
 template <typename SourceEncoding, typename TargetEncoding, typename Allocator = MemoryPoolAllocator<> >
@@ -203,14 +204,14 @@ public:
 
 	//! Parse JSON text.
 	/*! \tparam parseFlags Combination of ParseFlag. 
-		 \tparam Stream Type of input stream.
+		 \tparam InputStream Type of input stream.
 		 \tparam Handler Type of handler which must implement Handler concept.
 		 \param stream Input stream to be parsed.
 		 \param handler The handler to receive events.
 		 \return Whether the parsing is successful.
 	*/
-	template <unsigned parseFlags, typename Stream, typename Handler>
-	bool Parse(Stream& stream, Handler& handler) {
+	template <unsigned parseFlags, typename InputStream, typename Handler>
+	bool Parse(InputStream& is, Handler& handler) {
 		parseError_ = 0;
 		errorOffset_ = 0;
 
@@ -219,20 +220,20 @@ public:
 			return false;
 		}
 
-		SkipWhitespace(stream);
+		SkipWhitespace(is);
 
-		if (stream.Peek() == '\0')
-			RAPIDJSON_PARSE_ERROR("Text only contains white space(s)", stream.Tell());
+		if (is.Peek() == '\0')
+			RAPIDJSON_PARSE_ERROR("Text only contains white space(s)", is.Tell());
 		else {
-			switch (stream.Peek()) {
-				case '{': ParseObject<parseFlags>(stream, handler); break;
-				case '[': ParseArray<parseFlags>(stream, handler); break;
-				default: RAPIDJSON_PARSE_ERROR("Expect either an object or array at root", stream.Tell());
+			switch (is.Peek()) {
+				case '{': ParseObject<parseFlags>(is, handler); break;
+				case '[': ParseArray<parseFlags>(is, handler); break;
+				default: RAPIDJSON_PARSE_ERROR("Expect either an object or array at root", is.Tell());
 			}
-			SkipWhitespace(stream);
+			SkipWhitespace(is);
 
-			if (stream.Peek() != '\0')
-				RAPIDJSON_PARSE_ERROR("Nothing should follow the root object or array.", stream.Tell());
+			if (is.Peek() != '\0')
+				RAPIDJSON_PARSE_ERROR("Nothing should follow the root object or array.", is.Tell());
 		}
 
 		return true;
@@ -244,108 +245,108 @@ public:
 
 private:
 	// Parse object: { string : value, ... }
-	template<unsigned parseFlags, typename Stream, typename Handler>
-	void ParseObject(Stream& stream, Handler& handler) {
-		RAPIDJSON_ASSERT(stream.Peek() == '{');
-		stream.Take();	// Skip '{'
+	template<unsigned parseFlags, typename InputStream, typename Handler>
+	void ParseObject(InputStream& is, Handler& handler) {
+		RAPIDJSON_ASSERT(is.Peek() == '{');
+		is.Take();	// Skip '{'
 		handler.StartObject();
-		SkipWhitespace(stream);
+		SkipWhitespace(is);
 
-		if (stream.Peek() == '}') {
-			stream.Take();
+		if (is.Peek() == '}') {
+			is.Take();
 			handler.EndObject(0);	// empty object
 			return;
 		}
 
 		for (SizeType memberCount = 0;;) {
-			if (stream.Peek() != '"')
-				RAPIDJSON_PARSE_ERROR("Name of an object member must be a string", stream.Tell());
+			if (is.Peek() != '"')
+				RAPIDJSON_PARSE_ERROR("Name of an object member must be a string", is.Tell());
 
-			ParseString<parseFlags>(stream, handler);
-			SkipWhitespace(stream);
+			ParseString<parseFlags>(is, handler);
+			SkipWhitespace(is);
 
-			if (stream.Take() != ':')
-				RAPIDJSON_PARSE_ERROR("There must be a colon after the name of object member", stream.Tell());
+			if (is.Take() != ':')
+				RAPIDJSON_PARSE_ERROR("There must be a colon after the name of object member", is.Tell());
 
-			SkipWhitespace(stream);
+			SkipWhitespace(is);
 
-			ParseValue<parseFlags>(stream, handler);
-			SkipWhitespace(stream);
+			ParseValue<parseFlags>(is, handler);
+			SkipWhitespace(is);
 
 			++memberCount;
 
-			switch(stream.Take()) {
-				case ',': SkipWhitespace(stream); break;
+			switch(is.Take()) {
+				case ',': SkipWhitespace(is); break;
 				case '}': handler.EndObject(memberCount); return;
-				default:  RAPIDJSON_PARSE_ERROR("Must be a comma or '}' after an object member", stream.Tell());
+				default:  RAPIDJSON_PARSE_ERROR("Must be a comma or '}' after an object member", is.Tell());
 			}
 		}
 	}
 
 	// Parse array: [ value, ... ]
-	template<unsigned parseFlags, typename Stream, typename Handler>
-	void ParseArray(Stream& stream, Handler& handler) {
-		RAPIDJSON_ASSERT(stream.Peek() == '[');
-		stream.Take();	// Skip '['
+	template<unsigned parseFlags, typename InputStream, typename Handler>
+	void ParseArray(InputStream& is, Handler& handler) {
+		RAPIDJSON_ASSERT(is.Peek() == '[');
+		is.Take();	// Skip '['
 		handler.StartArray();
-		SkipWhitespace(stream);
+		SkipWhitespace(is);
 
-		if (stream.Peek() == ']') {
-			stream.Take();
+		if (is.Peek() == ']') {
+			is.Take();
 			handler.EndArray(0); // empty array
 			return;
 		}
 
 		for (SizeType elementCount = 0;;) {
-			ParseValue<parseFlags>(stream, handler);
+			ParseValue<parseFlags>(is, handler);
 			++elementCount;
-			SkipWhitespace(stream);
+			SkipWhitespace(is);
 
-			switch (stream.Take()) {
-				case ',': SkipWhitespace(stream); break;
+			switch (is.Take()) {
+				case ',': SkipWhitespace(is); break;
 				case ']': handler.EndArray(elementCount); return;
-				default:  RAPIDJSON_PARSE_ERROR("Must be a comma or ']' after an array element.", stream.Tell());
+				default:  RAPIDJSON_PARSE_ERROR("Must be a comma or ']' after an array element.", is.Tell());
 			}
 		}
 	}
 
-	template<unsigned parseFlags, typename Stream, typename Handler>
-	void ParseNull(Stream& stream, Handler& handler) {
-		RAPIDJSON_ASSERT(stream.Peek() == 'n');
-		stream.Take();
+	template<unsigned parseFlags, typename InputStream, typename Handler>
+	void ParseNull(InputStream& is, Handler& handler) {
+		RAPIDJSON_ASSERT(is.Peek() == 'n');
+		is.Take();
 
-		if (stream.Take() == 'u' && stream.Take() == 'l' && stream.Take() == 'l')
+		if (is.Take() == 'u' && is.Take() == 'l' && is.Take() == 'l')
 			handler.Null();
 		else
-			RAPIDJSON_PARSE_ERROR("Invalid value", stream.Tell() - 1);
+			RAPIDJSON_PARSE_ERROR("Invalid value", is.Tell() - 1);
 	}
 
-	template<unsigned parseFlags, typename Stream, typename Handler>
-	void ParseTrue(Stream& stream, Handler& handler) {
-		RAPIDJSON_ASSERT(stream.Peek() == 't');
-		stream.Take();
+	template<unsigned parseFlags, typename InputStream, typename Handler>
+	void ParseTrue(InputStream& is, Handler& handler) {
+		RAPIDJSON_ASSERT(is.Peek() == 't');
+		is.Take();
 
-		if (stream.Take() == 'r' && stream.Take() == 'u' && stream.Take() == 'e')
+		if (is.Take() == 'r' && is.Take() == 'u' && is.Take() == 'e')
 			handler.Bool(true);
 		else
-			RAPIDJSON_PARSE_ERROR("Invalid value", stream.Tell());
+			RAPIDJSON_PARSE_ERROR("Invalid value", is.Tell());
 	}
 
-	template<unsigned parseFlags, typename Stream, typename Handler>
-	void ParseFalse(Stream& stream, Handler& handler) {
-		RAPIDJSON_ASSERT(stream.Peek() == 'f');
-		stream.Take();
+	template<unsigned parseFlags, typename InputStream, typename Handler>
+	void ParseFalse(InputStream& is, Handler& handler) {
+		RAPIDJSON_ASSERT(is.Peek() == 'f');
+		is.Take();
 
-		if (stream.Take() == 'a' && stream.Take() == 'l' && stream.Take() == 's' && stream.Take() == 'e')
+		if (is.Take() == 'a' && is.Take() == 'l' && is.Take() == 's' && is.Take() == 'e')
 			handler.Bool(false);
 		else
-			RAPIDJSON_PARSE_ERROR("Invalid value", stream.Tell() - 1);
+			RAPIDJSON_PARSE_ERROR("Invalid value", is.Tell() - 1);
 	}
 
 	// Helper function to parse four hexidecimal digits in \uXXXX in ParseString().
-	template<typename Stream>
-	unsigned ParseHex4(Stream& stream) {
-		Stream s = stream;	// Use a local copy for optimization
+	template<typename InputStream>
+	unsigned ParseHex4(InputStream& is) {
+		InputStream s = is;	// Use a local copy for optimization
 		unsigned codepoint = 0;
 		for (int i = 0; i < 4; i++) {
 			Ch c = s.Take();
@@ -360,14 +361,16 @@ private:
 			else
 				RAPIDJSON_PARSE_ERROR("Incorrect hex digit after \\u escape", s.Tell() - 1);
 		}
-		stream = s; // Restore stream
+		is = s; // Restore is
 		return codepoint;
 	}
 
 	struct StackStream {
+		typedef typename TargetEncoding::Ch Ch;
+
 		StackStream(internal::Stack<Allocator>& stack) : stack_(stack), length_(0) {}
-		void Put(typename TargetEncoding::Ch c) {
-			*stack_.template Push<typename TargetEncoding::Ch>() = c;
+		void Put(Ch c) {
+			*stack_.template Push<Ch>() = c;
 			++length_;
 		}
 		internal::Stack<Allocator>& stack_;
@@ -375,28 +378,28 @@ private:
 	};
 
 	// Parse string and generate String event. Different code paths for kParseInsituFlag.
-	template<unsigned parseFlags, typename Stream, typename Handler>
-	void ParseString(Stream& stream, Handler& handler) {
-		Stream s = stream;	// Local copy for optimization
+	template<unsigned parseFlags, typename InputStream, typename Handler>
+	void ParseString(InputStream& is, Handler& handler) {
+		InputStream s = is;	// Local copy for optimization
 		if (parseFlags & kParseInsituFlag) {
 			Ch *head = s.PutBegin();
-			ParseStringToStream<parseFlags>(s, s);
+			ParseStringToStream<parseFlags, SourceEncoding, SourceEncoding>(s, s);
 			size_t length = s.PutEnd(head) - 1;
 			RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
 			handler.String((typename TargetEncoding::Ch*)head, SizeType(length), false);
 		}
 		else {
 			StackStream stackStream(stack_);
-			ParseStringToStream<parseFlags>(s, stackStream);
+			ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
 			handler.String(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, true);
 		}
-		stream = s;		// Restore stream
+		is = s;		// Restore is
 	}
 
-	// Parse string to an output stream
+	// Parse string to an output is
 	// This function handles the prefix/suffix double quotes, escaping, and optional encoding validation.
-	template<unsigned parseFlags, typename InputStream, typename OutputStream>
-	RAPIDJSON_FORCEINLINE void ParseStringToStream(InputStream& input, OutputStream& output) {
+	template<unsigned parseFlags, typename SEncoding, typename TEncoding, typename InputStream, typename OutputStream>
+	RAPIDJSON_FORCEINLINE void ParseStringToStream(InputStream& is, OutputStream& os) {
 #define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 		static const char escape[256] = {
 			Z16, Z16, 0, 0,'\"', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,'/', 
@@ -407,53 +410,53 @@ private:
 		};
 #undef Z16
 
-		RAPIDJSON_ASSERT(input.Peek() == '\"');
-		input.Take();	// Skip '\"'
+		RAPIDJSON_ASSERT(is.Peek() == '\"');
+		is.Take();	// Skip '\"'
 
 		for (;;) {
-			Ch c = input.Peek();
+			Ch c = is.Peek();
 			if (c == '\\') {	// Escape
-				input.Take();
-				Ch e = input.Take();
+				is.Take();
+				Ch e = is.Take();
 				if ((sizeof(Ch) == 1 || e < 256) && escape[(unsigned char)e])
-					output.Put(escape[(unsigned char)e]);
+					os.Put(escape[(unsigned char)e]);
 				else if (e == 'u') {	// Unicode
-					unsigned codepoint = ParseHex4(input);
+					unsigned codepoint = ParseHex4(is);
 					if (codepoint >= 0xD800 && codepoint <= 0xDBFF) {
 						// Handle UTF-16 surrogate pair
-						if (input.Take() != '\\' || input.Take() != 'u')
-							RAPIDJSON_PARSE_ERROR("Missing the second \\u in surrogate pair", input.Tell() - 2);
-						unsigned codepoint2 = ParseHex4(input);
+						if (is.Take() != '\\' || is.Take() != 'u')
+							RAPIDJSON_PARSE_ERROR("Missing the second \\u in surrogate pair", is.Tell() - 2);
+						unsigned codepoint2 = ParseHex4(is);
 						if (codepoint2 < 0xDC00 || codepoint2 > 0xDFFF)
-							RAPIDJSON_PARSE_ERROR("The second \\u in surrogate pair is invalid", input.Tell() - 2);
+							RAPIDJSON_PARSE_ERROR("The second \\u in surrogate pair is invalid", is.Tell() - 2);
 						codepoint = (((codepoint - 0xD800) << 10) | (codepoint2 - 0xDC00)) + 0x10000;
 					}
-					TargetEncoding::Encode(output, codepoint);
+					TEncoding::Encode(os, codepoint);
 				}
 				else
-					RAPIDJSON_PARSE_ERROR("Unknown escape character", input.Tell() - 1);
+					RAPIDJSON_PARSE_ERROR("Unknown escape character", is.Tell() - 1);
 			}
 			else if (c == '"') {	// Closing double quote
-				input.Take();
-				output.Put('\0');	// null-terminate the string
+				is.Take();
+				os.Put('\0');	// null-terminate the string
 				return;
 			}
 			else if (c == '\0')
-				RAPIDJSON_PARSE_ERROR("lacks ending quotation before the end of string", input.Tell() - 1);
+				RAPIDJSON_PARSE_ERROR("lacks ending quotation before the end of string", is.Tell() - 1);
 			else if ((unsigned)c < 0x20) // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
-				RAPIDJSON_PARSE_ERROR("Incorrect unescaped character in string", input.Tell() - 1);
+				RAPIDJSON_PARSE_ERROR("Incorrect unescaped character in string", is.Tell() - 1);
 			else {
 				if (parseFlags & kParseValidateEncodingFlag ? 
-					!Transcoder<SourceEncoding, TargetEncoding>::Validate(input, output) : 
-					!Transcoder<SourceEncoding, TargetEncoding>::Transcode(input, output))
-					RAPIDJSON_PARSE_ERROR("Invalid encoding", input.Tell());
+					!Transcoder<SEncoding, TEncoding>::Validate(is, os) : 
+					!Transcoder<SEncoding, TEncoding>::Transcode(is, os))
+					RAPIDJSON_PARSE_ERROR("Invalid encoding", is.Tell());
 			}
 		}
 	}
 
-	template<unsigned parseFlags, typename Stream, typename Handler>
-	void ParseNumber(Stream& stream, Handler& handler) {
-		Stream s = stream; // Local copy for optimization
+	template<unsigned parseFlags, typename InputStream, typename Handler>
+	void ParseNumber(InputStream& is, Handler& handler) {
+		InputStream s = is; // Local copy for optimization
 		// Parse minus
 		bool minus = false;
 		if (s.Peek() == '-') {
@@ -493,7 +496,7 @@ private:
 				}
 		}
 		else
-			RAPIDJSON_PARSE_ERROR("Expect a value here.", stream.Tell());
+			RAPIDJSON_PARSE_ERROR("Expect a value here.", is.Tell());
 
 		// Parse 64bit int
 		uint64_t i64;
@@ -526,7 +529,7 @@ private:
 			d = (double)i64;
 			while (s.Peek() >= '0' && s.Peek() <= '9') {
 				if (d >= 1E307)
-					RAPIDJSON_PARSE_ERROR("Number too big to store in double", stream.Tell());
+					RAPIDJSON_PARSE_ERROR("Number too big to store in double", is.Tell());
 				d = d * 10 + (s.Take() - '0');
 			}
 		}
@@ -545,7 +548,7 @@ private:
 				--expFrac;
 			}
 			else
-				RAPIDJSON_PARSE_ERROR("At least one digit in fraction part", stream.Tell());
+				RAPIDJSON_PARSE_ERROR("At least one digit in fraction part", is.Tell());
 
 			while (s.Peek() >= '0' && s.Peek() <= '9') {
 				if (expFrac > -16) {
@@ -578,7 +581,7 @@ private:
 				while (s.Peek() >= '0' && s.Peek() <= '9') {
 					exp = exp * 10 + (s.Take() - '0');
 					if (exp > 308)
-						RAPIDJSON_PARSE_ERROR("Number too big to store in double", stream.Tell());
+						RAPIDJSON_PARSE_ERROR("Number too big to store in double", is.Tell());
 				}
 			}
 			else
@@ -608,20 +611,20 @@ private:
 			}
 		}
 
-		stream = s; // restore stream
+		is = s; // restore is
 	}
 
 	// Parse any JSON value
-	template<unsigned parseFlags, typename Stream, typename Handler>
-	void ParseValue(Stream& stream, Handler& handler) {
-		switch (stream.Peek()) {
-			case 'n': ParseNull  <parseFlags>(stream, handler); break;
-			case 't': ParseTrue  <parseFlags>(stream, handler); break;
-			case 'f': ParseFalse <parseFlags>(stream, handler); break;
-			case '"': ParseString<parseFlags>(stream, handler); break;
-			case '{': ParseObject<parseFlags>(stream, handler); break;
-			case '[': ParseArray <parseFlags>(stream, handler); break;
-			default : ParseNumber<parseFlags>(stream, handler);
+	template<unsigned parseFlags, typename InputStream, typename Handler>
+	void ParseValue(InputStream& is, Handler& handler) {
+		switch (is.Peek()) {
+			case 'n': ParseNull  <parseFlags>(is, handler); break;
+			case 't': ParseTrue  <parseFlags>(is, handler); break;
+			case 'f': ParseFalse <parseFlags>(is, handler); break;
+			case '"': ParseString<parseFlags>(is, handler); break;
+			case '{': ParseObject<parseFlags>(is, handler); break;
+			case '[': ParseArray <parseFlags>(is, handler); break;
+			default : ParseNumber<parseFlags>(is, handler);
 		}
 	}
 

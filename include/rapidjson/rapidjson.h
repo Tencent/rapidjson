@@ -82,6 +82,29 @@ typedef unsigned SizeType;
 #define RAPIDJSON_ASSERT(x) assert(x)
 #endif // RAPIDJSON_ASSERT
 
+///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_STATIC_ASSERT
+
+// Adopt from boost
+#ifndef RAPIDJSON_STATIC_ASSERT
+namespace rapidjson {
+template <bool x> struct STATIC_ASSERTION_FAILURE;
+template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
+template<int x> struct StaticAssertTest {};
+} // namespace rapidjson
+
+#define RAPIDJSON_JOIN(X, Y) RAPIDJSON_DO_JOIN(X, Y)
+#define RAPIDJSON_DO_JOIN(X, Y) RAPIDJSON_DO_JOIN2(X, Y)
+#define RAPIDJSON_DO_JOIN2(X, Y) X##Y
+
+#define RAPIDJSON_STATIC_ASSERT(x) typedef ::rapidjson::StaticAssertTest<\
+	sizeof(::rapidjson::STATIC_ASSERTION_FAILURE<bool(x) >)>\
+	RAPIDJSON_JOIN(StaticAssertTypedef, __LINE__)
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// Allocators and Encodings
+
 #include "allocators.h"
 #include "encodings.h"
 
