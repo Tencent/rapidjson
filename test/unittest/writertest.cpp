@@ -54,3 +54,13 @@ TEST(Writer, String) {
 	TEST_ROUNDTRIP("[\"Hello\\u0000World\"]");
 	TEST_ROUNDTRIP("[\"\\\"\\\\/\\b\\f\\n\\r\\t\"]");
 }
+
+TEST(Writer, Transcode) {
+	// UTF8 -> UTF16 -> UTF8
+	StringStream s("{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3], \"dollar\":\"\x24\", \"cents\":\"\xC2\xA2\", \"euro\":\"\xE2\x82\xAC\", \"gclef\":\"\xF0\x9D\x84\x9E\" } ");
+	StringBuffer buffer;
+	Writer<StringBuffer, UTF16<>, UTF8<> > writer(buffer);
+	GenericReader<UTF8<>, UTF16<> > reader;
+	reader.Parse<0>(s, writer);
+	EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3],\"dollar\":\"\x24\",\"cents\":\"\xC2\xA2\",\"euro\":\"\xE2\x82\xAC\",\"gclef\":\"\xF0\x9D\x84\x9E\"}", buffer.GetString());
+}

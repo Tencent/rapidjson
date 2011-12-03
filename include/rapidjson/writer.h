@@ -23,10 +23,10 @@ namespace rapidjson {
 	\tparam Encoding Encoding of both source strings and output.
 	\implements Handler
 */
-template<typename Stream, typename Encoding = UTF8<>, typename Allocator = MemoryPoolAllocator<> >
+template<typename Stream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename Allocator = MemoryPoolAllocator<> >
 class Writer {
 public:
-	typedef typename Encoding::Ch Ch;
+	typedef typename SourceEncoding::Ch Ch;
 
 	Writer(Stream& stream, Allocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) : 
 		stream_(stream), level_stack_(allocator, levelDepth * sizeof(Level)) {}
@@ -166,7 +166,7 @@ protected:
 	}
 
 	void WriteString(const Ch* str, SizeType length)  {
-		static const char hexDigits[] = "0123456789ABCDEF";
+		static const char hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 		static const char escape[256] = {
 #define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 			//0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
@@ -180,19 +180,22 @@ protected:
 		};
 
 		stream_.Put('\"');
-		for (const Ch* p = str; p != str + length; ++p) {
-			if ((sizeof(Ch) == 1 || *p < 256) && escape[(unsigned char)*p])  {
+		GenericStringStream<SourceEncoding> is(str);
+		while (is.Tell() < length) {
+			const Ch c = is.Peek();
+			if ((sizeof(Ch) == 1 || (unsigned)c < 256) && escape[(unsigned char)c])  {
+				is.Take();
 				stream_.Put('\\');
-				stream_.Put(escape[(unsigned char)*p]);
-				if (escape[(unsigned char)*p] == 'u') {
+				stream_.Put(escape[(unsigned char)c]);
+				if (escape[(unsigned char)c] == 'u') {
 					stream_.Put('0');
 					stream_.Put('0');
-					stream_.Put(hexDigits[(*p) >> 4]);
-					stream_.Put(hexDigits[(*p) & 0xF]);
+					stream_.Put(hexDigits[(unsigned char)c >> 4]);
+					stream_.Put(hexDigits[(unsigned char)c & 0xF]);
 				}
 			}
 			else
-				stream_.Put(*p);
+				Transcoder<SourceEncoding, TargetEncoding>::Transcode(is, stream_);
 		}
 		stream_.Put('\"');
 	}
