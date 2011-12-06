@@ -418,7 +418,7 @@ private:
 			if (c == '\\') {	// Escape
 				is.Take();
 				Ch e = is.Take();
-				if ((sizeof(Ch) == 1 || e < 256) && escape[(unsigned char)e])
+				if ((sizeof(Ch) == 1 || unsigned(e) < 256) && escape[(unsigned char)e])
 					os.Put(escape[(unsigned char)e]);
 				else if (e == 'u') {	// Unicode
 					unsigned codepoint = ParseHex4(is);
