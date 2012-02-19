@@ -149,6 +149,7 @@ public:
 
 	//! Allocates a memory block. (concept Allocator)
 	void* Malloc(size_t size) {
+		size = RAPIDJSON_ALIGN(size);
 		if (chunkHead_->size + size > chunkHead_->capacity)
 			AddChunk(chunk_capacity_ > size ? chunk_capacity_ : size);
 
@@ -169,6 +170,7 @@ public:
 		// Simply expand it if it is the last allocation and there is sufficient space
 		if (originalPtr == (char *)(chunkHead_ + 1) + chunkHead_->size - originalSize) {
 			size_t increment = newSize - originalSize;
+			increment = RAPIDJSON_ALIGN(increment);
 			if (chunkHead_->size + increment <= chunkHead_->capacity) {
 				chunkHead_->size += increment;
 				return originalPtr;

@@ -45,6 +45,19 @@ typedef unsigned __int64 uint64_t;
 #endif
 #endif // RAPIDJSON_ENDIAN
 
+
+///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_ALIGNSIZE
+
+//! Data alignment of the machine.
+/*!
+	Some machine requires strict data alignment.
+	Currently the default uses 4 bytes alignment. User can customize this.
+*/
+#ifndef RAPIDJSON_ALIGN
+#define RAPIDJSON_ALIGN(x) ((x + 3) & ~3)
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_SSE2/RAPIDJSON_SSE42/RAPIDJSON_SIMD
 

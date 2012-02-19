@@ -98,11 +98,11 @@ public:
 	//! Constructor for uint64_t value.
 	GenericValue(uint64_t u64) : flags_(kNumberUint64Flag) {
 		data_.n.u64 = u64;
-		if (!(u64 & 0x8000000000000000L))
+		if (!(u64 & 0x8000000000000000ULL))
 			flags_ |= kInt64Flag;
-		if (!(u64 & 0xFFFFFFFF00000000L))
+		if (!(u64 & 0xFFFFFFFF00000000ULL))
 			flags_ |= kUintFlag;
-		if (!(u64 & 0xFFFFFFFF80000000L))
+		if (!(u64 & 0xFFFFFFFF80000000ULL))
 			flags_ |= kIntFlag;
 	}
 
@@ -270,18 +270,18 @@ public:
 		return *this;
 	}
 
-	GenericValue& AddMember(const char* name, Allocator& nameAllocator, GenericValue& value, Allocator& allocator) {
+	GenericValue& AddMember(const Ch* name, Allocator& nameAllocator, GenericValue& value, Allocator& allocator) {
 		GenericValue n(name, internal::StrLen(name), nameAllocator);
 		return AddMember(n, value, allocator);
 	}
 
-	GenericValue& AddMember(const char* name, GenericValue& value, Allocator& allocator) {
+	GenericValue& AddMember(const Ch* name, GenericValue& value, Allocator& allocator) {
 		GenericValue n(name, internal::StrLen(name));
 		return AddMember(n, value, allocator);
 	}
 
 	template <typename T>
-	GenericValue& AddMember(const char* name, T value, Allocator& allocator) {
+	GenericValue& AddMember(const Ch* name, T value, Allocator& allocator) {
 		GenericValue n(name, internal::StrLen(name));
 		GenericValue v(value);
 		return AddMember(n, v, allocator);
@@ -650,10 +650,10 @@ private:
 	void SetStringRaw(const Ch* s, SizeType length, Allocator& allocator) {
 		RAPIDJSON_ASSERT(s != NULL);
 		flags_ = kCopyStringFlag;
-		data_.s.str = (char *)allocator.Malloc(length + 1);
+		data_.s.str = (Ch *)allocator.Malloc(length + 1);
 		data_.s.length = length;
 		memcpy((void*)data_.s.str, s, length);
-		((char*)data_.s.str)[length] = '\0';
+		((Ch*)data_.s.str)[length] = '\0';
 	}
 
 	//! Assignment without calling destructor
@@ -703,7 +703,7 @@ public:
 		GenericReader<SourceEncoding, Encoding> reader;
 		if (reader.Parse<parseFlags>(is, *this)) {
 			RAPIDJSON_ASSERT(stack_.GetSize() == sizeof(ValueType)); // Got one and only one root object
-			RawAssign(*stack_.template Pop<ValueType>(1));
+			this->RawAssign(*stack_.template Pop<ValueType>(1));	// Add this-> to prevent issue 13.
 			parseError_ = 0;
 			errorOffset_ = 0;
 		}
