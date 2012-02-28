@@ -499,7 +499,7 @@ private:
 			RAPIDJSON_PARSE_ERROR("Expect a value here.", is.Tell());
 
 		// Parse 64bit int
-		uint64_t i64;
+		uint64_t i64 = 0;
 		bool useDouble = false;
 		if (try64bit) {
 			i64 = i;
@@ -524,7 +524,7 @@ private:
 		}
 
 		// Force double for big integer
-		double d;
+		double d = 0.0;
 		if (useDouble) {
 			d = (double)i64;
 			while (s.Peek() >= '0' && s.Peek() <= '9') {
