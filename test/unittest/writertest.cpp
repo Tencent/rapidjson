@@ -12,6 +12,7 @@ TEST(Writer, Compact) {
 	Reader reader;
 	reader.Parse<0>(s, writer);
 	EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3]}", buffer.GetString());
+	EXPECT_EQ(77, buffer.GetSize());
 }
 
 // json -> parse -> writer -> json
