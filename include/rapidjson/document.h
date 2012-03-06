@@ -298,9 +298,9 @@ public:
 			RAPIDJSON_ASSERT(data_.o.size > 0);
 			RAPIDJSON_ASSERT(data_.o.members != 0);
 
-			if (data_.o.size > 1) {
+			Member* last = data_.o.members + (data_.o.size - 1);
+			if (data_.o.size > 1 && m != last) {
 				// Move the last one to this place
-				Member* last = data_.o.members + (data_.o.size - 1);
 				m->name = last->name;
 				m->value = last->value;
 			}

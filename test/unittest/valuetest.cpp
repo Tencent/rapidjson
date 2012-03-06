@@ -576,3 +576,17 @@ TEST(Value, BigNestedObject) {
 		}
 	}
 }
+
+// Issue 18: Error removing last element of object
+// http://code.google.com/p/rapidjson/issues/detail?id=18
+TEST(Value, RemoveLastElement) {
+	rapidjson::Document doc;
+	rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+	rapidjson::Value objVal(rapidjson::kObjectType);        
+	objVal.AddMember("var1", 123, allocator);       
+	objVal.AddMember("var2", "444", allocator);
+	objVal.AddMember("var3", 555, allocator);
+	EXPECT_TRUE(objVal.HasMember("var3"));
+	objVal.RemoveMember("var3");    // Assertion here in r61
+	EXPECT_FALSE(objVal.HasMember("var3"));
+}
