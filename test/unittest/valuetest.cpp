@@ -105,9 +105,9 @@ TEST(Value, Int) {
 	Value x(1234);
 	EXPECT_EQ(kNumberType, x.GetType());
 	EXPECT_EQ(1234, x.GetInt());
-	EXPECT_EQ(1234, x.GetUint());
+	EXPECT_EQ(1234u, x.GetUint());
 	EXPECT_EQ(1234, x.GetInt64());
-	EXPECT_EQ(1234, x.GetUint64());
+	EXPECT_EQ(1234u, x.GetUint64());
 	EXPECT_EQ(1234, x.GetDouble());
 	//EXPECT_EQ(1234, (int)x);
 	//EXPECT_EQ(1234, (unsigned)x);
@@ -157,9 +157,9 @@ TEST(Value, Uint) {
 	// Constructor with int
 	Value x(1234u);
 	EXPECT_EQ(kNumberType, x.GetType());
-	EXPECT_EQ(1234u, x.GetInt());
+	EXPECT_EQ(1234, x.GetInt());
 	EXPECT_EQ(1234u, x.GetUint());
-	EXPECT_EQ(1234u, x.GetInt64());
+	EXPECT_EQ(1234, x.GetInt64());
 	EXPECT_EQ(1234u, x.GetUint64());
 	EXPECT_TRUE(x.IsNumber());
 	EXPECT_TRUE(x.IsInt());
@@ -180,11 +180,11 @@ TEST(Value, Uint) {
 	// SetUint()
 	Value z;
 	z.SetUint(1234);
-	EXPECT_EQ(1234, z.GetUint());
+	EXPECT_EQ(1234u, z.GetUint());
 
 	// operator=(unsigned)
 	z = 5678u;
-	EXPECT_EQ(5678, z.GetUint());
+	EXPECT_EQ(5678u, z.GetUint());
 
 	z = 2147483648u;	// 2^31, cannot cast as int
 	EXPECT_EQ(2147483648u, z.GetUint());
@@ -196,9 +196,9 @@ TEST(Value, Int64) {
 	Value x(int64_t(1234LL));
 	EXPECT_EQ(kNumberType, x.GetType());
 	EXPECT_EQ(1234, x.GetInt());
-	EXPECT_EQ(1234, x.GetUint());
+	EXPECT_EQ(1234u, x.GetUint());
 	EXPECT_EQ(1234, x.GetInt64());
-	EXPECT_EQ(1234, x.GetUint64());
+	EXPECT_EQ(1234u, x.GetUint64());
 	EXPECT_TRUE(x.IsNumber());
 	EXPECT_TRUE(x.IsInt());
 	EXPECT_TRUE(x.IsUint());
@@ -241,9 +241,9 @@ TEST(Value, Uint64) {
 	Value x(uint64_t(1234LL));
 	EXPECT_EQ(kNumberType, x.GetType());
 	EXPECT_EQ(1234, x.GetInt());
-	EXPECT_EQ(1234, x.GetUint());
+	EXPECT_EQ(1234u, x.GetUint());
 	EXPECT_EQ(1234, x.GetInt64());
-	EXPECT_EQ(1234, x.GetUint64());
+	EXPECT_EQ(1234u, x.GetUint64());
 	EXPECT_TRUE(x.IsNumber());
 	EXPECT_TRUE(x.IsInt());
 	EXPECT_TRUE(x.IsUint());
@@ -310,7 +310,7 @@ TEST(Value, String) {
 	EXPECT_EQ(kStringType, x.GetType());
 	EXPECT_TRUE(x.IsString());
 	EXPECT_STREQ("Hello", x.GetString());
-	EXPECT_EQ(5, x.GetStringLength());
+	EXPECT_EQ(5u, x.GetStringLength());
 
 	EXPECT_FALSE(x.IsNumber());
 	EXPECT_FALSE(x.IsNull());
@@ -326,20 +326,20 @@ TEST(Value, String) {
 	//x.SetString("World");
 	x.SetString("World", 5);
 	EXPECT_STREQ("Hello", c.GetString());
-	EXPECT_EQ(5, c.GetStringLength());
+	EXPECT_EQ(5u, c.GetStringLength());
 
 	// Constructor with type
 	Value y(kStringType);
 	EXPECT_TRUE(y.IsString());
 	EXPECT_EQ(0, y.GetString());
-	EXPECT_EQ(0, y.GetStringLength());
+	EXPECT_EQ(0u, y.GetStringLength());
 
 	// SetConsttring()
 	Value z;
 	//z.SetString("Hello");
 	z.SetString("Hello", 5);
 	EXPECT_STREQ("Hello", z.GetString());
-	EXPECT_EQ(5, z.GetStringLength());
+	EXPECT_EQ(5u, z.GetStringLength());
 
 	// SetString()
 	char s[] = "World";
@@ -347,7 +347,7 @@ TEST(Value, String) {
 	w.SetString(s, (SizeType)strlen(s), allocator);
 	s[0] = '\0';
 	EXPECT_STREQ("World", w.GetString());
-	EXPECT_EQ(5, w.GetStringLength());
+	EXPECT_EQ(5u, w.GetStringLength());
 }
 
 TEST(Value, Array) {
@@ -358,10 +358,10 @@ TEST(Value, Array) {
 	EXPECT_EQ(kArrayType, x.GetType());
 	EXPECT_TRUE(x.IsArray());
 	EXPECT_TRUE(x.Empty());
-	EXPECT_EQ(0, x.Size());
+	EXPECT_EQ(0u, x.Size());
 	EXPECT_TRUE(y.IsArray());
 	EXPECT_TRUE(y.Empty());
-	EXPECT_EQ(0, y.Size());
+	EXPECT_EQ(0u, y.Size());
 
 	EXPECT_FALSE(x.IsNull());
 	EXPECT_FALSE(x.IsBool());
@@ -381,9 +381,9 @@ TEST(Value, Array) {
 	x.PushBack(v, allocator);
 
 	EXPECT_FALSE(x.Empty());
-	EXPECT_EQ(4, x.Size());
+	EXPECT_EQ(4u, x.Size());
 	EXPECT_FALSE(y.Empty());
-	EXPECT_EQ(4, y.Size());
+	EXPECT_EQ(4u, y.Size());
 	EXPECT_TRUE(x[SizeType(0)].IsNull());
 	EXPECT_TRUE(x[1u].IsTrue());
 	EXPECT_TRUE(x[2u].IsFalse());
@@ -427,7 +427,7 @@ TEST(Value, Array) {
 
 	// PopBack()
 	x.PopBack();
-	EXPECT_EQ(3, x.Size());
+	EXPECT_EQ(3u, x.Size());
 	EXPECT_TRUE(y[SizeType(0)].IsNull());
 	EXPECT_TRUE(y[1].IsTrue());
 	EXPECT_TRUE(y[2].IsFalse());
@@ -435,9 +435,9 @@ TEST(Value, Array) {
 	// Clear()
 	x.Clear();
 	EXPECT_TRUE(x.Empty());
-	EXPECT_EQ(0, x.Size());
+	EXPECT_EQ(0u, x.Size());
 	EXPECT_TRUE(y.Empty());
-	EXPECT_EQ(0, y.Size());
+	EXPECT_EQ(0u, y.Size());
 
 	// SetArray()
 	Value z;

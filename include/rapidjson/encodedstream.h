@@ -22,7 +22,7 @@ public:
 
 	Ch Peek() const { return current_; }
 	Ch Take() { Ch c = current_; current_ = Encoding::Take(is_); return c; }
-	size_t Tell() const { is_.Tell(); }
+	size_t Tell() const { return is_.Tell(); }
 
 	// Not implemented
 	void Put(Ch c) { RAPIDJSON_ASSERT(false); }
@@ -31,6 +31,9 @@ public:
 	size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:
+	// Prohibit assignment for VC C4512 warning
+	EncodedInputStream& operator=(const EncodedInputStream&);
+
 	InputByteStream& is_;
 	Ch current_;
 };
@@ -57,11 +60,14 @@ public:
 	// Not implemented
 	Ch Peek() const { RAPIDJSON_ASSERT(false); }
 	Ch Take() { RAPIDJSON_ASSERT(false);  }
-	size_t Tell() const { RAPIDJSON_ASSERT(false);  }
+	size_t Tell() const { RAPIDJSON_ASSERT(false);  return 0; }
 	Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
 	size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:
+	// Prohibit assignment for VC C4512 warning
+	EncodedOutputStream& operator=(const EncodedOutputStream&);
+
 	OutputByteStream& os_;
 };
 
@@ -149,6 +155,9 @@ private:
 
 		// RUntime check whether the size of character type is sufficient. It only perform checks with assertion.
 		switch (type_) {
+		case kUTF8:
+			// Do nothing
+			break;
 		case kUTF16LE:
 		case kUTF16BE:
 			RAPIDJSON_ASSERT(sizeof(Ch) >= 2);
@@ -196,6 +205,9 @@ public:
 		case kUTF32BE:
 			RAPIDJSON_ASSERT(sizeof(Ch) >= 4);
 			break;
+		case kUTF8:
+			// Do nothing
+			break;
 		}
 
 		static const PutFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Put) };
@@ -213,7 +225,7 @@ public:
 	// Not implemented
 	Ch Peek() const { RAPIDJSON_ASSERT(false); }
 	Ch Take() { RAPIDJSON_ASSERT(false); }
-	size_t Tell() const { RAPIDJSON_ASSERT(false); }
+	size_t Tell() const { RAPIDJSON_ASSERT(false); return 0; }
 	Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
 	size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 

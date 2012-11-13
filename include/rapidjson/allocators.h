@@ -49,7 +49,7 @@ class CrtAllocator {
 public:
 	static const bool kNeedFree = true;
 	void* Malloc(size_t size) { return malloc(size); }
-	void* Realloc(void* originalPtr, size_t originalSize, size_t newSize) { return realloc(originalPtr, newSize); }
+	void* Realloc(void* originalPtr, size_t originalSize, size_t newSize) { (void)originalSize; return realloc(originalPtr, newSize); }
 	static void Free(void *ptr) { free(ptr); }
 };
 
@@ -184,7 +184,7 @@ public:
 	}
 
 	//! Frees a memory block (concept Allocator)
-	static void Free(void *ptr) {} // Do nothing
+	static void Free(void *ptr) { (void)ptr; } // Do nothing
 
 private:
 	//! Creates a new chunk.

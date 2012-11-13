@@ -193,7 +193,7 @@ struct UTF8 {
 	template <typename OutputByteStream>
 	static void Put(OutputByteStream& os, Ch c) {
 		RAPIDJSON_STATIC_ASSERT(sizeof(typename OutputByteStream::Ch) == 1);
-		os.Put(c);
+		os.Put(static_cast<typename OutputByteStream::Ch>(c));
 	}
 };
 
@@ -219,12 +219,12 @@ struct UTF16 {
 		RAPIDJSON_STATIC_ASSERT(sizeof(typename OutputStream::Ch) >= 2);
 		if (codepoint <= 0xFFFF) {
 			RAPIDJSON_ASSERT(codepoint < 0xD800 || codepoint > 0xDFFF); // Code point itself cannot be surrogate pair 
-			os.Put(codepoint);
+			os.Put(static_cast<wchar_t>(codepoint));
 		}
 		else {
 			RAPIDJSON_ASSERT(codepoint <= 0x10FFFF);
 			unsigned v = codepoint - 0x10000;
-			os.Put((v >> 10) | 0xD800);
+			os.Put(static_cast<wchar_t>((v >> 10) | 0xD800));
 			os.Put((v & 0x3FF) | 0xDC00);
 		}
 	}

@@ -30,11 +30,12 @@ TEST(JsonChecker, Reader) {
 			continue;
 
 		sprintf(filename, "jsonchecker/fail%d.json", i);
-		char* json;
 		size_t length;
-		if (!(json = ReadFile(filename, length))) {
+		char* json = ReadFile(filename, length);
+		if (!json) {
 			sprintf(filename, "../../bin/jsonchecker/fail%d.json", i);
-			if (!(json = ReadFile(filename, length))) {
+			json = ReadFile(filename, length);
+			if (!json) {
 				printf("jsonchecker file %s not found", filename);
 				continue;
 			}
@@ -50,11 +51,12 @@ TEST(JsonChecker, Reader) {
 	// passX.json
 	for (int i = 1; i <= 3; i++) {
 		sprintf(filename, "jsonchecker/pass%d.json", i);
-		char* json;
 		size_t length;
-		if (!(json = ReadFile(filename, length))) {
+		char* json = ReadFile(filename, length);
+		if (!json) {
 			sprintf(filename, "../../bin/jsonchecker/pass%d.json", i);
-			if (!(json = ReadFile(filename, length))) {
+			json = ReadFile(filename, length);
+			if (!json) {
 				printf("jsonchecker file %s not found", filename);
 				continue;
 			}

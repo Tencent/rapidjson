@@ -7,6 +7,11 @@
 #include <cstdio>	// snprintf() or _sprintf_s()
 #include <new>		// placement new
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4127) // conditional expression is constant
+#endif
+
 namespace rapidjson {
 
 //! JSON writer
@@ -43,6 +48,7 @@ public:
 	Writer& Double(double d)		{ Prefix(kNumberType); WriteDouble(d);		return *this; }
 
 	Writer& String(const Ch* str, SizeType length, bool copy = false) {
+		(void)copy;
 		Prefix(kStringType);
 		WriteString(str, length);
 		return *this;
@@ -56,6 +62,7 @@ public:
 	}
 
 	Writer& EndObject(SizeType memberCount = 0) {
+		(void)memberCount;
 		RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level));
 		RAPIDJSON_ASSERT(!level_stack_.template Top<Level>()->inArray);
 		level_stack_.template Pop<Level>(1);
@@ -73,6 +80,7 @@ public:
 	}
 
 	Writer& EndArray(SizeType elementCount = 0) {
+		(void)elementCount;
 		RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level));
 		RAPIDJSON_ASSERT(level_stack_.template Top<Level>()->inArray);
 		level_stack_.template Pop<Level>(1);
@@ -207,6 +215,7 @@ protected:
 	void WriteEndArray()	{ os_.Put(']'); }
 
 	void Prefix(Type type) {
+		(void)type;
 		if (level_stack_.GetSize() != 0) { // this value is not at root
 			Level* level = level_stack_.template Top<Level>();
 			if (level->valueCount > 0) {
@@ -225,8 +234,16 @@ protected:
 
 	OutputStream& os_;
 	internal::Stack<Allocator> level_stack_;
+
+private:
+	// Prohibit assignment for VC C4512 warning
+	Writer& operator=(const Writer& w);
 };
 
 } // namespace rapidjson
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #endif // RAPIDJSON_RAPIDJSON_H_

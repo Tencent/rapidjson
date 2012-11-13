@@ -16,8 +16,18 @@
 #include <emmintrin.h>
 #endif
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4127) // conditional expression is constant
+#endif
+
 #ifndef RAPIDJSON_PARSE_ERROR
-#define RAPIDJSON_PARSE_ERROR(msg, offset) do { parseError_ = msg; errorOffset_ = offset; longjmp(jmpbuf_, 1); } while(false)
+#define RAPIDJSON_PARSE_ERROR(msg, offset) \
+	RAPIDJSON_MULTILINEMACRO_BEGIN \
+	parseError_ = msg; \
+	errorOffset_ = offset; \
+	longjmp(jmpbuf_, 1); \
+	RAPIDJSON_MULTILINEMACRO_END
 #endif
 
 namespace rapidjson {
@@ -69,17 +79,17 @@ struct BaseReaderHandler {
 
 	void Default() {}
 	void Null() { Default(); }
-	void Bool(bool b) { Default(); }
-	void Int(int i) { Default(); }
-	void Uint(unsigned i) { Default(); }
-	void Int64(int64_t i) { Default(); }
-	void Uint64(uint64_t i) { Default(); }
-	void Double(double d) { Default(); }
-	void String(const Ch* str, SizeType length, bool copy) { Default(); }
+	void Bool(bool) { Default(); }
+	void Int(int) { Default(); }
+	void Uint(unsigned) { Default(); }
+	void Int64(int64_t) { Default(); }
+	void Uint64(uint64_t) { Default(); }
+	void Double(double) { Default(); }
+	void String(const Ch*, SizeType, bool) { Default(); }
 	void StartObject() { Default(); }
-	void EndObject(SizeType memberCount) { Default(); }
+	void EndObject(SizeType) { Default(); }
 	void StartArray() { Default(); }
-	void EndArray(SizeType elementCount) { Default(); }
+	void EndArray(SizeType) { Default(); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -215,7 +225,14 @@ public:
 		parseError_ = 0;
 		errorOffset_ = 0;
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4611) // interaction between '_setjmp' and C++ object destruction is non-portable
+#endif
 		if (setjmp(jmpbuf_)) {
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 			stack_.Clear();
 			return false;
 		}
@@ -365,7 +382,8 @@ private:
 		return codepoint;
 	}
 
-	struct StackStream {
+	class StackStream {
+	public:
 		typedef typename TargetEncoding::Ch Ch;
 
 		StackStream(internal::Stack<Allocator>& stack) : stack_(stack), length_(0) {}
@@ -375,6 +393,10 @@ private:
 		}
 		internal::Stack<Allocator>& stack_;
 		SizeType length_;
+
+	private:
+		// Prohibit assignment for VC C4512 warning
+		StackStream& operator=(const StackStream&);
 	};
 
 	// Parse string and generate String event. Different code paths for kParseInsituFlag.
@@ -639,5 +661,9 @@ private:
 typedef GenericReader<UTF8<>, UTF8<> > Reader;
 
 } // namespace rapidjson
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #endif // RAPIDJSON_READER_H_

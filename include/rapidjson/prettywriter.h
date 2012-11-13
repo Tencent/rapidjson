@@ -49,6 +49,7 @@ public:
 	PrettyWriter& Double(double d)		{ PrettyPrefix(kNumberType); Base::WriteDouble(d);		return *this; }
 
 	PrettyWriter& String(const Ch* str, SizeType length, bool copy = false) {
+		(void)copy;
 		PrettyPrefix(kStringType);
 		Base::WriteString(str, length);
 		return *this;
@@ -62,6 +63,7 @@ public:
 	}
 
 	PrettyWriter& EndObject(SizeType memberCount = 0) {
+		(void)memberCount;
 		RAPIDJSON_ASSERT(Base::level_stack_.GetSize() >= sizeof(typename Base::Level));
 		RAPIDJSON_ASSERT(!Base::level_stack_.template Top<typename Base::Level>()->inArray);
 		bool empty = Base::level_stack_.template Pop<typename Base::Level>(1)->valueCount == 0;
@@ -84,6 +86,7 @@ public:
 	}
 
 	PrettyWriter& EndArray(SizeType memberCount = 0) {
+		(void)memberCount;
 		RAPIDJSON_ASSERT(Base::level_stack_.GetSize() >= sizeof(typename Base::Level));
 		RAPIDJSON_ASSERT(Base::level_stack_.template Top<typename Base::Level>()->inArray);
 		bool empty = Base::level_stack_.template Pop<typename Base::Level>(1)->valueCount == 0;
@@ -105,6 +108,7 @@ public:
 
 protected:
 	void PrettyPrefix(Type type) {
+		(void)type;
 		if (Base::level_stack_.GetSize() != 0) { // this value is not at root
 			typename Base::Level* level = Base::level_stack_.template Top<typename Base::Level>();
 

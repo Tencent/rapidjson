@@ -4,6 +4,11 @@
 #include "reader.h"
 #include "internal/strfunc.h"
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4127) // conditional expression is constant
+#endif
+
 namespace rapidjson {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -413,16 +418,16 @@ int z = a[0u].GetInt();				// This works too.
 	//!@name Number
 	//@{
 
-	int GetInt() const			{ RAPIDJSON_ASSERT(flags_ & kIntFlag);   return data_.n.i;   }
-	unsigned GetUint() const	{ RAPIDJSON_ASSERT(flags_ & kUintFlag);  return data_.n.u;   }
+	int GetInt() const			{ RAPIDJSON_ASSERT(flags_ & kIntFlag);   return data_.n.i.i;   }
+	unsigned GetUint() const	{ RAPIDJSON_ASSERT(flags_ & kUintFlag);  return data_.n.u.u;   }
 	int64_t GetInt64() const	{ RAPIDJSON_ASSERT(flags_ & kInt64Flag); return data_.n.i64; }
 	int64_t GetUint64() const	{ RAPIDJSON_ASSERT(flags_ & kInt64Flag); return data_.n.u64; }
 
 	double GetDouble() const {
 		RAPIDJSON_ASSERT(IsNumber());
 		if ((flags_ & kDoubleFlag) != 0)				return data_.n.d;	// exact type, no conversion.
-		if ((flags_ & kIntFlag) != 0)					return data_.n.i;	// int -> double
-		if ((flags_ & kUintFlag) != 0)					return data_.n.u;	// unsigned -> double
+		if ((flags_ & kIntFlag) != 0)					return data_.n.i.i;	// int -> double
+		if ((flags_ & kUintFlag) != 0)					return data_.n.u.u;	// unsigned -> double
 		if ((flags_ & kInt64Flag) != 0)					return (double)data_.n.i64; // int64_t -> double (may lose precision)
 		RAPIDJSON_ASSERT((flags_ & kUint64Flag) != 0);	return (double)data_.n.u64;	// uint64_t -> double (may lose precision)
 	}
@@ -512,8 +517,8 @@ int z = a[0u].GetInt();				// This works too.
 			break;
 
 		case kNumberType:
-			if (IsInt())			handler.Int(data_.n.i);
-			else if (IsUint())		handler.Uint(data_.n.u);
+			if (IsInt())			handler.Int(data_.n.i.i);
+			else if (IsUint())		handler.Uint(data_.n.u.u);
 			else if (IsInt64())		handler.Int64(data_.n.i64);
 			else if (IsUint64())	handler.Uint64(data_.n.i64);
 			else					handler.Double(data_.n.d);
@@ -566,23 +571,23 @@ private:
 	// By using proper binary layout, retrieval of different integer types do not need conversions.
 	union Number {
 #if RAPIDJSON_ENDIAN == RAPIDJSON_LITTLEENDIAN
-		struct {
+		struct I {
 			int i;
 			char padding[4];
-		};
-		struct {
+		}i;
+		struct U {
 			unsigned u;
 			char padding2[4];
-		};
+		}u;
 #else
-		struct {
+		struct I {
 			char padding[4];
 			int i;
-		};
-		struct {
+		}i;
+		struct U {
 			char padding2[4];
 			unsigned u;
-		};
+		}u;
 #endif
 		int64_t i64;
 		uint64_t u64;
@@ -813,5 +818,9 @@ private:
 typedef GenericDocument<UTF8<> > Document;
 
 } // namespace rapidjson
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #endif // RAPIDJSON_DOCUMENT_H_

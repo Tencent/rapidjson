@@ -42,7 +42,7 @@ TEST(Document, Parse) {
 	EXPECT_TRUE(doc.HasMember("a"));
 	Value& a = doc["a"];
 	EXPECT_TRUE(a.IsArray());
-	EXPECT_EQ(4, a.Size());
+	EXPECT_EQ(4u, a.Size());
 	for (SizeType i = 0; i < 4; i++)
 		EXPECT_EQ(i + 1, a[i].GetUint());
 }

@@ -116,6 +116,13 @@ template<int x> struct StaticAssertTest {};
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// Helpers
+
+#define RAPIDJSON_MULTILINEMACRO_BEGIN do {  
+#define RAPIDJSON_MULTILINEMACRO_END \
+} while((void)0, 0)
+
+///////////////////////////////////////////////////////////////////////////////
 // Allocators and Encodings
 
 #include "allocators.h"
@@ -189,9 +196,9 @@ struct GenericStringStream {
 	size_t Tell() const { return src_ - head_; }
 
 	Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
-	void Put(Ch c) { RAPIDJSON_ASSERT(false); }
+	void Put(Ch) { RAPIDJSON_ASSERT(false); }
 	void Flush() { RAPIDJSON_ASSERT(false); }
-	size_t PutEnd(Ch* begin) { RAPIDJSON_ASSERT(false); return 0; }
+	size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
 	const Ch* src_;		//!< Current read position.
 	const Ch* head_;	//!< Original head of the string.

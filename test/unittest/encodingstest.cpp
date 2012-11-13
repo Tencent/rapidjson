@@ -225,8 +225,8 @@ static const unsigned kCodepointRanges[] = {
 // Copyright (c) 2008-2010 Bjoern Hoehrmann <bjoern@hoehrmann.de>
 // See http://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.
 
-#define UTF8_ACCEPT 0
-#define UTF8_REJECT 12
+#define UTF8_ACCEPT 0u
+#define UTF8_REJECT 12u
 
 static const unsigned char utf8d[] = {
 	// The first part of the table maps bytes to character classes that
@@ -260,14 +260,14 @@ static unsigned inline decode(unsigned* state, unsigned* codep, unsigned byte) {
 	return *state;
 }
 
-static bool IsUTF8(unsigned char* s) {
-	unsigned codepoint, state = 0;
-
-	while (*s)
-		decode(&state, &codepoint, *s++);
-
-	return state == UTF8_ACCEPT;
-}
+//static bool IsUTF8(unsigned char* s) {
+//	unsigned codepoint, state = 0;
+//
+//	while (*s)
+//		decode(&state, &codepoint, *s++);
+//
+//	return state == UTF8_ACCEPT;
+//}
 
 TEST(EncodingsTest, UTF8) {
 	StringBuffer os, os2;
@@ -279,7 +279,7 @@ TEST(EncodingsTest, UTF8) {
 
 			// Decode with Hoehrmann
 			{
-				unsigned decodedCodepoint;
+				unsigned decodedCodepoint = 0;
 				unsigned state = 0;
 
 				unsigned decodedCount = 0;
@@ -290,7 +290,7 @@ TEST(EncodingsTest, UTF8) {
 					}
 
 				if (*encodedStr)				// This decoder cannot handle U+0000
-					EXPECT_EQ(1, decodedCount);	// Should only contain one code point
+					EXPECT_EQ(1u, decodedCount);	// Should only contain one code point
 
 				EXPECT_EQ(UTF8_ACCEPT, state);
 				if (UTF8_ACCEPT != state)
@@ -337,7 +337,7 @@ TEST(EncodingsTest, UTF16) {
 				UTF8<>::Encode(utf8os, codepoint);
 
 				// transcode from UTF8 to UTF16 with Hoehrmann's code
-				unsigned decodedCodepoint;
+				unsigned decodedCodepoint = 0;
 				unsigned state = 0;
 				UTF16<>::Ch buffer[3], *p = &buffer[0];
 				for (const char* s = utf8os.GetString(); *s; ++s) {
@@ -346,11 +346,11 @@ TEST(EncodingsTest, UTF16) {
 				}
 
 				if (codepoint <= 0xFFFF)
-					*p++ = decodedCodepoint;
+					*p++ = static_cast<UTF16<>::Ch>(decodedCodepoint);
 				else {
 					// Encode code points above U+FFFF as surrogate pair.
-					*p++ = 0xD7C0 + (decodedCodepoint >> 10);
-					*p++ = 0xDC00 + (decodedCodepoint & 0x3FF);
+					*p++ = static_cast<UTF16<>::Ch>(0xD7C0 + (decodedCodepoint >> 10));
+					*p++ = static_cast<UTF16<>::Ch>(0xDC00 + (decodedCodepoint & 0x3FF));
 				}
 				*p++ = '\0';
 

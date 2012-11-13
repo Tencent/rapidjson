@@ -50,6 +50,7 @@ solution "test"
 
 	location ("./" .. (_ACTION or ""))
 	language "C++"
+	flags { "ExtraWarnings" }
 	
 	configuration "debug"
 		defines { "DEBUG" }
@@ -134,6 +135,7 @@ solution "example"
 	platforms { "x32", "x64" }
 	location ("./" .. (_ACTION or ""))
 	language "C++"
+	flags { "ExtraWarnings" }
 	includedirs "../include/"
 
 	configuration "debug"
