@@ -650,9 +650,9 @@ private:
 	void SetStringRaw(const Ch* s, SizeType length, Allocator& allocator) {
 		RAPIDJSON_ASSERT(s != NULL);
 		flags_ = kCopyStringFlag;
-		data_.s.str = (Ch *)allocator.Malloc(length + 1);
+		data_.s.str = (Ch *)allocator.Malloc((length + 1) * sizeof(Ch));
 		data_.s.length = length;
-		memcpy((void*)data_.s.str, s, length);
+		memcpy((void*)data_.s.str, s, length * sizeof(Ch));
 		((Ch*)data_.s.str)[length] = '\0';
 	}
 

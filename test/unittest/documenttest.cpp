@@ -67,3 +67,18 @@ TEST(Document, AcceptWriter) {
 
 	EXPECT_EQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3,4]}", os.str());
 }
+
+// Issue 44:	SetStringRaw doesn't work with wchar_t
+TEST(Document, UTF16_Document) {
+	GenericDocument< UTF16<> > json;
+	json.Parse<kParseValidateEncodingFlag>(L"[{\"created_at\":\"Wed Oct 30 17:13:20 +0000 2012\"}]");
+
+	ASSERT_TRUE(json.IsArray());
+	GenericValue< UTF16<> >& v = json[0u];
+	ASSERT_TRUE(v.IsObject());
+
+	GenericValue< UTF16<> >& s = v[L"created_at"];
+	ASSERT_TRUE(s.IsString());
+
+	EXPECT_EQ(0, wcscmp(L"Wed Oct 30 17:13:20 +0000 2012", s.GetString()));
+}
