@@ -591,3 +591,15 @@ TEST(Value, RemoveLastElement) {
 	objVal.RemoveMember("var3");    // Assertion here in r61
 	EXPECT_FALSE(objVal.HasMember("var3"));
 }
+
+// Issue 38:	Segmentation fault with CrtAllocator
+TEST(Document, CrtAllocator) {
+	typedef GenericValue<UTF8<>, CrtAllocator> V;
+
+	V::AllocatorType allocator;
+	V o(kObjectType);
+	o.AddMember("x", 1, allocator);	// Should not call destructor on uninitialized name/value of newly allocated members.
+
+	V a(kArrayType);
+	a.PushBack(1, allocator);	// Should not call destructor on uninitialized Value of newly allocated elements.
+}

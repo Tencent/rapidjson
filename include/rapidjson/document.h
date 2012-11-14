@@ -269,8 +269,8 @@ public:
 				o.members = (Member*)allocator.Realloc(o.members, oldCapacity * sizeof(Member), o.capacity * sizeof(Member));
 			}
 		}
-		o.members[o.size].name = name;
-		o.members[o.size].value = value;
+		o.members[o.size].name.RawAssign(name);
+		o.members[o.size].value.RawAssign(value);
 		o.size++;
 		return *this;
 	}
@@ -396,7 +396,7 @@ int z = a[0u].GetInt();				// This works too.
 		RAPIDJSON_ASSERT(IsArray());
 		if (data_.a.size >= data_.a.capacity)
 			Reserve(data_.a.capacity == 0 ? kDefaultArrayCapacity : data_.a.capacity * 2, allocator);
-		data_.a.elements[data_.a.size++] = value;
+		data_.a.elements[data_.a.size++].RawAssign(value);
 		return *this;
 	}
 
