@@ -97,7 +97,7 @@ public:
 protected:
 	//! Information for each nested level
 	struct Level {
-		Level(bool inArray) : inArray(inArray), valueCount(0) {}
+		Level(bool inArray_) : inArray(inArray_), valueCount(0) {}
 		bool inArray;		//!< true if in array, otherwise in object
 		size_t valueCount;	//!< number of values in this level
 	};
