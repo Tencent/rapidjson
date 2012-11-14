@@ -41,6 +41,12 @@ int main(int argc, char* argv[]) {
 	assert(document["hello"].IsString());
 	printf("hello = %s\n", document["hello"].GetString());
 
+	// Since version 0.2, you can use single lookup to check the existing of member and its value:
+	Value::Member* hello = document.FindMember("hello");
+	assert(hello != 0);
+	assert(hello->value.IsString());
+	assert(strcmp("world", hello->value.GetString()) == 0);
+
 	assert(document["t"].IsBool());		// JSON true/false are bool. Can also uses more specific function IsTrue().
 	printf("t = %s\n", document["t"].GetBool() ? "true" : "false");
 
@@ -67,8 +73,20 @@ int main(int argc, char* argv[]) {
 		//int x = a[0].GetInt();					// Error: operator[ is ambiguous, as 0 also mean a null pointer of const char* type.
 		int y = a[SizeType(0)].GetInt();			// Cast to SizeType will work.
 		int z = a[0u].GetInt();						// This works too.
+
+		// Iterating array with iterators
+		printf("a = ");
+		for (Value::ConstValueIterator itr = a.Begin(); itr != a.End(); ++itr)
+			printf("%d ", itr->GetInt());
+		printf("\n");
 	}
 
+	// Iterating object members
+	static const char* kTypeNames[] = { "Null", "False", "True", "Object", "Array", "String", "Number" };
+	for (Value::ConstMemberIterator itr = document.MemberBegin(); itr != document.MemberEnd(); ++itr)
+		printf("Type of member %s is %s\n", itr->name.GetString(), kTypeNames[itr->value.GetType()]);
+
+	////////////////////////////////////////////////////////////////////////////
 	// 3. Modify values in document.
 
 	// Change i to a bigger number

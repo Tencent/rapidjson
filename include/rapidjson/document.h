@@ -227,11 +227,18 @@ public:
 	//! Set this value as an empty object.
 	GenericValue& SetObject() { this->~GenericValue(); new (this) GenericValue(kObjectType); return *this; }
 
-	//! Get the value associated with the object's name.
+	//! Get the value associated with the name.
+	/*!
+		\note In version 0.1x, if the member is not found, this function returns a null value. This makes issue 7.
+		Since 0.2, if the name is not correct, it will assert.
+		If user is unsure whether a member exists, user should use HasMember() first.
+		A better approach is to use the now public FindMember().
+	*/
 	GenericValue& operator[](const Ch* name) {
 		if (Member* member = FindMember(name))
 			return member->value;
 		else {
+			RAPIDJSON_ASSERT(false);	// see above note
 			static GenericValue NullValue;
 			return NullValue;
 		}
@@ -245,7 +252,27 @@ public:
 	MemberIterator MemberEnd()				{ RAPIDJSON_ASSERT(IsObject()); return data_.o.members + data_.o.size; }
 
 	//! Check whether a member exists in the object.
+	/*!
+		\note It is better to use FindMember() directly if you need the obtain the value as well.
+	*/
 	bool HasMember(const Ch* name) const { return FindMember(name) != 0; }
+
+	//! Find member by name.
+	/*!
+		\return Return the member if exists. Otherwise returns null pointer.
+	*/
+	Member* FindMember(const Ch* name) {
+		RAPIDJSON_ASSERT(name);
+		RAPIDJSON_ASSERT(IsObject());
+
+		Object& o = data_.o;
+		for (Member* member = o.members; member != data_.o.members + data_.o.size; ++member)
+			if (name[member->name.data_.s.length] == '\0' && memcmp(member->name.data_.s.str, name, member->name.data_.s.length * sizeof(Ch)) == 0)
+				return member;
+
+		return 0;
+	}
+	const Member* FindMember(const Ch* name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
 
 	//! Add a member (name-value pair) to the object.
 	/*! \param name A string value as name of member.
@@ -612,20 +639,6 @@ private:
 		Object o;
 		Array a;
 	};	// 12 bytes in 32-bit mode, 16 bytes in 64-bit mode
-
-	//! Find member by name.
-	Member* FindMember(const Ch* name) {
-		RAPIDJSON_ASSERT(name);
-		RAPIDJSON_ASSERT(IsObject());
-
-		Object& o = data_.o;
-		for (Member* member = o.members; member != data_.o.members + data_.o.size; ++member)
-			if (name[member->name.data_.s.length] == '\0' && memcmp(member->name.data_.s.str, name, member->name.data_.s.length * sizeof(Ch)) == 0)
-				return member;
-
-		return 0;
-	}
-	const Member* FindMember(const Ch* name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
 
 	// Initialize this value as array with initial data, without calling destructor.
 	void SetArrayRaw(GenericValue* values, SizeType count, Allocator& alloctaor) {
