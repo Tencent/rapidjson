@@ -189,6 +189,7 @@ TEST(Value, Uint) {
 	z = 2147483648u;	// 2^31, cannot cast as int
 	EXPECT_EQ(2147483648u, z.GetUint());
 	EXPECT_FALSE(z.IsInt());
+	EXPECT_TRUE(z.IsInt64());	// Issue 41: Incorrect parsing of unsigned int number types
 }
 
 TEST(Value, Int64) {
