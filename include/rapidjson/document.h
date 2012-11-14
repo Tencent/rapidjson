@@ -517,7 +517,7 @@ int z = a[0u].GetInt();				// This works too.
 		\param handler An object implementing concept Handler.
 	*/
 	template <typename Handler>
-	GenericValue& Accept(Handler& handler) {
+	const GenericValue& Accept(Handler& handler) const {
 		switch(GetType()) {
 		case kNullType:		handler.Null(); break;
 		case kFalseType:	handler.Bool(false); break;
