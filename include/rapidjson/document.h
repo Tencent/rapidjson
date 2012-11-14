@@ -801,6 +801,9 @@ public:
 	}
 
 private:
+	// Prohibit assignment
+	GenericDocument& operator=(const GenericDocument&);
+
 	void ClearStack() {
 		if (Allocator::kNeedFree)
 			while (stack_.GetSize() > 0)	// Here assumes all elements in stack array are GenericValue (Member is actually 2 GenericValue objects)

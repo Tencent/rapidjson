@@ -82,3 +82,11 @@ TEST(Document, UTF16_Document) {
 
 	EXPECT_EQ(0, wcscmp(L"Wed Oct 30 17:13:20 +0000 2012", s.GetString()));
 }
+
+// Issue 22: Memory corruption via operator=
+// Fixed by making unimplemented assignment operator private.
+//TEST(Document, Assignment) {
+//	Document d1;
+//	Document d2;
+//	d1 = d2;
+//}
