@@ -263,7 +263,7 @@ TEST(Value, Uint64) {
 	// SetUint64()
 	Value z;
 	z.SetUint64(1234);
-	EXPECT_EQ(1234, z.GetUint64());
+	EXPECT_EQ(1234u, z.GetUint64());
 
 	z.SetUint64(2147483648LL);	// 2^31, cannot cast as int
 	EXPECT_FALSE(z.IsInt());
