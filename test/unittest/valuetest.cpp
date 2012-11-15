@@ -277,6 +277,9 @@ TEST(Value, Uint64) {
 
 	z.SetUint64(9223372036854775808uLL);	// 2^63 cannot cast as int64
 	EXPECT_FALSE(z.IsInt64());
+
+	// Issue 48
+	EXPECT_EQ(9223372036854775808uLL, z.GetUint64());
 }
 
 TEST(Value, Double) {

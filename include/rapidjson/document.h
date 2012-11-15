@@ -448,7 +448,7 @@ int z = a[0u].GetInt();				// This works too.
 	int GetInt() const			{ RAPIDJSON_ASSERT(flags_ & kIntFlag);   return data_.n.i.i;   }
 	unsigned GetUint() const	{ RAPIDJSON_ASSERT(flags_ & kUintFlag);  return data_.n.u.u;   }
 	int64_t GetInt64() const	{ RAPIDJSON_ASSERT(flags_ & kInt64Flag); return data_.n.i64; }
-	uint64_t GetUint64() const	{ RAPIDJSON_ASSERT(flags_ & kInt64Flag); return data_.n.u64; }
+	uint64_t GetUint64() const	{ RAPIDJSON_ASSERT(flags_ & kUint64Flag); return data_.n.u64; }
 
 	double GetDouble() const {
 		RAPIDJSON_ASSERT(IsNumber());
@@ -547,7 +547,7 @@ int z = a[0u].GetInt();				// This works too.
 			if (IsInt())			handler.Int(data_.n.i.i);
 			else if (IsUint())		handler.Uint(data_.n.u.u);
 			else if (IsInt64())		handler.Int64(data_.n.i64);
-			else if (IsUint64())	handler.Uint64(data_.n.i64);
+			else if (IsUint64())	handler.Uint64(data_.n.u64);
 			else					handler.Double(data_.n.d);
 			break;
 		}
