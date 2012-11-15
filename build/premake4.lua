@@ -64,7 +64,7 @@ solution "test"
 		defines { "_CRT_SECURE_NO_WARNINGS" }
 		
 	configuration "gmake"
-		buildoptions "-msse4.2"
+		buildoptions "-msse4.2 -Werror=cast-qual"
 
 	project "gtest"
 		kind "StaticLib"

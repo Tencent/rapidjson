@@ -152,7 +152,7 @@ public:
 				break;
 
 			case kCopyStringFlag:
-				Allocator::Free((void*)data_.s.str);
+				Allocator::Free(const_cast<Ch*>(data_.s.str));
 				break;
 			}
 		}
@@ -670,8 +670,8 @@ private:
 		flags_ = kCopyStringFlag;
 		data_.s.str = (Ch *)allocator.Malloc((length + 1) * sizeof(Ch));
 		data_.s.length = length;
-		memcpy((void*)data_.s.str, s, length * sizeof(Ch));
-		((Ch*)data_.s.str)[length] = '\0';
+		memcpy(const_cast<Ch*>(data_.s.str), s, length * sizeof(Ch));
+		const_cast<Ch*>(data_.s.str)[length] = '\0';
 	}
 
 	//! Assignment without calling destructor
