@@ -3,6 +3,7 @@
 
 #include "reader.h"
 #include "internal/strfunc.h"
+#include <new>		// placement new
 
 #ifdef _MSC_VER
 #pragma warning(push)
