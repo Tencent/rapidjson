@@ -8,7 +8,7 @@
 
 using namespace rapidjson;
 
-int main(int argc, char* argv[]) {
+int main(int, char*[]) {
 	////////////////////////////////////////////////////////////////////////////
 	// 1. Parse a JSON text string to a document.
 
@@ -46,6 +46,7 @@ int main(int argc, char* argv[]) {
 	assert(hello != 0);
 	assert(hello->value.IsString());
 	assert(strcmp("world", hello->value.GetString()) == 0);
+	(void)hello;
 
 	assert(document["t"].IsBool());		// JSON true/false are bool. Can also uses more specific function IsTrue().
 	printf("t = %s\n", document["t"].GetBool() ? "true" : "false");
@@ -73,6 +74,8 @@ int main(int argc, char* argv[]) {
 		//int x = a[0].GetInt();					// Error: operator[ is ambiguous, as 0 also mean a null pointer of const char* type.
 		int y = a[SizeType(0)].GetInt();			// Cast to SizeType will work.
 		int z = a[0u].GetInt();						// This works too.
+		(void)y;
+		(void)z;
 
 		// Iterating array with iterators
 		printf("a = ");

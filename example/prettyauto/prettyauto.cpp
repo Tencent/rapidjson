@@ -14,7 +14,7 @@
 
 using namespace rapidjson;
 
-int main(int argc, char* argv[]) {
+int main(int, char*[]) {
 #ifdef _WIN32
 	// Prevent Windows converting between CR+LF and LF
 	_setmode(_fileno(stdin), _O_BINARY);	// NEW

@@ -108,7 +108,7 @@ private:
 	std::vector<Dependent> dependents_;
 };
 
-int main(int argc, char* argv[]) {
+int main(int, char*[]) {
 	std::vector<Employee> employees;
 
 	employees.push_back(Employee("Milo YIP", 34, true));

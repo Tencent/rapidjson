@@ -8,7 +8,7 @@
 
 using namespace rapidjson;
 
-int main(int argc, char* argv[]) {
+int main(int, char*[]) {
 	// Prepare reader and input stream.
 	Reader reader;
 	char readBuffer[65536];
