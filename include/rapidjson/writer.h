@@ -35,7 +35,16 @@ public:
 	typedef typename SourceEncoding::Ch Ch;
 
 	Writer(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) : 
-		os_(os), level_stack_(allocator, levelDepth * sizeof(Level)) {}
+		os_(os), level_stack_(allocator, levelDepth * sizeof(Level))
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+		, acceptAnyRoot_(false)
+#endif
+	{}
+
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+	//! accept arbitrary root elements (not only arrays and objects)
+	Writer& AcceptAnyRoot(bool yesno = true) { acceptAnyRoot_ = yesno; return *this; }
+#endif
 
 	//@name Implementation of Handler
 	//@{
@@ -229,11 +238,17 @@ protected:
 			level->valueCount++;
 		}
 		else
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+			if (!acceptAnyRoot_)
+#endif
 			RAPIDJSON_ASSERT(type == kObjectType || type == kArrayType);
 	}
 
 	OutputStream& os_;
 	internal::Stack<Allocator> level_stack_;
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+	bool acceptAnyRoot_;
+#endif
 
 private:
 	// Prohibit assignment for VC C4512 warning
