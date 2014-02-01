@@ -26,6 +26,11 @@ public:
 	PrettyWriter(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
 		Base(os, allocator, levelDepth), indentChar_(' '), indentCharCount_(4) {}
 
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+	//! accept arbitrary root elements (not only arrays and objects)
+	PrettyWriter& AcceptAnyRoot(bool yesno = true) { Base::AcceptAnyRoot(yesno); return *this; }
+#endif
+
 	//! Overridden for fluent API, see \ref Writer::SetDoublePrecision()
 	PrettyWriter& SetDoublePrecision(int p) { Base::SetDoublePrecision(p); return *this; }
 
@@ -152,6 +157,9 @@ protected:
 			level->valueCount++;
 		}
 		else
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+			if (!Base::acceptAnyRoot_)
+#endif
 			RAPIDJSON_ASSERT(type == kObjectType || type == kArrayType);
 	}
 
