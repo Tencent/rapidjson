@@ -642,17 +642,17 @@ private:
 	};	// 12 bytes in 32-bit mode, 16 bytes in 64-bit mode
 
 	// Initialize this value as array with initial data, without calling destructor.
-	void SetArrayRaw(GenericValue* values, SizeType count, Allocator& alloctaor) {
+	void SetArrayRaw(GenericValue* values, SizeType count, Allocator& allocator) {
 		flags_ = kArrayFlag;
-		data_.a.elements = (GenericValue*)alloctaor.Malloc(count * sizeof(GenericValue));
+		data_.a.elements = (GenericValue*)allocator.Malloc(count * sizeof(GenericValue));
 		memcpy(data_.a.elements, values, count * sizeof(GenericValue));
 		data_.a.size = data_.a.capacity = count;
 	}
 
 	//! Initialize this value as object with initial data, without calling destructor.
-	void SetObjectRaw(Member* members, SizeType count, Allocator& alloctaor) {
+	void SetObjectRaw(Member* members, SizeType count, Allocator& allocator) {
 		flags_ = kObjectFlag;
-		data_.o.members = (Member*)alloctaor.Malloc(count * sizeof(Member));
+		data_.o.members = (Member*)allocator.Malloc(count * sizeof(Member));
 		memcpy(data_.o.members, members, count * sizeof(Member));
 		data_.o.size = data_.o.capacity = count;
 	}
@@ -696,7 +696,7 @@ typedef GenericValue<UTF8<> > Value;
 /*!
 	\implements Handler
 	\tparam Encoding encoding for both parsing and string storage.
-	\tparam Alloactor allocator for allocating memory for the DOM, and the stack during parsing.
+	\tparam Allocator allocator for allocating memory for the DOM, and the stack during parsing.
 */
 template <typename Encoding, typename Allocator = MemoryPoolAllocator<> >
 class GenericDocument : public GenericValue<Encoding, Allocator> {
