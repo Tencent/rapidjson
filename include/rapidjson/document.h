@@ -71,24 +71,24 @@ public:
 	}
 
 	//! Constructor for boolean value.
-	GenericValue(bool b) : flags_(b ? kTrueFlag : kFalseFlag) {}
+	explicit GenericValue(bool b) : flags_(b ? kTrueFlag : kFalseFlag) {}
 
 	//! Constructor for int value.
-	GenericValue(int i) : flags_(kNumberIntFlag) { 
+	explicit GenericValue(int i) : flags_(kNumberIntFlag) {
 		data_.n.i64 = i;
 		if (i >= 0)
 			flags_ |= kUintFlag | kUint64Flag;
 	}
 
 	//! Constructor for unsigned value.
-	GenericValue(unsigned u) : flags_(kNumberUintFlag) {
+	explicit GenericValue(unsigned u) : flags_(kNumberUintFlag) {
 		data_.n.u64 = u; 
 		if (!(u & 0x80000000))
 			flags_ |= kIntFlag | kInt64Flag;
 	}
 
 	//! Constructor for int64_t value.
-	GenericValue(int64_t i64) : flags_(kNumberInt64Flag) {
+	explicit GenericValue(int64_t i64) : flags_(kNumberInt64Flag) {
 		data_.n.i64 = i64;
 		if (i64 >= 0) {
 			flags_ |= kNumberUint64Flag;
@@ -102,7 +102,7 @@ public:
 	}
 
 	//! Constructor for uint64_t value.
-	GenericValue(uint64_t u64) : flags_(kNumberUint64Flag) {
+	explicit GenericValue(uint64_t u64) : flags_(kNumberUint64Flag) {
 		data_.n.u64 = u64;
 		if (!(u64 & 0x8000000000000000ULL))
 			flags_ |= kInt64Flag;
@@ -113,7 +113,7 @@ public:
 	}
 
 	//! Constructor for double value.
-	GenericValue(double d) : flags_(kNumberDoubleFlag) { data_.n.d = d; }
+	explicit GenericValue(double d) : flags_(kNumberDoubleFlag) { data_.n.d = d; }
 
 	//! Constructor for constant string (i.e. do not make a copy of string)
 	GenericValue(const Ch* s, SizeType length) { 
@@ -124,7 +124,7 @@ public:
 	}
 
 	//! Constructor for constant string (i.e. do not make a copy of string)
-	GenericValue(const Ch* s) { SetStringRaw(s, internal::StrLen(s)); }
+	explicit GenericValue(const Ch* s) { SetStringRaw(s, internal::StrLen(s)); }
 
 	//! Constructor for copy-string (i.e. do make a copy of string)
 	GenericValue(const Ch* s, SizeType length, Allocator& allocator) { SetStringRaw(s, length, allocator); }
