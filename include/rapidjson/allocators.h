@@ -187,6 +187,11 @@ public:
 	static void Free(void *ptr) { (void)ptr; } // Do nothing
 
 private:
+	//! Copy constructor is not permitted.
+	MemoryPoolAllocator(const MemoryPoolAllocator& rhs) /* = delete */;
+	//! Copy assignment operator is not permitted.
+	MemoryPoolAllocator& operator=(const MemoryPoolAllocator& rhs) /* = delete */;
+
 	//! Creates a new chunk.
 	/*! \param capacity Capacity of the chunk in bytes.
 	*/
