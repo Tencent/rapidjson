@@ -16,7 +16,7 @@ class FileStream {
 public:
 	typedef char Ch;	//!< Character type. Only support char.
 
-	FileStream(FILE* fp) : fp_(fp), count_(0) { Read(); }
+	FileStream(FILE* fp) : fp_(fp), current_('\0'), count_(0) { Read(); }
 	char Peek() const { return current_; }
 	char Take() { char c = current_; Read(); return c; }
 	size_t Tell() const { return count_; }
