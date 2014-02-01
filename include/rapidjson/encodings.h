@@ -448,7 +448,7 @@ enum UTFType {
 	kUTF16LE = 1,	//!< UTF-16 little endian.
 	kUTF16BE = 2,	//!< UTF-16 big endian.
 	kUTF32LE = 3,	//!< UTF-32 little endian.
-	kUTF32BE = 4,	//!< UTF-32 big endian.
+	kUTF32BE = 4	//!< UTF-32 big endian.
 };
 
 //! Dynamically select encoding according to stream's runtime-specified UTF encoding type.

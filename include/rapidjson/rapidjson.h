@@ -248,7 +248,7 @@ enum Type {
 	kObjectType = 3,	//!< object
 	kArrayType = 4,		//!< array 
 	kStringType = 5,	//!< string
-	kNumberType = 6,	//!< number
+	kNumberType = 6		//!< number
 };
 
 } // namespace rapidjson
