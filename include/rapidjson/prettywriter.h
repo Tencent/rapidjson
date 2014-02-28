@@ -26,6 +26,9 @@ public:
 	PrettyWriter(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
 		Base(os, allocator, levelDepth), indentChar_(' '), indentCharCount_(4) {}
 
+	//! Overridden for fluent API, see \ref Writer::SetDoublePrecision()
+	PrettyWriter& SetDoublePrecision(int p) { Base::SetDoublePrecision(p); return *this; }
+
 	//! Set custom indentation.
 	/*! \param indentChar		Character for indentation. Must be whitespace character (' ', '\\t', '\\n', '\\r').
 		\param indentCharCount	Number of indent characters for each indentation level.
