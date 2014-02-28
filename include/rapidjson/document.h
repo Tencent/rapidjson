@@ -579,7 +579,7 @@ int z = a[0u].GetInt();				// This works too.
 		case kObjectType:
 			handler.StartObject();
 			for (ConstMemberIterator m = MemberBegin(); m != MemberEnd(); ++m) {
-				handler.String(m->name.data_.s.str, m->name.data_.s.length, false);
+				handler.String(m->name.data_.s.str, m->name.data_.s.length, (m->name.flags_ & kCopyFlag) != 0);
 				m->value.Accept(handler);
 			}
 			handler.EndObject(data_.o.size);
@@ -593,7 +593,7 @@ int z = a[0u].GetInt();				// This works too.
 			break;
 
 		case kStringType:
-			handler.String(data_.s.str, data_.s.length, false);
+			handler.String(data_.s.str, data_.s.length, (flags_ & kCopyFlag) != 0);
 			break;
 
 		case kNumberType:
