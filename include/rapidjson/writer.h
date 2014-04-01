@@ -75,6 +75,20 @@ public:
 	*/
 	Writer& Double(double d)		{ Prefix(kNumberType); WriteDouble(d);		return *this; }
 
+	//! Writes the given \c double value to the stream (explicit precision)
+	/*!
+		The currently set double precision is ignored in favor of the explicitly
+		given precision for this value.
+		\see Double(), SetDoublePrecision(), GetDoublePrecision()
+		\param d The value to be written
+		\param precision The number of significant digits for this value
+		\return The Writer itself for fluent API.
+	*/
+	Writer& Double(double d, int precision) {
+		int oldPrecision = GetDoublePrecision();
+		return SetDoublePrecision(precision).Double(d).SetDoublePrecision(oldPrecision);
+	}
+
 	Writer& String(const Ch* str, SizeType length, bool copy = false) {
 		(void)copy;
 		Prefix(kStringType);
