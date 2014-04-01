@@ -51,6 +51,11 @@ public:
 	PrettyWriter& Int64(int64_t i64)	{ PrettyPrefix(kNumberType); Base::WriteInt64(i64);		return *this; }
 	PrettyWriter& Uint64(uint64_t u64)	{ PrettyPrefix(kNumberType); Base::WriteUint64(u64);	return *this; }
 	PrettyWriter& Double(double d)		{ PrettyPrefix(kNumberType); Base::WriteDouble(d);		return *this; }
+	//! Overridden for fluent API, see \ref Writer::Double()
+	PrettyWriter& Double(double d, int precision) {
+		int oldPrecision = Base::GetDoublePrecision();
+		return SetDoublePrecision(precision).Double(d).SetDoublePrecision(oldPrecision);
+	}
 
 	PrettyWriter& String(const Ch* str, SizeType length, bool copy = false) {
 		(void)copy;
