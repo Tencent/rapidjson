@@ -27,7 +27,7 @@ public:
 		Base(os, allocator, levelDepth), indentChar_(' '), indentCharCount_(4) {}
 
 #ifdef RAPIDJSON_ACCEPT_ANY_ROOT
-	//! accept arbitrary root elements (not only arrays and objects)
+	//! Accept arbitrary root elements (not only arrays and objects)
 	PrettyWriter& AcceptAnyRoot(bool yesno = true) { Base::AcceptAnyRoot(yesno); return *this; }
 #endif
 
