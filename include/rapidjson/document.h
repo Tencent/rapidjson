@@ -795,7 +795,8 @@ public:
 		{}
 
 #ifdef RAPIDJSON_ACCEPT_ANY_ROOT
-	GenericDocument& AcceptAnyRoot(bool yesno = true) { acceptAnyRoot_ = true; return *this; }
+	//! Accept arbitrary root elements (not only arrays and objects)
+	GenericDocument& AcceptAnyRoot(bool yesno = true) { acceptAnyRoot_ = yesno; return *this; }
 #endif
 
 	//! Parse JSON text from an input stream.

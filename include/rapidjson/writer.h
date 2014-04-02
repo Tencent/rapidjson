@@ -42,7 +42,7 @@ public:
 	{}
 
 #ifdef RAPIDJSON_ACCEPT_ANY_ROOT
-	//! accept arbitrary root elements (not only arrays and objects)
+	//! Accept arbitrary root elements (not only arrays and objects)
 	Writer& AcceptAnyRoot(bool yesno = true) { acceptAnyRoot_ = yesno; return *this; }
 #endif
 
