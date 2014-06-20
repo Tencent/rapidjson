@@ -60,14 +60,13 @@ public:
 		\param type	Type of the value.
 		\note Default content for number is zero.
 	*/
-	GenericValue(Type type) {
+	GenericValue(Type type) : data_() {
 		static const unsigned defaultFlags[7] = {
 			kNullFlag, kFalseFlag, kTrueFlag, kObjectFlag, kArrayFlag, kConstStringFlag,
 			kNumberFlag | kIntFlag | kUintFlag | kInt64Flag | kUint64Flag | kDoubleFlag
 		};
 		RAPIDJSON_ASSERT(type <= kNumberType);
 		flags_ = defaultFlags[type];
-		memset(&data_, 0, sizeof(data_));
 	}
 
 	//! Constructor for boolean value.
@@ -170,8 +169,7 @@ public:
 	GenericValue& operator=(GenericValue& rhs) {
 		RAPIDJSON_ASSERT(this != &rhs);
 		this->~GenericValue();
-		memcpy(this, &rhs, sizeof(GenericValue));
-		rhs.flags_ = kNullFlag;
+		RawAssign(rhs);
 		return *this;
 	}
 
@@ -677,7 +675,8 @@ private:
 
 	//! Assignment without calling destructor
 	void RawAssign(GenericValue& rhs) {
-		memcpy(this, &rhs, sizeof(GenericValue));
+		data_ = rhs.data_;
+		flags_ = rhs.flags_;
 		rhs.flags_ = kNullFlag;
 	}
 
