@@ -70,7 +70,7 @@ TEST_F(FileStreamTest, FileReadStream) {
 
 TEST_F(FileStreamTest, FileWriteStream) {
 	char filename[L_tmpnam];
-	tmpnam(filename);
+	TempFilename(filename);
 
 	FILE *fp = fopen(filename, "wb");
 	char buffer[65536];

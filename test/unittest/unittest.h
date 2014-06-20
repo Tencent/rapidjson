@@ -30,4 +30,13 @@ inline Ch* StrDup(const Ch* str) {
 	return buffer;
 }
 
+inline void TempFilename(char *filename) {
+	tmpnam(filename);
+
+	// For Visual Studio, tmpnam() adds a backslash in front. Remove it.
+	if (filename[0] == '\\')
+		for (int i = 0; filename[i] != '\0'; i++)
+			filename[i] = filename[i + 1];
+}
+
 #endif // UNITTEST_H_
