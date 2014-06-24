@@ -788,6 +788,11 @@ public:
 		return *this;
 	}
 
+	template <unsigned parseFlags, typename InputStream>
+	GenericDocument& ParseStream(InputStream& is) {
+		return ParseStream<parseFlags, Encoding, InputStream>(is);
+	}
+
 	//! Parse JSON text from a mutable string.
 	/*! \tparam parseFlags Combination of ParseFlag.
 		\param str Mutable zero-terminated string to be parsed.
