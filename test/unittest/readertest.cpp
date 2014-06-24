@@ -576,3 +576,12 @@ TEST(Reader, Parse_Error) {
 
 #undef TEST_ERROR
 }
+
+TEST(Reader, SkipWhitespace) {
+	StringStream ss(" A \t\tB\n \n\nC\r\r \rD \t\n\r E");
+	const char* expected = "ABCDE";
+	for (size_t i = 0; i < 5; i++) {
+		SkipWhitespace(ss);
+		EXPECT_EQ(expected[i], ss.Take());
+	}
+}
