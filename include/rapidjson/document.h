@@ -63,31 +63,31 @@ public:
 	GenericValue(Type type) : data_() {
 		static const unsigned defaultFlags[7] = {
 			kNullFlag, kFalseFlag, kTrueFlag, kObjectFlag, kArrayFlag, kConstStringFlag,
-			kNumberFlag | kIntFlag | kUintFlag | kInt64Flag | kUint64Flag | kDoubleFlag
+			kNumberAnyFlag
 		};
 		RAPIDJSON_ASSERT(type <= kNumberType);
 		flags_ = defaultFlags[type];
 	}
 
 	//! Constructor for boolean value.
-	GenericValue(bool b) : flags_(b ? kTrueFlag : kFalseFlag) {}
+	explicit GenericValue(bool b) : flags_(b ? kTrueFlag : kFalseFlag) {}
 
 	//! Constructor for int value.
-	GenericValue(int i) : flags_(kNumberIntFlag) { 
+	explicit GenericValue(int i) : flags_(kNumberIntFlag) {
 		data_.n.i64 = i;
 		if (i >= 0)
 			flags_ |= kUintFlag | kUint64Flag;
 	}
 
 	//! Constructor for unsigned value.
-	GenericValue(unsigned u) : flags_(kNumberUintFlag) {
+	explicit GenericValue(unsigned u) : flags_(kNumberUintFlag) {
 		data_.n.u64 = u; 
 		if (!(u & 0x80000000))
 			flags_ |= kIntFlag | kInt64Flag;
 	}
 
 	//! Constructor for int64_t value.
-	GenericValue(int64_t i64) : flags_(kNumberInt64Flag) {
+	explicit GenericValue(int64_t i64) : flags_(kNumberInt64Flag) {
 		data_.n.i64 = i64;
 		if (i64 >= 0) {
 			flags_ |= kNumberUint64Flag;
@@ -101,7 +101,7 @@ public:
 	}
 
 	//! Constructor for uint64_t value.
-	GenericValue(uint64_t u64) : flags_(kNumberUint64Flag) {
+	explicit GenericValue(uint64_t u64) : flags_(kNumberUint64Flag) {
 		data_.n.u64 = u64;
 		if (!(u64 & UINT64_C(0x8000000000000000)))
 			flags_ |= kInt64Flag;
@@ -112,7 +112,7 @@ public:
 	}
 
 	//! Constructor for double value.
-	GenericValue(double d) : flags_(kNumberDoubleFlag) { data_.n.d = d; }
+	explicit GenericValue(double d) : flags_(kNumberDoubleFlag) { data_.n.d = d; }
 
 	//! Constructor for constant string (i.e. do not make a copy of string)
 	GenericValue(const Ch* s, SizeType length) { 
@@ -123,7 +123,7 @@ public:
 	}
 
 	//! Constructor for constant string (i.e. do not make a copy of string)
-	GenericValue(const Ch* s) { SetStringRaw(s, internal::StrLen(s)); }
+	explicit GenericValue(const Ch* s) { SetStringRaw(s, internal::StrLen(s)); }
 
 	//! Constructor for copy-string (i.e. do make a copy of string)
 	GenericValue(const Ch* s, SizeType length, Allocator& allocator) { SetStringRaw(s, length, allocator); }
@@ -631,6 +631,7 @@ private:
 		kNumberInt64Flag = kNumberType | kNumberFlag | kInt64Flag,
 		kNumberUint64Flag = kNumberType | kNumberFlag | kUint64Flag,
 		kNumberDoubleFlag = kNumberType | kNumberFlag | kDoubleFlag,
+		kNumberAnyFlag = kNumberType | kNumberFlag | kIntFlag | kInt64Flag | kUintFlag | kUint64Flag | kDoubleFlag,
 		kConstStringFlag = kStringType | kStringFlag,
 		kCopyStringFlag = kStringType | kStringFlag | kCopyFlag,
 		kObjectFlag = kObjectType,
@@ -694,17 +695,17 @@ private:
 	};	// 12 bytes in 32-bit mode, 16 bytes in 64-bit mode
 
 	// Initialize this value as array with initial data, without calling destructor.
-	void SetArrayRaw(GenericValue* values, SizeType count, Allocator& alloctaor) {
+	void SetArrayRaw(GenericValue* values, SizeType count, Allocator& allocator) {
 		flags_ = kArrayFlag;
-		data_.a.elements = (GenericValue*)alloctaor.Malloc(count * sizeof(GenericValue));
+		data_.a.elements = (GenericValue*)allocator.Malloc(count * sizeof(GenericValue));
 		memcpy(data_.a.elements, values, count * sizeof(GenericValue));
 		data_.a.size = data_.a.capacity = count;
 	}
 
 	//! Initialize this value as object with initial data, without calling destructor.
-	void SetObjectRaw(Member* members, SizeType count, Allocator& alloctaor) {
+	void SetObjectRaw(Member* members, SizeType count, Allocator& allocator) {
 		flags_ = kObjectFlag;
-		data_.o.members = (Member*)alloctaor.Malloc(count * sizeof(Member));
+		data_.o.members = (Member*)allocator.Malloc(count * sizeof(Member));
 		memcpy(data_.o.members, members, count * sizeof(Member));
 		data_.o.size = data_.o.capacity = count;
 	}
@@ -772,7 +773,7 @@ public:
 	template <unsigned parseFlags, typename SourceEncoding, typename InputStream>
 	GenericDocument& ParseStream(InputStream& is) {
 		ValueType::SetNull(); // Remove existing root if exist
-		GenericReader<SourceEncoding, Encoding, Allocator> reader;
+		GenericReader<SourceEncoding, Encoding, Allocator> reader(&GetAllocator());
 		if (reader.template Parse<parseFlags>(is, *this)) {
 			RAPIDJSON_ASSERT(stack_.GetSize() == sizeof(ValueType)); // Got one and only one root object
 			this->RawAssign(*stack_.template Pop<ValueType>(1));	// Add this-> to prevent issue 13.
@@ -785,6 +786,11 @@ public:
 			ClearStack();
 		}
 		return *this;
+	}
+
+	template <unsigned parseFlags, typename InputStream>
+	GenericDocument& ParseStream(InputStream& is) {
+		return ParseStream<parseFlags,Encoding,InputStream>(is);
 	}
 
 	//! Parse JSON text from a mutable string.
