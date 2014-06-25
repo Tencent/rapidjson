@@ -35,7 +35,23 @@ public:
 	typedef typename SourceEncoding::Ch Ch;
 
 	Writer(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) : 
-		os_(os), level_stack_(allocator, levelDepth * sizeof(Level)) {}
+		os_(os), level_stack_(allocator, levelDepth * sizeof(Level)),
+		doublePrecision_(kDefaultDoublePrecision) {}
+
+	//! Set the number of significant digits for \c double values
+	/*! When writing a \c double value to the \c OutputStream, the number
+		of significant digits is limited to 6 by default.
+		\param p maximum number of significant digits (default: 6)
+		\return The Writer itself for fluent API.
+	*/
+	Writer& SetDoublePrecision(int p = kDefaultDoublePrecision) {
+		if (p < 0) p = kDefaultDoublePrecision; // negative precision is ignored
+		doublePrecision_ = p;
+		return *this;
+	}
+
+	//! \see SetDoublePrecision()
+	int GetDoublePrecision() const { return doublePrecision_; }
 
 	//@name Implementation of Handler
 	//@{
@@ -45,7 +61,33 @@ public:
 	Writer& Uint(unsigned u)		{ Prefix(kNumberType); WriteUint(u);		return *this; }
 	Writer& Int64(int64_t i64)		{ Prefix(kNumberType); WriteInt64(i64);		return *this; }
 	Writer& Uint64(uint64_t u64)	{ Prefix(kNumberType); WriteUint64(u64);	return *this; }
+
+	//! Writes the given \c double value to the stream
+	/*!
+		The number of significant digits (the precision) to be written
+		can be set by \ref SetDoublePrecision() for the Writer:
+		\code
+		Writer<...> writer(...);
+		writer.SetDoublePrecision(12).Double(M_PI);
+		\endcode
+		\param d The value to be written.
+		\return The Writer itself for fluent API.
+	*/
 	Writer& Double(double d)		{ Prefix(kNumberType); WriteDouble(d);		return *this; }
+
+	//! Writes the given \c double value to the stream (explicit precision)
+	/*!
+		The currently set double precision is ignored in favor of the explicitly
+		given precision for this value.
+		\see Double(), SetDoublePrecision(), GetDoublePrecision()
+		\param d The value to be written
+		\param precision The number of significant digits for this value
+		\return The Writer itself for fluent API.
+	*/
+	Writer& Double(double d, int precision) {
+		int oldPrecision = GetDoublePrecision();
+		return SetDoublePrecision(precision).Double(d).SetDoublePrecision(oldPrecision);
+	}
 
 	Writer& String(const Ch* str, SizeType length, bool copy = false) {
 		(void)copy;
@@ -161,18 +203,21 @@ protected:
 		} while (p != buffer);
 	}
 
+#ifdef _MSC_VER
+#define RAPIDJSON_SNPRINTF sprintf_s
+#else
+#define RAPIDJSON_SNPRINTF snprintf
+#endif
+
 	//! \todo Optimization with custom double-to-string converter.
 	void WriteDouble(double d) {
 		char buffer[100];
-#ifdef _MSC_VER
-		int ret = sprintf_s(buffer, sizeof(buffer), "%g", d);
-#else
-		int ret = snprintf(buffer, sizeof(buffer), "%g", d);
-#endif
+		int ret = RAPIDJSON_SNPRINTF(buffer, sizeof(buffer), "%.*g", doublePrecision_, d);
 		RAPIDJSON_ASSERT(ret >= 1);
 		for (int i = 0; i < ret; i++)
 			os_.Put(buffer[i]);
 	}
+#undef RAPIDJSON_SNPRINTF
 
 	void WriteString(const Ch* str, SizeType length)  {
 		static const char hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
@@ -234,6 +279,9 @@ protected:
 
 	OutputStream& os_;
 	internal::Stack<Allocator> level_stack_;
+	int doublePrecision_;
+
+	static const int kDefaultDoublePrecision = 6;
 
 private:
 	// Prohibit assignment for VC C4512 warning
