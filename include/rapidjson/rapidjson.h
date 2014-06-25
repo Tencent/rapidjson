@@ -55,7 +55,7 @@ typedef unsigned __int64 uint64_t;
 	Currently the default uses 4 bytes alignment. User can customize this.
 */
 #ifndef RAPIDJSON_ALIGN
-#define RAPIDJSON_ALIGN(x) ((x + 3) & ~3)
+#define RAPIDJSON_ALIGN(x) ((x + 3u) & ~3u)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -183,7 +183,7 @@ inline void PutN(Stream& stream, Ch c, size_t n) {
 // StringStream
 
 //! Read-only string stream.
-/*! \implements Stream
+/*! \note implements Stream concept
 */
 template <typename Encoding>
 struct GenericStringStream {
@@ -193,7 +193,7 @@ struct GenericStringStream {
 
 	Ch Peek() const { return *src_; }
 	Ch Take() { return *src_++; }
-	size_t Tell() const { return src_ - head_; }
+	size_t Tell() const { return static_cast<size_t>(src_ - head_); }
 
 	Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
 	void Put(Ch) { RAPIDJSON_ASSERT(false); }
@@ -211,7 +211,7 @@ typedef GenericStringStream<UTF8<> > StringStream;
 
 //! A read-write string stream.
 /*! This string stream is particularly designed for in-situ parsing.
-	\implements Stream
+	\note implements Stream concept
 */
 template <typename Encoding>
 struct GenericInsituStringStream {
@@ -222,13 +222,13 @@ struct GenericInsituStringStream {
 	// Read
 	Ch Peek() { return *src_; }
 	Ch Take() { return *src_++; }
-	size_t Tell() { return src_ - head_; }
+	size_t Tell() { return static_cast<size_t>(src_ - head_); }
 
 	// Write
 	Ch* PutBegin() { return dst_ = src_; }
 	void Put(Ch c) { RAPIDJSON_ASSERT(dst_ != 0); *dst_++ = c; }
 	void Flush() {}
-	size_t PutEnd(Ch* begin) { return dst_ - begin; }
+	size_t PutEnd(Ch* begin) { return static_cast<size_t>(dst_ - begin); }
 
 	Ch* src_;
 	Ch* dst_;
@@ -248,7 +248,7 @@ enum Type {
 	kObjectType = 3,	//!< object
 	kArrayType = 4,		//!< array 
 	kStringType = 5,	//!< string
-	kNumberType = 6,	//!< number
+	kNumberType = 6		//!< number
 };
 
 } // namespace rapidjson

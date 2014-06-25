@@ -64,7 +64,7 @@ concept Encoding {
 /*! http://en.wikipedia.org/wiki/UTF-8
 	http://tools.ietf.org/html/rfc3629
 	\tparam CharType Code unit for storing 8-bit UTF-8 data. Default is char.
-	\implements Encoding
+	\note implements Encoding concept
 */
 template<typename CharType = char>
 struct UTF8 {
@@ -73,22 +73,22 @@ struct UTF8 {
 	template<typename OutputStream>
 	static void Encode(OutputStream& os, unsigned codepoint) {
 		if (codepoint <= 0x7F) 
-			os.Put(codepoint & 0xFF);
+			os.Put(static_cast<Ch>(codepoint & 0xFF));
 		else if (codepoint <= 0x7FF) {
-			os.Put(0xC0 | ((codepoint >> 6) & 0xFF));
-			os.Put(0x80 | ((codepoint & 0x3F)));
+			os.Put(static_cast<Ch>(0xC0 | ((codepoint >> 6) & 0xFF)));
+			os.Put(static_cast<Ch>(0x80 | ((codepoint & 0x3F))));
 		}
 		else if (codepoint <= 0xFFFF) {
-			os.Put(0xE0 | ((codepoint >> 12) & 0xFF));
-			os.Put(0x80 | ((codepoint >> 6) & 0x3F));
-			os.Put(0x80 | (codepoint & 0x3F));
+			os.Put(static_cast<Ch>(0xE0 | ((codepoint >> 12) & 0xFF)));
+			os.Put(static_cast<Ch>(0x80 | ((codepoint >> 6) & 0x3F)));
+			os.Put(static_cast<Ch>(0x80 | (codepoint & 0x3F)));
 		}
 		else {
 			RAPIDJSON_ASSERT(codepoint <= 0x10FFFF);
-			os.Put(0xF0 | ((codepoint >> 18) & 0xFF));
-			os.Put(0x80 | ((codepoint >> 12) & 0x3F));
-			os.Put(0x80 | ((codepoint >> 6) & 0x3F));
-			os.Put(0x80 | (codepoint & 0x3F));
+			os.Put(static_cast<Ch>(0xF0 | ((codepoint >> 18) & 0xFF)));
+			os.Put(static_cast<Ch>(0x80 | ((codepoint >> 12) & 0x3F)));
+			os.Put(static_cast<Ch>(0x80 | ((codepoint >> 6) & 0x3F)));
+			os.Put(static_cast<Ch>(0x80 | (codepoint & 0x3F)));
 		}
 	}
 
@@ -204,7 +204,7 @@ struct UTF8 {
 /*! http://en.wikipedia.org/wiki/UTF-16
 	http://tools.ietf.org/html/rfc2781
 	\tparam CharType Type for storing 16-bit UTF-16 data. Default is wchar_t. C++11 may use char16_t instead.
-	\implements Encoding
+	\note implements Encoding concept
 
 	\note For in-memory access, no need to concern endianness. The code units and code points are represented by CPU's endianness.
 	For streaming, use UTF16LE and UTF16BE, which handle endianness.
@@ -332,8 +332,8 @@ struct UTF16BE : UTF16<CharType> {
 
 //! UTF-32 encoding. 
 /*! http://en.wikipedia.org/wiki/UTF-32
-	\tparam Ch Type for storing 32-bit UTF-32 data. Default is unsigned. C++11 may use char32_t instead.
-	\implements Encoding
+	\tparam CharType Type for storing 32-bit UTF-32 data. Default is unsigned. C++11 may use char32_t instead.
+	\note implements Encoding concept
 
 	\note For in-memory access, no need to concern endianness. The code units and code points are represented by CPU's endianness.
 	For streaming, use UTF32LE and UTF32BE, which handle endianness.
@@ -448,7 +448,7 @@ enum UTFType {
 	kUTF16LE = 1,	//!< UTF-16 little endian.
 	kUTF16BE = 2,	//!< UTF-16 big endian.
 	kUTF32LE = 3,	//!< UTF-32 little endian.
-	kUTF32BE = 4,	//!< UTF-32 big endian.
+	kUTF32BE = 4	//!< UTF-32 big endian.
 };
 
 //! Dynamically select encoding according to stream's runtime-specified UTF encoding type.

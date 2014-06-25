@@ -8,7 +8,8 @@ namespace rapidjson {
 //! Writer with indentation and spacing.
 /*!
 	\tparam OutputStream Type of ouptut os.
-	\tparam Encoding Encoding of both source strings and output.
+	\tparam SourceEncoding Encoding of source string.
+	\tparam TargetEncoding Encoding of output stream.
 	\tparam Allocator Type of allocator for allocating memory of stack.
 */
 template<typename OutputStream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename Allocator = MemoryPoolAllocator<> >
@@ -26,7 +27,7 @@ public:
 		Base(os, allocator, levelDepth), indentChar_(' '), indentCharCount_(4) {}
 
 	//! Set custom indentation.
-	/*! \param indentChar		Character for indentation. Must be whitespace character (' ', '\t', '\n', '\r').
+	/*! \param indentChar		Character for indentation. Must be whitespace character (' ', '\\t', '\\n', '\\r').
 		\param indentCharCount	Number of indent characters for each indentation level.
 		\note The default indentation is 4 spaces.
 	*/
