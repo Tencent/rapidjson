@@ -16,12 +16,21 @@
 #ifdef _MSC_VER
 typedef __int64 int64_t;
 typedef unsigned __int64 uint64_t;
-#define RAPIDJSON_FORCEINLINE __forceinline
 #else
 #include <inttypes.h>
-#define RAPIDJSON_FORCEINLINE
 #endif
 #endif // RAPIDJSON_NO_INT64TYPEDEF
+
+///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_FORCEINLINE
+
+#ifndef RAPIDJSON_FORCEINLINE
+#ifdef _MSC_VER
+#define RAPIDJSON_FORCEINLINE __forceinline
+#else
+#define RAPIDJSON_FORCEINLINE
+#endif
+#endif // RAPIDJSON_FORCEINLINE
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_ENDIAN
