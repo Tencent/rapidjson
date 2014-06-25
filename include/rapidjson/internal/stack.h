@@ -42,7 +42,7 @@ public:
 			stack_top_ = stack_ + size;
 			stack_end_ = stack_ + stack_capacity_;
 		}
-		T* ret = (T*)stack_top_;
+		T* ret = reinterpret_cast<T*>(stack_top_);
 		stack_top_ += sizeof(T) * count;
 		return ret;
 	}
@@ -51,13 +51,13 @@ public:
 	T* Pop(size_t count) {
 		RAPIDJSON_ASSERT(GetSize() >= count * sizeof(T));
 		stack_top_ -= count * sizeof(T);
-		return (T*)stack_top_;
+		return reinterpret_cast<T*>(stack_top_);
 	}
 
 	template<typename T>
 	T* Top() { 
 		RAPIDJSON_ASSERT(GetSize() >= sizeof(T));
-		return (T*)(stack_top_ - sizeof(T));
+		return reinterpret_cast<T*>(stack_top_ - sizeof(T));
 	}
 
 	template<typename T>
@@ -65,7 +65,7 @@ public:
 
 	Allocator& GetAllocator() { return *allocator_; }
 	bool Empty() const { return stack_top_ == stack_; }
-	size_t GetSize() const { return stack_top_ - stack_; }
+	size_t GetSize() const { return static_cast<size_t>(stack_top_ - stack_); }
 	size_t GetCapacity() const { return stack_capacity_; }
 
 private:

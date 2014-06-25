@@ -27,7 +27,7 @@ namespace rapidjson {
 	\tparam OutputStream Type of output stream.
 	\tparam SourceEncoding Encoding of both source strings.
 	\tparam TargetEncoding Encoding of and output stream.
-	\implements Handler
+	\note implements Handler concept
 */
 template<typename OutputStream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename Allocator = MemoryPoolAllocator<> >
 class Writer {
@@ -97,9 +97,9 @@ public:
 protected:
 	//! Information for each nested level
 	struct Level {
-		Level(bool inArray_) : inArray(inArray_), valueCount(0) {}
-		bool inArray;		//!< true if in array, otherwise in object
+		Level(bool inArray_) : valueCount(0), inArray(inArray_) {}
 		size_t valueCount;	//!< number of values in this level
+		bool inArray;		//!< true if in array, otherwise in object
 	};
 
 	static const size_t kDefaultLevelDepth = 32;
@@ -164,7 +164,7 @@ protected:
 	//! \todo Optimization with custom double-to-string converter.
 	void WriteDouble(double d) {
 		char buffer[100];
-#if _MSC_VER
+#ifdef _MSC_VER
 		int ret = sprintf_s(buffer, sizeof(buffer), "%g", d);
 #else
 		int ret = snprintf(buffer, sizeof(buffer), "%g", d);
