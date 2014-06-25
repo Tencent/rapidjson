@@ -63,7 +63,7 @@ public:
 	GenericValue(Type type) {
 		static const unsigned defaultFlags[7] = {
 			kNullFlag, kFalseFlag, kTrueFlag, kObjectFlag, kArrayFlag, kConstStringFlag,
-			kNumberFlag | kIntFlag | kUintFlag | kInt64Flag | kUint64Flag | kDoubleFlag
+			kNumberAnyFlag
 		};
 		RAPIDJSON_ASSERT(type <= kNumberType);
 		flags_ = defaultFlags[type];
@@ -578,6 +578,7 @@ private:
 		kNumberInt64Flag = kNumberType | kNumberFlag | kInt64Flag,
 		kNumberUint64Flag = kNumberType | kNumberFlag | kUint64Flag,
 		kNumberDoubleFlag = kNumberType | kNumberFlag | kDoubleFlag,
+		kNumberAnyFlag = kNumberType | kNumberFlag | kIntFlag | kInt64Flag | kUintFlag | kUint64Flag | kDoubleFlag,
 		kConstStringFlag = kStringType | kStringFlag,
 		kCopyStringFlag = kStringType | kStringFlag | kCopyFlag,
 		kObjectFlag = kObjectType,
