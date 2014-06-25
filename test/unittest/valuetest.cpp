@@ -25,6 +25,36 @@ TEST(Value, assignment_operator) {
 	EXPECT_EQ(1234, y.GetInt());
 }
 
+TEST(Value, CopyFrom)
+{
+	// use CrtAllocator to explicitly malloc/free any memory
+	// comment this line to use the default Allocator instead
+	typedef GenericValue<UTF8<>,CrtAllocator> Value;
+
+	Value::AllocatorType a;
+	Value v1(1234);
+	Value v2(v1,a); // deep copy constructor
+	EXPECT_TRUE(v1.GetType() == v2.GetType());
+	EXPECT_EQ(v1.GetInt(), v2.GetInt());
+
+	v1.SetString("foo");
+	v2.CopyFrom(v1,a);
+	EXPECT_TRUE(v1.GetType() == v2.GetType());
+	EXPECT_STREQ(v1.GetString(), v2.GetString());
+	EXPECT_EQ(v1.GetString(), v2.GetString()); // string NOT copied
+
+	v1.SetArray().PushBack(1234,a);
+	v2.CopyFrom(v1,a);
+	EXPECT_TRUE(v2.IsArray());
+	EXPECT_EQ(v1.Size(), v2.Size());
+
+	v1.PushBack(Value().SetString("foo",a),a); // push string copy
+	EXPECT_TRUE(v1.Size() != v2.Size());
+	v2.CopyFrom(v1,a);
+	EXPECT_TRUE(v1.Size() == v2.Size());
+	EXPECT_STREQ(v1[1].GetString(), v2[1].GetString());
+	EXPECT_NE(v1[1].GetString(), v2[1].GetString()); // string got copied
+}
 
 TEST(Value, Null) {
 	// Default constructor
