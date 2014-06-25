@@ -8,7 +8,7 @@ namespace rapidjson {
 
 //! File byte stream for input using fread().
 /*!
-	\implements Stream
+	\note implements Stream concept
 */
 class FileReadStream {
 public:
@@ -28,7 +28,7 @@ public:
 
 	Ch Peek() const { return *current_; }
 	Ch Take() { Ch c = *current_; Read(); return c; }
-	size_t Tell() const { return count_ + (current_ - buffer_); }
+	size_t Tell() const { return count_ + static_cast<size_t>(current_ - buffer_); }
 
 	// Not implemented
 	void Put(Ch) { RAPIDJSON_ASSERT(false); }

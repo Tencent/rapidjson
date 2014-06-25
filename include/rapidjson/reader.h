@@ -39,7 +39,7 @@ namespace rapidjson {
 enum ParseFlag {
 	kParseDefaultFlags = 0,			//!< Default parse flags. Non-destructive parsing. Text strings are decoded into allocated buffer.
 	kParseInsituFlag = 1,			//!< In-situ(destructive) parsing.
-	kParseValidateEncodingFlag = 2,	//!< Validate encoding of JSON strings.
+	kParseValidateEncodingFlag = 2	//!< Validate encoding of JSON strings.
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ concept Handler {
 
 //! Default implementation of Handler.
 /*! This can be used as base class of any reader handler.
-	\implements Handler
+	\note implements Handler concept
 */
 template<typename Encoding = UTF8<> >
 struct BaseReaderHandler {
@@ -96,7 +96,7 @@ struct BaseReaderHandler {
 // SkipWhitespace
 
 //! Skip the JSON white spaces in a stream.
-/*! \param stream A input stream for skipping white spaces.
+/*! \param is A input stream for skipping white spaces.
 	\note This function has SSE2/SSE4.2 specialization.
 */
 template<typename InputStream>
@@ -216,7 +216,7 @@ public:
 	/*! \tparam parseFlags Combination of ParseFlag. 
 		 \tparam InputStream Type of input stream.
 		 \tparam Handler Type of handler which must implement Handler concept.
-		 \param stream Input stream to be parsed.
+		 \param is Input stream to be parsed.
 		 \param handler The handler to receive events.
 		 \return Whether the parsing is successful.
 	*/
@@ -368,7 +368,7 @@ private:
 		for (int i = 0; i < 4; i++) {
 			Ch c = s.Take();
 			codepoint <<= 4;
-			codepoint += c;
+			codepoint += static_cast<unsigned>(c);
 			if (c >= '0' && c <= '9')
 				codepoint -= '0';
 			else if (c >= 'A' && c <= 'F')
@@ -494,7 +494,7 @@ private:
 			s.Take();
 		}
 		else if (s.Peek() >= '1' && s.Peek() <= '9') {
-			i = s.Take() - '0';
+			i = static_cast<unsigned>(s.Take() - '0');
 
 			if (minus)
 				while (s.Peek() >= '0' && s.Peek() <= '9') {
@@ -504,7 +504,7 @@ private:
 							break;
 						}
 					}
-					i = i * 10 + (s.Take() - '0');
+					i = i * 10 + static_cast<unsigned>(s.Take() - '0');
 				}
 			else
 				while (s.Peek() >= '0' && s.Peek() <= '9') {
@@ -514,7 +514,7 @@ private:
 							break;
 						}
 					}
-					i = i * 10 + (s.Take() - '0');
+					i = i * 10 + static_cast<unsigned>(s.Take() - '0');
 				}
 		}
 		else
@@ -527,21 +527,21 @@ private:
 			i64 = i;
 			if (minus) 
 				while (s.Peek() >= '0' && s.Peek() <= '9') {					
-					if (i64 >= 922337203685477580uLL) // 2^63 = 9223372036854775808
-						if (i64 != 922337203685477580uLL || s.Peek() > '8') {
+					if (i64 >= UINT64_C(922337203685477580)) // 2^63 = 9223372036854775808
+						if (i64 != UINT64_C(922337203685477580) || s.Peek() > '8') {
 							useDouble = true;
 							break;
 						}
-					i64 = i64 * 10 + (s.Take() - '0');
+					i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
 				}
 			else
 				while (s.Peek() >= '0' && s.Peek() <= '9') {					
-					if (i64 >= 1844674407370955161uLL) // 2^64 - 1 = 18446744073709551615
-						if (i64 != 1844674407370955161uLL || s.Peek() > '5') {
+					if (i64 >= UINT64_C(1844674407370955161)) // 2^64 - 1 = 18446744073709551615
+						if (i64 != UINT64_C(1844674407370955161) || s.Peek() > '5') {
 							useDouble = true;
 							break;
 						}
-					i64 = i64 * 10 + (s.Take() - '0');
+					i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
 				}
 		}
 

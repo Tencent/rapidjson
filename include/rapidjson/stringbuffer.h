@@ -10,7 +10,7 @@ namespace rapidjson {
 /*!
 	\tparam Encoding Encoding of the stream.
 	\tparam Allocator type for allocating memory buffer.
-	\implements Stream
+	\note implements Stream concept
 */
 template <typename Encoding, typename Allocator = CrtAllocator>
 struct GenericStringBuffer {

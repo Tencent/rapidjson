@@ -23,10 +23,12 @@ int main(int, char*[]) {
 		return 1;
 #else
 	// In-situ parsing, decode strings directly in the source string. Source must be string.
-	char buffer[sizeof(json)];
-	memcpy(buffer, json, sizeof(json));
-	if (document.ParseInsitu<0>(buffer).HasParseError())
-		return 1;
+	{
+		char buffer[sizeof(json)];
+		memcpy(buffer, json, sizeof(json));
+		if (document.ParseInsitu<0>(buffer).HasParseError())
+			return 1;
+	}
 #endif
 
 	printf("\nParsing to document succeeded.\n");
@@ -128,7 +130,7 @@ int main(int, char*[]) {
 		char buffer[10];
 		int len = sprintf(buffer, "%s %s", "Milo", "Yip");	// synthetic example of dynamically created string.
 
-		author.SetString(buffer, len, document.GetAllocator());
+		author.SetString(buffer, static_cast<size_t>(len), document.GetAllocator());
 		// Shorter but slower version:
 		// document["hello"].SetString(buffer, document.GetAllocator());
 

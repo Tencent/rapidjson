@@ -91,23 +91,23 @@ public:
 		data_.n.i64 = i64;
 		if (i64 >= 0) {
 			flags_ |= kNumberUint64Flag;
-			if (!(i64 & 0xFFFFFFFF00000000LL))
+			if (!(static_cast<uint64_t>(i64) & UINT64_C(0xFFFFFFFF00000000)))
 				flags_ |= kUintFlag;
-			if (!(i64 & 0xFFFFFFFF80000000LL))
+			if (!(static_cast<uint64_t>(i64) & UINT64_C(0xFFFFFFFF80000000)))
 				flags_ |= kIntFlag;
 		}
-		else if (i64 >= -2147483648LL)
+		else if (i64 >= INT64_C(-2147483648))
 			flags_ |= kIntFlag;
 	}
 
 	//! Constructor for uint64_t value.
 	GenericValue(uint64_t u64) : flags_(kNumberUint64Flag) {
 		data_.n.u64 = u64;
-		if (!(u64 & 0x8000000000000000ULL))
+		if (!(u64 & UINT64_C(0x8000000000000000)))
 			flags_ |= kInt64Flag;
-		if (!(u64 & 0xFFFFFFFF00000000ULL))
+		if (!(u64 & UINT64_C(0xFFFFFFFF00000000)))
 			flags_ |= kUintFlag;
-		if (!(u64 & 0xFFFFFFFF80000000ULL))
+		if (!(u64 & UINT64_C(0xFFFFFFFF80000000)))
 			flags_ |= kIntFlag;
 	}
 
@@ -430,7 +430,6 @@ public:
 
 	//! Get an element from array by index.
 	/*! \param index Zero-based index of element.
-		\note
 \code
 Value a(kArrayType);
 a.PushBack(123);
@@ -527,7 +526,7 @@ int z = a[0u].GetInt();				// This works too.
 	const Ch* GetString() const { RAPIDJSON_ASSERT(IsString()); return data_.s.str; }
 
 	//! Get the length of string.
-	/*! Since rapidjson permits "\u0000" in the json string, strlen(v.GetString()) may not equal to v.GetStringLength().
+	/*! Since rapidjson permits "\\u0000" in the json string, strlen(v.GetString()) may not equal to v.GetStringLength().
 	*/
 	SizeType GetStringLength() const { RAPIDJSON_ASSERT(IsString()); return data_.s.length; }
 
@@ -748,9 +747,9 @@ typedef GenericValue<UTF8<> > Value;
 
 //! A document for parsing JSON text as DOM.
 /*!
-	\implements Handler
+	\note implements Handler concept
 	\tparam Encoding encoding for both parsing and string storage.
-	\tparam Alloactor allocator for allocating memory for the DOM, and the stack during parsing.
+	\tparam Allocator allocator for allocating memory for the DOM, and the stack during parsing.
 */
 template <typename Encoding, typename Allocator = MemoryPoolAllocator<> >
 class GenericDocument : public GenericValue<Encoding, Allocator> {
@@ -767,7 +766,7 @@ public:
 
 	//! Parse JSON text from an input stream.
 	/*! \tparam parseFlags Combination of ParseFlag.
-		\param stream Input stream to be parsed.
+		\param is Input stream to be parsed.
 		\return The document itself for fluent API.
 	*/
 	template <unsigned parseFlags, typename SourceEncoding, typename InputStream>

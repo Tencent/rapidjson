@@ -12,7 +12,7 @@ using namespace rapidjson;
 class Person {
 public:
 	Person(const std::string& name, unsigned age) : name_(name), age_(age) {}
-	virtual ~Person() {}
+	virtual ~Person();
 
 protected:
 	template <typename Writer>
@@ -29,6 +29,9 @@ private:
 	std::string name_;
 	unsigned age_;
 };
+
+Person::~Person() {
+}
 
 class Education {
 public:
@@ -56,7 +59,7 @@ class Dependent : public Person {
 public:
 	Dependent(const std::string& name, unsigned age, Education* education = 0) : Person(name, age), education_(education) {}
 	Dependent(const Dependent& rhs) : Person(rhs) { education_ = (rhs.education_ == 0) ? 0 : new Education(*rhs.education_); }
-	~Dependent() { delete education_; }
+	virtual ~Dependent();
 
 	template <typename Writer>
 	void Serialize(Writer& writer) const {
@@ -77,9 +80,14 @@ private:
 	Education *education_;
 };
 
+Dependent::~Dependent() {
+	delete education_; 
+}
+
 class Employee : public Person {
 public:
 	Employee(const std::string& name, unsigned age, bool married) : Person(name, age), married_(married) {}
+	virtual ~Employee();
 
 	void AddDependent(const Dependent& dependent) {
 		dependents_.push_back(dependent);
@@ -104,9 +112,12 @@ public:
 	}
 
 private:
-	bool married_;
 	std::vector<Dependent> dependents_;
+	bool married_;
 };
+
+Employee::~Employee() {
+}
 
 int main(int, char*[]) {
 	std::vector<Employee> employees;
