@@ -8,7 +8,7 @@ namespace rapidjson {
 
 //! Wrapper of C file stream for input using fread().
 /*!
-	\implements Stream
+	\note implements Stream concept
 */
 class FileWriteStream {
 public:
@@ -26,13 +26,13 @@ public:
 	}
 
 	void PutN(char c, size_t n) {
-		size_t avail = bufferEnd_ - current_;
+		size_t avail = static_cast<size_t>(bufferEnd_ - current_);
 		while (n > avail) {
 			memset(current_, c, avail);
 			current_ += avail;
 			Flush();
 			n -= avail;
-			avail = bufferEnd_ - current_;
+			avail = static_cast<size_t>(bufferEnd_ - current_);
 		}
 
 		if (n > 0) {
@@ -43,7 +43,7 @@ public:
 
 	void Flush() {
 		if (current_ != buffer_) {
-			fwrite(buffer_, 1, current_ - buffer_, fp_);
+			fwrite(buffer_, 1, static_cast<size_t>(current_ - buffer_), fp_);
 			current_ = buffer_;
 		}
 	}
