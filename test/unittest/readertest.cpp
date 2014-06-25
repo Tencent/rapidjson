@@ -9,7 +9,9 @@ template<bool expect>
 struct ParseBoolHandler : BaseReaderHandler<> {
 	ParseBoolHandler() : step_(0) {}
 	void Default() { FAIL(); }
-	void Bool(bool b) { EXPECT_EQ(expect, b); ++step_; }
+	// gcc 4.8.x generates warning in EXPECT_EQ(bool, bool) on this gtest version.
+	// Workaround with EXPECT_TRUE().
+	void Bool(bool b) { /*EXPECT_EQ(expect, b); */EXPECT_TRUE(expect == b);  ++step_; }
 
 	unsigned step_;
 };
@@ -184,7 +186,7 @@ struct ParseStringHandler : BaseReaderHandler<Encoding> {
 		EXPECT_EQ(0, str_);
 		if (copy) {
 			str_ = (typename Encoding::Ch*)malloc((length + 1) * sizeof(typename Encoding::Ch));
-			memcpy((void*)str_, str, (length + 1) * sizeof(typename Encoding::Ch));
+			memcpy(const_cast<typename Encoding::Ch*>(str_), str, (length + 1) * sizeof(typename Encoding::Ch));
 		}
 		else
 			str_ = str;
@@ -218,17 +220,22 @@ TEST(Reader, ParseString) {
 
 	// String constant L"\xXX" can only specify character code in bytes, which is not endianness-neutral. 
 	// And old compiler does not support u"" and U"" string literal. So here specify string literal by array of Ch.
+	// In addition, GCC 4.8 generates -Wnarrowing warnings when character code >= 128 are assigned to signed integer types.
+	// Therefore, utype is added for declaring unsigned array, and then cast it to Encoding::Ch.
 #define ARRAY(...) { __VA_ARGS__ }
-#define TEST_STRINGARRAY(Encoding, array, x) \
+#define TEST_STRINGARRAY(Encoding, utype, array, x) \
 	{ \
-		static const Encoding::Ch e[] = array; \
+		static const utype ue[] = array; \
+		static const Encoding::Ch* e = reinterpret_cast<const Encoding::Ch *>(&ue[0]); \
 		TEST_STRING(Encoding, e, x); \
 	}
 
-#define TEST_STRINGARRAY2(Encoding, earray, xarray) \
+#define TEST_STRINGARRAY2(Encoding, utype, earray, xarray) \
 	{ \
-		static const Encoding::Ch e[] = earray; \
-		static const Encoding::Ch x[] = xarray; \
+		static const utype ue[] = earray; \
+		static const utype xe[] = xarray; \
+		static const Encoding::Ch* e = reinterpret_cast<const Encoding::Ch *>(&ue[0]); \
+		static const Encoding::Ch* x = reinterpret_cast<const Encoding::Ch *>(&xe[0]); \
 		TEST_STRING(Encoding, e, x); \
 	}
 
@@ -246,20 +253,20 @@ TEST(Reader, ParseString) {
 	TEST_STRING(UTF16<>, L"Hello", L"\"Hello\"");
 	TEST_STRING(UTF16<>, L"Hello\nWorld", L"\"Hello\\nWorld\"");
 	TEST_STRING(UTF16<>, L"\"\\/\b\f\n\r\t", L"\"\\\"\\\\/\\b\\f\\n\\r\\t\"");
-	TEST_STRINGARRAY(UTF16<>, ARRAY(0x0024, 0x0000), L"\"\\u0024\"");
-	TEST_STRINGARRAY(UTF16<>, ARRAY(0x00A2, 0x0000), L"\"\\u00A2\"");	// Cents sign U+00A2
-	TEST_STRINGARRAY(UTF16<>, ARRAY(0x20AC, 0x0000), L"\"\\u20AC\"");	// Euro sign U+20AC
-	TEST_STRINGARRAY(UTF16<>, ARRAY(0xD834, 0xDD1E, 0x0000), L"\"\\uD834\\uDD1E\"");	// G clef sign U+1D11E
+	TEST_STRINGARRAY(UTF16<>, wchar_t, ARRAY(0x0024, 0x0000), L"\"\\u0024\"");
+	TEST_STRINGARRAY(UTF16<>, wchar_t, ARRAY(0x00A2, 0x0000), L"\"\\u00A2\"");	// Cents sign U+00A2
+	TEST_STRINGARRAY(UTF16<>, wchar_t, ARRAY(0x20AC, 0x0000), L"\"\\u20AC\"");	// Euro sign U+20AC
+	TEST_STRINGARRAY(UTF16<>, wchar_t, ARRAY(0xD834, 0xDD1E, 0x0000), L"\"\\uD834\\uDD1E\"");	// G clef sign U+1D11E
 
 	// UTF32
-	TEST_STRINGARRAY2(UTF32<>, ARRAY('\0'), ARRAY('\"', '\"', '\0'));
-	TEST_STRINGARRAY2(UTF32<>, ARRAY('H', 'e', 'l', 'l', 'o', '\0'), ARRAY('\"', 'H', 'e', 'l', 'l', 'o', '\"', '\0'));
-	TEST_STRINGARRAY2(UTF32<>, ARRAY('H', 'e', 'l', 'l', 'o', '\n', 'W', 'o', 'r', 'l', 'd', '\0'), ARRAY('\"', 'H', 'e', 'l', 'l', 'o', '\\', 'n', 'W', 'o', 'r', 'l', 'd', '\"', '\0'));
-	TEST_STRINGARRAY2(UTF32<>, ARRAY('\"', '\\', '/', '\b', '\f', '\n', '\r', '\t', '\0'), ARRAY('\"', '\\', '\"', '\\', '\\', '/', '\\', 'b', '\\', 'f', '\\', 'n', '\\', 'r', '\\', 't', '\"', '\0'));
-	TEST_STRINGARRAY2(UTF32<>, ARRAY(0x00024, 0x0000), ARRAY('\"', '\\', 'u', '0', '0', '2', '4', '\"', '\0'));
-	TEST_STRINGARRAY2(UTF32<>, ARRAY(0x000A2, 0x0000), ARRAY('\"', '\\', 'u', '0', '0', 'A', '2', '\"', '\0'));	// Cents sign U+00A2
-	TEST_STRINGARRAY2(UTF32<>, ARRAY(0x020AC, 0x0000), ARRAY('\"', '\\', 'u', '2', '0', 'A', 'C', '\"', '\0'));	// Euro sign U+20AC
-	TEST_STRINGARRAY2(UTF32<>, ARRAY(0x1D11E, 0x0000), ARRAY('\"', '\\', 'u', 'D', '8', '3', '4', '\\', 'u', 'D', 'D', '1', 'E', '\"', '\0'));	// G clef sign U+1D11E
+	TEST_STRINGARRAY2(UTF32<>, unsigned, ARRAY('\0'), ARRAY('\"', '\"', '\0'));
+	TEST_STRINGARRAY2(UTF32<>, unsigned, ARRAY('H', 'e', 'l', 'l', 'o', '\0'), ARRAY('\"', 'H', 'e', 'l', 'l', 'o', '\"', '\0'));
+	TEST_STRINGARRAY2(UTF32<>, unsigned, ARRAY('H', 'e', 'l', 'l', 'o', '\n', 'W', 'o', 'r', 'l', 'd', '\0'), ARRAY('\"', 'H', 'e', 'l', 'l', 'o', '\\', 'n', 'W', 'o', 'r', 'l', 'd', '\"', '\0'));
+	TEST_STRINGARRAY2(UTF32<>, unsigned, ARRAY('\"', '\\', '/', '\b', '\f', '\n', '\r', '\t', '\0'), ARRAY('\"', '\\', '\"', '\\', '\\', '/', '\\', 'b', '\\', 'f', '\\', 'n', '\\', 'r', '\\', 't', '\"', '\0'));
+	TEST_STRINGARRAY2(UTF32<>, unsigned, ARRAY(0x00024, 0x0000), ARRAY('\"', '\\', 'u', '0', '0', '2', '4', '\"', '\0'));
+	TEST_STRINGARRAY2(UTF32<>, unsigned, ARRAY(0x000A2, 0x0000), ARRAY('\"', '\\', 'u', '0', '0', 'A', '2', '\"', '\0'));	// Cents sign U+00A2
+	TEST_STRINGARRAY2(UTF32<>, unsigned, ARRAY(0x020AC, 0x0000), ARRAY('\"', '\\', 'u', '2', '0', 'A', 'C', '\"', '\0'));	// Euro sign U+20AC
+	TEST_STRINGARRAY2(UTF32<>, unsigned, ARRAY(0x1D11E, 0x0000), ARRAY('\"', '\\', 'u', 'D', '8', '3', '4', '\\', 'u', 'D', 'D', '1', 'E', '\"', '\0'));	// G clef sign U+1D11E
 
 #undef TEST_STRINGARRAY
 #undef ARRAY
@@ -306,9 +313,10 @@ bool TestString(const char* str) {
 
 TEST(Reader, ParseString_Error) {
 #define ARRAY(...) { __VA_ARGS__ }
-#define TEST_STRINGARRAY_ERROR(Encoding, array) \
+#define TEST_STRINGARRAY_ERROR(Encoding, utype, array) \
 	{ \
-		static const Encoding::Ch e[] = array; \
+		static const utype ue[] = array; \
+		static const Encoding::Ch* e = reinterpret_cast<const Encoding::Ch *>(&ue[0]); \
 		EXPECT_FALSE(TestString(e)); \
 	}
 
@@ -346,30 +354,30 @@ TEST(Reader, ParseString_Error) {
 	// 4  Overlong sequences 
 
 	// 4.1  Examples of an overlong ASCII character
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xC0u, 0xAFu, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xE0u, 0x80u, 0xAFu, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0xAFu, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xC0u, 0xAFu, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x80u, 0xAFu, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0xAFu, '\"', ']', '\0'));
 
 	// 4.2  Maximum overlong sequences 
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xC1u, 0xBFu, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xE0u, 0x9Fu, 0xBFu, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xF0u, 0x8Fu, 0xBFu, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xC1u, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x9Fu, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x8Fu, 0xBFu, 0xBFu, '\"', ']', '\0'));
 
 	// 4.3  Overlong representation of the NUL character 
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xC0u, 0x80u, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xE0u, 0x80u, 0x80u, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xC0u, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x80u, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0x80u, '\"', ']', '\0'));
 
 	// 5  Illegal code positions
 
 	// 5.1 Single UTF-16 surrogates
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xEDu, 0xA0u, 0x80u, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xEDu, 0xADu, 0xBFu, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xEDu, 0xAEu, 0x80u, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xEDu, 0xAFu, 0xBFu, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xEDu, 0xB0u, 0x80u, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xEDu, 0xBEu, 0x80u, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, ARRAY('[', '\"', 0xEDu, 0xBFu, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xA0u, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xADu, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xAEu, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xAFu, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xB0u, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xBEu, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xBFu, 0xBFu, '\"', ']', '\0'));
 
 #undef ARRAY
 #undef TEST_STRINGARRAY_ERROR
@@ -575,4 +583,13 @@ TEST(Reader, Parse_Error) {
 	TEST_ERROR("falsE");
 
 #undef TEST_ERROR
+}
+
+TEST(Reader, SkipWhitespace) {
+	StringStream ss(" A \t\tB\n \n\nC\r\r \rD \t\n\r E");
+	const char* expected = "ABCDE";
+	for (size_t i = 0; i < 5; i++) {
+		SkipWhitespace(ss);
+		EXPECT_EQ(expected[i], ss.Take());
+	}
 }

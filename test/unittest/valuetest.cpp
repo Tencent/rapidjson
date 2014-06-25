@@ -470,19 +470,31 @@ TEST(Value, Object) {
 	value.SetString("Banana", 6);
 	x.AddMember(name, value, allocator);
 
+	// Tests a member with null character
+	const Value C0D("C\0D", 3);
+	name.SetString(C0D.GetString(), 3);
+	value.SetString("CherryD", 7);
+	x.AddMember(name, value, allocator);
+
 	// HasMember()
 	EXPECT_TRUE(x.HasMember("A"));
 	EXPECT_TRUE(x.HasMember("B"));
 	EXPECT_TRUE(y.HasMember("A"));
 	EXPECT_TRUE(y.HasMember("B"));
 
+	name.SetString("C\0D", 3);
+	EXPECT_TRUE(x.HasMember(name));
+	EXPECT_TRUE(y.HasMember(name));
+
 	// operator[]
 	EXPECT_STREQ("Apple", x["A"].GetString());
 	EXPECT_STREQ("Banana", x["B"].GetString());
+	EXPECT_STREQ("CherryD", x[C0D].GetString());
 
 	// const operator[]
 	EXPECT_STREQ("Apple", y["A"].GetString());
 	EXPECT_STREQ("Banana", y["B"].GetString());
+	EXPECT_STREQ("CherryD", y[C0D].GetString());
 
 	// member iterator
 	Value::MemberIterator itr = x.MemberBegin(); 
@@ -493,6 +505,10 @@ TEST(Value, Object) {
 	EXPECT_TRUE(itr != x.MemberEnd());
 	EXPECT_STREQ("B", itr->name.GetString());
 	EXPECT_STREQ("Banana", itr->value.GetString());
+	++itr;
+	EXPECT_TRUE(itr != x.MemberEnd());
+	EXPECT_TRUE(memcmp(itr->name.GetString(), "C\0D", 4) == 0);
+	EXPECT_STREQ("CherryD", itr->value.GetString());
 	++itr;
 	EXPECT_FALSE(itr != x.MemberEnd());
 
@@ -506,6 +522,10 @@ TEST(Value, Object) {
 	EXPECT_STREQ("B", citr->name.GetString());
 	EXPECT_STREQ("Banana", citr->value.GetString());
 	++citr;
+	EXPECT_TRUE(citr != y.MemberEnd());
+	EXPECT_TRUE(memcmp(citr->name.GetString(), "C\0D", 4) == 0);
+	EXPECT_STREQ("CherryD", citr->value.GetString());
+	++citr;
 	EXPECT_FALSE(citr != y.MemberEnd());
 
 	// RemoveMember()
@@ -514,6 +534,9 @@ TEST(Value, Object) {
 
 	x.RemoveMember("B");
 	EXPECT_FALSE(x.HasMember("B"));
+
+	x.RemoveMember(name);
+	EXPECT_FALSE(x.HasMember(name));
 
 	EXPECT_TRUE(x.MemberBegin() == x.MemberEnd());
 

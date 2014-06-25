@@ -85,7 +85,7 @@ protected:
 	template <typename FileEncoding, typename MemoryEncoding>
 	void TestEncodedOutputStream(const char* expectedFilename, bool putBOM) {
 		char filename[L_tmpnam];
-		tmpnam(filename);
+		TempFilename(filename);
 
 		FILE *fp = fopen(filename, "wb");
 		char buffer[16];
@@ -114,7 +114,7 @@ protected:
 
 	void TestAutoUTFOutputStream(UTFType type, bool putBOM, const char *expectedFilename) {
 		char filename[L_tmpnam];
-		tmpnam(filename);
+		TempFilename(filename);
 
 		FILE *fp = fopen(filename, "wb");
 		char buffer[16];
