@@ -9,7 +9,7 @@ namespace rapidjson {
 //! (Depreciated) Wrapper of C file stream for input or output.
 /*!
 	This simple wrapper does not check the validity of the stream.
-	\note implements Stream concept
+	\implements Stream
 	\deprecated { This was only for basic testing in version 0.1, it is found that the performance is very low by using fgetc(). Use FileReadStream instead. }
 */
 class FileStream {
