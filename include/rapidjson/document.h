@@ -719,7 +719,7 @@ public:
 	template <unsigned parseFlags, typename SourceEncoding, typename InputStream>
 	GenericDocument& ParseStream(InputStream& is) {
 		ValueType::SetNull(); // Remove existing root if exist
-		GenericReader<SourceEncoding, Encoding, Allocator> reader;
+		GenericReader<SourceEncoding, Encoding, Allocator> reader(&GetAllocator());
 		if (reader.template Parse<parseFlags>(is, *this)) {
 			RAPIDJSON_ASSERT(stack_.GetSize() == sizeof(ValueType)); // Got one and only one root object
 			this->RawAssign(*stack_.template Pop<ValueType>(1));	// Add this-> to prevent issue 13.
