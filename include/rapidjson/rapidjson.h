@@ -13,26 +13,12 @@
 // Here defines int64_t and uint64_t types in global namespace.
 // If user have their own definition, can define RAPIDJSON_NO_INT64DEFINE to disable this.
 #ifndef RAPIDJSON_NO_INT64DEFINE
-// Old Visual C++ does not have standard integer types, typedef our own.
 #ifdef _MSC_VER
-typedef __int64 int64_t;
-typedef unsigned __int64 uint64_t;
-#ifndef RAPIDJSON_INT64_C
-#define RAPIDJSON_INT64_C(x) x##LL
-#endif
-#ifndef RAPIDJSON_UINT64_C
-#define RAPIDJSON_UINT64_C(x) x##uLL
-#endif
+#include "msinttypes/inttypes.h"
 #else
 // Other compilers should have this.
 #include <inttypes.h>
-#ifndef RAPIDJSON_INT64_C
-#define RAPIDJSON_INT64_C(x) INT64_C(x)
 #endif
-#ifndef RAPIDJSON_UINT64_C
-#define RAPIDJSON_UINT64_C(x) UINT64_C(x)
-#endif
-#endif // _MSC_VER
 #endif // RAPIDJSON_NO_INT64TYPEDEF
 
 ///////////////////////////////////////////////////////////////////////////////
