@@ -210,7 +210,17 @@ public:
 	/*! \param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
 		\param stackCapacity stack capacity in bytes for storing a single decoded string.  (Only use for non-destructive parsing)
 	*/
-	GenericReader(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseError_(0), errorOffset_(0) {}
+	GenericReader(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseError_(0), errorOffset_(0)
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+		, acceptAnyRoot_(false)
+#endif
+	{}
+
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+	//! Accept arbitrary root elements (not only arrays and objects)
+	GenericReader& AcceptAnyRoot(bool yesno = true) { acceptAnyRoot_ = yesno; return *this; }
+#endif
+
 
 	//! Parse JSON text.
 	/*! \tparam parseFlags Combination of ParseFlag. 
@@ -245,7 +255,13 @@ public:
 			switch (is.Peek()) {
 				case '{': ParseObject<parseFlags>(is, handler); break;
 				case '[': ParseArray<parseFlags>(is, handler); break;
-				default: RAPIDJSON_PARSE_ERROR("Expect either an object or array at root", is.Tell());
+				default:
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+					if (acceptAnyRoot_)
+						ParseValue<parseFlags>(is,handler);
+					else
+#endif
+					RAPIDJSON_PARSE_ERROR("Expect either an object or array at root", is.Tell());
 			}
 			SkipWhitespace(is);
 
@@ -655,6 +671,9 @@ private:
 	jmp_buf jmpbuf_;					//!< setjmp buffer for fast exit from nested parsing function calls.
 	const char* parseError_;
 	size_t errorOffset_;
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+	bool acceptAnyRoot_;
+#endif
 }; // class GenericReader
 
 //! Reader with UTF8 encoding and default allocator.

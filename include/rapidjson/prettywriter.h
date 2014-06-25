@@ -26,6 +26,11 @@ public:
 	PrettyWriter(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
 		Base(os, allocator, levelDepth), indentChar_(' '), indentCharCount_(4) {}
 
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+	//! Accept arbitrary root elements (not only arrays and objects)
+	PrettyWriter& AcceptAnyRoot(bool yesno = true) { Base::AcceptAnyRoot(yesno); return *this; }
+#endif
+
 	//! Set custom indentation.
 	/*! \param indentChar		Character for indentation. Must be whitespace character (' ', '\\t', '\\n', '\\r').
 		\param indentCharCount	Number of indent characters for each indentation level.
@@ -144,6 +149,9 @@ protected:
 			level->valueCount++;
 		}
 		else
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+			if (!Base::acceptAnyRoot_)
+#endif
 			RAPIDJSON_ASSERT(type == kObjectType || type == kArrayType);
 	}
 
