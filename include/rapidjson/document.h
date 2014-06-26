@@ -69,6 +69,16 @@ public:
 		flags_ = defaultFlags[type];
 	}
 
+	//! Explicit copy constructor (with allocator)
+	/*! Creates a copy of a Value by using the given Allocator
+		\tparam SourceAllocator allocator of \c rhs
+		\param rhs Value to copy from (read-only)
+		\param allocator Allocator to use for copying
+		\see CopyFrom()
+	*/
+	template< typename SourceAllocator >
+	GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator & allocator);
+
 	//! Constructor for boolean value.
 	explicit GenericValue(bool b) : flags_(b ? kTrueFlag : kFalseFlag) {}
 
@@ -183,6 +193,21 @@ public:
 		new (this) GenericValue(value);
 		return *this;
 	}
+
+	//! Deep-copy assignment from Value
+	/*! Assigns a \b copy of the Value to the current Value object
+		\tparam SourceAllocator Allocator type of \c rhs
+		\param rhs Value to copy from (read-only)
+		\param allocator Allocator to use for copying
+	 */
+	template <typename SourceAllocator>
+	GenericValue& CopyFrom(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator) {
+		RAPIDJSON_ASSERT((void*)this != (void*)&rhs);
+		this->~GenericValue();
+		new (this) GenericValue(rhs,allocator);
+		return *this;
+	}
+
 	//@}
 
 	//!@name Type
@@ -579,7 +604,7 @@ int z = a[0u].GetInt();				// This works too.
 		case kObjectType:
 			handler.StartObject();
 			for (ConstMemberIterator m = MemberBegin(); m != MemberEnd(); ++m) {
-				handler.String(m->name.data_.s.str, m->name.data_.s.length, false);
+				handler.String(m->name.data_.s.str, m->name.data_.s.length, (m->name.flags_ & kCopyFlag) != 0);
 				m->value.Accept(handler);
 			}
 			handler.EndObject(data_.o.size);
@@ -593,7 +618,7 @@ int z = a[0u].GetInt();				// This works too.
 			break;
 
 		case kStringType:
-			handler.String(data_.s.str, data_.s.length, false);
+			handler.String(data_.s.str, data_.s.length, (flags_ & kCopyFlag) != 0);
 			break;
 
 		case kNumberType:
@@ -840,8 +865,10 @@ public:
 	//! Get the capacity of stack in bytes.
 	size_t GetStackCapacity() const { return stack_.GetCapacity(); }
 
-//private:
-	//friend class GenericReader<Encoding>;	// for Reader to call the following private handler functions
+private:
+	// callers of the following private Handler functions
+	template <typename,typename,typename> friend class GenericReader; // for parsing
+	friend class GenericValue<Encoding,Allocator>; // for deep copying
 
 	// Implementation of Handler
 	void Null()	{ new (stack_.template Push<ValueType>()) ValueType(); }
@@ -892,6 +919,17 @@ private:
 };
 
 typedef GenericDocument<UTF8<> > Document;
+
+// defined here due to the dependency on GenericDocument
+template <typename Encoding, typename Allocator>
+template <typename SourceAllocator>
+inline
+GenericValue<Encoding,Allocator>::GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator)
+{
+	GenericDocument<Encoding,Allocator> d(&allocator);
+	rhs.Accept(d);
+	RawAssign(*d.stack_.template Pop<GenericValue>(1));
+}
 
 } // namespace rapidjson
 
