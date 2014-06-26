@@ -27,7 +27,7 @@ JSON(JavaScript Object Notation) is a light-weight data exchange format. Rapidjs
 
 Rapidjson is cross-platform. Some platform/compiler combinations which have been tested are shown as follows.
 * Visual C++ 2008/2010/2013 on Windows (32/64-bit)
-* Cygwin GNU C++ 3.8.x on Windows
+* GNU C++ 3.8.x on Cygwin
 * Clang 3.4 on Mac OS X (32/64-bit) and iOS
 * Clang 3.4 on Android NDK
 
