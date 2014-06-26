@@ -1,4 +1,4 @@
-# Rapidjson v0.1
+# Rapidjson
 
 Copyright (c) 2011-2014 Milo Yip (miloyip@gmail.com)
 
@@ -6,7 +6,7 @@ https://github.com/miloyip/rapidjson/
 
 ## Introduction
 
-Rapidjson is a JSON parser and generator for C++. It was inspired by [rapidxml](http://rapidxml.sourceforge.net/)
+Rapidjson is a JSON parser and generator for C++. It was inspired by [rapidxml](http://rapidxml.sourceforge.net/).
 
 * Rapidjson is small but complete. It supports both SAX and DOM style API. The SAX parser is only a half thousand lines of code.
 
@@ -18,9 +18,7 @@ Rapidjson is a JSON parser and generator for C++. It was inspired by [rapidxml](
 
 For the full features please refer to the user guide.
 
-JSON(JavaScript Object Notation) is a light-weight data exchange format.
-
-More information about JSON can be obtained at
+JSON(JavaScript Object Notation) is a light-weight data exchange format. More information about JSON can be obtained at
 * http://json.org/
 * http://www.ietf.org/rfc/rfc4627.txt
 
