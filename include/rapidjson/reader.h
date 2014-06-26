@@ -277,6 +277,9 @@ private:
 				RAPIDJSON_PARSE_ERROR("Name of an object member must be a string", is.Tell());
 
 			ParseString<parseFlags>(is, handler);
+			if (HasParseError())
+				return;
+
 			SkipWhitespace(is);
 
 			if (is.Take() != ':')
@@ -285,6 +288,9 @@ private:
 			SkipWhitespace(is);
 
 			ParseValue<parseFlags>(is, handler);
+			if (HasParseError())
+				return;
+
 			SkipWhitespace(is);
 
 			++memberCount;
@@ -313,6 +319,9 @@ private:
 
 		for (SizeType elementCount = 0;;) {
 			ParseValue<parseFlags>(is, handler);
+			if (HasParseError())
+				return;
+
 			++elementCount;
 			SkipWhitespace(is);
 
