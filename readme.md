@@ -18,9 +18,20 @@ Rapidjson is a JSON parser and generator for C++. It was inspired by [rapidxml](
 
 For the full features please refer to the user guide.
 
-JSON(JavaScript Object Notation) is a light-weight data exchange format. More information about JSON can be obtained at
-* http://json.org/
-* http://www.ietf.org/rfc/rfc4627.txt
+JSON(JavaScript Object Notation) is a light-weight data exchange format. Rapidjson should be in fully compliance with RFC4627/ECMA-404. More information about JSON can be obtained at
+* [Introducing JSON](http://json.org/)
+* [RFC4627: The application/json Media Type for JavaScript Object Notation (JSON)](http://www.ietf.org/rfc/rfc4627.txt)
+* [Standard ECMA-404: The JSON Data Interchange Format](http://www.ecma-international.org/publications/standards/Ecma-404.htm)
+
+## Compatibility
+
+Rapidjson is cross-platform. Some platform/compiler combinations which have been tested are shown as follows.
+* Visual C++ 2008/2010/2013 on Windows (32/64-bit)
+* Cygwin GNU C++ 3.8.x on Windows
+* Clang 3.4 on Mac OS X (32/64-bit) and iOS
+* Clang 3.4 on Android NDK
+
+Users can build and run the unit tests on their platform/compiler.
 
 ## Installation
 
