@@ -8,7 +8,6 @@
 #include "encodings.h"
 #include "internal/pow10.h"
 #include "internal/stack.h"
-#include <csetjmp>
 
 #ifdef RAPIDJSON_SSE42
 #include <nmmintrin.h>
@@ -21,12 +20,21 @@
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
 
+#ifndef RAPIDJSON_PARSE_ERROR_NORETURN
+#define RAPIDJSON_PARSE_ERROR_NORETURN(msg, offset) \
+	RAPIDJSON_MULTILINEMACRO_BEGIN \
+	if (!HasParseError()) {\
+		parseError_ = msg; \
+		errorOffset_ = offset; \
+	}\
+RAPIDJSON_MULTILINEMACRO_END
+#endif
+
 #ifndef RAPIDJSON_PARSE_ERROR
 #define RAPIDJSON_PARSE_ERROR(msg, offset) \
 	RAPIDJSON_MULTILINEMACRO_BEGIN \
-	parseError_ = msg; \
-	errorOffset_ = offset; \
-	longjmp(jmpbuf_, 1); \
+	RAPIDJSON_PARSE_ERROR_NORETURN(msg, offset); \
+	return; \
 	RAPIDJSON_MULTILINEMACRO_END
 #endif
 
@@ -225,35 +233,24 @@ public:
 		parseError_ = 0;
 		errorOffset_ = 0;
 
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4611) // interaction between '_setjmp' and C++ object destruction is non-portable
-#endif
-		if (setjmp(jmpbuf_)) {
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-			stack_.Clear();
-			return false;
-		}
-
 		SkipWhitespace(is);
 
 		if (is.Peek() == '\0')
-			RAPIDJSON_PARSE_ERROR("Text only contains white space(s)", is.Tell());
+			RAPIDJSON_PARSE_ERROR_NORETURN("Text only contains white space(s)", is.Tell());
 		else {
 			switch (is.Peek()) {
 				case '{': ParseObject<parseFlags>(is, handler); break;
 				case '[': ParseArray<parseFlags>(is, handler); break;
-				default: RAPIDJSON_PARSE_ERROR("Expect either an object or array at root", is.Tell());
+				default: RAPIDJSON_PARSE_ERROR_NORETURN("Expect either an object or array at root", is.Tell());
 			}
 			SkipWhitespace(is);
 
 			if (is.Peek() != '\0')
-				RAPIDJSON_PARSE_ERROR("Nothing should follow the root object or array.", is.Tell());
+				RAPIDJSON_PARSE_ERROR_NORETURN("Nothing should follow the root object or array.", is.Tell());
 		}
 
-		return true;
+		stack_.Clear();
+		return !HasParseError();
 	}
 
 	bool HasParseError() const { return parseError_ != 0; }
@@ -280,6 +277,9 @@ private:
 				RAPIDJSON_PARSE_ERROR("Name of an object member must be a string", is.Tell());
 
 			ParseString<parseFlags>(is, handler);
+			if (HasParseError())
+				return;
+
 			SkipWhitespace(is);
 
 			if (is.Take() != ':')
@@ -288,6 +288,9 @@ private:
 			SkipWhitespace(is);
 
 			ParseValue<parseFlags>(is, handler);
+			if (HasParseError())
+				return;
+
 			SkipWhitespace(is);
 
 			++memberCount;
@@ -316,6 +319,9 @@ private:
 
 		for (SizeType elementCount = 0;;) {
 			ParseValue<parseFlags>(is, handler);
+			if (HasParseError())
+				return;
+
 			++elementCount;
 			SkipWhitespace(is);
 
@@ -375,8 +381,10 @@ private:
 				codepoint -= 'A' - 10;
 			else if (c >= 'a' && c <= 'f')
 				codepoint -= 'a' - 10;
-			else
-				RAPIDJSON_PARSE_ERROR("Incorrect hex digit after \\u escape", s.Tell() - 1);
+			else {
+				RAPIDJSON_PARSE_ERROR_NORETURN("Incorrect hex digit after \\u escape", s.Tell() - 1);
+				return 0;
+			}
 		}
 		is = s; // Restore is
 		return codepoint;
@@ -652,7 +660,6 @@ private:
 
 	static const size_t kDefaultStackCapacity = 256;	//!< Default stack capacity in bytes for storing a single decoded string. 
 	internal::Stack<Allocator> stack_;	//!< A stack for storing decoded string temporarily during non-destructive parsing.
-	jmp_buf jmpbuf_;					//!< setjmp buffer for fast exit from nested parsing function calls.
 	const char* parseError_;
 	size_t errorOffset_;
 }; // class GenericReader
