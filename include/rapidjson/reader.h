@@ -8,7 +8,6 @@
 #include "encodings.h"
 #include "internal/pow10.h"
 #include "internal/stack.h"
-#include <csetjmp>
 
 #ifdef RAPIDJSON_SSE42
 #include <nmmintrin.h>
@@ -652,7 +651,6 @@ private:
 
 	static const size_t kDefaultStackCapacity = 256;	//!< Default stack capacity in bytes for storing a single decoded string. 
 	internal::Stack<Allocator> stack_;	//!< A stack for storing decoded string temporarily during non-destructive parsing.
-	jmp_buf jmpbuf_;					//!< setjmp buffer for fast exit from nested parsing function calls.
 	const char* parseError_;
 	size_t errorOffset_;
 }; // class GenericReader
