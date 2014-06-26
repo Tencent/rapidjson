@@ -5,6 +5,7 @@
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/filewritestream.h"
+#include "rapidjson/error/en.h"
 
 using namespace rapidjson;
 
@@ -21,7 +22,7 @@ int main(int, char*[]) {
 
 	// JSON reader parse from the input stream and let writer generate the output.
 	if (!reader.Parse<kParseValidateEncodingFlag>(is, writer)) {
-		fprintf(stderr, "\nError(%u): %s\n", (unsigned)reader.GetErrorOffset(), reader.GetParseError());
+		fprintf(stderr, "\nError(%u): %s\n", (unsigned)reader.GetErrorOffset(), GetParseError_En(reader.GetParseErrorCode()));
 		return 1;
 	}
 

@@ -788,7 +788,7 @@ public:
 	/*! \param allocator		Optional allocator for allocating stack memory.
 		\param stackCapacity	Initial capacity of stack in bytes.
 	*/
-	GenericDocument(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseError_(0), errorOffset_(0) {}
+	GenericDocument(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseErrorCode_(kParseErrorNone), errorOffset_(0) {}
 
 	//! Parse JSON text from an input stream.
 	/*! \tparam parseFlags Combination of ParseFlag.
@@ -802,11 +802,11 @@ public:
 		if (reader.template Parse<parseFlags>(is, *this)) {
 			RAPIDJSON_ASSERT(stack_.GetSize() == sizeof(ValueType)); // Got one and only one root object
 			this->RawAssign(*stack_.template Pop<ValueType>(1));	// Add this-> to prevent issue 13.
-			parseError_ = 0;
+			parseErrorCode_ = kParseErrorNone;
 			errorOffset_ = 0;
 		}
 		else {
-			parseError_ = reader.GetParseError();
+			parseErrorCode_ = reader.GetParseErrorCode();
 			errorOffset_ = reader.GetErrorOffset();
 			ClearStack();
 		}
@@ -851,10 +851,10 @@ public:
 	}
 
 	//! Whether a parse error was occured in the last parsing.
-	bool HasParseError() const { return parseError_ != 0; }
+	bool HasParseError() const { return parseErrorCode_ != kParseErrorNone; }
 
 	//! Get the message of parsing error.
-	const char* GetParseError() const { return parseError_; }
+	ParseErrorCode GetParseError() const { return parseErrorCode_; }
 
 	//! Get the offset in character of the parsing error.
 	size_t GetErrorOffset() const { return errorOffset_; }
@@ -914,7 +914,7 @@ private:
 
 	static const size_t kDefaultStackCapacity = 1024;
 	internal::Stack<Allocator> stack_;
-	const char* parseError_;
+	ParseErrorCode parseErrorCode_;
 	size_t errorOffset_;
 };
 
