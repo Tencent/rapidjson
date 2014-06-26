@@ -240,9 +240,9 @@ public:
 			RAPIDJSON_PARSE_ERROR_NORETURN("Text only contains white space(s)", is.Tell());
 		else {
 			switch (is.Peek()) {
-			case '{': ParseObject<parseFlags>(is, handler); break;
-			case '[': ParseArray<parseFlags>(is, handler); break;
-			default: RAPIDJSON_PARSE_ERROR_NORETURN("Expect either an object or array at root", is.Tell());
+				case '{': ParseObject<parseFlags>(is, handler); break;
+				case '[': ParseArray<parseFlags>(is, handler); break;
+				default: RAPIDJSON_PARSE_ERROR_NORETURN("Expect either an object or array at root", is.Tell());
 			}
 			SkipWhitespace(is);
 
@@ -250,6 +250,7 @@ public:
 				RAPIDJSON_PARSE_ERROR_NORETURN("Nothing should follow the root object or array.", is.Tell());
 		}
 
+		stack_.Clear();
 		return !HasParseError();
 	}
 
