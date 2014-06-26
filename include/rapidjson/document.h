@@ -788,7 +788,16 @@ public:
 	/*! \param allocator		Optional allocator for allocating stack memory.
 		\param stackCapacity	Initial capacity of stack in bytes.
 	*/
-	GenericDocument(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseError_(0), errorOffset_(0) {}
+	GenericDocument(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseError_(0), errorOffset_(0)
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+		, acceptAnyRoot_(false)
+#endif
+		{}
+
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+	//! Accept arbitrary root elements (not only arrays and objects)
+	GenericDocument& AcceptAnyRoot(bool yesno = true) { acceptAnyRoot_ = yesno; return *this; }
+#endif
 
 	//! Parse JSON text from an input stream.
 	/*! \tparam parseFlags Combination of ParseFlag.
@@ -799,6 +808,9 @@ public:
 	GenericDocument& ParseStream(InputStream& is) {
 		ValueType::SetNull(); // Remove existing root if exist
 		GenericReader<SourceEncoding, Encoding, Allocator> reader(&GetAllocator());
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+		reader.AcceptAnyRoot(acceptAnyRoot_);
+#endif
 		if (reader.template Parse<parseFlags>(is, *this)) {
 			RAPIDJSON_ASSERT(stack_.GetSize() == sizeof(ValueType)); // Got one and only one root object
 			this->RawAssign(*stack_.template Pop<ValueType>(1));	// Add this-> to prevent issue 13.
@@ -916,6 +928,9 @@ private:
 	internal::Stack<Allocator> stack_;
 	const char* parseError_;
 	size_t errorOffset_;
+#ifdef RAPIDJSON_ACCEPT_ANY_ROOT
+	bool acceptAnyRoot_;
+#endif
 };
 
 typedef GenericDocument<UTF8<> > Document;
