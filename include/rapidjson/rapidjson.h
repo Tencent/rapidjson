@@ -10,13 +10,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NO_INT64DEFINE
 
-// Here defines int64_t and uint64_t types in global namespace.
+// Here defines int64_t and uint64_t types in global namespace as well as the
+// (U)INT64_C constant macros.
 // If user have their own definition, can define RAPIDJSON_NO_INT64DEFINE to disable this.
 #ifndef RAPIDJSON_NO_INT64DEFINE
+#ifndef __STDC_CONSTANT_MACROS
+#  define __STDC_CONSTANT_MACROS 1 // required by C++ standard
+#endif
 #ifdef _MSC_VER
+#include "msinttypes/stdint.h"
 #include "msinttypes/inttypes.h"
 #else
 // Other compilers should have this.
+#include <stdint.h>
 #include <inttypes.h>
 #endif
 #endif // RAPIDJSON_NO_INT64TYPEDEF
