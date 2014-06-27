@@ -335,8 +335,8 @@ TEST(Reader, ParseString_Error) {
 	TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uABCG\"]");
 
 	// The surrogate pair in string is invalid.
-	TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uD800X\"]");
-	TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uD800\\uFFFF\"]");
+	TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800X\"]");
+	TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800\\uFFFF\"]");
 
 	// Missing a closing quotation mark in string.
 	TEST_STRING_ERROR(kParseErrorStringMissQuotationMark, "[\"Test]");
@@ -352,7 +352,7 @@ TEST(Reader, ParseString_Error) {
 			e[2] = c;
 			ParseErrorCode error = TestString(e);
 			EXPECT_EQ(kParseErrorStringInvalidEncoding, error);
-			if (error != kParseErrorNone)
+			if (error != kParseErrorStringInvalidEncoding)
 				std::cout << (unsigned)(unsigned char)c << std::endl;
 		 }
 	}
@@ -443,8 +443,8 @@ TEST(Reader, ParseArray_Error) {
 	}
 
 	// Missing a comma or ']' after an array element.
-	TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[");
-	TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[}");
+	TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1");
+	TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1}");
 	TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1 2]");
 
 #undef TEST_ARRAY_ERROR
@@ -590,8 +590,6 @@ TEST(Reader, ParseObject_Error) {
 	TEST_ERROR(kParseErrorObjectMissColon, "{\"a\",1}");
 
 	// Must be a comma or '}' after an object member
-	TEST_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, "{");
-	TEST_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, "{]");
 	TEST_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, "{\"a\":1]");
 }
 

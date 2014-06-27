@@ -269,12 +269,16 @@ public:
 				case '[': ParseArray<parseFlags>(is, handler); break;
 				default: RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotObjectOrArray, is.Tell());
 			}
+			if (HasParseError())
+				goto out;
+
 			SkipWhitespace(is);
 
 			if (is.Peek() != '\0')
 				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotSingular, is.Tell());
 		}
 
+	out:
 		stack_.Clear();
 		return !HasParseError();
 	}
@@ -440,6 +444,8 @@ private:
 		if (parseFlags & kParseInsituFlag) {
 			Ch *head = s.PutBegin();
 			ParseStringToStream<parseFlags, SourceEncoding, SourceEncoding>(s, s);
+			if (HasParseError())
+				return;
 			size_t length = s.PutEnd(head) - 1;
 			RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
 			handler.String((typename TargetEncoding::Ch*)head, SizeType(length), false);
@@ -447,6 +453,8 @@ private:
 		else {
 			StackStream stackStream(stack_);
 			ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
+			if (HasParseError())
+				return;
 			handler.String(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, true);
 		}
 		is = s;		// Restore is
