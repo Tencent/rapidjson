@@ -147,8 +147,8 @@ TEST(Reader, ParseNumberHandler) {
 #undef TEST_DOUBLE
 }
 
-TEST(Reader, ParseNumberHandler_Error) {
-#define TEST_NUMBER_ERROR(str) \
+TEST(Reader, ParseNumber_Error) {
+#define TEST_NUMBER_ERROR(errorCode, str) \
 	{ \
 		char buffer[1001]; \
 		sprintf(buffer, "[%s]", str); \
@@ -156,23 +156,27 @@ TEST(Reader, ParseNumberHandler_Error) {
 		BaseReaderHandler<> h; \
 		Reader reader; \
 		EXPECT_FALSE(reader.Parse<0>(s, h)); \
+		EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
 	}
 
-	TEST_NUMBER_ERROR("a");		// At least one digit in integer part
-	TEST_NUMBER_ERROR(".1");	// At least one digit in integer part
-	
+	// Number too big to be stored in double.
 	{
 		char n1e309[311];	// '1' followed by 309 '0'
 		n1e309[0] = '1';
 		for (int i = 1; i < 310; i++)
 			n1e309[i] = '0';
 		n1e309[310] = '\0';
-		TEST_NUMBER_ERROR(n1e309);	// Number too big to store in double
+		TEST_NUMBER_ERROR(kParesErrorNumberTooBig, n1e309);
 	}
+	TEST_NUMBER_ERROR(kParesErrorNumberTooBig, "1e309");
 
-	TEST_NUMBER_ERROR("1.");	// At least one digit in fraction part
-	TEST_NUMBER_ERROR("1e309"); // Number too big to store in double
-	TEST_NUMBER_ERROR("1e_");	// At least one digit in exponent
+	// Miss fraction part in number.
+	TEST_NUMBER_ERROR(kParseErrorNumberMissFraction, "1.");
+	TEST_NUMBER_ERROR(kParseErrorNumberMissFraction, "1.a");
+
+	// Miss exponent in number.
+	TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e");
+	TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e_");
 
 #undef TEST_NUMBER_ERROR
 }
@@ -304,27 +308,38 @@ TEST(Reader, ParseString_NonDestructive) {
 	EXPECT_EQ(11u, h.length_);
 }
 
-bool TestString(const char* str) {
+ParseErrorCode TestString(const char* str) {
 	StringStream s(str);
 	BaseReaderHandler<> h;
 	Reader reader;
-	return reader.Parse<kParseValidateEncodingFlag>(s, h);
+	reader.Parse<kParseValidateEncodingFlag>(s, h);
+	return reader.GetParseErrorCode();
 }
 
 TEST(Reader, ParseString_Error) {
+#define TEST_STRING_ERROR(errorCode, str)\
+		EXPECT_EQ(errorCode, TestString(str))
+
 #define ARRAY(...) { __VA_ARGS__ }
-#define TEST_STRINGARRAY_ERROR(Encoding, utype, array) \
+#define TEST_STRINGENCODING_ERROR(Encoding, utype, array) \
 	{ \
 		static const utype ue[] = array; \
 		static const Encoding::Ch* e = reinterpret_cast<const Encoding::Ch *>(&ue[0]); \
-		EXPECT_FALSE(TestString(e)); \
+		EXPECT_EQ(kParseErrorStringInvalidEncoding, TestString(e));\
 	}
 
-	EXPECT_FALSE(TestString("[\"\\a\"]"));				// Unknown escape character
-	EXPECT_FALSE(TestString("[\"\\uABCG\"]"));			// Incorrect hex digit after \\u escape
-	EXPECT_FALSE(TestString("[\"\\uD800X\"]"));			// Missing the second \\u in surrogate pair
-	EXPECT_FALSE(TestString("[\"\\uD800\\uFFFF\"]"));	// The second \\u in surrogate pair is invalid
-	EXPECT_FALSE(TestString("[\"Test]"));				// lacks ending quotation before the end of string
+	// Invalid escape character in string.
+	TEST_STRING_ERROR(kParseErrorStringEscapeInvalid, "[\"\\a\"]");
+
+	// Incorrect hex digit after \\u escape in string.
+	TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uABCG\"]");
+
+	// The surrogate pair in string is invalid.
+	TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uD800X\"]");
+	TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uD800\\uFFFF\"]");
+
+	// Missing a closing quotation mark in string.
+	TEST_STRING_ERROR(kParseErrorStringMissQuotationMark, "[\"Test]");
 
 	// http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
 
@@ -335,9 +350,9 @@ TEST(Reader, ParseString_Error) {
 		 char e[] = { '[', '\"', 0, '\"', ']', '\0' };
 		 for (unsigned char c = 0x80u; c <= 0xBFu; c++) {
 			e[2] = c;
-			bool b = TestString(e);
-			EXPECT_FALSE(b);
-			if (b)
+			ParseErrorCode error = TestString(e);
+			EXPECT_EQ(kParseErrorStringInvalidEncoding, error);
+			if (error != kParseErrorNone)
 				std::cout << (unsigned)(unsigned char)c << std::endl;
 		 }
 	}
@@ -347,37 +362,37 @@ TEST(Reader, ParseString_Error) {
 		char e[] = { '[', '\"', 0, ' ', '\"', ']', '\0' };
 		for (unsigned c = 0xC0u; c <= 0xFFu; c++) {
 			e[2] = (char)c;
-			EXPECT_FALSE(TestString(e));
+			TEST_STRING_ERROR(kParseErrorStringInvalidEncoding, e);
 		}
 	}
 
 	// 4  Overlong sequences 
 
 	// 4.1  Examples of an overlong ASCII character
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xC0u, 0xAFu, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x80u, 0xAFu, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0xAFu, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xC0u, 0xAFu, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x80u, 0xAFu, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0xAFu, '\"', ']', '\0'));
 
 	// 4.2  Maximum overlong sequences 
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xC1u, 0xBFu, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x9Fu, 0xBFu, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x8Fu, 0xBFu, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xC1u, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x9Fu, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x8Fu, 0xBFu, 0xBFu, '\"', ']', '\0'));
 
 	// 4.3  Overlong representation of the NUL character 
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xC0u, 0x80u, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x80u, 0x80u, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xC0u, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x80u, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0x80u, '\"', ']', '\0'));
 
 	// 5  Illegal code positions
 
 	// 5.1 Single UTF-16 surrogates
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xA0u, 0x80u, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xADu, 0xBFu, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xAEu, 0x80u, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xAFu, 0xBFu, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xB0u, 0x80u, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xBEu, 0x80u, '\"', ']', '\0'));
-	TEST_STRINGARRAY_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xBFu, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xA0u, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xADu, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xAEu, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xAFu, 0xBFu, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xB0u, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xBEu, 0x80u, '\"', ']', '\0'));
+	TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xBFu, 0xBFu, '\"', ']', '\0'));
 
 #undef ARRAY
 #undef TEST_STRINGARRAY_ERROR
@@ -416,7 +431,7 @@ TEST(Reader, ParseArray) {
 }
 
 TEST(Reader, ParseArray_Error) {
-#define TEST_ARRAY_ERROR(str) \
+#define TEST_ARRAY_ERROR(errorCode, str) \
 	{ \
 		char buffer[1001]; \
 		strncpy(buffer, str, 1000); \
@@ -424,12 +439,13 @@ TEST(Reader, ParseArray_Error) {
 		BaseReaderHandler<> h; \
 		GenericReader<UTF8<>, UTF8<>, CrtAllocator> reader; \
 		EXPECT_FALSE(reader.Parse<0>(s, h)); \
+		EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
 	}
 
-	// Must be a comma or ']' after an array element.
-	TEST_ARRAY_ERROR("[");
-	TEST_ARRAY_ERROR("[}");
-	TEST_ARRAY_ERROR("[1 2]");
+	// Missing a comma or ']' after an array element.
+	TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[");
+	TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[}");
+	TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1 2]");
 
 #undef TEST_ARRAY_ERROR
 }
@@ -519,39 +535,7 @@ TEST(Reader, Parse_EmptyObject) {
 	EXPECT_EQ(2u, h.step_);
 }
 
-TEST(Reader, ParseObject_Error) {
-#define TEST_OBJECT_ERROR(str) \
-	{ \
-		char buffer[1001]; \
-		strncpy(buffer, str, 1000); \
-		InsituStringStream s(buffer); \
-		BaseReaderHandler<> h; \
-		GenericReader<UTF8<>, UTF8<>, CrtAllocator> reader; \
-		EXPECT_FALSE(reader.Parse<0>(s, h)); \
-	}
-
-	// Name of an object member must be a string
-	TEST_OBJECT_ERROR("{null:1}");
-	TEST_OBJECT_ERROR("{true:1}");
-	TEST_OBJECT_ERROR("{false:1}");
-	TEST_OBJECT_ERROR("{1:1}");
-	TEST_OBJECT_ERROR("{[]:1}");
-	TEST_OBJECT_ERROR("{{}:1}");
-	TEST_OBJECT_ERROR("{xyz:1}");
-
-	// There must be a colon after the name of object member
-	TEST_OBJECT_ERROR("{\"a\" 1}");
-	TEST_OBJECT_ERROR("{\"a\",1}");
-
-	// Must be a comma or '}' after an object member
-	TEST_OBJECT_ERROR("{]");
-	TEST_OBJECT_ERROR("{\"a\":1]");
-
-#undef TEST_OBJECT_ERROR
-}
-
-TEST(Reader, Parse_Error) {
-#define TEST_ERROR(str) \
+#define TEST_ERROR(errorCode, str) \
 	{ \
 		char buffer[1001]; \
 		strncpy(buffer, str, 1000); \
@@ -559,31 +543,59 @@ TEST(Reader, Parse_Error) {
 		BaseReaderHandler<> h; \
 		Reader reader; \
 		EXPECT_FALSE(reader.Parse<0>(s, h)); \
+		EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
 	}
 
-	// Text only contains white space(s)
-	TEST_ERROR("");
-	TEST_ERROR(" ");
-	TEST_ERROR(" \n");
+TEST(Reader, ParseDocument_Error) {
+	// The document is empty.
+	TEST_ERROR(kParseErrorDocumentEmpty, "");
+	TEST_ERROR(kParseErrorDocumentEmpty, " ");
+	TEST_ERROR(kParseErrorDocumentEmpty, " \n");
 
-	// Expect either an object or array at root
-	TEST_ERROR("null");
-	TEST_ERROR("true");
-	TEST_ERROR("false");
-	TEST_ERROR("\"s\"");
-	TEST_ERROR("0");
+	// The document root must be either object or array.
+	TEST_ERROR(kParseErrorDocumentRootNotObjectOrArray, "null");
+	TEST_ERROR(kParseErrorDocumentRootNotObjectOrArray, "true");
+	TEST_ERROR(kParseErrorDocumentRootNotObjectOrArray, "false");
+	TEST_ERROR(kParseErrorDocumentRootNotObjectOrArray, "\"s\"");
+	TEST_ERROR(kParseErrorDocumentRootNotObjectOrArray, "0");
 
-	// Nothing should follow the root object or array
-	TEST_ERROR("[] 0");
-	TEST_ERROR("{} 0");
+	// The document root must not follow by other values.
+	TEST_ERROR(kParseErrorDocumentRootNotSingular, "[] 0");
+	TEST_ERROR(kParseErrorDocumentRootNotSingular, "{} 0");
+}
 
-	// Invalid value
-	TEST_ERROR("nulL");
-	TEST_ERROR("truE");
-	TEST_ERROR("falsE");
+TEST(Reader, ParseValue_Error) {
+	// Invalid value.
+	TEST_ERROR(kParseErrorValueInvalid, "[nulL]");
+	TEST_ERROR(kParseErrorValueInvalid, "[truE]");
+	TEST_ERROR(kParseErrorValueInvalid, "[falsE]");
+	TEST_ERROR(kParseErrorValueInvalid, "[a]");
+	TEST_ERROR(kParseErrorValueInvalid, "[.1]");
+}
+
+TEST(Reader, ParseObject_Error) {
+	// Missing a name for object member.
+	TEST_ERROR(kParseErrorObjectMissName, "{1}");
+	TEST_ERROR(kParseErrorObjectMissName, "{:1}");
+	TEST_ERROR(kParseErrorObjectMissName, "{null:1}");
+	TEST_ERROR(kParseErrorObjectMissName, "{true:1}");
+	TEST_ERROR(kParseErrorObjectMissName, "{false:1}");
+	TEST_ERROR(kParseErrorObjectMissName, "{1:1}");
+	TEST_ERROR(kParseErrorObjectMissName, "{[]:1}");
+	TEST_ERROR(kParseErrorObjectMissName, "{{}:1}");
+	TEST_ERROR(kParseErrorObjectMissName, "{xyz:1}");
+
+	// Missing a colon after a name of object member.
+	TEST_ERROR(kParseErrorObjectMissColon, "{\"a\" 1}");
+	TEST_ERROR(kParseErrorObjectMissColon, "{\"a\",1}");
+
+	// Must be a comma or '}' after an object member
+	TEST_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, "{");
+	TEST_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, "{]");
+	TEST_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, "{\"a\":1]");
+}
 
 #undef TEST_ERROR
-}
 
 TEST(Reader, SkipWhitespace) {
 	StringStream ss(" A \t\tB\n \n\nC\r\r \rD \t\n\r E");
