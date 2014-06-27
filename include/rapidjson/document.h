@@ -202,7 +202,7 @@ public:
 	 */
 	template <typename SourceAllocator>
 	GenericValue& CopyFrom(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator) {
-		RAPIDJSON_ASSERT((void*)this != (void*)&rhs);
+		RAPIDJSON_ASSERT((void*)this != (void const*)&rhs);
 		this->~GenericValue();
 		new (this) GenericValue(rhs,allocator);
 		return *this;
