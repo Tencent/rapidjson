@@ -19,7 +19,7 @@ inline const RAPIDJSON_ERROR_CHARTYPE* GetParseError_En(ParseErrorCode parseErro
 		case kParseErrorObjectMissColon:				return RAPIDJSON_ERROR_STRING("Missing a colon after a name of object member.");
 		case kParseErrorObjectMissCommaOrCurlyBracket:	return RAPIDJSON_ERROR_STRING("Missing a comma or '}' after an object member.");
 	
-		case kParseErrorArrayMissCommaOrSquareBracket:	return RAPIDJSON_ERROR_STRING("Must be a comma or ']' after an array element.");
+		case kParseErrorArrayMissCommaOrSquareBracket:	return RAPIDJSON_ERROR_STRING("Missing a comma or ']' after an array element.");
 
 		case kParseErrorStringUnicodeEscapeInvalidHex:	return RAPIDJSON_ERROR_STRING("Incorrect hex digit after \\u escape in string.");
 		case kParseErrorStringUnicodeSurrogateInvalid:	return RAPIDJSON_ERROR_STRING("The surrogate pair in string is invalid.");
@@ -27,7 +27,7 @@ inline const RAPIDJSON_ERROR_CHARTYPE* GetParseError_En(ParseErrorCode parseErro
 		case kParseErrorStringMissQuotationMark:		return RAPIDJSON_ERROR_STRING("Missing a closing quotation mark in string.");
 		case kParseErrorStringInvalidEncoding:			return RAPIDJSON_ERROR_STRING("Invalid encoidng in string.");
 
-		case kParesErrorNumberTooBig:					return RAPIDJSON_ERROR_STRING("Number too big to store in double.");
+		case kParesErrorNumberTooBig:					return RAPIDJSON_ERROR_STRING("Number too big to be stored in double.");
 		case kParseErrorNumberMissFraction:				return RAPIDJSON_ERROR_STRING("Miss fraction part in number.");
 		case kParseErrorNumberMissExponent:				return RAPIDJSON_ERROR_STRING("Miss exponent in number.");
 

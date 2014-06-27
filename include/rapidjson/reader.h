@@ -64,7 +64,7 @@ enum ParseErrorCode {
 	kParseErrorObjectMissColon,					//!< Missing a colon after a name of object member.
 	kParseErrorObjectMissCommaOrCurlyBracket,	//!< Missing a comma or '}' after an object member.
 	
-	kParseErrorArrayMissCommaOrSquareBracket,	//!< Must be a comma or ']' after an array element.
+	kParseErrorArrayMissCommaOrSquareBracket,	//!< Missing a comma or ']' after an array element.
 
 	kParseErrorStringUnicodeEscapeInvalidHex,	//!< Incorrect hex digit after \\u escape in string.
 	kParseErrorStringUnicodeSurrogateInvalid,	//!< The surrogate pair in string is invalid.
@@ -72,7 +72,7 @@ enum ParseErrorCode {
 	kParseErrorStringMissQuotationMark,			//!< Missing a closing quotation mark in string.
 	kParseErrorStringInvalidEncoding,			//!< Invalid encoidng in string.
 
-	kParesErrorNumberTooBig,					//!< Number too big to store in double.
+	kParesErrorNumberTooBig,					//!< Number too big to be stored in double.
 	kParseErrorNumberMissFraction,				//!< Miss fraction part in number.
 	kParseErrorNumberMissExponent				//!< Miss exponent in number.
 };
