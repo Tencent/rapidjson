@@ -16,6 +16,8 @@ Rapidjson is a JSON parser and generator for C++. It was inspired by [rapidxml](
 
 * Rapidjson is memory friendly. Each JSON value occupies exactly 16/20 bytes for most 32/64-bit machines (excluding text string). By default it uses a fast memory allocator, and the parser allocates memory compactly during parsing.
 
+* Rapidjson is Unicode friendly. It supports UTF-8, UTF-16, UTF-32 (LE & BE), and their detection, validataton and transcoding internally. For example, you can read a UTF-8 file and let rapidjson transcode the JSON strings into UTF-16 into DOM. It also supports surrogates and "\u0000" (null character).
+
 For the full features please refer to the user guide.
 
 JSON(JavaScript Object Notation) is a light-weight data exchange format. Rapidjson should be in fully compliance with RFC4627/ECMA-404. More information about JSON can be obtained at
