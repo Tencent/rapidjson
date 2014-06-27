@@ -23,11 +23,10 @@
 #ifndef RAPIDJSON_PARSE_ERROR_NORETURN
 #define RAPIDJSON_PARSE_ERROR_NORETURN(parseErrorCode, offset) \
 	RAPIDJSON_MULTILINEMACRO_BEGIN \
-	if (!HasParseError()) {\
+	RAPIDJSON_ASSERT(!HasParseError()); /* Error can only be assigned once */ \
 	parseErrorCode_ = parseErrorCode; \
-		errorOffset_ = offset; \
-	}\
-RAPIDJSON_MULTILINEMACRO_END
+	errorOffset_ = offset; \
+	RAPIDJSON_MULTILINEMACRO_END
 #endif
 
 #ifndef RAPIDJSON_PARSE_ERROR
