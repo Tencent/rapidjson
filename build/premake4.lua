@@ -176,3 +176,8 @@ solution "example"
 		kind "ConsoleApp"
 		files "../example/serialize/*"
 		setTargetObjDir("../bin")
+
+	project "simpledom"
+		kind "ConsoleApp"
+		files "../example/simpledom/*"
+		setTargetObjDir("../bin")
