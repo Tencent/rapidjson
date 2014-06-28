@@ -85,6 +85,6 @@ Note that this exmample did not handle potential errors.
 
 The following diagram shows the process.
 
-[simpledom](doc/diagram/simpledom.png)
+![simpledom](doc/diagram/simpledom.png?raw=true)
 
 More [examples](example/) are avaliable.
