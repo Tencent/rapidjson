@@ -75,7 +75,7 @@ int main() {
     Writer<StringBuffer> writer(buffer);
     d.Accept(writer);
 
-    // Output {"project":"rapidjson","stars":10}
+    // Output {"project":"rapidjson","stars":11}
     std::cout << buffer.GetString() << std::endl;
     return 0;
 }
