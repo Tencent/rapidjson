@@ -3,14 +3,15 @@
 ## General
 
 * Cross-platform
- * Compiler: tested Visual Studio, gcc, clang
- * Architecture: x86, x64, ARM
- * Operating systems: Windows, Mac OS X, Linux, iOS, Android
+ * Compilers: Visual Studio, gcc, clang, etc.
+ * Architectures: x86, x64, ARM, etc.
+ * Operating systems: Windows, Mac OS X, Linux, iOS, Android, etc.
 * Easy installation
  * Header files only library. Just copy the headers to your project.
-* Self-contained, minimal dependence
+* Self-contained, minimal dependences
  * No STL, BOOST, etc.
- * Only included `<cstdio>`, `<cstdlib>`, `<cstring>`, `<inttypes.h>`, `<new>`, `<stdint.h>`.
+ * Only included `<cstdio>`, `<cstdlib>`, `<cstring>`, `<inttypes.h>`, `<new>`, `<stdint.h>`. * 
+* Without C++ exception, RTTI
 * High performance
  * Use template and inline functions to reduce function call overheads.
  * Optional SSE2/SSE4.1 support.
@@ -20,15 +21,7 @@
 * RapidJSON should be fully RFC4627/ECMA-404 compliance.
 * Support unicode surrogate.
 * Support null character (`"\u0000"`)
-** For example, `["Hello\u0000World"]` can be parsed and handled gracefully.
-
-## API style
-
-* SAX (Simple API for XML) style API
- * Similar to [SAX](http://en.wikipedia.org/wiki/Simple_API_for_XML), RapidJSON provides a event sequential access parser API (`GenericReader`). It also provides a generator API (`GenericWriter`) which consumes the same set of events.
-* DOM (Document Object Model) style API
- * Similar to [DOM](http://en.wikipedia.org/wiki/Document_Object_Model) for HTML/XML, RapidJSON can parse JSON into a DOM representation (`GenericDocument`), for easy manipulation, and finally stringify back to JSON if needed.
- * The DOM style API (`GenericDocument`) is actually implemented with SAX style API (`GenericReader`). SAX is faster but sometimes DOM is easier. Users can pick their choices according to scenarios.
+ * For example, `["Hello\u0000World"]` can be parsed and handled gracefully. There is API for getting/setting lengths of string.
 
 ## Unicode
 
@@ -38,17 +31,41 @@
  * For example, you can read a UTF-8 file and let RapidJSON transcode the JSON strings into UTF-16 in the DOM.
 * Support encoding validation internally.
  * For example, you can read a UTF-8 file, and let RapidJSON check whether all JSON strings are valid UTF-8 byte sequence.
+* Support custom character types.
+ * By default the character types are `char` for UTF8, `wchar_t` for UTF16, `uint32_t` for UTF32.
 * Support custom encodings.
+
+## API styles
+
+* SAX (Simple API for XML) style API
+ * Similar to [SAX](http://en.wikipedia.org/wiki/Simple_API_for_XML), RapidJSON provides a event sequential access parser API (`GenericReader`). It also provides a generator API (`GenericWriter`) which consumes the same set of events.
+* DOM (Document Object Model) style API
+ * Similar to [DOM](http://en.wikipedia.org/wiki/Document_Object_Model) for HTML/XML, RapidJSON can parse JSON into a DOM representation (`GenericDocument`), for easy manipulation, and finally stringify back to JSON if needed.
+ * The DOM style API (`GenericDocument`) is actually implemented with SAX style API (`GenericReader`). SAX is faster but sometimes DOM is easier. Users can pick their choices according to scenarios.
+
+## DOM (Document)
+
+* Support insitu parsing.
+ * Parse JSON string values in-place at the source JSON, and then the DOM points to addresses of those strings.
+ * Faster than convention parsing: no allocation for strings, no copy (if string does not contain escapes), cache-friendly.
+* Support 32-bit/64-bit signed/unsigned integer and `double` for JSON number type.
+ * RapidJSON checks range of numerical values for conversions.
+
+## SAX (Reader)
+
+* Support comprehensive error code if parsing failed.
+* Support localizable error message.
+
+## SAX (Writer)
+
+* Support PrettyWriter for adding newlines and indentations.
+* Support custom precision for floating point values.
 
 ## Stream
 
 * Support `GenericStringBuffer` for storing the output JSON as string.
 * Support `FileReadStream`/`FileWriteStream` for input/output `FILE` object.
 * Support custom streams.
-
-## JSON formatting
-
-* Support PrettyWriter for adding newlines and indentations.
 
 ## Memory
 
