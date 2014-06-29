@@ -27,6 +27,7 @@
 
 * Support UTF-8, UTF-16, UTF-32 encodings, including little endian and big endian.
  * These encodings are used in input/output streams and in-memory representation.
+* Support Automatic detection of encodings in input stream.
 * Support transcoding between encodings internally.
  * For example, you can read a UTF-8 file and let RapidJSON transcode the JSON strings into UTF-16 in the DOM.
 * Support encoding validation internally.
