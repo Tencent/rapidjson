@@ -21,6 +21,8 @@ before_script:
   - cd "${TRAVIS_BUILD_DIR}"
 
 script:
-  - make -C build/gmake -f test.make unittest
+  - make -C build/gmake -f test.make
+  - make -C build/gmake -f example.make 
   - cd bin
   - ./unittest_${config_suffix}
+  - ./perftest_${config_suffix}
