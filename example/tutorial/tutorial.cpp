@@ -19,14 +19,14 @@ int main(int, char*[]) {
 
 #if 0
 	// "normal" parsing, decode strings to new buffers. Can use other input stream via ParseStream().
-	if (document.Parse<0>(json).HasParseError())
+	if (document.Parse(json).HasParseError())
 		return 1;
 #else
 	// In-situ parsing, decode strings directly in the source string. Source must be string.
 	{
 		char buffer[sizeof(json)];
 		memcpy(buffer, json, sizeof(json));
-		if (document.ParseInsitu<0>(buffer).HasParseError())
+		if (document.ParseInsitu(buffer).HasParseError())
 			return 1;
 	}
 #endif

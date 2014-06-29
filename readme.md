@@ -65,7 +65,7 @@ int main() {
     // 1. Parse a JSON string into DOM.
     const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
     Document d;
-    d.Parse<0>(json);
+    d.Parse(json);
 
     // 2. Modify it by DOM.
     Value& s = d["stars"];

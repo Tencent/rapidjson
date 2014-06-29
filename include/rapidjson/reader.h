@@ -257,6 +257,11 @@ public:
 		return !HasParseError();
 	}
 
+	template <typename InputStream, typename Handler>
+	bool Parse(InputStream& is, Handler& handler) {
+		return Parse<0>(is, handler);
+	}
+
 	bool HasParseError() const { return parseError_ != 0; }
 	const char* GetParseError() const { return parseError_; }
 	size_t GetErrorOffset() const { return errorOffset_; }
