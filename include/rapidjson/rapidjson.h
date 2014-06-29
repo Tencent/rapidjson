@@ -193,6 +193,24 @@ concept Stream {
 \endcode
 */
 
+//! Provides additional information for stream.
+/*!
+	By using traits pattern, this type provides a default configuration for stream.
+	For custom stream, this type can be specialized for other configuration.
+	See TEST(Reader, CustomStringStream) in readertest.cpp for example.
+*/
+template<typename Stream>
+struct StreamTraits {
+	//! Whether to make local copy of stream for optimization during parsing.
+	/*!
+		If it is defined as Stream&, it will not make a local copy.
+		If it is defined as Stream, it will make a local copy for optimization.
+		By default, for safety, streams do not use local copy optimization, i.e. it is defined as Stream&.
+		Stream that can be copied fast should specialize this, like StreamTraits<StringStream>.
+	*/
+	typedef Stream& StreamCopyType;
+};
+
 //! Put N copies of a character to a stream.
 template<typename Stream, typename Ch>
 inline void PutN(Stream& stream, Ch c, size_t n) {
@@ -225,6 +243,11 @@ struct GenericStringStream {
 	const Ch* head_;	//!< Original head of the string.
 };
 
+template <typename Encoding>
+struct StreamTraits<GenericStringStream<Encoding>> {
+	typedef GenericStringStream<Encoding> StreamCopyType;	// Enable stream copy optimization.
+};
+
 typedef GenericStringStream<UTF8<> > StringStream;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -254,6 +277,11 @@ struct GenericInsituStringStream {
 	Ch* src_;
 	Ch* dst_;
 	Ch* head_;
+};
+
+template <typename Encoding>
+struct StreamTraits<GenericInsituStringStream<Encoding>> {
+	typedef GenericInsituStringStream<Encoding> StreamCopyType;	// Enable stream copy optimization.
 };
 
 typedef GenericInsituStringStream<UTF8<> > InsituStringStream;
