@@ -626,7 +626,7 @@ private:
 namespace rapidjson {
 
 template <typename Encoding>
-struct StreamTraits<CustomStringStream<Encoding>> {
+struct StreamTraits<CustomStringStream<Encoding> > {
 	typedef CustomStringStream<Encoding> StreamCopyType;
 };
 
@@ -635,7 +635,7 @@ struct StreamTraits<CustomStringStream<Encoding>> {
 
 TEST(Reader, CustomStringStream) {
 	const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] } ";
-	CustomStringStream<UTF8<char>> s(json);
+	CustomStringStream<UTF8<char> > s(json);
 	ParseObjectHandler h;
 	Reader reader;
 	reader.ParseObject<0>(s, h);

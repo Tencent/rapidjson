@@ -244,7 +244,7 @@ struct GenericStringStream {
 };
 
 template <typename Encoding>
-struct StreamTraits<GenericStringStream<Encoding>> {
+struct StreamTraits<GenericStringStream<Encoding> > {
 	typedef GenericStringStream<Encoding> StreamCopyType;	// Enable stream copy optimization.
 };
 
@@ -280,7 +280,7 @@ struct GenericInsituStringStream {
 };
 
 template <typename Encoding>
-struct StreamTraits<GenericInsituStringStream<Encoding>> {
+struct StreamTraits<GenericInsituStringStream<Encoding> > {
 	typedef GenericInsituStringStream<Encoding> StreamCopyType;	// Enable stream copy optimization.
 };
 
