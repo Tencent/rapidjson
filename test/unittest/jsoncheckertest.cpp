@@ -42,7 +42,7 @@ TEST(JsonChecker, Reader) {
 		}
 
 		GenericDocument<UTF8<>, CrtAllocator> document;	// Use Crt allocator to check exception-safety (no memory leak)
-		if (!document.Parse<0>((const char*)json).HasParseError())
+		if (!document.Parse((const char*)json).HasParseError())
 			FAIL();
 		//printf("%s(%u):%s\n", filename, (unsigned)document.GetErrorOffset(), document.GetParseError());
 		free(json);
@@ -63,7 +63,7 @@ TEST(JsonChecker, Reader) {
 		}
 
 		GenericDocument<UTF8<>, CrtAllocator> document;	// Use Crt allocator to check exception-safety (no memory leak)
-		document.Parse<0>((const char*)json);
+		document.Parse((const char*)json);
 		EXPECT_TRUE(!document.HasParseError());
 		free(json);
 	}
