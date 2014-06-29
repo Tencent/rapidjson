@@ -68,7 +68,8 @@ int main() {
     d.Parse<0>(json);
 
     // 2. Modify it by DOM.
-    d["stars"].SetInt(d["stars"].GetInt() + 1);
+    Value& s = d["stars"];
+    s.SetInt(s.GetInt() + 1);
 
     // 3. Stringify the DOM
     StringBuffer buffer;
