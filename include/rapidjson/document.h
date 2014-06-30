@@ -12,6 +12,22 @@
 
 namespace rapidjson {
 
+// Forward declaration.
+template <typename Encoding, typename Allocator>
+class GenericValue;
+
+//! Name-value pair in an object.
+/*!
+	This class was internal to GenericValue. It used to be a inner struct.
+	But a compiler (IBM XL C/C++ for AIX) have reported to have problem with that so it moved as a namespace scope struct.
+	https://code.google.com/p/rapidjson/issues/detail?id=64
+*/
+template <typename Encoding, typename Allocator> 
+struct GenericMember { 
+	GenericValue<Encoding, Allocator> name;		//!< name of member (must be a string)
+	GenericValue<Encoding, Allocator> value;	//!< value of member.
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 // GenericValue
 
@@ -30,11 +46,7 @@ template <typename Encoding, typename Allocator = MemoryPoolAllocator<> >
 class GenericValue {
 public:
 	//! Name-value pair in an object.
-	struct Member { 
-		GenericValue<Encoding, Allocator> name;		//!< name of member (must be a string)
-		GenericValue<Encoding, Allocator> value;	//!< value of member.
-	};
-
+	typedef GenericMember<Encoding, Allocator> Member;
 	typedef Encoding EncodingType;					//!< Encoding type from template parameter.
 	typedef Allocator AllocatorType;				//!< Allocator type from template parameter.
 	typedef typename Encoding::Ch Ch;				//!< Character type derived from Encoding.
