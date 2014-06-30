@@ -41,9 +41,10 @@
 #pragma once
 #endif
 
-#if _MSC_VER >= 1600 // [
+// miloyip: Originally Visual Studio 2010 uses its own stdint.h. However it generates warning with INT64_C(), so change to use this file for vs2010.
+#if _MSC_VER >= 1700 // [
 #include <stdint.h>
-#else // ] _MSC_VER >= 1600 [
+#else // ] _MSC_VER >= 1700 [
 
 #include <limits.h>
 
