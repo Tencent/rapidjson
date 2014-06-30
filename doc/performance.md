@@ -4,7 +4,7 @@ The old performance article for RapidJSON 0.1 is provided [here](https://code.go
 
 This file will be updated with new version and better procedures.
 
-In the mean time, you may also refer to the following third-party benchmarks.
+In the meantime, you may also refer to the following third-party benchmarks.
 
 ## Third-party benchmarks
 
