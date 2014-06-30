@@ -7,6 +7,7 @@
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/encodedstream.h"	// NEW
+#include "rapidjson/error/en.h"
 #ifdef _WIN32
 #include <fcntl.h>
 #include <io.h>
@@ -47,7 +48,7 @@ int main(int, char*[]) {
 	// JSON reader parse from the input stream and let writer generate the output.
 	//if (!reader.Parse<kParseValidateEncodingFlag>(is, writer)) {
 	if (!reader.Parse<kParseValidateEncodingFlag>(eis, writer)) {	// CHANGED
-		fprintf(stderr, "\nError(%u): %s\n", (unsigned)reader.GetErrorOffset(), reader.GetParseError());
+		fprintf(stderr, "\nError(%u): %s\n", (unsigned)reader.GetErrorOffset(), GetParseError_En(reader.GetParseErrorCode()));
 		return 1;
 	}
 

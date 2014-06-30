@@ -21,19 +21,18 @@
 #endif
 
 #ifndef RAPIDJSON_PARSE_ERROR_NORETURN
-#define RAPIDJSON_PARSE_ERROR_NORETURN(msg, offset) \
+#define RAPIDJSON_PARSE_ERROR_NORETURN(parseErrorCode, offset) \
 	RAPIDJSON_MULTILINEMACRO_BEGIN \
-	if (!HasParseError()) {\
-		parseError_ = msg; \
-		errorOffset_ = offset; \
-	}\
-RAPIDJSON_MULTILINEMACRO_END
+	RAPIDJSON_ASSERT(!HasParseError()); /* Error can only be assigned once */ \
+	parseErrorCode_ = parseErrorCode; \
+	errorOffset_ = offset; \
+	RAPIDJSON_MULTILINEMACRO_END
 #endif
 
 #ifndef RAPIDJSON_PARSE_ERROR
-#define RAPIDJSON_PARSE_ERROR(msg, offset) \
+#define RAPIDJSON_PARSE_ERROR(parseErrorCode, offset) \
 	RAPIDJSON_MULTILINEMACRO_BEGIN \
-	RAPIDJSON_PARSE_ERROR_NORETURN(msg, offset); \
+	RAPIDJSON_PARSE_ERROR_NORETURN(parseErrorCode, offset); \
 	return; \
 	RAPIDJSON_MULTILINEMACRO_END
 #endif
@@ -48,6 +47,33 @@ enum ParseFlag {
 	kParseDefaultFlags = 0,			//!< Default parse flags. Non-destructive parsing. Text strings are decoded into allocated buffer.
 	kParseInsituFlag = 1,			//!< In-situ(destructive) parsing.
 	kParseValidateEncodingFlag = 2	//!< Validate encoding of JSON strings.
+};
+
+//! Error code of parsing.
+enum ParseErrorCode {
+	kParseErrorNone = 0,						//!< No error.
+	
+	kParseErrorDocumentEmpty,					//!< The document is empty.
+	kParseErrorDocumentRootNotObjectOrArray,	//!< The document root must be either object or array.
+	kParseErrorDocumentRootNotSingular,			//!< The document root must not follow by other values.
+	
+	kParseErrorValueInvalid,					//!< Invalid value.
+	
+	kParseErrorObjectMissName,					//!< Missing a name for object member.
+	kParseErrorObjectMissColon,					//!< Missing a colon after a name of object member.
+	kParseErrorObjectMissCommaOrCurlyBracket,	//!< Missing a comma or '}' after an object member.
+	
+	kParseErrorArrayMissCommaOrSquareBracket,	//!< Missing a comma or ']' after an array element.
+
+	kParseErrorStringUnicodeEscapeInvalidHex,	//!< Incorrect hex digit after \\u escape in string.
+	kParseErrorStringUnicodeSurrogateInvalid,	//!< The surrogate pair in string is invalid.
+	kParseErrorStringEscapeInvalid,				//!< Invalid escape character in string.
+	kParseErrorStringMissQuotationMark,			//!< Missing a closing quotation mark in string.
+	kParseErrorStringInvalidEncoding,			//!< Invalid encoidng in string.
+
+	kParesErrorNumberTooBig,					//!< Number too big to be stored in double.
+	kParseErrorNumberMissFraction,				//!< Miss fraction part in number.
+	kParseErrorNumberMissExponent				//!< Miss exponent in number.
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -218,7 +244,7 @@ public:
 	/*! \param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
 		\param stackCapacity stack capacity in bytes for storing a single decoded string.  (Only use for non-destructive parsing)
 	*/
-	GenericReader(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseError_(0), errorOffset_(0) {}
+	GenericReader(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseErrorCode_(kParseErrorNone), errorOffset_(0) {}
 
 	//! Parse JSON text.
 	/*! \tparam parseFlags Combination of ParseFlag. 
@@ -230,18 +256,18 @@ public:
 	*/
 	template <unsigned parseFlags, typename InputStream, typename Handler>
 	bool Parse(InputStream& is, Handler& handler) {
-		parseError_ = 0;
+		parseErrorCode_ = kParseErrorNone;
 		errorOffset_ = 0;
 
 		SkipWhitespace(is);
 
 		if (is.Peek() == '\0')
-			RAPIDJSON_PARSE_ERROR_NORETURN("Text only contains white space(s)", is.Tell());
+			RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentEmpty, is.Tell());
 		else {
 			switch (is.Peek()) {
 				case '{': ParseObject<parseFlags>(is, handler); break;
 				case '[': ParseArray<parseFlags>(is, handler); break;
-				default: RAPIDJSON_PARSE_ERROR_NORETURN("Expect either an object or array at root", is.Tell());
+				default: RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotObjectOrArray, is.Tell());
 			}
 			if (HasParseError())
 				goto out;
@@ -249,7 +275,7 @@ public:
 			SkipWhitespace(is);
 
 			if (is.Peek() != '\0')
-				RAPIDJSON_PARSE_ERROR_NORETURN("Nothing should follow the root object or array.", is.Tell());
+				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotSingular, is.Tell());
 		}
 
 	out:
@@ -262,8 +288,10 @@ public:
 		return Parse<0>(is, handler);
 	}
 
-	bool HasParseError() const { return parseError_ != 0; }
-	const char* GetParseError() const { return parseError_; }
+	bool HasParseError() const { return parseErrorCode_ != kParseErrorNone; }
+	
+	ParseErrorCode GetParseErrorCode() const { return parseErrorCode_; }
+
 	size_t GetErrorOffset() const { return errorOffset_; }
 
 private:
@@ -283,7 +311,7 @@ private:
 
 		for (SizeType memberCount = 0;;) {
 			if (is.Peek() != '"')
-				RAPIDJSON_PARSE_ERROR("Name of an object member must be a string", is.Tell());
+				RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
 
 			ParseString<parseFlags>(is, handler);
 			if (HasParseError())
@@ -292,7 +320,7 @@ private:
 			SkipWhitespace(is);
 
 			if (is.Take() != ':')
-				RAPIDJSON_PARSE_ERROR("There must be a colon after the name of object member", is.Tell());
+				RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissColon, is.Tell());
 
 			SkipWhitespace(is);
 
@@ -307,7 +335,7 @@ private:
 			switch(is.Take()) {
 				case ',': SkipWhitespace(is); break;
 				case '}': handler.EndObject(memberCount); return;
-				default:  RAPIDJSON_PARSE_ERROR("Must be a comma or '}' after an object member", is.Tell());
+				default:  RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell());
 			}
 		}
 	}
@@ -337,7 +365,7 @@ private:
 			switch (is.Take()) {
 				case ',': SkipWhitespace(is); break;
 				case ']': handler.EndArray(elementCount); return;
-				default:  RAPIDJSON_PARSE_ERROR("Must be a comma or ']' after an array element.", is.Tell());
+				default:  RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell());
 			}
 		}
 	}
@@ -350,7 +378,7 @@ private:
 		if (is.Take() == 'u' && is.Take() == 'l' && is.Take() == 'l')
 			handler.Null();
 		else
-			RAPIDJSON_PARSE_ERROR("Invalid value", is.Tell() - 1);
+			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell() - 1);
 	}
 
 	template<unsigned parseFlags, typename InputStream, typename Handler>
@@ -361,7 +389,7 @@ private:
 		if (is.Take() == 'r' && is.Take() == 'u' && is.Take() == 'e')
 			handler.Bool(true);
 		else
-			RAPIDJSON_PARSE_ERROR("Invalid value", is.Tell());
+			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell());
 	}
 
 	template<unsigned parseFlags, typename InputStream, typename Handler>
@@ -372,7 +400,7 @@ private:
 		if (is.Take() == 'a' && is.Take() == 'l' && is.Take() == 's' && is.Take() == 'e')
 			handler.Bool(false);
 		else
-			RAPIDJSON_PARSE_ERROR("Invalid value", is.Tell() - 1);
+			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell() - 1);
 	}
 
 	// Helper function to parse four hexidecimal digits in \uXXXX in ParseString().
@@ -391,7 +419,7 @@ private:
 			else if (c >= 'a' && c <= 'f')
 				codepoint -= 'a' - 10;
 			else {
-				RAPIDJSON_PARSE_ERROR_NORETURN("Incorrect hex digit after \\u escape", s.Tell() - 1);
+				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorStringUnicodeEscapeInvalidHex, s.Tell() - 1);
 				return 0;
 			}
 		}
@@ -468,16 +496,16 @@ private:
 					if (codepoint >= 0xD800 && codepoint <= 0xDBFF) {
 						// Handle UTF-16 surrogate pair
 						if (is.Take() != '\\' || is.Take() != 'u')
-							RAPIDJSON_PARSE_ERROR("Missing the second \\u in surrogate pair", is.Tell() - 2);
+							RAPIDJSON_PARSE_ERROR(kParseErrorStringUnicodeSurrogateInvalid, is.Tell() - 2);
 						unsigned codepoint2 = ParseHex4(is);
 						if (codepoint2 < 0xDC00 || codepoint2 > 0xDFFF)
-							RAPIDJSON_PARSE_ERROR("The second \\u in surrogate pair is invalid", is.Tell() - 2);
+							RAPIDJSON_PARSE_ERROR(kParseErrorStringUnicodeSurrogateInvalid, is.Tell() - 2);
 						codepoint = (((codepoint - 0xD800) << 10) | (codepoint2 - 0xDC00)) + 0x10000;
 					}
 					TEncoding::Encode(os, codepoint);
 				}
 				else
-					RAPIDJSON_PARSE_ERROR("Unknown escape character", is.Tell() - 1);
+					RAPIDJSON_PARSE_ERROR(kParseErrorStringEscapeInvalid, is.Tell() - 1);
 			}
 			else if (c == '"') {	// Closing double quote
 				is.Take();
@@ -485,14 +513,14 @@ private:
 				return;
 			}
 			else if (c == '\0')
-				RAPIDJSON_PARSE_ERROR("lacks ending quotation before the end of string", is.Tell() - 1);
+				RAPIDJSON_PARSE_ERROR(kParseErrorStringMissQuotationMark, is.Tell() - 1);
 			else if ((unsigned)c < 0x20) // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
-				RAPIDJSON_PARSE_ERROR("Incorrect unescaped character in string", is.Tell() - 1);
+				RAPIDJSON_PARSE_ERROR(kParseErrorStringEscapeInvalid, is.Tell() - 1);
 			else {
 				if (parseFlags & kParseValidateEncodingFlag ? 
 					!Transcoder<SEncoding, TEncoding>::Validate(is, os) : 
 					!Transcoder<SEncoding, TEncoding>::Transcode(is, os))
-					RAPIDJSON_PARSE_ERROR("Invalid encoding", is.Tell());
+					RAPIDJSON_PARSE_ERROR(kParseErrorStringInvalidEncoding, is.Tell());
 			}
 		}
 	}
@@ -539,7 +567,7 @@ private:
 				}
 		}
 		else
-			RAPIDJSON_PARSE_ERROR("Expect a value here.", is.Tell());
+			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell());
 
 		// Parse 64bit int
 		uint64_t i64 = 0;
@@ -572,7 +600,7 @@ private:
 			d = (double)i64;
 			while (s.Peek() >= '0' && s.Peek() <= '9') {
 				if (d >= 1E307)
-					RAPIDJSON_PARSE_ERROR("Number too big to store in double", is.Tell());
+					RAPIDJSON_PARSE_ERROR(kParesErrorNumberTooBig, is.Tell());
 				d = d * 10 + (s.Take() - '0');
 			}
 		}
@@ -591,7 +619,7 @@ private:
 				--expFrac;
 			}
 			else
-				RAPIDJSON_PARSE_ERROR("At least one digit in fraction part", is.Tell());
+				RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, is.Tell());
 
 			while (s.Peek() >= '0' && s.Peek() <= '9') {
 				if (expFrac > -16) {
@@ -624,11 +652,11 @@ private:
 				while (s.Peek() >= '0' && s.Peek() <= '9') {
 					exp = exp * 10 + (s.Take() - '0');
 					if (exp > 308)
-						RAPIDJSON_PARSE_ERROR("Number too big to store in double", is.Tell());
+						RAPIDJSON_PARSE_ERROR(kParesErrorNumberTooBig, is.Tell());
 				}
 			}
 			else
-				RAPIDJSON_PARSE_ERROR("At least one digit in exponent", s.Tell());
+				RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissExponent, s.Tell());
 
 			if (expMinus)
 				exp = -exp;
@@ -673,7 +701,7 @@ private:
 
 	static const size_t kDefaultStackCapacity = 256;	//!< Default stack capacity in bytes for storing a single decoded string. 
 	internal::Stack<Allocator> stack_;	//!< A stack for storing decoded string temporarily during non-destructive parsing.
-	const char* parseError_;
+	ParseErrorCode parseErrorCode_;
 	size_t errorOffset_;
 }; // class GenericReader
 
