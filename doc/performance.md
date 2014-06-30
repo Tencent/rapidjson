@@ -8,7 +8,7 @@ In the mean time, you may also refer to the following third-party benchmarks.
 
 ## Third-party benchmarks
 
-* (Basic benchmarks for miscellaneous C++ JSON parsers and generators)[https://github.com/mloskot/json_benchmark] by Mateusz Loskot (Jun 2013)
+* [Basic benchmarks for miscellaneous C++ JSON parsers and generators](https://github.com/mloskot/json_benchmark) by Mateusz Loskot (Jun 2013)
  * [casablanca](https://casablanca.codeplex.com/)
  * [json_spirit](https://github.com/cierelabs/json_spirit)
  * [jsoncpp](http://jsoncpp.sourceforge.net/)
@@ -16,7 +16,7 @@ In the mean time, you may also refer to the following third-party benchmarks.
  * [rapidjson](https://github.com/miloyip/rapidjson/)
  * [QJsonDocument](http://qt-project.org/doc/qt-5.0/qtcore/qjsondocument.html)
  
-* [JSON Parser Benchmarking by Chad Austin](http://chadaustin.me/2013/01/json-parser-benchmarking/) (Jan 2013)
+* [JSON Parser Benchmarking](http://chadaustin.me/2013/01/json-parser-benchmarking/) by Chad Austin (Jan 2013)
  * [sajson](https://github.com/chadaustin/sajson)
  * [rapidjson](https://github.com/miloyip/rapidjson/)
  * [vjson](https://code.google.com/p/vjson/)
