@@ -149,8 +149,8 @@ solution "example"
 	configuration "vs*"
 		defines { "_CRT_SECURE_NO_WARNINGS" }
 
-	configuration "gmake"
- 		buildoptions "-Weverything"
+--	configuration "gmake"
+-- 		buildoptions "-Weverything"
 
 	project "condense"
 		kind "ConsoleApp"
@@ -175,4 +175,9 @@ solution "example"
 	project "serialize"
 		kind "ConsoleApp"
 		files "../example/serialize/*"
+		setTargetObjDir("../bin")
+
+	project "simpledom"
+		kind "ConsoleApp"
+		files "../example/simpledom/*"
 		setTargetObjDir("../bin")

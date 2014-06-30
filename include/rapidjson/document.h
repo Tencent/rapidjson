@@ -202,7 +202,7 @@ public:
 	 */
 	template <typename SourceAllocator>
 	GenericValue& CopyFrom(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator) {
-		RAPIDJSON_ASSERT((void*)this != (void*)&rhs);
+		RAPIDJSON_ASSERT((void*)this != (void const*)&rhs);
 		this->~GenericValue();
 		new (this) GenericValue(rhs,allocator);
 		return *this;
@@ -818,6 +818,11 @@ public:
 		return ParseStream<parseFlags,Encoding,InputStream>(is);
 	}
 
+	template <typename InputStream>
+	GenericDocument& ParseStream(InputStream& is) {
+		return ParseStream<0, Encoding, InputStream>(is);
+	}
+
 	//! Parse JSON text from a mutable string.
 	/*! \tparam parseFlags Combination of ParseFlag.
 		\param str Mutable zero-terminated string to be parsed.
@@ -834,6 +839,10 @@ public:
 		return ParseInsitu<parseFlags, Encoding>(str);
 	}
 
+	GenericDocument& ParseInsitu(Ch* str) {
+		return ParseInsitu<0, Encoding>(str);
+	}
+
 	//! Parse JSON text from a read-only string.
 	/*! \tparam parseFlags Combination of ParseFlag (must not contain kParseInsituFlag).
 		\param str Read-only zero-terminated string to be parsed.
@@ -848,6 +857,10 @@ public:
 	template <unsigned parseFlags>
 	GenericDocument& Parse(const Ch* str) {
 		return Parse<parseFlags, Encoding>(str);
+	}
+
+	GenericDocument& Parse(const Ch* str) {
+		return Parse<0>(str);
 	}
 
 	//! Whether a parse error was occured in the last parsing.

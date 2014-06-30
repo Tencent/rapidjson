@@ -8,7 +8,7 @@ using namespace rapidjson;
 TEST(Document, Parse) {
 	Document doc;
 
-	doc.Parse<0>(" { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3, 4] } ");
+	doc.Parse(" { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3, 4] } ");
 
 	EXPECT_TRUE(doc.IsObject());
 
@@ -59,7 +59,7 @@ struct OutputStringStream : public std::ostringstream {
 
 TEST(Document, AcceptWriter) {
 	Document doc;
-	doc.Parse<0>(" { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3, 4] } ");
+	doc.Parse(" { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3, 4] } ");
 
 	OutputStringStream os;
 	Writer<OutputStringStream> writer(os);

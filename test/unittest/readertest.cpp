@@ -603,3 +603,51 @@ TEST(Reader, SkipWhitespace) {
 		EXPECT_EQ(expected[i], ss.Take());
 	}
 }
+
+// Test implementing a stream without copy stream optimization.
+// Clone from GenericStringStream except that copy constructor is disabled.
+template <typename Encoding>
+class CustomStringStream {
+public:
+	typedef typename Encoding::Ch Ch;
+
+	CustomStringStream(const Ch *src) : src_(src), head_(src) {}
+
+	Ch Peek() const { return *src_; }
+	Ch Take() { return *src_++; }
+	size_t Tell() const { return static_cast<size_t>(src_ - head_); }
+
+	Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
+	void Put(Ch) { RAPIDJSON_ASSERT(false); }
+	void Flush() { RAPIDJSON_ASSERT(false); }
+	size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
+
+private:
+	// Not support copy constructor.
+	CustomStringStream(const CustomStringStream&);
+
+	const Ch* src_;		//!< Current read position.
+	const Ch* head_;	//!< Original head of the string.
+};
+
+// If the following code is compiled, it should generate compilation error as predicted.
+// Because CustomStringStream<> is not copyable via making copy constructor private.
+#if 0
+namespace rapidjson {
+
+template <typename Encoding>
+struct StreamTraits<CustomStringStream<Encoding> > {
+	typedef CustomStringStream<Encoding> StreamCopyType;
+};
+
+} // namespace rapdijson
+#endif 
+
+TEST(Reader, CustomStringStream) {
+	const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] } ";
+	CustomStringStream<UTF8<char> > s(json);
+	ParseObjectHandler h;
+	Reader reader;
+	reader.ParseObject<0>(s, h);
+	EXPECT_EQ(20u, h.step_);
+}

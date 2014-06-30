@@ -135,7 +135,7 @@ struct BaseReaderHandler {
 */
 template<typename InputStream>
 void SkipWhitespace(InputStream& is) {
-	InputStream s = is;	// Use a local copy for optimization
+	typename StreamTraits<InputStream>::StreamCopyType s = is;	// Use a local copy for optimization
 	while (s.Peek() == ' ' || s.Peek() == '\n' || s.Peek() == '\r' || s.Peek() == '\t')
 		s.Take();
 	is = s;
@@ -283,8 +283,15 @@ public:
 		return !HasParseError();
 	}
 
+	template <typename InputStream, typename Handler>
+	bool Parse(InputStream& is, Handler& handler) {
+		return Parse<0>(is, handler);
+	}
+
 	bool HasParseError() const { return parseErrorCode_ != kParseErrorNone; }
+	
 	ParseErrorCode GetParseErrorCode() const { return parseErrorCode_; }
+
 	size_t GetErrorOffset() const { return errorOffset_; }
 
 private:
@@ -399,7 +406,7 @@ private:
 	// Helper function to parse four hexidecimal digits in \uXXXX in ParseString().
 	template<typename InputStream>
 	unsigned ParseHex4(InputStream& is) {
-		InputStream s = is;	// Use a local copy for optimization
+		typename StreamTraits<InputStream>::StreamCopyType s = is;	// Use a local copy for optimization
 		unsigned codepoint = 0;
 		for (int i = 0; i < 4; i++) {
 			Ch c = s.Take();
@@ -440,7 +447,7 @@ private:
 	// Parse string and generate String event. Different code paths for kParseInsituFlag.
 	template<unsigned parseFlags, typename InputStream, typename Handler>
 	void ParseString(InputStream& is, Handler& handler) {
-		InputStream s = is;	// Local copy for optimization
+		typename StreamTraits<InputStream>::StreamCopyType  s = is;	// Local copy for optimization
 		if (parseFlags & kParseInsituFlag) {
 			Ch *head = s.PutBegin();
 			ParseStringToStream<parseFlags, SourceEncoding, SourceEncoding>(s, s);
@@ -520,7 +527,7 @@ private:
 
 	template<unsigned parseFlags, typename InputStream, typename Handler>
 	void ParseNumber(InputStream& is, Handler& handler) {
-		InputStream s = is; // Local copy for optimization
+		typename StreamTraits<InputStream>::StreamCopyType s = is; // Local copy for optimization
 		// Parse minus
 		bool minus = false;
 		if (s.Peek() == '-') {

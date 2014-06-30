@@ -23,7 +23,7 @@ int main(int, char*[]) {
 	Writer<FileWriteStream> writer(os);
 
 	// JSON reader parse from the input stream and let writer generate the output.
-	if (!reader.Parse<0>(is, writer)) {
+	if (!reader.Parse(is, writer)) {
 		fprintf(stderr, "\nError(%u): %s\n", (unsigned)reader.GetErrorOffset(), GetParseError_En(reader.GetParseErrorCode()));
 		return 1;
 	}
