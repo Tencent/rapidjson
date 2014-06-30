@@ -37,23 +37,23 @@ Users can build and run the unit tests on their platform/compiler.
 
 ## Installation
 
-RapidJSON is a header-only C++ library. Just copy the `RapidJSON/include/RapidJSON` folder to system or project's include path.
+RapidJSON is a header-only C++ library. Just copy the `rapidjson/include/rapidjson` folder to system or project's include path.
 
 To build the tests and examples:
 
 1. Obtain [premake4](http://industriousone.com/premake/download).
 2. Copy premake4 executable to RapidJSON/build (or system path)
-3. Run `RapidJSON/build/premake.bat` on Windows, `RapidJSON/build/premake.sh` on Linux or other platforms
-4. On Windows, build the solution at `RapidJSON/build/vs2008/` or `/vs2010/`
-5. On other platforms, run GNU make at `RapidJSON/build/gmake/` (e.g., `make -f test.make config=release32`, `make -f example.make config=debug32`)
-6. On success, the executable are generated at `RapidJSON/bin`
+3. Run `rapidjson/build/premake.bat` on Windows, `RapidJSON/build/premake.sh` on Linux or other platforms
+4. On Windows, build the solution at `rapidjson/build/vs2008/` or `/vs2010/`
+5. On other platforms, run GNU make at `rapidjson/build/gmake/` (e.g., `make -f test.make config=release32`, `make -f example.make config=debug32`)
+6. On success, the executable are generated at `rapidjson/bin`
 
 ## Usage at a glance
 
 This simple example parses a JSON string into a document (DOM), make a simple modification of the DOM, and finally stringify the DOM to a JSON string.
 
+[simpledom.cpp](example/simpledom/simpledom.cpp)
 ```cpp
-// example/simpledom/simpledom.cpp
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
