@@ -1226,17 +1226,13 @@ public:
 	GenericDocument& ParseStream(InputStream& is) {
 		ValueType::SetNull(); // Remove existing root if exist
 		GenericReader<SourceEncoding, Encoding, Allocator> reader(&GetAllocator());
+		ClearStackOnExit scope(*this);
 		if (reader.template Parse<parseFlags>(is, *this)) {
 			RAPIDJSON_ASSERT(stack_.GetSize() == sizeof(ValueType)); // Got one and only one root object
 			this->RawAssign(*stack_.template Pop<ValueType>(1));	// Add this-> to prevent issue 13.
-			parseErrorCode_ = kParseErrorNone;
-			errorOffset_ = 0;
 		}
-		else {
-			parseErrorCode_ = reader.GetParseErrorCode();
-			errorOffset_ = reader.GetErrorOffset();
-			ClearStack();
-		}
+		parseErrorCode_ = reader.GetParseErrorCode();
+		errorOffset_ = reader.GetErrorOffset();
 		return *this;
 	}
 
@@ -1349,6 +1345,14 @@ public:
 	size_t GetStackCapacity() const { return stack_.GetCapacity(); }
 
 private:
+	// clear stack on any exit from ParseStream, e.g. due to exception
+	struct ClearStackOnExit {
+		explicit ClearStackOnExit(GenericDocument& d) : d_(d) {}
+		~ClearStackOnExit() { d_.ClearStack(); }
+	private:
+		GenericDocument& d_;
+	};
+
 	// callers of the following private Handler functions
 	template <typename,typename,typename> friend class GenericReader; // for parsing
 	friend class GenericValue<Encoding,Allocator>; // for deep copying
