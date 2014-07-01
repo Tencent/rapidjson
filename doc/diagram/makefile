@@ -5,4 +5,4 @@
 	dot $< -Tpng -o $@
 
 DOTFILES = $(basename $(wildcard *.dot))
-all: $(addsuffix .png, $(DOTFILES)) #$(addsuffix .pdf, $(DOTFILES))
+all: $(addsuffix .png, $(DOTFILES)) $(addsuffix .pdf, $(DOTFILES))
