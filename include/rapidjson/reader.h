@@ -71,7 +71,7 @@ enum ParseErrorCode {
 	kParseErrorStringMissQuotationMark,			//!< Missing a closing quotation mark in string.
 	kParseErrorStringInvalidEncoding,			//!< Invalid encoidng in string.
 
-	kParesErrorNumberTooBig,					//!< Number too big to be stored in double.
+	kParseErrorNumberTooBig,					//!< Number too big to be stored in double.
 	kParseErrorNumberMissFraction,				//!< Miss fraction part in number.
 	kParseErrorNumberMissExponent				//!< Miss exponent in number.
 };
@@ -643,7 +643,7 @@ private:
 			d = (double)i64;
 			while (s.Peek() >= '0' && s.Peek() <= '9') {
 				if (d >= 1E307)
-					RAPIDJSON_PARSE_ERROR(kParesErrorNumberTooBig, is.Tell());
+					RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, is.Tell());
 				d = d * 10 + (s.Take() - '0');
 			}
 		}
@@ -695,7 +695,7 @@ private:
 				while (s.Peek() >= '0' && s.Peek() <= '9') {
 					exp = exp * 10 + (s.Take() - '0');
 					if (exp > 308)
-						RAPIDJSON_PARSE_ERROR(kParesErrorNumberTooBig, is.Tell());
+						RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, is.Tell());
 				}
 			}
 			else

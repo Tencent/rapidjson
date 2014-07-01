@@ -34,7 +34,7 @@ inline const RAPIDJSON_ERROR_CHARTYPE* GetParseError_En(ParseErrorCode parseErro
 		case kParseErrorStringMissQuotationMark:		return RAPIDJSON_ERROR_STRING("Missing a closing quotation mark in string.");
 		case kParseErrorStringInvalidEncoding:			return RAPIDJSON_ERROR_STRING("Invalid encoidng in string.");
 
-		case kParesErrorNumberTooBig:					return RAPIDJSON_ERROR_STRING("Number too big to be stored in double.");
+		case kParseErrorNumberTooBig:					return RAPIDJSON_ERROR_STRING("Number too big to be stored in double.");
 		case kParseErrorNumberMissFraction:				return RAPIDJSON_ERROR_STRING("Miss fraction part in number.");
 		case kParseErrorNumberMissExponent:				return RAPIDJSON_ERROR_STRING("Miss exponent in number.");
 

@@ -171,9 +171,9 @@ TEST(Reader, ParseNumber_Error) {
 		for (int i = 1; i < 310; i++)
 			n1e309[i] = '0';
 		n1e309[310] = '\0';
-		TEST_NUMBER_ERROR(kParesErrorNumberTooBig, n1e309);
+		TEST_NUMBER_ERROR(kParseErrorNumberTooBig, n1e309);
 	}
-	TEST_NUMBER_ERROR(kParesErrorNumberTooBig, "1e309");
+	TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e309");
 
 	// Miss fraction part in number.
 	TEST_NUMBER_ERROR(kParseErrorNumberMissFraction, "1.");
