@@ -173,7 +173,7 @@ if (itr != 0)
 
 JSON provide a single numerical type called Number. Number can be integer or real numbers. RFC 4627 says the range of Number is specified by parser.
 
-As C++ provides several integer and floating point number types, the DOM trys to handle these with widest possible range and good performance.
+As C++ provides several integer and floating point number types, the DOM tries to handle these with widest possible range and good performance.
 
 When the DOM parses a Number, it stores it as either one of the following type:
 
