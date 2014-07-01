@@ -187,14 +187,14 @@ Type       | Description
 
 When querying a number, you can check whether the number can be obtained as target type:
 
-Checking     | Obtaining
--------------|--------------
-`IsNumber()` | N/A
-`IsInt()`    | `GetInt()`
-`IsUint()`   | `GetUint()`
-`IsInt64()`  | `GetInt64()`
-`IsUint64()` | `GetUint()`
-`IsDouble()` | `GetDouble()`
+Checking          | Obtaining
+------------------|---------------------
+`bool IsNumber()` | N/A
+`bool IsInt()`    | `int GetInt()`
+`bool IsUint()`   | `unsigned GetUint()`
+`bool IsInt64()`  | `uint64_t GetInt64()`
+`bool IsUint64()` | `int64_t GetUint()`
+`bool IsDouble()` | `double GetDouble()`
 
 Note that, an integer value may be obtained in various ways without conversion. For example, A value `x` containing `123` will make `x.IsInt() == x.IsUint() == x.Int64() == x.Uint64() == ture`. But a value `y` containing `-3000000000` will only makes `x.int64() == true`.
 
