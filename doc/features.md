@@ -10,7 +10,7 @@
  * Header files only library. Just copy the headers to your project.
 * Self-contained, minimal dependences
  * No STL, BOOST, etc.
- * Only included `<cstdio>`, `<cstdlib>`, `<cstring>`, `<inttypes.h>`, `<new>`, `<stdint.h>`. * 
+ * Only included `<cstdio>`, `<cstdlib>`, `<cstring>`, `<inttypes.h>`, `<new>`, `<stdint.h>`. 
 * Without C++ exception, RTTI
 * High performance
  * Use template and inline functions to reduce function call overheads.
