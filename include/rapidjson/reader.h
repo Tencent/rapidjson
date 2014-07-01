@@ -24,6 +24,16 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
 #endif
 
+#define RAPIDJSON_NOTHING /* deliberately empty */
+#ifndef RAPIDJSON_PARSE_ERROR_EARLY_RETURN
+#define RAPIDJSON_PARSE_ERROR_EARLY_RETURN(value) \
+	RAPIDJSON_MULTILINEMACRO_BEGIN \
+	if (HasParseError()) { return value; } \
+	RAPIDJSON_MULTILINEMACRO_END
+#endif
+#define RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID \
+	RAPIDJSON_PARSE_ERROR_EARLY_RETURN(RAPIDJSON_NOTHING)
+
 #ifndef RAPIDJSON_PARSE_ERROR_NORETURN
 #define RAPIDJSON_PARSE_ERROR_NORETURN(parseErrorCode, offset) \
 	RAPIDJSON_MULTILINEMACRO_BEGIN \
@@ -37,7 +47,7 @@ RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
 #define RAPIDJSON_PARSE_ERROR(parseErrorCode, offset) \
 	RAPIDJSON_MULTILINEMACRO_BEGIN \
 	RAPIDJSON_PARSE_ERROR_NORETURN(parseErrorCode, offset); \
-	return; \
+	RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID; \
 	RAPIDJSON_MULTILINEMACRO_END
 #endif
 
@@ -278,28 +288,30 @@ public:
 		parseErrorCode_ = kParseErrorNone;
 		errorOffset_ = 0;
 
+		ClearStackOnExit scope(*this);
 		SkipWhitespace(is);
 
-		if (is.Peek() == '\0')
+		if (is.Peek() == '\0') {
 			RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentEmpty, is.Tell());
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN(false);
+		}
 		else {
 			switch (is.Peek()) {
 				case '{': ParseObject<parseFlags>(is, handler); break;
 				case '[': ParseArray<parseFlags>(is, handler); break;
 				default: RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotObjectOrArray, is.Tell());
 			}
-			if (HasParseError())
-				goto out;
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN(false);
 
 			SkipWhitespace(is);
 
-			if (is.Peek() != '\0')
+			if (is.Peek() != '\0') {
 				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotSingular, is.Tell());
+				RAPIDJSON_PARSE_ERROR_EARLY_RETURN(false);
+			}
 		}
 
-	out:
-		stack_.Clear();
-		return !HasParseError();
+		return true;
 	}
 
 	//! Parse JSON text (with \ref kParseDefaultFlags)
@@ -325,6 +337,16 @@ private:
 	GenericReader(const GenericReader&);
 	GenericReader& operator=(const GenericReader&);
 
+	void ClearStack() { stack_.Clear(); }
+
+	// clear stack on any exit from ParseStream, e.g. due to exception
+	struct ClearStackOnExit {
+		explicit ClearStackOnExit(GenericReader& r) : r_(r) {}
+		~ClearStackOnExit() { r_.ClearStack(); }
+	private:
+		GenericReader& r_;
+	};
+
 	// Parse object: { string : value, ... }
 	template<unsigned parseFlags, typename InputStream, typename Handler>
 	void ParseObject(InputStream& is, Handler& handler) {
@@ -344,8 +366,7 @@ private:
 				RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
 
 			ParseString<parseFlags>(is, handler);
-			if (HasParseError())
-				return;
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
 			SkipWhitespace(is);
 
@@ -355,8 +376,7 @@ private:
 			SkipWhitespace(is);
 
 			ParseValue<parseFlags>(is, handler);
-			if (HasParseError())
-				return;
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
 			SkipWhitespace(is);
 
@@ -386,8 +406,7 @@ private:
 
 		for (SizeType elementCount = 0;;) {
 			ParseValue<parseFlags>(is, handler);
-			if (HasParseError())
-				return;
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
 			++elementCount;
 			SkipWhitespace(is);
@@ -449,7 +468,7 @@ private:
 				codepoint -= 'a' - 10;
 			else {
 				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorStringUnicodeEscapeInvalidHex, is.Tell() - 1);
-				return 0;
+				RAPIDJSON_PARSE_ERROR_EARLY_RETURN(0);
 			}
 		}
 		return codepoint;
@@ -481,8 +500,7 @@ private:
 		if (parseFlags & kParseInsituFlag) {
 			typename InputStream::Ch *head = s.PutBegin();
 			ParseStringToStream<parseFlags, SourceEncoding, SourceEncoding>(s, s);
-			if (HasParseError())
-				return;
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 			size_t length = s.PutEnd(head) - 1;
 			RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
 			handler.String((typename TargetEncoding::Ch*)head, SizeType(length), false);
@@ -490,8 +508,7 @@ private:
 		else {
 			StackStream stackStream(stack_);
 			ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
-			if (HasParseError())
-				return;
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 			handler.String(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, true);
 		}
 	}
