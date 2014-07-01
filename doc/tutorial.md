@@ -178,7 +178,7 @@ As C++ provides several integer and floating point number types, the DOM trys to
 When the DOM parses a Number, it stores it as either one of the following type:
 
 Type       | Description
----------------------------------------------------
+-----------|---------------------------------------
 `unsigned` | 32-bit unsigned integer
 `int`      | 32-bit signed integer
 `uint64_t` | 64-bit unsigned integer
@@ -187,14 +187,14 @@ Type       | Description
 
 When querying a number, you can check whether the number can be obtained as target type:
 
-Function     | Description
------------------------------------------------
-`IsNumber()` | whether the value is a number
-`IsInt()`    | whether the number is a int
-`IsUint()`   | whether the number is a uint
-`IsInt64()`  | whether the number is a int64_t
-`IsUint64()` | whether the number is a uint64_t
-`IsDouble()` | whether the number is a double
+Checking     | Obtaining
+-------------|--------------
+`IsNumber()` | N/A
+`IsInt()`    | `GetInt()`
+`IsUint()`   | `GetUint()`
+`IsInt64()`  | `GetInt64()`
+`IsUint64()` | `GetUint()`
+`IsDouble()` | `GetDouble()`
 
 Note that, an integer value may be obtained in various ways without conversion. For example, A value `x` containing `123` will make `x.IsInt() == x.IsUint() == x.Int64() == x.Uint64() == ture`. But a value `y` containing `-3000000000` will only makes `x.int64() == true`.
 
