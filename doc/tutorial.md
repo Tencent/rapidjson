@@ -196,7 +196,7 @@ Checking          | Obtaining
 `bool IsInt64()`  | `int64_t GetInt64()`
 `bool IsDouble()` | `double GetDouble()`
 
-Note that, an integer value may be obtained in various ways without conversion. For example, A value `x` containing `123` will make `x.IsInt() == x.IsUint() == x.Int64() == x.Uint64() == ture`. But a value `y` containing `-3000000000` will only makes `x.int64() == true`.
+Note that, an integer value may be obtained in various ways without conversion. For example, A value `x` containing 123 will make `x.IsInt() == x.IsUint() == x.Int64() == x.Uint64() == ture`. But a value `y` containing -3000000000 will only makes `x.int64() == true`.
 
 When obtaining the numeric values, `GetDouble()` will convert internal integer representation to a `double`. Note that, `int` and `uint` can be safely convert to `double`, but `int64_t` and `uint64_t` may lose precision (since mantissa of `double` is only 52-bits).
 
