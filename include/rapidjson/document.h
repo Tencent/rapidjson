@@ -1004,7 +1004,7 @@ public:
 
 	template <typename InputStream>
 	GenericDocument& ParseStream(InputStream& is) {
-		return ParseStream<0, Encoding, InputStream>(is);
+		return ParseStream<kParseDefaultFlags, Encoding, InputStream>(is);
 	}
 
 	//! Parse JSON text from a mutable string.
@@ -1024,7 +1024,7 @@ public:
 	}
 
 	GenericDocument& ParseInsitu(Ch* str) {
-		return ParseInsitu<0, Encoding>(str);
+		return ParseInsitu<kParseDefaultFlags, Encoding>(str);
 	}
 
 	//! Parse JSON text from a read-only string.
@@ -1044,7 +1044,7 @@ public:
 	}
 
 	GenericDocument& Parse(const Ch* str) {
-		return Parse<0>(str);
+		return Parse<kParseDefaultFlags>(str);
 	}
 
 	//! Whether a parse error was occured in the last parsing.

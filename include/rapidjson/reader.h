@@ -323,7 +323,7 @@ public:
 
 	template <typename InputStream, typename Handler>
 	bool Parse(InputStream& is, Handler& handler) {
-		return Parse<0>(is, handler);
+		return Parse<kParseDefaultFlags>(is, handler);
 	}
 
 	bool HasParseError() const { return parseErrorCode_ != kParseErrorNone; }
