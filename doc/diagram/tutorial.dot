@@ -43,8 +43,8 @@ digraph {
 		}
 
 		edge [arrowhead=vee]
-		root -> { hello, t, f, n, i, pi, a }		
-		array -> { a1, a2, a3, a4}
+		root -> { hello; t; f; n; i; pi; a }		
+		array -> { a1; a2; a3; a4 }
 
 		edge [arrowhead=none]
 		hello -> world

@@ -164,7 +164,7 @@ Note that, when `operator[](const char*)` cannot find the member, it will fail a
 If we are unsure whether a member exists, we need to call `HasMember()` before calling `operator[](const char*)`. However, this incurs two lookup. A better way is to call `FindMember()`, which can check the existence of member and obtain its value at once:
 
 ```cpp
-Value::ConstMemberIerator itr = document.FindMember("hello");
+Value::ConstMemberIterator itr = document.FindMember("hello");
 if (itr != 0)
     printf("%s %s\n", itr->value.GetString());
 ```
@@ -196,7 +196,7 @@ Checking          | Obtaining
 `bool IsInt64()`  | `int64_t GetInt64()`
 `bool IsDouble()` | `double GetDouble()`
 
-Note that, an integer value may be obtained in various ways without conversion. For example, A value `x` containing 123 will make `x.IsInt() == x.IsUint() == x.Int64() == x.Uint64() == ture`. But a value `y` containing -3000000000 will only makes `x.int64() == true`.
+Note that, an integer value may be obtained in various ways without conversion. For example, A value `x` containing 123 will make `x.IsInt() == x.IsUint() == x.IsInt64() == x.IsUint64() == ture`. But a value `y` containing -3000000000 will only makes `x.IsInt64() == true`.
 
 When obtaining the numeric values, `GetDouble()` will convert internal integer representation to a `double`. Note that, `int` and `uint` can be safely convert to `double`, but `int64_t` and `uint64_t` may lose precision (since mantissa of `double` is only 52-bits).
 
@@ -226,6 +226,165 @@ string( const char* s, size_type count);
 which accepts the length of string as parameter. This constructor supports storing null character within the string, and should also provide better performance.
 
 ## Create/Modify Values
+
+There are several ways to create values. After a DOM tree is created and/or modified, it can be saved as JSON again using `Writer`.
+
+### Changing Value Type
+When creating a Value or Document by default constructor, its type is Null. To change its type, call `SetXXX()` or assignment operator, for example:
+
+```cpp
+Document d; // Null
+d.SetObject();
+
+Value v;    // Null
+v.SetInt(10);
+v = 10;     // Shortcut, same as above
+```
+
+### Overloaded Constructors
+There are also overloaded constructors for several types:
+
+```cpp
+Value b(true);    // calls Value(bool)
+Value i(-123);    // calls Value(int)
+Value u(123u);    // calls Value(unsigned)
+Value d(1.5);     // calls Value(double)
+```
+
+To create empty object or array, you may use `SetObject()`/`SetArray()` after default constructor, or using the `Value(Type)` in one shot:
+
+```cpp
+Value o(kObjectType);
+Value a(kArrayType);
+```
+
+### Move Semantics
+A very special decision during design of RapidJSON is that, assignment of value does not copy the source value to destination value. Instead, the value from source is moved to the destination. For example,
+
+```cpp
+Value a(123);
+Value b(456);
+b = a;         // a becomes a Null value, b becomes number 123.
+```
+
+![move1](diagram/move1.png?raw=true)
+
+Why? What is the advantage of this semantics?
+
+The simple answer is performance. For fixed size JSON types (Number, True, False, Null), copying them is fast and easy. However, For variable size JSON types (String, Array, Object), copying them will incur a lot of overheads. And these overheads are often unnoticed. Especially when we need to create temporary object, copy it to another variable, and then destruct it.
+
+For example, if normal copy semantics is used
+
+```cpp
+Value o(kObjectType);
+{
+    Value contacts(kArrayType);
+    // adding elements to contacts array.
+    // ...
+    o.AddMember("contacts", contacts);  // deep clone contacts (may be with lots of allocations)
+    // destruct contacts.
+}
+```
+
+The object o needs to allocate a same size buffer as contacts, makes a deep clone of it, and then finally contacts is destructed. This will incur a lot of unnecessary allocations/deallocations.
+
+There are solutions to prevent actual copying these data, such as reference counting and garbage collection(GC).
+
+To make rapidjson simple and fast, we chose to use move semantics for assignment. It is similar to auto_ptr<> which transfer ownership during assignment. Move is much faster and simpler, it just destructs the original value, memcpy() the source to destination, and finally sets the source as Null type.
+
+So, with move semantics, the above example become:
+
+```cpp
+Value o(kObjectType);
+{
+    Value contacts(kArrayType);
+    // adding elements to contacts array.
+    o.AddMember("contacts", contacts);  // just memcpy() of contacts itself to the value of new member (16 bytes)
+    // contacts became Null here. Its destruction is trivial.
+}
+```
+
+This is called move assignment operator in C++11. As RapidJSON supports C++03, it adopts move semantics as default.
+
+### Manipulating String
+RapidJSON provide two strategies for storing string.
+
+1. copy-string: allocates a buffer, and then copy the source data into it.
+2. const-string: simply store a pointer of string.
+
+Copy-string is always safe because it owns a copy of the data. Const-string can be used for storing string literal, and in-situ parsing which we will mentioned in Document.
+
+To make memory allocation customizable, rapidjson needs user to pass an instance of allocator, whenever that operation may require allocation. This design is more flexible than STL's allocator type per class, as we can assign a allocator instance for each allocation.
+
+Therefore, when we assign a copy-string, we call this overloaded SetString() with allocator:
+
+```cpp
+Document document;
+Value author;
+char buffer[10];
+int len = sprintf(buffer, "%s %s", "Milo", "Yip"); // dynamically created string.
+author.SetString(buffer, len, document.GetAllocator());
+memset(buffer, 0, sizeof(buffer));
+// author.GetString() still contains "Milo Yip" after buffer is destroyed
+```
+
+In this example, we get the allocator from a Document instance. This is a common idiom when using rapidjson. But you may use other instances of allocator.
+
+Besides, the above SetString() requires the length of a string. This can handle null characters within a string. There is another SetString() overloaded function without the length parameter. And it actually assumes the input is null-terminated and calls a strlen()-like function to obtain the length.
+
+Finally, for literal string or string with safe life-cycle can use const-string version of SetString(), which are without alloactor parameter:
+
+```cpp
+Value s;
+s.SetString("rapidjson", 9); // faster, can contain null character
+s.SetString("rapidjson");    // slower, assumes null-terminated
+s = "rapidjson";             // shortcut, same as above
+```
+
+### Manipulating Array
+Value with array type provides similar APIs as `std::vector`.
+
+* `Clear()`
+* `Reserve(SizeType, Allocator&)`
+* `Value& PushBack(Value&, Allocator&)`
+* `template <typename T> GenericValue& PushBack(T, Allocator&)`
+* `Value& PopBack()`
+
+Note that, `Reserve(...)` and `PushBack(...)` may allocate memory, therefore requires an allocator.
+
+Here is an example of `PushBack()`:
+
+```cpp
+Value a(kArrayType);
+Document::AllocatorType& allocator = document.GetAllocator();
+
+for (int i = 5; i <= 10; i++)
+    a.PushBack(i, allocator);   // allocator is needed for potentially realloc.
+
+// Fluent interface
+a.PushBack("Lua", allocator).PushBack("Mio", allocator);
+```
+
+Differs from STL, `PushBack()`/`PopBack()` returns the array reference itself. This is called fluent interface.
+
+### Manipulating Object
+Object is a collection of key-value pairs. Each key must be a string value. The way to manipulating object is to add/remove members:
+
+* `Value& AddMember(Value&, Value&, Allocator& allocator)`
+* `Value& AddMember(const Ch*, Allocator&, GenericValue& value, Allocator&)`
+* `Value& AddMember(const Ch*, Value&, Allocator&)`
+* `template <typename T> Value& AddMember(const Ch*, T value, Allocator&)`
+* `bool RemoveMember(const Ch*)`
+
+There are 4 overloaded version of AddMember(). They are 4 combinations for supplying the name string (copy- or const-), whether to supply a different allocator for name string, and whether use generic type for value.
+
+Here is an example.
+
+```cpp
+Value contact(kObejct);
+contact.AddMember("name", "Milo", document.GetAllocator());
+contact.AddMember("married", true, document.GetAllocator());
+```
 
 ### Object
 

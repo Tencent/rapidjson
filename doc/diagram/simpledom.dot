@@ -39,7 +39,7 @@ digraph {
 		}
 
 		edge [arrowhead=vee]
-		root -> { project, stars }
+		root -> { project; stars }
 
 		edge [arrowhead="none"]
 		project -> rapidjson
