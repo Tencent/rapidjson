@@ -20,8 +20,8 @@ public:
 		length_ = (size_t)ftell(fp);
 		fseek(fp, 0, SEEK_SET);
 		json_ = (char*)malloc(length_ + 1);
-		fread(json_, 1, length_, fp);
-		json_[length_] = '\0';
+		size_t readLength = fread(json_, 1, length_, fp);
+		json_[readLength] = '\0';
 		fclose(fp);
 	}
 

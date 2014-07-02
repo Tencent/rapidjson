@@ -47,8 +47,8 @@ protected:
 		*outLength = (size_t)ftell(fp);
 		fseek(fp, 0, SEEK_SET);
 		char* buffer = (char*)malloc(*outLength + 1);
-		fread(buffer, 1, *outLength, fp);
-		buffer[*outLength] = '\0';
+		size_t readLength = fread(buffer, 1, *outLength, fp);
+		buffer[readLength] = '\0';
 		fclose(fp);
 		return buffer;
 	}
