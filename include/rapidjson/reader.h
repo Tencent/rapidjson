@@ -127,6 +127,43 @@ struct BaseReaderHandler {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+// StreamLocalCopy
+
+namespace internal {
+
+template<typename Stream, int = StreamTraits<Stream>::copyOptimization>
+class StreamLocalCopy;
+
+//! Do copy optimziation.
+template<typename Stream>
+class StreamLocalCopy<Stream, 1> {
+public:
+	StreamLocalCopy(Stream& original) : s(original), original_(original) {}
+	~StreamLocalCopy() { original_ = s; }
+
+	Stream s;
+
+private:
+	StreamLocalCopy& operator=(const StreamLocalCopy&) /* = delete */;
+
+	Stream& original_;
+};
+
+//! Keep reference.
+template<typename Stream>
+class StreamLocalCopy<Stream, 0> {
+public:
+	StreamLocalCopy(Stream& original) : s(original) {}
+
+	Stream& s;
+
+private:
+	StreamLocalCopy& operator=(const StreamLocalCopy&) /* = delete */;
+};
+
+} // namespace internal
+
+///////////////////////////////////////////////////////////////////////////////
 // SkipWhitespace
 
 //! Skip the JSON white spaces in a stream.
@@ -135,7 +172,7 @@ struct BaseReaderHandler {
 */
 template<typename InputStream>
 void SkipWhitespace(InputStream& is) {
-	StreamLocalCopy<InputStream> copy(is);
+	internal::StreamLocalCopy<InputStream> copy(is);
 	InputStream& s(copy.s);
 
 	while (s.Peek() == ' ' || s.Peek() == '\n' || s.Peek() == '\r' || s.Peek() == '\t')
@@ -450,7 +487,7 @@ private:
 	// Parse string and generate String event. Different code paths for kParseInsituFlag.
 	template<unsigned parseFlags, typename InputStream, typename Handler>
 	void ParseString(InputStream& is, Handler& handler) {
-		StreamLocalCopy<InputStream> copy(is);
+		internal::StreamLocalCopy<InputStream> copy(is);
 		InputStream& s(copy.s);
 
 		if (parseFlags & kParseInsituFlag) {
@@ -531,7 +568,7 @@ private:
 
 	template<unsigned parseFlags, typename InputStream, typename Handler>
 	void ParseNumber(InputStream& is, Handler& handler) {
-		StreamLocalCopy<InputStream> copy(is);
+		internal::StreamLocalCopy<InputStream> copy(is);
 		InputStream& s(copy.s);
 
 		// Parse minus

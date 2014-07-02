@@ -209,31 +209,6 @@ struct StreamTraits {
 	enum { copyOptimization = 0 };
 };
 
-template<typename Stream, bool = StreamTraits<Stream>::copyOptimization>
-class StreamLocalCopy;
-
-template<typename Stream>
-class StreamLocalCopy<Stream, 1> {
-public:
-	StreamLocalCopy(Stream& original) : s(original), original_(original) {}
-	~StreamLocalCopy() { original_ = s; }
-
-	Stream s; //!< copy
-private:
-	StreamLocalCopy& operator=(const StreamLocalCopy&) /* = delete */;
-	Stream& original_;
-};
-
-template<typename Stream>
-class StreamLocalCopy<Stream, 0> {
-public:
-	StreamLocalCopy(Stream& original) : s(original) {}
-
-	Stream& s; //!< reference
-private:
-	StreamLocalCopy& operator=(const StreamLocalCopy&) /* = delete */;
-};
-
 //! Put N copies of a character to a stream.
 template<typename Stream, typename Ch>
 inline void PutN(Stream& stream, Ch c, size_t n) {
