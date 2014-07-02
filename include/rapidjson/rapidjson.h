@@ -203,12 +203,42 @@ template<typename Stream>
 struct StreamTraits {
 	//! Whether to make local copy of stream for optimization during parsing.
 	/*!
-		If it is defined as Stream&, it will not make a local copy.
-		If it is defined as Stream, it will make a local copy for optimization.
-		By default, for safety, streams do not use local copy optimization, i.e. it is defined as Stream&.
+		By default, for safety, streams do not use local copy optimization.
 		Stream that can be copied fast should specialize this, like StreamTraits<StringStream>.
 	*/
-	typedef Stream& StreamCopyType;
+	enum { copyOptimization = 0 };
+};
+
+template<typename Stream, bool>
+class StreamLocalCopy;
+
+template<typename Stream>
+class StreamLocalCopy<Stream, 1> {
+public:
+	StreamLocalCopy(Stream& original) : original_(original), s_(original) {}
+	~StreamLocalCopy() { original_ = s_; }
+	Stream* operator->() { return &s_; }
+	Stream& operator*() { return s_; }
+
+private:
+	StreamLocalCopy& operator=(const StreamLocalCopy&);
+
+	Stream& original_;
+	Stream s_;
+};
+
+template<typename Stream>
+class StreamLocalCopy<Stream, 0> {
+public:
+	StreamLocalCopy(Stream& original) : s_(original) {}
+	~StreamLocalCopy() {}
+	Stream* operator->() { return &s_; }
+	Stream& operator*() { return s_; }
+
+private:
+	StreamLocalCopy& operator=(const StreamLocalCopy&);
+
+	Stream& s_;
 };
 
 //! Put N copies of a character to a stream.
@@ -245,7 +275,7 @@ struct GenericStringStream {
 
 template <typename Encoding>
 struct StreamTraits<GenericStringStream<Encoding> > {
-	typedef GenericStringStream<Encoding> StreamCopyType;	// Enable stream copy optimization.
+	enum { copyOptimization = 1 };
 };
 
 typedef GenericStringStream<UTF8<> > StringStream;
@@ -281,7 +311,7 @@ struct GenericInsituStringStream {
 
 template <typename Encoding>
 struct StreamTraits<GenericInsituStringStream<Encoding> > {
-	typedef GenericInsituStringStream<Encoding> StreamCopyType;	// Enable stream copy optimization.
+	enum { copyOptimization = 1 };
 };
 
 typedef GenericInsituStringStream<UTF8<> > InsituStringStream;
