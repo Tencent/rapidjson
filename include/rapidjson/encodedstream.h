@@ -3,6 +3,11 @@
 
 #include "rapidjson.h"
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Weffc++"
+#endif
+
 namespace rapidjson {
 
 //! Input byte stream wrapper with a statically bound encoding.
@@ -31,7 +36,7 @@ public:
 	size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:
-	// Prohibit assignment for VC C4512 warning
+	EncodedInputStream(const EncodedInputStream&);
 	EncodedInputStream& operator=(const EncodedInputStream&);
 
 	InputByteStream& is_;
@@ -65,7 +70,7 @@ public:
 	size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:
-	// Prohibit assignment for VC C4512 warning
+	EncodedOutputStream(const EncodedOutputStream&);
 	EncodedOutputStream& operator=(const EncodedOutputStream&);
 
 	OutputByteStream& os_;
@@ -110,6 +115,9 @@ public:
 	size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:
+	AutoUTFInputStream(const AutoUTFInputStream&);
+	AutoUTFInputStream& operator=(const AutoUTFInputStream&);
+
 	// Detect encoding type with BOM or RFC 4627
 	void DetectType() {
 		// BOM (Byte Order Mark):
@@ -230,6 +238,9 @@ public:
 	size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:
+	AutoUTFOutputStream(const AutoUTFOutputStream&);
+	AutoUTFOutputStream& operator=(const AutoUTFOutputStream&);
+
 	void PutBOM() { 
 		typedef void (*PutBOMFunc)(OutputByteStream&);
 		static const PutBOMFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(PutBOM) };
@@ -246,5 +257,9 @@ private:
 #undef RAPIDJSON_ENCODINGS_FUNC
 
 } // namespace rapidjson
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 #endif // RAPIDJSON_FILESTREAM_H_

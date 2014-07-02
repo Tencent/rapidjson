@@ -69,11 +69,6 @@ private:
 	bool eof_;
 };
 
-template<>
-struct StreamTraits<FileReadStream> {
-	typedef FileReadStream StreamCopyType;	// Enable stream copy optimization.
-};
-
 } // namespace rapidjson
 
 #endif // RAPIDJSON_FILESTREAM_H_

@@ -3,6 +3,11 @@
 
 #include "writer.h"
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Weffc++"
+#endif
+
 namespace rapidjson {
 
 //! Writer with indentation and spacing.
@@ -162,8 +167,17 @@ protected:
 
 	Ch indentChar_;
 	unsigned indentCharCount_;
+
+private:
+	// Prohibit copy constructor & assignment operator.
+	PrettyWriter(const PrettyWriter&);
+	PrettyWriter& operator=(const PrettyWriter&);
 };
 
 } // namespace rapidjson
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 #endif // RAPIDJSON_RAPIDJSON_H_

@@ -7,6 +7,9 @@
 using namespace rapidjson;
 
 class FileStreamTest : public ::testing::Test {
+public:
+	FileStreamTest() : filename_(), json_(), length_() {}
+
 	virtual void SetUp() {
 		FILE *fp = fopen(filename_ = "data/sample.json", "rb");
 		if (!fp) 
@@ -24,8 +27,13 @@ class FileStreamTest : public ::testing::Test {
 
 	virtual void TearDown() {
 		free(json_);
+		json_ = 0;
 	}
 
+private:
+	FileStreamTest(const FileStreamTest&);
+	FileStreamTest& operator=(const FileStreamTest&);
+	
 protected:
 	const char* filename_;
 	char *json_;

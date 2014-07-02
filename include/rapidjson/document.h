@@ -10,6 +10,11 @@
 #pragma warning(disable : 4127) // conditional expression is constant
 #endif
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Weffc++"
+#endif
+
 namespace rapidjson {
 
 // Forward declaration.
@@ -59,7 +64,7 @@ public:
 	//@{
 
 	//! Default constructor creates a null value.
-	GenericValue() : flags_(kNullFlag) {}
+	GenericValue() : data_(), flags_(kNullFlag) {}
 
 	//! Copy constructor is not permitted.
 private:
@@ -72,7 +77,7 @@ public:
 		\param type	Type of the value.
 		\note Default content for number is zero.
 	*/
-	GenericValue(Type type) : data_() {
+	GenericValue(Type type) : data_(), flags_() {
 		static const unsigned defaultFlags[7] = {
 			kNullFlag, kFalseFlag, kTrueFlag, kObjectFlag, kArrayFlag, kConstStringFlag,
 			kNumberAnyFlag
@@ -92,24 +97,24 @@ public:
 	GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator & allocator);
 
 	//! Constructor for boolean value.
-	explicit GenericValue(bool b) : flags_(b ? kTrueFlag : kFalseFlag) {}
+	explicit GenericValue(bool b) : data_(), flags_(b ? kTrueFlag : kFalseFlag) {}
 
 	//! Constructor for int value.
-	explicit GenericValue(int i) : flags_(kNumberIntFlag) {
+	explicit GenericValue(int i) : data_(), flags_(kNumberIntFlag) {
 		data_.n.i64 = i;
 		if (i >= 0)
 			flags_ |= kUintFlag | kUint64Flag;
 	}
 
 	//! Constructor for unsigned value.
-	explicit GenericValue(unsigned u) : flags_(kNumberUintFlag) {
+	explicit GenericValue(unsigned u) : data_(), flags_(kNumberUintFlag) {
 		data_.n.u64 = u; 
 		if (!(u & 0x80000000))
 			flags_ |= kIntFlag | kInt64Flag;
 	}
 
 	//! Constructor for int64_t value.
-	explicit GenericValue(int64_t i64) : flags_(kNumberInt64Flag) {
+	explicit GenericValue(int64_t i64) : data_(), flags_(kNumberInt64Flag) {
 		data_.n.i64 = i64;
 		if (i64 >= 0) {
 			flags_ |= kNumberUint64Flag;
@@ -123,7 +128,7 @@ public:
 	}
 
 	//! Constructor for uint64_t value.
-	explicit GenericValue(uint64_t u64) : flags_(kNumberUint64Flag) {
+	explicit GenericValue(uint64_t u64) : data_(), flags_(kNumberUint64Flag) {
 		data_.n.u64 = u64;
 		if (!(u64 & UINT64_C(0x8000000000000000)))
 			flags_ |= kInt64Flag;
@@ -134,10 +139,10 @@ public:
 	}
 
 	//! Constructor for double value.
-	explicit GenericValue(double d) : flags_(kNumberDoubleFlag) { data_.n.d = d; }
+	explicit GenericValue(double d) : data_(), flags_(kNumberDoubleFlag) { data_.n.d = d; }
 
 	//! Constructor for constant string (i.e. do not make a copy of string)
-	GenericValue(const Ch* s, SizeType length) { 
+	GenericValue(const Ch* s, SizeType length) : data_(), flags_() { 
 		RAPIDJSON_ASSERT(s != NULL);
 		flags_ = kConstStringFlag;
 		data_.s.str = s;
@@ -145,13 +150,13 @@ public:
 	}
 
 	//! Constructor for constant string (i.e. do not make a copy of string)
-	explicit GenericValue(const Ch* s) { SetStringRaw(s, internal::StrLen(s)); }
+	explicit GenericValue(const Ch* s) : data_(), flags_() { SetStringRaw(s, internal::StrLen(s)); }
 
 	//! Constructor for copy-string (i.e. do make a copy of string)
-	GenericValue(const Ch* s, SizeType length, Allocator& allocator) { SetStringRaw(s, length, allocator); }
+	GenericValue(const Ch* s, SizeType length, Allocator& allocator) : data_(), flags_() { SetStringRaw(s, length, allocator); }
 
 	//! Constructor for copy-string (i.e. do make a copy of string)
-	GenericValue(const Ch*s, Allocator& allocator) { SetStringRaw(s, internal::StrLen(s), allocator); }
+	GenericValue(const Ch*s, Allocator& allocator) : data_(), flags_() { SetStringRaw(s, internal::StrLen(s), allocator); }
 
 	//! Destructor.
 	/*! Need to destruct elements of array, members of object, or copy-string.
@@ -960,6 +965,10 @@ GenericValue<Encoding,Allocator>::GenericValue(const GenericValue<Encoding,Sourc
 
 #ifdef _MSC_VER
 #pragma warning(pop)
+#endif
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
 #endif
 
 #endif // RAPIDJSON_DOCUMENT_H_

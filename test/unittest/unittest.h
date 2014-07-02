@@ -1,13 +1,28 @@
 #ifndef UNITTEST_H_
 #define UNITTEST_H_
 
+
+// gtest indirectly included inttypes.h, without __STDC_CONSTANT_MACROS.
+#ifndef __STDC_CONSTANT_MACROS
+#  define __STDC_CONSTANT_MACROS 1 // required by C++ standard
+#endif
+
 #ifdef _MSC_VER
 #define _CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #pragma warning(disable : 4996) // 'function': was declared deprecated
 #endif
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Weffc++"
+#endif
+
 #include "gtest/gtest.h"
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 template <typename Ch>
 inline size_t StrLen(const Ch* s) {

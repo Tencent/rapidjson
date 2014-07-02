@@ -284,8 +284,9 @@ protected:
 	static const int kDefaultDoublePrecision = 6;
 
 private:
-	// Prohibit assignment for VC C4512 warning
-	Writer& operator=(const Writer& w);
+	// Prohibit copy constructor & assignment operator.
+	Writer(const Writer&);
+	Writer& operator=(const Writer&);
 };
 
 } // namespace rapidjson

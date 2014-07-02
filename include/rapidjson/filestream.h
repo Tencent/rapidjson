@@ -28,6 +28,10 @@ public:
 	size_t PutEnd(char*) { return 0; }
 
 private:
+	// Prohibit copy constructor & assignment operator.
+	FileStream(const FileStream&);
+	FileStream& operator=(const FileStream&);
+
 	void Read() {
 		RAPIDJSON_ASSERT(fp_ != 0);
 		int c = fgetc(fp_);
