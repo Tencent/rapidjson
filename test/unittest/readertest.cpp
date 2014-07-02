@@ -623,8 +623,9 @@ public:
 	size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:
-	// Not support copy constructor.
+	// Prohibit copy constructor & assignment operator.
 	CustomStringStream(const CustomStringStream&);
+	CustomStringStream& operator=(const CustomStringStream&);
 
 	const Ch* src_;		//!< Current read position.
 	const Ch* head_;	//!< Original head of the string.
@@ -637,7 +638,7 @@ namespace rapidjson {
 
 template <typename Encoding>
 struct StreamTraits<CustomStringStream<Encoding> > {
-	typedef CustomStringStream<Encoding> StreamCopyType;
+	enum { copyOptimization = 1 };
 };
 
 } // namespace rapdijson
