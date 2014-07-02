@@ -86,8 +86,7 @@ solution "test"
 	project "unittest"
 		kind "ConsoleApp"
 		
-		configuration "gmake"
-			buildoptions "-Weffc++"
+		buildoptions "-Weffc++"
 
 		files { 
 			"../include/**.h",
