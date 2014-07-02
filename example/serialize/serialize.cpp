@@ -58,8 +58,16 @@ private:
 class Dependent : public Person {
 public:
 	Dependent(const std::string& name, unsigned age, Education* education = 0) : Person(name, age), education_(education) {}
-	Dependent(const Dependent& rhs) : Person(rhs) { education_ = (rhs.education_ == 0) ? 0 : new Education(*rhs.education_); }
+	Dependent(const Dependent& rhs) : Person(rhs), education_(0) { education_ = (rhs.education_ == 0) ? 0 : new Education(*rhs.education_); }
 	virtual ~Dependent();
+
+	Dependent& operator=(const Dependent& rhs) {
+	    if (this == &rhs)
+	        return *this;
+        delete education_;
+		education_ = (rhs.education_ == 0) ? 0 : new Education(*rhs.education_);
+		return *this;
+	}
 
 	template <typename Writer>
 	void Serialize(Writer& writer) const {
@@ -77,6 +85,7 @@ public:
 	}
 
 private:
+
 	Education *education_;
 };
 
@@ -86,7 +95,7 @@ Dependent::~Dependent() {
 
 class Employee : public Person {
 public:
-	Employee(const std::string& name, unsigned age, bool married) : Person(name, age), married_(married) {}
+	Employee(const std::string& name, unsigned age, bool married) : Person(name, age), dependents_(), married_(married) {}
 	virtual ~Employee();
 
 	void AddDependent(const Dependent& dependent) {

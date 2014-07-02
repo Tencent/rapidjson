@@ -3,6 +3,11 @@
 
 #include "rapidjson.h"
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Weffc++"
+#endif
+
 namespace rapidjson {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -523,5 +528,9 @@ struct Transcoder<Encoding, Encoding> {
 };
 
 } // namespace rapidjson
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 #endif // RAPIDJSON_ENCODINGS_H_

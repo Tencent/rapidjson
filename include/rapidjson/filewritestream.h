@@ -56,6 +56,10 @@ public:
 	size_t PutEnd(char*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:
+	// Prohibit copy constructor & assignment operator.
+	FileWriteStream(const FileWriteStream&);
+	FileWriteStream& operator=(const FileWriteStream&);
+
 	FILE* fp_;
 	char *buffer_;
 	char *bufferEnd_;

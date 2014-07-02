@@ -8,14 +8,21 @@ using namespace rapidjson;
 
 class EncodedStreamTest : public ::testing::Test {
 public:
+	EncodedStreamTest() : json_(), length_() {}
+
 	virtual void SetUp() {
 		json_ = ReadFile("utf8.json", true, &length_);
 	}
 
 	virtual void TearDown() {
 		free(json_);
+		json_ = 0;
 	}
 
+private:
+	EncodedStreamTest(const EncodedStreamTest&);
+	EncodedStreamTest& operator=(const EncodedStreamTest&);
+	
 protected:
 	static FILE* Open(const char* filename) {
 		char buffer[1024];
@@ -40,8 +47,8 @@ protected:
 		*outLength = (size_t)ftell(fp);
 		fseek(fp, 0, SEEK_SET);
 		char* buffer = (char*)malloc(*outLength + 1);
-		fread(buffer, 1, *outLength, fp);
-		buffer[*outLength] = '\0';
+		size_t readLength = fread(buffer, 1, *outLength, fp);
+		buffer[readLength] = '\0';
 		fclose(fp);
 		return buffer;
 	}
@@ -131,7 +138,6 @@ protected:
 		remove(filename);
 	}
 
-	const char* filename_;
 	char *json_;
 	size_t length_;
 };

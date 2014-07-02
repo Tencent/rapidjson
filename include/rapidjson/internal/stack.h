@@ -69,6 +69,10 @@ public:
 	size_t GetCapacity() const { return stack_capacity_; }
 
 private:
+	// Prohibit copy constructor & assignment operator.
+	Stack(const Stack&);
+	Stack& operator=(const Stack&);
+
 	Allocator* allocator_;
 	Allocator* own_allocator_;
 	char *stack_;

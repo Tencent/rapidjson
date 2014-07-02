@@ -21,6 +21,8 @@ using namespace rapidjson;
 
 class RapidJson : public PerfTest {
 public:
+	RapidJson() : temp_(), doc_() {}
+
 	virtual void SetUp() {
 		PerfTest::SetUp();
 
@@ -35,6 +37,10 @@ public:
 		PerfTest::TearDown();
 		free(temp_);
 	}
+
+private:
+	RapidJson(const RapidJson&);
+	RapidJson& operator=(const RapidJson&);
 
 protected:
 	char *temp_;
@@ -165,6 +171,11 @@ TEST_F(RapidJson, DocumentTraverse) {
 	}
 }
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Weffc++"
+#endif
+
 struct ValueCounter : public BaseReaderHandler<> {
 	ValueCounter() : count_(1) {}	// root
 
@@ -173,6 +184,10 @@ struct ValueCounter : public BaseReaderHandler<> {
 
 	SizeType count_;
 };
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 TEST_F(RapidJson, DocumentAccept) {
 	for (size_t i = 0; i < kTrialCount; i++) {

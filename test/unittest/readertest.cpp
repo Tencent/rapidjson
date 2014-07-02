@@ -5,6 +5,11 @@
 
 using namespace rapidjson;
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Weffc++"
+#endif
+
 template<bool expect>
 struct ParseBoolHandler : BaseReaderHandler<> {
 	ParseBoolHandler() : step_(0) {}
@@ -33,7 +38,7 @@ TEST(Reader, ParseFalse) {
 }
 
 struct ParseIntHandler : BaseReaderHandler<> {
-	ParseIntHandler() : step_(0) {}
+	ParseIntHandler() : step_(0), actual_() {}
 	void Default() { FAIL(); }
 	void Int(int i) { actual_ = i; step_++; }
 
@@ -42,7 +47,7 @@ struct ParseIntHandler : BaseReaderHandler<> {
 };
 
 struct ParseUintHandler : BaseReaderHandler<> {
-	ParseUintHandler() : step_(0) {}
+	ParseUintHandler() : step_(0), actual_() {}
 	void Default() { FAIL(); }
 	void Uint(unsigned i) { actual_ = i; step_++; }
 
@@ -51,7 +56,7 @@ struct ParseUintHandler : BaseReaderHandler<> {
 };
 
 struct ParseInt64Handler : BaseReaderHandler<> {
-	ParseInt64Handler() : step_(0) {}
+	ParseInt64Handler() : step_(0), actual_() {}
 	void Default() { FAIL(); }
 	void Int64(int64_t i) { actual_ = i; step_++; }
 
@@ -60,7 +65,7 @@ struct ParseInt64Handler : BaseReaderHandler<> {
 };
 
 struct ParseUint64Handler : BaseReaderHandler<> {
-	ParseUint64Handler() : step_(0) {}
+	ParseUint64Handler() : step_(0), actual_() {}
 	void Default() { FAIL(); }
 	void Uint64(uint64_t i) { actual_ = i; step_++; }
 
@@ -69,7 +74,7 @@ struct ParseUint64Handler : BaseReaderHandler<> {
 };
 
 struct ParseDoubleHandler : BaseReaderHandler<> {
-	ParseDoubleHandler() : step_(0) {}
+	ParseDoubleHandler() : step_(0), actual_() {}
 	void Default() { FAIL(); }
 	void Double(double d) { actual_ = d; step_++; }
 
@@ -183,8 +188,12 @@ TEST(Reader, ParseNumber_Error) {
 
 template <typename Encoding>
 struct ParseStringHandler : BaseReaderHandler<Encoding> {
-	ParseStringHandler() : str_(0), length_(0) {}
+	ParseStringHandler() : str_(0), length_(0), copy_() {}
 	~ParseStringHandler() { EXPECT_TRUE(str_ != 0); if (copy_) free(const_cast<typename Encoding::Ch*>(str_)); }
+	
+	ParseStringHandler(const ParseStringHandler&);
+	ParseStringHandler& operator=(const ParseStringHandler&);
+
 	void Default() { FAIL(); }
 	void String(const typename Encoding::Ch* str, size_t length, bool copy) { 
 		EXPECT_EQ(0, str_);
@@ -652,3 +661,7 @@ TEST(Reader, CustomStringStream) {
 	reader.ParseObject<0>(s, h);
 	EXPECT_EQ(20u, h.step_);
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif

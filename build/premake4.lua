@@ -64,7 +64,7 @@ solution "test"
 		defines { "_CRT_SECURE_NO_WARNINGS" }
 		
 	configuration "gmake"
-		buildoptions "-msse4.2 -Werror=cast-qual"
+		buildoptions "-msse4.2 -Werror -Wall -Wextra"
 
 	project "gtest"
 		kind "StaticLib"
@@ -86,6 +86,8 @@ solution "test"
 	project "unittest"
 		kind "ConsoleApp"
 		
+		buildoptions "-Weffc++"
+
 		files { 
 			"../include/**.h",
 			"../test/unittest/**.cpp",
@@ -149,8 +151,8 @@ solution "example"
 	configuration "vs*"
 		defines { "_CRT_SECURE_NO_WARNINGS" }
 
---	configuration "gmake"
--- 		buildoptions "-Weverything"
+	configuration "gmake"
+		buildoptions "-Werror -Wall -Wextra -Weffc++"
 
 	project "condense"
 		kind "ConsoleApp"

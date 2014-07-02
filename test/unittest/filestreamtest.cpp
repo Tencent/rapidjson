@@ -7,6 +7,9 @@
 using namespace rapidjson;
 
 class FileStreamTest : public ::testing::Test {
+public:
+	FileStreamTest() : filename_(), json_(), length_() {}
+
 	virtual void SetUp() {
 		FILE *fp = fopen(filename_ = "data/sample.json", "rb");
 		if (!fp) 
@@ -17,15 +20,20 @@ class FileStreamTest : public ::testing::Test {
 		length_ = (size_t)ftell(fp);
 		fseek(fp, 0, SEEK_SET);
 		json_ = (char*)malloc(length_ + 1);
-		fread(json_, 1, length_, fp);
-		json_[length_] = '\0';
+		size_t readLength = fread(json_, 1, length_, fp);
+		json_[readLength] = '\0';
 		fclose(fp);
 	}
 
 	virtual void TearDown() {
 		free(json_);
+		json_ = 0;
 	}
 
+private:
+	FileStreamTest(const FileStreamTest&);
+	FileStreamTest& operator=(const FileStreamTest&);
+	
 protected:
 	const char* filename_;
 	char *json_;
