@@ -15,8 +15,8 @@ static char* ReadFile(const char* filename, size_t& length) {
 	length = (size_t)ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 	char* json = (char*)malloc(length + 1);
-	fread(json, 1, length, fp);
-	json[length] = '\0';
+	size_t readLength = fread(json, 1, length, fp);
+	json[readLength] = '\0';
 	fclose(fp);
 	return json;
 }
