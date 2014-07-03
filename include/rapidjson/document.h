@@ -368,6 +368,14 @@ public:
 		return *this;
 	}
 
+	GenericValue& Swap(GenericValue& other) {
+		char temp[sizeof(GenericValue)];
+		memcpy(&temp[0], this, sizeof(GenericValue));
+		memcpy(this, &other, sizeof(GenericValue));
+		memcpy(&other, temp, sizeof(GenericValue));
+		return *this;
+	}
+
 	//@}
 
 	//!@name Type
