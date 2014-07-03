@@ -44,8 +44,8 @@ int main(int, char*[]) {
 	printf("hello = %s\n", document["hello"].GetString());
 
 	// Since version 0.2, you can use single lookup to check the existing of member and its value:
-	Value::Member* hello = document.FindMember("hello");
-	assert(hello != 0);
+	Value::MemberIterator hello = document.FindMember("hello");
+	assert(hello != document.MemberEnd());
 	assert(hello->value.IsString());
 	assert(strcmp("world", hello->value.GetString()) == 0);
 	(void)hello;
