@@ -85,7 +85,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_ValidateEncoding)) {
 	}
 }
 
-TEST_F(RapidJson, SIMD_SUFFIX(DoucmentParseInsitu_MemoryPoolAllocator)) {
+TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseInsitu_MemoryPoolAllocator)) {
 	//const size_t userBufferSize = 128 * 1024;
 	//char* userBuffer = (char*)malloc(userBufferSize);
 
@@ -108,7 +108,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(DoucmentParseInsitu_MemoryPoolAllocator)) {
 	//free(userBuffer);
 }
 
-TEST_F(RapidJson, SIMD_SUFFIX(DoucmentParse_MemoryPoolAllocator)) {
+TEST_F(RapidJson, SIMD_SUFFIX(DocumentParse_MemoryPoolAllocator)) {
 	//const size_t userBufferSize = 128 * 1024;
 	//char* userBuffer = (char*)malloc(userBufferSize);
 
@@ -130,7 +130,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(DoucmentParse_MemoryPoolAllocator)) {
 	//free(userBuffer);
 }
 
-TEST_F(RapidJson, SIMD_SUFFIX(DoucmentParse_CrtAllocator)) {
+TEST_F(RapidJson, SIMD_SUFFIX(DocumentParse_CrtAllocator)) {
 	for (size_t i = 0; i < kTrialCount; i++) {
 		memcpy(temp_, json_, length_ + 1);
 		GenericDocument<UTF8<>, CrtAllocator> doc;

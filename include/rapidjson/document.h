@@ -285,12 +285,7 @@ public:
 	explicit GenericValue(double d) : data_(), flags_(kNumberDoubleFlag) { data_.n.d = d; }
 
 	//! Constructor for constant string (i.e. do not make a copy of string)
-	GenericValue(const Ch* s, SizeType length) : data_(), flags_() { 
-		RAPIDJSON_ASSERT(s != NULL);
-		flags_ = kConstStringFlag;
-		data_.s.str = s;
-		data_.s.length = length;
-	}
+	GenericValue(const Ch* s, SizeType length) : data_(), flags_() { SetStringRaw(s, length); }
 
 	//! Constructor for constant string (i.e. do not make a copy of string)
 	explicit GenericValue(const Ch* s) : data_(), flags_() { SetStringRaw(s, internal::StrLen(s)); }
@@ -427,14 +422,8 @@ public:
 		A better approach is to use the now public FindMember().
 	*/
 	GenericValue& operator[](const Ch* name) {
-		MemberIterator member = FindMember(name);
-		if (member != MemberEnd())
-			return member->value;
-		else {
-			RAPIDJSON_ASSERT(false);	// see above note
-			static GenericValue NullValue;
-			return NullValue;
-		}
+		GenericValue n(name, internal::StrLen(name));
+		return (*this)[n];
 	}
 	const GenericValue& operator[](const Ch* name) const { return const_cast<GenericValue&>(*this)[name]; }
 
@@ -486,15 +475,8 @@ public:
 			\c std::map, this has been changed to MemberEnd() now.
 	*/
 	MemberIterator FindMember(const Ch* name) {
-		RAPIDJSON_ASSERT(name);
-		RAPIDJSON_ASSERT(IsObject());
-
-		SizeType len = internal::StrLen(name);
-		MemberIterator member = MemberBegin();
-		for (; member != MemberEnd(); ++member)
-			if (member->name.data_.s.length == len && memcmp(member->name.data_.s.str, name, len * sizeof(Ch)) == 0)
-				break;
-		return member;
+		GenericValue n(name, internal::StrLen(name));
+		return FindMember(n);
 	}
 
 	ConstMemberIterator FindMember(const Ch* name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
@@ -565,13 +547,8 @@ public:
 	    \note Removing member is implemented by moving the last member. So the ordering of members is changed.
 	*/
 	bool RemoveMember(const Ch* name) {
-		MemberIterator m = FindMember(name);
-		if (m != MemberEnd()) {
-			RemoveMember(m);
-			return true;
-		}
-		else
-			return false;
+		GenericValue n(name, internal::StrLen(name));
+		return RemoveMember(n);
 	}
 
 	bool RemoveMember(const GenericValue& name) {
@@ -891,7 +868,7 @@ private:
 	};	// 12 bytes in 32-bit mode, 16 bytes in 64-bit mode
 
 	struct Array {
-		GenericValue<Encoding, Allocator>* elements;
+		GenericValue* elements;
 		SizeType size;
 		SizeType capacity;
 	};	// 12 bytes in 32-bit mode, 16 bytes in 64-bit mode
@@ -1004,7 +981,7 @@ public:
 
 	template <typename InputStream>
 	GenericDocument& ParseStream(InputStream& is) {
-		return ParseStream<0, Encoding, InputStream>(is);
+		return ParseStream<kParseDefaultFlags, Encoding, InputStream>(is);
 	}
 
 	//! Parse JSON text from a mutable string.
@@ -1024,7 +1001,7 @@ public:
 	}
 
 	GenericDocument& ParseInsitu(Ch* str) {
-		return ParseInsitu<0, Encoding>(str);
+		return ParseInsitu<kParseDefaultFlags, Encoding>(str);
 	}
 
 	//! Parse JSON text from a read-only string.
@@ -1044,7 +1021,7 @@ public:
 	}
 
 	GenericDocument& Parse(const Ch* str) {
-		return Parse<0>(str);
+		return Parse<kParseDefaultFlags>(str);
 	}
 
 	//! Whether a parse error was occured in the last parsing.

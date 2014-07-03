@@ -1,4 +1,7 @@
 /bin/*
+!/bin/data
+!/bin/encodings
+!/bin/jsonchecker
 /build/*.exe
 /build/gmake
 /build/vs*/

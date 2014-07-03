@@ -71,7 +71,7 @@ enum ParseErrorCode {
 	kParseErrorStringMissQuotationMark,			//!< Missing a closing quotation mark in string.
 	kParseErrorStringInvalidEncoding,			//!< Invalid encoidng in string.
 
-	kParesErrorNumberTooBig,					//!< Number too big to be stored in double.
+	kParseErrorNumberTooBig,					//!< Number too big to be stored in double.
 	kParseErrorNumberMissFraction,				//!< Miss fraction part in number.
 	kParseErrorNumberMissExponent				//!< Miss exponent in number.
 };
@@ -224,7 +224,7 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
 		x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w1));
 		x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w2));
 		x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w3));
-		unsigned short r = ~_mm_movemask_epi8(x);
+		unsigned short r = (unsigned short)~_mm_movemask_epi8(x);
 		if (r == 0)	// all 16 characters are whitespace
 			p += 16;
 		else {		// some of characters may be non-whitespace
@@ -323,7 +323,7 @@ public:
 
 	template <typename InputStream, typename Handler>
 	bool Parse(InputStream& is, Handler& handler) {
-		return Parse<0>(is, handler);
+		return Parse<kParseDefaultFlags>(is, handler);
 	}
 
 	bool HasParseError() const { return parseErrorCode_ != kParseErrorNone; }
@@ -610,7 +610,7 @@ private:
 				}
 		}
 		else
-			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell());
+			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
 
 		// Parse 64bit int
 		uint64_t i64 = 0;
@@ -643,7 +643,7 @@ private:
 			d = (double)i64;
 			while (s.Peek() >= '0' && s.Peek() <= '9') {
 				if (d >= 1E307)
-					RAPIDJSON_PARSE_ERROR(kParesErrorNumberTooBig, is.Tell());
+					RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
 				d = d * 10 + (s.Take() - '0');
 			}
 		}
@@ -662,7 +662,7 @@ private:
 				--expFrac;
 			}
 			else
-				RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, is.Tell());
+				RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, s.Tell());
 
 			while (s.Peek() >= '0' && s.Peek() <= '9') {
 				if (expFrac > -16) {
@@ -695,11 +695,11 @@ private:
 				while (s.Peek() >= '0' && s.Peek() <= '9') {
 					exp = exp * 10 + (s.Take() - '0');
 					if (exp > 308)
-						RAPIDJSON_PARSE_ERROR(kParesErrorNumberTooBig, is.Tell());
+						RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
 				}
 			}
 			else
-				RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissExponent, is.Tell());
+				RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissExponent, s.Tell());
 
 			if (expMinus)
 				exp = -exp;

@@ -27,7 +27,7 @@ TEST(Value, assignment_operator) {
 
 template <typename Value>
 void TestCopyFrom() {
-	Value::AllocatorType a;
+	typename Value::AllocatorType a;
 	Value v1(1234);
 	Value v2(v1, a); // deep copy constructor
 	EXPECT_TRUE(v1.GetType() == v2.GetType());
