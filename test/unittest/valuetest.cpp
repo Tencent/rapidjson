@@ -504,18 +504,35 @@ TEST(Value, Object) {
 	// AddMember()
 	Value name("A", 1);
 	Value value("Apple", 5);
-	x.AddMember(name, value, allocator);
-	//name.SetString("B");
-	name.SetString("B", 1);
-	//value.SetString("Banana");
+	x.AddMember(name, value, allocator);	// AddMember(Value&, Value&, Allocator)
 	value.SetString("Banana", 6);
-	x.AddMember(name, value, allocator);
+	x.AddMember("B", value, allocator);		// AddMember(const Ch*, Value&, Allocator)
 
 	// Tests a member with null character
 	const Value C0D("C\0D", 3);
 	name.SetString(C0D.GetString(), 3);
 	value.SetString("CherryD", 7);
 	x.AddMember(name, value, allocator);
+
+	// AddMember<T>(const Ch*, T, Allocator)
+	{
+		Value o(kObjectType);
+		o.AddMember("true", true, allocator);
+		o.AddMember("false", false, allocator);
+		o.AddMember("int", -1, allocator);
+		o.AddMember("uint", 1u, allocator);
+		o.AddMember("int64", INT64_C(-4294967296), allocator);
+		o.AddMember("uint64", UINT64_C(4294967296), allocator);
+		o.AddMember("double", 3.14, allocator);
+		o.AddMember("string", "Jelly", allocator);
+
+		EXPECT_TRUE(o["true"].GetBool());
+		EXPECT_FALSE(o["false"].GetBool());
+		EXPECT_EQ(-1, o["int"].GetInt());
+		EXPECT_EQ(1u, o["uint"].GetInt());
+		EXPECT_EQ(INT64_C(-4294967296), o["int64"].GetInt64());
+		EXPECT_EQ(UINT64_C(4294967296), o["uint64"].GetUint64());
+	}
 
 	// HasMember()
 	EXPECT_TRUE(x.HasMember("A"));

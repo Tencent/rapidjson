@@ -524,19 +524,31 @@ public:
 		return *this;
 	}
 
-	GenericValue& AddMember(const Ch* name, Allocator& nameAllocator, GenericValue& value, Allocator& allocator) {
-		GenericValue n(name, internal::StrLen(name), nameAllocator);
-		return AddMember(n, value, allocator);
-	}
-
+	//! Add a member to the object with copy-string name.
+	/*! \param name Name of member (as copy-string).
+		\param value Value of any type.
+	    \param allocator Allocator for name and reallocating memory.
+	    \return The value itself for fluent API.
+	    \note The ownership of value will be transfered to this object if success.
+	    \note If constant string name is needed, use AddMember(Value(name), v).
+	*/
 	GenericValue& AddMember(const Ch* name, GenericValue& value, Allocator& allocator) {
-		GenericValue n(name, internal::StrLen(name));
+		GenericValue n(name, allocator);
 		return AddMember(n, value, allocator);
 	}
 
+	//! Add a member to the object with copy-string name and primitive value.
+	/*!	\tparam T Either bool, int, unsigned, int64_t, uint64_t, const Ch*
+		\param name Name of member (as copy-string).
+		\param value Primitive value.
+	    \param allocator Allocator for name and reallocating memory.
+	    \return The value itself for fluent API.
+	    \note The ownership of value will be transfered to this object if success.
+	    \note If constant string name is needed, use AddMember(Value(name), v).
+	*/
 	template <typename T>
 	GenericValue& AddMember(const Ch* name, T value, Allocator& allocator) {
-		GenericValue n(name, internal::StrLen(name));
+		GenericValue n(name, allocator);
 		GenericValue v(value);
 		return AddMember(n, v, allocator);
 	}
