@@ -8,7 +8,7 @@ As shown in [Usage at a glance](../readme.md#usage-at-a-glance), a JSON text can
 
 Each JSON value is stored in a type called `Value`. A `Document`, representing the DOM, contains the root of `Value`.
 
-### Querying Value
+### Query Value
 
 In this section, we will use excerpt of [`example/tutorial/tutorial.cpp`](../example/tutorial/tutorial.cpp).
 
@@ -115,7 +115,7 @@ Note that, RapidJSON does not automatically convert values between JSON types. I
 
 In the following, details about querying individual types are discussed.
 
-### Querying Array
+### Query Array
 
 By default, `SizeType` is typedef of `unsigned`. In most systems, array is limited to store up to 2^32-1 elements.
 
@@ -200,7 +200,7 @@ Note that, an integer value may be obtained in various ways without conversion. 
 
 When obtaining the numeric values, `GetDouble()` will convert internal integer representation to a `double`. Note that, `int` and `uint` can be safely convert to `double`, but `int64_t` and `uint64_t` may lose precision (since mantissa of `double` is only 52-bits).
 
-### Querying String
+### Query String
 
 In addition to `GetString()`, the `Value` class also contains `GetStringLength()`. Here explains why.
 
@@ -273,7 +273,7 @@ Why? What is the advantage of this semantics?
 
 The simple answer is performance. For fixed size JSON types (Number, True, False, Null), copying them is fast and easy. However, For variable size JSON types (String, Array, Object), copying them will incur a lot of overheads. And these overheads are often unnoticed. Especially when we need to create temporary object, copy it to another variable, and then destruct it.
 
-For example, if normal copy semantics is used
+For example, if normal *copy* semantics was used:
 
 ```cpp
 Value o(kObjectType);
@@ -286,13 +286,15 @@ Value o(kObjectType);
 }
 ```
 
-The object o needs to allocate a same size buffer as contacts, makes a deep clone of it, and then finally contacts is destructed. This will incur a lot of unnecessary allocations/deallocations.
+![move2](diagram/move2.png?raw=true)
+
+The object `o` needs to allocate a buffer of same size as contacts, makes a deep clone of it, and then finally contacts is destructed. This will incur a lot of unnecessary allocations/deallocations and memory copying.
 
 There are solutions to prevent actual copying these data, such as reference counting and garbage collection(GC).
 
-To make rapidjson simple and fast, we chose to use move semantics for assignment. It is similar to auto_ptr<> which transfer ownership during assignment. Move is much faster and simpler, it just destructs the original value, memcpy() the source to destination, and finally sets the source as Null type.
+To make RapidJSON simple and fast, we chose to use *move* semantics for assignment. It is similar to `std::auto_ptr` which transfer ownership during assignment. Move is much faster and simpler, it just destructs the original value, `memcpy()` the source to destination, and finally sets the source as Null type.
 
-So, with move semantics, the above example become:
+So, with move semantics, the above example becomes:
 
 ```cpp
 Value o(kObjectType);
@@ -304,19 +306,21 @@ Value o(kObjectType);
 }
 ```
 
-This is called move assignment operator in C++11. As RapidJSON supports C++03, it adopts move semantics as default.
+![move3](diagram/move3.png?raw=true)
 
-### Manipulating String
+This is called move assignment operator in C++11. As RapidJSON supports C++03, it adopts move semantics using normal copy constructor, assignment operator, and all other modifying function like `AddMember()`, `PushBack()`, which will be discussed soon.
+
+### Create String
 RapidJSON provide two strategies for storing string.
 
 1. copy-string: allocates a buffer, and then copy the source data into it.
 2. const-string: simply store a pointer of string.
 
-Copy-string is always safe because it owns a copy of the data. Const-string can be used for storing string literal, and in-situ parsing which we will mentioned in Document.
+Copy-string is always safe because it owns a copy of the data. Const-string can be used for storing string literal, and in-situ parsing which we will mentioned in Document section.
 
-To make memory allocation customizable, rapidjson needs user to pass an instance of allocator, whenever that operation may require allocation. This design is more flexible than STL's allocator type per class, as we can assign a allocator instance for each allocation.
+To make memory allocation customizable, RapidJSON requires user to pass an instance of allocator, whenever an operation may require allocation. This design is more flexible than STL's allocator type per class, as we can assign an allocator instance for each allocation.
 
-Therefore, when we assign a copy-string, we call this overloaded SetString() with allocator:
+Therefore, when we assign a copy-string, we call this overloaded `SetString()` with allocator:
 
 ```cpp
 Document document;
@@ -328,11 +332,11 @@ memset(buffer, 0, sizeof(buffer));
 // author.GetString() still contains "Milo Yip" after buffer is destroyed
 ```
 
-In this example, we get the allocator from a Document instance. This is a common idiom when using rapidjson. But you may use other instances of allocator.
+In this example, we get the allocator from a `Document` instance. This is a common idiom when using RapidJSON. But you may use other instances of allocator.
 
-Besides, the above SetString() requires the length of a string. This can handle null characters within a string. There is another SetString() overloaded function without the length parameter. And it actually assumes the input is null-terminated and calls a strlen()-like function to obtain the length.
+Besides, the above `SetString()` requires length. This can handle null characters within a string. There is another `SetString()` overloaded function without the length parameter. And it assumes the input is null-terminated and calls a `strlen()`-like function to obtain the length.
 
-Finally, for literal string or string with safe life-cycle can use const-string version of SetString(), which are without alloactor parameter:
+Finally, for literal string or string with safe life-cycle can use const-string version of `SetString()`, which lacks alloactor parameter:
 
 ```cpp
 Value s;
@@ -341,7 +345,7 @@ s.SetString("rapidjson");    // slower, assumes null-terminated
 s = "rapidjson";             // shortcut, same as above
 ```
 
-### Manipulating Array
+### Modify Array
 Value with array type provides similar APIs as `std::vector`.
 
 * `Clear()`
@@ -359,7 +363,7 @@ Value a(kArrayType);
 Document::AllocatorType& allocator = document.GetAllocator();
 
 for (int i = 5; i <= 10; i++)
-    a.PushBack(i, allocator);   // allocator is needed for potentially realloc.
+    a.PushBack(i, allocator);   // allocator is needed for potential realloc().
 
 // Fluent interface
 a.PushBack("Lua", allocator).PushBack("Mio", allocator);
@@ -367,7 +371,7 @@ a.PushBack("Lua", allocator).PushBack("Mio", allocator);
 
 Differs from STL, `PushBack()`/`PopBack()` returns the array reference itself. This is called fluent interface.
 
-### Manipulating Object
+### Modify Object
 Object is a collection of key-value pairs. Each key must be a string value. The way to manipulating object is to add/remove members:
 
 * `Value& AddMember(Value&, Value&, Allocator& allocator)`
@@ -376,7 +380,7 @@ Object is a collection of key-value pairs. Each key must be a string value. The 
 * `template <typename T> Value& AddMember(const Ch*, T value, Allocator&)`
 * `bool RemoveMember(const Ch*)`
 
-There are 4 overloaded version of AddMember(). They are 4 combinations for supplying the name string (copy- or const-), whether to supply a different allocator for name string, and whether use generic type for value.
+There are 4 overloaded version of `AddMember()`. They are 4 combinations for supplying the name string (copy- or const-), whether to supply a different allocator for name string, and whether use generic type for value.
 
 Here is an example.
 
@@ -386,9 +390,31 @@ contact.AddMember("name", "Milo", document.GetAllocator());
 contact.AddMember("married", true, document.GetAllocator());
 ```
 
-### Object
+### Deep Copy Value
+Although we mentioned that copying values implicitly may have performance problem, sometimes, explicit copying is needed. Threr are two APIs for deep copy: constructor with allocator and `CopyFrom()`.
 
-### Array
+```cpp
+Document d;
+Document::AllocatorType& a = d.GetAllocator();
+Value v1("foo");
+// Value v2(v1); // not allowed
 
-### String
+Value v2(v1, a);                                // make a copy
+RAPIDJSON_ASSERT(v1.IsString());                // v1 untouched
+d.SetArray().PushBack(v1, a).PushBack(v2, a);
+RAPIDJSON_ASSERT(v1.IsNull() && v2.IsNull());   // both moved to d
 
+v2.CopyFrom(d, a);                              // copy whole document to v2
+RAPIDJSON_ASSERT(d.IsArray() && d.Size() == 2); // d untouched
+v1.SetObject().AddMember( "array", v2, a );
+d.PushBack(v1,a);
+```
+
+### Swap Values
+
+## What's next
+
+Stream
+Encoding
+DOM
+SAX
