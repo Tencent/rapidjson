@@ -1,8 +1,6 @@
 #ifndef RAPIDJSON_ERROR_ERROR_H__
 #define RAPIDJSON_ERROR_ERROR_H__
 
-#include "../reader.h"	// ParseErrorCode
-
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_ERROR_CHARTYPE
 
@@ -28,6 +26,39 @@
 #endif
 
 namespace rapidjson {
+
+///////////////////////////////////////////////////////////////////////////////
+// ParseErrorCode
+
+//! Error code of parsing.
+/*! \see GenericReader::Parse, GenericReader::GetParseErrorCode
+*/
+enum ParseErrorCode {
+	kParseErrorNone = 0,						//!< No error.
+
+	kParseErrorDocumentEmpty,					//!< The document is empty.
+	kParseErrorDocumentRootNotObjectOrArray,	//!< The document root must be either object or array.
+	kParseErrorDocumentRootNotSingular,			//!< The document root must not follow by other values.
+
+	kParseErrorValueInvalid,					//!< Invalid value.
+
+	kParseErrorObjectMissName,					//!< Missing a name for object member.
+	kParseErrorObjectMissColon,					//!< Missing a colon after a name of object member.
+	kParseErrorObjectMissCommaOrCurlyBracket,	//!< Missing a comma or '}' after an object member.
+
+	kParseErrorArrayMissCommaOrSquareBracket,	//!< Missing a comma or ']' after an array element.
+
+	kParseErrorStringUnicodeEscapeInvalidHex,	//!< Incorrect hex digit after \\u escape in string.
+	kParseErrorStringUnicodeSurrogateInvalid,	//!< The surrogate pair in string is invalid.
+	kParseErrorStringEscapeInvalid,				//!< Invalid escape character in string.
+	kParseErrorStringMissQuotationMark,			//!< Missing a closing quotation mark in string.
+	kParseErrorStringInvalidEncoding,			//!< Invalid encoidng in string.
+
+	kParseErrorNumberTooBig,					//!< Number too big to be stored in double.
+	kParseErrorNumberMissFraction,				//!< Miss fraction part in number.
+	kParseErrorNumberMissExponent				//!< Miss exponent in number.
+};
+
 
 //! Function pointer type of GetParseError().
 /*! This is the prototype for GetParseError_X(), where X is a locale.

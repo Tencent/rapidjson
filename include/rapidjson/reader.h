@@ -41,6 +41,8 @@ RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
 	RAPIDJSON_MULTILINEMACRO_END
 #endif
 
+#include "error/error.h" // ParseErrorCode
+
 namespace rapidjson {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -53,33 +55,6 @@ enum ParseFlag {
 	kParseDefaultFlags = 0,			//!< Default parse flags. Non-destructive parsing. Text strings are decoded into allocated buffer.
 	kParseInsituFlag = 1,			//!< In-situ(destructive) parsing.
 	kParseValidateEncodingFlag = 2	//!< Validate encoding of JSON strings.
-};
-
-//! Error code of parsing.
-enum ParseErrorCode {
-	kParseErrorNone = 0,						//!< No error.
-	
-	kParseErrorDocumentEmpty,					//!< The document is empty.
-	kParseErrorDocumentRootNotObjectOrArray,	//!< The document root must be either object or array.
-	kParseErrorDocumentRootNotSingular,			//!< The document root must not follow by other values.
-	
-	kParseErrorValueInvalid,					//!< Invalid value.
-	
-	kParseErrorObjectMissName,					//!< Missing a name for object member.
-	kParseErrorObjectMissColon,					//!< Missing a colon after a name of object member.
-	kParseErrorObjectMissCommaOrCurlyBracket,	//!< Missing a comma or '}' after an object member.
-	
-	kParseErrorArrayMissCommaOrSquareBracket,	//!< Missing a comma or ']' after an array element.
-
-	kParseErrorStringUnicodeEscapeInvalidHex,	//!< Incorrect hex digit after \\u escape in string.
-	kParseErrorStringUnicodeSurrogateInvalid,	//!< The surrogate pair in string is invalid.
-	kParseErrorStringEscapeInvalid,				//!< Invalid escape character in string.
-	kParseErrorStringMissQuotationMark,			//!< Missing a closing quotation mark in string.
-	kParseErrorStringInvalidEncoding,			//!< Invalid encoidng in string.
-
-	kParseErrorNumberTooBig,					//!< Number too big to be stored in double.
-	kParseErrorNumberMissFraction,				//!< Miss fraction part in number.
-	kParseErrorNumberMissExponent				//!< Miss exponent in number.
 };
 
 ///////////////////////////////////////////////////////////////////////////////
