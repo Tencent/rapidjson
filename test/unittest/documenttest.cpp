@@ -47,6 +47,28 @@ TEST(Document, Parse) {
 		EXPECT_EQ(i + 1, a[i].GetUint());
 }
 
+TEST(Document, Swap) {
+	Document d1;
+	Document::AllocatorType& a = d1.GetAllocator();
+
+	d1.SetArray().PushBack(1, a).PushBack(2, a);
+
+	Value o;
+	o.SetObject().AddMember("a", 1, a);
+
+	// Swap between Document and Value
+	d1.Swap(o);
+	EXPECT_TRUE(d1.IsObject());
+	EXPECT_TRUE(o.IsArray());
+
+	// Swap between Document and Document
+	Document d2;
+	d2.SetArray().PushBack(3, a);
+	d1.Swap(d2);
+	EXPECT_TRUE(d1.IsArray());
+	EXPECT_TRUE(d2.IsObject());
+}
+
 // This should be slow due to assignment in inner-loop.
 struct OutputStringStream : public std::ostringstream {
 	typedef char Ch;
