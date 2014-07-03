@@ -5,11 +5,6 @@
 #include "internal/strfunc.h"
 #include <new>		// placement new
 
-#ifndef RAPIDJSON_NOMEMBERITERATORCLASS
-#include "internal/meta.h"
-#include <iterator> // std::iterator, std::random_access_iterator_tag
-#endif
-
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable : 4127) // conditional expression is constant
@@ -18,6 +13,11 @@
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Weffc++"
+#endif
+
+#ifndef RAPIDJSON_NOMEMBERITERATORCLASS
+#include "internal/meta.h"
+#include <iterator> // std::iterator, std::random_access_iterator_tag
 #endif
 
 namespace rapidjson {
