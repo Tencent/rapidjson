@@ -420,7 +420,8 @@ public:
 		A better approach is to use the now public FindMember().
 	*/
 	GenericValue& operator[](const Ch* name) {
-		if (MemberIterator member = FindMember(name))
+		MemberIterator member = FindMember(name);
+		if (member != MemberEnd())
 			return member->value;
 		else {
 			RAPIDJSON_ASSERT(false);	// see above note
@@ -433,7 +434,8 @@ public:
 	// This version is faster because it does not need a StrLen(). 
 	// It can also handle string with null character.
 	GenericValue& operator[](const GenericValue& name) {
-		if (Member* member = FindMember(name))
+		MemberIterator member = FindMember(name);
+		if (member != MemberEnd())
 			return member->value;
 		else {
 			RAPIDJSON_ASSERT(false);	// see above note
@@ -443,37 +445,51 @@ public:
 	}
 	const GenericValue& operator[](const GenericValue& name) const { return const_cast<GenericValue&>(*this)[name]; }
 
-	//! Member iterators.
-	ConstMemberIterator MemberBegin() const	{ RAPIDJSON_ASSERT(IsObject()); return data_.o.members; }
-	ConstMemberIterator MemberEnd()	const	{ RAPIDJSON_ASSERT(IsObject()); return data_.o.members + data_.o.size; }
-	MemberIterator MemberBegin()			{ RAPIDJSON_ASSERT(IsObject()); return data_.o.members; }
-	MemberIterator MemberEnd()				{ RAPIDJSON_ASSERT(IsObject()); return data_.o.members + data_.o.size; }
+	//! Const member iterator
+	/*! \pre IsObject() == true */
+	ConstMemberIterator MemberBegin() const	{ RAPIDJSON_ASSERT(IsObject()); return ConstMemberIterator(data_.o.members); }
+	//! Const \em past-the-end member iterator
+	/*! \pre IsObject() == true */
+	ConstMemberIterator MemberEnd()	const	{ RAPIDJSON_ASSERT(IsObject()); return ConstMemberIterator(data_.o.members + data_.o.size); }
+	//! Member iterator
+	/*! \pre IsObject() == true */
+	MemberIterator MemberBegin()			{ RAPIDJSON_ASSERT(IsObject()); return MemberIterator(data_.o.members); }
+	//! \em Past-the-end member iterator
+	/*! \pre IsObject() == true */
+	MemberIterator MemberEnd()				{ RAPIDJSON_ASSERT(IsObject()); return MemberIterator(data_.o.members + data_.o.size); }
 
 	//! Check whether a member exists in the object.
 	/*!
 		\note It is better to use FindMember() directly if you need the obtain the value as well.
 	*/
-	bool HasMember(const Ch* name) const { return FindMember(name) != 0; }
+	bool HasMember(const Ch* name) const { return FindMember(name) != MemberEnd(); }
 
 	// This version is faster because it does not need a StrLen(). 
 	// It can also handle string with null character.
-	bool HasMember(const GenericValue& name) const { return FindMember(name) != 0; }
+	bool HasMember(const GenericValue& name) const { return FindMember(name) != MemberEnd(); }
 
 	//! Find member by name.
 	/*!
-		\return Return the member if exists. Otherwise returns null pointer.
+		\pre IsObject() == true
+		\return Iterator to member, if it exists.
+			Otherwise returns \ref MemberEnd().
+
+		\note Earlier versions of Rapidjson returned a \c NULL pointer, in case
+			the requested member doesn't exist. For consistency with e.g.
+			\c std::map, this has been changed to MemberEnd() now.
 	*/
 	MemberIterator FindMember(const Ch* name) {
 		RAPIDJSON_ASSERT(name);
 		RAPIDJSON_ASSERT(IsObject());
 
 		SizeType len = internal::StrLen(name);
-		for (MemberIterator member = MemberBegin(); member != MemberEnd(); ++member)
+		MemberIterator member = MemberBegin();
+		for (; member != MemberEnd(); ++member)
 			if (member->name.data_.s.length == len && memcmp(member->name.data_.s.str, name, len * sizeof(Ch)) == 0)
-				return member;
-
-		return 0;
+				break;
+		return member;
 	}
+
 	ConstMemberIterator FindMember(const Ch* name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
 
 	// This version is faster because it does not need a StrLen(). 
@@ -482,11 +498,11 @@ public:
 		RAPIDJSON_ASSERT(IsObject());
 		RAPIDJSON_ASSERT(name.IsString());
 		SizeType len = name.data_.s.length;
-		for (MemberIterator member = MemberBegin(); member != MemberEnd(); ++member)
+		MemberIterator member = MemberBegin();
+		for ( ; member != MemberEnd(); ++member)
 			if (member->name.data_.s.length == len && memcmp(member->name.data_.s.str, name.data_.s.str, len * sizeof(Ch)) == 0)
-				return member;
-
-		return 0;
+				break;
+		return member;
 	}
 	ConstMemberIterator FindMember(const GenericValue& name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
 
@@ -543,7 +559,7 @@ public:
 	*/
 	bool RemoveMember(const Ch* name) {
 		MemberIterator m = FindMember(name);
-		if (m) {
+		if (m != MemberEnd()) {
 			RemoveMember(m);
 			return true;
 		}
@@ -553,7 +569,7 @@ public:
 
 	bool RemoveMember(const GenericValue& name) {
 		MemberIterator m = FindMember(name);
-		if (m) {
+		if (m != MemberEnd()) {
 			RemoveMember(m);
 			return true;
 		}
@@ -572,7 +588,7 @@ public:
 		RAPIDJSON_ASSERT(data_.o.members != 0);
 		RAPIDJSON_ASSERT(m >= MemberBegin() && m < MemberEnd());
 
-		MemberIterator last = data_.o.members + (data_.o.size - 1);
+		MemberIterator last(data_.o.members + (data_.o.size - 1));
 		if (data_.o.size > 1 && m != last) {
 			// Move the last one to this place
 			m->name = last->name;
