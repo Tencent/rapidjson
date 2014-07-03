@@ -40,9 +40,9 @@ struct GenericMember {
 
 #ifndef RAPIDJSON_NOMEMBERITERATORCLASS
 
-//! (Const) member iterator for a JSON object value
+//! (Constant) member iterator for a JSON object value
 /*!
-	\tparam Const Is this a const iterator?
+	\tparam Const Is this a constant iterator?
 	\tparam Encoding	Encoding of the value. (Even non-string values need to have the same encoding in a document)
 	\tparam Allocator	Allocator type for allocating memory of object, array and string.
 
@@ -74,9 +74,9 @@ class GenericMemberIterator
 public:
 	//! Iterator type itself
 	typedef GenericMemberIterator Type;
-	//! Const iterator type
+	//! Constant iterator type
 	typedef GenericMemberIterator<true,Encoding,Allocator>  ConstType;
-	//! Non-const iterator type
+	//! Non-constant iterator type
 	typedef GenericMemberIterator<false,Encoding,Allocator> NonConstType;
 
 	//! Pointer to (const) GenericMember
@@ -97,8 +97,8 @@ public:
 		\param it (Non-const) iterator to copy from
 
 		Allows the creation of an iterator from another GenericMemberIterator
-		that is "less const".  Especially, creating a non-const iterator from
-		a const iterator are disabled:
+		that is "less const".  Especially, creating a non-constant iterator
+		from a constant iterator are disabled:
 		\li const -> non-const (not ok)
 		\li const -> const (ok)
 		\li non-const -> const (ok)
@@ -108,8 +108,7 @@ public:
 			constructor effectively defines a regular copy-constructor.
 			Otherwise, the copy constructor is implicitly defined.
 	*/
-	GenericMemberIterator(const NonConstType & it)
-		: ptr_( it.ptr_ ) {}
+	GenericMemberIterator(const NonConstType & it) : ptr_( it.ptr_ ) {}
 
 	//! @name stepping
 	//@{
@@ -149,7 +148,7 @@ public:
 	DifferenceType operator-(Type that) const { return ptr_-that.ptr_; }
 
 private:
-	//!< Internal constructor from plain pointer
+	//! Internal constructor from plain pointer
 	explicit GenericMemberIterator(Pointer p) : ptr_(p) {}
 
 	Pointer ptr_; //!< raw pointer
