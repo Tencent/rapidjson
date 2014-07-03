@@ -56,6 +56,16 @@ TEST(Value, CopyFrom)
 	EXPECT_NE(v1[1].GetString(), v2[1].GetString()); // string got copied
 }
 
+TEST(Value, Swap) {
+	Value v1(1234);
+	Value v2(kObjectType);
+
+	EXPECT_EQ(&v1, &v1.Swap(v2));
+	EXPECT_TRUE(v1.IsObject());
+	EXPECT_TRUE(v2.IsInt());
+	EXPECT_EQ(1234, v2.GetInt());
+}
+
 TEST(Value, Null) {
 	// Default constructor
 	Value x;
