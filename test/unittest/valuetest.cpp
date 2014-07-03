@@ -529,7 +529,7 @@ TEST(Value, Object) {
 		EXPECT_TRUE(o["true"].GetBool());
 		EXPECT_FALSE(o["false"].GetBool());
 		EXPECT_EQ(-1, o["int"].GetInt());
-		EXPECT_EQ(1u, o["uint"].GetInt());
+		EXPECT_EQ(1u, o["uint"].GetUint());
 		EXPECT_EQ(INT64_C(-4294967296), o["int64"].GetInt64());
 		EXPECT_EQ(UINT64_C(4294967296), o["uint64"].GetUint64());
 	}
