@@ -15,13 +15,18 @@
 #pragma GCC diagnostic ignored "-Weffc++"
 #endif
 
+#ifndef RAPIDJSON_NOMEMBERITERATORCLASS
+#include "internal/meta.h"
+#include <iterator> // std::iterator, std::random_access_iterator_tag
+#endif
+
 namespace rapidjson {
 
 // Forward declaration.
 template <typename Encoding, typename Allocator>
 class GenericValue;
 
-//! Name-value pair in an object.
+//! Name-value pair in a JSON object value.
 /*!
 	This class was internal to GenericValue. It used to be a inner struct.
 	But a compiler (IBM XL C/C++ for AIX) have reported to have problem with that so it moved as a namespace scope struct.
@@ -32,6 +37,144 @@ struct GenericMember {
 	GenericValue<Encoding, Allocator> name;		//!< name of member (must be a string)
 	GenericValue<Encoding, Allocator> value;	//!< value of member.
 };
+
+#ifndef RAPIDJSON_NOMEMBERITERATORCLASS
+
+//! (Constant) member iterator for a JSON object value
+/*!
+	\tparam Const Is this a constant iterator?
+	\tparam Encoding	Encoding of the value. (Even non-string values need to have the same encoding in a document)
+	\tparam Allocator	Allocator type for allocating memory of object, array and string.
+
+	This class implements a Random Access Iterator for GenericMember elements
+	of a GenericValue, see ISO/IEC 14882:2003(E) C++ standard, 24.1 [lib.iterator.requirements].
+
+	\note This iterator implementation is mainly intended to avoid implicit
+		conversions from iterator values to \c NULL,
+		e.g. from GenericValue::FindMember.
+
+	\note Define \c RAPIDJSON_NOMEMBERITERATORCLASS to fall back to a
+		pointer-based implementation, if your platform doesn't provide
+		the C++ <iterator> header.
+
+	\see GenericMember, GenericValue::MemberIterator, GenericValue::ConstMemberIterator
+ */
+template <bool Const, typename Encoding, typename Allocator>
+class GenericMemberIterator
+	: public std::iterator<std::random_access_iterator_tag
+		, typename internal::MaybeAddConst<Const,GenericMember<Encoding,Allocator> >::Type> {
+
+	friend class GenericValue<Encoding,Allocator>;
+	template <bool, typename, typename> friend class GenericMemberIterator;
+
+	typedef GenericMember<Encoding,Allocator> PlainType;
+	typedef typename internal::MaybeAddConst<Const,PlainType>::Type ValueType;
+	typedef std::iterator<std::random_access_iterator_tag,ValueType> BaseType;
+
+public:
+	//! Iterator type itself
+	typedef GenericMemberIterator Type;
+	//! Constant iterator type
+	typedef GenericMemberIterator<true,Encoding,Allocator>  ConstType;
+	//! Non-constant iterator type
+	typedef GenericMemberIterator<false,Encoding,Allocator> NonConstType;
+
+	//! Pointer to (const) GenericMember
+	typedef typename BaseType::pointer         Pointer;
+	//! Reference to (const) GenericMember
+	typedef typename BaseType::reference       Reference;
+	//! Signed integer type (e.g. \c ptrdiff_t)
+	typedef typename BaseType::difference_type DifferenceType;
+
+	//! Default constructor (singular value)
+	/*! Creates an iterator pointing to no element.
+		\note All operations, except for comparisons, are undefined on such values.
+	 */
+	GenericMemberIterator() : ptr_() {}
+
+	//! Iterator conversions to more const
+	/*!
+		\param it (Non-const) iterator to copy from
+
+		Allows the creation of an iterator from another GenericMemberIterator
+		that is "less const".  Especially, creating a non-constant iterator
+		from a constant iterator are disabled:
+		\li const -> non-const (not ok)
+		\li const -> const (ok)
+		\li non-const -> const (ok)
+		\li non-const -> non-const (ok)
+
+		\note If the \c Const template parameter is already \c false, this
+			constructor effectively defines a regular copy-constructor.
+			Otherwise, the copy constructor is implicitly defined.
+	*/
+	GenericMemberIterator(const NonConstType & it) : ptr_( it.ptr_ ) {}
+
+	//! @name stepping
+	//@{
+	Type& operator++(){ ++ptr_; return *this; }
+	Type& operator--(){ --ptr_; return *this; }
+	Type  operator++(int){ Type old(*this); ++ptr_; return old; }
+	Type  operator--(int){ Type old(*this); --ptr_; return old; }
+	//@}
+
+	//! @name increment/decrement
+	//@{
+	Type operator+(DifferenceType n) const { return Type(ptr_+n); }
+	Type operator-(DifferenceType n) const { return Type(ptr_-n); }
+
+	Type& operator+=(DifferenceType n) { ptr_+=n; return *this; }
+	Type& operator-=(DifferenceType n) { ptr_-=n; return *this; }
+	//@}
+
+	//! @name relations
+	//@{
+	bool operator==(Type that) const { return ptr_ == that.ptr_; }
+	bool operator!=(Type that) const { return ptr_ != that.ptr_; }
+	bool operator<=(Type that) const { return ptr_ <= that.ptr_; }
+	bool operator>=(Type that) const { return ptr_ >= that.ptr_; }
+	bool operator< (Type that) const { return ptr_ < that.ptr_; }
+	bool operator> (Type that) const { return ptr_ > that.ptr_; }
+	//@}
+
+	//! @name dereference
+	//@{
+	Reference operator*() const { return *ptr_; }
+	Pointer   operator->() const { return ptr_; }
+	Reference operator[](DifferenceType n) const { return ptr_[n]; }
+	//@}
+
+	//! Distance
+	DifferenceType operator-(Type that) const { return ptr_-that.ptr_; }
+
+private:
+	//! Internal constructor from plain pointer
+	explicit GenericMemberIterator(Pointer p) : ptr_(p) {}
+
+	Pointer ptr_; //!< raw pointer
+};
+
+#else // RAPIDJSON_NOMEMBERITERATORCLASS
+
+// class-based member iterator implementation disabled, use plain pointers
+
+template <bool Const, typename Encoding, typename Allocator>
+struct GenericMemberIterator;
+
+//! non-const GenericMemberIterator
+template <typename Encoding, typename Allocator>
+struct GenericMemberIterator<false,Encoding,Allocator> {
+	//! use plain pointer as iterator type
+	typedef GenericMember<Encoding,Allocator>* Type;
+};
+//! const GenericMemberIterator
+template <typename Encoding, typename Allocator>
+struct GenericMemberIterator<true,Encoding,Allocator> {
+	//! use plain const pointer as iterator type
+	typedef const GenericMember<Encoding,Allocator>* Type;
+};
+
+#endif // RAPIDJSON_NOMEMBERITERATORCLASS
 
 ///////////////////////////////////////////////////////////////////////////////
 // GenericValue
@@ -55,8 +198,8 @@ public:
 	typedef Encoding EncodingType;					//!< Encoding type from template parameter.
 	typedef Allocator AllocatorType;				//!< Allocator type from template parameter.
 	typedef typename Encoding::Ch Ch;				//!< Character type derived from Encoding.
-	typedef Member* MemberIterator;					//!< Member iterator for iterating in object.
-	typedef const Member* ConstMemberIterator;		//!< Constant member iterator for iterating in object.
+	typedef typename GenericMemberIterator<false,Encoding,Allocator>::Type MemberIterator;	//!< Member iterator for iterating in object.
+	typedef typename GenericMemberIterator<true,Encoding,Allocator>::Type ConstMemberIterator;	//!< Constant member iterator for iterating in object.
 	typedef GenericValue* ValueIterator;			//!< Value iterator for iterating in array.
 	typedef const GenericValue* ConstValueIterator;	//!< Constant value iterator for iterating in array.
 
@@ -276,7 +419,8 @@ public:
 		A better approach is to use the now public FindMember().
 	*/
 	GenericValue& operator[](const Ch* name) {
-		if (MemberIterator member = FindMember(name))
+		MemberIterator member = FindMember(name);
+		if (member != MemberEnd())
 			return member->value;
 		else {
 			RAPIDJSON_ASSERT(false);	// see above note
@@ -289,7 +433,8 @@ public:
 	// This version is faster because it does not need a StrLen(). 
 	// It can also handle string with null character.
 	GenericValue& operator[](const GenericValue& name) {
-		if (Member* member = FindMember(name))
+		MemberIterator member = FindMember(name);
+		if (member != MemberEnd())
 			return member->value;
 		else {
 			RAPIDJSON_ASSERT(false);	// see above note
@@ -299,37 +444,51 @@ public:
 	}
 	const GenericValue& operator[](const GenericValue& name) const { return const_cast<GenericValue&>(*this)[name]; }
 
-	//! Member iterators.
-	ConstMemberIterator MemberBegin() const	{ RAPIDJSON_ASSERT(IsObject()); return data_.o.members; }
-	ConstMemberIterator MemberEnd()	const	{ RAPIDJSON_ASSERT(IsObject()); return data_.o.members + data_.o.size; }
-	MemberIterator MemberBegin()			{ RAPIDJSON_ASSERT(IsObject()); return data_.o.members; }
-	MemberIterator MemberEnd()				{ RAPIDJSON_ASSERT(IsObject()); return data_.o.members + data_.o.size; }
+	//! Const member iterator
+	/*! \pre IsObject() == true */
+	ConstMemberIterator MemberBegin() const	{ RAPIDJSON_ASSERT(IsObject()); return ConstMemberIterator(data_.o.members); }
+	//! Const \em past-the-end member iterator
+	/*! \pre IsObject() == true */
+	ConstMemberIterator MemberEnd()	const	{ RAPIDJSON_ASSERT(IsObject()); return ConstMemberIterator(data_.o.members + data_.o.size); }
+	//! Member iterator
+	/*! \pre IsObject() == true */
+	MemberIterator MemberBegin()			{ RAPIDJSON_ASSERT(IsObject()); return MemberIterator(data_.o.members); }
+	//! \em Past-the-end member iterator
+	/*! \pre IsObject() == true */
+	MemberIterator MemberEnd()				{ RAPIDJSON_ASSERT(IsObject()); return MemberIterator(data_.o.members + data_.o.size); }
 
 	//! Check whether a member exists in the object.
 	/*!
 		\note It is better to use FindMember() directly if you need the obtain the value as well.
 	*/
-	bool HasMember(const Ch* name) const { return FindMember(name) != 0; }
+	bool HasMember(const Ch* name) const { return FindMember(name) != MemberEnd(); }
 
 	// This version is faster because it does not need a StrLen(). 
 	// It can also handle string with null character.
-	bool HasMember(const GenericValue& name) const { return FindMember(name) != 0; }
+	bool HasMember(const GenericValue& name) const { return FindMember(name) != MemberEnd(); }
 
 	//! Find member by name.
 	/*!
-		\return Return the member if exists. Otherwise returns null pointer.
+		\pre IsObject() == true
+		\return Iterator to member, if it exists.
+			Otherwise returns \ref MemberEnd().
+
+		\note Earlier versions of Rapidjson returned a \c NULL pointer, in case
+			the requested member doesn't exist. For consistency with e.g.
+			\c std::map, this has been changed to MemberEnd() now.
 	*/
 	MemberIterator FindMember(const Ch* name) {
 		RAPIDJSON_ASSERT(name);
 		RAPIDJSON_ASSERT(IsObject());
 
 		SizeType len = internal::StrLen(name);
-		for (MemberIterator member = MemberBegin(); member != MemberEnd(); ++member)
+		MemberIterator member = MemberBegin();
+		for (; member != MemberEnd(); ++member)
 			if (member->name.data_.s.length == len && memcmp(member->name.data_.s.str, name, len * sizeof(Ch)) == 0)
-				return member;
-
-		return 0;
+				break;
+		return member;
 	}
+
 	ConstMemberIterator FindMember(const Ch* name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
 
 	// This version is faster because it does not need a StrLen(). 
@@ -338,11 +497,11 @@ public:
 		RAPIDJSON_ASSERT(IsObject());
 		RAPIDJSON_ASSERT(name.IsString());
 		SizeType len = name.data_.s.length;
-		for (MemberIterator member = MemberBegin(); member != MemberEnd(); ++member)
+		MemberIterator member = MemberBegin();
+		for ( ; member != MemberEnd(); ++member)
 			if (member->name.data_.s.length == len && memcmp(member->name.data_.s.str, name.data_.s.str, len * sizeof(Ch)) == 0)
-				return member;
-
-		return 0;
+				break;
+		return member;
 	}
 	ConstMemberIterator FindMember(const GenericValue& name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
 
@@ -399,7 +558,7 @@ public:
 	*/
 	bool RemoveMember(const Ch* name) {
 		MemberIterator m = FindMember(name);
-		if (m) {
+		if (m != MemberEnd()) {
 			RemoveMember(m);
 			return true;
 		}
@@ -409,7 +568,7 @@ public:
 
 	bool RemoveMember(const GenericValue& name) {
 		MemberIterator m = FindMember(name);
-		if (m) {
+		if (m != MemberEnd()) {
 			RemoveMember(m);
 			return true;
 		}
@@ -428,7 +587,7 @@ public:
 		RAPIDJSON_ASSERT(data_.o.members != 0);
 		RAPIDJSON_ASSERT(m >= MemberBegin() && m < MemberEnd());
 
-		MemberIterator last = data_.o.members + (data_.o.size - 1);
+		MemberIterator last(data_.o.members + (data_.o.size - 1));
 		if (data_.o.size > 1 && m != last) {
 			// Move the last one to this place
 			m->name = last->name;
