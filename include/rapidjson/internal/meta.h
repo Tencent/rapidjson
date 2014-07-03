@@ -43,7 +43,7 @@ template <typename T> struct EnableIfCond<true, T> { typedef T Type; };
 template <typename T> struct EnableIfCond<false, T> { /* empty */ };
 
 template <bool Condition, typename T = void>
-struct DisableIfCond : EnableIfCond<not Condition, T> {};
+struct DisableIfCond : EnableIfCond<!Condition, T> {};
 
 template <typename Condition, typename T = void>
 struct EnableIf : EnableIfCond<Condition::Value, T> {};
