@@ -610,7 +610,7 @@ private:
 				}
 		}
 		else
-			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell());
+			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
 
 		// Parse 64bit int
 		uint64_t i64 = 0;
@@ -643,7 +643,7 @@ private:
 			d = (double)i64;
 			while (s.Peek() >= '0' && s.Peek() <= '9') {
 				if (d >= 1E307)
-					RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, is.Tell());
+					RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
 				d = d * 10 + (s.Take() - '0');
 			}
 		}
@@ -662,7 +662,7 @@ private:
 				--expFrac;
 			}
 			else
-				RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, is.Tell());
+				RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, s.Tell());
 
 			while (s.Peek() >= '0' && s.Peek() <= '9') {
 				if (expFrac > -16) {
@@ -695,11 +695,11 @@ private:
 				while (s.Peek() >= '0' && s.Peek() <= '9') {
 					exp = exp * 10 + (s.Take() - '0');
 					if (exp > 308)
-						RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, is.Tell());
+						RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
 				}
 			}
 			else
-				RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissExponent, is.Tell());
+				RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissExponent, s.Tell());
 
 			if (expMinus)
 				exp = -exp;
