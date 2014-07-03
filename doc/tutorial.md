@@ -36,7 +36,7 @@ Document document;
 document.Parse(json);
 ```
 
-The JSON text is now parsed into `document` as a DOM tree:
+The JSON text is now parsed into `document` as a *DOM tree*:
 
 ![tutorial](diagram/tutorial.png?raw=true)
 
@@ -135,7 +135,7 @@ And other familar query functions:
 
 ### Quering Object
 
-Similarly, we can iterate object members by iterator:
+Similar to array, we can iterate object members by iterator:
 
 ```cpp
 static const char* kTypeNames[] = 
@@ -165,7 +165,7 @@ If we are unsure whether a member exists, we need to call `HasMember()` before c
 
 ```cpp
 Value::ConstMemberIterator itr = document.FindMember("hello");
-if (itr != 0)
+if (itr != document.MemberEnd())
     printf("%s %s\n", itr->value.GetString());
 ```
 
@@ -259,6 +259,7 @@ Value a(kArrayType);
 ```
 
 ### Move Semantics
+
 A very special decision during design of RapidJSON is that, assignment of value does not copy the source value to destination value. Instead, the value from source is moved to the destination. For example,
 
 ```cpp
@@ -308,7 +309,7 @@ Value o(kObjectType);
 
 ![move3](diagram/move3.png?raw=true)
 
-This is called move assignment operator in C++11. As RapidJSON supports C++03, it adopts move semantics using normal copy constructor, assignment operator, and all other modifying function like `AddMember()`, `PushBack()`, which will be discussed soon.
+This is called move assignment operator in C++11. As RapidJSON supports C++03, it adopts move semantics using assignment operator, and all other modifying function like `AddMember()`, `PushBack()`.
 
 ### Create String
 RapidJSON provide two strategies for storing string.
@@ -375,12 +376,9 @@ Differs from STL, `PushBack()`/`PopBack()` returns the array reference itself. T
 Object is a collection of key-value pairs. Each key must be a string value. The way to manipulating object is to add/remove members:
 
 * `Value& AddMember(Value&, Value&, Allocator& allocator)`
-* `Value& AddMember(const Ch*, Allocator&, GenericValue& value, Allocator&)`
 * `Value& AddMember(const Ch*, Value&, Allocator&)`
 * `template <typename T> Value& AddMember(const Ch*, T value, Allocator&)`
 * `bool RemoveMember(const Ch*)`
-
-There are 4 overloaded version of `AddMember()`. They are 4 combinations for supplying the name string (copy- or const-), whether to supply a different allocator for name string, and whether use generic type for value.
 
 Here is an example.
 
@@ -391,7 +389,7 @@ contact.AddMember("married", true, document.GetAllocator());
 ```
 
 ### Deep Copy Value
-Although we mentioned that copying values implicitly may have performance problem, sometimes, explicit copying is needed. Threr are two APIs for deep copy: constructor with allocator and `CopyFrom()`.
+If we really need to copy a DOM tree, we can use two APIs for deep copy: constructor with allocator, and `CopyFrom()`.
 
 ```cpp
 Document d;
@@ -399,22 +397,40 @@ Document::AllocatorType& a = d.GetAllocator();
 Value v1("foo");
 // Value v2(v1); // not allowed
 
-Value v2(v1, a);                                // make a copy
-RAPIDJSON_ASSERT(v1.IsString());                // v1 untouched
+Value v2(v1, a);                      // make a copy
+assert(v1.IsString());                // v1 untouched
 d.SetArray().PushBack(v1, a).PushBack(v2, a);
-RAPIDJSON_ASSERT(v1.IsNull() && v2.IsNull());   // both moved to d
+assert(v1.IsNull() && v2.IsNull());   // both moved to d
 
-v2.CopyFrom(d, a);                              // copy whole document to v2
-RAPIDJSON_ASSERT(d.IsArray() && d.Size() == 2); // d untouched
+v2.CopyFrom(d, a);                    // copy whole document to v2
+assert(d.IsArray() && d.Size() == 2); // d untouched
 v1.SetObject().AddMember( "array", v2, a );
 d.PushBack(v1,a);
 ```
 
 ### Swap Values
 
+`Swap()` is also provided.
+
+```cpp
+Value a(123);
+Value b("Hello");
+a.Swap(b);
+assert(a.IsString());
+assert(b.IsInt());
+```
+
+Swapping two DOM trees is fast (constant time), despite the complexity of the tress.
+
 ## What's next
 
-Stream
-Encoding
-DOM
-SAX
+This tutorial shows the basics of DOM tree query and manipulation. There are several important concepts in RapidJSON:
+
+1. [Streams](stream.md) are channels for reading/writing JSON, which can be a in-memory string, or file stream, etc. Uesr can also create their streams.
+2. [Encoding](encoding.md) defines which character set is used in streams and memory. RapidJSON also provide Unicode conversion/validation internally.
+3. [DOM](dom.md)'s basics are already covered in this tutorial. Uncover more advanced features such as insitu-parsing, other parsing options and advanced usages.
+4. [SAX](sax.md) is the foundation of parsing/generating facility in RapidJSON. Learn how to use `Reader`/`Writer` to implement even faster applications. Also try `PrettyWriter` to format the JSON.
+5. [Performance](performance.md) shows some in-house and thirdparty benchmarks.
+6. [Implementation](implementation.md) describes some internal designs and techniques of RapidJSON.
+
+You may also refer to the FAQ, API documentation, examples and unit tests.
