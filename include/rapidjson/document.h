@@ -518,12 +518,12 @@ public:
 		if (o.size >= o.capacity) {
 			if (o.capacity == 0) {
 				o.capacity = kDefaultObjectCapacity;
-				o.members = (Member*)allocator.Malloc(o.capacity * sizeof(Member));
+				o.members = reinterpret_cast<Member*>(allocator.Malloc(o.capacity * sizeof(Member)));
 			}
 			else {
 				SizeType oldCapacity = o.capacity;
 				o.capacity *= 2;
-				o.members = (Member*)allocator.Realloc(o.members, oldCapacity * sizeof(Member), o.capacity * sizeof(Member));
+				o.members = reinterpret_cast<Member*>(allocator.Realloc(o.members, oldCapacity * sizeof(Member), o.capacity * sizeof(Member)));
 			}
 		}
 		o.members[o.size].name.RawAssign(name);

@@ -130,7 +130,7 @@ public:
 	//! Computes the total capacity of allocated memory chunks.
 	/*! \return total capacity in bytes.
 	*/
-	size_t Capacity() {
+	size_t Capacity() const {
 		size_t capacity = 0;
 		for (ChunkHeader* c = chunkHead_; c != 0; c = c->next)
 			capacity += c->capacity;
@@ -140,7 +140,7 @@ public:
 	//! Computes the memory blocks allocated.
 	/*! \return total used bytes.
 	*/
-	size_t Size() {
+	size_t Size() const {
 		size_t size = 0;
 		for (ChunkHeader* c = chunkHead_; c != 0; c = c->next)
 			size += c->size;
@@ -196,7 +196,7 @@ private:
 	/*! \param capacity Capacity of the chunk in bytes.
 	*/
 	void AddChunk(size_t capacity) {
-		ChunkHeader* chunk = (ChunkHeader*)baseAllocator_->Malloc(sizeof(ChunkHeader) + capacity);
+		ChunkHeader* chunk = reinterpret_cast<ChunkHeader*>(baseAllocator_->Malloc(sizeof(ChunkHeader) + capacity));
 		chunk->capacity = capacity;
 		chunk->size = 0;
 		chunk->next = chunkHead_;
