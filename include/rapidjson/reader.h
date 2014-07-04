@@ -491,7 +491,7 @@ private:
 		InputStream& s(copy.s);
 
 		if (parseFlags & kParseInsituFlag) {
-			Ch *head = s.PutBegin();
+			typename InputStream::Ch *head = s.PutBegin();
 			ParseStringToStream<parseFlags, SourceEncoding, SourceEncoding>(s, s);
 			if (HasParseError())
 				return;
