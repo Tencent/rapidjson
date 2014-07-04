@@ -101,6 +101,44 @@ TEST(Document, ParseStream_EncodedInputStream) {
 	}
 }
 
+TEST(Document, ParseStream_AutoUTFInputStream) {
+	// Any -> UTF8
+	FILE* fp = OpenEncodedFile("utf32BE.json");
+	char buffer[256];
+	FileReadStream bis(fp, buffer, sizeof(buffer));
+	AutoUTFInputStream<unsigned, FileReadStream> eis(bis);
+
+	Document d;
+	d.ParseStream<0, AutoUTF<unsigned> >(eis);
+	EXPECT_FALSE(d.HasParseError());
+
+	fclose(fp);
+
+	char expected[] = "I can eat glass and it doesn't hurt me.";
+	Value& v = d["en"];
+	EXPECT_TRUE(v.IsString());
+	EXPECT_EQ(sizeof(expected) - 1, v.GetStringLength());
+	EXPECT_EQ(0, StrCmp(expected, v.GetString()));
+
+	// UTF8 -> UTF8 in memory
+	StringBuffer bos;
+	Writer<StringBuffer> writer(bos);
+	d.Accept(writer);
+
+	{
+		// Condense the original file and compare.
+		FILE *fp = OpenEncodedFile("utf8.json");
+		FileReadStream is(fp, buffer, sizeof(buffer));
+		Reader reader;
+		StringBuffer bos2;
+		Writer<StringBuffer> writer(bos2);
+		reader.Parse(is, writer);
+
+		EXPECT_EQ(bos.GetSize(), bos2.GetSize());
+		EXPECT_EQ(0, memcmp(bos.GetString(), bos2.GetString(), bos2.GetSize()));
+	}
+}
+
 TEST(Document, Swap) {
 	Document d1;
 	Document::AllocatorType& a = d1.GetAllocator();

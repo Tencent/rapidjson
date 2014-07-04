@@ -662,6 +662,50 @@ TEST(Reader, CustomStringStream) {
 	EXPECT_EQ(20u, h.step_);
 }
 
+#include <sstream>
+
+class IStreamWrapper {
+public:
+	typedef char Ch;
+
+	IStreamWrapper(std::istream& is) : is_(is) {}
+
+	Ch Peek() const {
+		int c = is_.peek();
+		return c == std::char_traits<char>::eof() ? '\0' : (Ch)c;
+	}
+
+	Ch Take() { 
+		int c = is_.get();
+		return c == std::char_traits<char>::eof() ? '\0' : (Ch)c;
+	}
+
+	size_t Tell() const { return (size_t)is_.tellg(); }
+
+	Ch* PutBegin() { assert(false); return 0; }
+	void Put(Ch) { assert(false); }
+	void Flush() { assert(false); }
+	size_t PutEnd(Ch*) { assert(false); return 0; }
+
+private:
+	IStreamWrapper(const IStreamWrapper&);
+	IStreamWrapper& operator=(const IStreamWrapper&);
+
+	std::istream& is_;
+};
+
+TEST(Reader, Parse_IStreamWrapper_StringStream) {
+	const char* json = "[1,2,3,4]";
+
+	std::stringstream ss(json);
+	IStreamWrapper is(ss);
+
+	Reader reader;
+	ParseArrayHandler<4> h;
+	reader.ParseArray<0>(is, h);
+	EXPECT_FALSE(reader.HasParseError());	
+}
+
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif

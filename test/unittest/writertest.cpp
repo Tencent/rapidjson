@@ -121,3 +121,42 @@ TEST(Writer, Transcode) {
 	reader.Parse<0>(s, writer);
 	EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3],\"dollar\":\"\x24\",\"cents\":\"\xC2\xA2\",\"euro\":\"\xE2\x82\xAC\",\"gclef\":\"\xF0\x9D\x84\x9E\"}", buffer.GetString());
 }
+
+#include <sstream>
+
+class OStreamWrapper {
+public:
+	typedef char Ch;
+
+	OStreamWrapper(std::ostream& os) : os_(os) {}
+
+	Ch Peek() const { assert(false); return '\0'; }
+	Ch Take() { assert(false); return '\0'; }
+	size_t Tell() const {  }
+
+	Ch* PutBegin() { assert(false); return 0; }
+	void Put(Ch c) { os_.put(c); }
+	void Flush() { os_.flush(); }
+	size_t PutEnd(Ch*) { assert(false); return 0; }
+
+private:
+	OStreamWrapper(const OStreamWrapper&);
+	OStreamWrapper& operator=(const OStreamWrapper&);
+
+	std::ostream& os_;
+};
+
+TEST(Writer, OStreamWrapper) {
+	StringStream s("{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] } ");
+	
+	std::stringstream ss;
+	OStreamWrapper os(ss);
+	
+	Writer<OStreamWrapper> writer(os);
+
+	Reader reader;
+	reader.Parse<0>(s, writer);
+	
+	std::string actual = ss.str();
+	EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3]}", actual.c_str());
+}
