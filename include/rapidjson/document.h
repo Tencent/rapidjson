@@ -319,6 +319,9 @@ public:
 			case kCopyStringFlag:
 				Allocator::Free(const_cast<Ch*>(data_.s.str));
 				break;
+
+			default:
+				break;	// Do nothing for other types.
 			}
 		}
 	}
@@ -794,6 +797,9 @@ int z = a[0u].GetInt();				// This works too.
 			else if (IsUint64())	handler.Uint64(data_.n.u64);
 			else					handler.Double(data_.n.d);
 			break;
+
+		default:
+			RAPIDJSON_ASSERT(false);
 		}
 		return *this;
 	}

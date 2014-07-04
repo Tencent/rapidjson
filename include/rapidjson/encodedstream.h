@@ -158,10 +158,11 @@ private:
 			case 0x01: type_ = kUTF32LE; break;
 			case 0x05: type_ = kUTF16LE; break;
 			case 0x0F: type_ = kUTF8;    break;
+			default: break; // Use type defined by user.
 			}
 		}
 
-		// RUntime check whether the size of character type is sufficient. It only perform checks with assertion.
+		// Runtime check whether the size of character type is sufficient. It only perform checks with assertion.
 		switch (type_) {
 		case kUTF8:
 			// Do nothing
@@ -174,6 +175,8 @@ private:
 		case kUTF32BE:
 			RAPIDJSON_ASSERT(sizeof(Ch) >= 4);
 			break;
+		default:
+			RAPIDJSON_ASSERT(false);	// Invalid type
 		}
 	}
 
@@ -216,6 +219,8 @@ public:
 		case kUTF8:
 			// Do nothing
 			break;
+		default:
+			RAPIDJSON_ASSERT(false);	// Invalid UTFType
 		}
 
 		static const PutFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Put) };
