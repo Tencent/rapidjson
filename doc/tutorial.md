@@ -431,6 +431,6 @@ This tutorial shows the basics of DOM tree query and manipulation. There are sev
 3. [DOM](dom.md)'s basics are already covered in this tutorial. Uncover more advanced features such as *in situ* parsing, other parsing options and advanced usages.
 4. [SAX](sax.md) is the foundation of parsing/generating facility in RapidJSON. Learn how to use `Reader`/`Writer` to implement even faster applications. Also try `PrettyWriter` to format the JSON.
 5. [Performance](performance.md) shows some in-house and third-party benchmarks.
-6. [Implementation](implementation.md) describes some internal designs and techniques of RapidJSON.
+6. [Internals](internals.md) describes some internal designs and techniques of RapidJSON.
 
 You may also refer to the FAQ, API documentation, examples and unit tests.
