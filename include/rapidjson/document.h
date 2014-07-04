@@ -363,11 +363,16 @@ public:
 		return *this;
 	}
 
+	//! Exchange the contents of this value with those of other.
+	/*!
+		\param other Another value.
+		\note Constant complexity.
+	*/
 	GenericValue& Swap(GenericValue& other) {
-		char temp[sizeof(GenericValue)];
-		memcpy(&temp[0], this, sizeof(GenericValue));
-		memcpy(this, &other, sizeof(GenericValue));
-		memcpy(&other, temp, sizeof(GenericValue));
+		GenericValue temp;
+		temp.RawAssign(*this);
+		RawAssign(other);
+		other.RawAssign(temp);
 		return *this;
 	}
 
