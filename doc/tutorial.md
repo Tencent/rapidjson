@@ -2,7 +2,7 @@
 
 This tutorial introduces the basics of the Document Object Model(DOM) API.
 
-As shown in [Usage at a glance](../readme.md#usage-at-a-glance), a JSON text can be parsed into DOM, and then the DOM can be queried and modfied easily, and finally be converted back to JSON text.
+As shown in [Usage at a glance](../readme.md#usage-at-a-glance), a JSON text can be parsed into DOM, and then the DOM can be queried and modified easily, and finally be converted back to JSON text.
 
 ## Value & Document
 
@@ -119,7 +119,7 @@ In the following, details about querying individual types are discussed.
 
 By default, `SizeType` is typedef of `unsigned`. In most systems, array is limited to store up to 2^32-1 elements.
 
-You may access the elements in array by integer literal, for example, `a[1]`, `a[2]`. However, `a[0]` will generate a compiler error. It is because two overloaded operators `operator[](SizeType)` and `operator[](const char*)` is avaliable, and C++ can treat `0` as a null pointer. Workarounds:
+You may access the elements in array by integer literal, for example, `a[1]`, `a[2]`. However, `a[0]` will generate a compiler error. It is because two overloaded operators `operator[](SizeType)` and `operator[](const char*)` is available, and C++ can treat `0` as a null pointer. Workarounds:
 * `a[SizeType(0)]`
 * `a[0u]`
 
@@ -129,11 +129,11 @@ for (Value::ConstValueIterator itr = a.Begin(); itr != a.End(); ++itr)
     printf("%d ", itr->GetInt());
 ```
 
-And other familar query functions:
+And other familiar query functions:
 * `SizeType Capacity() const`
 * `bool Empty() const`
 
-### Quering Object
+### Query Object
 
 Similar to array, we can iterate object members by iterator:
 
@@ -196,7 +196,7 @@ Checking          | Obtaining
 `bool IsInt64()`  | `int64_t GetInt64()`
 `bool IsDouble()` | `double GetDouble()`
 
-Note that, an integer value may be obtained in various ways without conversion. For example, A value `x` containing 123 will make `x.IsInt() == x.IsUint() == x.IsInt64() == x.IsUint64() == ture`. But a value `y` containing -3000000000 will only makes `x.IsInt64() == true`.
+Note that, an integer value may be obtained in various ways without conversion. For example, A value `x` containing 123 will make `x.IsInt() == x.IsUint() == x.IsInt64() == x.IsUint64() == true`. But a value `y` containing -3000000000 will only makes `x.IsInt64() == true`.
 
 When obtaining the numeric values, `GetDouble()` will convert internal integer representation to a `double`. Note that, `int` and `uint` can be safely convert to `double`, but `int64_t` and `uint64_t` may lose precision (since mantissa of `double` is only 52-bits).
 
@@ -204,7 +204,7 @@ When obtaining the numeric values, `GetDouble()` will convert internal integer r
 
 In addition to `GetString()`, the `Value` class also contains `GetStringLength()`. Here explains why.
 
-According to RFC 4627, JSON strings can contain unicode character `U+0000`, which must be escaped as `"\u0000"`. The problem is that, C/C++ often uses null-terminated string, which treats ``\0'` as the terminator symbol.
+According to RFC 4627, JSON strings can contain Unicode character `U+0000`, which must be escaped as `"\u0000"`. The problem is that, C/C++ often uses null-terminated string, which treats ``\0'` as the terminator symbol.
 
 To conform RFC 4627, RapidJSON supports string containing `U+0000`. If you need to handle this, you can use `GetStringLength()` API to obtain the correct length of string.
 
@@ -337,7 +337,7 @@ In this example, we get the allocator from a `Document` instance. This is a comm
 
 Besides, the above `SetString()` requires length. This can handle null characters within a string. There is another `SetString()` overloaded function without the length parameter. And it assumes the input is null-terminated and calls a `strlen()`-like function to obtain the length.
 
-Finally, for literal string or string with safe life-cycle can use const-string version of `SetString()`, which lacks alloactor parameter:
+Finally, for literal string or string with safe life-cycle can use const-string version of `SetString()`, which lacks allocator parameter:
 
 ```cpp
 Value s;
@@ -426,11 +426,11 @@ Swapping two DOM trees is fast (constant time), despite the complexity of the tr
 
 This tutorial shows the basics of DOM tree query and manipulation. There are several important concepts in RapidJSON:
 
-1. [Streams](stream.md) are channels for reading/writing JSON, which can be a in-memory string, or file stream, etc. Uesr can also create their streams.
+1. [Streams](stream.md) are channels for reading/writing JSON, which can be a in-memory string, or file stream, etc. User can also create their streams.
 2. [Encoding](encoding.md) defines which character set is used in streams and memory. RapidJSON also provide Unicode conversion/validation internally.
-3. [DOM](dom.md)'s basics are already covered in this tutorial. Uncover more advanced features such as insitu-parsing, other parsing options and advanced usages.
+3. [DOM](dom.md)'s basics are already covered in this tutorial. Uncover more advanced features such as *in situ* parsing, other parsing options and advanced usages.
 4. [SAX](sax.md) is the foundation of parsing/generating facility in RapidJSON. Learn how to use `Reader`/`Writer` to implement even faster applications. Also try `PrettyWriter` to format the JSON.
-5. [Performance](performance.md) shows some in-house and thirdparty benchmarks.
+5. [Performance](performance.md) shows some in-house and third-party benchmarks.
 6. [Implementation](implementation.md) describes some internal designs and techniques of RapidJSON.
 
 You may also refer to the FAQ, API documentation, examples and unit tests.

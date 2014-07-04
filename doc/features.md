@@ -19,7 +19,7 @@
 ## Standard compliance
 
 * RapidJSON should be fully RFC4627/ECMA-404 compliance.
-* Support unicode surrogate.
+* Support Unicode surrogate.
 * Support null character (`"\u0000"`)
  * For example, `["Hello\u0000World"]` can be parsed and handled gracefully. There is API for getting/setting lengths of string.
 
@@ -46,7 +46,7 @@
 
 ## DOM (Document)
 
-* Support insitu parsing.
+* Support *in situ* parsing.
  * Parse JSON string values in-place at the source JSON, and then the DOM points to addresses of those strings.
  * Faster than convention parsing: no allocation for strings, no copy (if string does not contain escapes), cache-friendly.
 * Support 32-bit/64-bit signed/unsigned integer and `double` for JSON number type.
@@ -55,7 +55,7 @@
 ## SAX (Reader)
 
 * Support comprehensive error code if parsing failed.
-* Support localizable error message.
+* Support error message localization.
 
 ## SAX (Writer)
 

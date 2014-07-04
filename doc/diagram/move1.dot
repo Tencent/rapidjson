@@ -5,7 +5,6 @@ digraph {
 	margin="0,0"
 	ranksep=0.2
 	penwidth=0.5
-	forcelabels=true
 
 	node [fontname="Inconsolata, Consolas", fontsize=10, penwidth=0.5]
 	edge [fontname="Inconsolata, Consolas", fontsize=10, arrowhead=normal]
@@ -19,10 +18,13 @@ digraph {
 
 		node [shape=Mrecord, style=filled, colorscheme=spectral7]
 
-		b1 [label="{b:number|456}", fillcolor=6]
-		a1 [label="{a:number|123}", fillcolor=6]
+		{
+			rank = same
+			b1 [label="{b:number|456}", fillcolor=6]
+			a1 [label="{a:number|123}", fillcolor=6]
+		}
 
-		b1 -> a1 [style="dashed", constraint=false, label="Move"]
+		a1 -> b1 [style="dashed", label="Move", dir=back]
 	}
 
 	subgraph cluster2 {
@@ -34,7 +36,12 @@ digraph {
 
 		node [shape=Mrecord, style=filled, colorscheme=spectral7]
 
-		b2 [label="{b:null|}", fillcolor=1]
-		a2 [label="{a:number|456}", fillcolor=6]
+		{
+			rank = same
+			b2 [label="{b:null|}", fillcolor=1]
+			a2 [label="{a:number|456}", fillcolor=6]
+		}
+		a2 -> b2 [style=invis, dir=back]
 	}
+	b1 -> b2 [style=invis]
 }
