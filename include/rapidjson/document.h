@@ -175,6 +175,51 @@ struct GenericMemberIterator<true,Encoding,Allocator> {
 #endif // RAPIDJSON_NOMEMBERITERATORCLASS
 
 ///////////////////////////////////////////////////////////////////////////////
+// GenericStringRef
+
+//! Reference to a constant string (not taking a copy)
+template<typename CharType>
+struct GenericStringRef {
+	typedef CharType Ch; //!< character type of the string
+
+	//! Create string reference from \c const character array
+	template<SizeType N>
+	GenericStringRef(const CharType (&str)[N])
+		: s(str), length(N-1) {}
+
+	//! Explicitly create string reference from \c const character pointer
+	explicit GenericStringRef(const CharType* str)
+		: s(str), length(internal::StrLen(str)){}
+
+	//! Create constant string reference from pointer and length
+	GenericStringRef(const CharType* str, SizeType len)
+		: s(str), length(len) { RAPIDJSON_ASSERT(s != NULL); }
+
+	//! implicit conversion to plain CharType pointer
+	operator const Ch *() const { return s; }
+
+	const Ch* s; //!< plain CharType pointer
+	const SizeType length; //!< length of the string (excluding the trailing NULL terminator)
+
+private:
+	//! Disallow construction from non-const array
+	template<SizeType N>
+	GenericStringRef(CharType (&str)[N]) /* = delete */;
+};
+
+//! Mark a character pointer as constant string
+template<typename CharType>
+inline GenericStringRef<CharType> StringRef(const CharType* str) {
+	return GenericStringRef<CharType>(str, internal::StrLen(str));
+}
+
+//! Mark a character pointer as constant string
+template<typename CharType>
+inline GenericStringRef<CharType> StringRef(const CharType* str, size_t length) {
+	return GenericStringRef<CharType>(str, SizeType(length));
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // GenericValue
 
 //! Represents a JSON value. Use Value for UTF8 encoding and default allocator.
@@ -196,6 +241,7 @@ public:
 	typedef Encoding EncodingType;					//!< Encoding type from template parameter.
 	typedef Allocator AllocatorType;				//!< Allocator type from template parameter.
 	typedef typename Encoding::Ch Ch;				//!< Character type derived from Encoding.
+	typedef GenericStringRef<Ch> StringRefType;		//!< Reference to a constant string
 	typedef typename GenericMemberIterator<false,Encoding,Allocator>::Iterator MemberIterator;	//!< Member iterator for iterating in object.
 	typedef typename GenericMemberIterator<true,Encoding,Allocator>::Iterator ConstMemberIterator;	//!< Constant member iterator for iterating in object.
 	typedef GenericValue* ValueIterator;			//!< Value iterator for iterating in array.
@@ -207,9 +253,11 @@ public:
 	//! Default constructor creates a null value.
 	GenericValue() : data_(), flags_(kNullFlag) {}
 
-	//! Copy constructor is not permitted.
 private:
+	//! Copy constructor is not permitted.
 	GenericValue(const GenericValue& rhs);
+	//! Disabled constructor for arbitrary pointers.
+	template<typename T> explicit GenericValue(T*);
 
 public:
 
@@ -283,16 +331,16 @@ public:
 	explicit GenericValue(double d) : data_(), flags_(kNumberDoubleFlag) { data_.n.d = d; }
 
 	//! Constructor for constant string (i.e. do not make a copy of string)
-	GenericValue(const Ch* s, SizeType length) : data_(), flags_() { SetStringRaw(s, length); }
+	GenericValue(const Ch* s, SizeType length) : data_(), flags_() { SetStringRaw(StringRef(s, length)); }
 
 	//! Constructor for constant string (i.e. do not make a copy of string)
-	explicit GenericValue(const Ch* s) : data_(), flags_() { SetStringRaw(s, internal::StrLen(s)); }
+	explicit GenericValue(StringRefType s) : data_(), flags_() { SetStringRaw(s); }
 
 	//! Constructor for copy-string (i.e. do make a copy of string)
-	GenericValue(const Ch* s, SizeType length, Allocator& allocator) : data_(), flags_() { SetStringRaw(s, length, allocator); }
+	GenericValue(const Ch* s, SizeType length, Allocator& allocator) : data_(), flags_() { SetStringRaw(StringRef(s, length), allocator); }
 
 	//! Constructor for copy-string (i.e. do make a copy of string)
-	GenericValue(const Ch*s, Allocator& allocator) : data_(), flags_() { SetStringRaw(s, internal::StrLen(s), allocator); }
+	GenericValue(const Ch*s, Allocator& allocator) : data_(), flags_() { SetStringRaw(StringRef(s), allocator); }
 
 	//! Destructor.
 	/*! Need to destruct elements of array, members of object, or copy-string.
@@ -339,12 +387,17 @@ public:
 		return *this;
 	}
 
+	//! Assignment of constant string reference (no copy)
+	GenericValue& operator=(StringRefType str) {
+		return (*this).template operator=<StringRefType>(str);
+	}
 	//! Assignment with primitive types.
-	/*! \tparam T Either Type, int, unsigned, int64_t, uint64_t, const Ch*
+	/*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t
 		\param value The value to be assigned.
 	*/
 	template <typename T>
-	GenericValue& operator=(T value) {
+	RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>,GenericValue&)
+	operator=(T value) {
 		this->~GenericValue();
 		new (this) GenericValue(value);
 		return *this;
@@ -428,7 +481,7 @@ public:
 		A better approach is to use the now public FindMember().
 	*/
 	GenericValue& operator[](const Ch* name) {
-		GenericValue n(name, internal::StrLen(name));
+		GenericValue n(StringRef(name));
 		return (*this)[n];
 	}
 	const GenericValue& operator[](const Ch* name) const { return const_cast<GenericValue&>(*this)[name]; }
@@ -481,7 +534,7 @@ public:
 			\c std::map, this has been changed to MemberEnd() now.
 	*/
 	MemberIterator FindMember(const Ch* name) {
-		GenericValue n(name, internal::StrLen(name));
+		GenericValue n(StringRef(name));
 		return FindMember(n);
 	}
 
@@ -530,19 +583,23 @@ public:
 		return *this;
 	}
 
-	GenericValue& AddMember(const Ch* name, Allocator& nameAllocator, GenericValue& value, Allocator& allocator) {
-		GenericValue n(name, internal::StrLen(name), nameAllocator);
+	//! Add a member (name-value pair) to the object.
+	GenericValue& AddMember(StringRefType name, GenericValue& value, Allocator& allocator) {
+		GenericValue n(name);
 		return AddMember(n, value, allocator);
 	}
 
-	GenericValue& AddMember(const Ch* name, GenericValue& value, Allocator& allocator) {
-		GenericValue n(name, internal::StrLen(name));
-		return AddMember(n, value, allocator);
+	//! Add a constant string value as member (name-value pair) to the object.
+	GenericValue& AddMember(StringRefType name, StringRefType value, Allocator& allocator) {
+		GenericValue v(value);
+		return AddMember(name, v, allocator);
 	}
 
+	//! Add any primitive value as member (name-value pair) to the object.
 	template <typename T>
-	GenericValue& AddMember(const Ch* name, T value, Allocator& allocator) {
-		GenericValue n(name, internal::StrLen(name));
+	RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>,GenericValue&)
+	AddMember(StringRefType name, T value, Allocator& allocator) {
+		GenericValue n(name);
 		GenericValue v(value);
 		return AddMember(n, v, allocator);
 	}
@@ -553,7 +610,7 @@ public:
 	    \note Removing member is implemented by moving the last member. So the ordering of members is changed.
 	*/
 	bool RemoveMember(const Ch* name) {
-		GenericValue n(name, internal::StrLen(name));
+		GenericValue n(StringRef(name));
 		return RemoveMember(n);
 	}
 
@@ -657,7 +714,7 @@ int z = a[0u].GetInt();				// This works too.
 		return *this;
 	}
 
-	//! Append a value at the end of the array.
+	//! Append a GenericValue at the end of the array.
 	/*! \param value		The value to be appended.
 	    \param allocator	The allocator for allocating memory. It must be the same one use previously.
 	    \return The value itself for fluent API.
@@ -672,8 +729,15 @@ int z = a[0u].GetInt();				// This works too.
 		return *this;
 	}
 
+	//! Append a constant string reference at the end of the array.
+	GenericValue& PushBack(StringRefType value, Allocator& allocator) {
+		return (*this).template PushBack<StringRefType>(value, allocator);
+	}
+
+	//! Append a primitive value at the end of the array.
 	template <typename T>
-	GenericValue& PushBack(T value, Allocator& allocator) {
+	RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>,GenericValue&)
+	PushBack(T value, Allocator& allocator) {
 		GenericValue v(value);
 		return PushBack(v, allocator);
 	}
@@ -728,13 +792,13 @@ int z = a[0u].GetInt();				// This works too.
 		\param length The length of source string, excluding the trailing null terminator.
 		\return The value itself for fluent API.
 	*/
-	GenericValue& SetString(const Ch* s, SizeType length) { this->~GenericValue(); SetStringRaw(s, length); return *this; }
+	GenericValue& SetString(const Ch* s, SizeType length) { return SetString(StringRef(s, length)); }
 
 	//! Set this value as a string without copying source string.
-	/*! \param s source string pointer. 
+	/*! \param s source string reference
 		\return The value itself for fluent API.
 	*/
-	GenericValue& SetString(const Ch* s) { return SetString(s, internal::StrLen(s)); }
+	GenericValue& SetString(StringRefType s) { this->~GenericValue(); SetStringRaw(s); return *this; }
 
 	//! Set this value as a string by copying from source string.
 	/*! This version has better performance with supplied length, and also support string containing null character.
@@ -743,14 +807,14 @@ int z = a[0u].GetInt();				// This works too.
 		\param allocator Allocator for allocating copied buffer. Commonly use document.GetAllocator().
 		\return The value itself for fluent API.
 	*/
-	GenericValue& SetString(const Ch* s, SizeType length, Allocator& allocator) { this->~GenericValue(); SetStringRaw(s, length, allocator); return *this; }
+	GenericValue& SetString(const Ch* s, SizeType length, Allocator& allocator) { this->~GenericValue(); SetStringRaw(StringRef(s, length), allocator); return *this; }
 
 	//! Set this value as a string by copying from source string.
 	/*!	\param s source string. 
 		\param allocator Allocator for allocating copied buffer. Commonly use document.GetAllocator().
 		\return The value itself for fluent API.
 	*/
-	GenericValue& SetString(const Ch* s, Allocator& allocator) {	SetString(s, internal::StrLen(s), allocator); return *this; }
+	GenericValue& SetString(const Ch* s, Allocator& allocator) { return SetString(s, internal::StrLen(s), allocator); }
 
 	//@}
 
@@ -906,21 +970,19 @@ private:
 	}
 
 	//! Initialize this value as constant string, without calling destructor.
-	void SetStringRaw(const Ch* s, SizeType length) {
-		RAPIDJSON_ASSERT(s != NULL);
+	void SetStringRaw(StringRefType s) {
 		flags_ = kConstStringFlag;
 		data_.s.str = s;
-		data_.s.length = length;
+		data_.s.length = s.length;
 	}
 
 	//! Initialize this value as copy string with initial data, without calling destructor.
-	void SetStringRaw(const Ch* s, SizeType length, Allocator& allocator) {
-		RAPIDJSON_ASSERT(s != NULL);
+	void SetStringRaw(StringRefType s, Allocator& allocator) {
 		flags_ = kCopyStringFlag;
-		data_.s.str = (Ch *)allocator.Malloc((length + 1) * sizeof(Ch));
-		data_.s.length = length;
-		memcpy(const_cast<Ch*>(data_.s.str), s, length * sizeof(Ch));
-		const_cast<Ch*>(data_.s.str)[length] = '\0';
+		data_.s.str = (Ch *)allocator.Malloc((s.length + 1) * sizeof(Ch));
+		data_.s.length = s.length;
+		memcpy(const_cast<Ch*>(data_.s.str), s, s.length * sizeof(Ch));
+		const_cast<Ch*>(data_.s.str)[s.length] = '\0';
 	}
 
 	//! Assignment without calling destructor
