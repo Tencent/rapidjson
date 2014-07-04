@@ -178,20 +178,92 @@ struct GenericMemberIterator<true,Encoding,Allocator> {
 // GenericStringRef
 
 //! Reference to a constant string (not taking a copy)
+/*!
+	\tparam CharType character type of the string
+
+	This helper class is used to automatically infer constant string
+	references for string literals, especially from \c const \b (!)
+	character arrays.
+
+	The main use is for creating JSON string values without copying the
+	source string via an \ref Allocator.  This requires that the referenced
+	string pointers have a sufficient lifetime, which exceeds the lifetime
+	of the associated GenericValue.
+
+	\b Example
+	\code
+	Value v("foo");   // ok, no need to copy & calculate length
+	const char foo[] = "foo";
+	v.SetString(foo); // ok
+
+	const char* bar = foo;
+	// Value x(bar); // not ok, can't rely on bar's lifetime
+	Value x(StringRef(bar)); // lifetime explicitly guaranteed by user
+	Value y(StringRef(bar, 3));  // ok, explicitly pass length
+	\endcode
+
+	\see StringRef, GenericValue::SetString
+*/
 template<typename CharType>
 struct GenericStringRef {
 	typedef CharType Ch; //!< character type of the string
 
 	//! Create string reference from \c const character array
+	/*!
+		This constructor implicitly creates a constant string reference from
+		a \c const character array.  It has better performance than
+		\ref StringRef(const CharType*) by inferring the string \ref length
+		from the array length, and also supports strings containing null
+		characters.
+
+		\tparam N length of the string, automatically inferred
+
+		\param str Constant character array, lifetime assumed to be longer
+			than the use of the string in e.g. a GenericValue
+
+		\post \ref s == str
+
+		\note Constant complexity.
+		\note There is a hidden, private overload to disallow references to
+			non-const character arrays to be created via this constructor.
+			By this, e.g. function-scope arrays used to be filled via
+			\c snprintf are excluded from consideration.
+			In such cases, the referenced string should be \b copied to the
+			GenericValue instead.
+	 */
 	template<SizeType N>
 	GenericStringRef(const CharType (&str)[N])
 		: s(str), length(N-1) {}
 
 	//! Explicitly create string reference from \c const character pointer
+	/*!
+		This constructor can be used to \b explicitly  create a reference to
+		a constant string pointer.
+
+		\see StringRef(const CharType*)
+
+		\param str Constant character pointer, lifetime assumed to be longer
+			than the use of the string in e.g. a GenericValue
+
+		\post \ref s == str
+
+		\note There is a hidden, private overload to disallow references to
+			non-const character arrays to be created via this constructor.
+			By this, e.g. function-scope arrays used to be filled via
+			\c snprintf are excluded from consideration.
+			In such cases, the referenced string should be \b copied to the
+			GenericValue instead.
+	 */
 	explicit GenericStringRef(const CharType* str)
 		: s(str), length(internal::StrLen(str)){}
 
 	//! Create constant string reference from pointer and length
+	/*! \param str constant string, lifetime assumed to be longer than the use of the string in e.g. a GenericValue
+		\param len length of the string, excluding the trailing NULL terminator
+
+		\post \ref s == str && \ref length == len
+		\note Constant complexity.
+	 */
 	GenericStringRef(const CharType* str, SizeType len)
 		: s(str), length(len) { RAPIDJSON_ASSERT(s != NULL); }
 
@@ -208,12 +280,37 @@ private:
 };
 
 //! Mark a character pointer as constant string
+/*! Mark a plain character pointer as a "string literal".  This function
+	can be used to avoid copying a character string to be referenced as a
+	value in a JSON GenericValue object, if the string's lifetime is known
+	to be valid long enough.
+	\tparam CharType Character type of the string
+	\param str Constant string, lifetime assumed to be longer than the use of the string in e.g. a GenericValue
+	\return GenericStringRef string reference object
+	\relatesalso GenericStringRef
+
+	\see GenericValue::GenericValue(StringRefType), GenericValue::operator=(StringRefType), GenericValue::SetString(StringRefType), GenericValue::PushBack(StringRefType, Allocator&), GenericValue::AddMember
+*/
 template<typename CharType>
 inline GenericStringRef<CharType> StringRef(const CharType* str) {
 	return GenericStringRef<CharType>(str, internal::StrLen(str));
 }
 
 //! Mark a character pointer as constant string
+/*! Mark a plain character pointer as a "string literal".  This function
+	can be used to avoid copying a character string to be referenced as a
+	value in a JSON GenericValue object, if the string's lifetime is known
+	to be valid long enough.
+
+	This version has better performance with supplied length, and also
+	supports string containing null characters.
+
+	\tparam CharType character type of the string
+	\param str Constant string, lifetime assumed to be longer than the use of the string in e.g. a GenericValue
+	\param length The length of source string.
+	\return GenericStringRef string reference object
+	\relatesalso GenericStringRef
+*/
 template<typename CharType>
 inline GenericStringRef<CharType> StringRef(const CharType* str, size_t length) {
 	return GenericStringRef<CharType>(str, SizeType(length));
@@ -279,7 +376,7 @@ public:
 	/*! Creates a copy of a Value by using the given Allocator
 		\tparam SourceAllocator allocator of \c rhs
 		\param rhs Value to copy from (read-only)
-		\param allocator Allocator to use for copying
+		\param allocator Allocator for allocating copied elements and buffers. Commonly use GenericDocument::GetAllocator().
 		\see CopyFrom()
 	*/
 	template< typename SourceAllocator >
@@ -388,12 +485,25 @@ public:
 	}
 
 	//! Assignment of constant string reference (no copy)
+	/*! \param str Constant string reference to be assigned
+		\note This overload is needed to avoid clashes with the generic primitive type assignment overload below.
+		\see GenericStringRef, operator=(T)
+	*/
 	GenericValue& operator=(StringRefType str) {
 		return (*this).template operator=<StringRefType>(str);
 	}
+
 	//! Assignment with primitive types.
 	/*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t
 		\param value The value to be assigned.
+
+		\note The source type \c T explicitly disallows all pointer types,
+			especially (\c const) \ref Ch*.  This helps avoiding implicitly
+			referencing character strings with insufficient lifetime, use
+			\ref SetString(const Ch*, Allocator&) (for copying) or
+			\ref StringRef() (to explicitly mark the pointer as constant) instead.
+			All other pointer types would implicitly convert to \c bool,
+			use \ref SetBool() instead.
 	*/
 	template <typename T>
 	RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>,GenericValue&)
@@ -463,6 +573,8 @@ public:
 	//@{
 
 	bool GetBool() const { RAPIDJSON_ASSERT(IsBool()); return flags_ == kTrueFlag; }
+	//!< Set boolean value
+	/*! \post IsBool() == true */
 	GenericValue& SetBool(bool b) { this->~GenericValue(); new (this) GenericValue(b); return *this; }
 
 	//@}
@@ -471,6 +583,7 @@ public:
 	//@{
 
 	//! Set this value as an empty object.
+	/*! \post IsObject() == true */
 	GenericValue& SetObject() { this->~GenericValue(); new (this) GenericValue(kObjectType); return *this; }
 
 	//! Get the value associated with the name.
@@ -557,9 +670,11 @@ public:
 	//! Add a member (name-value pair) to the object.
 	/*! \param name A string value as name of member.
 		\param value Value of any type.
-	    \param allocator Allocator for reallocating memory.
-	    \return The value itself for fluent API.
-	    \note The ownership of name and value will be transfered to this object if success.
+		\param allocator	Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
+		\return The value itself for fluent API.
+		\note The ownership of \c name and \c value will be transferred to this object on success.
+		\pre  IsObject() && name.IsString()
+		\post name.IsNull() && value.IsNull()
 	*/
 	GenericValue& AddMember(GenericValue& name, GenericValue& value, Allocator& allocator) {
 		RAPIDJSON_ASSERT(IsObject());
@@ -584,18 +699,48 @@ public:
 	}
 
 	//! Add a member (name-value pair) to the object.
+	/*! \param name A constant string reference as name of member.
+		\param value Value of any type.
+		\param allocator	Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
+		\return The value itself for fluent API.
+		\note The ownership of \c value will be transferred to this object on success.
+		\pre  IsObject()
+		\post value.IsNull()
+	*/
 	GenericValue& AddMember(StringRefType name, GenericValue& value, Allocator& allocator) {
 		GenericValue n(name);
 		return AddMember(n, value, allocator);
 	}
 
 	//! Add a constant string value as member (name-value pair) to the object.
+	/*! \param name A constant string reference as name of member.
+		\param value constant string reference as value of member.
+		\param allocator	Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
+		\return The value itself for fluent API.
+		\pre  IsObject()
+		\note This overload is needed to avoid clashes with the generic primitive type AddMember(StringRefType,T,Allocator&) overload below.
+	*/
 	GenericValue& AddMember(StringRefType name, StringRefType value, Allocator& allocator) {
 		GenericValue v(value);
 		return AddMember(name, v, allocator);
 	}
 
 	//! Add any primitive value as member (name-value pair) to the object.
+	/*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t
+		\param name A constant string reference as name of member.
+		\param value Value of primitive type \c T as value of member
+		\param allocator Allocator for reallocating memory. Commonly use GenericDocument::GetAllocator().
+		\return The value itself for fluent API.
+		\pre  IsObject()
+
+		\note The source type \c T explicitly disallows all pointer types,
+			especially (\c const) \ref Ch*.  This helps avoiding implicitly
+			referencing character strings with insufficient lifetime, use
+			\ref AddMember(StringRefType, GenericValue&, Allocator&) or \ref
+			AddMember(StringRefType, StringRefType, Allocator&).
+			All other pointer types would implicitly convert to \c bool,
+			use an explicit cast instead, if needed.
+	*/
 	template <typename T>
 	RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>,GenericValue&)
 	AddMember(StringRefType name, T value, Allocator& allocator) {
@@ -656,6 +801,7 @@ public:
 	//@{
 
 	//! Set this value as an empty array.
+	/*! \post IsArray == true */
 	GenericValue& SetArray() {	this->~GenericValue(); new (this) GenericValue(kArrayType); return *this; }
 
 	//! Get the number of elements in array.
@@ -702,7 +848,7 @@ int z = a[0u].GetInt();				// This works too.
 
 	//! Request the array to have enough capacity to store elements.
 	/*! \param newCapacity	The capacity that the array at least need to have.
-		\param allocator	The allocator for allocating memory. It must be the same one use previously.
+		\param allocator	Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
 		\return The value itself for fluent API.
 	*/
 	GenericValue& Reserve(SizeType newCapacity, Allocator &allocator) {
@@ -715,11 +861,13 @@ int z = a[0u].GetInt();				// This works too.
 	}
 
 	//! Append a GenericValue at the end of the array.
-	/*! \param value		The value to be appended.
-	    \param allocator	The allocator for allocating memory. It must be the same one use previously.
-	    \return The value itself for fluent API.
-	    \note The ownership of the value will be transfered to this object if success.
-	    \note If the number of elements to be appended is known, calls Reserve() once first may be more efficient.
+	/*! \param value		Value to be appended.
+		\param allocator	Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
+		\pre IsArray() == true
+		\post value.IsNull() == true
+		\return The value itself for fluent API.
+		\note The ownership of \c value will be transferred to this array on success.
+		\note If the number of elements to be appended is known, calls Reserve() once first may be more efficient.
 	*/
 	GenericValue& PushBack(GenericValue& value, Allocator& allocator) {
 		RAPIDJSON_ASSERT(IsArray());
@@ -730,11 +878,33 @@ int z = a[0u].GetInt();				// This works too.
 	}
 
 	//! Append a constant string reference at the end of the array.
+	/*! \param value		Constant string reference to be appended.
+		\param allocator	Allocator for reallocating memory. It must be the same one used previously. Commonly use GenericDocument::GetAllocator().
+		\pre IsArray() == true
+		\return The value itself for fluent API.
+		\note If the number of elements to be appended is known, calls Reserve() once first may be more efficient.
+		\see GenericStringRef
+	*/
 	GenericValue& PushBack(StringRefType value, Allocator& allocator) {
 		return (*this).template PushBack<StringRefType>(value, allocator);
 	}
 
-	//! Append a primitive value at the end of the array.
+	//! Append a primitive value at the end of the array(.)
+	/*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t
+		\param value Value of primitive type T to be appended.
+		\param allocator	Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
+		\pre IsArray() == true
+		\return The value itself for fluent API.
+		\note If the number of elements to be appended is known, calls Reserve() once first may be more efficient.
+
+		\note The source type \c T explicitly disallows all pointer types,
+			especially (\c const) \ref Ch*.  This helps avoiding implicitly
+			referencing character strings with insufficient lifetime, use
+			\ref PushBack(GenericValue&, Allocator&) or \ref
+			PushBack(StringRefType, Allocator&).
+			All other pointer types would implicitly convert to \c bool,
+			use an explicit cast instead, if needed.
+	*/
 	template <typename T>
 	RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>,GenericValue&)
 	PushBack(T value, Allocator& allocator) {
@@ -791,12 +961,15 @@ int z = a[0u].GetInt();				// This works too.
 		\param s source string pointer. 
 		\param length The length of source string, excluding the trailing null terminator.
 		\return The value itself for fluent API.
+		\post IsString() == true && GetString() == s && GetStringLength() == length
+		\see SetString(StringRefType)
 	*/
 	GenericValue& SetString(const Ch* s, SizeType length) { return SetString(StringRef(s, length)); }
 
 	//! Set this value as a string without copying source string.
 	/*! \param s source string reference
 		\return The value itself for fluent API.
+		\post IsString() == true && GetString() == s && GetStringLength() == s.length
 	*/
 	GenericValue& SetString(StringRefType s) { this->~GenericValue(); SetStringRaw(s); return *this; }
 
@@ -804,15 +977,17 @@ int z = a[0u].GetInt();				// This works too.
 	/*! This version has better performance with supplied length, and also support string containing null character.
 		\param s source string. 
 		\param length The length of source string, excluding the trailing null terminator.
-		\param allocator Allocator for allocating copied buffer. Commonly use document.GetAllocator().
+		\param allocator Allocator for allocating copied buffer. Commonly use GenericDocument::GetAllocator().
 		\return The value itself for fluent API.
+		\post IsString() == true && GetString() != s && strcmp(GetString(),s) == 0 && GetStringLength() == length
 	*/
 	GenericValue& SetString(const Ch* s, SizeType length, Allocator& allocator) { this->~GenericValue(); SetStringRaw(StringRef(s, length), allocator); return *this; }
 
 	//! Set this value as a string by copying from source string.
 	/*!	\param s source string. 
-		\param allocator Allocator for allocating copied buffer. Commonly use document.GetAllocator().
+		\param allocator Allocator for allocating copied buffer. Commonly use GenericDocument::GetAllocator().
 		\return The value itself for fluent API.
+		\post IsString() == true && GetString() != s && strcmp(GetString(),s) == 0 && GetStringLength() == length
 	*/
 	GenericValue& SetString(const Ch* s, Allocator& allocator) { return SetString(s, internal::StrLen(s), allocator); }
 
