@@ -480,7 +480,7 @@ private:
 		SizeType length_;
 
 	private:
-		// Prohibit assignment for VC C4512 warning
+		StackStream(const StackStream&);
 		StackStream& operator=(const StackStream&);
 	};
 
