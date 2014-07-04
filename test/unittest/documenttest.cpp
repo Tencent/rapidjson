@@ -103,7 +103,7 @@ TEST(Document, ParseStream_EncodedInputStream) {
 
 TEST(Document, ParseStream_AutoUTFInputStream) {
 	// Any -> UTF8
-	FILE* fp = OpenEncodedFile("utf32BE.json");
+	FILE* fp = OpenEncodedFile("utf32be.json");
 	char buffer[256];
 	FileReadStream bis(fp, buffer, sizeof(buffer));
 	AutoUTFInputStream<unsigned, FileReadStream> eis(bis);
