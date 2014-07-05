@@ -937,7 +937,7 @@ private:
 };
 #pragma pack (pop)
 
-//! Value with UTF8 encoding.
+//! GenericValue with UTF8 encoding
 typedef GenericValue<UTF8<> > Value;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -948,6 +948,7 @@ typedef GenericValue<UTF8<> > Value;
 	\note implements Handler concept
 	\tparam Encoding encoding for both parsing and string storage.
 	\tparam Allocator allocator for allocating memory for the DOM, and the stack during parsing.
+	\warning Although GenericDocument inherits from GenericValue, the API does \b not provide any virtual functions, especially no virtual destructors.  To avoid memory leaks, do not \c delete a GenericDocument object via a pointer to a GenericValue.
 */
 template <typename Encoding, typename Allocator = MemoryPoolAllocator<> >
 class GenericDocument : public GenericValue<Encoding, Allocator> {
@@ -962,8 +963,13 @@ public:
 	*/
 	GenericDocument(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseErrorCode_(kParseErrorNone), errorOffset_(0) {}
 
-	//! Parse JSON text from an input stream.
-	/*! \tparam parseFlags Combination of ParseFlag.
+	//!@name Parse from stream
+	//!@{
+
+	//! Parse JSON text from an input stream (with Encoding conversion)
+	/*! \tparam parseFlags Combination of \ref ParseFlag.
+		\tparam SourceEncoding Encoding of input stream
+		\tparam InputStream Type of input stream, implementing Stream concept
 		\param is Input stream to be parsed.
 		\return The document itself for fluent API.
 	*/
@@ -985,18 +991,34 @@ public:
 		return *this;
 	}
 
+	//! Parse JSON text from an input stream
+	/*! \tparam parseFlags Combination of \ref ParseFlag.
+		\tparam InputStream Type of input stream, implementing Stream concept
+		\param is Input stream to be parsed.
+		\return The document itself for fluent API.
+	*/
 	template <unsigned parseFlags, typename InputStream>
 	GenericDocument& ParseStream(InputStream& is) {
 		return ParseStream<parseFlags,Encoding,InputStream>(is);
 	}
 
+	//! Parse JSON text from an input stream (with \ref kParseDefaultFlags)
+	/*! \tparam InputStream Type of input stream, implementing Stream concept
+		\param is Input stream to be parsed.
+		\return The document itself for fluent API.
+	*/
 	template <typename InputStream>
 	GenericDocument& ParseStream(InputStream& is) {
 		return ParseStream<kParseDefaultFlags, Encoding, InputStream>(is);
 	}
+	//!@}
 
-	//! Parse JSON text from a mutable string.
-	/*! \tparam parseFlags Combination of ParseFlag.
+	//!@name Parse in-place from mutable string
+	//!@{
+
+	//! Parse JSON text from a mutable string (with Encoding conversion)
+	/*! \tparam parseFlags Combination of \ref ParseFlag.
+		\tparam SourceEncoding Transcoding from input Encoding
 		\param str Mutable zero-terminated string to be parsed.
 		\return The document itself for fluent API.
 	*/
@@ -1006,17 +1028,31 @@ public:
 		return ParseStream<parseFlags | kParseInsituFlag, SourceEncoding>(s);
 	}
 
+	//! Parse JSON text from a mutable string
+	/*! \tparam parseFlags Combination of \ref ParseFlag.
+		\param str Mutable zero-terminated string to be parsed.
+		\return The document itself for fluent API.
+	*/
 	template <unsigned parseFlags>
 	GenericDocument& ParseInsitu(Ch* str) {
 		return ParseInsitu<parseFlags, Encoding>(str);
 	}
 
+	//! Parse JSON text from a mutable string (with \ref kParseDefaultFlags)
+	/*! \param str Mutable zero-terminated string to be parsed.
+		\return The document itself for fluent API.
+	*/
 	GenericDocument& ParseInsitu(Ch* str) {
 		return ParseInsitu<kParseDefaultFlags, Encoding>(str);
 	}
+	//!@}
 
-	//! Parse JSON text from a read-only string.
-	/*! \tparam parseFlags Combination of ParseFlag (must not contain kParseInsituFlag).
+	//!@name Parse from read-only string
+	//!@{
+
+	//! Parse JSON text from a read-only string (with Encoding conversion)
+	/*! \tparam parseFlags Combination of \ref ParseFlag (must not contain \ref kParseInsituFlag).
+		\tparam SourceEncoding Transcoding from input Encoding
 		\param str Read-only zero-terminated string to be parsed.
 	*/
 	template <unsigned parseFlags, typename SourceEncoding>
@@ -1026,14 +1062,25 @@ public:
 		return ParseStream<parseFlags, SourceEncoding>(s);
 	}
 
+	//! Parse JSON text from a read-only string
+	/*! \tparam parseFlags Combination of \ref ParseFlag (must not contain \ref kParseInsituFlag).
+		\param str Read-only zero-terminated string to be parsed.
+	*/
 	template <unsigned parseFlags>
 	GenericDocument& Parse(const Ch* str) {
 		return Parse<parseFlags, Encoding>(str);
 	}
 
+	//! Parse JSON text from a read-only string (with \ref kParseDefaultFlags)
+	/*! \param str Read-only zero-terminated string to be parsed.
+	*/
 	GenericDocument& Parse(const Ch* str) {
 		return Parse<kParseDefaultFlags>(str);
 	}
+	//!@}
+
+	//!@name Handling parse errors
+	//!@{
 
 	//! Whether a parse error was occured in the last parsing.
 	bool HasParseError() const { return parseErrorCode_ != kParseErrorNone; }
@@ -1043,6 +1090,8 @@ public:
 
 	//! Get the offset in character of the parsing error.
 	size_t GetErrorOffset() const { return errorOffset_; }
+
+	//!@}
 
 	//! Get the allocator of this document.
 	Allocator& GetAllocator() {	return stack_.GetAllocator(); }
@@ -1086,7 +1135,7 @@ private:
 	}
 
 private:
-	// Prohibit assignment
+	//! Prohibit assignment
 	GenericDocument& operator=(const GenericDocument&);
 
 	void ClearStack() {
@@ -1103,6 +1152,7 @@ private:
 	size_t errorOffset_;
 };
 
+//! GenericDocument with UTF8 encoding
 typedef GenericDocument<UTF8<> > Document;
 
 // defined here due to the dependency on GenericDocument
