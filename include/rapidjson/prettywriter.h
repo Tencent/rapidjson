@@ -24,9 +24,9 @@ public:
 	typedef typename Base::Ch Ch;
 
 	//! Constructor
-	/*! \param os Output os.
+	/*! \param os Output stream.
 		\param allocator User supplied allocator. If it is null, it will create a private one.
-		\param levelDepth Initial capacity of 
+		\param levelDepth Initial capacity of stack.
 	*/
 	PrettyWriter(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
 		Base(os, allocator, levelDepth), indentChar_(' '), indentCharCount_(4) {}
@@ -46,7 +46,9 @@ public:
 		return *this;
 	}
 
-	//@name Implementation of Handler.
+	/*! @name Implementation of Handler
+		\see Handler
+	*/
 	//@{
 
 	PrettyWriter& Null()				{ PrettyPrefix(kNullType);   Base::WriteNull();			return *this; }
@@ -56,11 +58,6 @@ public:
 	PrettyWriter& Int64(int64_t i64)	{ PrettyPrefix(kNumberType); Base::WriteInt64(i64);		return *this; }
 	PrettyWriter& Uint64(uint64_t u64)	{ PrettyPrefix(kNumberType); Base::WriteUint64(u64);	return *this; }
 	PrettyWriter& Double(double d)		{ PrettyPrefix(kNumberType); Base::WriteDouble(d);		return *this; }
-	//! Overridden for fluent API, see \ref Writer::Double()
-	PrettyWriter& Double(double d, int precision) {
-		int oldPrecision = Base::GetDoublePrecision();
-		return SetDoublePrecision(precision).Double(d).SetDoublePrecision(oldPrecision);
-	}
 
 	PrettyWriter& String(const Ch* str, SizeType length, bool copy = false) {
 		(void)copy;
@@ -117,9 +114,19 @@ public:
 
 	//@}
 
+	/*! @name Convenience extensions */
+	//@{
+
 	//! Simpler but slower overload.
 	PrettyWriter& String(const Ch* str) { return String(str, internal::StrLen(str)); }
 
+	//! Overridden for fluent API, see \ref Writer::Double()
+	PrettyWriter& Double(double d, int precision) {
+		int oldPrecision = Base::GetDoublePrecision();
+		return SetDoublePrecision(precision).Double(d).SetDoublePrecision(oldPrecision);
+	}
+
+	//@}
 protected:
 	void PrettyPrefix(Type type) {
 		(void)type;
