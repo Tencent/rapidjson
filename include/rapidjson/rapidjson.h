@@ -265,6 +265,7 @@ struct StreamTraits<GenericStringStream<Encoding> > {
 	enum { copyOptimization = 1 };
 };
 
+//! String stream with UTF8 encoding.
 typedef GenericStringStream<UTF8<> > StringStream;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -301,6 +302,7 @@ struct StreamTraits<GenericInsituStringStream<Encoding> > {
 	enum { copyOptimization = 1 };
 };
 
+//! Insitu string stream with UTF8 encoding.
 typedef GenericInsituStringStream<UTF8<> > InsituStringStream;
 
 ///////////////////////////////////////////////////////////////////////////////
