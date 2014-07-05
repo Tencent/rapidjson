@@ -73,7 +73,7 @@ class GenericMemberIterator
 
 public:
 	//! Iterator type itself
-	typedef GenericMemberIterator Type;
+	typedef GenericMemberIterator Iterator;
 	//! Constant iterator type
 	typedef GenericMemberIterator<true,Encoding,Allocator>  ConstType;
 	//! Non-constant iterator type
@@ -112,29 +112,29 @@ public:
 
 	//! @name stepping
 	//@{
-	Type& operator++(){ ++ptr_; return *this; }
-	Type& operator--(){ --ptr_; return *this; }
-	Type  operator++(int){ Type old(*this); ++ptr_; return old; }
-	Type  operator--(int){ Type old(*this); --ptr_; return old; }
+	Iterator& operator++(){ ++ptr_; return *this; }
+	Iterator& operator--(){ --ptr_; return *this; }
+	Iterator  operator++(int){ Iterator old(*this); ++ptr_; return old; }
+	Iterator  operator--(int){ Iterator old(*this); --ptr_; return old; }
 	//@}
 
 	//! @name increment/decrement
 	//@{
-	Type operator+(DifferenceType n) const { return Type(ptr_+n); }
-	Type operator-(DifferenceType n) const { return Type(ptr_-n); }
+	Iterator operator+(DifferenceType n) const { return Iterator(ptr_+n); }
+	Iterator operator-(DifferenceType n) const { return Iterator(ptr_-n); }
 
-	Type& operator+=(DifferenceType n) { ptr_+=n; return *this; }
-	Type& operator-=(DifferenceType n) { ptr_-=n; return *this; }
+	Iterator& operator+=(DifferenceType n) { ptr_+=n; return *this; }
+	Iterator& operator-=(DifferenceType n) { ptr_-=n; return *this; }
 	//@}
 
 	//! @name relations
 	//@{
-	bool operator==(Type that) const { return ptr_ == that.ptr_; }
-	bool operator!=(Type that) const { return ptr_ != that.ptr_; }
-	bool operator<=(Type that) const { return ptr_ <= that.ptr_; }
-	bool operator>=(Type that) const { return ptr_ >= that.ptr_; }
-	bool operator< (Type that) const { return ptr_ < that.ptr_; }
-	bool operator> (Type that) const { return ptr_ > that.ptr_; }
+	bool operator==(Iterator that) const { return ptr_ == that.ptr_; }
+	bool operator!=(Iterator that) const { return ptr_ != that.ptr_; }
+	bool operator<=(Iterator that) const { return ptr_ <= that.ptr_; }
+	bool operator>=(Iterator that) const { return ptr_ >= that.ptr_; }
+	bool operator< (Iterator that) const { return ptr_ < that.ptr_; }
+	bool operator> (Iterator that) const { return ptr_ > that.ptr_; }
 	//@}
 
 	//! @name dereference
@@ -145,7 +145,7 @@ public:
 	//@}
 
 	//! Distance
-	DifferenceType operator-(Type that) const { return ptr_-that.ptr_; }
+	DifferenceType operator-(Iterator that) const { return ptr_-that.ptr_; }
 
 private:
 	//! Internal constructor from plain pointer
@@ -165,13 +165,13 @@ struct GenericMemberIterator;
 template <typename Encoding, typename Allocator>
 struct GenericMemberIterator<false,Encoding,Allocator> {
 	//! use plain pointer as iterator type
-	typedef GenericMember<Encoding,Allocator>* Type;
+	typedef GenericMember<Encoding,Allocator>* Iterator;
 };
 //! const GenericMemberIterator
 template <typename Encoding, typename Allocator>
 struct GenericMemberIterator<true,Encoding,Allocator> {
 	//! use plain const pointer as iterator type
-	typedef const GenericMember<Encoding,Allocator>* Type;
+	typedef const GenericMember<Encoding,Allocator>* Iterator;
 };
 
 #endif // RAPIDJSON_NOMEMBERITERATORCLASS
@@ -198,8 +198,8 @@ public:
 	typedef Encoding EncodingType;					//!< Encoding type from template parameter.
 	typedef Allocator AllocatorType;				//!< Allocator type from template parameter.
 	typedef typename Encoding::Ch Ch;				//!< Character type derived from Encoding.
-	typedef typename GenericMemberIterator<false,Encoding,Allocator>::Type MemberIterator;	//!< Member iterator for iterating in object.
-	typedef typename GenericMemberIterator<true,Encoding,Allocator>::Type ConstMemberIterator;	//!< Constant member iterator for iterating in object.
+	typedef typename GenericMemberIterator<false,Encoding,Allocator>::Iterator MemberIterator;	//!< Member iterator for iterating in object.
+	typedef typename GenericMemberIterator<true,Encoding,Allocator>::Iterator ConstMemberIterator;	//!< Constant member iterator for iterating in object.
 	typedef GenericValue* ValueIterator;			//!< Value iterator for iterating in array.
 	typedef const GenericValue* ConstValueIterator;	//!< Constant value iterator for iterating in array.
 
