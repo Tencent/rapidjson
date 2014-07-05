@@ -4,6 +4,12 @@
 // Copyright (c) 2011 Milo Yip (miloyip@gmail.com)
 // Version 0.1
 
+/*!\file rapidjson.h
+	\brief common definitions and configuration
+
+	\todo Complete Doxygen documentation for configure macros.
+ */
+
 #include <cstdlib>	// malloc(), realloc(), free()
 #include <cstring>	// memcpy()
 
@@ -14,6 +20,7 @@
 // (U)INT64_C constant macros.
 // If user have their own definition, can define RAPIDJSON_NO_INT64DEFINE to disable this.
 #ifndef RAPIDJSON_NO_INT64DEFINE
+//!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 #ifndef __STDC_CONSTANT_MACROS
 #  define __STDC_CONSTANT_MACROS 1 // required by C++ standard
 #endif
@@ -25,6 +32,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 #endif
+//!@endcond
 #endif // RAPIDJSON_NO_INT64TYPEDEF
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -46,7 +54,7 @@
 //! Endianness of the machine.
 /*!	GCC provided macro for detecting endianness of the target machine. But other
 	compilers may not have this. User can define RAPIDJSON_ENDIAN to either
-	RAPIDJSON_LITTLEENDIAN or RAPIDJSON_BIGENDIAN.
+	\ref RAPIDJSON_LITTLEENDIAN or \ref RAPIDJSON_BIGENDIAN.
 */
 #ifndef RAPIDJSON_ENDIAN
 #ifdef __BYTE_ORDER__
@@ -115,7 +123,9 @@ typedef unsigned SizeType;
 
 // Adopt from boost
 #ifndef RAPIDJSON_STATIC_ASSERT
+//!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 namespace rapidjson {
+
 template <bool x> struct STATIC_ASSERTION_FAILURE;
 template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
 template<int x> struct StaticAssertTest {};
@@ -130,7 +140,13 @@ template<int x> struct StaticAssertTest {};
 #else
 #define RAPIDJSON_STATIC_ASSERT_UNUSED_ATTRIBUTE 
 #endif
+//!@endcond
 
+/*! \def RAPIDJSON_STATIC_ASSERT
+	\brief (internal) macro to check for conditions at compile-time
+	\param x compile-time condition
+	\hideinitializer
+ */
 #define RAPIDJSON_STATIC_ASSERT(x) typedef ::rapidjson::StaticAssertTest<\
 	sizeof(::rapidjson::STATIC_ASSERTION_FAILURE<bool(x) >)>\
 	RAPIDJSON_JOIN(StaticAssertTypedef, __LINE__) RAPIDJSON_STATIC_ASSERT_UNUSED_ATTRIBUTE
@@ -139,9 +155,11 @@ template<int x> struct StaticAssertTest {};
 ///////////////////////////////////////////////////////////////////////////////
 // Helpers
 
+//!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 #define RAPIDJSON_MULTILINEMACRO_BEGIN do {  
 #define RAPIDJSON_MULTILINEMACRO_END \
 } while((void)0, 0)
+//!@endcond
 
 ///////////////////////////////////////////////////////////////////////////////
 // Allocators and Encodings
@@ -149,6 +167,7 @@ template<int x> struct StaticAssertTest {};
 #include "allocators.h"
 #include "encodings.h"
 
+//! main RapidJSON namespace
 namespace rapidjson {
 
 ///////////////////////////////////////////////////////////////////////////////
