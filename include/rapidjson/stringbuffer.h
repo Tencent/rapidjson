@@ -37,6 +37,7 @@ struct GenericStringBuffer {
 	mutable internal::Stack<Allocator> stack_;
 };
 
+//! String buffer with UTF8 encoding
 typedef GenericStringBuffer<UTF8<> > StringBuffer;
 
 //! Implement specialized version of PutN() with memset() for better performance.

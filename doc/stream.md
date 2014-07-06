@@ -1,6 +1,6 @@
 # RapidJSON Stream
 
-In RapidJSON, `Stream` is a concept for reading/writing JSON. Here we first show how to use streams provided. And then see how to create a custom streams.
+In RapidJSON, `rapidjson::Stream` is a concept for reading/writing JSON. Here we first show how to use streams provided. And then see how to create a custom streams.
 
 ## Memory Streams
 
@@ -73,6 +73,8 @@ However, if the JSON is big, or memory is limited, you can use `FileReadStream`.
 #include "rapidjson/filereadstream.h"
 #include <cstdio>
 
+using namespace rapidjson;
+
 FILE* fp = fopen("big.json", "rb"); // non-Windows use "r"
 
 char readBuffer[65536];
@@ -95,6 +97,8 @@ Apart from reading file, user can also use `FileReadStream` to read `stdin`.
 ~~~~~~~~~~cpp
 #include "rapidjson/filewritestream.h"
 #include <cstdio>
+
+using namespace rapidjson;
 
 Document d;
 d.Parse(json);
@@ -212,6 +216,8 @@ You can obtain the type of UTF via `UTFType GetType()`. And check whether a BOM 
 Similarly, to choose encoding for output during runtime, we can use `AutoUTFOutputStream`. This class is not automatic *per se*. You need to specify the UTF type and whether to write BOM in runtime.
 
 ~~~~~~~~~~cpp
+using namespace rapidjson;
+
 void WriteJSONFile(FILE* fp, UTFType type, bool putBOM, const Document& d) {
     char writeBuffer[256];
     FileWriteStream bos(fp, writeBuffer, sizeof(writeBuffer));

@@ -383,7 +383,7 @@ Object is a collection of key-value pairs. Each key must be a string value. The 
 Here is an example.
 
 ~~~~~~~~~~cpp
-Value contact(kObejct);
+Value contact(kObject);
 contact.AddMember("name", "Milo", document.GetAllocator());
 contact.AddMember("married", true, document.GetAllocator());
 ~~~~~~~~~~
@@ -433,4 +433,4 @@ This tutorial shows the basics of DOM tree query and manipulation. There are sev
 5. [Performance](performance.md) shows some in-house and third-party benchmarks.
 6. [Internals](internals.md) describes some internal designs and techniques of RapidJSON.
 
-You may also refer to the FAQ, API documentation, examples and unit tests.
+You may also refer to the [FAQ](faq.md), API documentation, examples and unit tests.
