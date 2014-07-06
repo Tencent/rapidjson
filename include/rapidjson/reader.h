@@ -46,7 +46,8 @@ namespace rapidjson {
 enum ParseFlag {
 	kParseDefaultFlags = 0,			//!< Default parse flags. Non-destructive parsing. Text strings are decoded into allocated buffer.
 	kParseInsituFlag = 1,			//!< In-situ(destructive) parsing.
-	kParseValidateEncodingFlag = 2	//!< Validate encoding of JSON strings.
+	kParseValidateEncodingFlag = 2,	//!< Validate encoding of JSON strings.
+	kParseNonRecursiveFlag = 4		//!< Non-recursive(constant complexity in terms of function call stack size) parsing.
 };
 
 //! Error code of parsing.
@@ -69,7 +70,7 @@ enum ParseErrorCode {
 	kParseErrorStringUnicodeSurrogateInvalid,	//!< The surrogate pair in string is invalid.
 	kParseErrorStringEscapeInvalid,				//!< Invalid escape character in string.
 	kParseErrorStringMissQuotationMark,			//!< Missing a closing quotation mark in string.
-	kParseErrorStringInvalidEncoding,			//!< Invalid encoidng in string.
+	kParseErrorStringInvalidEncoding,			//!< Invalid encoding in string.
 
 	kParseErrorNumberTooBig,					//!< Number too big to be stored in double.
 	kParseErrorNumberMissFraction,				//!< Miss fraction part in number.
@@ -134,7 +135,7 @@ namespace internal {
 template<typename Stream, int = StreamTraits<Stream>::copyOptimization>
 class StreamLocalCopy;
 
-//! Do copy optimziation.
+//! Do copy optimization.
 template<typename Stream>
 class StreamLocalCopy<Stream, 1> {
 public:
@@ -296,6 +297,9 @@ public:
 	bool Parse(InputStream& is, Handler& handler) {
 		parseErrorCode_ = kParseErrorNone;
 		errorOffset_ = 0;
+
+		if (parseFlags & kParseNonRecursiveFlag)
+			return NonRecursiveParse<parseFlags>(is, handler);
 
 		SkipWhitespace(is);
 
@@ -746,6 +750,220 @@ private:
 			case '[': ParseArray <parseFlags>(is, handler); break;
 			default : ParseNumber<parseFlags>(is, handler);
 		}
+	}
+
+	// Non-recursive parsing
+	enum NonRecursiveParsingState {
+		NonRecursiveParsingStartState,
+		NonRecursiveParsingFinishState,
+		NonRecursiveParsingErrorState,
+		// Object states
+		NonRecursiveParsingObjectInitialState,
+		NonRecursiveParsingObjectContentState,
+		// Array states
+		NonRecursiveParsingArrayInitialState,
+		NonRecursiveParsingArrayContentState
+	};
+
+	template <typename InputStream, typename Handler>
+	NonRecursiveParsingState TransitToCompoundValueTypeState(NonRecursiveParsingState state, InputStream& is, Handler& handler) {
+		// For compound value type(object and array), we should push the current state and start a new stack frame for this type.
+		NonRecursiveParsingState r = NonRecursiveParsingErrorState;
+
+		switch (is.Take()) {
+		case '{':
+			handler.StartObject();
+			r = NonRecursiveParsingObjectInitialState;
+			// Push current state.
+			*stack_.template Push<NonRecursiveParsingState>(1) = state;
+			// Initialize and push member count.
+			*stack_.template Push<int>(1) = 0;
+			break;
+		case '[':
+			handler.StartArray();
+			r = NonRecursiveParsingArrayInitialState;
+			// Push current state.
+			*stack_.template Push<NonRecursiveParsingState>(1) = state;
+			// Initialize and push element count.
+			*stack_.template Push<int>(1) = 0;
+			break;
+		}
+		return r;
+	}
+
+	// Inner transition of object or array states(ObjectInitial->ObjectContent, ArrayInitial->ArrayContent).
+	template <unsigned parseFlags, typename InputStream, typename Handler>
+	NonRecursiveParsingState TransitByValue(NonRecursiveParsingState state, InputStream& is, Handler& handler) {
+		RAPIDJSON_ASSERT(
+			state == NonRecursiveParsingObjectInitialState ||
+			state == NonRecursiveParsingArrayInitialState ||
+			state == NonRecursiveParsingObjectContentState ||
+			state == NonRecursiveParsingArrayContentState);
+
+		NonRecursiveParsingState t;
+		if (state == NonRecursiveParsingObjectInitialState)
+			t = NonRecursiveParsingObjectContentState;
+		else if (state == NonRecursiveParsingArrayInitialState)
+			t = NonRecursiveParsingArrayContentState;
+		else
+			t = state;
+
+		NonRecursiveParsingState r = NonRecursiveParsingErrorState;
+
+		switch (is.Peek()) {
+		// For plain value state is not changed.
+		case 'n': ParseNull  <parseFlags>(is, handler); r = t;  break;
+		case 't': ParseTrue  <parseFlags>(is, handler); r = t;  break;
+		case 'f': ParseFalse <parseFlags>(is, handler); r = t;  break;
+		case '"': ParseString<parseFlags>(is, handler); r = t;  break;
+		// Transit when value is object or array.
+		case '{':
+		case '[':
+			r = TransitToCompoundValueTypeState(state, is, handler); break;
+		default: ParseNumber<parseFlags>(is, handler); r = t;  break;
+		}
+
+		if (HasParseError())
+			r = NonRecursiveParsingErrorState;
+
+		return r;
+	}
+
+	// Transit from object related states(ObjectInitial, ObjectContent).
+	template <unsigned parseFlags, typename InputStream, typename Handler>
+	NonRecursiveParsingState TransitFromObjectStates(NonRecursiveParsingState state, InputStream& is, Handler& handler) {
+		NonRecursiveParsingState r = NonRecursiveParsingErrorState;
+
+		switch (is.Peek()) {
+		case '}': {
+			is.Take();
+			// Get member count(include an extra one for non-empty object).
+			int memberCount = *stack_.template Pop<int>(1);
+			if (state == NonRecursiveParsingObjectContentState)
+				++memberCount;
+			// Restore the parent stack frame.
+			r = *stack_.template Pop<NonRecursiveParsingState>(1);
+			// Transit to ContentState since a member/an element was just parsed.
+			if (r == NonRecursiveParsingArrayInitialState)
+				r = NonRecursiveParsingArrayContentState;
+			else if (r == NonRecursiveParsingObjectInitialState)
+				r = NonRecursiveParsingObjectContentState;
+			// If we return to the topmost frame mark it finished.
+			if (r == NonRecursiveParsingStartState)
+				r = NonRecursiveParsingFinishState;
+			handler.EndObject(memberCount);
+			break;
+		}
+		case ',':
+			is.Take();
+			r = NonRecursiveParsingObjectContentState;
+			// Update member count.
+			*stack_.template Top<int>() = *stack_.template Top<int>() + 1;
+			break;
+		case '"':
+			// Should be a key-value pair.
+			ParseString<parseFlags>(is, handler);
+			if (HasParseError()) {
+				r = NonRecursiveParsingErrorState;
+				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorObjectMissName, is.Tell());
+				break;
+			}
+
+			SkipWhitespace(is);
+
+			if (is.Take() != ':') {
+				r = NonRecursiveParsingErrorState;
+				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorObjectMissColon, is.Tell());
+				break;
+			}
+
+			SkipWhitespace(is);
+
+			r = TransitByValue<parseFlags>(state, is, handler);
+
+			break;
+		default:
+			r = NonRecursiveParsingErrorState;
+			RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell());
+			break;
+		}
+
+		return r;
+	}
+
+	// Transit from array related states(ArrayInitial, ArrayContent).
+	template <unsigned parseFlags, typename InputStream, typename Handler>
+	NonRecursiveParsingState TransitFromArrayStates(NonRecursiveParsingState state, InputStream& is, Handler& handler) {
+		NonRecursiveParsingState r = NonRecursiveParsingErrorState;
+
+		switch (is.Peek()) {
+		case ']': {
+			is.Take();
+			// Get element count(include an extra one for non-empty array).
+			int elementCount = *stack_.template Pop<int>(1);
+			if (state == NonRecursiveParsingArrayContentState)
+				++elementCount;
+			// Restore the parent stack frame.
+			r = *stack_.template Pop<NonRecursiveParsingState>(1);
+			// Transit to ContentState since a member/an element was just parsed.
+			if (r == NonRecursiveParsingArrayInitialState)
+				r = NonRecursiveParsingArrayContentState;
+			else if (r == NonRecursiveParsingObjectInitialState)
+				r = NonRecursiveParsingObjectContentState;
+			// If we return to the topmost frame mark it finished.
+			if (r == NonRecursiveParsingStartState)
+				r = NonRecursiveParsingFinishState;
+			handler.EndArray(elementCount);
+			break;
+		}
+		case ',':
+			is.Take();
+			r = NonRecursiveParsingArrayContentState;
+			// Update element count.
+			*stack_.template Top<int>() = *stack_.template Top<int>() + 1;
+			break;
+		default:
+			// Should be a single value.
+			r = TransitByValue<parseFlags>(state, is, handler);
+			break;
+		}
+
+		return r;
+	}
+
+	template <unsigned parseFlags, typename InputStream, typename Handler>
+	NonRecursiveParsingState Transit(NonRecursiveParsingState state, InputStream& is, Handler& handler) {
+		NonRecursiveParsingState r = NonRecursiveParsingErrorState;
+
+		switch (state) {
+		case NonRecursiveParsingStartState:
+			r = TransitToCompoundValueTypeState(state, is, handler);
+			break;
+		case NonRecursiveParsingObjectInitialState:
+		case NonRecursiveParsingObjectContentState:
+			r = TransitFromObjectStates<parseFlags>(state, is, handler);
+			break;
+		case NonRecursiveParsingArrayInitialState:
+		case NonRecursiveParsingArrayContentState:
+			r = TransitFromArrayStates<parseFlags>(state, is, handler);
+			break;
+		}
+
+		return r;
+	}
+
+	template <unsigned parseFlags, typename InputStream, typename Handler>
+	bool NonRecursiveParse(InputStream& is, Handler& handler) {
+		NonRecursiveParsingState state = NonRecursiveParsingStartState;
+
+		SkipWhitespace(is);
+		while (is.Peek() != '\0' && state != NonRecursiveParsingErrorState) {
+			state = Transit<parseFlags>(state, is, handler);
+			SkipWhitespace(is);
+		}
+
+		stack_.Clear();
+		return state == NonRecursiveParsingFinishState && !HasParseError();
 	}
 
 	static const size_t kDefaultStackCapacity = 256;	//!< Default stack capacity in bytes for storing a single decoded string. 
