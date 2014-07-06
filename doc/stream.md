@@ -10,7 +10,7 @@ Memory streams store JSON in memory.
 
 `StringStream` is the most basic input stream. It represents a complete, read-only JSON stored in memory. It is defined in `rapidjson/rapidjson.h`.
 
-```cpp
+~~~~~~~~~~cpp
 #include "rapidjson/document.h" // will include "rapidjson/rapidjson.h"
 
 using namespace rapidjson;
@@ -21,16 +21,16 @@ StringStream s(json);
 
 Document d;
 d.ParseStream(s);
-```
+~~~~~~~~~~
 
 Since this is very common usage, `Document::Parse(const char*)` is provided to do exactly the same as above:
 
-```cpp
+~~~~~~~~~~cpp
 // ...
 const char json[] = "[1, 2, 3, 4]";
 Document d;
 d.Parse(json);
-```
+~~~~~~~~~~
 
 Note that, `StringStream` is a typedef of `GenericStringStream<UTF8<> >`, user may use another encodings to represent the character set of the stream.
 
@@ -38,7 +38,7 @@ Note that, `StringStream` is a typedef of `GenericStringStream<UTF8<> >`, user m
 
 `StringBuffer` is a simple output stream. It allocates a memory buffer for writing the whole JSON. Use `GetString()` to obtain the buffer.
 
-```cpp
+~~~~~~~~~~cpp
 #include "rapidjson/stringbuffer.h"
 
 StringBuffer buffer;
@@ -46,14 +46,14 @@ Writer<StringBuffer> writer(buffer);
 d.Accept(writer);
 
 const char* output = buffer.GetString();
-```
+~~~~~~~~~~
 
 When the buffer is full, it will increases the capacity automatically. The default capacity is 256 characters (256 bytes for UTF8, 512 bytes for UTF16, etc.). User can provide an allocator and a initial capacity.
 
-```cpp
+~~~~~~~~~~cpp
 StringBuffer buffer1(0, 1024); // Use its allocator, initial size = 1024
 StringBuffer buffer2(allocator, 1024);
-```
+~~~~~~~~~~
 
 By default, `StringBuffer` will instantiate an internal allocator.
 
@@ -69,7 +69,7 @@ However, if the JSON is big, or memory is limited, you can use `FileReadStream`.
 
 `FileReadStream` reads the file via a `FILE` pointer. And user need to provide a buffer.
 
-```cpp
+~~~~~~~~~~cpp
 #include "rapidjson/filereadstream.h"
 #include <cstdio>
 
@@ -82,7 +82,7 @@ Document d;
 d.ParseStream(is);
 
 fclose(fp);
-```
+~~~~~~~~~~
 
 Different from string streams, `FileReadStream` is byte stream. It does not handle encodings. If the file is not UTF-8, the byte stream can be wrapped in a `EncodedInputStream`. It will be discussed very soon.
 
@@ -92,7 +92,7 @@ Apart from reading file, user can also use `FileReadStream` to read `stdin`.
 
 `FileWriteStream` is buffered output stream. Its usage is very similar to `FileReadStream`.
 
-```cpp
+~~~~~~~~~~cpp
 #include "rapidjson/filewritestream.h"
 #include <cstdio>
 
@@ -109,7 +109,7 @@ Writer<FileWriteStream> writer(os);
 d.Accept(writer);
 
 fclose(fp);
-```
+~~~~~~~~~~
 
 It can also directs the output to `stdout`.
 
@@ -129,7 +129,7 @@ Note that, these encoded streams can be applied to streams other than file. For 
 
 `EncodedInputStream` has two template parameters. The first one is a `Encoding` class, such as `UTF8`, `UTF16LE`, defined in `rapidjson/encodings.h`. The second one is the class of stream to be wrapped.
 
-```cpp
+~~~~~~~~~~cpp
 #include "rapidjson/document.h"
 #include "rapidjson/filereadstream.h"   // FileReadStream
 #include "rapidjson/encodedstream.h"    // EncodedInputStream
@@ -148,13 +148,13 @@ Document d; // Document is GenericDocument<UTF8<> >
 d.ParseStream<0, UTF16LE<> >(eis);  // Parses UTF-16LE file into UTF-8 in memory
 
 fclose(fp);
-```
+~~~~~~~~~~
 
 ### EncodedOutputStream
 
 `EncodedOutputStream` is similar but it has a `bool putBOM` parameter in the constructor, controlling whether to write BOM into output byte stream.
 
-```cpp
+~~~~~~~~~~cpp
 #include "rapidjson/filewritestream.h"  // FileWriteStream
 #include "rapidjson/encodedstream.h"    // EncodedOutputStream
 #include <cstdio>
@@ -174,7 +174,7 @@ Writer<OutputStream, UTF32LE<>, UTF8<>> writer(eos);
 d.Accept(writer);   // This generates UTF32-LE file from UTF-8 in memory
 
 fclose(fp);
-```
+~~~~~~~~~~
 
 ### AutoUTFInputStream
 
@@ -182,7 +182,7 @@ Sometimes an application may want to handle all supported JSON encoding. `AutoUT
 
 Since the characters (code units) may be 8-bit, 16-bit or 32-bit. `AutoUTFInputStream` requires a character type which can hold at least 32-bit. We may use `unsigned`, as in the template parameter:
 
-```cpp
+~~~~~~~~~~cpp
 #include "rapidjson/document.h"
 #include "rapidjson/filereadstream.h"   // FileReadStream
 #include "rapidjson/encodedstream.h"    // AutoUTFInputStream
@@ -201,7 +201,7 @@ Document d;         // Document is GenericDocument<UTF8<> >
 d.ParseStream<0, AutoUTF<unsigned> >(eis); // This parses any UTF file into UTF-8 in memory
 
 fclose(fp);
-```
+~~~~~~~~~~
 
 When specifying the encoding of stream, uses `AutoUTF<CharType>` as in `ParseStream()` above.
 
@@ -211,7 +211,7 @@ You can obtain the type of UTF via `UTFType GetType()`. And check whether a BOM 
 
 Similarly, to choose encoding for output during runtime, we can use `AutoUTFOutputStream`. This class is not automatic *per se*. You need to specify the UTF type and whether to write BOM in runtime.
 
-```cpp
+~~~~~~~~~~cpp
 void WriteJSONFile(FILE* fp, UTFType type, bool putBOM, const Document& d) {
     char writeBuffer[256];
     FileWriteStream bos(fp, writeBuffer, sizeof(writeBuffer));
@@ -222,7 +222,7 @@ void WriteJSONFile(FILE* fp, UTFType type, bool putBOM, const Document& d) {
     Writer<OutputStream, UTF8<>, AutoUTF<> > writer;
     d.Accept(writer);
 }
-```
+~~~~~~~~~~
 
 `AutoUTFInputStream` and `AutoUTFOutputStream` is more convenient than `EncodedInputStream` and `EncodedOutputStream`. They just incur a little bit runtime overheads.
 
@@ -232,7 +232,7 @@ In addition to memory/file streams, user can create their own stream classes whi
 
 RapidJSON combines different types using templates. A class containing all required interface can be a stream. The Stream interface is defined in comments of `rapidjson/rapidjson.h`:
 
-```cpp
+~~~~~~~~~~cpp
 concept Stream {
     typename Ch;    //!< Character type of the stream.
 
@@ -261,7 +261,7 @@ concept Stream {
     //! \return Number of characters written.
     size_t PutEnd(Ch* begin);
 }
-```
+~~~~~~~~~~
 
 For input stream, they must implement `Peek()`, `Take()` and `Tell()`.
 For output stream, they must implement `Put()` and `Flush()`. 
@@ -271,7 +271,7 @@ There are two special interface, `PutBegin()` and `PutEnd()`, which are only for
 
 The following example is a wrapper of `std::istream`, which only implements 3 functions.
 
-```cpp
+~~~~~~~~~~cpp
 class IStreamWrapper {
 public:
     typedef char Ch;
@@ -302,18 +302,18 @@ private:
 
     std::istream& is_;
 };
-```
+~~~~~~~~~~
 
 User can use it to wrap instances of `std::stringstream`, `std::ifstream`.
 
-```cpp
+~~~~~~~~~~cpp
 const char* json = "[1,2,3,4]";
 std::stringstream ss(json);
 IStreamWrapper is(ss);
 
 Document d;
 d.Parse(is);
-```
+~~~~~~~~~~
 
 Note that, this implementation may not be as efficient as RapidJSON's memory or file streams, due to internal overheads of the standard library.
 
@@ -321,7 +321,7 @@ Note that, this implementation may not be as efficient as RapidJSON's memory or 
 
 The following example is a wrapper of `std::istream`, which only implements 2 functions.
 
-```cpp
+~~~~~~~~~~cpp
 class OStreamWrapper {
 public:
     typedef char Ch;
@@ -344,11 +344,11 @@ private:
 
     std::ostream& os_;
 };
-```
+~~~~~~~~~~
 
 User can use it to wrap instances of `std::stringstream`, `std::ofstream`.
 
-```cpp
+~~~~~~~~~~cpp
 Document d;
 // ...
 
@@ -357,7 +357,7 @@ OSStreamWrapper os(ss);
 
 Writer<OStreamWrapper> writer(os);
 d.Accept(writer);
-```
+~~~~~~~~~~
 
 Note that, this implementation may not be as efficient as RapidJSON's memory or file streams, due to internal overheads of the standard library.
 
