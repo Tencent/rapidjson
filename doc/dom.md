@@ -119,25 +119,19 @@ When the parse processing succeeded, the `Document` contains the parse results. 
 Parse Error Code                            | Description
 --------------------------------------------|---------------------------------------------------
 `kParseErrorNone`                           | No error.
-Document:                                   |
 `kParseErrorDocumentEmpty`                  | The document is empty.
 `kParseErrorDocumentRootNotObjectOrArray`   | The document root must be either object or array.
 `kParseErrorDocumentRootNotSingular`        | The document root must not follow by other values.
-Value:                                      |
 `kParseErrorValueInvalid`                   | Invalid value.
-Object:                                     |
 `kParseErrorObjectMissName`                 | Missing a name for object member.
 `kParseErrorObjectMissColon`                | Missing a colon after a name of object member.
 `kParseErrorObjectMissCommaOrCurlyBracket`  | Missing a comma or `}` after an object member.
-Array:                                      |
 `kParseErrorArrayMissCommaOrSquareBracket`  | Missing a comma or `]` after an array element.
-String:                                     |
 `kParseErrorStringUnicodeEscapeInvalidHex`  | Incorrect hex digit after `\\u` escape in string.
 `kParseErrorStringUnicodeSurrogateInvalid`  | The surrogate pair in string is invalid.
 `kParseErrorStringEscapeInvalid`            | Invalid escape character in string.
 `kParseErrorStringMissQuotationMark`        | Missing a closing quotation mark in string.
 `kParseErrorStringInvalidEncoding`          | Invalid encoding in string.
-Number:                                     |
 `kParseErrorNumberTooBig`                   | Number too big to be stored in `double`.
 `kParseErrorNumberMissFraction`             | Miss fraction part in number.
 `kParseErrorNumberMissExponent`             | Miss exponent in number.
