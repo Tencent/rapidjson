@@ -10,6 +10,10 @@
 	\todo Complete Doxygen documentation for configure macros.
  */
 
+/*! \mainpage
+	Documentation can be found in \ref readme.md README.
+*/
+
 #include <cstdlib>	// malloc(), realloc(), free()
 #include <cstring>	// memcpy()
 
