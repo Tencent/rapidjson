@@ -166,11 +166,11 @@ In normal parsing process, a large overhead is to decode JSON strings and copy t
 
 The following diagrams compare normal and *in situ* parsing. The JSON string values contain pointers to the decoded string.
 
-![normal parsing](diagrams/normalparsing.png)
+![normal parsing](diagram/normalparsing.png)
 
 In normal parsing, the decoded string are copied to freshly allocated buffers. `"\\n"` (2 characters) is decoded as `"\n"` (1 character). `"\\u0073"` (6 characters) is decoded as "s" (1 character).
 
-![instiu parsing](diagrams/insituparsing.png)
+![instiu parsing](diagram/insituparsing.png)
 
 *In situ* parsing just modified the original JSON. Updated characters are highlighted in the diagram. If the JSON string does not contain escape character, such as `"msg"`, the parsing process merely replace the closing double quotation mark with a null character.
 
