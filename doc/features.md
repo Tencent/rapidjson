@@ -1,4 +1,4 @@
-# RapidJSON Features
+# Features
 
 ## General
 

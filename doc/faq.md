@@ -1,4 +1,4 @@
-# RapidJSON FAQ
+# FAQ
 
 ## General
 

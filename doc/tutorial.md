@@ -1,4 +1,4 @@
-# RapidJSON Tutorial
+# Tutorial
 
 This tutorial introduces the basics of the Document Object Model(DOM) API.
 

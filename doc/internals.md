@@ -1,4 +1,4 @@
-# RapidJSON Internals
+# Internals
 
 This section records some design and implementation details.
 

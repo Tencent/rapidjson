@@ -1,4 +1,4 @@
-# RapidJSON Encoding
+# Encoding
 
 ## Unicode
 

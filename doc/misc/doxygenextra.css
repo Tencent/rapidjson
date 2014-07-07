@@ -17,7 +17,11 @@ body, table, div, p, dl {
 	font-style: normal;
 	font-variant: normal;
 	font-weight: normal;
-	line-height: 25.5px;	
+	line-height: 25.5px;
+}
+
+body {
+	background-color: #eee;
 }
 
 div.header {
@@ -67,6 +71,12 @@ pre.fragment {
 	line-height: 19px;
 }
 
+#doc-content {
+	background-color: #fff;
+	width: 918px;
+	height: auto !important;
+}
+
 div.contents {
 	width: 858px;
 	margin: 30px;
@@ -113,4 +123,76 @@ div.fragment {
 	line-height: 22.4px;
 	margin: 0px 0px 13px 0px;
 	padding: 2px;
+}
+
+/* side bar and search */
+
+#side-nav
+{
+	padding: 10px 0px 20px 20px;
+	border-top: 60px solid #2980b9;
+	background-color: #343131;
+	/*height: 100% !important;*/
+	position: fixed
+}
+
+#nav-tree
+{
+	background-color: transparent;
+	background-image: none;
+	height: 100% !important;
+}
+
+#nav-tree .label
+{
+	font-family: Helvetica, arial, freesans, clean, sans-serif, 'Segoe UI Emoji', 'Segoe UI Symbol';
+	line-height: 25.5px;	
+	font-size: 15px;
+}
+
+#nav-tree
+{
+	color: #b3b3b3;
+}
+
+#nav-tree .selected {
+	background-image: none;
+}
+
+#nav-tree a
+{
+	color: #b3b3b3;
+}
+
+#MSearchBox
+{
+	margin: 20px;
+	right: auto;
+	position: fixed;
+	width: 220px;
+}
+
+#MSearchField
+{
+	width: 161px;
+}
+
+#MSearchResultsWindow
+{
+	left: 45px !important;
+}
+
+#nav-sync
+{
+	display: none;
+}
+
+.ui-resizable .ui-resizable-handle
+{
+	width: 0px;
+}
+
+#nav-path
+{
+	display: none;
 }

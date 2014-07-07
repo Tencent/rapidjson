@@ -1,4 +1,4 @@
-# RapidJSON DOM
+# DOM
 
 Document Object Model(DOM) is a in-memory representation of JSON for query and manipulation. The basic usage of DOM is described in [Tutorial](tutorial.md). This section will describe some details and more advanced usages.
 
