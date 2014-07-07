@@ -24,12 +24,12 @@ before_script:
   - cd "${TRAVIS_BUILD_DIR}"
 
 script:
-#  - make -C build/gmake -f test.make
-#  - make -C build/gmake -f example.make 
+  - make -C build/gmake -f test.make
+  - make -C build/gmake -f example.make 
    - cd bin
-#  - ./unittest_${config_suffix}
-#  - valgrind --leak-check=full --error-exitcode=1 ./unittest_${config_suffix}
-#  - ./perftest_${config_suffix}
+  - ./unittest_${config_suffix}
+  - valgrind --leak-check=full --error-exitcode=1 ./unittest_${config_suffix}
+  - if [ "$config" = "release64" ]; then ./perftest_${config_suffix}; fi
 
 after_success:
 # Build latest doxygen from source
