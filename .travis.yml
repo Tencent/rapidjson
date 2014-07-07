@@ -30,15 +30,15 @@ script:
 
 after_success :
   - cd "${TRAVIS_BUILD_DIR}"
-  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then cd /tmp; fi
-  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then git clone https://github.com/doxygen/doxygen.git; fi
-  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then cd doxygen; fi
-  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then ./configure; fi
-  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then make; fi
-  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then make distclean; fi
-  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then git pull; fi
-  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then ./configure; fi
-  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then make; fi
-  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then sudo make install; fi
-  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then cd "${TRAVIS_BUILD_DIR}"; fi
-  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then doxygen build/Doxyfile; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cd /tmp; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then git clone https://github.com/doxygen/doxygen.git; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cd doxygen; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then ./configure; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then make; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then make distclean; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then git pull; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then ./configure; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then make; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then sudo make install; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cd "${TRAVIS_BUILD_DIR}"; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then doxygen build/Doxyfile; fi
