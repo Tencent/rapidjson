@@ -900,6 +900,16 @@ TEST(Reader, IterativeParsing_ElementCounting) {
 	EXPECT_EQ(1, handler.ElementCount);
 }
 
+TEST(Reader, IterativeParsing_AfterFinishState) {
+	StringStream json("{}, {}");
+	Reader reader;
+	BaseReaderHandler<> handler;
+	
+	reader.IterativeParse<kParseIterativeFlag>(json, handler);
+
+	EXPECT_TRUE(reader.HasParseError());
+}
+
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif

@@ -947,6 +947,11 @@ private:
 		case IterativeParsingArrayContentState:
 			r = TransitFromArrayStates<parseFlags>(state, is, handler);
 			break;
+		case IterativeParsingFinishState:
+			// Any token appears after finish state leads to error state.
+			r = IterativeParsingErrorState;
+			RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotSingular, is.Tell());
+			break;
 		}
 
 		return r;
