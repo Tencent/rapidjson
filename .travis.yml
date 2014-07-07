@@ -21,14 +21,24 @@ before_script:
   - cd "${TRAVIS_BUILD_DIR}"
 
 script:
-  - make -C build/gmake -f test.make
-  - make -C build/gmake -f example.make 
-  - cd bin
-  - ./unittest_${config_suffix}
+#  - make -C build/gmake -f test.make
+#  - make -C build/gmake -f example.make 
+#  - cd bin
+#  - ./unittest_${config_suffix}
 #  - valgrind --leak-check=full --error-exitcode=1 ./unittest_${config_suffix}
 #  - ./perftest_${config_suffix}
 
 after_success :
   - cd "${TRAVIS_BUILD_DIR}"
-  - sudo chmod +x build/travis_doxygen.sh
-  - sudo build/travis_doxygen.sh
+  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then cd /tmp; fi
+  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then git clone https://github.com/doxygen/doxygen.git; fi
+  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then cd doxygen; fi
+  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then ./configure; fi
+  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then make; fi
+  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then make distclean; fi
+  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then git pull; fi
+  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then ./configure; fi
+  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then make; fi
+  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then sudo make install; fi
+  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then cd "${TRAVIS_BUILD_DIR}"; fi
+  - if [ "$config" = "release64" ] && [ "$CC" = "clang" ]; then doxygen build/Doxyfile; fi
