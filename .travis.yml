@@ -5,8 +5,11 @@ compiler:
  - gcc
 
 env:
- - config=debug64   config_suffix=debug_x64_gmake
- - config=release64 config_suffix=release_x64_gmake
+  matrix:
+    - config=debug64   config_suffix=debug_x64_gmake
+    - config=release64 config_suffix=release_x64_gmake
+  global:
+    secure: HAEPpA7IxUd+X4X5VcUpSxWf3hDRDNgNpKQrRSX/X/nS0/h5PAwES7fmM6WJAsoEmczCp3OOArzyOON+KLbISvJLnHvnexd+rtyVjU2zOOVTEgzJRdAPHwocqVx5FOxtlKgbDISE6dl3H5aUCycf962jfquhKosi11rbxwcscmc=
 
 before_install:
   - sudo add-apt-repository -y ppa:codegear/release
@@ -29,6 +32,7 @@ script:
 #  - ./perftest_${config_suffix}
 
 after_success:
+# Build latest doxygen from source
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cd /tmp; fi
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then git clone https://github.com/doxygen/doxygen.git; fi
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cd doxygen; fi
@@ -40,4 +44,18 @@ after_success:
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then make; fi
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then sudo make install; fi
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cd "${TRAVIS_BUILD_DIR}"; fi
+
+# Run doxygen  
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then doxygen build/Doxyfile; fi
+
+# Push to Github Pages
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then git config --global user.name "${GIT_NAME}"; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then git config --global user.email ${GIT_EMAIL}; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then mkdir build/doc; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cd build/doc; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then git clone https://github.com/miloyip/rapidjson; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then git checkout gh-pages; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cp -r ../../doc/html/* .; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then git add --all; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then git commit -m "Automatic doxygen build"; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then git push https://${GH_TOKEN}@github.com/miloyip/rapidjson gh-pages; fi
