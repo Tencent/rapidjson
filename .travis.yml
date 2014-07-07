@@ -25,8 +25,9 @@ script:
   - make -C build/gmake -f example.make 
   - cd bin
   - ./unittest_${config_suffix}
-  - valgrind --leak-check=full --error-exitcode=1 ./unittest_${config_suffix}
-  - ./perftest_${config_suffix}
+#  - valgrind --leak-check=full --error-exitcode=1 ./unittest_${config_suffix}
+#  - ./perftest_${config_suffix}
 
 after_script:
+  - cd "${TRAVIS_BUILD_DIR}"
   - doxygen build/Doxyfile
