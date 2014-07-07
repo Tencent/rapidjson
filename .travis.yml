@@ -54,8 +54,9 @@ after_success:
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then mkdir build/doc; fi
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cd build/doc; fi
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then git clone https://github.com/miloyip/rapidjson; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cd rapidjson; fi
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then git checkout gh-pages; fi
-  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cp -r ../../doc/html/* .; fi
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cp -r ../../../doc/html/* .; fi
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then git add --all; fi
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then git commit -m "Automatic doxygen build"; fi
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then git push https://${GH_TOKEN}@github.com/miloyip/rapidjson gh-pages; fi
