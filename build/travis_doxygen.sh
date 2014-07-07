@@ -12,5 +12,5 @@ git pull
 make
 sudo make install
 
-cd "${TRAVIS_BUILD_DIR}
+cd "${TRAVIS_BUILD_DIR}"
 doxygen build/Doxyfile
