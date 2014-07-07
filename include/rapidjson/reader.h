@@ -47,7 +47,7 @@ enum ParseFlag {
 	kParseDefaultFlags = 0,			//!< Default parse flags. Non-destructive parsing. Text strings are decoded into allocated buffer.
 	kParseInsituFlag = 1,			//!< In-situ(destructive) parsing.
 	kParseValidateEncodingFlag = 2,	//!< Validate encoding of JSON strings.
-	kParseNonRecursiveFlag = 4		//!< Non-recursive(constant complexity in terms of function call stack size) parsing.
+	kParseIterativeFlag = 4			//!< Iterative(constant complexity in terms of function call stack size) parsing.
 };
 
 //! Error code of parsing.
@@ -298,8 +298,8 @@ public:
 		parseErrorCode_ = kParseErrorNone;
 		errorOffset_ = 0;
 
-		if (parseFlags & kParseNonRecursiveFlag)
-			return NonRecursiveParse<parseFlags>(is, handler);
+		if (parseFlags & kParseIterativeFlag)
+			return IterativeParse<parseFlags>(is, handler);
 
 		SkipWhitespace(is);
 
@@ -753,37 +753,37 @@ private:
 	}
 
 	// Non-recursive parsing
-	enum NonRecursiveParsingState {
-		NonRecursiveParsingStartState,
-		NonRecursiveParsingFinishState,
-		NonRecursiveParsingErrorState,
+	enum IterativeParsingState {
+		IterativeParsingStartState,
+		IterativeParsingFinishState,
+		IterativeParsingErrorState,
 		// Object states
-		NonRecursiveParsingObjectInitialState,
-		NonRecursiveParsingObjectContentState,
+		IterativeParsingObjectInitialState,
+		IterativeParsingObjectContentState,
 		// Array states
-		NonRecursiveParsingArrayInitialState,
-		NonRecursiveParsingArrayContentState
+		IterativeParsingArrayInitialState,
+		IterativeParsingArrayContentState
 	};
 
 	template <typename InputStream, typename Handler>
-	NonRecursiveParsingState TransitToCompoundValueTypeState(NonRecursiveParsingState state, InputStream& is, Handler& handler) {
+	IterativeParsingState TransitToCompoundValueTypeState(IterativeParsingState state, InputStream& is, Handler& handler) {
 		// For compound value type(object and array), we should push the current state and start a new stack frame for this type.
-		NonRecursiveParsingState r = NonRecursiveParsingErrorState;
+		IterativeParsingState r = IterativeParsingErrorState;
 
 		switch (is.Take()) {
 		case '{':
 			handler.StartObject();
-			r = NonRecursiveParsingObjectInitialState;
+			r = IterativeParsingObjectInitialState;
 			// Push current state.
-			*stack_.template Push<NonRecursiveParsingState>(1) = state;
+			*stack_.template Push<IterativeParsingState>(1) = state;
 			// Initialize and push member count.
 			*stack_.template Push<int>(1) = 0;
 			break;
 		case '[':
 			handler.StartArray();
-			r = NonRecursiveParsingArrayInitialState;
+			r = IterativeParsingArrayInitialState;
 			// Push current state.
-			*stack_.template Push<NonRecursiveParsingState>(1) = state;
+			*stack_.template Push<IterativeParsingState>(1) = state;
 			// Initialize and push element count.
 			*stack_.template Push<int>(1) = 0;
 			break;
@@ -793,22 +793,22 @@ private:
 
 	// Inner transition of object or array states(ObjectInitial->ObjectContent, ArrayInitial->ArrayContent).
 	template <unsigned parseFlags, typename InputStream, typename Handler>
-	NonRecursiveParsingState TransitByValue(NonRecursiveParsingState state, InputStream& is, Handler& handler) {
+	IterativeParsingState TransitByValue(IterativeParsingState state, InputStream& is, Handler& handler) {
 		RAPIDJSON_ASSERT(
-			state == NonRecursiveParsingObjectInitialState ||
-			state == NonRecursiveParsingArrayInitialState ||
-			state == NonRecursiveParsingObjectContentState ||
-			state == NonRecursiveParsingArrayContentState);
+			state == IterativeParsingObjectInitialState ||
+			state == IterativeParsingArrayInitialState ||
+			state == IterativeParsingObjectContentState ||
+			state == IterativeParsingArrayContentState);
 
-		NonRecursiveParsingState t;
-		if (state == NonRecursiveParsingObjectInitialState)
-			t = NonRecursiveParsingObjectContentState;
-		else if (state == NonRecursiveParsingArrayInitialState)
-			t = NonRecursiveParsingArrayContentState;
+		IterativeParsingState t;
+		if (state == IterativeParsingObjectInitialState)
+			t = IterativeParsingObjectContentState;
+		else if (state == IterativeParsingArrayInitialState)
+			t = IterativeParsingArrayContentState;
 		else
 			t = state;
 
-		NonRecursiveParsingState r = NonRecursiveParsingErrorState;
+		IterativeParsingState r = IterativeParsingErrorState;
 
 		switch (is.Peek()) {
 		// For plain value state is not changed.
@@ -824,39 +824,39 @@ private:
 		}
 
 		if (HasParseError())
-			r = NonRecursiveParsingErrorState;
+			r = IterativeParsingErrorState;
 
 		return r;
 	}
 
 	// Transit from object related states(ObjectInitial, ObjectContent).
 	template <unsigned parseFlags, typename InputStream, typename Handler>
-	NonRecursiveParsingState TransitFromObjectStates(NonRecursiveParsingState state, InputStream& is, Handler& handler) {
-		NonRecursiveParsingState r = NonRecursiveParsingErrorState;
+	IterativeParsingState TransitFromObjectStates(IterativeParsingState state, InputStream& is, Handler& handler) {
+		IterativeParsingState r = IterativeParsingErrorState;
 
 		switch (is.Peek()) {
 		case '}': {
 			is.Take();
 			// Get member count(include an extra one for non-empty object).
 			int memberCount = *stack_.template Pop<int>(1);
-			if (state == NonRecursiveParsingObjectContentState)
+			if (state == IterativeParsingObjectContentState)
 				++memberCount;
 			// Restore the parent stack frame.
-			r = *stack_.template Pop<NonRecursiveParsingState>(1);
+			r = *stack_.template Pop<IterativeParsingState>(1);
 			// Transit to ContentState since a member/an element was just parsed.
-			if (r == NonRecursiveParsingArrayInitialState)
-				r = NonRecursiveParsingArrayContentState;
-			else if (r == NonRecursiveParsingObjectInitialState)
-				r = NonRecursiveParsingObjectContentState;
+			if (r == IterativeParsingArrayInitialState)
+				r = IterativeParsingArrayContentState;
+			else if (r == IterativeParsingObjectInitialState)
+				r = IterativeParsingObjectContentState;
 			// If we return to the topmost frame mark it finished.
-			if (r == NonRecursiveParsingStartState)
-				r = NonRecursiveParsingFinishState;
+			if (r == IterativeParsingStartState)
+				r = IterativeParsingFinishState;
 			handler.EndObject(memberCount);
 			break;
 		}
 		case ',':
 			is.Take();
-			r = NonRecursiveParsingObjectContentState;
+			r = IterativeParsingObjectContentState;
 			// Update member count.
 			*stack_.template Top<int>() = *stack_.template Top<int>() + 1;
 			break;
@@ -864,7 +864,7 @@ private:
 			// Should be a key-value pair.
 			ParseString<parseFlags>(is, handler);
 			if (HasParseError()) {
-				r = NonRecursiveParsingErrorState;
+				r = IterativeParsingErrorState;
 				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorObjectMissName, is.Tell());
 				break;
 			}
@@ -872,7 +872,7 @@ private:
 			SkipWhitespace(is);
 
 			if (is.Take() != ':') {
-				r = NonRecursiveParsingErrorState;
+				r = IterativeParsingErrorState;
 				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorObjectMissColon, is.Tell());
 				break;
 			}
@@ -883,7 +883,7 @@ private:
 
 			break;
 		default:
-			r = NonRecursiveParsingErrorState;
+			r = IterativeParsingErrorState;
 			RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell());
 			break;
 		}
@@ -893,32 +893,32 @@ private:
 
 	// Transit from array related states(ArrayInitial, ArrayContent).
 	template <unsigned parseFlags, typename InputStream, typename Handler>
-	NonRecursiveParsingState TransitFromArrayStates(NonRecursiveParsingState state, InputStream& is, Handler& handler) {
-		NonRecursiveParsingState r = NonRecursiveParsingErrorState;
+	IterativeParsingState TransitFromArrayStates(IterativeParsingState state, InputStream& is, Handler& handler) {
+		IterativeParsingState r = IterativeParsingErrorState;
 
 		switch (is.Peek()) {
 		case ']': {
 			is.Take();
 			// Get element count(include an extra one for non-empty array).
 			int elementCount = *stack_.template Pop<int>(1);
-			if (state == NonRecursiveParsingArrayContentState)
+			if (state == IterativeParsingArrayContentState)
 				++elementCount;
 			// Restore the parent stack frame.
-			r = *stack_.template Pop<NonRecursiveParsingState>(1);
+			r = *stack_.template Pop<IterativeParsingState>(1);
 			// Transit to ContentState since a member/an element was just parsed.
-			if (r == NonRecursiveParsingArrayInitialState)
-				r = NonRecursiveParsingArrayContentState;
-			else if (r == NonRecursiveParsingObjectInitialState)
-				r = NonRecursiveParsingObjectContentState;
+			if (r == IterativeParsingArrayInitialState)
+				r = IterativeParsingArrayContentState;
+			else if (r == IterativeParsingObjectInitialState)
+				r = IterativeParsingObjectContentState;
 			// If we return to the topmost frame mark it finished.
-			if (r == NonRecursiveParsingStartState)
-				r = NonRecursiveParsingFinishState;
+			if (r == IterativeParsingStartState)
+				r = IterativeParsingFinishState;
 			handler.EndArray(elementCount);
 			break;
 		}
 		case ',':
 			is.Take();
-			r = NonRecursiveParsingArrayContentState;
+			r = IterativeParsingArrayContentState;
 			// Update element count.
 			*stack_.template Top<int>() = *stack_.template Top<int>() + 1;
 			break;
@@ -932,19 +932,19 @@ private:
 	}
 
 	template <unsigned parseFlags, typename InputStream, typename Handler>
-	NonRecursiveParsingState Transit(NonRecursiveParsingState state, InputStream& is, Handler& handler) {
-		NonRecursiveParsingState r = NonRecursiveParsingErrorState;
+	IterativeParsingState Transit(IterativeParsingState state, InputStream& is, Handler& handler) {
+		IterativeParsingState r = IterativeParsingErrorState;
 
 		switch (state) {
-		case NonRecursiveParsingStartState:
+		case IterativeParsingStartState:
 			r = TransitToCompoundValueTypeState(state, is, handler);
 			break;
-		case NonRecursiveParsingObjectInitialState:
-		case NonRecursiveParsingObjectContentState:
+		case IterativeParsingObjectInitialState:
+		case IterativeParsingObjectContentState:
 			r = TransitFromObjectStates<parseFlags>(state, is, handler);
 			break;
-		case NonRecursiveParsingArrayInitialState:
-		case NonRecursiveParsingArrayContentState:
+		case IterativeParsingArrayInitialState:
+		case IterativeParsingArrayContentState:
 			r = TransitFromArrayStates<parseFlags>(state, is, handler);
 			break;
 		}
@@ -953,17 +953,17 @@ private:
 	}
 
 	template <unsigned parseFlags, typename InputStream, typename Handler>
-	bool NonRecursiveParse(InputStream& is, Handler& handler) {
-		NonRecursiveParsingState state = NonRecursiveParsingStartState;
+	bool IterativeParse(InputStream& is, Handler& handler) {
+		IterativeParsingState state = IterativeParsingStartState;
 
 		SkipWhitespace(is);
-		while (is.Peek() != '\0' && state != NonRecursiveParsingErrorState) {
+		while (is.Peek() != '\0' && state != IterativeParsingErrorState) {
 			state = Transit<parseFlags>(state, is, handler);
 			SkipWhitespace(is);
 		}
 
 		stack_.Clear();
-		return state == NonRecursiveParsingFinishState && !HasParseError();
+		return state == IterativeParsingFinishState && !HasParseError();
 	}
 
 	static const size_t kDefaultStackCapacity = 256;	//!< Default stack capacity in bytes for storing a single decoded string. 

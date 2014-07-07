@@ -706,163 +706,163 @@ TEST(Reader, Parse_IStreamWrapper_StringStream) {
 	EXPECT_FALSE(reader.HasParseError());	
 }
 
-TEST(Reader, NonRecursiveParsing) {
+TEST(Reader, IterativeParsing) {
 	StringStream json("[1,true,false,null,\"string\",{\"array\":[1]}]");
 	Reader reader;
 	BaseReaderHandler<> handler;
 
-	Reader::NonRecursiveParsingState r;
+	Reader::IterativeParsingState r;
 
 	// [
-	r = reader.Transit<kParseNonRecursiveFlag>(
-		Reader::NonRecursiveParsingStartState,
+	r = reader.Transit<kParseIterativeFlag>(
+		Reader::IterativeParsingStartState,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingArrayInitialState, r);
+	EXPECT_EQ(Reader::IterativeParsingArrayInitialState, r);
 
 	// 1
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingArrayContentState, r);
+	EXPECT_EQ(Reader::IterativeParsingArrayContentState, r);
 	EXPECT_EQ(0, *reader.stack_.template Top<int>()); // element count
 
 	// ,
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingArrayContentState, r);
+	EXPECT_EQ(Reader::IterativeParsingArrayContentState, r);
 	EXPECT_EQ(1, *reader.stack_.template Top<int>()); // element count
 
 	// true
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingArrayContentState, r);
+	EXPECT_EQ(Reader::IterativeParsingArrayContentState, r);
 	EXPECT_EQ(1, *reader.stack_.template Top<int>()); // element count
 
 	// ,
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingArrayContentState, r);
+	EXPECT_EQ(Reader::IterativeParsingArrayContentState, r);
 	EXPECT_EQ(2, *reader.stack_.template Top<int>()); // element count
 
 	// false
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingArrayContentState, r);
+	EXPECT_EQ(Reader::IterativeParsingArrayContentState, r);
 	EXPECT_EQ(2, *reader.stack_.template Top<int>()); // element count
 
 	// ,
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingArrayContentState, r);
+	EXPECT_EQ(Reader::IterativeParsingArrayContentState, r);
 	EXPECT_EQ(3, *reader.stack_.template Top<int>()); // element count
 
 	// null
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingArrayContentState, r);
+	EXPECT_EQ(Reader::IterativeParsingArrayContentState, r);
 	EXPECT_EQ(3, *reader.stack_.template Top<int>()); // element count
 
 	// ,
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingArrayContentState, r);
+	EXPECT_EQ(Reader::IterativeParsingArrayContentState, r);
 	EXPECT_EQ(4, *reader.stack_.template Top<int>()); // element count
 
 	// "string"
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingArrayContentState, r);
+	EXPECT_EQ(Reader::IterativeParsingArrayContentState, r);
 	EXPECT_EQ(4, *reader.stack_.template Top<int>()); // element count
 
 	// ,
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingArrayContentState, r);
+	EXPECT_EQ(Reader::IterativeParsingArrayContentState, r);
 	EXPECT_EQ(5, *reader.stack_.template Top<int>()); // element count
 
 	// {
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingObjectInitialState, r);
+	EXPECT_EQ(Reader::IterativeParsingObjectInitialState, r);
 	EXPECT_EQ(0, *reader.stack_.template Top<int>()); // member count
 
 	// "array":[
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingArrayInitialState, r);
+	EXPECT_EQ(Reader::IterativeParsingArrayInitialState, r);
 	EXPECT_EQ(0, *reader.stack_.template Top<int>()); // element count
 
 	// 1
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingArrayContentState, r);
+	EXPECT_EQ(Reader::IterativeParsingArrayContentState, r);
 	EXPECT_EQ(0, *reader.stack_.template Top<int>()); // element count
 
 	// ]
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingObjectContentState, r);
+	EXPECT_EQ(Reader::IterativeParsingObjectContentState, r);
 	EXPECT_EQ(0, *reader.stack_.template Top<int>()); // member count
 
 	// }
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingArrayContentState, r);
+	EXPECT_EQ(Reader::IterativeParsingArrayContentState, r);
 	EXPECT_EQ(5, *reader.stack_.template Top<int>()); // element count
 
 	// ]
-	r = reader.Transit<kParseNonRecursiveFlag>(
+	r = reader.Transit<kParseIterativeFlag>(
 		r,
 		json,
 		handler);
 	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::NonRecursiveParsingFinishState, r);
+	EXPECT_EQ(Reader::IterativeParsingFinishState, r);
 }
 
 struct CountHandler : BaseReaderHandler<> {
@@ -878,23 +878,23 @@ struct CountHandler : BaseReaderHandler<> {
 	SizeType ElementCount;
 };
 
-TEST(Reader, NonRecursiveParsing_MemberCounting) {
+TEST(Reader, IterativeParsing_MemberCounting) {
 	StringStream json("{\"array\": []}");
 	Reader reader;
 	CountHandler handler;
 
-	reader.NonRecursiveParse<kParseNonRecursiveFlag>(json, handler);
+	reader.IterativeParse<kParseIterativeFlag>(json, handler);
 
 	EXPECT_FALSE(reader.HasParseError());
 	EXPECT_EQ(1, handler.MemberCount);
 }
 
-TEST(Reader, NonRecursiveParsing_ElementCounting) {
+TEST(Reader, IterativeParsing_ElementCounting) {
 	StringStream json("[{}]");
 	Reader reader;
 	CountHandler handler;
 
-	reader.NonRecursiveParse<kParseNonRecursiveFlag>(json, handler);
+	reader.IterativeParse<kParseIterativeFlag>(json, handler);
 
 	EXPECT_FALSE(reader.HasParseError());
 	EXPECT_EQ(1, handler.ElementCount);
