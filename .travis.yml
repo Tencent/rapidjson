@@ -30,4 +30,4 @@ script:
 
 after_success :
   - cd "${TRAVIS_BUILD_DIR}"
-  - sudo build/travis_doxygen.sh
+  - sudo ./build/travis_doxygen.sh
