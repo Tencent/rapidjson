@@ -968,7 +968,7 @@ private:
 		}
 
 		stack_.Clear();
-		return state == IterativeParsingFinishState && !HasParseError();
+		return state == IterativeParsingFinishState;
 	}
 
 	static const size_t kDefaultStackCapacity = 256;	//!< Default stack capacity in bytes for storing a single decoded string. 
