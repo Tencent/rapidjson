@@ -30,4 +30,4 @@ script:
 
 after_success :
   - cd "${TRAVIS_BUILD_DIR}"
-  - build/travis_doxygen.sh
+  - ./build/travis_doxygen.sh

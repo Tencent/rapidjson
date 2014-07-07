@@ -10,7 +10,7 @@ make distclean
 git pull
 ./configure
 make
-make install
+sudo make install
 
 cd "${TRAVIS_BUILD_DIR}
 doxygen build/Doxyfile
