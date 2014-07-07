@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "${config}" = "release64" ] && [ "$CC" = "clang" ]
+if [ "${config}" = "release64" ] && [ "${CC}" = "clang" ]
 then
 	cd /tmp
 	git clone https://github.com/doxygen/doxygen.git
