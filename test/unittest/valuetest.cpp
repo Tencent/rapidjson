@@ -676,7 +676,7 @@ TEST(Document, RecursiveFind) {
 	rapidjson::Document doc;
 	doc.Parse("{ \"first1\" : {\"second1\" : \"second1_val\", \
 		\"second2\" : { \"third1\" : \"third1_val\" }}, \
-		\"first2\" : \"first2_val\"}");
+		\"first2\" : { \"second3\" : \"second3_val\"}}");
 
 	EXPECT_TRUE(doc.HasMemberRecursive("first1"));
 	EXPECT_TRUE(doc.HasMemberRecursive("first2"));
