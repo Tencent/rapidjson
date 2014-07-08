@@ -503,6 +503,56 @@ public:
 	}
 	ConstMemberIterator FindMember(const GenericValue& name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
 
+ ConstMemberIterator FindMemberRecursive(const GenericValue &parent,
+					const GenericValue &name) const {
+
+			RAPIDJSON_ASSERT(IsObject());
+			RAPIDJSON_ASSERT(name.IsString());
+
+			for (ConstMemberIterator mi = parent.MemberBegin();
+							mi != parent.MemberEnd(); ++mi) {
+
+					SizeType len = name.data_.s.length;
+					if (mi->name.data_.s.length == len &&
+									memcmp(name, mi->name.data_.s.str,
+									len * sizeof (Ch)) == 0)
+							return mi;
+
+					if (mi->value.flags_ == kObjectFlag) {
+							return FindMemberRecursive(mi->value, name);
+					}
+			}
+
+			return 0;
+	}
+
+	ConstMemberIterator FindMemberRecursive(const GenericValue &parent,
+					const Ch* name) const {
+
+			RAPIDJSON_ASSERT(IsObject());
+			RAPIDJSON_ASSERT(name);
+
+			for (ConstMemberIterator mi = parent.MemberBegin();
+							mi != parent.MemberEnd(); ++mi) {
+
+					SizeType len = internal::StrLen(name);
+					if (mi->name.data_.s.length == len &&
+									memcmp(name, mi->name.data_.s.str,
+									len * sizeof (Ch)) == 0)
+							return mi;
+
+					if (mi->value.flags_ == kObjectFlag) {
+							return FindMemberRecursive(mi->value, name);
+					}
+			}
+
+			return 0;
+	}
+
+	bool HasMemberRecursive(const Ch *name) const {
+			return FindMemberRecursive(this, name) != 0;
+	}
+
 	//! Add a member (name-value pair) to the object.
 	/*! \param name A string value as name of member.
 		\param value Value of any type.
