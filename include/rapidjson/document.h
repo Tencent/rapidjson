@@ -510,7 +510,7 @@ public:
 		\return Iterator to member, if it exists.
 				Otherwise returns \ref MemberEnd().
 	 */
-	MemberIterator FindMemberRecursive(GenericValue &name) {
+	MemberIterator FindMemberRecursive(const GenericValue &name) {
 
 		RAPIDJSON_ASSERT(IsObject());
 		RAPIDJSON_ASSERT(name.IsString());

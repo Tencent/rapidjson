@@ -684,7 +684,9 @@ TEST(Document, RecursiveFind) {
 	EXPECT_TRUE(doc.HasMemberRecursive("second2"));
 	EXPECT_TRUE(doc.HasMemberRecursive("second3"));
 	EXPECT_TRUE(doc.HasMemberRecursive("third1"));
+
 	EXPECT_FALSE(doc.HasMemberRecursive("lol"));
+	EXPECT_EQ(doc.FindMemberRecursive("lol"), doc.MemberEnd());
 
 	EXPECT_TRUE(doc.FindMemberRecursive("third1")->name.IsString());
 	EXPECT_STREQ(doc.FindMemberRecursive("third1")->name.GetString(), "third1");
