@@ -49,7 +49,6 @@ after_success:
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cd /tmp; fi
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then wget http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.7.linux.bin.tar.gz; fi
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then tar -xvf doxygen-1.8.7.linux.bin.tar.gz; fi
-  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cd doxygen-1.8.7; fi
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then sudo install -m 755 doxygen-1.8.7/bin/doxygen /usr/bin; fi
 
 # Run doxygen  
