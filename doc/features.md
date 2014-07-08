@@ -65,7 +65,7 @@
 ## Stream
 
 * Support `rapidjson::GenericStringBuffer` for storing the output JSON as string.
-* Support `rapidjson::FileReadStream`/`rapidjson::FileWriteStream` for input/output `FILE` object.
+* Support `rapidjson::FileReadStream` and `rapidjson::FileWriteStream` for input/output `FILE` object.
 * Support custom streams.
 
 ## Memory

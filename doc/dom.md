@@ -1,12 +1,16 @@
 # DOM
 
-Document Object Model(DOM) is a in-memory representation of JSON for query and manipulation. The basic usage of DOM is described in [Tutorial](tutorial.md). This section will describe some details and more advanced usages.
+Document Object Model(DOM) is an in-memory representation of JSON for query and manipulation. The basic usage of DOM is described in [Tutorial](doc/tutorial.md). This section will describe some details and more advanced usages.
 
-## Template
+[TOC]
+
+# Template {#Template}
 
 In the tutorial,  `Value` and `Document` was used. Similarly to `std::string`, these are actually `typedef` of template classes:
 
 ~~~~~~~~~~cpp
+namespace rapidjson {
+
 template <typename Encoding, typename Allocator = MemoryPoolAllocator<> >
 class GenericValue {
     // ...
@@ -19,17 +23,21 @@ class GenericDocument : public GenericValue<Encoding, Allocator> {
 
 typedef GenericValue<UTF8<> > Value;
 typedef GenericDocument<UTF8<> > Document;
+
+} // namespace rapidjson
 ~~~~~~~~~~
 
 User can customize these template parameters.
 
-### Encoding
+## Encoding {#Encoding}
 
 The `Encoding` parameter specifies the encoding of JSON String value in memory. Possible options are `UTF8`, `UTF16`, `UTF32`. Note that, these 3 types are also template class. `UTF8<>` is `UTF8<char>`, which means using char to store the characters. You may refer to [Encoding](encoding.md) for details.
 
 Suppose a Windows application would query localization strings stored in JSON files. Unicode-enabled functions in Windows use UTF-16 (wide character) encoding. No matter what encoding was used in JSON files, we can store the strings in UTF-16 in memory.
 
 ~~~~~~~~~~cpp
+using namespace rapidjson;
+
 typedef GenericDocument<UTF16<> > WDocument;
 typedef GenericValue<UTF16<> > WValue;
 
@@ -48,7 +56,7 @@ const WValue locale(L"ja"); // Japanese
 MessageBoxW(hWnd, d[locale].GetString(), L"Test", MB_OK);
 ~~~~~~~~~~
 
-### Allocator
+## Allocator {#Allocator}
 
 The `Allocator` defines which allocator class is used when allocating/deallocating memory for `Document`/`Value`. `Document` owns, or references to an `Allocator` instance. On the other hand, `Value` does not do so, in order to reduce memory consumption.
 
@@ -56,44 +64,46 @@ The default allocator used in `GenericDocument` is `MemoryPoolAllocator`. This a
 
 Another allocator is `CrtAllocator`, of which CRT is short for C RunTime library. This allocator simply calls the standard `malloc()`/`realloc()`/`free()`. When there is a lot of add and remove operations, this allocator may be preferred. But this allocator is far less efficient than `MemoryPoolAllocator`.
 
-## Parsing
+# Parsing {#Parsing}
 
 `Document` provides several functions for parsing. In below, (1) is the fundamental function, while the others are helpers which call (1).
 
 ~~~~~~~~~~cpp
+using namespace rapidjson;
+
 // (1) Fundamental
 template <unsigned parseFlags, typename SourceEncoding, typename InputStream>
-GenericDocument& ParseStream(InputStream& is);
+GenericDocument& GenericDocument::ParseStream(InputStream& is);
 
 // (2) Using the same Encoding for stream
 template <unsigned parseFlags, typename InputStream>
-GenericDocument& ParseStream(InputStream& is);
+GenericDocument& GenericDocument::ParseStream(InputStream& is);
 
 // (3) Using default parse flags
 template <typename InputStream>
-GenericDocument& ParseStream(InputStream& is);
+GenericDocument& GenericDocument::ParseStream(InputStream& is);
 
 // (4) In situ parsing
 template <unsigned parseFlags, typename SourceEncoding>
-GenericDocument& ParseInsitu(Ch* str);
+GenericDocument& GenericDocument::ParseInsitu(Ch* str);
 
 // (5) In situ parsing, using same Encoding for stream
 template <unsigned parseFlags>
-GenericDocument& ParseInsitu(Ch* str);
+GenericDocument& GenericDocument::ParseInsitu(Ch* str);
 
 // (6) In situ parsing, using default parse flags
-GenericDocument& ParseInsitu(Ch* str);
+GenericDocument& GenericDocument::ParseInsitu(Ch* str);
 
 // (7) Normal parsing of a string
 template <unsigned parseFlags, typename SourceEncoding>
-GenericDocument& Parse(const Ch* str);
+GenericDocument& GenericDocument::Parse(const Ch* str);
 
 // (8) Normal parsing of a string, using same Encoding for stream
 template <unsigned parseFlags>
-GenericDocument& Parse(const Ch* str);
+GenericDocument& GenericDocument::Parse(const Ch* str);
 
 // (9) Normal parsing of a string, using default parse flags
-GenericDocument& Parse(const Ch* str);
+GenericDocument& GenericDocument::Parse(const Ch* str);
 ~~~~~~~~~~
 
 The examples of [tutorial](tutorial.md) uses (9) for normal parsing of string. The examples of [stream](stream.md) uses the first three. *In situ* parsing will be described soon.
@@ -108,11 +118,11 @@ Parse flags                   | Meaning
 
 By using a non-type template parameter, instead of a function parameter, C++ compiler can generate code which is optimized for specified combinations, improving speed, and reducing code size (if only using a single specialization). The downside is the flags needed to be determined in compile-time.
 
-The `SourceEncoding` parameter defines what encoding is in the stream. This can be differed to the `Encoding` of the `Document`. See [Transcoding and Validation](#transcoding-and-validation) section for details.
+The `SourceEncoding` parameter defines what encoding is in the stream. This can be differed to the `Encoding` of the `Document`. See [Transcoding and Validation](#TranscodingAndValidation) section for details.
 
 And the `InputStream` is type of input stream.
 
-### Parse Error
+## Parse Error {#ParseError}
 
 When the parse processing succeeded, the `Document` contains the parse results. When there is an error, the original DOM is *unchanged*. And the error state of parsing can be obtained by `bool HasParseError()`,  `ParseErrorCode GetParseError()` and `size_t GetParseOffet()`.
 
@@ -146,14 +156,12 @@ Here shows an example of parse error handling.
 // TODO: example
 ~~~~~~~~~~
 
-### In Situ Parsing
+## In Situ Parsing {#InSituParsing}
 
 From [Wikipedia](http://en.wikipedia.org/wiki/In_situ):
 
 > *In situ* ... is a Latin phrase that translates literally to "on site" or "in position". It means "locally", "on site", "on the premises" or "in place" to describe an event where it takes place, and is used in many different contexts.
-
 > ...
-
 > (In computer science) An algorithm is said to be an in situ algorithm, or in-place algorithm, if the extra amount of memory required to execute the algorithm is O(1), that is, does not exceed a constant no matter how large the input. For example, heapsort is an in situ sorting algorithm.
 
 In normal parsing process, a large overhead is to decode JSON strings and copy them to other buffers. *In situ* parsing decodes those JSON string at the place where it is stored. It is possible in JSON because the decoded string is always shorter than the one in JSON. In this context, decoding a JSON string means to process the escapes, such as `"\n"`, `"\u1234"`, etc., and add a null terminator (`'\0'`)at the end of string.
@@ -204,17 +212,17 @@ There are some limitations of *in situ* parsing:
 
 *In situ* parsing is mostly suitable for short-term JSON that only need to be processed once, and then be released from memory. In practice, these situation is very common, for example, deserializing JSON to C++ objects, processing web requests represented in JSON, etc.
 
-### Transcoding and Validation
+## Transcoding and Validation {#TranscodingAndValidation}
 
-RapidJSON supports conversion between Unicode formats (officially termed UCS Transformation Format) internally. During DOM parsing, the source encoding of the stream can be different from the encoding of the DOM. For example, the source stream contains a UTF-8 JSON, while the DOM is using UTF-16 encoding. There is an example code in [EncodedInputStream](stream.md#encodedinputstream).
+RapidJSON supports conversion between Unicode formats (officially termed UCS Transformation Format) internally. During DOM parsing, the source encoding of the stream can be different from the encoding of the DOM. For example, the source stream contains a UTF-8 JSON, while the DOM is using UTF-16 encoding. There is an example code in [EncodedInputStream](doc/stream.md#EncodedInputStream).
 
-When writing a JSON from DOM to output stream, transcoding can also be used. An example is in [EncodedOutputStream](stream.md##encodedoutputstream).
+When writing a JSON from DOM to output stream, transcoding can also be used. An example is in [EncodedOutputStream](stream.md##EncodedOutputStream).
 
 During transcoding, the source string is decoded to into Unicode code points, and then the code points are encoded in the target format. During decoding, it will validate the byte sequence in the source string. If it is not a valid sequence, the parser will be stopped with `kParseErrorStringInvalidEncoding` error.
 
 When the source encoding of stream is the same as encoding of DOM, by default, the parser will *not* validate the sequence. User may use `kParseValidateEncodingFlag` to force validation.
 
-## Techniques
+# Techniques {#Techniques}
 
 Some techniques about using DOM API is discussed here.
 
@@ -236,9 +244,9 @@ User may create customer handlers for transforming the DOM into other formats. F
 // TODO: example
 ~~~~~~~~~~
 
-For more about SAX events and handler, please refer to [SAX](sax.md).
+For more about SAX events and handler, please refer to [SAX](doc/sax.md).
 
-### User Buffer
+## User Buffer {#UserBuffer}
 
 Some applications may try to avoid memory allocations whenever possible.
 

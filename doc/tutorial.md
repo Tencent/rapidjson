@@ -2,15 +2,17 @@
 
 This tutorial introduces the basics of the Document Object Model(DOM) API.
 
-As shown in [Usage at a glance](../readme.md#usage-at-a-glance), a JSON can be parsed into DOM, and then the DOM can be queried and modified easily, and finally be converted back to JSON.
+As shown in [Usage at a glance](readme.md), a JSON can be parsed into DOM, and then the DOM can be queried and modified easily, and finally be converted back to JSON.
 
-## Value & Document
+[TOC]
+
+# Value & Document {#ValueDocument}
 
 Each JSON value is stored in a type called `Value`. A `Document`, representing the DOM, contains the root of `Value`. All public types and functions of RapidJSON are defined in the `rapidjson` namespace.
 
-### Query Value
+# Query Value {#QueryValue}
 
-In this section, we will use excerpt of [`example/tutorial/tutorial.cpp`](../example/tutorial/tutorial.cpp).
+In this section, we will use excerpt of `example/tutorial/tutorial.cpp`.
 
 Assumes we have a JSON stored in a C string (`const char* json`):
 ~~~~~~~~~~js
@@ -38,7 +40,7 @@ document.Parse(json);
 
 The JSON is now parsed into `document` as a *DOM tree*:
 
-![tutorial](diagram/tutorial.png)
+![DOM in the tutorial](diagram/tutorial.png)
 
 The root of a conforming JSON should be either an object or an array. In this case, the root is an object.
 ~~~~~~~~~~cpp
@@ -115,7 +117,7 @@ Note that, RapidJSON does not automatically convert values between JSON types. I
 
 In the following, details about querying individual types are discussed.
 
-### Query Array
+## Query Array {#QueryArray}
 
 By default, `SizeType` is typedef of `unsigned`. In most systems, array is limited to store up to 2^32-1 elements.
 
@@ -133,7 +135,7 @@ And other familiar query functions:
 * `SizeType Capacity() const`
 * `bool Empty() const`
 
-### Query Object
+## Query Object {#QueryObject}
 
 Similar to array, we can iterate object members by iterator:
 
@@ -169,7 +171,7 @@ if (itr != document.MemberEnd())
     printf("%s %s\n", itr->value.GetString());
 ~~~~~~~~~~
 
-### Querying Number
+## Querying Number {#QueryNumber}
 
 JSON provide a single numerical type called Number. Number can be integer or real numbers. RFC 4627 says the range of Number is specified by parser.
 
@@ -200,7 +202,7 @@ Note that, an integer value may be obtained in various ways without conversion. 
 
 When obtaining the numeric values, `GetDouble()` will convert internal integer representation to a `double`. Note that, `int` and `uint` can be safely convert to `double`, but `int64_t` and `uint64_t` may lose precision (since mantissa of `double` is only 52-bits).
 
-### Query String
+## Query String {#QueryString}
 
 In addition to `GetString()`, the `Value` class also contains `GetStringLength()`. Here explains why.
 
@@ -225,11 +227,11 @@ string( const char* s, size_type count);
 
 which accepts the length of string as parameter. This constructor supports storing null character within the string, and should also provide better performance.
 
-## Create/Modify Values
+# Create/Modify Values {#CreateModifyValues}
 
 There are several ways to create values. After a DOM tree is created and/or modified, it can be saved as JSON again using `Writer`.
 
-### Changing Value Type
+## Change Value Type {#ChangeValueType}
 When creating a Value or Document by default constructor, its type is Null. To change its type, call `SetXXX()` or assignment operator, for example:
 
 ~~~~~~~~~~cpp
@@ -258,7 +260,7 @@ Value o(kObjectType);
 Value a(kArrayType);
 ~~~~~~~~~~
 
-### Move Semantics
+## Move Semantics {#MoveSemantics}
 
 A very special decision during design of RapidJSON is that, assignment of value does not copy the source value to destination value. Instead, the value from source is moved to the destination. For example,
 
@@ -268,7 +270,7 @@ Value b(456);
 b = a;         // a becomes a Null value, b becomes number 123.
 ~~~~~~~~~~
 
-![move1](diagram/move1.png)
+![Assignment with move semantics.](diagram/move1.png)
 
 Why? What is the advantage of this semantics?
 
@@ -287,7 +289,7 @@ Value o(kObjectType);
 }
 ~~~~~~~~~~
 
-![move2](diagram/move2.png)
+![Copy semantics makes a lots of copy operations.](diagram/move2.png)
 
 The object `o` needs to allocate a buffer of same size as contacts, makes a deep clone of it, and then finally contacts is destructed. This will incur a lot of unnecessary allocations/deallocations and memory copying.
 
@@ -307,11 +309,11 @@ Value o(kObjectType);
 }
 ~~~~~~~~~~
 
-![move3](diagram/move3.png)
+![Move semantics makes no copying.](diagram/move3.png)
 
 This is called move assignment operator in C++11. As RapidJSON supports C++03, it adopts move semantics using assignment operator, and all other modifying function like `AddMember()`, `PushBack()`.
 
-### Create String
+## Create String {#CreateString}
 RapidJSON provide two strategies for storing string.
 
 1. copy-string: allocates a buffer, and then copy the source data into it.
@@ -346,7 +348,7 @@ s.SetString("rapidjson");    // slower, assumes null-terminated
 s = "rapidjson";             // shortcut, same as above
 ~~~~~~~~~~
 
-### Modify Array
+## Modify Array {#ModifyArray}
 Value with array type provides similar APIs as `std::vector`.
 
 * `Clear()`
@@ -372,7 +374,7 @@ a.PushBack("Lua", allocator).PushBack("Mio", allocator);
 
 Differs from STL, `PushBack()`/`PopBack()` returns the array reference itself. This is called fluent interface.
 
-### Modify Object
+## Modify Object {#ModifyObject}
 Object is a collection of key-value pairs. Each key must be a string value. The way to manipulating object is to add/remove members:
 
 * `Value& AddMember(Value&, Value&, Allocator& allocator)`
@@ -388,7 +390,7 @@ contact.AddMember("name", "Milo", document.GetAllocator());
 contact.AddMember("married", true, document.GetAllocator());
 ~~~~~~~~~~
 
-### Deep Copy Value
+## Deep Copy Value {#DeepCopyValue}
 If we really need to copy a DOM tree, we can use two APIs for deep copy: constructor with allocator, and `CopyFrom()`.
 
 ~~~~~~~~~~cpp
@@ -408,7 +410,7 @@ v1.SetObject().AddMember( "array", v2, a );
 d.PushBack(v1,a);
 ~~~~~~~~~~
 
-### Swap Values
+## Swap Values {#SwapValues}
 
 `Swap()` is also provided.
 
@@ -422,15 +424,15 @@ assert(b.IsInt());
 
 Swapping two DOM trees is fast (constant time), despite the complexity of the tress.
 
-## What's next
+# What's next {#WhatsNext}
 
 This tutorial shows the basics of DOM tree query and manipulation. There are several important concepts in RapidJSON:
 
-1. [Streams](stream.md) are channels for reading/writing JSON, which can be a in-memory string, or file stream, etc. User can also create their streams.
-2. [Encoding](encoding.md) defines which character set is used in streams and memory. RapidJSON also provide Unicode conversion/validation internally.
-3. [DOM](dom.md)'s basics are already covered in this tutorial. Uncover more advanced features such as *in situ* parsing, other parsing options and advanced usages.
-4. [SAX](sax.md) is the foundation of parsing/generating facility in RapidJSON. Learn how to use `Reader`/`Writer` to implement even faster applications. Also try `PrettyWriter` to format the JSON.
-5. [Performance](performance.md) shows some in-house and third-party benchmarks.
-6. [Internals](internals.md) describes some internal designs and techniques of RapidJSON.
+1. [Streams](doc/stream.md) are channels for reading/writing JSON, which can be a in-memory string, or file stream, etc. User can also create their streams.
+2. [Encoding](doc/encoding.md) defines which character set is used in streams and memory. RapidJSON also provide Unicode conversion/validation internally.
+3. [DOM](doc/dom.md)'s basics are already covered in this tutorial. Uncover more advanced features such as *in situ* parsing, other parsing options and advanced usages.
+4. [SAX](doc/sax.md) is the foundation of parsing/generating facility in RapidJSON. Learn how to use `Reader`/`Writer` to implement even faster applications. Also try `PrettyWriter` to format the JSON.
+5. [Performance](doc/performance.md) shows some in-house and third-party benchmarks.
+6. [Internals](doc/internals.md) describes some internal designs and techniques of RapidJSON.
 
 You may also refer to the [FAQ](faq.md), API documentation, examples and unit tests.

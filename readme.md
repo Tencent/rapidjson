@@ -2,7 +2,9 @@
 
 Copyright (c) 2011-2014 Milo Yip (miloyip@gmail.com)
 
-https://github.com/miloyip/rapidjson/
+[RapidJSON GitHub](https://github.com/miloyip/rapidjson/)
+
+[RapidJSON Documentation](http://miloyip.github.io/rapidjson/)
 
 ## Introduction
 
@@ -42,11 +44,11 @@ RapidJSON is a header-only C++ library. Just copy the `include/rapidjson` folder
 To build the tests and examples:
 
 1. Obtain [premake4](http://industriousone.com/premake/download).
-2. Copy premake4 executable to RapidJSON/build (or system path)
-3. Run `rapidjson/build/premake.bat` on Windows, `RapidJSON/build/premake.sh` on Linux or other platforms
-4. On Windows, build the solution at `rapidjson/build/vs2008/` or `/vs2010/`
-5. On other platforms, run GNU make at `rapidjson/build/gmake/` (e.g., `make -f test.make config=release32`; `make -f example.make config=debug32`)
-6. On success, the executable are generated at `rapidjson/bin`
+2. Copy premake4 executable to RapidJSON/build (or system path).
+3. Run `rapidjson/build/premake.bat` on Windows, `RapidJSON/build/premake.sh` on Linux or other platforms.
+4. On Windows, build the solution at `rapidjson/build/vs2008/` or `/vs2010/`.
+5. On other platforms, run GNU make at `rapidjson/build/gmake/` (e.g., `make -f test.make config=release32`; `make -f example.make config=debug32`).
+6. On success, the executable are generated at `rapidjson/bin`.
 
 To build the [Doxygen](http://doxygen.org) documentation:
 
@@ -58,8 +60,8 @@ To build the [Doxygen](http://doxygen.org) documentation:
 
 This simple example parses a JSON string into a document (DOM), make a simple modification of the DOM, and finally stringify the DOM to a JSON string.
 
-[simpledom.cpp](example/simpledom/simpledom.cpp)
 ~~~~~~~~~~cpp
+// rapidjson/example/simpledom/simpledom.cpp`
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"

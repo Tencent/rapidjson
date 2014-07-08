@@ -2,11 +2,13 @@
 
 In RapidJSON, `rapidjson::Stream` is a concept for reading/writing JSON. Here we first show how to use streams provided. And then see how to create a custom streams.
 
-## Memory Streams
+[TOC]
+
+# Memory Streams {#MemoryStreams}
 
 Memory streams store JSON in memory.
 
-### StringStream (Input)
+## StringStream (Input) {#StringStream}
 
 `StringStream` is the most basic input stream. It represents a complete, read-only JSON stored in memory. It is defined in `rapidjson/rapidjson.h`.
 
@@ -34,7 +36,7 @@ d.Parse(json);
 
 Note that, `StringStream` is a typedef of `GenericStringStream<UTF8<> >`, user may use another encodings to represent the character set of the stream.
 
-### StringBuffer (Output)
+## StringBuffer (Output) {#StringBuffer}
 
 `StringBuffer` is a simple output stream. It allocates a memory buffer for writing the whole JSON. Use `GetString()` to obtain the buffer.
 
@@ -59,13 +61,13 @@ By default, `StringBuffer` will instantiate an internal allocator.
 
 Similarly, `StringBuffer` is a typedef of `GenericStringBuffer<UTF8<> >`.
 
-## File Streams
+# File Streams {#FileStreams}
 
 When parsing a JSON from file, you may read the whole JSON into memory and use ``StringStream`` above.
 
 However, if the JSON is big, or memory is limited, you can use `FileReadStream`. It only read a part of JSON from file into buffer, and then let the part be parsed. If it runs out of characters in the buffer, it will read the next part from file.
 
-### FileReadStream (Input)
+## FileReadStream (Input) {#FileReadStream}
 
 `FileReadStream` reads the file via a `FILE` pointer. And user need to provide a buffer.
 
@@ -90,7 +92,7 @@ Different from string streams, `FileReadStream` is byte stream. It does not hand
 
 Apart from reading file, user can also use `FileReadStream` to read `stdin`.
 
-### FileWriteStream (Output)
+## FileWriteStream (Output) {#FileWriteStream}
 
 `FileWriteStream` is buffered output stream. Its usage is very similar to `FileReadStream`.
 
@@ -117,7 +119,7 @@ fclose(fp);
 
 It can also directs the output to `stdout`.
 
-## Encoded Streams
+# Encoded Streams {#EncodedStreams}
 
 Encoded streams do not contain JSON itself, but they wrap byte streams to provide basic encoding/decoding function.
 
@@ -129,7 +131,7 @@ If the encoding of stream is known in compile-time, you may use `EncodedInputStr
 
 Note that, these encoded streams can be applied to streams other than file. For example, you may have a file in memory, or a custom byte stream, be wrapped in encoded streams.
 
-### EncodedInputStream
+## EncodedInputStream {#EncodedInputStream}
 
 `EncodedInputStream` has two template parameters. The first one is a `Encoding` class, such as `UTF8`, `UTF16LE`, defined in `rapidjson/encodings.h`. The second one is the class of stream to be wrapped.
 
@@ -154,7 +156,7 @@ d.ParseStream<0, UTF16LE<> >(eis);  // Parses UTF-16LE file into UTF-8 in memory
 fclose(fp);
 ~~~~~~~~~~
 
-### EncodedOutputStream
+## EncodedOutputStream {#EncodedOutputStream}
 
 `EncodedOutputStream` is similar but it has a `bool putBOM` parameter in the constructor, controlling whether to write BOM into output byte stream.
 
@@ -180,7 +182,7 @@ d.Accept(writer);   // This generates UTF32-LE file from UTF-8 in memory
 fclose(fp);
 ~~~~~~~~~~
 
-### AutoUTFInputStream
+## AutoUTFInputStream {#AutoUTFInputStream}
 
 Sometimes an application may want to handle all supported JSON encoding. `AutoUTFInputStream` will detection encoding by BOM first. If BOM is unavailable, it will use  characteristics of valid JSON to make detection. If neither method success, it falls back to the UTF type provided in constructor.
 
@@ -211,7 +213,7 @@ When specifying the encoding of stream, uses `AutoUTF<CharType>` as in `ParseStr
 
 You can obtain the type of UTF via `UTFType GetType()`. And check whether a BOM is found by `HasBOM()`
 
-### AutoUTFOutputStream
+## AutoUTFOutputStream {#AutoUTFOutputStream}
 
 Similarly, to choose encoding for output during runtime, we can use `AutoUTFOutputStream`. This class is not automatic *per se*. You need to specify the UTF type and whether to write BOM in runtime.
 
@@ -232,7 +234,7 @@ void WriteJSONFile(FILE* fp, UTFType type, bool putBOM, const Document& d) {
 
 `AutoUTFInputStream` and `AutoUTFOutputStream` is more convenient than `EncodedInputStream` and `EncodedOutputStream`. They just incur a little bit runtime overheads.
 
-## Custom Stream
+# Custom Stream {#CustomStream}
 
 In addition to memory/file streams, user can create their own stream classes which fits RapidJSON's API. For example, you may create network stream, stream from compressed file, etc.
 
@@ -273,7 +275,7 @@ For input stream, they must implement `Peek()`, `Take()` and `Tell()`.
 For output stream, they must implement `Put()` and `Flush()`. 
 There are two special interface, `PutBegin()` and `PutEnd()`, which are only for *in situ* parsing. Normal streams do not implement them. However, if the interface is not needed for a particular stream, it is still need to a dummy implementation, otherwise will generate compilation error.
 
-### Example: istream wrapper
+## Example: istream wrapper {#ExampleIStreamWrapper}
 
 The following example is a wrapper of `std::istream`, which only implements 3 functions.
 
@@ -323,7 +325,7 @@ d.Parse(is);
 
 Note that, this implementation may not be as efficient as RapidJSON's memory or file streams, due to internal overheads of the standard library.
 
-### Example: ostream wrapper
+## Example: ostream wrapper {#ExampleOStreamWrapper}
 
 The following example is a wrapper of `std::istream`, which only implements 2 functions.
 
@@ -367,6 +369,6 @@ d.Accept(writer);
 
 Note that, this implementation may not be as efficient as RapidJSON's memory or file streams, due to internal overheads of the standard library.
 
-## Summary
+# Summary {#Summary}
 
 This section describes stream classes available in RapidJSON. Memory streams are simple. File stream can reduce the memory required during JSON parsing and generation, if the JSON is stored in file system. Encoded streams converts between byte streams and character streams. Finally, user may create custom streams using a simple interface.
