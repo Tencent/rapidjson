@@ -43,7 +43,6 @@ after_success:
 #  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then ./configure; fi
 #  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then make; fi
 #  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then sudo make install; fi
-#  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cd "${TRAVIS_BUILD_DIR}"; fi
 
 # Install doxygen binary distribution 
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cd /tmp; fi
@@ -52,6 +51,7 @@ after_success:
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then sudo install -m 755 doxygen-1.8.7/bin/doxygen /usr/bin; fi
 
 # Run doxygen  
+  - if [ "$config" = "release64" -a "$CC" = "clang" ]; then cd "${TRAVIS_BUILD_DIR}"; fi
   - if [ "$config" = "release64" -a "$CC" = "clang" ]; then doxygen build/Doxyfile; fi
 
 # Push to Github Pages
