@@ -6,13 +6,11 @@
 #include <new>		// placement new
 
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4127) // conditional expression is constant
-#endif
-
-#ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Weffc++"
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
+#elif defined(__GNUC__)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
 #ifndef RAPIDJSON_NOMEMBERITERATORCLASS
@@ -1168,12 +1166,8 @@ GenericValue<Encoding,Allocator>::GenericValue(const GenericValue<Encoding,Sourc
 
 } // namespace rapidjson
 
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-
-#ifdef __GNUC__
-#pragma GCC diagnostic pop
+#if defined(_MSC_VER) || defined(__GNUC__)
+RAPIDJSON_DIAG_POP
 #endif
 
 #endif // RAPIDJSON_DOCUMENT_H_

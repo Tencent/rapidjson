@@ -6,8 +6,8 @@
 using namespace rapidjson;
 
 #ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Weffc++"
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
 template<bool expect>
@@ -707,5 +707,5 @@ TEST(Reader, Parse_IStreamWrapper_StringStream) {
 }
 
 #ifdef __GNUC__
-#pragma GCC diagnostic pop
+RAPIDJSON_DIAG_POP
 #endif

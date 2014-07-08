@@ -156,9 +156,56 @@ template<int x> struct StaticAssertTest {};
 // Helpers
 
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
+
 #define RAPIDJSON_MULTILINEMACRO_BEGIN do {  
 #define RAPIDJSON_MULTILINEMACRO_END \
 } while((void)0, 0)
+
+// adopted from Boost
+#define RAPIDJSON_VERSION_CODE(x,y,z) \
+  (((x)*100000) + ((y)*100) + (z))
+
+// token stringification
+#define RAPIDJSON_STRINGIFY(x) RAPIDJSON_DO_STRINGIFY(x)
+#define RAPIDJSON_DO_STRINGIFY(x) #x
+
+///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_DIAG_PUSH/POP, RAPIDJSON_DIAG_OFF
+
+#if defined(__clang__) || (defined(__GNUC__) && RAPIDJSON_VERSION_CODE(__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__) >= RAPIDJSON_VERSION_CODE(4,2,0))
+
+#define RAPIDJSON_PRAGMA(x) _Pragma(RAPIDJSON_STRINGIFY(x))
+#define RAPIDJSON_DIAG_PRAGMA(x) RAPIDJSON_PRAGMA(GCC diagnostic x)
+#define RAPIDJSON_DIAG_OFF(x) \
+	RAPIDJSON_DIAG_PRAGMA(ignored RAPIDJSON_STRINGIFY(RAPIDJSON_JOIN(-W,x)))
+
+// push/pop support in Clang and GCC>=4.6
+#if defined(__clang__) || (defined(__GNUC__) && RAPIDJSON_VERSION_CODE(__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__) >= RAPIDJSON_VERSION_CODE(4,6,0))
+#define RAPIDJSON_DIAG_PUSH RAPIDJSON_DIAG_PRAGMA(push)
+#define RAPIDJSON_DIAG_POP  RAPIDJSON_DIAG_PRAGMA(pop)
+#else // GCC >= 4.2, < 4.6
+#define RAPIDJSON_DIAG_PUSH /* ignored */
+#define RAPIDJSON_DIAG_POP /* ignored */
+#endif
+
+#elif defined(_MSC_VER)
+
+// pragma (MSVC specific)
+#define RAPIDJSON_PRAGMA(x) __pragma(x)
+#define RAPIDJSON_DIAG_PRAGMA(x) RAPIDJSON_PRAGMA(warning(x))
+
+#define RAPIDJSON_DIAG_OFF(x) RAPIDJSON_DIAG_PRAGMA(disable: x)
+#define RAPIDJSON_DIAG_PUSH RAPIDJSON_DIAG_PRAGMA(push)
+#define RAPIDJSON_DIAG_POP  RAPIDJSON_DIAG_PRAGMA(pop)
+
+#else
+
+#define RAPIDJSON_DIAG_OFF(x) /* ignored */
+#define RAPIDJSON_DIAG_PUSH   /* ignored */
+#define RAPIDJSON_DIAG_POP    /* ignored */
+
+#endif // RAPIDJSON_DIAG_*
+
 //!@endcond
 
 ///////////////////////////////////////////////////////////////////////////////
