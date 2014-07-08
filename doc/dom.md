@@ -226,7 +226,7 @@ When the source encoding of stream is the same as encoding of DOM, by default, t
 
 Some techniques about using DOM API is discussed here.
 
-### DOM as SAX Event Publisher
+## DOM as SAX Event Publisher
 
 In RapidJSON, stringifying a DOM with `Writer` may be look a little bit weired.
 
