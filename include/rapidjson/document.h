@@ -462,7 +462,12 @@ public:
 	/*! \pre IsObject() == true */
 	MemberIterator MemberEnd()				{ RAPIDJSON_ASSERT(IsObject()); return MemberIterator(data_.o.members + data_.o.size); }
 
+	MemberIterator MemberNotFound()	        { RAPIDJSON_ASSERT(IsObject()); return MemberIterator(0); }
+    
+    ConstMemberIterator MemberNotFound() const { RAPIDJSON_ASSERT(IsObject()); return MemberIterator(0); }
+
 	//! Check whether a member exists in the object.
+
 	/*!
 		\note It is better to use FindMember() directly if you need the obtain the value as well.
 	*/
@@ -513,44 +518,33 @@ public:
 							mi != parent.MemberEnd(); ++mi) {
 
 					SizeType len = name.data_.s.length;
-					if (mi->name.data_.s.length == len &&
-									memcmp(name, mi->name.data_.s.str,
-									len * sizeof (Ch)) == 0)
+                    if (mi->name.data_.s.length == len &&
+                            memcmp(mi->name.data_.s.str, name.data_.s.str,
+                            len * sizeof(Ch)) == 0) {
 							return mi;
+                    }
 
 					if (mi->value.flags_ == kObjectFlag) {
 							return FindMemberRecursive(mi->value, name);
 					}
 			}
 
-			return 0;
+			return MemberNotFound();
 	}
 
 	ConstMemberIterator FindMemberRecursive(const GenericValue &parent,
 					const Ch* name) const {
 
-			RAPIDJSON_ASSERT(IsObject());
-			RAPIDJSON_ASSERT(name);
+		GenericValue n(name, internal::StrLen(name));
+		return FindMemberRecursive(parent, n);
+	}
 
-			for (ConstMemberIterator mi = parent.MemberBegin();
-							mi != parent.MemberEnd(); ++mi) {
-
-					SizeType len = internal::StrLen(name);
-					if (mi->name.data_.s.length == len &&
-									memcmp(name, mi->name.data_.s.str,
-									len * sizeof (Ch)) == 0)
-							return mi;
-
-					if (mi->value.flags_ == kObjectFlag) {
-							return FindMemberRecursive(mi->value, name);
-					}
-			}
-
-			return 0;
+	bool HasMemberRecursive(const GenericValue &parent, const Ch *name) const {
+			return FindMemberRecursive(parent, name) != parent.MemberNotFound();
 	}
 
 	bool HasMemberRecursive(const Ch *name) const {
-			return FindMemberRecursive(this, name) != 0;
+			return FindMemberRecursive(*this, name) != MemberNotFound();
 	}
 
 	//! Add a member (name-value pair) to the object.
