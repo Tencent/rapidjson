@@ -25,8 +25,8 @@ before_script:
 
 script:
   - make -C build/gmake -f test.make
-  - make -C build/gmake -f example.make 
-   - cd bin
+  - make -C build/gmake -f example.make
+  - cd bin
   - ./unittest_${config_suffix}
   - valgrind --leak-check=full --error-exitcode=1 ./unittest_${config_suffix}
   - if [ "$config" = "release64" ]; then ./perftest_${config_suffix}; fi
