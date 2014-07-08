@@ -99,6 +99,16 @@ pre.fragment {
 	line-height: 19px;
 }
 
+table.doxtable th {
+	background-color: #f8f8f8;
+	color: #333333;
+	font-size: 15px;
+}
+
+table.doxtable td, table.doxtable th {
+	border: 1px solid #ddd;
+}
+
 #doc-content {
 	background-color: #fff;
 	width: 918px;
