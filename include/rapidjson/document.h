@@ -355,8 +355,6 @@ public:
 private:
 	//! Copy constructor is not permitted.
 	GenericValue(const GenericValue& rhs);
-	//! Disabled constructor for arbitrary pointers.
-	template<typename T> explicit GenericValue(T*);
 
 public:
 
@@ -385,7 +383,18 @@ public:
 	GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator & allocator);
 
 	//! Constructor for boolean value.
-	explicit GenericValue(bool b) : data_(), flags_(b ? kTrueFlag : kFalseFlag) {}
+	/*! \param b Boolean value
+		\note This constructor is limited to \em real boolean values and rejects
+			implicitly converted types like arbitrary pointers.  Use an explicit cast
+			to \c bool, if you want to construct a boolean JSON value in such cases.
+	 */
+#ifndef RAPIDJSON_DOXYGEN_RUNNING // hide SFINAE from Doxygen
+	template <typename T>
+	explicit GenericValue(T b, RAPIDJSON_ENABLEIF((internal::IsSame<T,bool>)))
+#else
+	explicit GenericValue(bool b)
+#endif
+		: data_(), flags_(b ? kTrueFlag : kFalseFlag) {}
 
 	//! Constructor for int value.
 	explicit GenericValue(int i) : data_(), flags_(kNumberIntFlag) {
