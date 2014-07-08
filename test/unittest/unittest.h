@@ -13,14 +13,16 @@
 #pragma warning(disable : 4996) // 'function': was declared deprecated
 #endif
 
-#ifdef __GNUC__
+#if defined(__clang__) || defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 2))
+#if defined(__clang__) || (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
 #pragma GCC diagnostic push
+#endif
 #pragma GCC diagnostic ignored "-Weffc++"
 #endif
 
 #include "gtest/gtest.h"
 
-#ifdef __GNUC__
+#if defined(__clang__) || defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
 #pragma GCC diagnostic pop
 #endif
 
