@@ -505,47 +505,55 @@ public:
 	ConstMemberIterator FindMember(const GenericValue& name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
 
 	//! Recursively find member by name via breadth-first search.
-	/*!
+    /*!
 		\pre IsObject() == true
 		\return Iterator to member, if it exists.
-			Otherwise returns \ref MemberEnd().
-     */
-    ConstMemberIterator FindMemberRecursive(const GenericValue &name) const {
+				Otherwise returns \ref MemberEnd().
+	 */
+	MemberIterator FindMemberRecursive(GenericValue &name) {
 
-        RAPIDJSON_ASSERT(IsObject());
-        RAPIDJSON_ASSERT(name.IsString());
+		RAPIDJSON_ASSERT(IsObject());
+		RAPIDJSON_ASSERT(name.IsString());
 
-        // search on current level
-        ConstMemberIterator ret = FindMember(name);
+		// search on current level
+		MemberIterator ret = FindMember(name);
 
-        if (ret != MemberEnd())
-            return ret;
+		if (ret != MemberEnd())
+			return ret;
 
-        // recursively search children
-        for (ConstMemberIterator mi = MemberBegin();
-                        mi != MemberEnd(); ++mi) {
+		// recursively search children
+		for (MemberIterator mi = MemberBegin();
+				mi != MemberEnd(); ++mi) {
 
-            if (mi->value.IsObject()) {
-                ConstMemberIterator found = mi->value.FindMemberRecursive(name);
-                if (found != mi->value.MemberEnd()) {
-                    return found;
-                }
-            }
-        }
+			if (mi->value.IsObject()) {
+				MemberIterator found = mi->value.FindMemberRecursive(name);
+				if (found != mi->value.MemberEnd()) {
+					return found;
+				}
+			}
+		}
 
-        return MemberEnd();
+		return MemberEnd();
 	}
 
-	//! Recursively find member by name.
-	ConstMemberIterator FindMemberRecursive(const Ch* name) const {
+	ConstMemberIterator FindMemberRecursive(const GenericValue& name) const {
+		return const_cast<GenericValue&> (*this).FindMemberRecursive(name);
+	}
+
+	//! Recursively find member by name
+	MemberIterator FindMemberRecursive(const Ch* name) {
 
 		GenericValue n(name, internal::StrLen(name));
 		return FindMemberRecursive(n);
 	}
 
+	ConstMemberIterator FindMemberRecursive(const Ch* name) const {
+		return const_cast<GenericValue&> (*this).FindMemberRecursive(name);
+	}
+
 	//! Recursively check whether a member exists in the object.
 	bool HasMemberRecursive(const Ch *name) const {
-			return FindMemberRecursive(name) != MemberEnd();
+		return FindMemberRecursive(name) != MemberEnd();
 	}
 
 	//! Add a member (name-value pair) to the object.
