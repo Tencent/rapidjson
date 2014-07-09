@@ -591,6 +591,27 @@ TEST(Value, Object) {
 	Value value("Banana", 6);
 	x.AddMember("B", "Banana", allocator);
 
+	// AddMember<T>(StringRefType, T, Allocator)
+	{
+		Value o(kObjectType);
+		o.AddMember("true", true, allocator);
+		o.AddMember("false", false, allocator);
+		o.AddMember("int", -1, allocator);
+		o.AddMember("uint", 1u, allocator);
+		o.AddMember("int64", INT64_C(-4294967296), allocator);
+		o.AddMember("uint64", UINT64_C(4294967296), allocator);
+		o.AddMember("double", 3.14, allocator);
+		o.AddMember("string", "Jelly", allocator);
+
+		EXPECT_TRUE(o["true"].GetBool());
+		EXPECT_FALSE(o["false"].GetBool());
+		EXPECT_EQ(-1, o["int"].GetInt());
+		EXPECT_EQ(1u, o["uint"].GetUint());
+		EXPECT_EQ(INT64_C(-4294967296), o["int64"].GetInt64());
+		EXPECT_EQ(UINT64_C(4294967296), o["uint64"].GetUint64());
+		EXPECT_STREQ("Jelly",o["string"].GetString());
+	}
+
 	// Tests a member with null character
 	Value name;
 	const Value C0D("C\0D", 3);
