@@ -11,9 +11,7 @@ DOXYGEN_URL="http://ftp.stack.nl/pub/users/dimitri/${DOXYGEN_TAR}"
 DOXYGEN_BIN="/usr/local/bin/doxygen"
 
 GHPAGES_REPO="miloyip/rapidjson"
-GHPAGES_BASE="https://github.com/${GHPAGES_REPO}"
-# NOTE: not expanded here to hide GH_TOKEN
-GHPAGES_PUSH='https://${GH_TOKEN}@github.com/${GHPAGES_REPO}'
+GHPAGES_URL="https://github.com/${GHPAGES_REPO}"
 
 skip() {
 	echo "$@" 1>&2
@@ -63,7 +61,7 @@ gh_pages_prepare()
 	cd "${TRAVIS_BUILD_DIR}/doc";
 	[ ! -d "html" ] || \
 		abort "Doxygen target directory already exists."
-	git clone --single-branch -b gh-pages ${GHPAGES_BASE} html
+	git clone --single-branch -b gh-pages ${GHPAGES_URL} html
 	cd html
 	# setup git config (with defaults)
 	git config user.name "${GIT_NAME-travis}"
@@ -87,9 +85,11 @@ gh_pages_push() {
 		skip "GitHub access token not available, not updating GitHub pages."
 
 	cd "${TRAVIS_BUILD_DIR}/doc/html";
-	# push to GitHub without printing GH_TOKEN even in "set -x" mode
-	( echo "git push ${GHPAGES_PUSH} gh-pages" ; set +x; \
-		eval "git push ${GHPAGES_PUSH} gh-pages" )
+	# setup credentials (hide in "set -x" mode)
+	git config core.askpass /bin/true
+	( set +x ; git config credential.${GHPAGES_URL}.username "${GH_TOKEN}" )
+	# push to GitHub
+	git push origin gh-pages
 }
 
 doxygen_install
