@@ -24,11 +24,14 @@ struct SelectIf : SelectIfCond<Condition::Value,T1,T2> {};
 template <bool Constify, typename T>
 struct MaybeAddConst : SelectIfCond<Constify, const T, T> {};
 
-template <typename T, typename U> struct IsSame { enum { Value = false }; };
-template <typename T> struct IsSame<T,T> { enum { Value = true }; };
+template <typename T, typename U> struct IsSame  : FalseType {};
+template <typename T> struct IsSame<T,T>  : TrueType {};
 
-template <typename T> struct IsConst { enum { Value = false }; };
-template <typename T> struct IsConst<const T> { enum { Value = true }; };
+template <typename T> struct IsConst : FalseType {};
+template <typename T> struct IsConst<const T> : TrueType {};
+
+template <typename T> struct IsPointer : FalseType {};
+template <typename T> struct IsPointer<T*> : TrueType {};
 
 template <typename CT, typename T>
 struct IsMoreConst {
@@ -63,6 +66,9 @@ template <typename T> struct RemoveSfinaeFptr<SfinaeResultTag&(*)(T)> { typedef 
 #define RAPIDJSON_ENABLEIF(cond) \
 	typename ::rapidjson::internal::EnableIf \
 		<RAPIDJSON_REMOVEFPTR_(cond)>::Type * = NULL
+
+#define RAPIDJSON_DISABLEIF_RETURN(cond,returntype) \
+	typename ::rapidjson::internal::DisableIf<cond,returntype>::Type
 
 } // namespace internal
 } // namespace rapidjson

@@ -23,6 +23,25 @@ TEST(Value, assignment_operator) {
 	y = x;
 	EXPECT_TRUE(x.IsNull());	// move semantic
 	EXPECT_EQ(1234, y.GetInt());
+
+	y = 5678;
+	EXPECT_TRUE(y.IsInt());
+	EXPECT_EQ(5678, y.GetInt());
+
+	x = "Hello";
+	EXPECT_TRUE(x.IsString());
+	EXPECT_STREQ(x.GetString(),"Hello");
+
+	y = StringRef(x.GetString(),x.GetStringLength());
+	EXPECT_TRUE(y.IsString());
+	EXPECT_EQ(y.GetString(),x.GetString());
+	EXPECT_EQ(y.GetStringLength(),x.GetStringLength());
+
+	static char mstr[] = "mutable";
+	// y = mstr; // should not compile
+	y = StringRef(mstr);
+	EXPECT_TRUE(y.IsString());
+	EXPECT_EQ(y.GetString(),mstr);
 }
 
 template <typename Value>
@@ -350,8 +369,8 @@ TEST(Value, Double) {
 }
 
 TEST(Value, String) {
-	// Constructor with const string
-	Value x("Hello", 5);
+	// Construction with const string
+	Value x("Hello", 5); // literal
 	EXPECT_EQ(kStringType, x.GetType());
 	EXPECT_TRUE(x.IsString());
 	EXPECT_STREQ("Hello", x.GetString());
@@ -365,9 +384,41 @@ TEST(Value, String) {
 	EXPECT_FALSE(x.IsObject());
 	EXPECT_FALSE(x.IsArray());
 
+	static const char cstr[] = "World"; // const array
+	Value(cstr).Swap(x);
+	EXPECT_TRUE(x.IsString());
+	EXPECT_EQ(x.GetString(), cstr);
+	EXPECT_EQ(x.GetStringLength(), sizeof(cstr)-1);
+
+	static char mstr[] = "Howdy"; // non-const array
+	// Value(mstr).Swap(x); // should not compile
+	Value(StringRef(mstr)).Swap(x);
+	EXPECT_TRUE(x.IsString());
+	EXPECT_EQ(x.GetString(), mstr);
+	EXPECT_EQ(x.GetStringLength(), sizeof(mstr)-1);
+	strncpy(mstr,"Hello", sizeof(mstr));
+	EXPECT_STREQ(x.GetString(), "Hello");
+
+	const char* pstr = cstr;
+	//Value(pstr).Swap(x); // should not compile
+	Value(StringRef(pstr)).Swap(x);
+	EXPECT_TRUE(x.IsString());
+	EXPECT_EQ(x.GetString(), cstr);
+	EXPECT_EQ(x.GetStringLength(), sizeof(cstr)-1);
+
+	char* mpstr = mstr;
+	Value(StringRef(mpstr,sizeof(mstr)-1)).Swap(x);
+	EXPECT_TRUE(x.IsString());
+	EXPECT_EQ(x.GetString(), mstr);
+	EXPECT_EQ(x.GetStringLength(), 5u);
+	EXPECT_STREQ(x.GetString(), "Hello");
+
 	// Constructor with copy string
 	MemoryPoolAllocator<> allocator;
 	Value c(x.GetString(), x.GetStringLength(), allocator);
+	EXPECT_NE(x.GetString(), c.GetString());
+	EXPECT_EQ(x.GetStringLength(), c.GetStringLength());
+	EXPECT_STREQ(x.GetString(), c.GetString());
 	//x.SetString("World");
 	x.SetString("World", 5);
 	EXPECT_STREQ("Hello", c.GetString());
@@ -381,10 +432,30 @@ TEST(Value, String) {
 
 	// SetConsttring()
 	Value z;
-	//z.SetString("Hello");
+	z.SetString("Hello");
+	EXPECT_TRUE(x.IsString());
 	z.SetString("Hello", 5);
 	EXPECT_STREQ("Hello", z.GetString());
+	EXPECT_STREQ("Hello", z.GetString());
 	EXPECT_EQ(5u, z.GetStringLength());
+
+	z.SetString("Hello");
+	EXPECT_TRUE(z.IsString());
+	EXPECT_STREQ("Hello", z.GetString());
+
+	//z.SetString(mstr); // should not compile
+	//z.SetString(pstr); // should not compile
+	z.SetString(StringRef(mstr));
+	EXPECT_TRUE(z.IsString());
+	EXPECT_STREQ(z.GetString(), mstr);
+
+	z.SetString(cstr);
+	EXPECT_TRUE(z.IsString());
+	EXPECT_EQ(cstr, z.GetString());
+
+	z = cstr;
+	EXPECT_TRUE(z.IsString());
+	EXPECT_EQ(cstr, z.GetString());
 
 	// SetString()
 	char s[] = "World";
@@ -424,11 +495,13 @@ TEST(Value, Array) {
 	x.PushBack(v, allocator);
 	v.SetInt(123);
 	x.PushBack(v, allocator);
+	//x.PushBack((const char*)"foo", allocator); // should not compile
+	x.PushBack("foo", allocator);
 
 	EXPECT_FALSE(x.Empty());
-	EXPECT_EQ(4u, x.Size());
+	EXPECT_EQ(5u, x.Size());
 	EXPECT_FALSE(y.Empty());
-	EXPECT_EQ(4u, y.Size());
+	EXPECT_EQ(5u, y.Size());
 	EXPECT_TRUE(x[SizeType(0)].IsNull());
 	EXPECT_TRUE(x[1u].IsTrue());
 	EXPECT_TRUE(x[2u].IsFalse());
@@ -439,6 +512,8 @@ TEST(Value, Array) {
 	EXPECT_TRUE(y[2u].IsFalse());
 	EXPECT_TRUE(y[3u].IsInt());
 	EXPECT_EQ(123, y[3u].GetInt());
+	EXPECT_TRUE(y[4u].IsString());
+	EXPECT_STREQ("foo", y[4u].GetString());
 
 	// iterator
 	Value::ValueIterator itr = x.Begin();
@@ -454,6 +529,10 @@ TEST(Value, Array) {
 	EXPECT_TRUE(itr != x.End());
 	EXPECT_TRUE(itr->IsInt());
 	EXPECT_EQ(123, itr->GetInt());
+	++itr;
+	EXPECT_TRUE(itr != x.End());
+	EXPECT_TRUE(itr->IsString());
+	EXPECT_STREQ("foo", itr->GetString());
 
 	// const iterator
 	Value::ConstValueIterator citr = y.Begin();
@@ -469,13 +548,18 @@ TEST(Value, Array) {
 	EXPECT_TRUE(citr != y.End());
 	EXPECT_TRUE(citr->IsInt());
 	EXPECT_EQ(123, citr->GetInt());
+	++citr;
+	EXPECT_TRUE(citr != y.End());
+	EXPECT_TRUE(citr->IsString());
+	EXPECT_STREQ("foo", citr->GetString());
 
 	// PopBack()
 	x.PopBack();
-	EXPECT_EQ(3u, x.Size());
+	EXPECT_EQ(4u, x.Size());
 	EXPECT_TRUE(y[SizeType(0)].IsNull());
-	EXPECT_TRUE(y[1].IsTrue());
-	EXPECT_TRUE(y[2].IsFalse());
+	EXPECT_TRUE(y[1u].IsTrue());
+	EXPECT_TRUE(y[2u].IsFalse());
+	EXPECT_TRUE(y[3u].IsInt());
 
 	// Clear()
 	x.Clear();
@@ -502,16 +586,34 @@ TEST(Value, Object) {
 	EXPECT_TRUE(y.IsObject());
 
 	// AddMember()
-	Value name("A", 1);
-	Value value("Apple", 5);
-	x.AddMember(name, value, allocator);
-	//name.SetString("B");
-	name.SetString("B", 1);
-	//value.SetString("Banana");
-	value.SetString("Banana", 6);
-	x.AddMember(name, value, allocator);
+	x.AddMember("A", "Apple", allocator);
+
+	Value value("Banana", 6);
+	x.AddMember("B", "Banana", allocator);
+
+	// AddMember<T>(StringRefType, T, Allocator)
+	{
+		Value o(kObjectType);
+		o.AddMember("true", true, allocator);
+		o.AddMember("false", false, allocator);
+		o.AddMember("int", -1, allocator);
+		o.AddMember("uint", 1u, allocator);
+		o.AddMember("int64", INT64_C(-4294967296), allocator);
+		o.AddMember("uint64", UINT64_C(4294967296), allocator);
+		o.AddMember("double", 3.14, allocator);
+		o.AddMember("string", "Jelly", allocator);
+
+		EXPECT_TRUE(o["true"].GetBool());
+		EXPECT_FALSE(o["false"].GetBool());
+		EXPECT_EQ(-1, o["int"].GetInt());
+		EXPECT_EQ(1u, o["uint"].GetUint());
+		EXPECT_EQ(INT64_C(-4294967296), o["int64"].GetInt64());
+		EXPECT_EQ(UINT64_C(4294967296), o["uint64"].GetUint64());
+		EXPECT_STREQ("Jelly",o["string"].GetString());
+	}
 
 	// Tests a member with null character
+	Value name;
 	const Value C0D("C\0D", 3);
 	name.SetString(C0D.GetString(), 3);
 	value.SetString("CherryD", 7);
@@ -523,7 +625,7 @@ TEST(Value, Object) {
 	EXPECT_TRUE(y.HasMember("A"));
 	EXPECT_TRUE(y.HasMember("B"));
 
-	name.SetString("C\0D", 3);
+	name.SetString("C\0D");
 	EXPECT_TRUE(x.HasMember(name));
 	EXPECT_TRUE(y.HasMember(name));
 
@@ -617,6 +719,7 @@ TEST(Value, BigNestedObject) {
 		char name1[10];
 		sprintf(name1, "%d", i);
 
+		// Value name(name1); // should not compile
 		Value name(name1, (SizeType)strlen(name1), allocator);
 		Value object(kObjectType);
 
@@ -629,6 +732,7 @@ TEST(Value, BigNestedObject) {
 			object.AddMember(name, number, allocator);
 		}
 
+		// x.AddMember(name1, object, allocator); // should not compile
 		x.AddMember(name, object, allocator);
 	}
 
