@@ -813,7 +813,7 @@ private:
 		}
 	}
 
-	IterativeParsingState Transit(IterativeParsingState state, IterativeParsingToken token) {
+	IterativeParsingState Deduce(IterativeParsingState state, IterativeParsingToken token) {
 		// current state x one lookahead token -> new state
 		static const IterativeParsingState G[cIterativeParsingStateCount][cIterativeParsingTokenCount] = {
 			// Start
@@ -974,7 +974,7 @@ private:
 	// Make an advance in the token stream and state based on the candidate destination state which was returned by Transit().
 	// May return a new state on state pop.
 	template <unsigned parseFlags, typename InputStream, typename Handler>
-	IterativeParsingState Advance(IterativeParsingState src, IterativeParsingToken token, IterativeParsingState dst, InputStream& is, Handler& handler) {
+	IterativeParsingState Transit(IterativeParsingState src, IterativeParsingToken token, IterativeParsingState dst, InputStream& is, Handler& handler) {
 		int c = 0;
 		IterativeParsingState n;
 
@@ -1087,6 +1087,35 @@ private:
 		}
 	}
 
+	template <typename InputStream>
+	void HandleError(IterativeParsingState src, InputStream& is) {
+		if (HasParseError()) {
+			// Error flag has been set.
+			return;
+		}
+		
+		if (src == IterativeParsingStartState && is.Peek() == '\0')
+			RAPIDJSON_PARSE_ERROR(kParseErrorDocumentEmpty, is.Tell());
+
+		else if (src == IterativeParsingStartState)
+			RAPIDJSON_PARSE_ERROR(kParseErrorDocumentRootNotObjectOrArray, is.Tell());
+
+		else if (src == IterativeParsingFinishState)
+			RAPIDJSON_PARSE_ERROR(kParseErrorDocumentRootNotSingular, is.Tell());
+
+		else if (src == IterativeParsingObjectInitialState || src == IterativeParsingMemberDelimiterState)
+			RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
+
+		else if (src == IterativeParsingMemberKeyState)
+			RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissColon, is.Tell());
+
+		else if (src == IterativeParsingMemberValueState)
+			RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell());
+
+		else if (src == IterativeParsingElementState)
+			RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell());
+	}
+
 	template <unsigned parseFlags, typename InputStream, typename Handler>
 	bool IterativeParse(InputStream& is, Handler& handler) {
 		IterativeParsingState state = IterativeParsingStartState;
@@ -1094,16 +1123,22 @@ private:
 		SkipWhitespace(is);
 		while (is.Peek() != '\0') {
 			IterativeParsingToken t = GuessToken(is.Peek());
-			IterativeParsingState n = Transit(state, t);
+			IterativeParsingState n = Deduce(state, t);
+			IterativeParsingState d = Transit<parseFlags>(state, t, n, is, handler);
 
-			if ((n = Advance<parseFlags>(state, t, n, is, handler)) != IterativeParsingErrorState)
-				state = n;
-			else
+			if (d == IterativeParsingErrorState) {
+				HandleError(state, is);
 				break;
+			}
 
+			state = d;
 			SkipWhitespace(is);
 		}
 
+		// Handle the end of file.
+		if (state != IterativeParsingFinishState)
+			HandleError(state, is);
+		
 		stack_.Clear();
 		return state == IterativeParsingFinishState;
 	}

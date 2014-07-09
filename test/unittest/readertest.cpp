@@ -706,6 +706,30 @@ TEST(Reader, Parse_IStreamWrapper_StringStream) {
 	EXPECT_FALSE(reader.HasParseError());	
 }
 
+#define TESTERRORHANDLING(text, errorCode)\
+	{\
+		StringStream json(text);\
+		BaseReaderHandler<> handler;\
+		Reader reader;\
+		reader.IterativeParse<kParseDefaultFlags>(json, handler);\
+		EXPECT_TRUE(reader.HasParseError());\
+		EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
+	}
+
+TEST(Reader, IterativeParsing_ErrorHandling) {
+	TESTERRORHANDLING("{\"a\": a}", kParseErrorValueInvalid);
+
+	TESTERRORHANDLING("", kParseErrorDocumentEmpty);
+	TESTERRORHANDLING("1", kParseErrorDocumentRootNotObjectOrArray);
+	TESTERRORHANDLING("{}{}", kParseErrorDocumentRootNotSingular);
+
+	TESTERRORHANDLING("{1}", kParseErrorObjectMissName);
+	TESTERRORHANDLING("{\"a\", 1}", kParseErrorObjectMissColon);
+	TESTERRORHANDLING("{\"a\"}", kParseErrorObjectMissColon);
+	TESTERRORHANDLING("{\"a\": 1", kParseErrorObjectMissCommaOrCurlyBracket);
+	TESTERRORHANDLING("[1 2 3]", kParseErrorArrayMissCommaOrSquareBracket);
+}
+
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
