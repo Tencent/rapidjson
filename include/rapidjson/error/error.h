@@ -59,6 +59,28 @@ enum ParseErrorCode {
 	kParseErrorNumberMissExponent				//!< Miss exponent in number.
 };
 
+struct ParseResult {
+
+	ParseResult() : code_(kParseErrorNone), offset_(0) {}
+	ParseResult(ParseErrorCode code, size_t offset) : code_(code), offset_(offset) {}
+
+	ParseErrorCode Code() const { return code_; }
+	size_t Offset() const { return offset_; }
+
+	operator bool() const { return !IsError(); }
+	bool IsError() const { return code_ != kParseErrorNone; }
+
+	bool operator==(const ParseResult& that) const { return code_ == that.code_; }
+	bool operator==(ParseErrorCode code) const { return code_ == code; }
+	friend bool operator==(ParseErrorCode code, const ParseResult & err) { return code == err.code_; }
+
+	void Clear() { Set(kParseErrorNone); }
+	void Set(ParseErrorCode code, size_t offset = 0) { code_ = code; offset_ = offset; }
+
+private:
+	ParseErrorCode code_;
+	size_t offset_;
+};
 
 //! Function pointer type of GetParseError().
 /*! This is the prototype for GetParseError_X(), where X is a locale.

@@ -38,8 +38,7 @@ RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
 #define RAPIDJSON_PARSE_ERROR_NORETURN(parseErrorCode, offset) \
 	RAPIDJSON_MULTILINEMACRO_BEGIN \
 	RAPIDJSON_ASSERT(!HasParseError()); /* Error can only be assigned once */ \
-	parseErrorCode_ = parseErrorCode; \
-	errorOffset_ = offset; \
+	parseResult_.Set(parseErrorCode,offset); \
 	RAPIDJSON_MULTILINEMACRO_END
 #endif
 
@@ -51,7 +50,7 @@ RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
 	RAPIDJSON_MULTILINEMACRO_END
 #endif
 
-#include "error/error.h" // ParseErrorCode
+#include "error/error.h" // ParseErrorCode, ParseResult
 
 namespace rapidjson {
 
@@ -273,7 +272,7 @@ public:
 	/*! \param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
 		\param stackCapacity stack capacity in bytes for storing a single decoded string.  (Only use for non-destructive parsing)
 	*/
-	GenericReader(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseErrorCode_(kParseErrorNone), errorOffset_(0) {}
+	GenericReader(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseResult_() {}
 
 	//! Parse JSON text.
 	/*! \tparam parseFlags Combination of \ref ParseFlag.
@@ -284,16 +283,15 @@ public:
 		\return Whether the parsing is successful.
 	*/
 	template <unsigned parseFlags, typename InputStream, typename Handler>
-	bool Parse(InputStream& is, Handler& handler) {
-		parseErrorCode_ = kParseErrorNone;
-		errorOffset_ = 0;
+	ParseResult Parse(InputStream& is, Handler& handler) {
+		parseResult_.Clear();
 
 		ClearStackOnExit scope(*this);
 		SkipWhitespace(is);
 
 		if (is.Peek() == '\0') {
 			RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentEmpty, is.Tell());
-			RAPIDJSON_PARSE_ERROR_EARLY_RETURN(false);
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
 		}
 		else {
 			switch (is.Peek()) {
@@ -301,17 +299,17 @@ public:
 				case '[': ParseArray<parseFlags>(is, handler); break;
 				default: RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotObjectOrArray, is.Tell());
 			}
-			RAPIDJSON_PARSE_ERROR_EARLY_RETURN(false);
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
 
 			SkipWhitespace(is);
 
 			if (is.Peek() != '\0') {
 				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotSingular, is.Tell());
-				RAPIDJSON_PARSE_ERROR_EARLY_RETURN(false);
+				RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
 			}
 		}
 
-		return true;
+		return parseResult_;
 	}
 
 	//! Parse JSON text (with \ref kParseDefaultFlags)
@@ -322,15 +320,15 @@ public:
 		\return Whether the parsing is successful.
 	*/
 	template <typename InputStream, typename Handler>
-	bool Parse(InputStream& is, Handler& handler) {
+	ParseResult Parse(InputStream& is, Handler& handler) {
 		return Parse<kParseDefaultFlags>(is, handler);
 	}
 
-	bool HasParseError() const { return parseErrorCode_ != kParseErrorNone; }
+	bool HasParseError() const { return parseResult_.IsError(); }
 	
-	ParseErrorCode GetParseErrorCode() const { return parseErrorCode_; }
+	ParseErrorCode GetParseErrorCode() const { return parseResult_.Code(); }
 
-	size_t GetErrorOffset() const { return errorOffset_; }
+	size_t GetErrorOffset() const { return parseResult_.Offset(); }
 
 private:
 	// Prohibit copy constructor & assignment operator.
@@ -755,8 +753,7 @@ private:
 
 	static const size_t kDefaultStackCapacity = 256;	//!< Default stack capacity in bytes for storing a single decoded string. 
 	internal::Stack<Allocator> stack_;	//!< A stack for storing decoded string temporarily during non-destructive parsing.
-	ParseErrorCode parseErrorCode_;
-	size_t errorOffset_;
+	ParseResult parseResult_;
 }; // class GenericReader
 
 //! Reader with UTF8 encoding and default allocator.
