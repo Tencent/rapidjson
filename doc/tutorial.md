@@ -313,6 +313,17 @@ Value o(kObjectType);
 
 This is called move assignment operator in C++11. As RapidJSON supports C++03, it adopts move semantics using assignment operator, and all other modifying function like `AddMember()`, `PushBack()`.
 
+### Move semantics and temporary values {#TemporaryValues}
+
+Sometimes, it is convenient to construct a Value in place, before passing it to one of the "moving" functions, like `PushBack()` or `AddMember()`.  As temporary objects can't be converted to proper Value references, the convenience function `Move()` is available:
+
+~~~~~~~~~~cpp
+Value a(kArrayType);
+// a.PushBack(Value(42));       // will not compile
+a.PushBack(Value().SetInt(42)); // fluent API
+a.PushBack(Value(42).Move());   // same as above
+~~~~~~~~~~
+
 ## Create String {#CreateString}
 RapidJSON provide two strategies for storing string.
 
@@ -339,14 +350,27 @@ In this example, we get the allocator from a `Document` instance. This is a comm
 
 Besides, the above `SetString()` requires length. This can handle null characters within a string. There is another `SetString()` overloaded function without the length parameter. And it assumes the input is null-terminated and calls a `strlen()`-like function to obtain the length.
 
-Finally, for literal string or string with safe life-cycle can use const-string version of `SetString()`, which lacks allocator parameter:
+Finally, for literal string or string with safe life-cycle can use const-string version of `SetString()`, which lacks allocator parameter.  For string literals (or constant character arrays), simply passing the literal as parameter is safe and efficient:
 
 ~~~~~~~~~~cpp
 Value s;
-s.SetString("rapidjson", 9); // faster, can contain null character
-s.SetString("rapidjson");    // slower, assumes null-terminated
+s.SetString("rapidjson");    // can contain null character, length derived at compile time
 s = "rapidjson";             // shortcut, same as above
 ~~~~~~~~~~
+
+For plain string pointers, the RapidJSON requires to mark a string as safe before using it without copying.  This can be achieved by using the `StringRef` function:
+
+~~~~~~~~~cpp
+const char * cstr = getenv("USER");
+size_t cstr_len = ...;                 // in case length is available
+Value s;
+// s.SetString(cstr);                  // will not compile
+s.SetString(StringRef(cstr));          // ok, assume safe lifetime, null-terminated
+s = StringRef(cstr);                   // shortcut, same as above
+s.SetString(StringRef(cstr,cstr_len)); // faster, can contain null character
+s = StringRef(cstr,cstr_len);          // shortcut, same as above
+
+~~~~~~~~~
 
 ## Modify Array {#ModifyArray}
 Value with array type provides similar APIs as `std::vector`.
@@ -357,7 +381,7 @@ Value with array type provides similar APIs as `std::vector`.
 * `template <typename T> GenericValue& PushBack(T, Allocator&)`
 * `Value& PopBack()`
 
-Note that, `Reserve(...)` and `PushBack(...)` may allocate memory, therefore requires an allocator.
+Note that, `Reserve(...)` and `PushBack(...)` may allocate memory for the array elements, therefore require an allocator.
 
 Here is an example of `PushBack()`:
 
@@ -372,14 +396,26 @@ for (int i = 5; i <= 10; i++)
 a.PushBack("Lua", allocator).PushBack("Mio", allocator);
 ~~~~~~~~~~
 
-Differs from STL, `PushBack()`/`PopBack()` returns the array reference itself. This is called fluent interface.
+Differs from STL, `PushBack()`/`PopBack()` returns the array reference itself. This is called _fluent interface_.
+
+If you want to add a non-constant string or a string without sufficient lifetime (see [Create String](#CreateString)) to the array, you need to create a string Value by using the copy-string API.  To avoid the need for an intermediate variable, you can use a [temporary value](#TemporaryValues) in place:
+
+~~~~~~~~~~cpp
+// in-place Value parameter
+contact.PushBack(Value("copy", document.GetAllocator()).Move(), // copy string
+                 document.GetAllocator());
+
+// explicit parameters
+Value val("key", document.GetAllocator()); // copy string
+contact.PushBack(val, document.GetAllocator());
+~~~~~~~~~~
 
 ## Modify Object {#ModifyObject}
 Object is a collection of key-value pairs. Each key must be a string value. The way to manipulating object is to add/remove members:
 
 * `Value& AddMember(Value&, Value&, Allocator& allocator)`
-* `Value& AddMember(const Ch*, Value&, Allocator&)`
-* `template <typename T> Value& AddMember(const Ch*, T value, Allocator&)`
+* `Value& AddMember(StringRefType, Value&, Allocator&)`
+* `template <typename T> Value& AddMember(StringRefType, T value, Allocator&)`
 * `bool RemoveMember(const Ch*)`
 
 Here is an example.
@@ -388,6 +424,22 @@ Here is an example.
 Value contact(kObject);
 contact.AddMember("name", "Milo", document.GetAllocator());
 contact.AddMember("married", true, document.GetAllocator());
+~~~~~~~~~~
+
+The `StringRefType` used as name parameter assumes the same interface as the `SetString` function for string values.  These overloads are used to avoid the need for copying the `name` string, as constant key names are very common in JSON objects.
+
+If you need to create a name from a non-constant string or a string without sufficient lifetime (see [Create String](#CreateString)), you need to create a string Value by using the copy-string API.  To avoid the need for an intermediate variable, you can use a [temporary value](#TemporaryValues) in place:
+
+~~~~~~~~~~cpp
+// in-place Value parameter
+contact.AddMember(Value("copy", document.GetAllocator()).Move(), // copy string
+                  Value().Move(),                                // null value
+                  document.GetAllocator());
+
+// explicit parameters
+Value key("key", document.GetAllocator()); // copy name string
+Value val(42);                             // some value
+contact.AddMember(key, val, document.GetAllocator());
 ~~~~~~~~~~
 
 ## Deep Copy Value {#DeepCopyValue}
