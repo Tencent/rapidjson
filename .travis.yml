@@ -9,7 +9,7 @@ env:
     - config=debug64   config_suffix=debug_x64_gmake
     - config=release64 config_suffix=release_x64_gmake
   global:
-    secure: HAEPpA7IxUd+X4X5VcUpSxWf3hDRDNgNpKQrRSX/X/nS0/h5PAwES7fmM6WJAsoEmczCp3OOArzyOON+KLbISvJLnHvnexd+rtyVjU2zOOVTEgzJRdAPHwocqVx5FOxtlKgbDISE6dl3H5aUCycf962jfquhKosi11rbxwcscmc=
+    secure: "PoHpnUX6AnuS0Rj2lytxG63cgU8r8dph4z2eSlc0q401nzakOgRRdhzuIqFyAv+qfihUoWi/xwCzAI8d67qamBFR6YUCsdQ5wpFZ3kHg4ZhlIlvAxOWcCcpWwwSqlQboGbv/JAWdnBaCXzyuA6soKyY32LSgMaUP2kOcwhbZvxo="
 
 before_install:
   - sudo add-apt-repository -y ppa:codegear/release
