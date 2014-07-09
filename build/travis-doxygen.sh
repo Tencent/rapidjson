@@ -63,10 +63,11 @@ gh_pages_prepare()
 	cd "${TRAVIS_BUILD_DIR}/doc";
 	[ ! -d "html" ] || \
 		abort "Doxygen target directory already exists."
-	git config --global user.name "${GIT_NAME}"
-	git config --global user.email "${GIT_EMAIL}"
 	git clone --single-branch -b gh-pages ${GHPAGES_BASE} html
 	cd html
+	# setup git config (with defaults)
+	git config user.name "${GIT_NAME-travis}"
+	git config user.email "${GIT_EMAIL-"travis@localhost"}"
 	# clean working dir
 	rm -f .git/index
 	git clean -df
@@ -75,7 +76,7 @@ gh_pages_prepare()
 gh_pages_commit() {
 	cd "${TRAVIS_BUILD_DIR}/doc/html";
 	git add --all;
-	git commit -m "Automatic doxygen build";
+	git diff-index --quiet HEAD || git commit -m "Automatic doxygen build";
 }
 
 gh_pages_push() {
