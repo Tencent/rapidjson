@@ -313,6 +313,17 @@ Value o(kObjectType);
 
 This is called move assignment operator in C++11. As RapidJSON supports C++03, it adopts move semantics using assignment operator, and all other modifying function like `AddMember()`, `PushBack()`.
 
+### Move semantics and temporary values {#TemporaryValues}
+
+Sometimes, it is convenient to construct a Value in place, before passing it to one of the "moving" functions, like `PushBack()` or `AddMember()`.  As temporary objects can't be converted to proper Value references, the convenience function `Move()` is available:
+
+~~~~~~~~~~cpp
+Value a(kArrayType);
+// a.PushBack(Value(42));       // will not compile
+a.PushBack(Value().SetInt(42)); // fluent API
+a.PushBack(Value(42).Move());   // same as above
+~~~~~~~~~~
+
 ## Create String {#CreateString}
 RapidJSON provide two strategies for storing string.
 
