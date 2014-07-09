@@ -551,6 +551,9 @@ public:
 		return *this;
 	}
 
+	//! Prepare Value for move semantics
+	/*! \return *this */
+	GenericValue& Move() { return *this; }
 	//@}
 
 	//!@name Type
