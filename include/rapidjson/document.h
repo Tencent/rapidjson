@@ -1326,13 +1326,13 @@ public:
 	//!@name Handling parse errors
 	//!@{
 
-	//! Whether a parse error was occured in the last parsing.
+	//! Whether a parse error has occured in the last parsing.
 	bool HasParseError() const { return parseResult_.IsError(); }
 
-	//! Get the message of parsing error.
+	//! Get the \ref ParseErrorCode of last parsing.
 	ParseErrorCode GetParseError() const { return parseResult_.Code(); }
 
-	//! Get the offset in character of the parsing error.
+	//! Get the position of last parsing error in input, 0 otherwise.
 	size_t GetErrorOffset() const { return parseResult_.Offset(); }
 
 	//!@}

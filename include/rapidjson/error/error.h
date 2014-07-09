@@ -59,22 +59,43 @@ enum ParseErrorCode {
 	kParseErrorNumberMissExponent				//!< Miss exponent in number.
 };
 
+//! Result of parsing (wraps ParseErrorCode)
+/*!
+	\code
+		Document doc;
+		ParseResult ok = doc.Parse("[42]");
+		if (!ok) {
+			fprintf(stderr, "JSON parse error: %s (%u)",
+					GetParseError_En(ok.Code()), ok.Offset());
+			exit(EXIT_FAILURE);
+		}
+	\endcode
+	\see GenericReader::Parse, GenericDocument::Parse
+*/
 struct ParseResult {
 
+	//! Default constructor, no error.
 	ParseResult() : code_(kParseErrorNone), offset_(0) {}
+	//! Constructor to set an error.
 	ParseResult(ParseErrorCode code, size_t offset) : code_(code), offset_(offset) {}
 
+	//! Get the error code.
 	ParseErrorCode Code() const { return code_; }
+	//! Get the error offset, if \ref IsError(), 0 otherwise.
 	size_t Offset() const { return offset_; }
 
+	//! Conversion to \c bool, returns \c true, iff !\ref IsError().
 	operator bool() const { return !IsError(); }
+	//! Whether the result is an error.
 	bool IsError() const { return code_ != kParseErrorNone; }
 
 	bool operator==(const ParseResult& that) const { return code_ == that.code_; }
 	bool operator==(ParseErrorCode code) const { return code_ == code; }
 	friend bool operator==(ParseErrorCode code, const ParseResult & err) { return code == err.code_; }
 
+	//! Reset error code.
 	void Clear() { Set(kParseErrorNone); }
+	//! Update error code and offset.
 	void Set(ParseErrorCode code, size_t offset = 0) { code_ = code; offset_ = offset; }
 
 private:

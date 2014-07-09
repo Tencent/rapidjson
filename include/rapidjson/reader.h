@@ -324,10 +324,13 @@ public:
 		return Parse<kParseDefaultFlags>(is, handler);
 	}
 
+	//! Whether a parse error has occured in the last parsing.
 	bool HasParseError() const { return parseResult_.IsError(); }
 	
+	//! Get the \ref ParseErrorCode of last parsing.
 	ParseErrorCode GetParseErrorCode() const { return parseResult_.Code(); }
 
+	//! Get the position of last parsing error in input, 0 otherwise.
 	size_t GetErrorOffset() const { return parseResult_.Offset(); }
 
 private:
