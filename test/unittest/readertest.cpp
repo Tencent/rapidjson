@@ -13,7 +13,7 @@ RAPIDJSON_DIAG_OFF(effc++)
 template<bool expect>
 struct ParseBoolHandler : BaseReaderHandler<> {
 	ParseBoolHandler() : step_(0) {}
-	bool Default() { FAIL(); }
+	bool Default() { ADD_FAILURE(); return false; }
 	// gcc 4.8.x generates warning in EXPECT_EQ(bool, bool) on this gtest version.
 	// Workaround with EXPECT_TRUE().
 	bool Bool(bool b) { /*EXPECT_EQ(expect, b); */EXPECT_TRUE(expect == b);  ++step_; return true; }
