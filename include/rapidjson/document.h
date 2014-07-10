@@ -501,7 +501,7 @@ public:
 		\see GenericStringRef, operator=(T)
 	*/
 	GenericValue& operator=(StringRefType str) {
-		return (*this).template operator=<StringRefType>(str);
+		return (*this).operator=<StringRefType>(str);
 	}
 
 	//! Assignment with primitive types.

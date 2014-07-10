@@ -9,6 +9,10 @@
 #include "internal/pow10.h"
 #include "internal/stack.h"
 
+#if defined(RAPIDJSON_SIMD) && defined(_MSC_VER)
+#include <intrin.h>
+#pragma intrinsic(_BitScanForward)
+#endif
 #ifdef RAPIDJSON_SSE42
 #include <nmmintrin.h>
 #elif defined(RAPIDJSON_SSE2)
@@ -16,8 +20,8 @@
 #endif
 
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4127) // conditional expression is constant
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
 #endif
 
 #ifndef RAPIDJSON_PARSE_ERROR_NORETURN
@@ -769,7 +773,7 @@ typedef GenericReader<UTF8<>, UTF8<> > Reader;
 } // namespace rapidjson
 
 #ifdef _MSC_VER
-#pragma warning(pop)
+RAPIDJSON_DIAG_POP
 #endif
 
 #endif // RAPIDJSON_READER_H_

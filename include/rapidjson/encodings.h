@@ -3,7 +3,10 @@
 
 #include "rapidjson.h"
 
-#ifdef __GNUC__
+#ifdef _MSC_VER
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4244) // conversion from 'type1' to 'type2', possible loss of data
+#elif defined(__GNUC__)
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
@@ -529,7 +532,7 @@ struct Transcoder<Encoding, Encoding> {
 
 } // namespace rapidjson
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || defined(_MSV_VER)
 RAPIDJSON_DIAG_POP
 #endif
 
