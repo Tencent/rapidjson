@@ -74,7 +74,9 @@ enum ParseErrorCode {
 
 	kParseErrorNumberTooBig,					//!< Number too big to be stored in double.
 	kParseErrorNumberMissFraction,				//!< Miss fraction part in number.
-	kParseErrorNumberMissExponent				//!< Miss exponent in number.
+	kParseErrorNumberMissExponent,				//!< Miss exponent in number.
+
+	kParseErrorUnspecificSyntaxError				//!< General syntax error.
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1114,6 +1116,9 @@ private:
 
 		else if (src == IterativeParsingElementState)
 			RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell());
+
+		else
+			RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell());
 	}
 
 	template <unsigned parseFlags, typename InputStream, typename Handler>
