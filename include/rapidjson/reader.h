@@ -799,7 +799,7 @@ private:
 		cIterativeParsingTokenCount
 	};
 
-	IterativeParsingToken GuessToken(Ch c) {
+	IterativeParsingToken Tokenize(Ch c) {
 		switch (c) {
 		case '[': return IterativeParsingLeftBracketToken;
 		case ']': return IterativeParsingRightBracketToken;
@@ -815,7 +815,7 @@ private:
 		}
 	}
 
-	IterativeParsingState Deduce(IterativeParsingState state, IterativeParsingToken token) {
+	IterativeParsingState Predict(IterativeParsingState state, IterativeParsingToken token) {
 		// current state x one lookahead token -> new state
 		static const IterativeParsingState G[cIterativeParsingStateCount][cIterativeParsingTokenCount] = {
 			// Start
@@ -1127,8 +1127,8 @@ private:
 
 		SkipWhitespace(is);
 		while (is.Peek() != '\0') {
-			IterativeParsingToken t = GuessToken(is.Peek());
-			IterativeParsingState n = Deduce(state, t);
+			IterativeParsingToken t = Tokenize(is.Peek());
+			IterativeParsingState n = Predict(state, t);
 			IterativeParsingState d = Transit<parseFlags>(state, t, n, is, handler);
 
 			if (d == IterativeParsingErrorState) {
