@@ -76,6 +76,24 @@ TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler)) {
 	}
 }
 
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseIterative_DummyHandler)) {
+	for (size_t i = 0; i < kTrialCount; i++) {
+		StringStream s(json_);
+		BaseReaderHandler<> h;
+		Reader reader;
+		EXPECT_TRUE(reader.Parse<kParseIterativeFlag>(s, h));
+	}
+}
+
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseIterativeInsitu_DummyHandler)) {
+	for (size_t i = 0; i < kTrialCount; i++) {
+		StringStream s(json_);
+		BaseReaderHandler<> h;
+		Reader reader;
+		EXPECT_TRUE(reader.Parse<kParseIterativeFlag|kParseInsituFlag>(s, h));
+	}
+}
+
 TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_ValidateEncoding)) {
 	for (size_t i = 0; i < kTrialCount; i++) {
 		StringStream s(json_);
