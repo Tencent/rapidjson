@@ -8,8 +8,8 @@
 #include <new>		// placement new
 
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4127) // conditional expression is constant
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 #endif
 
 namespace rapidjson {
@@ -306,7 +306,7 @@ private:
 } // namespace rapidjson
 
 #ifdef _MSC_VER
-#pragma warning(pop)
+RAPIDJSON_DIAG_POP
 #endif
 
 #endif // RAPIDJSON_RAPIDJSON_H_
