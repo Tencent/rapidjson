@@ -83,13 +83,13 @@ TEST(Writer,DoublePrecision) {
 		buffer.Clear();
 	}
 	{ // explicit individual double precisions
-		writer.SetDoublePrecision(2)
-			.StartArray()
-			.Double(1.2345,5)
-			.Double(1.2345678,9)
-			.Double(0.123456789012,12)
-			.Double(1234567.8,8)
-			.EndArray();
+		writer.SetDoublePrecision(2);
+		writer.StartArray();
+		writer.Double(1.2345, 5);
+		writer.Double(1.2345678, 9);
+		writer.Double(0.123456789012, 12);
+		writer.Double(1234567.8, 8);
+		writer.EndArray();
 
 		EXPECT_EQ(writer.GetDoublePrecision(), 2);
 		EXPECT_STREQ(json, buffer.GetString());

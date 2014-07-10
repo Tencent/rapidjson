@@ -8,7 +8,11 @@
 #define TEST_PLATFORM   0
 #define TEST_MISC		0
 
-#if TEST_RAPIDJSON
+#define TEST_VERSION_CODE(x,y,z) \
+  (((x)*100000) + ((y)*100) + (z))
+
+// Only gcc >4.3 supports SSE4.2
+#if TEST_RAPIDJSON && !(defined(__GNUC__) && TEST_VERSION_CODE(__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__) < TEST_VERSION_CODE(4,3,0))
 //#define RAPIDJSON_SSE2
 #define RAPIDJSON_SSE42
 #endif

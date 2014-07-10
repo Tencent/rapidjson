@@ -64,12 +64,12 @@ public:
 	*/
 	//@{
 
-	Writer& Null()					{ Prefix(kNullType);   WriteNull();			return *this; }
-	Writer& Bool(bool b)			{ Prefix(b ? kTrueType : kFalseType); WriteBool(b); return *this; }
-	Writer& Int(int i)				{ Prefix(kNumberType); WriteInt(i);			return *this; }
-	Writer& Uint(unsigned u)		{ Prefix(kNumberType); WriteUint(u);		return *this; }
-	Writer& Int64(int64_t i64)		{ Prefix(kNumberType); WriteInt64(i64);		return *this; }
-	Writer& Uint64(uint64_t u64)	{ Prefix(kNumberType); WriteUint64(u64);	return *this; }
+	bool Null()					{ Prefix(kNullType);   return WriteNull(); }
+	bool Bool(bool b)			{ Prefix(b ? kTrueType : kFalseType); return WriteBool(b); }
+	bool Int(int i)				{ Prefix(kNumberType); return WriteInt(i); }
+	bool Uint(unsigned u)		{ Prefix(kNumberType); return WriteUint(u); }
+	bool Int64(int64_t i64)		{ Prefix(kNumberType); return WriteInt64(i64); }
+	bool Uint64(uint64_t u64)	{ Prefix(kNumberType); return WriteUint64(u64); }
 
 	//! Writes the given \c double value to the stream
 	/*!
@@ -80,51 +80,48 @@ public:
 		writer.SetDoublePrecision(12).Double(M_PI);
 		\endcode
 		\param d The value to be written.
-		\return The Writer itself for fluent API.
+		\return Whether it is succeed.
 	*/
-	Writer& Double(double d)		{ Prefix(kNumberType); WriteDouble(d);		return *this; }
+	bool Double(double d)		{ Prefix(kNumberType); return WriteDouble(d); }
 
-	Writer& String(const Ch* str, SizeType length, bool copy = false) {
+	bool String(const Ch* str, SizeType length, bool copy = false) {
 		(void)copy;
 		Prefix(kStringType);
-		WriteString(str, length);
-		return *this;
+		return WriteString(str, length);
 	}
 
-	Writer& StartObject() {
+	bool StartObject() {
 		Prefix(kObjectType);
 		new (level_stack_.template Push<Level>()) Level(false);
-		WriteStartObject();
-		return *this;
+		return WriteStartObject();
 	}
 
-	Writer& EndObject(SizeType memberCount = 0) {
+	bool EndObject(SizeType memberCount = 0) {
 		(void)memberCount;
 		RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level));
 		RAPIDJSON_ASSERT(!level_stack_.template Top<Level>()->inArray);
 		level_stack_.template Pop<Level>(1);
-		WriteEndObject();
+		bool ret = WriteEndObject();
 		if (level_stack_.Empty())	// end of json text
 			os_.Flush();
-		return *this;
+		return ret;
 	}
 
-	Writer& StartArray() {
+	bool StartArray() {
 		Prefix(kArrayType);
 		new (level_stack_.template Push<Level>()) Level(true);
-		WriteStartArray();
-		return *this;
+		return WriteStartArray();
 	}
 
-	Writer& EndArray(SizeType elementCount = 0) {
+	bool EndArray(SizeType elementCount = 0) {
 		(void)elementCount;
 		RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level));
 		RAPIDJSON_ASSERT(level_stack_.template Top<Level>()->inArray);
 		level_stack_.template Pop<Level>(1);
-		WriteEndArray();
+		bool ret = WriteEndArray();
 		if (level_stack_.Empty())	// end of json text
 			os_.Flush();
-		return *this;
+		return ret;
 	}
 	//@}
 
@@ -138,15 +135,18 @@ public:
 		\see Double(), SetDoublePrecision(), GetDoublePrecision()
 		\param d The value to be written
 		\param precision The number of significant digits for this value
-		\return The Writer itself for fluent API.
+		\return Whether it is succeeded.
 	*/
-	Writer& Double(double d, int precision) {
+	bool Double(double d, int precision) {
 		int oldPrecision = GetDoublePrecision();
-		return SetDoublePrecision(precision).Double(d).SetDoublePrecision(oldPrecision);
+		SetDoublePrecision(precision);
+		bool ret = Double(d);
+		SetDoublePrecision(oldPrecision);
+		return ret;
 	}
 
 	//! Simpler but slower overload.
-	Writer& String(const Ch* str) { return String(str, internal::StrLen(str)); }
+	bool String(const Ch* str) { return String(str, internal::StrLen(str)); }
 
 	//@}
 
@@ -160,28 +160,29 @@ protected:
 
 	static const size_t kDefaultLevelDepth = 32;
 
-	void WriteNull()  {
-		os_.Put('n'); os_.Put('u'); os_.Put('l'); os_.Put('l');
+	bool WriteNull()  {
+		os_.Put('n'); os_.Put('u'); os_.Put('l'); os_.Put('l'); return true;
 	}
 
-	void WriteBool(bool b)  {
+	bool WriteBool(bool b)  {
 		if (b) {
 			os_.Put('t'); os_.Put('r'); os_.Put('u'); os_.Put('e');
 		}
 		else {
 			os_.Put('f'); os_.Put('a'); os_.Put('l'); os_.Put('s'); os_.Put('e');
 		}
+		return true;
 	}
 
-	void WriteInt(int i) {
+	bool WriteInt(int i) {
 		if (i < 0) {
 			os_.Put('-');
 			i = -i;
 		}
-		WriteUint((unsigned)i);
+		return WriteUint((unsigned)i);
 	}
 
-	void WriteUint(unsigned u) {
+	bool WriteUint(unsigned u) {
 		char buffer[10];
 		char *p = buffer;
 		do {
@@ -193,17 +194,19 @@ protected:
 			--p;
 			os_.Put(*p);
 		} while (p != buffer);
+		return true;
 	}
 
-	void WriteInt64(int64_t i64) {
+	bool WriteInt64(int64_t i64) {
 		if (i64 < 0) {
 			os_.Put('-');
 			i64 = -i64;
 		}
 		WriteUint64((uint64_t)i64);
+		return true;
 	}
 
-	void WriteUint64(uint64_t u64) {
+	bool WriteUint64(uint64_t u64) {
 		char buffer[20];
 		char *p = buffer;
 		do {
@@ -215,6 +218,7 @@ protected:
 			--p;
 			os_.Put(*p);
 		} while (p != buffer);
+		return true;
 	}
 
 #ifdef _MSC_VER
@@ -224,16 +228,17 @@ protected:
 #endif
 
 	//! \todo Optimization with custom double-to-string converter.
-	void WriteDouble(double d) {
+	bool WriteDouble(double d) {
 		char buffer[100];
 		int ret = RAPIDJSON_SNPRINTF(buffer, sizeof(buffer), "%.*g", doublePrecision_, d);
 		RAPIDJSON_ASSERT(ret >= 1);
 		for (int i = 0; i < ret; i++)
 			os_.Put(buffer[i]);
+		return true;
 	}
 #undef RAPIDJSON_SNPRINTF
 
-	void WriteString(const Ch* str, SizeType length)  {
+	bool WriteString(const Ch* str, SizeType length)  {
 		static const char hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 		static const char escape[256] = {
 #define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -266,12 +271,13 @@ protected:
 				Transcoder<SourceEncoding, TargetEncoding>::Transcode(is, os_);
 		}
 		os_.Put('\"');
+		return true;
 	}
 
-	void WriteStartObject()	{ os_.Put('{'); }
-	void WriteEndObject()	{ os_.Put('}'); }
-	void WriteStartArray()	{ os_.Put('['); }
-	void WriteEndArray()	{ os_.Put(']'); }
+	bool WriteStartObject()	{ os_.Put('{'); return true; }
+	bool WriteEndObject()	{ os_.Put('}'); return true; }
+	bool WriteStartArray()	{ os_.Put('['); return true; }
+	bool WriteEndArray()	{ os_.Put(']'); return true; }
 
 	void Prefix(Type type) {
 		(void)type;
