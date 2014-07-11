@@ -92,7 +92,8 @@ gh_pages_push() {
 	git config core.askpass /bin/true
 	( set +x ; git config credential.${GHPAGES_URL}.username "${GH_TOKEN}" )
 	# push to GitHub
-	git push origin gh-pages
+	git push origin gh-pages || \
+		skip "GitHub pages update failed, temporarily ignored."
 }
 
 doxygen_install
