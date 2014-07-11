@@ -501,7 +501,8 @@ public:
 		\see GenericStringRef, operator=(T)
 	*/
 	GenericValue& operator=(StringRefType str) {
-		return (*this).operator=<StringRefType>(str);
+		GenericValue s(str);
+		return *this = s;
 	}
 
 	//! Assignment with primitive types.
@@ -519,9 +520,8 @@ public:
 	template <typename T>
 	RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>,GenericValue&)
 	operator=(T value) {
-		this->~GenericValue();
-		new (this) GenericValue(value);
-		return *this;
+		GenericValue v(value);
+		return *this = v;
 	}
 
 	//! Deep-copy assignment from Value
