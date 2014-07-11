@@ -809,7 +809,7 @@ struct IterativeParsingReaderHandler {
 	}
 
 TEST(Reader, IterativeParsing_StateTransition_Start) {
-	// Start->ArrayInitial
+	// Start -> ArrayInitial
 	{
 		IterativeParsingReaderHandler<> handler;
 		Reader reader;
@@ -823,7 +823,7 @@ TEST(Reader, IterativeParsing_StateTransition_Start) {
 		EXPECT_TRUE(handler.IsStartArrayTriggered);
 	}
 
-	// Start->ObjectInitial
+	// Start -> ObjectInitial
 	{
 		IterativeParsingReaderHandler<> handler;
 		Reader reader;
@@ -965,7 +965,7 @@ TEST(Reader, IterativeParsing_StateTransition_KeyValueDelimiter) {
 }
 
 TEST(Reader, IterativeParsing_StateTransition_MemberValue) {
-	// MemberValue -> ObjectFinish
+	// MemberValue -> ObjectFinish -> Finish
 	{
 		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("{\"k\": 123}", 9);
 		handler.Reset();
@@ -1025,12 +1025,26 @@ TEST(Reader, IterativeParsing_StateTransition_MemberDelimiter) {
 TEST(Reader, IterativeParsing_StateTransition_ArrayInitial) {
 	// ArrayInitial -> ArrayInitial
 	{
-		TEST_COMPOUNDTYPE_INITIAL_STATE(
-			Array,
-			"[]",
-			Reader::IterativeParsingArrayInitialState,
+		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[[1]]", 1);
+		handler.Reset();
+
+		EXPECT_FALSE(reader.HasParseError());
+		EXPECT_EQ(Reader::IterativeParsingArrayInitialState, state);
+
+		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
+			state,
 			Reader::IterativeParsingLeftBracketToken,
-			Reader::IterativeParsingElementState);
+			Reader::IterativeParsingArrayInitialState,
+			is, handler);
+
+		EXPECT_FALSE(reader.HasParseError());
+		EXPECT_EQ(Reader::IterativeParsingArrayInitialState, d);
+		// Check initialized element count.
+		int c = *reader.stack_.template Pop<int>(1);
+		EXPECT_EQ(0, c);
+		// Check pushed state.
+		Reader::IterativeParsingState s = *reader.stack_.template Pop<Reader::IterativeParsingState>(1);
+		EXPECT_EQ(Reader::IterativeParsingElementState, s);
 	}
 
 	// ArrayInitial -> ArrayFinish -> Finish
@@ -1055,12 +1069,26 @@ TEST(Reader, IterativeParsing_StateTransition_ArrayInitial) {
 
 	// ArrayInitial -> ObjectInitial
 	{
-		TEST_COMPOUNDTYPE_INITIAL_STATE(
-			Object,
-			"{}",
-			Reader::IterativeParsingStartState,
+		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[{\"k\": 1}]", 1);
+		handler.Reset();
+
+		EXPECT_FALSE(reader.HasParseError());
+		EXPECT_EQ(Reader::IterativeParsingArrayInitialState, state);
+
+		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
+			state,
 			Reader::IterativeParsingLeftCurlyBracketToken,
-			Reader::IterativeParsingStartState);
+			Reader::IterativeParsingObjectInitialState,
+			is, handler);
+
+		EXPECT_FALSE(reader.HasParseError());
+		EXPECT_EQ(Reader::IterativeParsingObjectInitialState, d);
+		// Check initialized element count.
+		int c = *reader.stack_.template Pop<int>(1);
+		EXPECT_EQ(0, c);
+		// Check pushed state.
+		Reader::IterativeParsingState s = *reader.stack_.template Pop<Reader::IterativeParsingState>(1);
+		EXPECT_EQ(Reader::IterativeParsingElementState, s);
 	}
 
 	// ArrayInitial -> Element
