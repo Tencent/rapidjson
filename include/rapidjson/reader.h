@@ -9,6 +9,10 @@
 #include "internal/pow10.h"
 #include "internal/stack.h"
 
+#if defined(RAPIDJSON_SIMD) && defined(_MSC_VER)
+#include <intrin.h>
+#pragma intrinsic(_BitScanForward)
+#endif
 #ifdef RAPIDJSON_SSE42
 #include <nmmintrin.h>
 #elif defined(RAPIDJSON_SSE2)
@@ -16,8 +20,8 @@
 #endif
 
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4127) // conditional expression is constant
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
 #endif
 
 #ifndef RAPIDJSON_PARSE_ERROR_NORETURN
@@ -43,6 +47,8 @@ namespace rapidjson {
 // ParseFlag
 
 //! Combination of parseFlags
+/*! \see Reader::Parse, Document::Parse, Document::ParseInsitu, Document::ParseStream
+ */
 enum ParseFlag {
 	kParseDefaultFlags = 0,			//!< Default parse flags. Non-destructive parsing. Text strings are decoded into allocated buffer.
 	kParseInsituFlag = 1,			//!< In-situ(destructive) parsing.
@@ -260,7 +266,7 @@ template<> inline void SkipWhitespace(StringStream& is) {
 ///////////////////////////////////////////////////////////////////////////////
 // GenericReader
 
-//! SAX-style JSON parser. Use Reader for UTF8 encoding and default allocator.
+//! SAX-style JSON parser. Use \ref Reader for UTF8 encoding and default allocator.
 /*! GenericReader parses JSON text from a stream, and send events synchronously to an 
     object implementing Handler concept.
 
@@ -279,7 +285,7 @@ template<> inline void SkipWhitespace(StringStream& is) {
 template <typename SourceEncoding, typename TargetEncoding, typename Allocator = MemoryPoolAllocator<> >
 class GenericReader {
 public:
-	typedef typename SourceEncoding::Ch Ch;
+	typedef typename SourceEncoding::Ch Ch; //!< SourceEncoding character type
 
 	//! Constructor.
 	/*! \param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
@@ -288,12 +294,12 @@ public:
 	GenericReader(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseErrorCode_(kParseErrorNone), errorOffset_(0) {}
 
 	//! Parse JSON text.
-	/*! \tparam parseFlags Combination of ParseFlag. 
-		 \tparam InputStream Type of input stream.
-		 \tparam Handler Type of handler which must implement Handler concept.
-		 \param is Input stream to be parsed.
-		 \param handler The handler to receive events.
-		 \return Whether the parsing is successful.
+	/*! \tparam parseFlags Combination of \ref ParseFlag.
+		\tparam InputStream Type of input stream, implementing Stream concept.
+		\tparam Handler Type of handler, implementing Handler concept.
+		\param is Input stream to be parsed.
+		\param handler The handler to receive events.
+		\return Whether the parsing is successful.
 	*/
 	template <unsigned parseFlags, typename InputStream, typename Handler>
 	bool Parse(InputStream& is, Handler& handler) {
@@ -327,6 +333,13 @@ public:
 		return !HasParseError();
 	}
 
+	//! Parse JSON text (with \ref kParseDefaultFlags)
+	/*! \tparam InputStream Type of input stream, implementing Stream concept
+		\tparam Handler Type of handler, implementing Handler concept.
+		\param is Input stream to be parsed.
+		\param handler The handler to receive events.
+		\return Whether the parsing is successful.
+	*/
 	template <typename InputStream, typename Handler>
 	bool Parse(InputStream& is, Handler& handler) {
 		return Parse<kParseDefaultFlags>(is, handler);
@@ -1160,7 +1173,7 @@ typedef GenericReader<UTF8<>, UTF8<> > Reader;
 } // namespace rapidjson
 
 #ifdef _MSC_VER
-#pragma warning(pop)
+RAPIDJSON_DIAG_POP
 #endif
 
 #endif // RAPIDJSON_READER_H_

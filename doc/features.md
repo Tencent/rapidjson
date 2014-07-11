@@ -1,4 +1,4 @@
-# RapidJSON Features
+# Features
 
 ## General
 
@@ -39,10 +39,10 @@
 ## API styles
 
 * SAX (Simple API for XML) style API
- * Similar to [SAX](http://en.wikipedia.org/wiki/Simple_API_for_XML), RapidJSON provides a event sequential access parser API (`GenericReader`). It also provides a generator API (`GenericWriter`) which consumes the same set of events.
+ * Similar to [SAX](http://en.wikipedia.org/wiki/Simple_API_for_XML), RapidJSON provides a event sequential access parser API (`rapidjson::GenericReader`). It also provides a generator API (`rapidjson::Writer`) which consumes the same set of events.
 * DOM (Document Object Model) style API
- * Similar to [DOM](http://en.wikipedia.org/wiki/Document_Object_Model) for HTML/XML, RapidJSON can parse JSON into a DOM representation (`GenericDocument`), for easy manipulation, and finally stringify back to JSON if needed.
- * The DOM style API (`GenericDocument`) is actually implemented with SAX style API (`GenericReader`). SAX is faster but sometimes DOM is easier. Users can pick their choices according to scenarios.
+ * Similar to [DOM](http://en.wikipedia.org/wiki/Document_Object_Model) for HTML/XML, RapidJSON can parse JSON into a DOM representation (`rapidjson::GenericDocument`), for easy manipulation, and finally stringify back to JSON if needed.
+ * The DOM style API (`rapidjson::GenericDocument`) is actually implemented with SAX style API (`rapidjson::GenericReader`). SAX is faster but sometimes DOM is easier. Users can pick their choices according to scenarios.
 
 ## DOM (Document)
 
@@ -59,13 +59,13 @@
 
 ## SAX (Writer)
 
-* Support PrettyWriter for adding newlines and indentations.
+* Support `rapidjson::PrettyWriter` for adding newlines and indentations.
 * Support custom precision for floating point values.
 
 ## Stream
 
-* Support `GenericStringBuffer` for storing the output JSON as string.
-* Support `FileReadStream`/`FileWriteStream` for input/output `FILE` object.
+* Support `rapidjson::GenericStringBuffer` for storing the output JSON as string.
+* Support `rapidjson::FileReadStream` and `rapidjson::FileWriteStream` for input/output `FILE` object.
 * Support custom streams.
 
 ## Memory

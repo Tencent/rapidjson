@@ -8,8 +8,8 @@
 #include <new>		// placement new
 
 #ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable : 4127) // conditional expression is constant
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 #endif
 
 namespace rapidjson {
@@ -25,8 +25,9 @@ namespace rapidjson {
 	for example Reader::Parse() and Document::Accept().
 
 	\tparam OutputStream Type of output stream.
-	\tparam SourceEncoding Encoding of both source strings.
-	\tparam TargetEncoding Encoding of and output stream.
+	\tparam SourceEncoding Encoding of source string.
+	\tparam TargetEncoding Encoding of output stream.
+	\tparam Allocator Type of allocator for allocating memory of stack.
 	\note implements Handler concept
 */
 template<typename OutputStream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename Allocator = MemoryPoolAllocator<> >
@@ -34,6 +35,11 @@ class Writer {
 public:
 	typedef typename SourceEncoding::Ch Ch;
 
+	//! Constructor
+	/*! \param os Output stream.
+		\param allocator User supplied allocator. If it is null, it will create a private one.
+		\param levelDepth Initial capacity of stack.
+	*/
 	Writer(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) : 
 		os_(os), level_stack_(allocator, levelDepth * sizeof(Level)),
 		doublePrecision_(kDefaultDoublePrecision) {}
@@ -53,8 +59,11 @@ public:
 	//! \see SetDoublePrecision()
 	int GetDoublePrecision() const { return doublePrecision_; }
 
-	//@name Implementation of Handler
+	/*!@name Implementation of Handler
+		\see Handler
+	*/
 	//@{
+
 	Writer& Null()					{ Prefix(kNullType);   WriteNull();			return *this; }
 	Writer& Bool(bool b)			{ Prefix(b ? kTrueType : kFalseType); WriteBool(b); return *this; }
 	Writer& Int(int i)				{ Prefix(kNumberType); WriteInt(i);			return *this; }
@@ -74,20 +83,6 @@ public:
 		\return The Writer itself for fluent API.
 	*/
 	Writer& Double(double d)		{ Prefix(kNumberType); WriteDouble(d);		return *this; }
-
-	//! Writes the given \c double value to the stream (explicit precision)
-	/*!
-		The currently set double precision is ignored in favor of the explicitly
-		given precision for this value.
-		\see Double(), SetDoublePrecision(), GetDoublePrecision()
-		\param d The value to be written
-		\param precision The number of significant digits for this value
-		\return The Writer itself for fluent API.
-	*/
-	Writer& Double(double d, int precision) {
-		int oldPrecision = GetDoublePrecision();
-		return SetDoublePrecision(precision).Double(d).SetDoublePrecision(oldPrecision);
-	}
 
 	Writer& String(const Ch* str, SizeType length, bool copy = false) {
 		(void)copy;
@@ -133,8 +128,27 @@ public:
 	}
 	//@}
 
+	/*! @name Convenience extensions */
+	//@{
+
+	//! Writes the given \c double value to the stream (explicit precision)
+	/*!
+		The currently set double precision is ignored in favor of the explicitly
+		given precision for this value.
+		\see Double(), SetDoublePrecision(), GetDoublePrecision()
+		\param d The value to be written
+		\param precision The number of significant digits for this value
+		\return The Writer itself for fluent API.
+	*/
+	Writer& Double(double d, int precision) {
+		int oldPrecision = GetDoublePrecision();
+		return SetDoublePrecision(precision).Double(d).SetDoublePrecision(oldPrecision);
+	}
+
 	//! Simpler but slower overload.
 	Writer& String(const Ch* str) { return String(str, internal::StrLen(str)); }
+
+	//@}
 
 protected:
 	//! Information for each nested level
@@ -171,7 +185,7 @@ protected:
 		char buffer[10];
 		char *p = buffer;
 		do {
-			*p++ = (u % 10) + '0';
+			*p++ = char(u % 10) + '0';
 			u /= 10;
 		} while (u > 0);
 
@@ -292,7 +306,7 @@ private:
 } // namespace rapidjson
 
 #ifdef _MSC_VER
-#pragma warning(pop)
+RAPIDJSON_DIAG_POP
 #endif
 
 #endif // RAPIDJSON_RAPIDJSON_H_

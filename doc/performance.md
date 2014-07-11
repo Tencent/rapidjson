@@ -1,4 +1,4 @@
-# RapidJSON Performance
+# Performance
 
 The old performance article for RapidJSON 0.1 is provided [here](https://code.google.com/p/rapidjson/wiki/Performance).
 

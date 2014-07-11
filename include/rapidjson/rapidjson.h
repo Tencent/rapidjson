@@ -4,6 +4,12 @@
 // Copyright (c) 2011 Milo Yip (miloyip@gmail.com)
 // Version 0.1
 
+/*!\file rapidjson.h
+	\brief common definitions and configuration
+
+	\todo Complete Doxygen documentation for configure macros.
+ */
+
 #include <cstdlib>	// malloc(), realloc(), free()
 #include <cstring>	// memcpy()
 
@@ -14,6 +20,7 @@
 // (U)INT64_C constant macros.
 // If user have their own definition, can define RAPIDJSON_NO_INT64DEFINE to disable this.
 #ifndef RAPIDJSON_NO_INT64DEFINE
+//!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 #ifndef __STDC_CONSTANT_MACROS
 #  define __STDC_CONSTANT_MACROS 1 // required by C++ standard
 #endif
@@ -25,6 +32,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 #endif
+//!@endcond
 #endif // RAPIDJSON_NO_INT64TYPEDEF
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -46,7 +54,7 @@
 //! Endianness of the machine.
 /*!	GCC provided macro for detecting endianness of the target machine. But other
 	compilers may not have this. User can define RAPIDJSON_ENDIAN to either
-	RAPIDJSON_LITTLEENDIAN or RAPIDJSON_BIGENDIAN.
+	\ref RAPIDJSON_LITTLEENDIAN or \ref RAPIDJSON_BIGENDIAN.
 */
 #ifndef RAPIDJSON_ENDIAN
 #ifdef __BYTE_ORDER__
@@ -115,7 +123,9 @@ typedef unsigned SizeType;
 
 // Adopt from boost
 #ifndef RAPIDJSON_STATIC_ASSERT
+//!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 namespace rapidjson {
+
 template <bool x> struct STATIC_ASSERTION_FAILURE;
 template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
 template<int x> struct StaticAssertTest {};
@@ -130,7 +140,13 @@ template<int x> struct StaticAssertTest {};
 #else
 #define RAPIDJSON_STATIC_ASSERT_UNUSED_ATTRIBUTE 
 #endif
+//!@endcond
 
+/*! \def RAPIDJSON_STATIC_ASSERT
+	\brief (internal) macro to check for conditions at compile-time
+	\param x compile-time condition
+	\hideinitializer
+ */
 #define RAPIDJSON_STATIC_ASSERT(x) typedef ::rapidjson::StaticAssertTest<\
 	sizeof(::rapidjson::STATIC_ASSERTION_FAILURE<bool(x) >)>\
 	RAPIDJSON_JOIN(StaticAssertTypedef, __LINE__) RAPIDJSON_STATIC_ASSERT_UNUSED_ATTRIBUTE
@@ -139,9 +155,58 @@ template<int x> struct StaticAssertTest {};
 ///////////////////////////////////////////////////////////////////////////////
 // Helpers
 
+//!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
+
 #define RAPIDJSON_MULTILINEMACRO_BEGIN do {  
 #define RAPIDJSON_MULTILINEMACRO_END \
 } while((void)0, 0)
+
+// adopted from Boost
+#define RAPIDJSON_VERSION_CODE(x,y,z) \
+  (((x)*100000) + ((y)*100) + (z))
+
+// token stringification
+#define RAPIDJSON_STRINGIFY(x) RAPIDJSON_DO_STRINGIFY(x)
+#define RAPIDJSON_DO_STRINGIFY(x) #x
+
+///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_DIAG_PUSH/POP, RAPIDJSON_DIAG_OFF
+
+#if defined(__clang__) || (defined(__GNUC__) && RAPIDJSON_VERSION_CODE(__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__) >= RAPIDJSON_VERSION_CODE(4,2,0))
+
+#define RAPIDJSON_PRAGMA(x) _Pragma(RAPIDJSON_STRINGIFY(x))
+#define RAPIDJSON_DIAG_PRAGMA(x) RAPIDJSON_PRAGMA(GCC diagnostic x)
+#define RAPIDJSON_DIAG_OFF(x) \
+	RAPIDJSON_DIAG_PRAGMA(ignored RAPIDJSON_STRINGIFY(RAPIDJSON_JOIN(-W,x)))
+
+// push/pop support in Clang and GCC>=4.6
+#if defined(__clang__) || (defined(__GNUC__) && RAPIDJSON_VERSION_CODE(__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__) >= RAPIDJSON_VERSION_CODE(4,6,0))
+#define RAPIDJSON_DIAG_PUSH RAPIDJSON_DIAG_PRAGMA(push)
+#define RAPIDJSON_DIAG_POP  RAPIDJSON_DIAG_PRAGMA(pop)
+#else // GCC >= 4.2, < 4.6
+#define RAPIDJSON_DIAG_PUSH /* ignored */
+#define RAPIDJSON_DIAG_POP /* ignored */
+#endif
+
+#elif defined(_MSC_VER)
+
+// pragma (MSVC specific)
+#define RAPIDJSON_PRAGMA(x) __pragma(x)
+#define RAPIDJSON_DIAG_PRAGMA(x) RAPIDJSON_PRAGMA(warning(x))
+
+#define RAPIDJSON_DIAG_OFF(x) RAPIDJSON_DIAG_PRAGMA(disable: x)
+#define RAPIDJSON_DIAG_PUSH RAPIDJSON_DIAG_PRAGMA(push)
+#define RAPIDJSON_DIAG_POP  RAPIDJSON_DIAG_PRAGMA(pop)
+
+#else
+
+#define RAPIDJSON_DIAG_OFF(x) /* ignored */
+#define RAPIDJSON_DIAG_PUSH   /* ignored */
+#define RAPIDJSON_DIAG_POP    /* ignored */
+
+#endif // RAPIDJSON_DIAG_*
+
+//!@endcond
 
 ///////////////////////////////////////////////////////////////////////////////
 // Allocators and Encodings
@@ -149,6 +214,7 @@ template<int x> struct StaticAssertTest {};
 #include "allocators.h"
 #include "encodings.h"
 
+//! main RapidJSON namespace
 namespace rapidjson {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -246,6 +312,7 @@ struct StreamTraits<GenericStringStream<Encoding> > {
 	enum { copyOptimization = 1 };
 };
 
+//! String stream with UTF8 encoding.
 typedef GenericStringStream<UTF8<> > StringStream;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -282,6 +349,7 @@ struct StreamTraits<GenericInsituStringStream<Encoding> > {
 	enum { copyOptimization = 1 };
 };
 
+//! Insitu string stream with UTF8 encoding.
 typedef GenericInsituStringStream<UTF8<> > InsituStringStream;
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -13,8 +13,7 @@ namespace internal {
 template <typename Ch>
 inline SizeType StrLen(const Ch* s) {
 	const Ch* p = s;
-	while (*p != '\0')
-		++p;
+	while (*p) ++p;
 	return SizeType(p - s);
 }
 
