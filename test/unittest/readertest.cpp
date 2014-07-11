@@ -735,20 +735,24 @@ template<typename Encoding = UTF8<> >
 struct IterativeParsingReaderHandler {
 	typedef typename Encoding::Ch Ch;
 
-	IterativeParsingReaderHandler() :
-		IsNullTriggered(false),
-		IsBoolTriggered(false),
-		IsIntTriggered(false),
-		IsUintTriggered(false),
-		IsInt64Triggered(false),
-		IsUint64Triggered(false),
-		IsDoubleTriggered(false),
-		IsStringTriggered(false),
-		IsStartObjectTriggered(false),
-		IsEndObjectTriggered(false),
-		MemberCount(0),
-		IsStartArrayTriggered(false),
-		ElementCount(0) {
+	IterativeParsingReaderHandler() {
+		Reset();
+	}
+
+	void Reset() {
+		IsNullTriggered = false;
+		IsBoolTriggered = false;
+		IsIntTriggered = false;
+		IsUintTriggered = false;
+		IsInt64Triggered = false;
+		IsUint64Triggered = false;
+		IsDoubleTriggered = false;
+		IsStringTriggered = false;
+		IsStartObjectTriggered = false;
+		IsEndObjectTriggered = false;
+		MemberCount = 0;
+		IsStartArrayTriggered = false;
+		ElementCount = 0;
 	}
 
 	bool IsNullTriggered;
@@ -838,6 +842,7 @@ TEST(Reader, IterativeParsing_StateTransition_ObjectInitial) {
 	// ObjectInitial -> ObjectFinish -> Finish
 	{
 		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("{}", 1);
+		handler.Reset();
 
 		EXPECT_EQ(Reader::IterativeParsingObjectInitialState, state);
 		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
@@ -855,6 +860,7 @@ TEST(Reader, IterativeParsing_StateTransition_ObjectInitial) {
 	// ObjectInitial -> MemberKey
 	{
 		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("{\"key\": 1}", 1);
+		handler.Reset();
 
 		EXPECT_EQ(Reader::IterativeParsingObjectInitialState, state);
 		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
@@ -962,6 +968,7 @@ TEST(Reader, IterativeParsing_StateTransition_MemberValue) {
 	// MemberValue -> ObjectFinish
 	{
 		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("{\"k\": 123}", 9);
+		handler.Reset();
 
 		EXPECT_FALSE(reader.HasParseError());
 		EXPECT_EQ(Reader::IterativeParsingMemberValueState, state);
@@ -981,6 +988,7 @@ TEST(Reader, IterativeParsing_StateTransition_MemberValue) {
 	// MemberValue -> MemberDelimiter
 	{
 		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("{\"k\": 1, \"e\": 2}", 7);
+		handler.Reset();
 
 		EXPECT_FALSE(reader.HasParseError());
 		EXPECT_EQ(Reader::IterativeParsingMemberValueState, state);
@@ -999,6 +1007,7 @@ TEST(Reader, IterativeParsing_StateTransition_MemberValue) {
 TEST(Reader, IterativeParsing_StateTransition_MemberDelimiter) {
 	// MemberDelimiter -> MemberKey
 	ITERATIVE_PARSING_PREPARE_STATE_UNTIL("{\"k\": 1, \"e\": 2}", 9);
+	handler.Reset();
 
 	EXPECT_FALSE(reader.HasParseError());
 	EXPECT_EQ(Reader::IterativeParsingMemberDelimiterState, state);
@@ -1027,6 +1036,7 @@ TEST(Reader, IterativeParsing_StateTransition_ArrayInitial) {
 	// ArrayInitial -> ArrayFinish -> Finish
 	{
 		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[]", 1);
+		handler.Reset();
 
 		EXPECT_FALSE(reader.HasParseError());
 		EXPECT_EQ(Reader::IterativeParsingArrayInitialState, state);
@@ -1056,6 +1066,7 @@ TEST(Reader, IterativeParsing_StateTransition_ArrayInitial) {
 	// ArrayInitial -> Element
 	{
 		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[1]", 1);
+		handler.Reset();
 
 		EXPECT_FALSE(reader.HasParseError());
 		EXPECT_EQ(Reader::IterativeParsingArrayInitialState, state);
@@ -1075,6 +1086,7 @@ TEST(Reader, IterativeParsing_StateTransition_Element) {
 	// Element -> ArrayFinish -> Finish
 	{
 		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[1]", 2);
+		handler.Reset();
 
 		EXPECT_FALSE(reader.HasParseError());
 		EXPECT_EQ(Reader::IterativeParsingElementState, state);
@@ -1094,6 +1106,7 @@ TEST(Reader, IterativeParsing_StateTransition_Element) {
 	// Element -> ElementDelimiter
 	{
 		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[1, 2]", 2);
+		handler.Reset();
 
 		EXPECT_FALSE(reader.HasParseError());
 		EXPECT_EQ(Reader::IterativeParsingElementState, state);
@@ -1113,6 +1126,7 @@ TEST(Reader, IterativeParsing_StateTransition_ElementDelimiter) {
 	// ElementDelimiter -> ArrayInitial
 	{
 		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[1, [1]]", 4);
+		handler.Reset();
 
 		EXPECT_FALSE(reader.HasParseError());
 		EXPECT_EQ(Reader::IterativeParsingElementDelimiterState, state);
@@ -1135,6 +1149,7 @@ TEST(Reader, IterativeParsing_StateTransition_ElementDelimiter) {
 	// ElementDelimiter -> ObjectInitial
 	{
 		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[1, [1]]", 4);
+		handler.Reset();
 
 		EXPECT_FALSE(reader.HasParseError());
 		EXPECT_EQ(Reader::IterativeParsingElementDelimiterState, state);
@@ -1157,6 +1172,7 @@ TEST(Reader, IterativeParsing_StateTransition_ElementDelimiter) {
 	// ElementDelimiter -> Element
 	{
 		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[1, 2]", 4);
+		handler.Reset();
 
 		EXPECT_FALSE(reader.HasParseError());
 		EXPECT_EQ(Reader::IterativeParsingElementDelimiterState, state);
