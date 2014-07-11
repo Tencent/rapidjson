@@ -81,15 +81,19 @@ gh_pages_push() {
 	# check for secure variables
 	[ "${TRAVIS_SECURE_ENV_VARS}" = "true" ] || \
 		skip "Secure variables not available, not updating GitHub pages."
+	# check for GitHub access token
 	[ "${GH_TOKEN+set}" = set ] || \
 		skip "GitHub access token not available, not updating GitHub pages."
+	[ "${#GH_TOKEN}" -eq 40 ] || \
+		abort "GitHub token invalid: found ${#GH_TOKEN} characters, expected 40."
 
 	cd "${TRAVIS_BUILD_DIR}/doc/html";
 	# setup credentials (hide in "set -x" mode)
 	git config core.askpass /bin/true
 	( set +x ; git config credential.${GHPAGES_URL}.username "${GH_TOKEN}" )
 	# push to GitHub
-	git push origin gh-pages
+	git push origin gh-pages || \
+		skip "GitHub pages update failed, temporarily ignored."
 }
 
 doxygen_install
