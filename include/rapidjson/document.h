@@ -1350,6 +1350,8 @@ private:
 		explicit ClearStackOnExit(GenericDocument& d) : d_(d) {}
 		~ClearStackOnExit() { d_.ClearStack(); }
 	private:
+		ClearStackOnExit(const ClearStackOnExit&);
+		ClearStackOnExit& operator=(const ClearStackOnExit&);
 		GenericDocument& d_;
 	};
 

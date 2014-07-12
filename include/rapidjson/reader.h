@@ -348,6 +348,8 @@ private:
 		~ClearStackOnExit() { r_.ClearStack(); }
 	private:
 		GenericReader& r_;
+		ClearStackOnExit(const ClearStackOnExit&);
+		ClearStackOnExit& operator=(const ClearStackOnExit&);
 	};
 
 	// Parse object: { string : value, ... }
@@ -611,7 +613,7 @@ private:
 		}
 
 		// Parse int: zero / ( digit1-9 *DIGIT )
-		unsigned i;
+		unsigned i = 0;
 		bool try64bit = false;
 		if (s.Peek() == '0') {
 			i = 0;
