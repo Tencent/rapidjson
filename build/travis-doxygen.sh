@@ -10,8 +10,8 @@ DOXYGEN_TAR=${DOXYGEN_VER}.linux.bin.tar.gz
 DOXYGEN_URL="http://ftp.stack.nl/pub/users/dimitri/${DOXYGEN_TAR}"
 DOXYGEN_BIN="/usr/local/bin/doxygen"
 
-GHPAGES_REPO="miloyip/rapidjson"
-GHPAGES_URL="https://github.com/${GHPAGES_REPO}"
+: ${GITHUB_REPO:="miloyip/rapidjson"}
+GITHUB_URL="https://github.com/${GITHUB_REPO}"
 
 skip() {
 	echo "$@" 1>&2
@@ -61,7 +61,7 @@ gh_pages_prepare()
 	cd "${TRAVIS_BUILD_DIR}/doc";
 	[ ! -d "html" ] || \
 		abort "Doxygen target directory already exists."
-	git clone --single-branch -b gh-pages ${GHPAGES_URL} html
+	git clone --single-branch -b gh-pages ${GITHUB_URL} html
 	cd html
 	# setup git config (with defaults)
 	git config user.name "${GIT_NAME-travis}"
@@ -90,7 +90,7 @@ gh_pages_push() {
 	cd "${TRAVIS_BUILD_DIR}/doc/html";
 	# setup credentials (hide in "set -x" mode)
 	git config core.askpass 'bash -c ":"'
-	( set +x ; git config credential.${GHPAGES_URL}.username "${GH_TOKEN}" )
+	( set +x ; git config credential.${GITHUB_URL}.username "${GH_TOKEN}" )
 	# push to GitHub
 	git push origin gh-pages || \
 		skip "GitHub pages update failed, temporarily ignored."
