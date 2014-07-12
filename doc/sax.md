@@ -50,7 +50,7 @@ EndArray(4)
 EndObject(7)
 ~~~~~~~~~~
 
-These events can be easily match up with the JSON, except some event parameters need further explanation. Let's see the code which produces exactly the same output as above:
+These events can be easily match up with the JSON, except some event parameters need further explanation. Let's see the simplereader example which produces exactly the same output as above:
 
 ~~~~~~~~~~cpp
 #include "rapidjson/reader.h"
@@ -60,26 +60,28 @@ using namespace rapidjson;
 using namespace std;
 
 struct MyHandler {
-    void Null() { cout << "Null()" << endl; }
-    void Bool(bool b) { cout << "Bool(" << (b ? "true" : "false") << ")" << endl; }
-    void Int(int i) { cout << "Int(" << i << ")" << endl; }
-    void Uint(unsigned u) { cout << "Uint(" << u << ")" << endl; }
-    void Int64(int64_t i) { cout << "Int64(" << i << ")" << endl; }
-    void Uint64(uint64_t u) { cout << "Uint64(" << u << ")" << endl; }
-    void Double(double d) { { cout << "Double(" << d << ")" << endl; }
-    void String(const char* str, SizeType length, bool copy) { 
-        cout << "String(" << str << ", " << length << ", " << (b ? "true" : "false") << ")" << endl; }
-    void StartObject() { cout << "StartObject()" << endl; }
-    void EndObject(SizeType memberCount) { cout << "EndObject(" << memberCount << ")" << endl; }
-    void StartArray() { cout << "StartArray()" << endl; }
-    void EndArray(SizeType elementCount) { cout << "EndArray(" << elementCount << ")" << endl; }
+    bool Null() { cout << "Null()" << endl; return true; }
+    bool Bool(bool b) { cout << "Bool(" << boolalpha << b << ")" << endl; return true; }
+    bool Int(int i) { cout << "Int(" << i << ")" << endl; return true; }
+    bool Uint(unsigned u) { cout << "Uint(" << u << ")" << endl; return true; }
+    bool Int64(int64_t i) { cout << "Int64(" << i << ")" << endl; return true; }
+    bool Uint64(uint64_t u) { cout << "Uint64(" << u << ")" << endl; return true; }
+    bool Double(double d) { cout << "Double(" << d << ")" << endl; return true; }
+    bool String(const char* str, SizeType length, bool copy) { 
+        cout << "String(" << str << ", " << length << ", " << boolalpha << copy << ")" << endl;
+        return true;
+    }
+    bool StartObject() { cout << "StartObject()" << endl; return true; }
+    bool EndObject(SizeType memberCount) { cout << "EndObject(" << memberCount << ")" << endl; return true; }
+    bool StartArray() { cout << "StartArray()" << endl; return true; }
+    bool EndArray(SizeType elementCount) { cout << "EndArray(" << elementCount << ")" << endl; return true; }
 };
 
 void main() {
-    const char* json = "...";
+    const char json[] = " { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3, 4] } ";
 
     MyHandler handler;
-    Reader<MyHandler> reader;
+    Reader reader;
     StringStream ss(json);
     reader.Parse(ss, handler);
 }
@@ -93,20 +95,18 @@ As the previous example showed, user needs to implement a handler, which consume
 
 ~~~~~~~~~~cpp
 concept Handler {
-    typename Ch;
-
-    void Null();
-    void Bool(bool b);
-    void Int(int i);
-    void Uint(unsigned i);
-    void Int64(int64_t i);
-    void Uint64(uint64_t i);
-    void Double(double d);
-    void String(const Ch* str, SizeType length, bool copy);
-    void StartObject();
-    void EndObject(SizeType memberCount);
-    void StartArray();
-    void EndArray(SizeType elementCount);
+    bool Null();
+    bool Bool(bool b);
+    bool Int(int i);
+    bool Uint(unsigned i);
+    bool Int64(int64_t i);
+    bool Uint64(uint64_t i);
+    bool Double(double d);
+    bool String(const Ch* str, SizeType length, bool copy);
+    bool StartObject();
+    bool EndObject(SizeType memberCount);
+    bool StartArray();
+    bool EndArray(SizeType elementCount);
 };
 ~~~~~~~~~~
 
@@ -121,6 +121,10 @@ When the `Reader` encounters a JSON number, it chooses a suitable C++ type mappi
 When the `Reader` encounters the beginning of an object, it calls `StartObject()`. An object in JSON is a set of name-value pairs. If the object contains members it first calls `String()` for the name of member, and then calls functions depending on the type of the value. These calls of name-value pairs repeats until calling `EndObject(SizeType memberCount)`. Note that the `memberCount` parameter is just an aid for the handler, user may not need this parameter.
 
 Array is similar to object but simpler. At the beginning of an array, the `Reader` calls `BeginArary()`. If there is elements, it calls functions according to the types of element. Similarly, in the last call `EndArray(SizeType elementCount)`, the parameter `elementCount` is just an aid for the handler.
+
+Every handler functions returns a `bool`. Normally it should returns `true`. If the handler encounters an error, it can return `false` to notify event publisher to stop further processing.
+
+For example, when we parse a JSON with `Reader` and the handler detected that the JSON does not conform to the required schema, then the handler can return `false` and let the `Reader` stop further parsing. And the `Reader` will be in error state with error code `kParseErrorTermination`.
 
 ## GenericReader {#GenericReader}
 
