@@ -38,6 +38,8 @@ inline const RAPIDJSON_ERROR_CHARTYPE* GetParseError_En(ParseErrorCode parseErro
 		case kParseErrorNumberMissFraction:				return RAPIDJSON_ERROR_STRING("Miss fraction part in number.");
 		case kParseErrorNumberMissExponent:				return RAPIDJSON_ERROR_STRING("Miss exponent in number.");
 
+		case kParseErrorTermination:					return RAPIDJSON_ERROR_STRING("Parsing was terminated.");
+
 		default:
 			return RAPIDJSON_ERROR_STRING("Unknown error.");
 	}
