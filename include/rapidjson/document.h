@@ -1015,44 +1015,45 @@ int z = a[0u].GetInt();				// This works too.
 		\param handler An object implementing concept Handler.
 	*/
 	template <typename Handler>
-	const GenericValue& Accept(Handler& handler) const {
+	bool Accept(Handler& handler) const {
 		switch(GetType()) {
-		case kNullType:		handler.Null(); break;
-		case kFalseType:	handler.Bool(false); break;
-		case kTrueType:		handler.Bool(true); break;
+		case kNullType:		return handler.Null();
+		case kFalseType:	return handler.Bool(false);
+		case kTrueType:		return handler.Bool(true);
 
 		case kObjectType:
-			handler.StartObject();
+			if (!handler.StartObject())
+				return false;
 			for (ConstMemberIterator m = MemberBegin(); m != MemberEnd(); ++m) {
-				handler.String(m->name.data_.s.str, m->name.data_.s.length, (m->name.flags_ & kCopyFlag) != 0);
-				m->value.Accept(handler);
+				if (!handler.String(m->name.data_.s.str, m->name.data_.s.length, (m->name.flags_ & kCopyFlag) != 0))
+					return false;
+				if (!m->value.Accept(handler))
+					return false;
 			}
-			handler.EndObject(data_.o.size);
-			break;
+			return handler.EndObject(data_.o.size);
 
 		case kArrayType:
-			handler.StartArray();
+			if (!handler.StartArray())
+				return false;
 			for (GenericValue* v = data_.a.elements; v != data_.a.elements + data_.a.size; ++v)
-				v->Accept(handler);
-			handler.EndArray(data_.a.size);
-			break;
-
+				if (!v->Accept(handler))
+					return false;
+			return handler.EndArray(data_.a.size);
+	
 		case kStringType:
-			handler.String(data_.s.str, data_.s.length, (flags_ & kCopyFlag) != 0);
-			break;
-
+			return handler.String(data_.s.str, data_.s.length, (flags_ & kCopyFlag) != 0);
+	
 		case kNumberType:
-			if (IsInt())			handler.Int(data_.n.i.i);
-			else if (IsUint())		handler.Uint(data_.n.u.u);
-			else if (IsInt64())		handler.Int64(data_.n.i64);
-			else if (IsUint64())	handler.Uint64(data_.n.u64);
-			else					handler.Double(data_.n.d);
-			break;
-
+			if (IsInt())			return handler.Int(data_.n.i.i);
+			else if (IsUint())		return handler.Uint(data_.n.u.u);
+			else if (IsInt64())		return handler.Int64(data_.n.i64);
+			else if (IsUint64())	return handler.Uint64(data_.n.u64);
+			else					return handler.Double(data_.n.d);
+	
 		default:
 			RAPIDJSON_ASSERT(false);
 		}
-		return *this;
+		return false;
 	}
 
 private:
@@ -1357,33 +1358,36 @@ private:
 	friend class GenericValue<Encoding,Allocator>; // for deep copying
 
 	// Implementation of Handler
-	void Null()	{ new (stack_.template Push<ValueType>()) ValueType(); }
-	void Bool(bool b) { new (stack_.template Push<ValueType>()) ValueType(b); }
-	void Int(int i) { new (stack_.template Push<ValueType>()) ValueType(i); }
-	void Uint(unsigned i) { new (stack_.template Push<ValueType>()) ValueType(i); }
-	void Int64(int64_t i) { new (stack_.template Push<ValueType>()) ValueType(i); }
-	void Uint64(uint64_t i) { new (stack_.template Push<ValueType>()) ValueType(i); }
-	void Double(double d) { new (stack_.template Push<ValueType>()) ValueType(d); }
+	bool Null()	{ new (stack_.template Push<ValueType>()) ValueType(); return true; }
+	bool Bool(bool b) { new (stack_.template Push<ValueType>()) ValueType(b); return true; }
+	bool Int(int i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
+	bool Uint(unsigned i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
+	bool Int64(int64_t i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
+	bool Uint64(uint64_t i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
+	bool Double(double d) { new (stack_.template Push<ValueType>()) ValueType(d); return true; }
 
-	void String(const Ch* str, SizeType length, bool copy) { 
+	bool String(const Ch* str, SizeType length, bool copy) { 
 		if (copy) 
 			new (stack_.template Push<ValueType>()) ValueType(str, length, GetAllocator());
 		else
 			new (stack_.template Push<ValueType>()) ValueType(str, length);
+		return true;
 	}
 
-	void StartObject() { new (stack_.template Push<ValueType>()) ValueType(kObjectType); }
+	bool StartObject() { new (stack_.template Push<ValueType>()) ValueType(kObjectType); return true; }
 	
-	void EndObject(SizeType memberCount) {
+	bool EndObject(SizeType memberCount) {
 		typename ValueType::Member* members = stack_.template Pop<typename ValueType::Member>(memberCount);
 		stack_.template Top<ValueType>()->SetObjectRaw(members, (SizeType)memberCount, GetAllocator());
+		return true;
 	}
 
-	void StartArray() { new (stack_.template Push<ValueType>()) ValueType(kArrayType); }
+	bool StartArray() { new (stack_.template Push<ValueType>()) ValueType(kArrayType); return true; }
 	
-	void EndArray(SizeType elementCount) {
+	bool EndArray(SizeType elementCount) {
 		ValueType* elements = stack_.template Pop<ValueType>(elementCount);
 		stack_.template Top<ValueType>()->SetArrayRaw(elements, elementCount, GetAllocator());
+		return true;
 	}
 
 private:

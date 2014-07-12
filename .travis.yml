@@ -6,10 +6,12 @@ compiler:
 
 env:
   matrix:
-    - config=debug64   config_suffix=debug_x64_gmake
-    - config=release64 config_suffix=release_x64_gmake
+    - CONF=debug
+    - CONF=release
   global:
-    secure: "CR3yKliFhwQLX+Zs1PCRcGej6jr4DIZsCqs9x6J2NN+U9Aow0gd/uiPBho/utgm+/TmSBji5n8FO/J3ORo34q4gC6EebTEaN4gCHNXVlIBJFw9x+Gs/lML5i8F2AoweFJY334OVaOf9qC8ZVJ8Z1nEwxj77fq3gcSLzRU3pIaS8="
+    # prepare for 32/64 bit multi-arch support
+    - BITS=64
+    - secure: "HrsaCb+N66EG1HR+LWH1u51SjaJyRwJEDzqJGYMB7LJ/bfqb9mWKF1fLvZGk46W5t7TVaXRDD5KHFx9DPWvKn4gRUVkwTHEy262ah5ORh8M6n/6VVVajeV/AYt2C0sswdkDBDO4Xq+xy5gdw3G8s1A4Inbm73pUh+6vx+7ltBbk="
 
 before_install:
   - sudo add-apt-repository -y ppa:codegear/release
@@ -22,11 +24,11 @@ before_script:
   - pushd build && premake4 'gmake' && popd
 
 script:
-  - make -C build/gmake -f test.make
-  - make -C build/gmake -f example.make
+  - make -C build/gmake -f test.make    config=${CONF}${BITS}
+  - make -C build/gmake -f example.make config=${CONF}${BITS}
   - pushd bin
-  - ./unittest_${config_suffix}
-  - valgrind --leak-check=full --error-exitcode=1 ./unittest_${config_suffix}
-  - if [ "$config" = "release64" ]; then ./perftest_${config_suffix}; fi
+  -  ./unittest_${CONF}_x${BITS}_gmake
+  - valgrind --leak-check=full --error-exitcode=1 ./unittest_${CONF}_x${BITS}_gmake
+  - if [ "$CONF" = "release" ]; then ./perftest_${CONF}_x${BITS}_gmake; fi
   - popd
   - ./build/travis-doxygen.sh;

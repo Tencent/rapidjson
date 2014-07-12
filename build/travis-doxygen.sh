@@ -64,8 +64,8 @@ gh_pages_prepare()
 	git clone --single-branch -b gh-pages ${GHPAGES_URL} html
 	cd html
 	# setup git config (with defaults)
-	git config user.name "${GIT_NAME-travis}"
-	git config user.email "${GIT_EMAIL-"travis@localhost"}"
+	git config --global user.name "${GIT_NAME-travis}"
+	git config --global user.email "${GIT_EMAIL-"travis@localhost"}"
 	# clean working dir
 	rm -f .git/index
 	git clean -df
@@ -81,15 +81,19 @@ gh_pages_push() {
 	# check for secure variables
 	[ "${TRAVIS_SECURE_ENV_VARS}" = "true" ] || \
 		skip "Secure variables not available, not updating GitHub pages."
+	# check for GitHub access token
 	[ "${GH_TOKEN+set}" = set ] || \
 		skip "GitHub access token not available, not updating GitHub pages."
+	[ "${#GH_TOKEN}" -eq 40 ] || \
+		abort "GitHub token invalid: found ${#GH_TOKEN} characters, expected 40."
 
 	cd "${TRAVIS_BUILD_DIR}/doc/html";
 	# setup credentials (hide in "set -x" mode)
 	git config core.askpass /bin/true
 	( set +x ; git config credential.${GHPAGES_URL}.username "${GH_TOKEN}" )
 	# push to GitHub
-	git push origin gh-pages
+	git push origin gh-pages || \
+		skip "GitHub pages update failed, temporarily ignored."
 }
 
 doxygen_install
