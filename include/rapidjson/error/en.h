@@ -32,11 +32,13 @@ inline const RAPIDJSON_ERROR_CHARTYPE* GetParseError_En(ParseErrorCode parseErro
 		case kParseErrorStringUnicodeSurrogateInvalid:	return RAPIDJSON_ERROR_STRING("The surrogate pair in string is invalid.");
 		case kParseErrorStringEscapeInvalid:			return RAPIDJSON_ERROR_STRING("Invalid escape character in string.");
 		case kParseErrorStringMissQuotationMark:		return RAPIDJSON_ERROR_STRING("Missing a closing quotation mark in string.");
-		case kParseErrorStringInvalidEncoding:			return RAPIDJSON_ERROR_STRING("Invalid encoidng in string.");
+		case kParseErrorStringInvalidEncoding:			return RAPIDJSON_ERROR_STRING("Invalid encoding in string.");
 
 		case kParseErrorNumberTooBig:					return RAPIDJSON_ERROR_STRING("Number too big to be stored in double.");
 		case kParseErrorNumberMissFraction:				return RAPIDJSON_ERROR_STRING("Miss fraction part in number.");
 		case kParseErrorNumberMissExponent:				return RAPIDJSON_ERROR_STRING("Miss exponent in number.");
+
+		case kParseErrorTermination:					return RAPIDJSON_ERROR_STRING("Terminate parsing due to Handler error.");
 
 		default:
 			return RAPIDJSON_ERROR_STRING("Unknown error.");
