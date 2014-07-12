@@ -79,7 +79,9 @@ enum ParseErrorCode {
 
 	kParseErrorNumberTooBig,					//!< Number too big to be stored in double.
 	kParseErrorNumberMissFraction,				//!< Miss fraction part in number.
-	kParseErrorNumberMissExponent				//!< Miss exponent in number.
+	kParseErrorNumberMissExponent,				//!< Miss exponent in number.
+
+	kParseErrorTermination						//!< Parsing was terminated.
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,22 +89,24 @@ enum ParseErrorCode {
 
 /*!	\class rapidjson::Handler
 	\brief Concept for receiving events from GenericReader upon parsing.
+	The functions return true if no error occurs. If they return false, 
+	the event publisher should terminate the process.
 \code
 concept Handler {
 	typename Ch;
 
-	void Null();
-	void Bool(bool b);
-	void Int(int i);
-	void Uint(unsigned i);
-	void Int64(int64_t i);
-	void Uint64(uint64_t i);
-	void Double(double d);
-	void String(const Ch* str, SizeType length, bool copy);
-	void StartObject();
-	void EndObject(SizeType memberCount);
-	void StartArray();
-	void EndArray(SizeType elementCount);
+	bool Null();
+	bool Bool(bool b);
+	bool Int(int i);
+	bool Uint(unsigned i);
+	bool Int64(int64_t i);
+	bool Uint64(uint64_t i);
+	bool Double(double d);
+	bool String(const Ch* str, SizeType length, bool copy);
+	bool StartObject();
+	bool EndObject(SizeType memberCount);
+	bool StartArray();
+	bool EndArray(SizeType elementCount);
 };
 \endcode
 */
@@ -117,19 +121,19 @@ template<typename Encoding = UTF8<> >
 struct BaseReaderHandler {
 	typedef typename Encoding::Ch Ch;
 
-	void Default() {}
-	void Null() { Default(); }
-	void Bool(bool) { Default(); }
-	void Int(int) { Default(); }
-	void Uint(unsigned) { Default(); }
-	void Int64(int64_t) { Default(); }
-	void Uint64(uint64_t) { Default(); }
-	void Double(double) { Default(); }
-	void String(const Ch*, SizeType, bool) { Default(); }
-	void StartObject() { Default(); }
-	void EndObject(SizeType) { Default(); }
-	void StartArray() { Default(); }
-	void EndArray(SizeType) { Default(); }
+	bool Default() { return true; }
+	bool Null() { return Default(); }
+	bool Bool(bool) { return Default(); }
+	bool Int(int) { return Default(); }
+	bool Uint(unsigned) { return Default(); }
+	bool Int64(int64_t) { return Default(); }
+	bool Uint64(uint64_t) { return Default(); }
+	bool Double(double) { return Default(); }
+	bool String(const Ch*, SizeType, bool) { return Default(); }
+	bool StartObject() { return Default(); }
+	bool EndObject(SizeType) { return Default(); }
+	bool StartArray() { return Default(); }
+	bool EndArray(SizeType) { return Default(); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -355,12 +359,16 @@ private:
 	void ParseObject(InputStream& is, Handler& handler) {
 		RAPIDJSON_ASSERT(is.Peek() == '{');
 		is.Take();	// Skip '{'
-		handler.StartObject();
+		
+		if (!handler.StartObject())
+			RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+
 		SkipWhitespace(is);
 
 		if (is.Peek() == '}') {
 			is.Take();
-			handler.EndObject(0);	// empty object
+			if (!handler.EndObject(0))	// empty object
+				RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
 			return;
 		}
 
@@ -387,9 +395,13 @@ private:
 
 			++memberCount;
 
-			switch(is.Take()) {
+			switch (is.Take()) {
 				case ',': SkipWhitespace(is); break;
-				case '}': handler.EndObject(memberCount); return;
+				case '}': 
+					if (!handler.EndObject(memberCount))
+						RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+					else
+						return;
 				default:  RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell());
 			}
 		}
@@ -400,12 +412,16 @@ private:
 	void ParseArray(InputStream& is, Handler& handler) {
 		RAPIDJSON_ASSERT(is.Peek() == '[');
 		is.Take();	// Skip '['
-		handler.StartArray();
+		
+		if (!handler.StartArray())
+			RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+		
 		SkipWhitespace(is);
 
 		if (is.Peek() == ']') {
 			is.Take();
-			handler.EndArray(0); // empty array
+			if (!handler.EndArray(0)) // empty array
+				RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
 			return;
 		}
 
@@ -419,7 +435,11 @@ private:
 
 			switch (is.Take()) {
 				case ',': SkipWhitespace(is); break;
-				case ']': handler.EndArray(elementCount); return;
+				case ']': 
+					if (!handler.EndArray(elementCount))
+						RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+					else
+						return;
 				default:  RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell());
 			}
 		}
@@ -430,8 +450,10 @@ private:
 		RAPIDJSON_ASSERT(is.Peek() == 'n');
 		is.Take();
 
-		if (is.Take() == 'u' && is.Take() == 'l' && is.Take() == 'l')
-			handler.Null();
+		if (is.Take() == 'u' && is.Take() == 'l' && is.Take() == 'l') {
+			if (!handler.Null())
+				RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+		}
 		else
 			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell() - 1);
 	}
@@ -441,10 +463,12 @@ private:
 		RAPIDJSON_ASSERT(is.Peek() == 't');
 		is.Take();
 
-		if (is.Take() == 'r' && is.Take() == 'u' && is.Take() == 'e')
-			handler.Bool(true);
+		if (is.Take() == 'r' && is.Take() == 'u' && is.Take() == 'e') {
+			if (!handler.Bool(true))
+				RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+		}
 		else
-			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell());
+			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell() - 1);
 	}
 
 	template<unsigned parseFlags, typename InputStream, typename Handler>
@@ -452,8 +476,10 @@ private:
 		RAPIDJSON_ASSERT(is.Peek() == 'f');
 		is.Take();
 
-		if (is.Take() == 'a' && is.Take() == 'l' && is.Take() == 's' && is.Take() == 'e')
-			handler.Bool(false);
+		if (is.Take() == 'a' && is.Take() == 'l' && is.Take() == 's' && is.Take() == 'e') {
+			if (!handler.Bool(false))
+				RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+		}
 		else
 			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell() - 1);
 	}
@@ -510,14 +536,16 @@ private:
 				return;
 			size_t length = s.PutEnd(head) - 1;
 			RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
-			handler.String((typename TargetEncoding::Ch*)head, SizeType(length), false);
+			if (!handler.String((typename TargetEncoding::Ch*)head, SizeType(length), false))
+				RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
 		}
 		else {
 			StackStream stackStream(stack_);
 			ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
 			if (HasParseError())
 				return;
-			handler.String(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, true);
+			if (!handler.String(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, true))
+				RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
 		}
 	}
 
@@ -719,6 +747,7 @@ private:
 		}
 
 		// Finish parsing, call event according to the type of number.
+		bool cont = true;
 		if (useDouble) {
 			int expSum = exp + expFrac;
 			if (expSum < -308) {
@@ -729,22 +758,24 @@ private:
 			else
 				d *= internal::Pow10(expSum);
 
-			handler.Double(minus ? -d : d);
+			cont = handler.Double(minus ? -d : d);
 		}
 		else {
 			if (try64bit) {
 				if (minus)
-					handler.Int64(-(int64_t)i64);
+					cont = handler.Int64(-(int64_t)i64);
 				else
-					handler.Uint64(i64);
+					cont = handler.Uint64(i64);
 			}
 			else {
 				if (minus)
-					handler.Int(-(int)i);
+					cont = handler.Int(-(int)i);
 				else
-					handler.Uint(i);
+					cont = handler.Uint(i);
 			}
 		}
+		if (!cont)
+			RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
 	}
 
 	// Parse any JSON value

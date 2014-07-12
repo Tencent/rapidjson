@@ -51,29 +51,27 @@ public:
 	*/
 	//@{
 
-	PrettyWriter& Null()				{ PrettyPrefix(kNullType);   Base::WriteNull();			return *this; }
-	PrettyWriter& Bool(bool b)			{ PrettyPrefix(b ? kTrueType : kFalseType); Base::WriteBool(b); return *this; }
-	PrettyWriter& Int(int i)			{ PrettyPrefix(kNumberType); Base::WriteInt(i);			return *this; }
-	PrettyWriter& Uint(unsigned u)		{ PrettyPrefix(kNumberType); Base::WriteUint(u);		return *this; }
-	PrettyWriter& Int64(int64_t i64)	{ PrettyPrefix(kNumberType); Base::WriteInt64(i64);		return *this; }
-	PrettyWriter& Uint64(uint64_t u64)	{ PrettyPrefix(kNumberType); Base::WriteUint64(u64);	return *this; }
-	PrettyWriter& Double(double d)		{ PrettyPrefix(kNumberType); Base::WriteDouble(d);		return *this; }
+	bool Null()					{ PrettyPrefix(kNullType);   return Base::WriteNull(); }
+	bool Bool(bool b)			{ PrettyPrefix(b ? kTrueType : kFalseType); return Base::WriteBool(b); }
+	bool Int(int i)				{ PrettyPrefix(kNumberType); return Base::WriteInt(i); }
+	bool Uint(unsigned u)		{ PrettyPrefix(kNumberType); return Base::WriteUint(u); }
+	bool Int64(int64_t i64)		{ PrettyPrefix(kNumberType); return Base::WriteInt64(i64); }
+	bool Uint64(uint64_t u64)	{ PrettyPrefix(kNumberType); return Base::WriteUint64(u64);	 }
+	bool Double(double d)		{ PrettyPrefix(kNumberType); return Base::WriteDouble(d); }
 
-	PrettyWriter& String(const Ch* str, SizeType length, bool copy = false) {
+	bool String(const Ch* str, SizeType length, bool copy = false) {
 		(void)copy;
 		PrettyPrefix(kStringType);
-		Base::WriteString(str, length);
-		return *this;
+		return Base::WriteString(str, length);
 	}
 
-	PrettyWriter& StartObject() {
+	bool StartObject() {
 		PrettyPrefix(kObjectType);
 		new (Base::level_stack_.template Push<typename Base::Level>()) typename Base::Level(false);
-		Base::WriteStartObject();
-		return *this;
+		return Base::WriteStartObject();
 	}
 
-	PrettyWriter& EndObject(SizeType memberCount = 0) {
+	bool EndObject(SizeType memberCount = 0) {
 		(void)memberCount;
 		RAPIDJSON_ASSERT(Base::level_stack_.GetSize() >= sizeof(typename Base::Level));
 		RAPIDJSON_ASSERT(!Base::level_stack_.template Top<typename Base::Level>()->inArray);
@@ -83,20 +81,20 @@ public:
 			Base::os_.Put('\n');
 			WriteIndent();
 		}
-		Base::WriteEndObject();
+		if (!Base::WriteEndObject())
+			return false;
 		if (Base::level_stack_.Empty())	// end of json text
 			Base::os_.Flush();
-		return *this;
+		return true;
 	}
 
-	PrettyWriter& StartArray() {
+	bool StartArray() {
 		PrettyPrefix(kArrayType);
 		new (Base::level_stack_.template Push<typename Base::Level>()) typename Base::Level(true);
-		Base::WriteStartArray();
-		return *this;
+		return Base::WriteStartArray();
 	}
 
-	PrettyWriter& EndArray(SizeType memberCount = 0) {
+	bool EndArray(SizeType memberCount = 0) {
 		(void)memberCount;
 		RAPIDJSON_ASSERT(Base::level_stack_.GetSize() >= sizeof(typename Base::Level));
 		RAPIDJSON_ASSERT(Base::level_stack_.template Top<typename Base::Level>()->inArray);
@@ -106,10 +104,11 @@ public:
 			Base::os_.Put('\n');
 			WriteIndent();
 		}
-		Base::WriteEndArray();
+		if (!Base::WriteEndArray())
+			return false;
 		if (Base::level_stack_.Empty())	// end of json text
 			Base::os_.Flush();
-		return *this;
+		return true;
 	}
 
 	//@}
@@ -118,12 +117,15 @@ public:
 	//@{
 
 	//! Simpler but slower overload.
-	PrettyWriter& String(const Ch* str) { return String(str, internal::StrLen(str)); }
+	bool String(const Ch* str) { return String(str, internal::StrLen(str)); }
 
 	//! Overridden for fluent API, see \ref Writer::Double()
-	PrettyWriter& Double(double d, int precision) {
+	bool Double(double d, int precision) {
 		int oldPrecision = Base::GetDoublePrecision();
-		return SetDoublePrecision(precision).Double(d).SetDoublePrecision(oldPrecision);
+		SetDoublePrecision(precision);
+		bool ret = Double(d);
+		SetDoublePrecision(oldPrecision);
+		return ret;
 	}
 
 	//@}
