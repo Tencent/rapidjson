@@ -52,11 +52,13 @@ enum ParseErrorCode {
 	kParseErrorStringUnicodeSurrogateInvalid,	//!< The surrogate pair in string is invalid.
 	kParseErrorStringEscapeInvalid,				//!< Invalid escape character in string.
 	kParseErrorStringMissQuotationMark,			//!< Missing a closing quotation mark in string.
-	kParseErrorStringInvalidEncoding,			//!< Invalid encoidng in string.
+	kParseErrorStringInvalidEncoding,			//!< Invalid encoding in string.
 
 	kParseErrorNumberTooBig,					//!< Number too big to be stored in double.
 	kParseErrorNumberMissFraction,				//!< Miss fraction part in number.
-	kParseErrorNumberMissExponent				//!< Miss exponent in number.
+	kParseErrorNumberMissExponent,				//!< Miss exponent in number.
+
+	kParseErrorTermination						//!< Parsing was terminated.
 };
 
 //! Result of parsing (wraps ParseErrorCode)
