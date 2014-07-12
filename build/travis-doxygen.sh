@@ -64,8 +64,8 @@ gh_pages_prepare()
 	git clone --single-branch -b gh-pages ${GHPAGES_URL} html
 	cd html
 	# setup git config (with defaults)
-	git config user.name "${GIT_NAME}"
-	git config user.email "${GIT_EMAIL}"
+	git config user.name "${GIT_NAME-travis}"
+	git config user.email "${GIT_EMAIL-"travis@localhost"}"
 	# clean working dir
 	rm -f .git/index
 	git clean -df
