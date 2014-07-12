@@ -50,7 +50,7 @@ EndArray(4)
 EndObject(7)
 ~~~~~~~~~~
 
-These events can be easily match up with the JSON, except some event parameters need further explanation. Let's see the simplereader example which produces exactly the same output as above:
+These events can be easily match up with the JSON, except some event parameters need further explanation. Let's see the `simplereader` example which produces exactly the same output as above:
 
 ~~~~~~~~~~cpp
 #include "rapidjson/reader.h"
@@ -170,7 +170,116 @@ If an error occurs during parsing, it will return `false`. User can also calls `
 
 # Writer {#Writer}
 
+`Reader` converts (parses) JSON into events. `Writer` does exactly the opposite. It converts events into JSON. 
+
+`Writer` is very easy to use. If your application only need to converts some data into JSON, it may be a good choice of using `Writer` directly, instead of building a `Document` and then stringifying it with a `Writer`.
+
+In `simplewriter` example, we do exactly the reverse of `simplereader`.
+
+~~~~~~~~~~cpp
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+#include <iostream>
+
+using namespace rapidjson;
+using namespace std;
+
+void main() {
+    StringBuffer s;
+    Writer<StringBuffer> writer(s);
+    
+    writer.StartObject();
+    writer.String("hello");
+    writer.String("world");
+    writer.String("t");
+    writer.Bool(true);
+    writer.String("f");
+    writer.Bool(false);
+    writer.String("n");
+    writer.Null();
+    writer.String("i");
+    writer.Uint(123);
+    writer.String("pi");
+    writer.Double(3.1416);
+    writer.String("a");
+    writer.StartArray();
+    for (unsigned i = 0; i < 4; i++)
+        writer.Uint(i);
+    writer.EndArray();
+    writer.EndObject();
+
+    cout << s.GetString() << endl;
+}
+~~~~~~~~~~
+
+~~~~~~~~~~
+{"hello":"world","t":true,"f":false,"n":null,"i":123,"pi":3.1416,"a":[0,1,2,3]}
+~~~~~~~~~~
+
+There is two `String()` overloads. One is the same as defined in handler concept with 3 parameters. It can handle string with null characters. Another one is the simpler version used in the above example.
+
+Note that, the example code does not pass any parameters in `EndArray()` and `EndObject()`. An `SizeType` can be passed but it will be simply ignored by `Writer`.
+
+You may doubt that, 
+
+> "why not just using `sprintf()` or `std::stringstream` to build a JSON?"
+
+There are various reasons:
+1. `Writer` must output a well-formed JSON. If there is incorrect event sequence (e.g. `Int()` just after `StartObject()`), it generates assertion fail in debug mode.
+2. `Writer::String()` can handle string escaping (e.g. converting code point `U+000A` to `\n`) and Unicode transcoding.
+3. `Writer` handles number output consistently. For example, user can set precision for `Double()`.
+3. `Writer` implements the event handler concept. It can be used to handle events from `Reader`, `Document` or other event publisher.
+4. `Writer` can be optimized for different platforms.
+
+Anyway, using `Writer` API is even simpler than generating a JSON by ad hoc methods.
+
+## Template {#WriterTemplate}
+
+`Writer` has a minor design difference to `Reader`. `Writer` is a template class, not a typedef. There is no `GenericWriter`. The following is the declaration.
+
+~~~~~~~~~~cpp
+namespace rapidjson {
+
+template<typename OutputStream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename Allocator = CrtAllocator<> >
+class Writer {
+public:
+    Writer(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth)
+// ...
+};
+
+} // namespace rapidjson
+~~~~~~~~~~
+
+The `OutputStream` template parameter is the type of output stream. It cannot be deduced and must be specified by user.
+
+The `SourceEncoding` template parameter specifies the encoding to be used in `String(const Ch*, ...)`.
+
+The `TargetEncoding` template parameter specifies the encoding in the output stream.
+
+The last one, `Allocator` is the type of allocator, which is used for allocating internal data structure (a stack).
+
+Besides, the constructor of `Writer` has a `levelDepth` parameter. This parameter affects the initial memory allocated for storing information per hierarchy level.
+
+## Precision (#WriterPrecision)
+When using `Double()`, the precision of output can be specified, for example:
+
+~~~~~~~~~~cpp
+writer.SetDoublePrecision(4);
+writer.StartArary();
+writer.Double(3.14159265359);
+writer.EndArray();
+~~~~~~~~~~
+~~~~~~~~~~
+[3.1416]
+~~~~~~~~~~
+
 ## PrettyWriter {#PrettyWriter}
+
+While the output of `Writer` is the most condensed JSON without white-spaces, suitable for network transfer or storage, it is not easily readable by human.
+
+Therefore, RapidJSON provides a `PrettyWriter`, which adds indentation and line feeds in the output.
+
+The usage of `PrettyWriter` is exactly the same as `Writer`, expect that `PrettyWriter` provides a `SetIndent(Ch indentChar, unsigned indentCharCount)` function. The default is 4 spaces.
 
 # Techniques {#Techniques}
 
@@ -180,52 +289,59 @@ If an error occurs during parsing, it will return `false`. User can also calls `
 
 User may uses `Reader` to build other data structures directly. This eliminates building of DOM, thus reducing memory and improving performance.
 
-Example:
+In the following `messagereader` example, `ParseMessages()` parses a JSON which should be an object with key-string pairs.
+
 ~~~~~~~~~~cpp
-// Note: Ad hoc, not yet tested.
+#include "rapidjson/reader.h"
+#include "rapidjson/error/en.h"
+#include <iostream>
+#include <string>
+#include <map>
+
 using namespace std;
 using namespace rapidjson;
 
 typedef map<string, string> MessageMap;
 
-struct MessageHandler : public GenericBaseHandler<> {
-    MessageHandler() : mState(kExpectStart) {
-    }
-
-    bool Default() {
-        return false;
+struct MessageHandler : public BaseReaderHandler<> {
+    MessageHandler() : state_(kExpectObjectStart) {
     }
 
     bool StartObject() {
-        if (!kBeforeStart)
+        switch (state_) {
+        case kExpectObjectStart:
+            state_ = kExpectNameOrObjectEnd;
+            return true;
+        default:
             return false;
-        mState = mExpectName;
-        return true;
+        }
     }
 
-    bool String(const Ch* str, SizeType length, bool copy) {
-        if (mState == kExpectName) {
+    bool String(const char* str, SizeType length, bool) {
+        switch (state_) {
+        case kExpectNameOrObjectEnd:
             name_ = string(str, length);
+            state_ = kExpectValue;
             return true;
-        }
-        else if (mState == kExpectValue) {
+        case kExpectValue:
             messages_.insert(MessageMap::value_type(name_, string(str, length)));
+            state_ = kExpectNameOrObjectEnd;
             return true;
-        }
-        else
+        default:
             return false;
+        }
     }
 
-    bool EndObject() {
-        return mState == kExpectName;
-    }
+    bool EndObject(SizeType) { return state_ == kExpectNameOrObjectEnd; }
+
+    bool Default() { return false; } // All other events are invalid.
 
     MessageMap messages_;
     enum State {
         kExpectObjectStart,
-        kExpectName,
+        kExpectNameOrObjectEnd,
         kExpectValue,
-    }mState;
+    }state_;
     std::string name_;
 };
 
@@ -234,19 +350,57 @@ void ParseMessages(const char* json, MessageMap& messages) {
     MessageHandler handler;
     StringStream ss(json);
     if (reader.Parse(ss, handler))
-        messages.swap(handler.messages_);
+        messages.swap(handler.messages_);   // Only change it if success.
+    else {
+        ParseErrorCode e = reader.GetParseErrorCode();
+        size_t o = reader.GetErrorOffset();
+        cout << "Error: " << GetParseError_En(e) << endl;;
+        cout << " at offset " << o << " near '" << string(json).substr(o, 10) << "...'" << endl;
+    }
 }
 
-main() {
+int main() {
     MessageMap messages;
-    ParseMessages("{ \"greeting\" : \"Hello!\", \"farewell\" : \"bye-bye!\" }", messages);
+
+    const char* json1 = "{ \"greeting\" : \"Hello!\", \"farewell\" : \"bye-bye!\" }";
+    cout << json1 << endl;
+    ParseMessages(json1, messages);
+
+    for (MessageMap::const_iterator itr = messages.begin(); itr != messages.end(); ++itr)
+        cout << itr->first << ": " << itr->second << endl;
+
+    cout << endl << "Parse a JSON with invalid schema." << endl;
+    const char* json2 = "{ \"greeting\" : \"Hello!\", \"farewell\" : \"bye-bye!\", \"foo\" : {} }";
+    cout << json2 << endl;
+    ParseMessages(json2, messages);
+
+    return 0;
 }
 ~~~~~~~~~~
 
-~~~~~~~~~~cpp
-// Parse a NxM array 
-const char* json = "[3, 4, [1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]]"
 ~~~~~~~~~~
+{ "greeting" : "Hello!", "farewell" : "bye-bye!" }
+farewell: bye-bye!
+greeting: Hello!
+
+Parse a JSON with invalid schema.
+{ "greeting" : "Hello!", "farewell" : "bye-bye!", "foo" : {} }
+Error: Terminate parsing due to Handler error.
+ at offset 59 near '} }...'
+~~~~~~~~~~
+
+The first JSON (`json1`) was successfully parsed into `MessageMap`. Since it is a `std::map`, the print out are sorted by the key, which is different from the JSON's order.
+
+In the second JSON (`json2`), `foo`'s value is an empty object. As it is an object, `MessageHandler::StartObject()` will be called. However, at that moment `state_ = kExpectValue`, so that function returns `false` and cause the parsing process be terminated. The error code is `kParseErrorTermination`.
 
 ## Filtering of JSON {#Filtering}
 
+As mentioned earlier, `Writer` can handle the events published by `Reader`. `condense` example simply set a `Writer` as handler of a `Reader`, so it can remove all white-spaces in JSON. `pretty` example uses the same relationship, but replacing `Writer` by `PrettyWriter`. So `pretty` can be used to reformat a JSON with indentation and line feed.
+
+Actually, we can add intermediate layer(s) to filter the contents of JSON via these SAX-style API. For example, `capitalize` example capitalize all strings in a JSON.
+
+~~~~~~~~~~cpp
+TODO
+~~~~~~~~~~
+
+More complicated filters can be developed. However, since SAX-style API can only provide information about a single event at a time, user may need to book-keeping the contextual information (e.g. the path from root value, storage of other related values). Some processing may be easier to be implemented in DOM than SAX.
