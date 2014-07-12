@@ -12,8 +12,13 @@ using namespace rapidjson;
 
 typedef map<string, string> MessageMap;
 
+#if defined(__GNUC__)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(effc++)
+#endif
+
 struct MessageHandler : public BaseReaderHandler<> {
-    MessageHandler() : state_(kExpectObjectStart) {}
+	MessageHandler() : messages_(), state_(kExpectObjectStart), name_() {}
 
     bool StartObject() {
 		switch (state_) {
@@ -52,6 +57,10 @@ struct MessageHandler : public BaseReaderHandler<> {
     }state_;
     std::string name_;
 };
+
+#if defined(__GNUC__)
+RAPIDJSON_DIAG_POP
+#endif
 
 void ParseMessages(const char* json, MessageMap& messages) {
     Reader reader;
