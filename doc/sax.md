@@ -400,7 +400,78 @@ As mentioned earlier, `Writer` can handle the events published by `Reader`. `con
 Actually, we can add intermediate layer(s) to filter the contents of JSON via these SAX-style API. For example, `capitalize` example capitalize all strings in a JSON.
 
 ~~~~~~~~~~cpp
-TODO
+#include "rapidjson/reader.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/filereadstream.h"
+#include "rapidjson/filewritestream.h"
+#include "rapidjson/error/en.h"
+#include <vector>
+#include <cctype>
+
+using namespace rapidjson;
+
+template<typename OutputHandler>
+struct CapitalizeFilter {
+    CapitalizeFilter(OutputHandler& out) : out_(out), buffer_() {
+    }
+
+    bool Null() { return out_.Null(); }
+    bool Bool(bool b) { return out_.Bool(b); }
+    bool Int(int i) { return out_.Int(i); }
+    bool Uint(unsigned u) { return out_.Uint(u); }
+    bool Int64(int64_t i) { return out_.Int64(i); }
+    bool Uint64(uint64_t u) { return out_.Uint64(u); }
+    bool Double(double d) { return out_.Double(d); }
+    bool String(const char* str, SizeType length, bool) { 
+        buffer_.clear();
+        for (SizeType i = 0; i < length; i++)
+            buffer_.push_back(std::toupper(str[i]));
+        return out_.String(&buffer_.front(), length, true); // true = output handler need to copy the string
+    }
+    bool StartObject() { return out_.StartObject(); }
+    bool EndObject(SizeType memberCount) { return out_.EndObject(memberCount); }
+    bool StartArray() { return out_.StartArray(); }
+    bool EndArray(SizeType elementCount) { return out_.EndArray(elementCount); }
+
+    OutputHandler& out_;
+    std::vector<char> buffer_;
+};
+
+int main(int, char*[]) {
+    // Prepare JSON reader and input stream.
+    Reader reader;
+    char readBuffer[65536];
+    FileReadStream is(stdin, readBuffer, sizeof(readBuffer));
+
+    // Prepare JSON writer and output stream.
+    char writeBuffer[65536];
+    FileWriteStream os(stdout, writeBuffer, sizeof(writeBuffer));
+    Writer<FileWriteStream> writer(os);
+
+    // JSON reader parse from the input stream and let writer generate the output.
+    CapitalizeFilter<Writer<FileWriteStream> > filter(writer);
+    if (!reader.Parse(is, filter)) {
+        fprintf(stderr, "\nError(%u): %s\n", (unsigned)reader.GetErrorOffset(), GetParseError_En(reader.GetParseErrorCode()));
+        return 1;
+    }
+
+    return 0;
+}
+~~~~~~~~~~
+
+Note that, it is incorrect to simply capitalize the JSON as a string. For example:
+~~~~~~~~~~js
+["Hello\\nWorld"]
+~~~~~~~~~~
+
+Simply capitalizing the whole JSON would contain incorrect escape character:
+~~~~~~~~~~js
+["HELLO\\NWORLD"]
+~~~~~~~~~~
+
+The correct result by `capitalize`:
+~~~~~~~~~~js
+["HELLO\\nWORLD"]
 ~~~~~~~~~~
 
 More complicated filters can be developed. However, since SAX-style API can only provide information about a single event at a time, user may need to book-keeping the contextual information (e.g. the path from root value, storage of other related values). Some processing may be easier to be implemented in DOM than SAX.
