@@ -5,7 +5,7 @@
 using namespace rapidjson;
 using namespace std;
 
-void main() {
+int main() {
     StringBuffer s;
     Writer<StringBuffer> writer(s);
     
@@ -30,4 +30,6 @@ void main() {
     writer.EndObject();
 
     cout << s.GetString() << endl;
+
+	return 0;
 }
