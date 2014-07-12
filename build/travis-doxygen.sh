@@ -89,7 +89,7 @@ gh_pages_push() {
 
 	cd "${TRAVIS_BUILD_DIR}/doc/html";
 	# setup credentials (hide in "set -x" mode)
-	git config core.askpass /bin/true
+	git config core.askpass 'bash -c ":"'
 	( set +x ; git config credential.${GHPAGES_URL}.username "${GH_TOKEN}" )
 	# push to GitHub
 	git push origin gh-pages || \
