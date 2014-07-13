@@ -534,6 +534,8 @@ template<typename CharType>
 struct AutoUTF {
 	typedef CharType Ch;
 
+	enum { supportUnicode = 1 };
+
 #define RAPIDJSON_ENCODINGS_FUNC(x) UTF8<Ch>::x, UTF16LE<Ch>::x, UTF16BE<Ch>::x, UTF32LE<Ch>::x, UTF32BE<Ch>::x
 
 	template<typename OutputStream>
