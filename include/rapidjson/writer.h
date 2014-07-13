@@ -44,6 +44,24 @@ public:
 		os_(&os), level_stack_(allocator, levelDepth * sizeof(Level)),
 		doublePrecision_(kDefaultDoublePrecision), hasRoot_(false) {}
 
+	//! Reset the writer with a new stream.
+	/*!
+		This function reset the writer with a new stream and default settings,
+		in order to make a Writer object reusable for output multiple JSONs.
+
+		\param os New output stream.
+		\code
+		Writer<OutputStream> writer(os1);
+		writer.StartObject();
+		// ...
+		writer.EndObject();
+
+		writer.Reset(os2);
+		writer.StartObject();
+		// ...
+		writer.EndObject();
+		\endcode
+	*/
 	void Reset(OutputStream& os) {
 		os_ = &os;
 		doublePrecision_ = kDefaultDoublePrecision;
@@ -51,6 +69,10 @@ public:
 		level_stack_.Clear();
 	}
 
+	//! Checks whether the output is a complete JSON.
+	/*!
+		A complete JSON has a complete root object or array.
+	*/
 	bool IsComplete() const {
 		return hasRoot_ && level_stack_.Empty();
 	}
