@@ -107,9 +107,9 @@ gh_pages_push() {
 	git remote set-url --push origin "${GITHUB_URL}"
 	git config credential.helper 'store'
 	# ( set +x ; git config credential.username "${GH_TOKEN}" )
-	( set +x ; \
-		echo "https://${GH_TOKEN}:@${GITHUB_HOST}" > ${HOME}/.git-credentials ; \
-		chmod go-rw ${HOME}/.git-credentials )
+	( set +x ; [ -f ${HOME}/.git-credentials ] || \
+			( echo "https://${GH_TOKEN}:@${GITHUB_HOST}" > ${HOME}/.git-credentials ; \
+			 chmod go-rw ${HOME}/.git-credentials ) )
 	# push to GitHub
 	git push origin gh-pages
 }
