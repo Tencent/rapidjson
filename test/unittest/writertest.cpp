@@ -15,6 +15,7 @@ TEST(Writer, Compact) {
 	reader.Parse<0>(s, writer);
 	EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3]}", buffer.GetString());
 	EXPECT_EQ(77u, buffer.GetSize());
+	EXPECT_TRUE(writer.IsComplete());
 }
 
 // json -> parse -> writer -> json
@@ -26,6 +27,7 @@ TEST(Writer, Compact) {
 		Reader reader; \
 		reader.Parse<0>(s, writer); \
 		EXPECT_STREQ(json, buffer.GetString()); \
+		EXPECT_TRUE(writer.IsComplete()); \
 	}
 
 TEST(Writer, Int) {
@@ -121,6 +123,7 @@ TEST(Writer, Transcode) {
 	Writer<StringBuffer, UTF16<>, UTF8<> > writer(buffer);
 	GenericReader<UTF8<>, UTF16<> > reader;
 	reader.Parse<0>(s, writer);
+	EXPECT_TRUE(writer.IsComplete());
 	EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3],\"dollar\":\"\x24\",\"cents\":\"\xC2\xA2\",\"euro\":\"\xE2\x82\xAC\",\"gclef\":\"\xF0\x9D\x84\x9E\"}", buffer.GetString());
 }
 
@@ -239,4 +242,32 @@ TEST(Writer, AssertMultipleRoot) {
 	writer.StartObject();
 	writer.EndObject();
 	ASSERT_THROW(writer.StartObject(), AssertException);
+}
+
+TEST(Writer, RootObjectIsComplete) {
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	EXPECT_FALSE(writer.IsComplete());
+	writer.StartObject();
+	EXPECT_FALSE(writer.IsComplete());
+	writer.String("foo");
+	EXPECT_FALSE(writer.IsComplete());
+	writer.Int(1);
+	EXPECT_FALSE(writer.IsComplete());
+	writer.EndObject();
+	EXPECT_TRUE(writer.IsComplete());
+}
+
+TEST(Writer, RootArrayIsComplete) {
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	EXPECT_FALSE(writer.IsComplete());
+	writer.StartArray();
+	EXPECT_FALSE(writer.IsComplete());
+	writer.String("foo");
+	EXPECT_FALSE(writer.IsComplete());
+	writer.Int(1);
+	EXPECT_FALSE(writer.IsComplete());
+	writer.EndArray();
+	EXPECT_TRUE(writer.IsComplete());
 }

@@ -51,6 +51,10 @@ public:
 		level_stack_.Clear();
 	}
 
+	bool IsComplete() const {
+		return hasRoot_ && level_stack_.Empty();
+	}
+
 	//! Set the number of significant digits for \c double values
 	/*! When writing a \c double value to the \c OutputStream, the number
 		of significant digits is limited to 6 by default.
