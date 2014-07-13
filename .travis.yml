@@ -9,6 +9,7 @@ env:
     - CONF=debug
     - CONF=release
   global:
+    - GITHUB_REPO='miloyip/rapidjson'
     # prepare for 32/64 bit multi-arch support
     - BITS=64
     - secure: "HrsaCb+N66EG1HR+LWH1u51SjaJyRwJEDzqJGYMB7LJ/bfqb9mWKF1fLvZGk46W5t7TVaXRDD5KHFx9DPWvKn4gRUVkwTHEy262ah5ORh8M6n/6VVVajeV/AYt2C0sswdkDBDO4Xq+xy5gdw3G8s1A4Inbm73pUh+6vx+7ltBbk="

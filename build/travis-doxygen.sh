@@ -10,8 +10,13 @@ DOXYGEN_TAR=${DOXYGEN_VER}.linux.bin.tar.gz
 DOXYGEN_URL="http://ftp.stack.nl/pub/users/dimitri/${DOXYGEN_TAR}"
 DOXYGEN_BIN="/usr/local/bin/doxygen"
 
-GHPAGES_REPO="miloyip/rapidjson"
-GHPAGES_URL="https://github.com/${GHPAGES_REPO}"
+: ${GITHUB_REPO:="miloyip/rapidjson"}
+GITHUB_HOST="github.com"
+GITHUB_CLONE="git://${GITHUB_HOST}/${GITHUB_REPO}"
+GITHUB_URL="https://${GITHUB_HOST}/${GITHUB_PUSH-${GITHUB_REPO}}"
+
+# if not set, ignore password
+#GIT_ASKPASS="${TRAVIS_BUILD_DIR}/gh_ignore_askpass.sh"
 
 skip() {
 	echo "$@" 1>&2
@@ -61,11 +66,12 @@ gh_pages_prepare()
 	cd "${TRAVIS_BUILD_DIR}/doc";
 	[ ! -d "html" ] || \
 		abort "Doxygen target directory already exists."
-	git clone --single-branch -b gh-pages ${GHPAGES_URL} html
+	git --version
+	git clone --single-branch -b gh-pages "${GITHUB_CLONE}" html
 	cd html
 	# setup git config (with defaults)
-	git config --global user.name "${GIT_NAME-travis}"
-	git config --global user.email "${GIT_EMAIL-"travis@localhost"}"
+	git config user.name "${GIT_NAME-travis}"
+	git config user.email "${GIT_EMAIL-"travis@localhost"}"
 	# clean working dir
 	rm -f .git/index
 	git clean -df
@@ -75,6 +81,15 @@ gh_pages_commit() {
 	cd "${TRAVIS_BUILD_DIR}/doc/html";
 	git add --all;
 	git diff-index --quiet HEAD || git commit -m "Automatic doxygen build";
+}
+
+gh_setup_askpass() {
+	cat > ${GIT_ASKPASS} <<EOF
+#!/bin/bash
+echo
+exit 0
+EOF
+	chmod a+x "$GIT_ASKPASS"
 }
 
 gh_pages_push() {
@@ -89,11 +104,14 @@ gh_pages_push() {
 
 	cd "${TRAVIS_BUILD_DIR}/doc/html";
 	# setup credentials (hide in "set -x" mode)
-	git config core.askpass /bin/true
-	( set +x ; git config credential.${GHPAGES_URL}.username "${GH_TOKEN}" )
+	git remote set-url --push origin "${GITHUB_URL}"
+	git config credential.helper 'store'
+	# ( set +x ; git config credential.username "${GH_TOKEN}" )
+	( set +x ; \
+		echo "https://${GH_TOKEN}:@${GITHUB_HOST}" > ${HOME}/.git-credentials ; \
+		chmod go-rw ${HOME}/.git-credentials )
 	# push to GitHub
-	git push origin gh-pages || \
-		skip "GitHub pages update failed, temporarily ignored."
+	git push origin gh-pages
 }
 
 doxygen_install
