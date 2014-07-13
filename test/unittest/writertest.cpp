@@ -113,13 +113,34 @@ TEST(Writer,DoublePrecision) {
 }
 
 TEST(Writer, Transcode) {
+	const char json[] = "{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3],\"dollar\":\"\x24\",\"cents\":\"\xC2\xA2\",\"euro\":\"\xE2\x82\xAC\",\"gclef\":\"\xF0\x9D\x84\x9E\"}";
+
 	// UTF8 -> UTF16 -> UTF8
-	StringStream s("{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3], \"dollar\":\"\x24\", \"cents\":\"\xC2\xA2\", \"euro\":\"\xE2\x82\xAC\", \"gclef\":\"\xF0\x9D\x84\x9E\" } ");
-	StringBuffer buffer;
-	Writer<StringBuffer, UTF16<>, UTF8<> > writer(buffer);
-	GenericReader<UTF8<>, UTF16<> > reader;
-	reader.Parse<0>(s, writer);
-	EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3],\"dollar\":\"\x24\",\"cents\":\"\xC2\xA2\",\"euro\":\"\xE2\x82\xAC\",\"gclef\":\"\xF0\x9D\x84\x9E\"}", buffer.GetString());
+	{
+		StringStream s(json);
+		StringBuffer buffer;
+		Writer<StringBuffer, UTF16<>, UTF8<> > writer(buffer);
+		GenericReader<UTF8<>, UTF16<> > reader;
+		reader.Parse(s, writer);
+		EXPECT_STREQ(json, buffer.GetString());
+	}
+
+	// UTF8 -> UTF8 -> ASCII -> UTF8 -> UTF8
+	{
+		StringStream s(json);
+		StringBuffer buffer;
+		Writer<StringBuffer, UTF8<>, ASCII<> > writer(buffer);
+		Reader reader;
+		reader.Parse(s, writer);
+
+		StringBuffer buffer2;
+		Writer<StringBuffer> writer2(buffer2);
+		GenericReader<ASCII<>, UTF8<> > reader2;
+		StringStream s2(buffer.GetString());
+		reader2.Parse(s2, writer2);
+
+		EXPECT_STREQ(json, buffer2.GetString());
+	}
 }
 
 #include <sstream>

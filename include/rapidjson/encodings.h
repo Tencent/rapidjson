@@ -23,6 +23,8 @@ namespace rapidjson {
 concept Encoding {
 	typename Ch;	//! Type of character. A "character" is actually a code unit in unicode's definition.
 
+	enum { supportUnicode = 1 }; // or 0 if not supporting unicode
+
 	//! \brief Encode a Unicode codepoint to an output stream.
 	//! \param os Output stream.
 	//! \param codepoint An unicode codepoint, ranging from 0x0 to 0x10FFFF inclusively.
@@ -77,6 +79,8 @@ concept Encoding {
 template<typename CharType = char>
 struct UTF8 {
 	typedef CharType Ch;
+
+	enum { supportUnicode = 1 };
 
 	template<typename OutputStream>
 	static void Encode(OutputStream& os, unsigned codepoint) {
@@ -222,6 +226,8 @@ struct UTF16 {
 	typedef CharType Ch;
 	RAPIDJSON_STATIC_ASSERT(sizeof(Ch) >= 2);
 
+	enum { supportUnicode = 1 };
+
 	template<typename OutputStream>
 	static void Encode(OutputStream& os, unsigned codepoint) {
 		RAPIDJSON_STATIC_ASSERT(sizeof(typename OutputStream::Ch) >= 2);
@@ -351,6 +357,8 @@ struct UTF32 {
 	typedef CharType Ch;
 	RAPIDJSON_STATIC_ASSERT(sizeof(Ch) >= 4);
 
+	enum { supportUnicode = 1 };
+
 	template<typename OutputStream>
 	static void Encode(OutputStream& os, unsigned codepoint) {
 		RAPIDJSON_STATIC_ASSERT(sizeof(typename OutputStream::Ch) >= 4);
@@ -444,6 +452,66 @@ struct UTF32BE : UTF32<CharType> {
 		os.Put((c >> 16) & 0xFFu);
 		os.Put((c >> 8) & 0xFFu);
 		os.Put(c & 0xFFu);
+	}
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// ASCII
+
+//! ASCII encoding.
+/*! http://en.wikipedia.org/wiki/ASCII
+	\tparam CharType Code unit for storing 7-bit ASCII data. Default is char.
+	\note implements Encoding concept
+*/
+template<typename CharType = char>
+struct ASCII {
+	typedef CharType Ch;
+
+	enum { supportUnicode = 0 };
+
+	template<typename OutputStream>
+	static void Encode(OutputStream& os, unsigned codepoint) {
+		RAPIDJSON_ASSERT(codepoint <= 0x7F);
+		os.Put(static_cast<Ch>(codepoint & 0xFF));
+	}
+
+	template <typename InputStream>
+	static bool Decode(InputStream& is, unsigned* codepoint) {
+		unsigned char c = static_cast<unsigned char>(is.Take());
+		*codepoint = c;
+		return c <= 0X7F;
+	}
+
+	template <typename InputStream, typename OutputStream>
+	static bool Validate(InputStream& is, OutputStream& os) {
+		unsigned char c = is.Take();
+		os.Put(c);
+		return c <= 0x7F;
+	}
+
+	template <typename InputByteStream>
+	static CharType TakeBOM(InputByteStream& is) {
+		RAPIDJSON_STATIC_ASSERT(sizeof(typename InputByteStream::Ch) == 1);
+		Ch c = Take(is);
+		return c;
+	}
+
+	template <typename InputByteStream>
+	static Ch Take(InputByteStream& is) {
+		RAPIDJSON_STATIC_ASSERT(sizeof(typename InputByteStream::Ch) == 1);
+		return is.Take();
+	}
+
+	template <typename OutputByteStream>
+	static void PutBOM(OutputByteStream& os) {
+		RAPIDJSON_STATIC_ASSERT(sizeof(typename OutputByteStream::Ch) == 1);
+		(void)os;
+	}
+
+	template <typename OutputByteStream>
+	static void Put(OutputByteStream& os, Ch c) {
+		RAPIDJSON_STATIC_ASSERT(sizeof(typename OutputByteStream::Ch) == 1);
+		os.Put(static_cast<typename OutputByteStream::Ch>(c));
 	}
 };
 

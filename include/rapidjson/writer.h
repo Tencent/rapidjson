@@ -256,7 +256,39 @@ protected:
 		GenericStringStream<SourceEncoding> is(str);
 		while (is.Tell() < length) {
 			const Ch c = is.Peek();
-			if ((sizeof(Ch) == 1 || (unsigned)c < 256) && escape[(unsigned char)c])  {
+			if (!TargetEncoding::supportUnicode && (unsigned)c >= 0x80) {
+				// Unicode escaping
+				unsigned codepoint;
+				if (!SourceEncoding::Decode(is, &codepoint))
+					return false;
+				os_.Put('\\');
+				os_.Put('u');
+				if (codepoint <= 0xD7FF || (codepoint >= 0xE000 && codepoint <= 0xFFFF)) {
+					os_.Put(hexDigits[(codepoint >> 12) & 15]);
+					os_.Put(hexDigits[(codepoint >>  8) & 15]);
+					os_.Put(hexDigits[(codepoint >>  4) & 15]);
+					os_.Put(hexDigits[(codepoint      ) & 15]);
+				}
+				else if (codepoint >= 0x010000 && codepoint <= 0x10FFFF)	{
+					// Surrogate pair
+					unsigned s = codepoint - 0x010000;
+					unsigned lead = (s >> 10) + 0xD800;
+					unsigned trail = (s & 0x3FF) + 0xDC00;
+					os_.Put(hexDigits[(lead >> 12) & 15]);
+					os_.Put(hexDigits[(lead >>  8) & 15]);
+					os_.Put(hexDigits[(lead >>  4) & 15]);
+					os_.Put(hexDigits[(lead      ) & 15]);
+					os_.Put('\\');
+					os_.Put('u');
+					os_.Put(hexDigits[(trail >> 12) & 15]);
+					os_.Put(hexDigits[(trail >>  8) & 15]);
+					os_.Put(hexDigits[(trail >>  4) & 15]);
+					os_.Put(hexDigits[(trail      ) & 15]);					
+				}
+				else
+					return false;	// invalid code point
+			}
+			else if ((sizeof(Ch) == 1 || (unsigned)c < 256) && escape[(unsigned char)c])  {
 				is.Take();
 				os_.Put('\\');
 				os_.Put(escape[(unsigned char)c]);
