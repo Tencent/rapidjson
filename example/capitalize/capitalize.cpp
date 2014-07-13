@@ -37,6 +37,10 @@ struct CapitalizeFilter {
 
 	OutputHandler& out_;
 	std::vector<char> buffer_;
+
+private:
+	CapitalizeFilter(const CapitalizeFilter&);
+	CapitalizeFilter& operator=(const CapitalizeFilter&);
 };
 
 int main(int, char*[]) {
