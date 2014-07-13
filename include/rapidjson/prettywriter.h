@@ -78,13 +78,13 @@ public:
 		bool empty = Base::level_stack_.template Pop<typename Base::Level>(1)->valueCount == 0;
 
 		if (!empty) {
-			Base::os_.Put('\n');
+			Base::os_->Put('\n');
 			WriteIndent();
 		}
 		if (!Base::WriteEndObject())
 			return false;
 		if (Base::level_stack_.Empty())	// end of json text
-			Base::os_.Flush();
+			Base::os_->Flush();
 		return true;
 	}
 
@@ -101,13 +101,13 @@ public:
 		bool empty = Base::level_stack_.template Pop<typename Base::Level>(1)->valueCount == 0;
 
 		if (!empty) {
-			Base::os_.Put('\n');
+			Base::os_->Put('\n');
 			WriteIndent();
 		}
 		if (!Base::WriteEndArray())
 			return false;
 		if (Base::level_stack_.Empty())	// end of json text
-			Base::os_.Flush();
+			Base::os_->Flush();
 		return true;
 	}
 
@@ -137,26 +137,26 @@ protected:
 
 			if (level->inArray) {
 				if (level->valueCount > 0) {
-					Base::os_.Put(','); // add comma if it is not the first element in array
-					Base::os_.Put('\n');
+					Base::os_->Put(','); // add comma if it is not the first element in array
+					Base::os_->Put('\n');
 				}
 				else
-					Base::os_.Put('\n');
+					Base::os_->Put('\n');
 				WriteIndent();
 			}
 			else {	// in object
 				if (level->valueCount > 0) {
 					if (level->valueCount % 2 == 0) {
-						Base::os_.Put(',');
-						Base::os_.Put('\n');
+						Base::os_->Put(',');
+						Base::os_->Put('\n');
 					}
 					else {
-						Base::os_.Put(':');
-						Base::os_.Put(' ');
+						Base::os_->Put(':');
+						Base::os_->Put(' ');
 					}
 				}
 				else
-					Base::os_.Put('\n');
+					Base::os_->Put('\n');
 
 				if (level->valueCount % 2 == 0)
 					WriteIndent();
@@ -165,13 +165,16 @@ protected:
 				RAPIDJSON_ASSERT(type == kStringType);  // if it's in object, then even number should be a name
 			level->valueCount++;
 		}
-		else
+		else {
 			RAPIDJSON_ASSERT(type == kObjectType || type == kArrayType);
+			RAPIDJSON_ASSERT(!Base::hasRoot_);	// Should only has one and only one root.
+			Base::hasRoot_ = true;
+		}
 	}
 
 	void WriteIndent()  {
 		size_t count = (Base::level_stack_.GetSize() / sizeof(typename Base::Level)) * indentCharCount_;
-		PutN(Base::os_, indentChar_, count);
+		PutN(*Base::os_, indentChar_, count);
 	}
 
 	Ch indentChar_;

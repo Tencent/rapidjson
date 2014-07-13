@@ -56,4 +56,22 @@ inline void TempFilename(char *filename) {
 			filename[i] = filename[i + 1];
 }
 
+// Use exception for catching assert
+#if _MSC_VER
+#pragma warning(disable : 4127)
+#endif
+
+class AssertException : public std::exception {
+public:
+	AssertException(const char* w) : what_(w) {}
+	AssertException(const AssertException& other) : what_(other.what_) {}
+	AssertException& operator=(const AssertException& rhs) { what_ = rhs.what_; return *this;  }
+	virtual const char* what() const throw() { return what_; }
+
+private:
+	const char* what_;
+};
+
+#define RAPIDJSON_ASSERT(x) if (!(x)) throw AssertException(RAPIDJSON_STRINGIFY(x))
+
 #endif // UNITTEST_H_

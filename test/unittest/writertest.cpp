@@ -1,4 +1,5 @@
 #include "unittest.h"
+
 #include "rapidjson/document.h"
 #include "rapidjson/reader.h"
 #include "rapidjson/writer.h"
@@ -80,9 +81,10 @@ TEST(Writer,DoublePrecision) {
 		reader.Parse<0>(s, writer.SetDoublePrecision(12));
 		EXPECT_EQ(writer.GetDoublePrecision(), 12);
 		EXPECT_STREQ(json, buffer.GetString());
-		buffer.Clear();
 	}
 	{ // explicit individual double precisions
+		buffer.Clear();
+		writer.Reset(buffer);
 		writer.SetDoublePrecision(2);
 		writer.StartArray();
 		writer.Double(1.2345, 5);
@@ -93,11 +95,12 @@ TEST(Writer,DoublePrecision) {
 
 		EXPECT_EQ(writer.GetDoublePrecision(), 2);
 		EXPECT_STREQ(json, buffer.GetString());
-		buffer.Clear();
 	}
 	{ // write with default precision (output with precision loss)
 		Document d;
 		d.Parse<0>(json);
+		buffer.Clear();
+		writer.Reset(buffer);
 		d.Accept(writer.SetDoublePrecision());
 
 		// parsed again to avoid platform-dependent floating point outputs
@@ -108,7 +111,6 @@ TEST(Writer,DoublePrecision) {
 		EXPECT_DOUBLE_EQ(d[1u].GetDouble(), 1.23457);
 		EXPECT_DOUBLE_EQ(d[2u].GetDouble(), 0.123457);
 		EXPECT_DOUBLE_EQ(d[3u].GetDouble(), 1234570);
-		buffer.Clear();
 	}
 }
 
@@ -159,4 +161,82 @@ TEST(Writer, OStreamWrapper) {
 	
 	std::string actual = ss.str();
 	EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3]}", actual.c_str());
+}
+
+TEST(Writer, AssertRootMustBeArrayOrObject) {
+#define T(x)\
+	{\
+		StringBuffer buffer;\
+		Writer<StringBuffer> writer(buffer);\
+		ASSERT_THROW(x, AssertException);\
+	}
+	T(writer.Bool(false));
+	T(writer.Bool(true));
+	T(writer.Null());
+	T(writer.Int(0));
+	T(writer.Uint(0));
+	T(writer.Int64(0));
+	T(writer.Uint64(0));
+	T(writer.Double(0));
+	T(writer.String("foo"));
+#undef T
+}
+
+TEST(Writer, AssertIncorrectObjectLevel) {
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	writer.StartObject();
+	writer.EndObject();
+	ASSERT_THROW(writer.EndObject(), AssertException);
+}
+
+TEST(Writer, AssertIncorrectArrayLevel) {
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	writer.StartArray();
+	writer.EndArray();
+	ASSERT_THROW(writer.EndArray(), AssertException);
+}
+
+TEST(Writer, AssertIncorrectEndObject) {
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	writer.StartObject();
+	ASSERT_THROW(writer.EndArray(), AssertException);
+}
+
+TEST(Writer, AssertIncorrectEndArray) {
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	writer.StartObject();
+	ASSERT_THROW(writer.EndArray(), AssertException);
+}
+
+TEST(Writer, AssertObjectKeyNotString) {
+#define T(x)\
+	{\
+		StringBuffer buffer;\
+		Writer<StringBuffer> writer(buffer);\
+		writer.StartObject();\
+		ASSERT_THROW(x, AssertException); \
+	}
+	T(writer.Bool(false));
+	T(writer.Bool(true));
+	T(writer.Null());
+	T(writer.Int(0));
+	T(writer.Uint(0));
+	T(writer.Int64(0));
+	T(writer.Uint64(0));
+	T(writer.Double(0));
+	T(writer.StartObject());
+	T(writer.StartArray());
+#undef T
+}
+
+TEST(Writer, AssertMultipleRoot) {
+	StringBuffer buffer;
+	Writer<StringBuffer> writer(buffer);
+	writer.StartObject();
+	writer.EndObject();
+	ASSERT_THROW(writer.StartObject(), AssertException);
 }
