@@ -24,7 +24,7 @@ For example, here is a JSON.
 }
 ~~~~~~~~~~
 
-While a `Reader` parses the JSON, it will publish the following events to the handler sequentially:
+While a `Reader` parses this JSON, it publishes the following events to the handler sequentially:
 
 ~~~~~~~~~~
 BeginObject()
@@ -50,7 +50,7 @@ EndArray(4)
 EndObject(7)
 ~~~~~~~~~~
 
-These events can be easily match up with the JSON, except some event parameters need further explanation. Let's see the `simplereader` example which produces exactly the same output as above:
+These events can be easily matched with the JSON, except some event parameters need further explanation. Let's see the `simplereader` example which produces exactly the same output as above:
 
 ~~~~~~~~~~cpp
 #include "rapidjson/reader.h"
@@ -91,10 +91,10 @@ Note that, RapidJSON uses template to statically bind the `Reader` type and the 
 
 ## Handler {#Handler}
 
-As the previous example showed, user needs to implement a handler, which consumes the events (function calls) from `Reader`. The handler concept has the following member type and member functions.
+As the previous example showed, user needs to implement a handler, which consumes the events (function calls) from `Reader`. The handler must contain the following member functions.
 
 ~~~~~~~~~~cpp
-concept Handler {
+class Handler {
     bool Null();
     bool Bool(bool b);
     bool Int(int i);
@@ -172,7 +172,7 @@ If an error occurs during parsing, it will return `false`. User can also calls `
 
 `Reader` converts (parses) JSON into events. `Writer` does exactly the opposite. It converts events into JSON. 
 
-`Writer` is very easy to use. If your application only need to converts some data into JSON, it may be a good choice of using `Writer` directly, instead of building a `Document` and then stringifying it with a `Writer`.
+`Writer` is very easy to use. If your application only need to converts some data into JSON, it may be a good choice to use `Writer` directly, instead of building a `Document` and then stringifying it with a `Writer`.
 
 In `simplewriter` example, we do exactly the reverse of `simplereader`.
 
@@ -220,16 +220,14 @@ There is two `String()` overloads. One is the same as defined in handler concept
 
 Note that, the example code does not pass any parameters in `EndArray()` and `EndObject()`. An `SizeType` can be passed but it will be simply ignored by `Writer`.
 
-You may doubt that, 
-
-> "why not just using `sprintf()` or `std::stringstream` to build a JSON?"
+You may doubt that, why not just using `sprintf()` or `std::stringstream` to build a JSON?
 
 There are various reasons:
 1. `Writer` must output a well-formed JSON. If there is incorrect event sequence (e.g. `Int()` just after `StartObject()`), it generates assertion fail in debug mode.
 2. `Writer::String()` can handle string escaping (e.g. converting code point `U+000A` to `\n`) and Unicode transcoding.
 3. `Writer` handles number output consistently. For example, user can set precision for `Double()`.
-3. `Writer` implements the event handler concept. It can be used to handle events from `Reader`, `Document` or other event publisher.
-4. `Writer` can be optimized for different platforms.
+4. `Writer` implements the event handler concept. It can be used to handle events from `Reader`, `Document` or other event publisher.
+5. `Writer` can be optimized for different platforms.
 
 Anyway, using `Writer` API is even simpler than generating a JSON by ad hoc methods.
 
@@ -261,6 +259,7 @@ The last one, `Allocator` is the type of allocator, which is used for allocating
 Besides, the constructor of `Writer` has a `levelDepth` parameter. This parameter affects the initial memory allocated for storing information per hierarchy level.
 
 ## Precision (#WriterPrecision)
+
 When using `Double()`, the precision of output can be specified, for example:
 
 ~~~~~~~~~~cpp
@@ -280,6 +279,12 @@ While the output of `Writer` is the most condensed JSON without white-spaces, su
 Therefore, RapidJSON provides a `PrettyWriter`, which adds indentation and line feeds in the output.
 
 The usage of `PrettyWriter` is exactly the same as `Writer`, expect that `PrettyWriter` provides a `SetIndent(Ch indentChar, unsigned indentCharCount)` function. The default is 4 spaces.
+
+## Completeness and Reset {#CompletenessReset}
+
+A `Writer` can only output a single JSON, which can be either an object or array at the root. Once the last matching `EndObject()` or `EndArray()` event is handled, the output JSON is well-formed and complete. User can detect this state by calling `Writer::IsComplete()`.
+
+When a JSON is complete, the `Writer` cannot accept any new events. Otherwise the output will be invalid (i.e. having more than one root). To reuse the `Writer` object, user can call `Writer::Reset(OutputStream& os)` to reset all internal states of the `Writer` with a new output stream.
 
 # Techniques {#Techniques}
 
@@ -389,7 +394,7 @@ Error: Terminate parsing due to Handler error.
  at offset 59 near '} }...'
 ~~~~~~~~~~
 
-The first JSON (`json1`) was successfully parsed into `MessageMap`. Since it is a `std::map`, the print out are sorted by the key, which is different from the JSON's order.
+The first JSON (`json1`) was successfully parsed into `MessageMap`. Since `MessageMap` is a `std::map`, the printing order are sorted by the key. This order is different from the JSON's order.
 
 In the second JSON (`json2`), `foo`'s value is an empty object. As it is an object, `MessageHandler::StartObject()` will be called. However, at that moment `state_ = kExpectValue`, so that function returns `false` and cause the parsing process be terminated. The error code is `kParseErrorTermination`.
 
@@ -460,18 +465,18 @@ int main(int, char*[]) {
 ~~~~~~~~~~
 
 Note that, it is incorrect to simply capitalize the JSON as a string. For example:
-~~~~~~~~~~js
-["Hello\\nWorld"]
+~~~~~~~~~~
+["Hello\nWorld"]
 ~~~~~~~~~~
 
 Simply capitalizing the whole JSON would contain incorrect escape character:
-~~~~~~~~~~js
-["HELLO\\NWORLD"]
+~~~~~~~~~~
+["HELLO\NWORLD"]
 ~~~~~~~~~~
 
 The correct result by `capitalize`:
-~~~~~~~~~~js
-["HELLO\\nWORLD"]
+~~~~~~~~~~
+["HELLO\nWORLD"]
 ~~~~~~~~~~
 
 More complicated filters can be developed. However, since SAX-style API can only provide information about a single event at a time, user may need to book-keeping the contextual information (e.g. the path from root value, storage of other related values). Some processing may be easier to be implemented in DOM than SAX.
