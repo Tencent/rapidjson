@@ -11,12 +11,12 @@ DOXYGEN_URL="http://ftp.stack.nl/pub/users/dimitri/${DOXYGEN_TAR}"
 DOXYGEN_BIN="/usr/local/bin/doxygen"
 
 : ${GITHUB_REPO:="miloyip/rapidjson"}
-GITHUB_CLONE="git://github.com"
-GITHUB_PUSH="https://ssl.sorgh.de/authdump.php"
-GITHUB_URL="${GITHUB_PUSH}/${GITHUB_REPO}"
+GITHUB_HOST="github.com"
+GITHUB_CLONE="git://${GITHUB_HOST}/${GITHUB_REPO}"
+GITHUB_URL="https://${GITHUB_HOST}/${GITHUB_PUSH-${GITHUB_REPO}}"
 
 # if not set, ignore password
-: ${GIT_ASKPASS:="${TRAVIS_BUILD_DIR}/gh_ignore_askpass.sh"}
+#GIT_ASKPASS="${TRAVIS_BUILD_DIR}/gh_ignore_askpass.sh"
 
 skip() {
 	echo "$@" 1>&2
@@ -67,7 +67,7 @@ gh_pages_prepare()
 	[ ! -d "html" ] || \
 		abort "Doxygen target directory already exists."
 	git --version
-	git clone --single-branch -b gh-pages "${GITHUB_CLONE}/${GITHUB_REPO}" html
+	git clone --single-branch -b gh-pages "${GITHUB_CLONE}" html
 	cd html
 	# setup git config (with defaults)
 	git config user.name "${GIT_NAME-travis}"
@@ -105,11 +105,11 @@ gh_pages_push() {
 	cd "${TRAVIS_BUILD_DIR}/doc/html";
 	# setup credentials (hide in "set -x" mode)
 	git remote set-url --push origin "${GITHUB_URL}"
-	[ -x "${GIT_ASKPASS}" ] || gh_setup_askpass
-	echo ${GIT_ASKPASS}
-	export GIT_ASKPASS
 	git config credential.helper 'store'
-	( set +x ; git config credential.username "${GH_TOKEN}" )
+	# ( set +x ; git config credential.username "${GH_TOKEN}" )
+	( set +x ; \
+		echo "https://${GH_TOKEN}:@${GITHUB_HOST}" > ${HOME}/.git-credentials ; \
+		chmod go-rw ${HOME}/.git-credentials )
 	# push to GitHub
 	git push origin gh-pages || \
 		skip "GitHub pages update failed, temporarily ignored."
