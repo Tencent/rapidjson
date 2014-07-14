@@ -707,7 +707,7 @@ TEST(Reader, Parse_IStreamWrapper_StringStream) {
 	EXPECT_FALSE(reader.HasParseError());	
 }
 
-#define TESTERRORHANDLING(text, errorCode)\
+#define TESTERRORHANDLING(text, errorCode, offset)\
 	{\
 		StringStream json(text);\
 		BaseReaderHandler<> handler;\
@@ -715,20 +715,21 @@ TEST(Reader, Parse_IStreamWrapper_StringStream) {
 		reader.IterativeParse<kParseDefaultFlags>(json, handler);\
 		EXPECT_TRUE(reader.HasParseError());\
 		EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
+		EXPECT_EQ(offset, reader.GetErrorOffset());\
 	}
 
 TEST(Reader, IterativeParsing_ErrorHandling) {
-	TESTERRORHANDLING("{\"a\": a}", kParseErrorValueInvalid);
+	TESTERRORHANDLING("{\"a\": a}", kParseErrorValueInvalid, 6);
 
-	TESTERRORHANDLING("", kParseErrorDocumentEmpty);
-	TESTERRORHANDLING("1", kParseErrorDocumentRootNotObjectOrArray);
-	TESTERRORHANDLING("{}{}", kParseErrorDocumentRootNotSingular);
+	TESTERRORHANDLING("", kParseErrorDocumentEmpty, 0);
+	TESTERRORHANDLING("1", kParseErrorDocumentRootNotObjectOrArray, 0);
+	TESTERRORHANDLING("{}{}", kParseErrorDocumentRootNotSingular, 2);
 
-	TESTERRORHANDLING("{1}", kParseErrorObjectMissName);
-	TESTERRORHANDLING("{\"a\", 1}", kParseErrorObjectMissColon);
-	TESTERRORHANDLING("{\"a\"}", kParseErrorObjectMissColon);
-	TESTERRORHANDLING("{\"a\": 1", kParseErrorObjectMissCommaOrCurlyBracket);
-	TESTERRORHANDLING("[1 2 3]", kParseErrorArrayMissCommaOrSquareBracket);
+	TESTERRORHANDLING("{1}", kParseErrorObjectMissName, 1);
+	TESTERRORHANDLING("{\"a\", 1}", kParseErrorObjectMissColon, 4);
+	TESTERRORHANDLING("{\"a\"}", kParseErrorObjectMissColon, 4);
+	TESTERRORHANDLING("{\"a\": 1", kParseErrorObjectMissCommaOrCurlyBracket, 7);
+	TESTERRORHANDLING("[1 2 3]", kParseErrorArrayMissCommaOrSquareBracket, 3);
 }
 
 // Test iterative parsing.
@@ -1217,6 +1218,73 @@ TEST(Reader, IterativeParsing_StateTransition_ElementDelimiter) {
 
 		int c = *reader.stack_.template Pop<int>(1);
 		EXPECT_EQ(1, c);
+	}
+}
+
+// Test iterative parsing on kParseErrorTermination.
+struct HandlerTerminateAtStartObject : public IterativeParsingReaderHandler<> {
+	bool StartObject() { return false; }
+};
+
+struct HandlerTerminateAtStartArray : public IterativeParsingReaderHandler<> {
+	bool StartArray() { return false; }
+};
+
+struct HandlerTerminateAtEndObject : public IterativeParsingReaderHandler<> {
+	bool EndObject(SizeType) { return false; }
+};
+
+struct HandlerTerminateAtEndArray : public IterativeParsingReaderHandler<> {
+	bool EndArray(SizeType) { return false; }
+};
+
+TEST(Reader, IterativeParsing_ShortCircuit) {
+	{
+		HandlerTerminateAtStartObject handler;
+		Reader reader;
+		StringStream is("[1, {}]");
+
+		ParseResult r = reader.Parse<kParseIterativeFlag>(is, handler);
+
+		EXPECT_TRUE(reader.HasParseError());
+		EXPECT_EQ(kParseErrorTermination, r.Code());
+		EXPECT_EQ(4, r.Offset());
+	}
+
+	{
+		HandlerTerminateAtStartArray handler;
+		Reader reader;
+		StringStream is("{\"a\": []}");
+
+		ParseResult r = reader.Parse<kParseIterativeFlag>(is, handler);
+
+		EXPECT_TRUE(reader.HasParseError());
+		EXPECT_EQ(kParseErrorTermination, r.Code());
+		EXPECT_EQ(6, r.Offset());
+	}
+
+	{
+		HandlerTerminateAtEndObject handler;
+		Reader reader;
+		StringStream is("[1, {}]");
+
+		ParseResult r = reader.Parse<kParseIterativeFlag>(is, handler);
+
+		EXPECT_TRUE(reader.HasParseError());
+		EXPECT_EQ(kParseErrorTermination, r.Code());
+		EXPECT_EQ(5, r.Offset());
+	}
+
+	{
+		HandlerTerminateAtEndArray handler;
+		Reader reader;
+		StringStream is("{\"a\": []}");
+
+		ParseResult r = reader.Parse<kParseIterativeFlag>(is, handler);
+
+		EXPECT_TRUE(reader.HasParseError());
+		EXPECT_EQ(kParseErrorTermination, r.Code());
+		EXPECT_EQ(7, r.Offset());
 	}
 }
 
