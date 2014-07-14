@@ -55,19 +55,32 @@
 /*!	GCC provided macro for detecting endianness of the target machine. But other
 	compilers may not have this. User can define RAPIDJSON_ENDIAN to either
 	\ref RAPIDJSON_LITTLEENDIAN or \ref RAPIDJSON_BIGENDIAN.
+
+	Implemented with reference to 
+	https://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html
+	http://www.boost.org/doc/libs/1_42_0/boost/detail/endian.hpp
 */
 #ifndef RAPIDJSON_ENDIAN
-#ifdef __BYTE_ORDER__
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define RAPIDJSON_ENDIAN RAPIDJSON_LITTLEENDIAN
-#else
-#define RAPIDJSON_ENDIAN RAPIDJSON_BIGENDIAN
-#endif // __BYTE_ORDER__
-#else
-#define RAPIDJSON_ENDIAN RAPIDJSON_LITTLEENDIAN	// Assumes little endian otherwise.
-#endif
+#  ifdef __BYTE_ORDER__
+#    if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#      define RAPIDJSON_ENDIAN RAPIDJSON_LITTLEENDIAN
+#    elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#      define RAPIDJSON_ENDIAN RAPIDJSON_BIGENDIAN
+#    else
+#      error Unknown machine endianess detected. User needs to define RAPIDJSON_ENDIAN.
+#	 endif // __BYTE_ORDER__
+#  elif defined(_LITTLE_ENDIAN) && !defined(_BIG_ENDIAN)
+#	 define RAPIDJSON_ENDIAN RAPIDJSON_LITTLEENDIAN
+#  elif defined(_BIG_ENDIAN) && !defined(_LITTLE_ENDIAN)
+#	 define RAPIDJSON_ENDIAN RAPIDJSON_BIGENDIAN
+#  elif defined(__sparc) || defined(__sparc__) || defined(_POWER) || defined(__powerpc__) || defined(__ppc__) || defined(__hpux) || defined(__hppa) || defined(_MIPSEB) || defined(_POWER) || defined(__s390__)
+#	 define RAPIDJSON_ENDIAN RAPIDJSON_BIGENDIAN
+#  elif defined(__i386__) || defined(__alpha__) || defined(__ia64) || defined(__ia64__) || defined(_M_IX86) || defined(_M_IA64) || defined(_M_ALPHA) || defined(__amd64) || defined(__amd64__) || defined(_M_AMD64) || defined(__x86_64) || defined(__x86_64__) || defined(_M_X64) || defined(__bfin__)
+#	 define RAPIDJSON_ENDIAN RAPIDJSON_LITTLEENDIAN
+#  else
+#    error Unknown machine endianess detected. User needs to define RAPIDJSON_ENDIAN.	
+#  endif
 #endif // RAPIDJSON_ENDIAN
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_ALIGNSIZE
