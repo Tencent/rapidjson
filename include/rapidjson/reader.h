@@ -24,12 +24,21 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
 #endif
 
+#define RAPIDJSON_NOTHING /* deliberately empty */
+#ifndef RAPIDJSON_PARSE_ERROR_EARLY_RETURN
+#define RAPIDJSON_PARSE_ERROR_EARLY_RETURN(value) \
+	RAPIDJSON_MULTILINEMACRO_BEGIN \
+	if (HasParseError()) { return value; } \
+	RAPIDJSON_MULTILINEMACRO_END
+#endif
+#define RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID \
+	RAPIDJSON_PARSE_ERROR_EARLY_RETURN(RAPIDJSON_NOTHING)
+
 #ifndef RAPIDJSON_PARSE_ERROR_NORETURN
 #define RAPIDJSON_PARSE_ERROR_NORETURN(parseErrorCode, offset) \
 	RAPIDJSON_MULTILINEMACRO_BEGIN \
 	RAPIDJSON_ASSERT(!HasParseError()); /* Error can only be assigned once */ \
-	parseErrorCode_ = parseErrorCode; \
-	errorOffset_ = offset; \
+	parseResult_.Set(parseErrorCode,offset); \
 	RAPIDJSON_MULTILINEMACRO_END
 #endif
 
@@ -37,9 +46,11 @@ RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
 #define RAPIDJSON_PARSE_ERROR(parseErrorCode, offset) \
 	RAPIDJSON_MULTILINEMACRO_BEGIN \
 	RAPIDJSON_PARSE_ERROR_NORETURN(parseErrorCode, offset); \
-	return; \
+	RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID; \
 	RAPIDJSON_MULTILINEMACRO_END
 #endif
+
+#include "error/error.h" // ParseErrorCode, ParseResult
 
 namespace rapidjson {
 
@@ -56,56 +67,29 @@ enum ParseFlag {
 	kParseIterativeFlag = 4			//!< Iterative(constant complexity in terms of function call stack size) parsing.
 };
 
-//! Error code of parsing.
-enum ParseErrorCode {
-	kParseErrorNone = 0,						//!< No error.
-	
-	kParseErrorDocumentEmpty,					//!< The document is empty.
-	kParseErrorDocumentRootNotObjectOrArray,	//!< The document root must be either object or array.
-	kParseErrorDocumentRootNotSingular,			//!< The document root must not follow by other values.
-	
-	kParseErrorValueInvalid,					//!< Invalid value.
-	
-	kParseErrorObjectMissName,					//!< Missing a name for object member.
-	kParseErrorObjectMissColon,					//!< Missing a colon after a name of object member.
-	kParseErrorObjectMissCommaOrCurlyBracket,	//!< Missing a comma or '}' after an object member.
-	
-	kParseErrorArrayMissCommaOrSquareBracket,	//!< Missing a comma or ']' after an array element.
-
-	kParseErrorStringUnicodeEscapeInvalidHex,	//!< Incorrect hex digit after \\u escape in string.
-	kParseErrorStringUnicodeSurrogateInvalid,	//!< The surrogate pair in string is invalid.
-	kParseErrorStringEscapeInvalid,				//!< Invalid escape character in string.
-	kParseErrorStringMissQuotationMark,			//!< Missing a closing quotation mark in string.
-	kParseErrorStringInvalidEncoding,			//!< Invalid encoding in string.
-
-	kParseErrorNumberTooBig,					//!< Number too big to be stored in double.
-	kParseErrorNumberMissFraction,				//!< Miss fraction part in number.
-	kParseErrorNumberMissExponent,				//!< Miss exponent in number.
-
-	kParseErrorUnspecificSyntaxError			//!< Unspecific syntax error.
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 // Handler
 
 /*!	\class rapidjson::Handler
 	\brief Concept for receiving events from GenericReader upon parsing.
+	The functions return true if no error occurs. If they return false, 
+	the event publisher should terminate the process.
 \code
 concept Handler {
 	typename Ch;
 
-	void Null();
-	void Bool(bool b);
-	void Int(int i);
-	void Uint(unsigned i);
-	void Int64(int64_t i);
-	void Uint64(uint64_t i);
-	void Double(double d);
-	void String(const Ch* str, SizeType length, bool copy);
-	void StartObject();
-	void EndObject(SizeType memberCount);
-	void StartArray();
-	void EndArray(SizeType elementCount);
+	bool Null();
+	bool Bool(bool b);
+	bool Int(int i);
+	bool Uint(unsigned i);
+	bool Int64(int64_t i);
+	bool Uint64(uint64_t i);
+	bool Double(double d);
+	bool String(const Ch* str, SizeType length, bool copy);
+	bool StartObject();
+	bool EndObject(SizeType memberCount);
+	bool StartArray();
+	bool EndArray(SizeType elementCount);
 };
 \endcode
 */
@@ -120,19 +104,19 @@ template<typename Encoding = UTF8<> >
 struct BaseReaderHandler {
 	typedef typename Encoding::Ch Ch;
 
-	void Default() {}
-	void Null() { Default(); }
-	void Bool(bool) { Default(); }
-	void Int(int) { Default(); }
-	void Uint(unsigned) { Default(); }
-	void Int64(int64_t) { Default(); }
-	void Uint64(uint64_t) { Default(); }
-	void Double(double) { Default(); }
-	void String(const Ch*, SizeType, bool) { Default(); }
-	void StartObject() { Default(); }
-	void EndObject(SizeType) { Default(); }
-	void StartArray() { Default(); }
-	void EndArray(SizeType) { Default(); }
+	bool Default() { return true; }
+	bool Null() { return Default(); }
+	bool Bool(bool) { return Default(); }
+	bool Int(int) { return Default(); }
+	bool Uint(unsigned) { return Default(); }
+	bool Int64(int64_t) { return Default(); }
+	bool Uint64(uint64_t) { return Default(); }
+	bool Double(double) { return Default(); }
+	bool String(const Ch*, SizeType, bool) { return Default(); }
+	bool StartObject() { return Default(); }
+	bool EndObject(SizeType) { return Default(); }
+	bool StartArray() { return Default(); }
+	bool EndArray(SizeType) { return Default(); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -291,7 +275,7 @@ public:
 	/*! \param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
 		\param stackCapacity stack capacity in bytes for storing a single decoded string.  (Only use for non-destructive parsing)
 	*/
-	GenericReader(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseErrorCode_(kParseErrorNone), errorOffset_(0) {}
+	GenericReader(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseResult_() {}
 
 	//! Parse JSON text.
 	/*! \tparam parseFlags Combination of \ref ParseFlag.
@@ -302,35 +286,37 @@ public:
 		\return Whether the parsing is successful.
 	*/
 	template <unsigned parseFlags, typename InputStream, typename Handler>
-	bool Parse(InputStream& is, Handler& handler) {
-		parseErrorCode_ = kParseErrorNone;
-		errorOffset_ = 0;
-
+	ParseResult Parse(InputStream& is, Handler& handler) {
 		if (parseFlags & kParseIterativeFlag)
 			return IterativeParse<parseFlags>(is, handler);
 
+		parseResult_.Clear();
+
+		ClearStackOnExit scope(*this);
+
 		SkipWhitespace(is);
 
-		if (is.Peek() == '\0')
+		if (is.Peek() == '\0') {
 			RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentEmpty, is.Tell());
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
+		}
 		else {
 			switch (is.Peek()) {
 				case '{': ParseObject<parseFlags>(is, handler); break;
 				case '[': ParseArray<parseFlags>(is, handler); break;
 				default: RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotObjectOrArray, is.Tell());
 			}
-			if (HasParseError())
-				goto out;
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
 
 			SkipWhitespace(is);
 
-			if (is.Peek() != '\0')
+			if (is.Peek() != '\0') {
 				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotSingular, is.Tell());
+				RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
+			}
 		}
 
-	out:
-		stack_.Clear();
-		return !HasParseError();
+		return parseResult_;
 	}
 
 	//! Parse JSON text (with \ref kParseDefaultFlags)
@@ -341,32 +327,51 @@ public:
 		\return Whether the parsing is successful.
 	*/
 	template <typename InputStream, typename Handler>
-	bool Parse(InputStream& is, Handler& handler) {
+	ParseResult Parse(InputStream& is, Handler& handler) {
 		return Parse<kParseDefaultFlags>(is, handler);
 	}
 
-	bool HasParseError() const { return parseErrorCode_ != kParseErrorNone; }
+	//! Whether a parse error has occured in the last parsing.
+	bool HasParseError() const { return parseResult_.IsError(); }
 	
-	ParseErrorCode GetParseErrorCode() const { return parseErrorCode_; }
+	//! Get the \ref ParseErrorCode of last parsing.
+	ParseErrorCode GetParseErrorCode() const { return parseResult_.Code(); }
 
-	size_t GetErrorOffset() const { return errorOffset_; }
+	//! Get the position of last parsing error in input, 0 otherwise.
+	size_t GetErrorOffset() const { return parseResult_.Offset(); }
 
 private:
 	// Prohibit copy constructor & assignment operator.
 	GenericReader(const GenericReader&);
 	GenericReader& operator=(const GenericReader&);
 
+	void ClearStack() { stack_.Clear(); }
+
+	// clear stack on any exit from ParseStream, e.g. due to exception
+	struct ClearStackOnExit {
+		explicit ClearStackOnExit(GenericReader& r) : r_(r) {}
+		~ClearStackOnExit() { r_.ClearStack(); }
+	private:
+		GenericReader& r_;
+		ClearStackOnExit(const ClearStackOnExit&);
+		ClearStackOnExit& operator=(const ClearStackOnExit&);
+	};
+
 	// Parse object: { string : value, ... }
 	template<unsigned parseFlags, typename InputStream, typename Handler>
 	void ParseObject(InputStream& is, Handler& handler) {
 		RAPIDJSON_ASSERT(is.Peek() == '{');
 		is.Take();	// Skip '{'
-		handler.StartObject();
+		
+		if (!handler.StartObject())
+			RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+
 		SkipWhitespace(is);
 
 		if (is.Peek() == '}') {
 			is.Take();
-			handler.EndObject(0);	// empty object
+			if (!handler.EndObject(0))	// empty object
+				RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
 			return;
 		}
 
@@ -375,8 +380,7 @@ private:
 				RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
 
 			ParseString<parseFlags>(is, handler);
-			if (HasParseError())
-				return;
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
 			SkipWhitespace(is);
 
@@ -386,16 +390,19 @@ private:
 			SkipWhitespace(is);
 
 			ParseValue<parseFlags>(is, handler);
-			if (HasParseError())
-				return;
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
 			SkipWhitespace(is);
 
 			++memberCount;
 
-			switch(is.Take()) {
+			switch (is.Take()) {
 				case ',': SkipWhitespace(is); break;
-				case '}': handler.EndObject(memberCount); return;
+				case '}': 
+					if (!handler.EndObject(memberCount))
+						RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+					else
+						return;
 				default:  RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell());
 			}
 		}
@@ -406,26 +413,33 @@ private:
 	void ParseArray(InputStream& is, Handler& handler) {
 		RAPIDJSON_ASSERT(is.Peek() == '[');
 		is.Take();	// Skip '['
-		handler.StartArray();
+		
+		if (!handler.StartArray())
+			RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+		
 		SkipWhitespace(is);
 
 		if (is.Peek() == ']') {
 			is.Take();
-			handler.EndArray(0); // empty array
+			if (!handler.EndArray(0)) // empty array
+				RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
 			return;
 		}
 
 		for (SizeType elementCount = 0;;) {
 			ParseValue<parseFlags>(is, handler);
-			if (HasParseError())
-				return;
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
 			++elementCount;
 			SkipWhitespace(is);
 
 			switch (is.Take()) {
 				case ',': SkipWhitespace(is); break;
-				case ']': handler.EndArray(elementCount); return;
+				case ']': 
+					if (!handler.EndArray(elementCount))
+						RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+					else
+						return;
 				default:  RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell());
 			}
 		}
@@ -436,8 +450,10 @@ private:
 		RAPIDJSON_ASSERT(is.Peek() == 'n');
 		is.Take();
 
-		if (is.Take() == 'u' && is.Take() == 'l' && is.Take() == 'l')
-			handler.Null();
+		if (is.Take() == 'u' && is.Take() == 'l' && is.Take() == 'l') {
+			if (!handler.Null())
+				RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+		}
 		else
 			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell() - 1);
 	}
@@ -447,10 +463,12 @@ private:
 		RAPIDJSON_ASSERT(is.Peek() == 't');
 		is.Take();
 
-		if (is.Take() == 'r' && is.Take() == 'u' && is.Take() == 'e')
-			handler.Bool(true);
+		if (is.Take() == 'r' && is.Take() == 'u' && is.Take() == 'e') {
+			if (!handler.Bool(true))
+				RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+		}
 		else
-			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell());
+			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell() - 1);
 	}
 
 	template<unsigned parseFlags, typename InputStream, typename Handler>
@@ -458,8 +476,10 @@ private:
 		RAPIDJSON_ASSERT(is.Peek() == 'f');
 		is.Take();
 
-		if (is.Take() == 'a' && is.Take() == 'l' && is.Take() == 's' && is.Take() == 'e')
-			handler.Bool(false);
+		if (is.Take() == 'a' && is.Take() == 'l' && is.Take() == 's' && is.Take() == 'e') {
+			if (!handler.Bool(false))
+				RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+		}
 		else
 			RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell() - 1);
 	}
@@ -480,7 +500,7 @@ private:
 				codepoint -= 'a' - 10;
 			else {
 				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorStringUnicodeEscapeInvalidHex, is.Tell() - 1);
-				return 0;
+				RAPIDJSON_PARSE_ERROR_EARLY_RETURN(0);
 			}
 		}
 		return codepoint;
@@ -512,18 +532,18 @@ private:
 		if (parseFlags & kParseInsituFlag) {
 			typename InputStream::Ch *head = s.PutBegin();
 			ParseStringToStream<parseFlags, SourceEncoding, SourceEncoding>(s, s);
-			if (HasParseError())
-				return;
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 			size_t length = s.PutEnd(head) - 1;
 			RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
-			handler.String((typename TargetEncoding::Ch*)head, SizeType(length), false);
+			if (!handler.String((typename TargetEncoding::Ch*)head, SizeType(length), false))
+				RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
 		}
 		else {
 			StackStream stackStream(stack_);
 			ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
-			if (HasParseError())
-				return;
-			handler.String(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, true);
+			RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
+			if (!handler.String(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, true))
+				RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
 		}
 	}
 
@@ -598,7 +618,7 @@ private:
 		}
 
 		// Parse int: zero / ( digit1-9 *DIGIT )
-		unsigned i;
+		unsigned i = 0;
 		bool try64bit = false;
 		if (s.Peek() == '0') {
 			i = 0;
@@ -725,6 +745,7 @@ private:
 		}
 
 		// Finish parsing, call event according to the type of number.
+		bool cont = true;
 		if (useDouble) {
 			int expSum = exp + expFrac;
 			if (expSum < -308) {
@@ -735,22 +756,24 @@ private:
 			else
 				d *= internal::Pow10(expSum);
 
-			handler.Double(minus ? -d : d);
+			cont = handler.Double(minus ? -d : d);
 		}
 		else {
 			if (try64bit) {
 				if (minus)
-					handler.Int64(-(int64_t)i64);
+					cont = handler.Int64(-(int64_t)i64);
 				else
-					handler.Uint64(i64);
+					cont = handler.Uint64(i64);
 			}
 			else {
 				if (minus)
-					handler.Int(-(int)i);
+					cont = handler.Int(-(int)i);
 				else
-					handler.Uint(i);
+					cont = handler.Uint(i);
 			}
 		}
+		if (!cont)
+			RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
 	}
 
 	// Parse any JSON value
@@ -992,6 +1015,7 @@ private:
 	IterativeParsingState Transit(IterativeParsingState src, IterativeParsingToken token, IterativeParsingState dst, InputStream& is, Handler& handler) {
 		int c = 0;
 		IterativeParsingState n;
+		bool hr;
 
 		switch (dst) {
 		case IterativeParsingStartState:
@@ -1021,10 +1045,16 @@ private:
 			*stack_.template Push<int>(1) = 0;
 			// Call handler
 			if (dst == IterativeParsingObjectInitialState)
-				handler.StartObject();
+				hr = handler.StartObject();
 			else
-				handler.StartArray();
-			return dst;
+				hr = handler.StartArray();
+			// On handler short circuits the parsing.
+			if (!hr) {
+				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorTermination, is.Tell());
+				return IterativeParsingErrorState;
+			}
+			else
+				return dst;
 
 		case IterativeParsingMemberKeyState:
 			ParseString<parseFlags>(is, handler);
@@ -1077,8 +1107,14 @@ private:
 			if (n == IterativeParsingStartState)
 				n = IterativeParsingFinishState;
 			// Call handler
-			handler.EndObject(c);
-			return n;
+			hr = handler.EndObject(c);
+			// On handler short circuits the parsing.
+			if (!hr) {
+				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorTermination, is.Tell());
+				return IterativeParsingErrorState;
+			}
+			else
+				return n;
 
 		case IterativeParsingArrayFinishState:
 			is.Take();
@@ -1093,8 +1129,14 @@ private:
 			if (n == IterativeParsingStartState)
 				n = IterativeParsingFinishState;
 			// Call handler
-			handler.EndArray(c);
-			return n;
+			hr = handler.EndArray(c);
+			// On handler short circuits the parsing.
+			if (!hr) {
+				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorTermination, is.Tell());
+				return IterativeParsingErrorState;
+			}
+			else
+				return n;
 
 		default:
 			RAPIDJSON_ASSERT(false);
@@ -1135,7 +1177,9 @@ private:
 	}
 
 	template <unsigned parseFlags, typename InputStream, typename Handler>
-	bool IterativeParse(InputStream& is, Handler& handler) {
+	ParseResult IterativeParse(InputStream& is, Handler& handler) {
+		parseResult_.Clear();
+		ClearStackOnExit scope(*this);
 		IterativeParsingState state = IterativeParsingStartState;
 
 		SkipWhitespace(is);
@@ -1156,15 +1200,13 @@ private:
 		// Handle the end of file.
 		if (state != IterativeParsingFinishState)
 			HandleError(state, is);
-		
-		stack_.Clear();
-		return state == IterativeParsingFinishState;
+
+		return parseResult_;
 	}
 
 	static const size_t kDefaultStackCapacity = 256;	//!< Default stack capacity in bytes for storing a single decoded string. 
 	internal::Stack<Allocator> stack_;	//!< A stack for storing decoded string temporarily during non-destructive parsing.
-	ParseErrorCode parseErrorCode_;
-	size_t errorOffset_;
+	ParseResult parseResult_;
 }; // class GenericReader
 
 //! Reader with UTF8 encoding and default allocator.

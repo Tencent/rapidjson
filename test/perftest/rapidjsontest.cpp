@@ -197,8 +197,8 @@ RAPIDJSON_DIAG_OFF(effc++)
 struct ValueCounter : public BaseReaderHandler<> {
 	ValueCounter() : count_(1) {}	// root
 
-	void EndObject(SizeType memberCount) { count_ += memberCount * 2; }
-	void EndArray(SizeType elementCount) { count_ += elementCount; }
+	bool EndObject(SizeType memberCount) { count_ += memberCount * 2; return true; }
+	bool EndArray(SizeType elementCount) { count_ += elementCount; return true; }
 
 	SizeType count_;
 };
