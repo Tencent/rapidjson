@@ -15,7 +15,7 @@ RapidJSON supports various encodings. It can also validate the encodings of JSON
 
 [TOC]
 
-# Unicode {Unicode}
+# Unicode {#Unicode}
 From [Unicode's official website](http://www.unicode.org/standard/WhatIsUnicode.html):
 > Unicode provides a unique number for every character, 
 > no matter what the platform,
@@ -24,7 +24,7 @@ From [Unicode's official website](http://www.unicode.org/standard/WhatIsUnicode.
 
 Those unique numbers are called code points, which is in the range `0x0` to `0x10FFFF`.
 
-## Unicode Transformation Format {UTF}
+## Unicode Transformation Format {#UTF}
 
 There are various encodings for storing Unicode code points. These are called Unicode Transformation Format (UTF). RapidJSON supports the most commonly used UTFs, including
 
@@ -76,7 +76,7 @@ typedef GenericValue<UTF16<> > WValue;
 
 For a detail example, please check the example in [DOM's Encoding](doc/stream.md#Encoding) section.
 
-## Character Type {CharacterType}
+## Character Type {#CharacterType}
 
 As shown in the declaration, each encoding has a `CharType` template parameter. Actually, it may be a little bit confusing, but each `CharType` stores a code unit, not a character (code point). As mentioned in previous section, a code point may be encoded to 1-4 code units for UTF-8.
 
@@ -84,13 +84,13 @@ For `UTF16(LE|BE)`, `UTF32(LE|BE)`, the `CharType` must be integer type of at le
 
 Note that C++11 introduces `char16_t` and `char32_t`, which can be used for `UTF16` and `UTF32` respectively.
 
-## AutoUTF {AutoUTF}
+## AutoUTF {#AutoUTF}
 
 Previous encodings are statically bound in compile-time. In other words, user must know exactly which encodings will be used in the memory or streams. However, sometimes we may need to read/write files of different encodings. The encoding needed to be decided in runtime.
 
 `AutoUTF` is an encoding designed for this purpose. It chooses which encoding to be used according to the input or output stream. Currently, it should be used with `EncodedInputStream` and `EncodedOutputStream`.
 
-## ASCII {ASCII}
+## ASCII {#ASCII}
 
 Although the JSON standards did not mention about [ASCII](http://en.wikipedia.org/wiki/ASCII), sometimes we would like to write 7-bit ASCII JSON for applications that cannot handle UTF-8. Since any JSON can represent unicode characters in escaped sequence `\uXXXX`, JSON can always be encoded in ASCII.
 
@@ -110,13 +110,13 @@ ASCII can be used in input stream. If the input stream contains bytes with value
 
 ASCII *cannot* be used in memory (encoding of `Document` or target encoding of `Reader`), as it cannot represent Unicode code points.
 
-# Validation & Transcoding {ValidationTranscoding}
+# Validation & Transcoding {#ValidationTranscoding}
 
 When RapidJSON parses a JSON, it can validate the input JSON, whether it is a valid sequence of a specified encoding. This option can be turned on by adding `kParseValidateEncodingFlag` in `parseFlags` template parameter.
 
 If the input encoding and output encoding is different, `Reader` and `Writer` will automatically transcode (convert) the text. In this case, `kParseValidateEncodingFlag` is not necessary, as it must decode the input sequence. And if the sequence was unable to be decoded, it must be invalid.
 
-## Transcoder {Transcoder}
+## Transcoder {#Transcoder}
 
 Although the encoding functions in RapidJSON are designed for JSON parsing/generation, user may abuse them for transcoding of non-JSON strings.
 
