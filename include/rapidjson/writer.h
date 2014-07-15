@@ -41,8 +41,41 @@ public:
 		\param levelDepth Initial capacity of stack.
 	*/
 	Writer(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) : 
-		os_(os), level_stack_(allocator, levelDepth * sizeof(Level)),
-		doublePrecision_(kDefaultDoublePrecision) {}
+		os_(&os), level_stack_(allocator, levelDepth * sizeof(Level)),
+		doublePrecision_(kDefaultDoublePrecision), hasRoot_(false) {}
+
+	//! Reset the writer with a new stream.
+	/*!
+		This function reset the writer with a new stream and default settings,
+		in order to make a Writer object reusable for output multiple JSONs.
+
+		\param os New output stream.
+		\code
+		Writer<OutputStream> writer(os1);
+		writer.StartObject();
+		// ...
+		writer.EndObject();
+
+		writer.Reset(os2);
+		writer.StartObject();
+		// ...
+		writer.EndObject();
+		\endcode
+	*/
+	void Reset(OutputStream& os) {
+		os_ = &os;
+		doublePrecision_ = kDefaultDoublePrecision;
+		hasRoot_ = false;
+		level_stack_.Clear();
+	}
+
+	//! Checks whether the output is a complete JSON.
+	/*!
+		A complete JSON has a complete root object or array.
+	*/
+	bool IsComplete() const {
+		return hasRoot_ && level_stack_.Empty();
+	}
 
 	//! Set the number of significant digits for \c double values
 	/*! When writing a \c double value to the \c OutputStream, the number
@@ -103,7 +136,7 @@ public:
 		level_stack_.template Pop<Level>(1);
 		bool ret = WriteEndObject();
 		if (level_stack_.Empty())	// end of json text
-			os_.Flush();
+			os_->Flush();
 		return ret;
 	}
 
@@ -120,7 +153,7 @@ public:
 		level_stack_.template Pop<Level>(1);
 		bool ret = WriteEndArray();
 		if (level_stack_.Empty())	// end of json text
-			os_.Flush();
+			os_->Flush();
 		return ret;
 	}
 	//@}
@@ -161,22 +194,22 @@ protected:
 	static const size_t kDefaultLevelDepth = 32;
 
 	bool WriteNull()  {
-		os_.Put('n'); os_.Put('u'); os_.Put('l'); os_.Put('l'); return true;
+		os_->Put('n'); os_->Put('u'); os_->Put('l'); os_->Put('l'); return true;
 	}
 
 	bool WriteBool(bool b)  {
 		if (b) {
-			os_.Put('t'); os_.Put('r'); os_.Put('u'); os_.Put('e');
+			os_->Put('t'); os_->Put('r'); os_->Put('u'); os_->Put('e');
 		}
 		else {
-			os_.Put('f'); os_.Put('a'); os_.Put('l'); os_.Put('s'); os_.Put('e');
+			os_->Put('f'); os_->Put('a'); os_->Put('l'); os_->Put('s'); os_->Put('e');
 		}
 		return true;
 	}
 
 	bool WriteInt(int i) {
 		if (i < 0) {
-			os_.Put('-');
+			os_->Put('-');
 			i = -i;
 		}
 		return WriteUint((unsigned)i);
@@ -192,14 +225,14 @@ protected:
 
 		do {
 			--p;
-			os_.Put(*p);
+			os_->Put(*p);
 		} while (p != buffer);
 		return true;
 	}
 
 	bool WriteInt64(int64_t i64) {
 		if (i64 < 0) {
-			os_.Put('-');
+			os_->Put('-');
 			i64 = -i64;
 		}
 		WriteUint64((uint64_t)i64);
@@ -216,7 +249,7 @@ protected:
 
 		do {
 			--p;
-			os_.Put(*p);
+			os_->Put(*p);
 		} while (p != buffer);
 		return true;
 	}
@@ -233,7 +266,7 @@ protected:
 		int ret = RAPIDJSON_SNPRINTF(buffer, sizeof(buffer), "%.*g", doublePrecision_, d);
 		RAPIDJSON_ASSERT(ret >= 1);
 		for (int i = 0; i < ret; i++)
-			os_.Put(buffer[i]);
+			os_->Put(buffer[i]);
 		return true;
 	}
 #undef RAPIDJSON_SNPRINTF
@@ -252,7 +285,7 @@ protected:
 #undef Z16
 		};
 
-		os_.Put('\"');
+		os_->Put('\"');
 		GenericStringStream<SourceEncoding> is(str);
 		while (is.Tell() < length) {
 			const Ch c = is.Peek();
@@ -261,55 +294,55 @@ protected:
 				unsigned codepoint;
 				if (!SourceEncoding::Decode(is, &codepoint))
 					return false;
-				os_.Put('\\');
-				os_.Put('u');
+				os_->Put('\\');
+				os_->Put('u');
 				if (codepoint <= 0xD7FF || (codepoint >= 0xE000 && codepoint <= 0xFFFF)) {
-					os_.Put(hexDigits[(codepoint >> 12) & 15]);
-					os_.Put(hexDigits[(codepoint >>  8) & 15]);
-					os_.Put(hexDigits[(codepoint >>  4) & 15]);
-					os_.Put(hexDigits[(codepoint      ) & 15]);
+					os_->Put(hexDigits[(codepoint >> 12) & 15]);
+					os_->Put(hexDigits[(codepoint >>  8) & 15]);
+					os_->Put(hexDigits[(codepoint >>  4) & 15]);
+					os_->Put(hexDigits[(codepoint      ) & 15]);
 				}
 				else if (codepoint >= 0x010000 && codepoint <= 0x10FFFF)	{
 					// Surrogate pair
 					unsigned s = codepoint - 0x010000;
 					unsigned lead = (s >> 10) + 0xD800;
 					unsigned trail = (s & 0x3FF) + 0xDC00;
-					os_.Put(hexDigits[(lead >> 12) & 15]);
-					os_.Put(hexDigits[(lead >>  8) & 15]);
-					os_.Put(hexDigits[(lead >>  4) & 15]);
-					os_.Put(hexDigits[(lead      ) & 15]);
-					os_.Put('\\');
-					os_.Put('u');
-					os_.Put(hexDigits[(trail >> 12) & 15]);
-					os_.Put(hexDigits[(trail >>  8) & 15]);
-					os_.Put(hexDigits[(trail >>  4) & 15]);
-					os_.Put(hexDigits[(trail      ) & 15]);					
+					os_->Put(hexDigits[(lead >> 12) & 15]);
+					os_->Put(hexDigits[(lead >>  8) & 15]);
+					os_->Put(hexDigits[(lead >>  4) & 15]);
+					os_->Put(hexDigits[(lead      ) & 15]);
+					os_->Put('\\');
+					os_->Put('u');
+					os_->Put(hexDigits[(trail >> 12) & 15]);
+					os_->Put(hexDigits[(trail >>  8) & 15]);
+					os_->Put(hexDigits[(trail >>  4) & 15]);
+					os_->Put(hexDigits[(trail      ) & 15]);					
 				}
 				else
 					return false;	// invalid code point
 			}
 			else if ((sizeof(Ch) == 1 || (unsigned)c < 256) && escape[(unsigned char)c])  {
 				is.Take();
-				os_.Put('\\');
-				os_.Put(escape[(unsigned char)c]);
+				os_->Put('\\');
+				os_->Put(escape[(unsigned char)c]);
 				if (escape[(unsigned char)c] == 'u') {
-					os_.Put('0');
-					os_.Put('0');
-					os_.Put(hexDigits[(unsigned char)c >> 4]);
-					os_.Put(hexDigits[(unsigned char)c & 0xF]);
+					os_->Put('0');
+					os_->Put('0');
+					os_->Put(hexDigits[(unsigned char)c >> 4]);
+					os_->Put(hexDigits[(unsigned char)c & 0xF]);
 				}
 			}
 			else
-				Transcoder<SourceEncoding, TargetEncoding>::Transcode(is, os_);
+				Transcoder<SourceEncoding, TargetEncoding>::Transcode(is, *os_);
 		}
-		os_.Put('\"');
+		os_->Put('\"');
 		return true;
 	}
 
-	bool WriteStartObject()	{ os_.Put('{'); return true; }
-	bool WriteEndObject()	{ os_.Put('}'); return true; }
-	bool WriteStartArray()	{ os_.Put('['); return true; }
-	bool WriteEndArray()	{ os_.Put(']'); return true; }
+	bool WriteStartObject()	{ os_->Put('{'); return true; }
+	bool WriteEndObject()	{ os_->Put('}'); return true; }
+	bool WriteStartArray()	{ os_->Put('['); return true; }
+	bool WriteEndArray()	{ os_->Put(']'); return true; }
 
 	void Prefix(Type type) {
 		(void)type;
@@ -317,21 +350,25 @@ protected:
 			Level* level = level_stack_.template Top<Level>();
 			if (level->valueCount > 0) {
 				if (level->inArray) 
-					os_.Put(','); // add comma if it is not the first element in array
+					os_->Put(','); // add comma if it is not the first element in array
 				else  // in object
-					os_.Put((level->valueCount % 2 == 0) ? ',' : ':');
+					os_->Put((level->valueCount % 2 == 0) ? ',' : ':');
 			}
 			if (!level->inArray && level->valueCount % 2 == 0)
 				RAPIDJSON_ASSERT(type == kStringType);  // if it's in object, then even number should be a name
 			level->valueCount++;
 		}
-		else
+		else {
 			RAPIDJSON_ASSERT(type == kObjectType || type == kArrayType);
+			RAPIDJSON_ASSERT(!hasRoot_);	// Should only has one and only one root.
+			hasRoot_ = true;
+		}
 	}
 
-	OutputStream& os_;
+	OutputStream* os_;
 	internal::Stack<Allocator> level_stack_;
 	int doublePrecision_;
+	bool hasRoot_;
 
 	static const int kDefaultDoublePrecision = 6;
 
