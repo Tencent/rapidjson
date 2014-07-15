@@ -6,8 +6,7 @@ According to [ECMA-404](http://www.ecma-international.org/publications/files/ECM
 
 The earlier [RFC4627](http://www.ietf.org/rfc/rfc4627.txt) stated that,
 
-> (in §3) JSON text SHALL be encoded in Unicode.  The default encoding is
-   UTF-8.
+> (in §3) JSON text SHALL be encoded in Unicode.  The default encoding is UTF-8.
 
 > (in §6) JSON may be represented using UTF-8, UTF-16, or UTF-32. When JSON is written in UTF-8, JSON is 8bit compatible.  When JSON is written in UTF-16 or UTF-32, the binary content-transfer-encoding must be used.
 
@@ -28,9 +27,9 @@ Those unique numbers are called code points, which is in the range `0x0` to `0x1
 
 There are various encodings for storing Unicode code points. These are called Unicode Transformation Format (UTF). RapidJSON supports the most commonly used UTFs, including
 
-* UTF-8: 8-bit variable-width encoding. It maps a code point to 1-4 bytes.
-* UTF-16: 16-bit variable-width encoding. It maps a code point to 1-2 16-bit code units (i.e., 2-4 bytes).
-* UTF-32: 32-bit fixed-width encoding. It directly maps a code point to 1 32-bit code unit (i.e. 4 bytes).
+* UTF-8: 8-bit variable-width encoding. It maps a code point to 1–4 bytes.
+* UTF-16: 16-bit variable-width encoding. It maps a code point to 1–2 16-bit code units (i.e., 2–4 bytes).
+* UTF-32: 32-bit fixed-width encoding. It directly maps a code point to a single 32-bit code unit (i.e. 4 bytes).
 
 For UTF-16 and UTF-32, the byte order (endianness) does matter. Within computer memory, they are often stored in the computer's endianness. However, when it is stored in file or transferred over network, we need to state the byte order of the byte sequence, either little-endian (LE) or big-endian (BE). 
 
@@ -78,7 +77,7 @@ For a detail example, please check the example in [DOM's Encoding](doc/stream.md
 
 ## Character Type {#CharacterType}
 
-As shown in the declaration, each encoding has a `CharType` template parameter. Actually, it may be a little bit confusing, but each `CharType` stores a code unit, not a character (code point). As mentioned in previous section, a code point may be encoded to 1-4 code units for UTF-8.
+As shown in the declaration, each encoding has a `CharType` template parameter. Actually, it may be a little bit confusing, but each `CharType` stores a code unit, not a character (code point). As mentioned in previous section, a code point may be encoded to 1–4 code units for UTF-8.
 
 For `UTF16(LE|BE)`, `UTF32(LE|BE)`, the `CharType` must be integer type of at least 2 and 4 bytes  respectively.
 
