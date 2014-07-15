@@ -1288,6 +1288,18 @@ TEST(Reader, IterativeParsing_ShortCircuit) {
 	}
 }
 
+TEST(Reader, IterativeParsing_LimitStackSize) {
+	BaseReaderHandler<> handler;
+	Reader reader(20);
+	StringStream is("[[[]]]");
+
+	ParseResult r = reader.Parse<kParseIterativeFlag>(is, handler);
+
+	EXPECT_TRUE(reader.HasParseError());
+	EXPECT_EQ(kParseErrorStackSizeLimitExceeded, r.Code());
+	EXPECT_EQ(2, r.Offset());
+}
+
 #ifdef __GNUC__
 RAPIDJSON_DIAG_POP
 #endif

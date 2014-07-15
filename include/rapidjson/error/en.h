@@ -40,6 +40,7 @@ inline const RAPIDJSON_ERROR_CHARTYPE* GetParseError_En(ParseErrorCode parseErro
 
 		case kParseErrorTermination:					return RAPIDJSON_ERROR_STRING("Terminate parsing due to Handler error.");
 		case kParseErrorUnspecificSyntaxError:			return RAPIDJSON_ERROR_STRING("Unspecific syntax error.");
+		case kParseErrorStackSizeLimitExceeded:			return RAPIDJSON_ERROR_STRING("Parsing stack size limit is exceeded.");
 
 		default:
 			return RAPIDJSON_ERROR_STRING("Unknown error.");

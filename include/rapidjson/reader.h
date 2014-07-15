@@ -272,10 +272,11 @@ public:
 	typedef typename SourceEncoding::Ch Ch; //!< SourceEncoding character type
 
 	//! Constructor.
-	/*! \param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
+	/*! \param limit Parsing stack size limit(in bytes). Pass 0 means no limit.
+		\param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
 		\param stackCapacity stack capacity in bytes for storing a single decoded string.  (Only use for non-destructive parsing)
 	*/
-	GenericReader(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseResult_() {}
+	GenericReader(size_t limit = 0, Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), kStackSizeLimit(limit), parseResult_() {}
 
 	//! Parse JSON text.
 	/*! \tparam parseFlags Combination of \ref ParseFlag.
@@ -569,8 +570,14 @@ private:
 			if (c == '\\') {	// Escape
 				is.Take();
 				Ch e = is.Take();
-				if ((sizeof(Ch) == 1 || unsigned(e) < 256) && escape[(unsigned char)e])
+				if ((sizeof(Ch) == 1 || unsigned(e) < 256) && escape[(unsigned char)e]) {
+					if (!(parseFlags & kParseInsituFlag)) {
+						if (!IsStackSpaceSufficient<Ch>(1)) {
+							RAPIDJSON_PARSE_ERROR(kParseErrorStackSizeLimitExceeded, is.Tell() - 1);
+						}
+					}
 					os.Put(escape[(unsigned char)e]);
+				}
 				else if (e == 'u') {	// Unicode
 					unsigned codepoint = ParseHex4(is);
 					if (codepoint >= 0xD800 && codepoint <= 0xDBFF) {
@@ -589,6 +596,11 @@ private:
 			}
 			else if (c == '"') {	// Closing double quote
 				is.Take();
+				if (!(parseFlags & kParseInsituFlag)) {
+					if (!IsStackSpaceSufficient<Ch>(1)) {
+						RAPIDJSON_PARSE_ERROR(kParseErrorStackSizeLimitExceeded, is.Tell() - 1);
+					}
+				}
 				os.Put('\0');	// null-terminate the string
 				return;
 			}
@@ -1038,8 +1050,16 @@ private:
 			else if (src == IterativeParsingKeyValueDelimiterState)
 				n = IterativeParsingMemberValueState;
 			// Push current state.
+			if (!IsStackSpaceSufficient<IterativeParsingState>(1)) {
+				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorStackSizeLimitExceeded, is.Tell());
+				return IterativeParsingErrorState;
+			}
 			*stack_.template Push<IterativeParsingState>(1) = n;
 			// Initialize and push the member/element count.
+			if (!IsStackSpaceSufficient<int>(1)) {
+				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorStackSizeLimitExceeded, is.Tell());
+				return IterativeParsingErrorState;
+			}
 			*stack_.template Push<int>(1) = 0;
 			// Call handler
 			if (dst == IterativeParsingObjectInitialState)
@@ -1206,7 +1226,13 @@ private:
 		return parseResult_;
 	}
 
-	static const size_t kDefaultStackCapacity = 256;	//!< Default stack capacity in bytes for storing a single decoded string. 
+	template <typename T>
+	bool IsStackSpaceSufficient(size_t count) const {
+		return kStackSizeLimit == 0 || (stack_.GetSize() + sizeof(T) * count <= kStackSizeLimit);
+	}
+
+	static const size_t kDefaultStackCapacity = 256;	//!< Default stack capacity in bytes for storing a single decoded string.
+	const size_t kStackSizeLimit; //!< Stack size limit(in bytes). A value of 0 means no limit.
 	internal::Stack<Allocator> stack_;	//!< A stack for storing decoded string temporarily during non-destructive parsing.
 	ParseResult parseResult_;
 }; // class GenericReader
