@@ -707,16 +707,18 @@ TEST(Reader, Parse_IStreamWrapper_StringStream) {
 	EXPECT_FALSE(reader.HasParseError());	
 }
 
+// Test iterative parsing.
+
 #define TESTERRORHANDLING(text, errorCode, offset)\
-	{\
-		StringStream json(text);\
-		BaseReaderHandler<> handler;\
-		Reader reader;\
-		reader.IterativeParse<kParseDefaultFlags>(json, handler);\
-		EXPECT_TRUE(reader.HasParseError());\
-		EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
-		EXPECT_EQ(offset, reader.GetErrorOffset());\
-	}
+{\
+	StringStream json(text); \
+	BaseReaderHandler<> handler; \
+	Reader reader; \
+	reader.IterativeParse<kParseDefaultFlags>(json, handler); \
+	EXPECT_TRUE(reader.HasParseError()); \
+	EXPECT_EQ(errorCode, reader.GetParseErrorCode()); \
+	EXPECT_EQ(offset, reader.GetErrorOffset()); \
+}
 
 TEST(Reader, IterativeParsing_ErrorHandling) {
 	TESTERRORHANDLING("{\"a\": a}", kParseErrorValueInvalid, 6);
@@ -732,492 +734,132 @@ TEST(Reader, IterativeParsing_ErrorHandling) {
 	TESTERRORHANDLING("[1 2 3]", kParseErrorArrayMissCommaOrSquareBracket, 3);
 }
 
-// Test iterative parsing.
 template<typename Encoding = UTF8<> >
 struct IterativeParsingReaderHandler {
 	typedef typename Encoding::Ch Ch;
 
-	IterativeParsingReaderHandler() {
-		Reset();
+	const static int LOG_NULL = -1;
+	const static int LOG_BOOL = -2;
+	const static int LOG_INT = -3;
+	const static int LOG_UINT = -4;
+	const static int LOG_INT64 = -5;
+	const static int LOG_UINT64 = -6;
+	const static int LOG_DOUBLE = -7;
+	const static int LOG_STRING = -8;
+	const static int LOG_STARTOBJECT = -9;
+	const static int LOG_ENDOBJECT = -10;
+	const static int LOG_STARTARRAY = -11;
+	const static int LOG_ENDARRAY = -12;
+
+	const static size_t LogCapacity = 256;
+	int Logs[LogCapacity];
+	size_t LogCount;
+
+	IterativeParsingReaderHandler() : LogCount(0) {
 	}
 
-	void Reset() {
-		IsNullTriggered = false;
-		IsBoolTriggered = false;
-		IsIntTriggered = false;
-		IsUintTriggered = false;
-		IsInt64Triggered = false;
-		IsUint64Triggered = false;
-		IsDoubleTriggered = false;
-		IsStringTriggered = false;
-		IsStartObjectTriggered = false;
-		IsEndObjectTriggered = false;
-		MemberCount = 0;
-		IsStartArrayTriggered = false;
-		ElementCount = 0;
+	bool Null() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_NULL; return true; }
+
+	bool Bool(bool) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_BOOL; return true; }
+
+	bool Int(int) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_INT; return true; }
+
+	bool Uint(unsigned) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_INT; return true; }
+
+	bool Int64(int64_t) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_INT64; return true; }
+
+	bool Uint64(uint64_t) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_UINT64; return true; }
+
+	bool Double(double) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_DOUBLE; return true; }
+
+	bool String(const Ch*, SizeType, bool) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STRING; return true; }
+
+	bool StartObject() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STARTOBJECT; return true; }
+
+	bool EndObject(SizeType c) {
+		RAPIDJSON_ASSERT(LogCount < LogCapacity);
+		Logs[LogCount++] = LOG_ENDOBJECT;
+		Logs[LogCount++] = (int)c;
+		return true;
 	}
 
-	bool IsNullTriggered;
-	bool Null() { IsNullTriggered = true; return true; }
+	bool StartArray() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STARTARRAY; return true; }
 
-	bool IsBoolTriggered;
-	bool Bool(bool) { IsBoolTriggered = true; return true; }
-
-	bool IsIntTriggered;
-	bool Int(int) { IsIntTriggered = true; return true; }
-
-	bool IsUintTriggered;
-	bool Uint(unsigned) { IsUintTriggered = true; return true; }
-
-	bool IsInt64Triggered;
-	bool Int64(int64_t) { IsInt64Triggered = true; return true; }
-
-	bool IsUint64Triggered;
-	bool Uint64(uint64_t) { IsUint64Triggered = true; return true; }
-
-	bool IsDoubleTriggered;
-	bool Double(double) { IsDoubleTriggered = true; return true; }
-
-	bool IsStringTriggered;
-	bool String(const Ch*, SizeType, bool) { IsStringTriggered = true; return true; }
-
-	bool IsStartObjectTriggered;
-	bool StartObject() { IsStartObjectTriggered = true; return true; }
-
-	bool IsEndObjectTriggered;
-	SizeType MemberCount;
-	bool EndObject(SizeType c) { IsEndObjectTriggered = true;  MemberCount = c; return true; }
-
-	bool IsStartArrayTriggered;
-	bool StartArray() { IsStartArrayTriggered = true; return true; }
-
-	bool IsEndArrayTriggered;
-	SizeType ElementCount;
-	bool EndArray(SizeType c) { IsEndArrayTriggered = true;  ElementCount = c; return true; }
+	bool EndArray(SizeType c) {
+		RAPIDJSON_ASSERT(LogCount < LogCapacity);
+		Logs[LogCount++] = LOG_ENDARRAY;
+		Logs[LogCount++] = (int)c;
+		return true;
+	}
 };
 
-#define ITERATIVE_PARSING_PREPARE_STATE_UNTIL(text, pos)\
-	IterativeParsingReaderHandler<> handler;\
-	Reader reader;\
-	StringStream is(text);\
-	\
-	Reader::IterativeParsingState state = Reader::IterativeParsingStartState;\
-	SkipWhitespace(is);\
-	while (is.Tell() != pos) {\
-		Reader::IterativeParsingToken token = reader.Tokenize(is.Peek());\
-		Reader::IterativeParsingState n = reader.Predict(state, token);\
-		state = reader.Transit<kParseIterativeFlag>(state, token, n, is, handler);\
-		SkipWhitespace(is);\
-	}
-
-TEST(Reader, IterativeParsing_StateTransition_Start) {
-	// Start -> ArrayInitial
+TEST(Reader, IterativeParsing_General) {
 	{
-		IterativeParsingReaderHandler<> handler;
+		StringStream is("[1, {\"k\": [1, 2]}, null, false, true, \"string\", 1.2]");
 		Reader reader;
-		StringStream is("[]");
-
-		Reader::IterativeParsingState n = reader.Predict(Reader::IterativeParsingStartState, Reader::IterativeParsingLeftBracketToken);
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(Reader::IterativeParsingStartState, Reader::IterativeParsingLeftBracketToken, n, is, handler);
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingArrayInitialState, d);
-		EXPECT_TRUE(handler.IsStartArrayTriggered);
-	}
-
-	// Start -> ObjectInitial
-	{
 		IterativeParsingReaderHandler<> handler;
+
+		ParseResult r = reader.IterativeParse<kParseIterativeFlag>(is, handler);
+
+		EXPECT_FALSE(reader.HasParseError());
+
+		int e[] = {
+			handler.LOG_STARTARRAY,
+			handler.LOG_INT,
+			handler.LOG_STARTOBJECT,
+			handler.LOG_STRING,
+			handler.LOG_STARTARRAY,
+			handler.LOG_INT,
+			handler.LOG_INT,
+			handler.LOG_ENDARRAY, 2,
+			handler.LOG_ENDOBJECT, 1,
+			handler.LOG_NULL,
+			handler.LOG_BOOL,
+			handler.LOG_BOOL,
+			handler.LOG_STRING,
+			handler.LOG_DOUBLE,
+			handler.LOG_ENDARRAY, 7
+		};
+
+		EXPECT_EQ(sizeof(e) / sizeof(int), handler.LogCount);
+
+		for (size_t i = 0; i < handler.LogCount; ++i) {
+			EXPECT_EQ(e[i], handler.Logs[i]) << "i = " << i;
+		}
+	}
+}
+
+TEST(Reader, IterativeParsing_Count) {
+	{
+		StringStream is("[{}, {\"k\": 1}, [1], []]");
 		Reader reader;
-		StringStream is("{}");
-
-		Reader::IterativeParsingState n = reader.Predict(Reader::IterativeParsingStartState, Reader::IterativeParsingLeftCurlyBracketToken);
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(Reader::IterativeParsingStartState, Reader::IterativeParsingLeftCurlyBracketToken, n, is, handler);
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingObjectInitialState, d);
-		EXPECT_TRUE(handler.IsStartObjectTriggered);
-	}
-}
-
-TEST(Reader, IterativeParsing_StateTransition_ObjectInitial) {
-	// ObjectInitial -> ObjectFinish -> Finish
-	{
-		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("{}", 1);
-		handler.Reset();
-
-		EXPECT_EQ(Reader::IterativeParsingObjectInitialState, state);
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
-			state,
-			Reader::IterativeParsingRightCurlyBracketToken,
-			Reader::IterativeParsingObjectFinishState,
-			is, handler);
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingFinishState, d);
-		EXPECT_TRUE(handler.IsEndObjectTriggered);
-		EXPECT_EQ(0, handler.MemberCount);
-	}
-
-	// ObjectInitial -> MemberKey
-	{
-		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("{\"key\": 1}", 1);
-		handler.Reset();
-
-		EXPECT_EQ(Reader::IterativeParsingObjectInitialState, state);
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
-			state,
-			Reader::IterativeParsingStringToken,
-			Reader::IterativeParsingMemberKeyState,
-			is, handler);
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingMemberKeyState, d);
-		EXPECT_TRUE(handler.IsStringTriggered);
-	}
-}
-
-TEST(Reader, IterativeParsing_StateTransition_MemberKey) {
-	// MemberKey -> KeyValueDelimiter
-	{
 		IterativeParsingReaderHandler<> handler;
-		Reader reader;
-		StringStream is(":");
 
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
-			Reader::IterativeParsingMemberKeyState,
-			Reader::IterativeParsingColonToken,
-			Reader::IterativeParsingKeyValueDelimiterState,
-			is, handler);
+		ParseResult r = reader.IterativeParse<kParseIterativeFlag>(is, handler);
 
 		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingKeyValueDelimiterState, d);
-	}
-}
 
-#define TEST_COMPOUNDTYPE_INITIAL_STATE_AUX(type, text, src, token, popstate, statesuffix, eventsuffix)\
-	{\
-		IterativeParsingReaderHandler<> handler;\
-		Reader reader;\
-		StringStream is(text);\
-		\
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(\
-			src,\
-			token,\
-			Reader::IterativeParsing ## type ## statesuffix,\
-			is, handler);\
-		\
-		EXPECT_FALSE(reader.HasParseError());\
-		EXPECT_EQ(Reader::IterativeParsing ## type ## statesuffix, d);\
-		EXPECT_TRUE(handler.IsStart ## type ## eventsuffix);\
-		\
-		int c = *reader.stack_.template Pop<int>(1);\
-		EXPECT_EQ(0, c);\
-		Reader::IterativeParsingState s = *reader.stack_.template Pop<Reader::IterativeParsingState>(1);\
-		EXPECT_EQ(popstate, s);\
-	}
+		int e[] = {
+			handler.LOG_STARTARRAY,
+			handler.LOG_STARTOBJECT,
+			handler.LOG_ENDOBJECT, 0,
+			handler.LOG_STARTOBJECT,
+			handler.LOG_STRING,
+			handler.LOG_INT,
+			handler.LOG_ENDOBJECT, 1,
+			handler.LOG_STARTARRAY,
+			handler.LOG_INT,
+			handler.LOG_ENDARRAY, 1,
+			handler.LOG_STARTARRAY,
+			handler.LOG_ENDARRAY, 0,
+			handler.LOG_ENDARRAY, 4
+		};
 
-#define TEST_COMPOUNDTYPE_INITIAL_STATE(type, text, src, token, popstate)\
-	TEST_COMPOUNDTYPE_INITIAL_STATE_AUX(type, text, src, token, popstate, InitialState, Triggered)
+		EXPECT_EQ(sizeof(e) / sizeof(int), handler.LogCount);
 
-#define TEST_PLAIN_VALUE_STATE_AUX(text, src, token, dst, event, eventsuffix)\
-	{\
-		IterativeParsingReaderHandler<> handler;\
-		Reader reader;\
-		StringStream is(text);\
-		\
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(\
-			src,\
-			token,\
-			dst,\
-			is, handler);\
-		\
-		EXPECT_FALSE(reader.HasParseError());\
-		EXPECT_EQ(dst, d);\
-		EXPECT_TRUE(handler. Is ## event ## eventsuffix);\
-	}
-
-#define TEST_PLAIN_VALUE_STATE(text, src, token, dst, event)\
-	TEST_PLAIN_VALUE_STATE_AUX(text, src, token, dst, event, Triggered)
-
-TEST(Reader, IterativeParsing_StateTransition_KeyValueDelimiter) {
-	// KeyValueDelimiter -> ArrayInitial
-	TEST_COMPOUNDTYPE_INITIAL_STATE(
-		Array,
-		"[",
-		Reader::IterativeParsingKeyValueDelimiterState,
-		Reader::IterativeParsingLeftBracketToken,
-		Reader::IterativeParsingMemberValueState);
-
-	// KeyValueDelimiter -> ObjectInitial
-	TEST_COMPOUNDTYPE_INITIAL_STATE(
-		Object,
-		"{",
-		Reader::IterativeParsingKeyValueDelimiterState,
-		Reader::IterativeParsingLeftCurlyBracketToken,
-		Reader::IterativeParsingMemberValueState);
-
-	// KeyValueDelimiter -> MemberValue
-	TEST_PLAIN_VALUE_STATE(
-		"123,",
-		Reader::IterativeParsingKeyValueDelimiterState,
-		Reader::IterativeParsingNumberToken,
-		Reader::IterativeParsingMemberValueState,
-		Uint);
-}
-
-TEST(Reader, IterativeParsing_StateTransition_MemberValue) {
-	// MemberValue -> ObjectFinish -> Finish
-	{
-		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("{\"k\": 123}", 9);
-		handler.Reset();
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingMemberValueState, state);
-
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
-			state,
-			Reader::IterativeParsingRightCurlyBracketToken,
-			Reader::IterativeParsingObjectFinishState,
-			is, handler);
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingFinishState, d);
-		EXPECT_TRUE(handler.IsEndObjectTriggered);
-		EXPECT_EQ(1, handler.MemberCount);
-	}
-
-	// MemberValue -> MemberDelimiter
-	{
-		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("{\"k\": 1, \"e\": 2}", 7);
-		handler.Reset();
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingMemberValueState, state);
-
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
-			state,
-			Reader::IterativeParsingCommaToken,
-			Reader::IterativeParsingMemberDelimiterState,
-			is, handler);
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingMemberDelimiterState, d);
-	}
-}
-
-TEST(Reader, IterativeParsing_StateTransition_MemberDelimiter) {
-	// MemberDelimiter -> MemberKey
-	ITERATIVE_PARSING_PREPARE_STATE_UNTIL("{\"k\": 1, \"e\": 2}", 9);
-	handler.Reset();
-
-	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::IterativeParsingMemberDelimiterState, state);
-
-	Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
-		state,
-		Reader::IterativeParsingStringToken,
-		Reader::IterativeParsingMemberKeyState,
-		is, handler);
-
-	EXPECT_FALSE(reader.HasParseError());
-	EXPECT_EQ(Reader::IterativeParsingMemberKeyState, d);
-}
-
-TEST(Reader, IterativeParsing_StateTransition_ArrayInitial) {
-	// ArrayInitial -> ArrayInitial
-	{
-		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[[1]]", 1);
-		handler.Reset();
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingArrayInitialState, state);
-
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
-			state,
-			Reader::IterativeParsingLeftBracketToken,
-			Reader::IterativeParsingArrayInitialState,
-			is, handler);
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingArrayInitialState, d);
-		// Check initialized element count.
-		int c = *reader.stack_.template Pop<int>(1);
-		EXPECT_EQ(0, c);
-		// Check pushed state.
-		Reader::IterativeParsingState s = *reader.stack_.template Pop<Reader::IterativeParsingState>(1);
-		EXPECT_EQ(Reader::IterativeParsingElementState, s);
-	}
-
-	// ArrayInitial -> ArrayFinish -> Finish
-	{
-		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[]", 1);
-		handler.Reset();
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingArrayInitialState, state);
-
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
-			state,
-			Reader::IterativeParsingRightBracketToken,
-			Reader::IterativeParsingArrayFinishState,
-			is, handler);
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingFinishState, d);
-		EXPECT_TRUE(handler.IsEndArrayTriggered);
-		EXPECT_EQ(0, handler.ElementCount);
-	}
-
-	// ArrayInitial -> ObjectInitial
-	{
-		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[{\"k\": 1}]", 1);
-		handler.Reset();
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingArrayInitialState, state);
-
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
-			state,
-			Reader::IterativeParsingLeftCurlyBracketToken,
-			Reader::IterativeParsingObjectInitialState,
-			is, handler);
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingObjectInitialState, d);
-		// Check initialized element count.
-		int c = *reader.stack_.template Pop<int>(1);
-		EXPECT_EQ(0, c);
-		// Check pushed state.
-		Reader::IterativeParsingState s = *reader.stack_.template Pop<Reader::IterativeParsingState>(1);
-		EXPECT_EQ(Reader::IterativeParsingElementState, s);
-	}
-
-	// ArrayInitial -> Element
-	{
-		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[1]", 1);
-		handler.Reset();
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingArrayInitialState, state);
-
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
-			state,
-			Reader::IterativeParsingNumberToken,
-			Reader::IterativeParsingElementState,
-			is, handler);
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingElementState, d);
-	}
-}
-
-TEST(Reader, IterativeParsing_StateTransition_Element) {
-	// Element -> ArrayFinish -> Finish
-	{
-		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[1]", 2);
-		handler.Reset();
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingElementState, state);
-
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
-			state,
-			Reader::IterativeParsingRightBracketToken,
-			Reader::IterativeParsingArrayFinishState,
-			is, handler);
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingFinishState, d);
-		EXPECT_TRUE(handler.IsEndArrayTriggered);
-		EXPECT_EQ(1, handler.ElementCount);
-	}
-
-	// Element -> ElementDelimiter
-	{
-		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[1, 2]", 2);
-		handler.Reset();
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingElementState, state);
-
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
-			state,
-			Reader::IterativeParsingCommaToken,
-			Reader::IterativeParsingElementDelimiterState,
-			is, handler);
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingElementDelimiterState, d);
-	}
-}
-
-TEST(Reader, IterativeParsing_StateTransition_ElementDelimiter) {
-	// ElementDelimiter -> ArrayInitial
-	{
-		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[1, [1]]", 4);
-		handler.Reset();
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingElementDelimiterState, state);
-
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
-			state,
-			Reader::IterativeParsingLeftBracketToken,
-			Reader::IterativeParsingArrayInitialState,
-			is, handler);
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingArrayInitialState, d);
-
-		int c = *reader.stack_.template Pop<int>(1);
-		EXPECT_EQ(0, c);
-		Reader::IterativeParsingState s = *reader.stack_.template Pop<Reader::IterativeParsingState>(1);
-		EXPECT_EQ(Reader::IterativeParsingElementState, s);
-	}
-
-	// ElementDelimiter -> ObjectInitial
-	{
-		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[1, [1]]", 4);
-		handler.Reset();
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingElementDelimiterState, state);
-
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
-			state,
-			Reader::IterativeParsingLeftBracketToken,
-			Reader::IterativeParsingArrayInitialState,
-			is, handler);
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingArrayInitialState, d);
-
-		int c = *reader.stack_.template Pop<int>(1);
-		EXPECT_EQ(0, c);
-		Reader::IterativeParsingState s = *reader.stack_.template Pop<Reader::IterativeParsingState>(1);
-		EXPECT_EQ(Reader::IterativeParsingElementState, s);
-	}
-
-	// ElementDelimiter -> Element
-	{
-		ITERATIVE_PARSING_PREPARE_STATE_UNTIL("[1, 2]", 4);
-		handler.Reset();
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingElementDelimiterState, state);
-
-		Reader::IterativeParsingState d = reader.Transit<kParseIterativeFlag>(
-			state,
-			Reader::IterativeParsingNumberToken,
-			Reader::IterativeParsingElementState,
-			is, handler);
-
-		EXPECT_FALSE(reader.HasParseError());
-		EXPECT_EQ(Reader::IterativeParsingElementState, d);
-
-		int c = *reader.stack_.template Pop<int>(1);
-		EXPECT_EQ(1, c);
+		for (size_t i = 0; i < handler.LogCount; ++i) {
+			EXPECT_EQ(e[i], handler.Logs[i]) << "i = " << i;
+		}
 	}
 }
 
