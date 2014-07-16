@@ -22,6 +22,7 @@ struct GenericStringBuffer {
 	void Flush() {}
 
 	void Clear() { stack_.Clear(); }
+	Ch* Allocate(size_t count) { return stack_.template Push<Ch>(count); }
 
 	const Ch* GetString() const {
 		// Push and pop a null terminator. This is safe.
