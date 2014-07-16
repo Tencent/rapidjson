@@ -572,7 +572,7 @@ private:
 				Ch e = is.Take();
 				if ((sizeof(Ch) == 1 || unsigned(e) < 256) && escape[(unsigned char)e]) {
 					if (!(parseFlags & kParseInsituFlag)) {
-						if (!IsStackSpaceSufficient<Ch>(1)) {
+						if (!CheckStackSpaceQuota(sizeof(Ch))) {
 							RAPIDJSON_PARSE_ERROR(kParseErrorStackSizeLimitExceeded, is.Tell() - 1);
 						}
 					}
@@ -597,7 +597,7 @@ private:
 			else if (c == '"') {	// Closing double quote
 				is.Take();
 				if (!(parseFlags & kParseInsituFlag)) {
-					if (!IsStackSpaceSufficient<Ch>(1)) {
+					if (!CheckStackSpaceQuota(sizeof(Ch))) {
 						RAPIDJSON_PARSE_ERROR(kParseErrorStackSizeLimitExceeded, is.Tell() - 1);
 					}
 				}
@@ -865,7 +865,7 @@ private:
 
 	IterativeParsingState Predict(IterativeParsingState state, IterativeParsingToken token) {
 		// current state x one lookahead token -> new state
-		static const IterativeParsingState G[cIterativeParsingStateCount][cIterativeParsingTokenCount] = {
+		static const char G[cIterativeParsingStateCount][cIterativeParsingTokenCount] = {
 			// Start
 			{
 				IterativeParsingArrayInitialState,	// Left bracket
@@ -1018,7 +1018,7 @@ private:
 			}
 		}; // End of G
 
-		return G[state][token];
+		return (IterativeParsingState)G[state][token];
 	}
 
 	// Make an advance in the token stream and state based on the candidate destination state which was returned by Transit().
@@ -1049,17 +1049,14 @@ private:
 				n = IterativeParsingElementState;
 			else if (src == IterativeParsingKeyValueDelimiterState)
 				n = IterativeParsingMemberValueState;
-			// Push current state.
-			if (!IsStackSpaceSufficient<IterativeParsingState>(1)) {
+			// Check stack space limit.
+			if (!CheckStackSpaceQuota(sizeof(IterativeParsingState) + sizeof(int))) {
 				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorStackSizeLimitExceeded, is.Tell());
 				return IterativeParsingErrorState;
 			}
+			// Push current state.
 			*stack_.template Push<IterativeParsingState>(1) = n;
 			// Initialize and push the member/element count.
-			if (!IsStackSpaceSufficient<int>(1)) {
-				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorStackSizeLimitExceeded, is.Tell());
-				return IterativeParsingErrorState;
-			}
 			*stack_.template Push<int>(1) = 0;
 			// Call handler
 			if (dst == IterativeParsingObjectInitialState)
@@ -1226,9 +1223,8 @@ private:
 		return parseResult_;
 	}
 
-	template <typename T>
-	bool IsStackSpaceSufficient(size_t count) const {
-		return kStackSizeLimit == 0 || (stack_.GetSize() + sizeof(T) * count <= kStackSizeLimit);
+	bool CheckStackSpaceQuota(size_t size) const {
+		return kStackSizeLimit == 0 || (stack_.GetSize() + size <= kStackSizeLimit);
 	}
 
 	static const size_t kDefaultStackCapacity = 256;	//!< Default stack capacity in bytes for storing a single decoded string.
