@@ -3,14 +3,23 @@
 #if TEST_MISC
 
 #define __STDC_FORMAT_MACROS
-
-#define strtk_no_tr1_or_boost
-#include "strtk/strtk.hpp"
 #include "rapidjson/stringbuffer.h"
 
 #ifdef _MSC_VER
 #pragma warning (push)
-#pragma warning (disable: 4245; disable: 4512)
+#pragma warning (disable: 4996)
+#endif
+
+#define strtk_no_tr1_or_boost
+#include "strtk/strtk.hpp"
+
+#ifdef _MSC_VER
+#pragma warning (pop)
+#endif
+
+#ifdef _MSC_VER
+#pragma warning (push)
+#pragma warning (disable: 4245; disable: 4512; disable: 4996)
 #endif
 
 #include "cppformat/format.h"
@@ -75,6 +84,154 @@ TEST_F(Misc, Hoehrmann_IsUTF8) {
 		EXPECT_TRUE(IsUTF8((unsigned char*)json_));
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// CountDecimalDigit: Count number of decimal places
+
+inline unsigned CountDecimalDigit_naive(unsigned n) {
+	unsigned count = 1;
+	while (n >= 10) {
+		n /= 10;
+		count++;
+	}
+	return count;
+}
+
+inline unsigned CountDecimalDigit_enroll4(unsigned n) {
+	unsigned count = 1;
+	while (n >= 10000) {
+		n /= 10000u;
+		count += 4;
+	}
+	if (n < 10) return count;
+	if (n < 100) return count + 1;
+	if (n < 1000) return count + 2;
+	return count + 3;
+}
+
+inline unsigned CountDecimalDigit64_enroll4(uint64_t n) {
+	unsigned count = 1;
+	while (n >= 10000) {
+		n /= 10000u;
+		count += 4;
+	}
+	if (n < 10) return count;
+	if (n < 100) return count + 1;
+	if (n < 1000) return count + 2;
+	return count + 3;
+}
+
+inline unsigned CountDecimalDigit_fast(unsigned n) {
+	static const uint32_t powers_of_10[] = {
+		0,
+		10,
+		100,
+		1000,
+		10000,
+		100000,
+		1000000,
+		10000000,
+		100000000,
+		1000000000
+	};
+
+	unsigned long i = 0;
+	//	uint32_t t = (32 - __builtin_clz(n | 1)) * 1233 >> 12;
+	_BitScanReverse(&i, n | 1);
+	uint32_t t = (i + 1) * 1233 >> 12;
+	return t - (n < powers_of_10[t]) + 1;
+}
+
+inline unsigned CountDecimalDigit64_fast(uint64_t n) {
+	static const uint64_t powers_of_10[] = {
+		0,
+		10,
+		100,
+		1000,
+		10000,
+		100000,
+		1000000,
+		10000000,
+		100000000,
+		1000000000,
+		10000000000,
+		100000000000,
+		1000000000000,
+		10000000000000,
+		100000000000000,
+		1000000000000000,
+		10000000000000000,
+		100000000000000000,
+		1000000000000000000,
+		10000000000000000000U
+	};
+
+	unsigned long i = 0;
+	//	uint32_t t = (32 - __builtin_clz(n | 1)) * 1233 >> 12;
+
+#if _M_IX86
+	uint64_t m = n | 1;
+	if (_BitScanReverse(&i, m >> 32))
+		i += 32;
+	else
+		_BitScanReverse(&i, m & 0xFFFFFFFF);
+#elif _M_X64
+	_BitScanReverse64(&i, n | 1);
+#else
+#error
+#endif
+
+	uint32_t t = (i + 1) * 1233 >> 12;
+	return t - (n < powers_of_10[t]) + 1;
+}
+
+#if 0
+// Exhaustive, very slow
+TEST_F(Misc, CountDecimalDigit_Verify) {
+	unsigned i = 0;
+	do {
+		if (i % (65536 * 256) == 0)
+			printf("%u\n", i);
+		ASSERT_EQ(CountDecimalDigit_enroll4(i), CountDecimalDigit_fast(i));
+		i++;
+	} while (i != 0);
+}
+
+static const unsigned kDigits10Trial = 1000000000u;
+TEST_F(Misc, CountDecimalDigit_naive) {
+	unsigned sum = 0;
+	for (unsigned i = 0; i < kDigits10Trial; i++)
+		sum += CountDecimalDigit_naive(i);
+	printf("%u\n", sum);
+}
+
+TEST_F(Misc, CountDecimalDigit_enroll4) {
+	unsigned sum = 0;
+	for (unsigned i = 0; i < kDigits10Trial; i++)
+		sum += CountDecimalDigit_enroll4(i);
+	printf("%u\n", sum);
+}
+
+TEST_F(Misc, CountDecimalDigit_fast) {
+	unsigned sum = 0;
+	for (unsigned i = 0; i < kDigits10Trial; i++)
+		sum += CountDecimalDigit_fast(i);
+	printf("%u\n", sum);
+}
+#endif
+
+TEST_F(Misc, CountDecimalDigit64_VerifyFast) {
+	uint64_t i = 1, j;
+	do {
+		printf("%" PRIu64 "\n", i);
+		ASSERT_EQ(CountDecimalDigit64_enroll4(i), CountDecimalDigit64_fast(i));
+		j = i;
+		i *= 3;
+	} while (j < i);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// integer-to-string conversion
 
 // https://gist.github.com/anonymous/7179097
 static const int randval[] ={
@@ -185,6 +342,13 @@ static const int randval[] ={
 static const size_t randvalCount = sizeof(randval) / sizeof(randval[0]);
 static const size_t kItoaTrialCount = 10000;
 
+static const char digits[201] =
+"0001020304050607080910111213141516171819"
+"2021222324252627282930313233343536373839"
+"4041424344454647484950515253545556575859"
+"6061626364656667686970717273747576777879"
+"8081828384858687888990919293949596979899";
+
 // Prevent code being optimized out
 #define OUTPUT_LENGTH(length) printf("", length)
 //#define OUTPUT_LENGTH(length) printf("%d\n", length)
@@ -250,12 +414,22 @@ private:
 	OutputStream* os_;
 };
 
-static const char digits[201] =
-	"0001020304050607080910111213141516171819"
-	"2021222324252627282930313233343536373839"
-	"4041424344454647484950515253545556575859"
-	"6061626364656667686970717273747576777879"
-	"8081828384858687888990919293949596979899";
+template<>
+inline bool Writer1<rapidjson::StringBuffer>::WriteUint(unsigned u) {
+	char buffer[10];
+	char* p = buffer;
+	do {
+		*p++ = char(u % 10) + '0';
+		u /= 10;
+	} while (u > 0);
+
+	char* d = os_->Allocate(p - buffer);
+	do {
+		--p;
+		*d++ = *p;
+	} while (p != buffer);
+	return true;
+}
 
 // Using digits LUT to reduce divsion/modulo
 template<typename OutputStream>
@@ -337,8 +511,254 @@ private:
 	OutputStream* os_;
 };
 
+// First pass to count digits
+template<typename OutputStream>
+class Writer3 {
+public:
+	Writer3() : os_() {}
+	Writer3(OutputStream& os) : os_(&os) {}
+
+	void Reset(OutputStream& os) {
+		os_ = &os;
+	}
+
+	bool WriteInt(int i) {
+		if (i < 0) {
+			os_->Put('-');
+			i = -i;
+		}
+		return WriteUint((unsigned)i);
+	}
+
+	bool WriteUint(unsigned u) {
+		char buffer[10];
+		char *p = buffer;
+		do {
+			*p++ = char(u % 10) + '0';
+			u /= 10;
+		} while (u > 0);
+
+		do {
+			--p;
+			os_->Put(*p);
+		} while (p != buffer);
+		return true;
+	}
+
+	bool WriteInt64(int64_t i64) {
+		if (i64 < 0) {
+			os_->Put('-');
+			i64 = -i64;
+		}
+		WriteUint64((uint64_t)i64);
+		return true;
+	}
+
+	bool WriteUint64(uint64_t u64) {
+		char buffer[20];
+		char *p = buffer;
+		do {
+			*p++ = char(u64 % 10) + '0';
+			u64 /= 10;
+		} while (u64 > 0);
+
+		do {
+			--p;
+			os_->Put(*p);
+		} while (p != buffer);
+		return true;
+	}
+
+private:
+	void WriteUintReverse(char* d, unsigned u) {
+		do {
+			*--d = char(u % 10) + '0';
+			u /= 10;
+		} while (u > 0);
+	}
+
+	void WriteUint64Reverse(char* d, uint64_t u) {
+		do {
+			*--d = char(u % 10) + '0';
+			u /= 10;
+		} while (u > 0);
+	}
+
+	OutputStream* os_;
+};
+
+template<>
+inline bool Writer3<rapidjson::StringBuffer>::WriteUint(unsigned u) {
+	unsigned digit = CountDecimalDigit_fast(u);
+	WriteUintReverse(os_->Allocate(digit) + digit, u);
+	return true;
+}
+
+template<>
+inline bool Writer3<rapidjson::InsituStringStream>::WriteUint(unsigned u) {
+	unsigned digit = CountDecimalDigit_fast(u);
+	WriteUintReverse(os_->Allocate(digit) + digit, u);
+	return true;
+}
+
+template<>
+inline bool Writer3<rapidjson::StringBuffer>::WriteUint64(uint64_t u) {
+	unsigned digit = CountDecimalDigit64_fast(u);
+	WriteUint64Reverse(os_->Allocate(digit) + digit, u);
+	return true;
+}
+
+template<>
+inline bool Writer3<rapidjson::InsituStringStream>::WriteUint64(uint64_t u) {
+	unsigned digit = CountDecimalDigit64_fast(u);
+	WriteUint64Reverse(os_->Allocate(digit) + digit, u);
+	return true;
+}
+
+// Using digits LUT to reduce divsion/modulo, two passes
+template<typename OutputStream>
+class Writer4 {
+public:
+	Writer4() : os_() {}
+	Writer4(OutputStream& os) : os_(&os) {}
+
+	void Reset(OutputStream& os) {
+		os_ = &os;
+	}
+
+	bool WriteInt(int i) {
+		if (i < 0) {
+			os_->Put('-');
+			i = -i;
+		}
+		return WriteUint((unsigned)i);
+	}
+
+	bool WriteUint(unsigned u) {
+		char buffer[10];
+		char* p = buffer;
+		while (u >= 100) {
+			const unsigned i = (u % 100) << 1;
+			u /= 100;
+			*p++ = digits[i + 1];
+			*p++ = digits[i];
+		}
+		if (u < 10)
+			*p++ = char(u) + '0';
+		else {
+			const unsigned i = u << 1;
+			*p++ = digits[i + 1];
+			*p++ = digits[i];
+		}
+
+		do {
+			--p;
+			os_->Put(*p);
+		} while (p != buffer);
+		return true;
+	}
+
+	bool WriteInt64(int64_t i64) {
+		if (i64 < 0) {
+			os_->Put('-');
+			i64 = -i64;
+		}
+		WriteUint64((uint64_t)i64);
+		return true;
+	}
+
+	bool WriteUint64(uint64_t u64) {
+		char buffer[20];
+		char* p = buffer;
+		while (u64 >= 100) {
+			const unsigned i = static_cast<unsigned>(u64 % 100) << 1;
+			u64 /= 100;
+			*p++ = digits[i + 1];
+			*p++ = digits[i];
+		}
+		if (u64 < 10)
+			*p++ = char(u64) + '0';
+		else {
+			const unsigned i = static_cast<unsigned>(u64) << 1;
+			*p++ = digits[i + 1];
+			*p++ = digits[i];
+		}
+
+		do {
+			--p;
+			os_->Put(*p);
+		} while (p != buffer);
+		return true;
+	}
+
+private:
+	void WriteUintReverse(char* d, unsigned u) {
+		while (u >= 100) {
+			const unsigned i = (u % 100) << 1;
+			u /= 100;
+			*--d = digits[i + 1];
+			*--d = digits[i];
+		}
+		if (u < 10) {
+			*--d = char(u) + '0';
+		}
+		else {
+			const unsigned i = u << 1;
+			*--d = digits[i + 1];
+			*--d = digits[i];
+		}
+	}
+
+	void WriteUint64Reverse(char* d, uint64_t u) {
+		while (u >= 100) {
+			const unsigned i = (u % 100) << 1;
+			u /= 100;
+			*--d = digits[i + 1];
+			*--d = digits[i];
+		}
+		if (u < 10) {
+			*--d = char(u) + '0';
+		}
+		else {
+			const unsigned i = u << 1;
+			*--d = digits[i + 1];
+			*--d = digits[i];
+		}
+	}
+
+	OutputStream* os_;
+};
+
+template<>
+inline bool Writer4<rapidjson::StringBuffer>::WriteUint(unsigned u) {
+	unsigned digit = CountDecimalDigit_fast(u);
+	WriteUintReverse(os_->Allocate(digit) + digit, u);
+	return true;
+}
+
+template<>
+inline bool Writer4<rapidjson::InsituStringStream>::WriteUint(unsigned u) {
+	unsigned digit = CountDecimalDigit_fast(u);
+	WriteUintReverse(os_->Allocate(digit) + digit, u);
+	return true;
+}
+
+template<>
+inline bool Writer4<rapidjson::StringBuffer>::WriteUint64(uint64_t u) {
+	unsigned digit = CountDecimalDigit64_fast(u);
+	WriteUint64Reverse(os_->Allocate(digit) + digit, u);
+	return true;
+}
+
+template<>
+inline bool Writer4<rapidjson::InsituStringStream>::WriteUint64(uint64_t u) {
+	unsigned digit = CountDecimalDigit64_fast(u);
+	WriteUint64Reverse(os_->Allocate(digit) + digit, u);
+	return true;
+}
+
 template <typename Writer>
-void itoa_Writer_Verify() {
+void itoa_Writer_StringBufferVerify() {
 	rapidjson::StringBuffer sb;
 	Writer writer(sb);
 	for (int j = 0; j < randvalCount; j++) {
@@ -347,6 +767,23 @@ void itoa_Writer_Verify() {
 		writer.WriteInt(randval[j]);
 		ASSERT_STREQ(buffer, sb.GetString());
 		sb.Clear();
+	}
+}
+
+template <typename Writer>
+void itoa_Writer_InsituStringStreamVerify() {
+	Writer writer;
+	for (int j = 0; j < randvalCount; j++) {
+		char buffer[32];
+		sprintf(buffer, "%d", randval[j]);
+		char buffer2[32];
+		rapidjson::InsituStringStream ss(buffer2);
+		writer.Reset(ss);
+		char* begin = ss.PutBegin();
+		writer.WriteInt(randval[j]);
+		ss.Put('\0');
+		ss.PutEnd(begin);
+		ASSERT_STREQ(buffer, buffer2);
 	}
 }
 
@@ -386,7 +823,7 @@ void itoa_Writer_InsituStringStream() {
 };
 
 template <typename Writer>
-void itoa64_Writer_Verify() {
+void itoa64_Writer_StringBufferVerify() {
 	rapidjson::StringBuffer sb;
 	Writer writer(sb);
 	for (int j = 0; j < randvalCount; j++) {
@@ -396,6 +833,24 @@ void itoa64_Writer_Verify() {
 		writer.WriteInt64(x);
 		ASSERT_STREQ(buffer, sb.GetString());
 		sb.Clear();
+	}
+}
+
+template <typename Writer>
+void itoa64_Writer_InsituStringStreamVerify() {
+	Writer writer;
+	for (int j = 0; j < randvalCount; j++) {
+		char buffer[32];
+		int64_t x = randval[j] * randval[j];
+		sprintf(buffer, "%" PRIi64, x);
+		char buffer2[32];
+		rapidjson::InsituStringStream ss(buffer2);
+		writer.Reset(ss);
+		char* begin = ss.PutBegin();
+		writer.WriteInt64(x);
+		ss.Put('\0');
+		ss.PutEnd(begin);
+		ASSERT_STREQ(buffer, buffer2);
 	}
 }
 
@@ -434,53 +889,39 @@ void itoa64_Writer_InsituStringStream() {
 	OUTPUT_LENGTH(length);
 };
 
-TEST_F(Misc, itoa_Writer1_Verify) {
-	itoa_Writer_Verify<Writer1<rapidjson::StringBuffer> >();
-}
+TEST_F(Misc, itoa_Writer1_StringBufferVerify) { itoa_Writer_StringBufferVerify<Writer1<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa_Writer2_StringBufferVerify) { itoa_Writer_StringBufferVerify<Writer2<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa_Writer3_StringBufferVerify) { itoa_Writer_StringBufferVerify<Writer3<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa_Writer4_StringBufferVerify) { itoa_Writer_StringBufferVerify<Writer4<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa_Writer1_InsituStringStreamVerify) { itoa_Writer_InsituStringStreamVerify<Writer1<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa_Writer2_InsituStringStreamVerify) { itoa_Writer_InsituStringStreamVerify<Writer2<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa_Writer3_InsituStringStreamVerify) { itoa_Writer_InsituStringStreamVerify<Writer3<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa_Writer4_InsituStringStreamVerify) { itoa_Writer_InsituStringStreamVerify<Writer4<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa_Writer1_StringBuffer) { itoa_Writer_StringBuffer<Writer1<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa_Writer2_StringBuffer) { itoa_Writer_StringBuffer<Writer2<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa_Writer3_StringBuffer) { itoa_Writer_StringBuffer<Writer3<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa_Writer4_StringBuffer) { itoa_Writer_StringBuffer<Writer4<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa_Writer1_InsituStringStream) { itoa_Writer_InsituStringStream<Writer1<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa_Writer2_InsituStringStream) { itoa_Writer_InsituStringStream<Writer2<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa_Writer3_InsituStringStream) { itoa_Writer_InsituStringStream<Writer3<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa_Writer4_InsituStringStream) { itoa_Writer_InsituStringStream<Writer4<rapidjson::InsituStringStream> >(); }
 
-TEST_F(Misc, itoa_Writer2_Verify) {
-	itoa_Writer_Verify<Writer1<rapidjson::StringBuffer> >();
-}
-
-TEST_F(Misc, itoa_Writer1_StringBuffer) {
-	itoa_Writer_StringBuffer<Writer1<rapidjson::StringBuffer> >();
-}
-
-TEST_F(Misc, itoa_Writer1_InsituStringStream) {
-	itoa_Writer_InsituStringStream<Writer1<rapidjson::InsituStringStream> >();
-}
-
-TEST_F(Misc, itoa_Writer2_StringBuffer) {
-	itoa_Writer_StringBuffer<Writer2<rapidjson::StringBuffer> >();
-}
-
-TEST_F(Misc, itoa_Writer2_InsituStringStream) {
-	itoa_Writer_InsituStringStream<Writer2<rapidjson::InsituStringStream> >();
-}
-
-TEST_F(Misc, itoa64_Writer1_Verify) {
-	itoa64_Writer_Verify<Writer1<rapidjson::StringBuffer> >();
-}
-
-TEST_F(Misc, itoa64_Writer2_Verify) {
-	itoa64_Writer_Verify<Writer1<rapidjson::StringBuffer> >();
-}
-
-TEST_F(Misc, itoa64_Writer1_StringBuffer) {
-	itoa64_Writer_StringBuffer<Writer1<rapidjson::StringBuffer> >();
-}
-
-TEST_F(Misc, itoa64_Writer1_InsituStringStream) {
-	itoa64_Writer_InsituStringStream<Writer1<rapidjson::InsituStringStream> >();
-}
-
-TEST_F(Misc, itoa64_Writer2_StringBuffer) {
-	itoa64_Writer_StringBuffer<Writer2<rapidjson::StringBuffer> >();
-}
-
-TEST_F(Misc, itoa64_Writer2_InsituStringStream) {
-	itoa64_Writer_InsituStringStream<Writer2<rapidjson::InsituStringStream> >();
-}
+TEST_F(Misc, itoa64_Writer1_StringBufferVerify) { itoa64_Writer_StringBufferVerify<Writer1<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa64_Writer2_StringBufferVerify) { itoa64_Writer_StringBufferVerify<Writer2<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa64_Writer3_StringBufferVerify) { itoa64_Writer_StringBufferVerify<Writer3<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa64_Writer4_StringBufferVerify) { itoa64_Writer_StringBufferVerify<Writer4<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa64_Writer1_InsituStringStreamVerify) { itoa64_Writer_InsituStringStreamVerify<Writer1<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa64_Writer2_InsituStringStreamVerify) { itoa64_Writer_InsituStringStreamVerify<Writer2<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa64_Writer3_InsituStringStreamVerify) { itoa64_Writer_InsituStringStreamVerify<Writer3<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa64_Writer4_InsituStringStreamVerify) { itoa64_Writer_InsituStringStreamVerify<Writer4<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa64_Writer1_StringBuffer) { itoa64_Writer_StringBuffer<Writer1<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa64_Writer2_StringBuffer) { itoa64_Writer_StringBuffer<Writer2<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa64_Writer3_StringBuffer) { itoa64_Writer_StringBuffer<Writer3<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa64_Writer4_StringBuffer) { itoa64_Writer_StringBuffer<Writer4<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa64_Writer1_InsituStringStream) { itoa64_Writer_InsituStringStream<Writer1<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa64_Writer2_InsituStringStream) { itoa64_Writer_InsituStringStream<Writer2<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa64_Writer3_InsituStringStream) { itoa64_Writer_InsituStringStream<Writer3<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa64_Writer4_InsituStringStream) { itoa64_Writer_InsituStringStream<Writer4<rapidjson::InsituStringStream> >(); }
 
 TEST_F(Misc, itoa_sprintf) {
 	size_t length = 0;
@@ -498,7 +939,8 @@ TEST_F(Misc, itoa64_sprintf) {
 	for (int i = 0; i < kItoaTrialCount; i++) {
 		for (int j = 0; j < randvalCount; j++) {
 			char buffer[32];
-			length += sprintf(buffer, "%" PRIi64, randval[j] * randval[j]);
+			int64_t x = randval[j] * randval[j];
+			length += sprintf(buffer, "%" PRIi64, x);
 		}
 	}
 	OUTPUT_LENGTH(length);

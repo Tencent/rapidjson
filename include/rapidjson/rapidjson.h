@@ -362,6 +362,7 @@ struct GenericInsituStringStream {
 	// Write
 	Ch* PutBegin() { return dst_ = src_; }
 	void Put(Ch c) { RAPIDJSON_ASSERT(dst_ != 0); *dst_++ = c; }
+	Ch* Allocate(size_t count) { Ch* begin = dst_; dst_ += count; return begin; }
 	void Flush() {}
 	size_t PutEnd(Ch* begin) { return static_cast<size_t>(dst_ - begin); }
 
