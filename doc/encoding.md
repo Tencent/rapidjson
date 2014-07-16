@@ -130,8 +130,17 @@ const char* s = "..."; // UTF-8 string
 StringStream source(s);
 GenericStringBuffer<UTF16<> > target;
 
-Transcoder::Transcode<UTF8<>, UTF16<> >(source, target)
-const wchar_t* t = target.GetString();
+bool hasError = false;
+while (source.Peak() != '\0')
+    if (!Transcoder::Transcode<UTF8<>, UTF16<> >(source, target)) {
+        hasError = true;
+        break;
+    }
+
+if (!hasError) {
+    const wchar_t* t = target.GetString();
+    // ...
+}
 ~~~~~~~~~~
 
 You may also use `AutoUTF` and the associated streams for setting source/target encoding in runtime.
