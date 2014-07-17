@@ -80,7 +80,7 @@ static bool IsUTF8(unsigned char* s) {
 }
 
 TEST_F(Misc, Hoehrmann_IsUTF8) {
-	for (int i = 0; i < kTrialCount; i++) {
+	for (size_t i = 0; i < kTrialCount; i++) {
 		EXPECT_TRUE(IsUTF8((unsigned char*)json_));
 	}
 }
@@ -135,10 +135,15 @@ inline unsigned CountDecimalDigit_fast(unsigned n) {
 		1000000000
 	};
 
+#if defined(_M_IX86) || defined(_M_X64)
 	unsigned long i = 0;
-	//	uint32_t t = (32 - __builtin_clz(n | 1)) * 1233 >> 12;
 	_BitScanReverse(&i, n | 1);
 	uint32_t t = (i + 1) * 1233 >> 12;
+#elif defined(__GNUC__)
+	uint32_t t = (32 - __builtin_clz(n | 1)) * 1233 >> 12;
+#else
+#error
+#endif
 	return t - (n < powers_of_10[t]) + 1;
 }
 
@@ -166,22 +171,24 @@ inline unsigned CountDecimalDigit64_fast(uint64_t n) {
 		10000000000000000000U
 	};
 
-	unsigned long i = 0;
-	//	uint32_t t = (32 - __builtin_clz(n | 1)) * 1233 >> 12;
-
-#if _M_IX86
+#if defined(_M_IX86)
 	uint64_t m = n | 1;
+	unsigned long i = 0;
 	if (_BitScanReverse(&i, m >> 32))
 		i += 32;
 	else
 		_BitScanReverse(&i, m & 0xFFFFFFFF);
-#elif _M_X64
+	uint32_t t = (i + 1) * 1233 >> 12;
+#elif defined(_M_X64)
+	unsigned long i = 0;
 	_BitScanReverse64(&i, n | 1);
+	uint32_t t = (i + 1) * 1233 >> 12;
+#elif defined(__GNUC__)
+	uint32_t t = (64 - __builtin_clzll(n | 1)) * 1233 >> 12;
 #else
 #error
 #endif
 
-	uint32_t t = (i + 1) * 1233 >> 12;
 	return t - (n < powers_of_10[t]) + 1;
 }
 
@@ -223,7 +230,7 @@ TEST_F(Misc, CountDecimalDigit_fast) {
 TEST_F(Misc, CountDecimalDigit64_VerifyFast) {
 	uint64_t i = 1, j;
 	do {
-		printf("%" PRIu64 "\n", i);
+		//printf("%" PRIu64 "\n", i);
 		ASSERT_EQ(CountDecimalDigit64_enroll4(i), CountDecimalDigit64_fast(i));
 		j = i;
 		i *= 3;
@@ -350,8 +357,8 @@ static const char digits[201] =
 "8081828384858687888990919293949596979899";
 
 // Prevent code being optimized out
-#define OUTPUT_LENGTH(length) printf("", length)
-//#define OUTPUT_LENGTH(length) printf("%d\n", length)
+//#define OUTPUT_LENGTH(length) printf("", length)
+#define OUTPUT_LENGTH(length) printf("%d\n", length)
 
 template<typename OutputStream>
 class Writer1 {
@@ -794,8 +801,8 @@ void itoa_Writer_StringBuffer() {
 	rapidjson::StringBuffer sb;
 	Writer writer(sb);
 
-	for (int i = 0; i < kItoaTrialCount; i++) {
-		for (int j = 0; j < randvalCount; j++) {
+	for (size_t i = 0; i < kItoaTrialCount; i++) {
+		for (size_t j = 0; j < randvalCount; j++) {
 			writer.WriteInt(randval[j]);
 			length += sb.GetSize();
 			sb.Clear();
@@ -810,8 +817,8 @@ void itoa_Writer_InsituStringStream() {
 
 	char buffer[32];
 	Writer writer;
-	for (int i = 0; i < kItoaTrialCount; i++) {
-		for (int j = 0; j < randvalCount; j++) {
+	for (size_t i = 0; i < kItoaTrialCount; i++) {
+		for (size_t j = 0; j < randvalCount; j++) {
 			rapidjson::InsituStringStream ss(buffer);
 			writer.Reset(ss);
 			char* begin = ss.PutBegin();
@@ -826,7 +833,7 @@ template <typename Writer>
 void itoa64_Writer_StringBufferVerify() {
 	rapidjson::StringBuffer sb;
 	Writer writer(sb);
-	for (int j = 0; j < randvalCount; j++) {
+	for (size_t j = 0; j < randvalCount; j++) {
 		char buffer[32];
 		int64_t x = randval[j] * randval[j];
 		sprintf(buffer, "%" PRIi64, x);
@@ -839,7 +846,7 @@ void itoa64_Writer_StringBufferVerify() {
 template <typename Writer>
 void itoa64_Writer_InsituStringStreamVerify() {
 	Writer writer;
-	for (int j = 0; j < randvalCount; j++) {
+	for (size_t j = 0; j < randvalCount; j++) {
 		char buffer[32];
 		int64_t x = randval[j] * randval[j];
 		sprintf(buffer, "%" PRIi64, x);
@@ -861,8 +868,8 @@ void itoa64_Writer_StringBuffer() {
 	rapidjson::StringBuffer sb;
 	Writer writer(sb);
 
-	for (int i = 0; i < kItoaTrialCount; i++) {
-		for (int j = 0; j < randvalCount; j++) {
+	for (size_t i = 0; i < kItoaTrialCount; i++) {
+		for (size_t j = 0; j < randvalCount; j++) {
 			writer.WriteInt64(randval[j] * randval[j]);
 			length += sb.GetSize();
 			sb.Clear();
@@ -877,8 +884,8 @@ void itoa64_Writer_InsituStringStream() {
 
 	char buffer[32];
 	Writer writer;
-	for (int i = 0; i < kItoaTrialCount; i++) {
-		for (int j = 0; j < randvalCount; j++) {
+	for (size_t i = 0; i < kItoaTrialCount; i++) {
+		for (size_t j = 0; j < randvalCount; j++) {
 			rapidjson::InsituStringStream ss(buffer);
 			writer.Reset(ss);
 			char* begin = ss.PutBegin();
@@ -925,8 +932,8 @@ TEST_F(Misc, itoa64_Writer4_InsituStringStream) { itoa64_Writer_InsituStringStre
 
 TEST_F(Misc, itoa_sprintf) {
 	size_t length = 0;
-	for (int i = 0; i < kItoaTrialCount; i++) {
-		for (int j = 0; j < randvalCount; j++) {
+	for (size_t i = 0; i < kItoaTrialCount; i++) {
+		for (size_t j = 0; j < randvalCount; j++) {
 			char buffer[32];
 			length += sprintf(buffer, "%d", randval[j]);
 		}
@@ -936,8 +943,8 @@ TEST_F(Misc, itoa_sprintf) {
 
 TEST_F(Misc, itoa64_sprintf) {
 	size_t length = 0;
-	for (int i = 0; i < kItoaTrialCount; i++) {
-		for (int j = 0; j < randvalCount; j++) {
+	for (size_t i = 0; i < kItoaTrialCount; i++) {
+		for (size_t j = 0; j < randvalCount; j++) {
 			char buffer[32];
 			int64_t x = randval[j] * randval[j];
 			length += sprintf(buffer, "%" PRIi64, x);
@@ -950,8 +957,8 @@ TEST_F(Misc, itoa_strtk) {
 	size_t length = 0;
 	std::string s;
 	s.reserve(32);
-	for (int i = 0; i < kItoaTrialCount; i++) {
-		for (int j = 0; j < randvalCount; j++) {
+	for (size_t i = 0; i < kItoaTrialCount; i++) {
+		for (size_t j = 0; j < randvalCount; j++) {
 			s = strtk::type_to_string(randval[j]);
 			length += s.size();
 		}
@@ -963,8 +970,8 @@ TEST_F(Misc, itoa64_strtk) {
 	size_t length = 0;
 	std::string s;
 	s.reserve(32);
-	for (int i = 0; i < kItoaTrialCount; i++) {
-		for (int j = 0; j < randvalCount; j++) {
+	for (size_t i = 0; i < kItoaTrialCount; i++) {
+		for (size_t j = 0; j < randvalCount; j++) {
 			int64_t x = randval[j] * randval[j];
 			s = strtk::type_to_string(x);
 			length += s.size();
@@ -976,8 +983,8 @@ TEST_F(Misc, itoa64_strtk) {
 TEST_F(Misc, itoa_cppformat) {
 	size_t length = 0;
 	char buffer[32];
-	for (int i = 0; i < kItoaTrialCount; i++) {
-		for (int j = 0; j < randvalCount; j++) {
+	for (size_t i = 0; i < kItoaTrialCount; i++) {
+		for (size_t j = 0; j < randvalCount; j++) {
 			char* p = buffer;
 			fmt::FormatDec(p, randval[j]);
 			length += (p - buffer);
@@ -989,8 +996,8 @@ TEST_F(Misc, itoa_cppformat) {
 TEST_F(Misc, itoa64_cppformat) {
 	size_t length = 0;
 	char buffer[32];
-	for (int i = 0; i < kItoaTrialCount; i++) {
-		for (int j = 0; j < randvalCount; j++) {
+	for (size_t i = 0; i < kItoaTrialCount; i++) {
+		for (size_t j = 0; j < randvalCount; j++) {
 			char* p = buffer;
 			int64_t x = randval[j] * randval[j];
 			fmt::FormatDec(p, x);
