@@ -277,7 +277,7 @@ public:
 		\param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
 		\param stackCapacity stack capacity in bytes for storing a single decoded string.  (Only use for non-destructive parsing)
 	*/
-	GenericReader(size_t limit = 0, Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), kStackSizeLimit(limit), parseResult_() {}
+	GenericReader(size_t limit = 0, Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), kStackSizeLimit_(limit), parseResult_() {}
 
 	//! Parse JSON text.
 	/*! \tparam parseFlags Combination of \ref ParseFlag.
@@ -1225,12 +1225,12 @@ private:
 	}
 
 	bool CheckStackSpaceQuota(size_t size) const {
-		return kStackSizeLimit == 0 || (stack_.GetSize() + size <= kStackSizeLimit);
+		return kStackSizeLimit_ == 0 || (stack_.GetSize() + size <= kStackSizeLimit_);
 	}
 
 	static const size_t kDefaultStackCapacity = 256;	//!< Default stack capacity in bytes for storing a single decoded string.
-	const size_t kStackSizeLimit; //!< Stack size limit(in bytes). A value of 0 means no limit.
 	internal::Stack<Allocator> stack_;	//!< A stack for storing decoded string temporarily during non-destructive parsing.
+	const size_t kStackSizeLimit_; //!< Stack size limit(in bytes). A value of 0 means no limit.
 	ParseResult parseResult_;
 }; // class GenericReader
 
