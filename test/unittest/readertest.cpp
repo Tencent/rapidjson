@@ -892,7 +892,7 @@ TEST(Reader, IterativeParsing_ShortCircuit) {
 
 		EXPECT_TRUE(reader.HasParseError());
 		EXPECT_EQ(kParseErrorTermination, r.Code());
-		EXPECT_EQ(4, r.Offset());
+		EXPECT_EQ(4u, r.Offset());
 	}
 
 	{
@@ -904,7 +904,7 @@ TEST(Reader, IterativeParsing_ShortCircuit) {
 
 		EXPECT_TRUE(reader.HasParseError());
 		EXPECT_EQ(kParseErrorTermination, r.Code());
-		EXPECT_EQ(6, r.Offset());
+		EXPECT_EQ(6u, r.Offset());
 	}
 
 	{
@@ -916,7 +916,7 @@ TEST(Reader, IterativeParsing_ShortCircuit) {
 
 		EXPECT_TRUE(reader.HasParseError());
 		EXPECT_EQ(kParseErrorTermination, r.Code());
-		EXPECT_EQ(5, r.Offset());
+		EXPECT_EQ(5u, r.Offset());
 	}
 
 	{
@@ -928,7 +928,7 @@ TEST(Reader, IterativeParsing_ShortCircuit) {
 
 		EXPECT_TRUE(reader.HasParseError());
 		EXPECT_EQ(kParseErrorTermination, r.Code());
-		EXPECT_EQ(7, r.Offset());
+		EXPECT_EQ(7u, r.Offset());
 	}
 }
 
@@ -941,7 +941,7 @@ TEST(Reader, IterativeParsing_LimitStackSize) {
 
 	EXPECT_TRUE(reader.HasParseError());
 	EXPECT_EQ(kParseErrorStackSizeLimitExceeded, r.Code());
-	EXPECT_EQ(2, r.Offset());
+	EXPECT_EQ(2u, r.Offset());
 }
 
 #ifdef __GNUC__
