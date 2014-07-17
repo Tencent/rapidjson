@@ -422,7 +422,7 @@ private:
 };
 
 template<>
-inline bool Writer1<rapidjson::StringBuffer>::WriteUint(unsigned u) {
+bool Writer1<rapidjson::StringBuffer>::WriteUint(unsigned u) {
 	char buffer[10];
 	char* p = buffer;
 	do {
@@ -952,6 +952,32 @@ TEST_F(Misc, itoa64_sprintf) {
 	}
 	OUTPUT_LENGTH(length);
 }
+
+#ifdef _MSC_VER
+TEST_F(Misc, itoa_VC) {
+	size_t length = 0;
+	for (size_t i = 0; i < kItoaTrialCount; i++) {
+		for (size_t j = 0; j < randvalCount; j++) {
+			char buffer[32];
+			_itoa(randval[j], buffer, 10);
+			length += strlen(buffer);
+		}
+	}
+	OUTPUT_LENGTH(length);
+}
+
+TEST_F(Misc, itoa64_VC) {
+	size_t length = 0;
+	for (size_t i = 0; i < kItoaTrialCount; i++) {
+		for (size_t j = 0; j < randvalCount; j++) {
+			char buffer[32];
+			_i64toa(randval[j] * randval[j], buffer, 10);
+			length += strlen(buffer);
+		}
+	}
+	OUTPUT_LENGTH(length);
+}
+#endif
 
 TEST_F(Misc, itoa_strtk) {
 	size_t length = 0;
