@@ -721,17 +721,17 @@ TEST(Reader, Parse_IStreamWrapper_StringStream) {
 }
 
 TEST(Reader, IterativeParsing_ErrorHandling) {
-	TESTERRORHANDLING("{\"a\": a}", kParseErrorValueInvalid, 6);
+	TESTERRORHANDLING("{\"a\": a}", kParseErrorValueInvalid, 6u);
 
-	TESTERRORHANDLING("", kParseErrorDocumentEmpty, 0);
-	TESTERRORHANDLING("1", kParseErrorDocumentRootNotObjectOrArray, 0);
-	TESTERRORHANDLING("{}{}", kParseErrorDocumentRootNotSingular, 2);
+	TESTERRORHANDLING("", kParseErrorDocumentEmpty, 0u);
+	TESTERRORHANDLING("1", kParseErrorDocumentRootNotObjectOrArray, 0u);
+	TESTERRORHANDLING("{}{}", kParseErrorDocumentRootNotSingular, 2u);
 
-	TESTERRORHANDLING("{1}", kParseErrorObjectMissName, 1);
-	TESTERRORHANDLING("{\"a\", 1}", kParseErrorObjectMissColon, 4);
-	TESTERRORHANDLING("{\"a\"}", kParseErrorObjectMissColon, 4);
-	TESTERRORHANDLING("{\"a\": 1", kParseErrorObjectMissCommaOrCurlyBracket, 7);
-	TESTERRORHANDLING("[1 2 3]", kParseErrorArrayMissCommaOrSquareBracket, 3);
+	TESTERRORHANDLING("{1}", kParseErrorObjectMissName, 1u);
+	TESTERRORHANDLING("{\"a\", 1}", kParseErrorObjectMissColon, 4u);
+	TESTERRORHANDLING("{\"a\"}", kParseErrorObjectMissColon, 4u);
+	TESTERRORHANDLING("{\"a\": 1", kParseErrorObjectMissCommaOrCurlyBracket, 7u);
+	TESTERRORHANDLING("[1 2 3]", kParseErrorArrayMissCommaOrSquareBracket, 3u);
 }
 
 template<typename Encoding = UTF8<> >
@@ -801,6 +801,7 @@ TEST(Reader, IterativeParsing_General) {
 
 		ParseResult r = reader.IterativeParse<kParseIterativeFlag>(is, handler);
 
+		EXPECT_FALSE(r.IsError());
 		EXPECT_FALSE(reader.HasParseError());
 
 		int e[] = {
@@ -837,6 +838,7 @@ TEST(Reader, IterativeParsing_Count) {
 
 		ParseResult r = reader.IterativeParse<kParseIterativeFlag>(is, handler);
 
+		EXPECT_FALSE(r.IsError());
 		EXPECT_FALSE(reader.HasParseError());
 
 		int e[] = {
