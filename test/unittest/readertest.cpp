@@ -651,7 +651,7 @@ struct StreamTraits<CustomStringStream<Encoding> > {
 	enum { copyOptimization = 1 };
 };
 
-} // namespace rapdijson
+} // namespace rapidjson
 #endif 
 
 TEST(Reader, CustomStringStream) {
@@ -705,6 +705,243 @@ TEST(Reader, Parse_IStreamWrapper_StringStream) {
 	ParseArrayHandler<4> h;
 	reader.ParseArray<0>(is, h);
 	EXPECT_FALSE(reader.HasParseError());	
+}
+
+// Test iterative parsing.
+
+#define TESTERRORHANDLING(text, errorCode, offset)\
+{\
+	StringStream json(text); \
+	BaseReaderHandler<> handler; \
+	Reader reader; \
+	reader.IterativeParse<kParseDefaultFlags>(json, handler); \
+	EXPECT_TRUE(reader.HasParseError()); \
+	EXPECT_EQ(errorCode, reader.GetParseErrorCode()); \
+	EXPECT_EQ(offset, reader.GetErrorOffset()); \
+}
+
+TEST(Reader, IterativeParsing_ErrorHandling) {
+	TESTERRORHANDLING("{\"a\": a}", kParseErrorValueInvalid, 6u);
+
+	TESTERRORHANDLING("", kParseErrorDocumentEmpty, 0u);
+	TESTERRORHANDLING("1", kParseErrorDocumentRootNotObjectOrArray, 0u);
+	TESTERRORHANDLING("{}{}", kParseErrorDocumentRootNotSingular, 2u);
+
+	TESTERRORHANDLING("{1}", kParseErrorObjectMissName, 1u);
+	TESTERRORHANDLING("{\"a\", 1}", kParseErrorObjectMissColon, 4u);
+	TESTERRORHANDLING("{\"a\"}", kParseErrorObjectMissColon, 4u);
+	TESTERRORHANDLING("{\"a\": 1", kParseErrorObjectMissCommaOrCurlyBracket, 7u);
+	TESTERRORHANDLING("[1 2 3]", kParseErrorArrayMissCommaOrSquareBracket, 3u);
+}
+
+template<typename Encoding = UTF8<> >
+struct IterativeParsingReaderHandler {
+	typedef typename Encoding::Ch Ch;
+
+	const static int LOG_NULL = -1;
+	const static int LOG_BOOL = -2;
+	const static int LOG_INT = -3;
+	const static int LOG_UINT = -4;
+	const static int LOG_INT64 = -5;
+	const static int LOG_UINT64 = -6;
+	const static int LOG_DOUBLE = -7;
+	const static int LOG_STRING = -8;
+	const static int LOG_STARTOBJECT = -9;
+	const static int LOG_ENDOBJECT = -10;
+	const static int LOG_STARTARRAY = -11;
+	const static int LOG_ENDARRAY = -12;
+
+	const static size_t LogCapacity = 256;
+	int Logs[LogCapacity];
+	size_t LogCount;
+
+	IterativeParsingReaderHandler() : LogCount(0) {
+	}
+
+	bool Null() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_NULL; return true; }
+
+	bool Bool(bool) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_BOOL; return true; }
+
+	bool Int(int) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_INT; return true; }
+
+	bool Uint(unsigned) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_INT; return true; }
+
+	bool Int64(int64_t) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_INT64; return true; }
+
+	bool Uint64(uint64_t) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_UINT64; return true; }
+
+	bool Double(double) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_DOUBLE; return true; }
+
+	bool String(const Ch*, SizeType, bool) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STRING; return true; }
+
+	bool StartObject() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STARTOBJECT; return true; }
+
+	bool EndObject(SizeType c) {
+		RAPIDJSON_ASSERT(LogCount < LogCapacity);
+		Logs[LogCount++] = LOG_ENDOBJECT;
+		Logs[LogCount++] = (int)c;
+		return true;
+	}
+
+	bool StartArray() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STARTARRAY; return true; }
+
+	bool EndArray(SizeType c) {
+		RAPIDJSON_ASSERT(LogCount < LogCapacity);
+		Logs[LogCount++] = LOG_ENDARRAY;
+		Logs[LogCount++] = (int)c;
+		return true;
+	}
+};
+
+TEST(Reader, IterativeParsing_General) {
+	{
+		StringStream is("[1, {\"k\": [1, 2]}, null, false, true, \"string\", 1.2]");
+		Reader reader;
+		IterativeParsingReaderHandler<> handler;
+
+		ParseResult r = reader.IterativeParse<kParseIterativeFlag>(is, handler);
+
+		EXPECT_FALSE(r.IsError());
+		EXPECT_FALSE(reader.HasParseError());
+
+		int e[] = {
+			handler.LOG_STARTARRAY,
+			handler.LOG_INT,
+			handler.LOG_STARTOBJECT,
+			handler.LOG_STRING,
+			handler.LOG_STARTARRAY,
+			handler.LOG_INT,
+			handler.LOG_INT,
+			handler.LOG_ENDARRAY, 2,
+			handler.LOG_ENDOBJECT, 1,
+			handler.LOG_NULL,
+			handler.LOG_BOOL,
+			handler.LOG_BOOL,
+			handler.LOG_STRING,
+			handler.LOG_DOUBLE,
+			handler.LOG_ENDARRAY, 7
+		};
+
+		EXPECT_EQ(sizeof(e) / sizeof(int), handler.LogCount);
+
+		for (size_t i = 0; i < handler.LogCount; ++i) {
+			EXPECT_EQ(e[i], handler.Logs[i]) << "i = " << i;
+		}
+	}
+}
+
+TEST(Reader, IterativeParsing_Count) {
+	{
+		StringStream is("[{}, {\"k\": 1}, [1], []]");
+		Reader reader;
+		IterativeParsingReaderHandler<> handler;
+
+		ParseResult r = reader.IterativeParse<kParseIterativeFlag>(is, handler);
+
+		EXPECT_FALSE(r.IsError());
+		EXPECT_FALSE(reader.HasParseError());
+
+		int e[] = {
+			handler.LOG_STARTARRAY,
+			handler.LOG_STARTOBJECT,
+			handler.LOG_ENDOBJECT, 0,
+			handler.LOG_STARTOBJECT,
+			handler.LOG_STRING,
+			handler.LOG_INT,
+			handler.LOG_ENDOBJECT, 1,
+			handler.LOG_STARTARRAY,
+			handler.LOG_INT,
+			handler.LOG_ENDARRAY, 1,
+			handler.LOG_STARTARRAY,
+			handler.LOG_ENDARRAY, 0,
+			handler.LOG_ENDARRAY, 4
+		};
+
+		EXPECT_EQ(sizeof(e) / sizeof(int), handler.LogCount);
+
+		for (size_t i = 0; i < handler.LogCount; ++i) {
+			EXPECT_EQ(e[i], handler.Logs[i]) << "i = " << i;
+		}
+	}
+}
+
+// Test iterative parsing on kParseErrorTermination.
+struct HandlerTerminateAtStartObject : public IterativeParsingReaderHandler<> {
+	bool StartObject() { return false; }
+};
+
+struct HandlerTerminateAtStartArray : public IterativeParsingReaderHandler<> {
+	bool StartArray() { return false; }
+};
+
+struct HandlerTerminateAtEndObject : public IterativeParsingReaderHandler<> {
+	bool EndObject(SizeType) { return false; }
+};
+
+struct HandlerTerminateAtEndArray : public IterativeParsingReaderHandler<> {
+	bool EndArray(SizeType) { return false; }
+};
+
+TEST(Reader, IterativeParsing_ShortCircuit) {
+	{
+		HandlerTerminateAtStartObject handler;
+		Reader reader;
+		StringStream is("[1, {}]");
+
+		ParseResult r = reader.Parse<kParseIterativeFlag>(is, handler);
+
+		EXPECT_TRUE(reader.HasParseError());
+		EXPECT_EQ(kParseErrorTermination, r.Code());
+		EXPECT_EQ(4u, r.Offset());
+	}
+
+	{
+		HandlerTerminateAtStartArray handler;
+		Reader reader;
+		StringStream is("{\"a\": []}");
+
+		ParseResult r = reader.Parse<kParseIterativeFlag>(is, handler);
+
+		EXPECT_TRUE(reader.HasParseError());
+		EXPECT_EQ(kParseErrorTermination, r.Code());
+		EXPECT_EQ(6u, r.Offset());
+	}
+
+	{
+		HandlerTerminateAtEndObject handler;
+		Reader reader;
+		StringStream is("[1, {}]");
+
+		ParseResult r = reader.Parse<kParseIterativeFlag>(is, handler);
+
+		EXPECT_TRUE(reader.HasParseError());
+		EXPECT_EQ(kParseErrorTermination, r.Code());
+		EXPECT_EQ(5u, r.Offset());
+	}
+
+	{
+		HandlerTerminateAtEndArray handler;
+		Reader reader;
+		StringStream is("{\"a\": []}");
+
+		ParseResult r = reader.Parse<kParseIterativeFlag>(is, handler);
+
+		EXPECT_TRUE(reader.HasParseError());
+		EXPECT_EQ(kParseErrorTermination, r.Code());
+		EXPECT_EQ(7u, r.Offset());
+	}
+}
+
+TEST(Reader, IterativeParsing_LimitStackSize) {
+	BaseReaderHandler<> handler;
+	Reader reader(20);
+	StringStream is("[[[]]]");
+
+	ParseResult r = reader.Parse<kParseIterativeFlag>(is, handler);
+
+	EXPECT_TRUE(reader.HasParseError());
+	EXPECT_EQ(kParseErrorStackSizeLimitExceeded, r.Code());
+	EXPECT_EQ(2u, r.Offset());
 }
 
 #ifdef __GNUC__

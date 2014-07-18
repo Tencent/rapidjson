@@ -58,7 +58,9 @@ enum ParseErrorCode {
 	kParseErrorNumberMissFraction,				//!< Miss fraction part in number.
 	kParseErrorNumberMissExponent,				//!< Miss exponent in number.
 
-	kParseErrorTermination						//!< Parsing was terminated.
+	kParseErrorTermination,						//!< Parsing was terminated.
+	kParseErrorUnspecificSyntaxError,			//!< Unspecific syntax error.
+	kParseErrorStackSizeLimitExceeded			//!< Parsing stack size limit is exceeded.
 };
 
 //! Result of parsing (wraps ParseErrorCode)
