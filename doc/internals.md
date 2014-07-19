@@ -112,10 +112,16 @@ while generating a production could work.
 In RapidJSON, several modifications(or adaptations to current design) are made to a direct implementation.
 
 First, the parsing table is encoded in a state machine in RapidJSON.
-Extra states are added for productions involved with `array` and `object`.
+States are constructed by the head and body of production.
+State transitions are constructed by production rules.
+Besides, extra states are added for productions involved with `array` and `object`.
 In this way the generation of array values or object members would be a single state transition,
 rather than several pop/push operations in the direct implementation.
 This also makes the estimation of stack size more easier.
+
+The final states diagram is shown below:
+
+![States Diagram](diagram/iterative-parser-states-diagram.png)
 
 Second, the iterative parser also keeps track of array's value count and object's member count
 in its internal stack, which may be different from a conventional implementation.

@@ -1,0 +1,37 @@
+digraph {
+    splines=true;
+    node [shape = doublecircle]; Start; Finish;
+    node [shape = circle];
+
+    Start -> ArrayInitial [label="["];
+    Start -> ObjectInitial [label="{"];
+
+    ObjectInitial -> ObjectFinish [label="}"];
+    ObjectInitial -> MemberKey [label="string"];
+
+    MemberKey -> KeyValueDelimiter [label=":"];
+
+    KeyValueDelimiter -> ArrayInitial [label="[ (push MemberValue)"];
+    KeyValueDelimiter -> ObjectInitial [label="{ (push MemberValue)"];
+    KeyValueDelimiter -> MemberValue [label="string|false|true|null|number"];
+
+    MemberValue -> ObjectFinish [label="}"];
+    MemberValue -> MemberDelimiter [label=","];
+
+    MemberDelimiter -> MemberKey [label="string"];
+
+    ArrayInitial -> ArrayInitial [label="[ (push Element)"];
+    ArrayInitial -> ArrayFinish [label="]"];
+    ArrayInitial -> ObjectInitial [label="{ (push Element)"];
+    ArrayInitial -> Element [label="string|flase|true|null|number"];
+
+    Element -> ArrayFinish [label="]"];
+    Element -> ElementDelimiter [label=","];
+
+    ElementDelimiter -> ArrayInitial [label="[ (push Element)"];
+    ElementDelimiter -> ObjectInitial [label="{ (push Element)"];
+    ElementDelimiter -> Element [label="string|false|true|null|number"];
+
+    ArrayFinish -> Finish;
+    ObjectFinish -> Finish;
+}
