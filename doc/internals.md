@@ -121,7 +121,7 @@ This also makes the estimation of stack size more easier.
 
 The final states diagram is shown below:
 
-![States Diagram](diagram/iterative-parser-states-diagram.png)
+![States Diagram](diagram/iterative-parser-states-diagram.png =400px)
 
 Second, the iterative parser also keeps track of array's value count and object's member count
 in its internal stack, which may be different from a conventional implementation.
