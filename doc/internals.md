@@ -2,32 +2,34 @@
 
 This section records some design and implementation details.
 
-# Value
+[TOC]
 
-## Data Layout
+# Value {#Value}
 
-## Flags
+## Data Layout {#DataLayout}
 
-# Allocator
+## Flags {#Flags}
 
-## MemoryPoolAllocator
+# Allocator {#Allocator}
 
-# Parsing Optimization
+## MemoryPoolAllocator {#MemoryPoolAllocator}
 
-## Skip Whitespace with SIMD
+# Parsing Optimization {#ParsingOptimization}
 
-## Pow10()
+## Skip Whitespace with SIMD {#SkipwhitespaceWithSIMD}
 
-## Local Stream Copy
+## Pow10() {#Pow10}
 
-# Parser
+## Local Stream Copy {#LocalStreamCopy}
 
-## Iterative Parser
+# Parser {#Parser}
+
+## Iterative Parser {#IterativeParser}
 
 The iterative parser is a recursive descent LL(1) parser
 implemented in a non-recursive manner.
 
-### Grammar
+### Grammar {#IterativeParserGrammar}
 
 The grammar used for this parser is based on strict JSON syntax:
 ~~~~~~~~~~
@@ -47,7 +49,7 @@ value -> STRING | NUMBER | NULL | BOOLEAN | object | array
 Note that left factoring is applied to non-terminals `values` and `members`
 to make the grammar be LL(1).
 
-### Parsing Table
+### Parsing Table {#IterativeParserParsingTable}
 
 Based on the grammar, we can construct the FIRST and FOLLOW set.
 
@@ -101,7 +103,7 @@ Finally the parsing table can be constructed from FIRST and FOLLOW set:
 
 There is a great [tool](http://hackingoff.com/compilers/predict-first-follow-set) for above grammar analysis.
 
-### Implementation
+### Implementation {#IterativeParserImplementation}
 
 Based on the parsing table, a direct(or conventional) implementation
 that pushes the production body in reverse order
