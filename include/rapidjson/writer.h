@@ -238,7 +238,7 @@ protected:
 	}
 
 	bool WriteUint64(uint64_t u64) {
-		char buffer[11];
+		char buffer[20];
 		const char* end = internal::u64toa(u64, buffer);
 		for (const char* p = buffer; p != end; ++p)
 			os_->Put(*p);
