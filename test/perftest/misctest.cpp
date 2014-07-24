@@ -29,6 +29,10 @@
 #pragma warning (pop)
 #endif
 
+#define protected public
+#include "rapidjson/writer.h"
+#undef private
+
 class Misc : public PerfTest {
 };
 
@@ -358,7 +362,7 @@ static const char digits[201] =
 
 // Prevent code being optimized out
 //#define OUTPUT_LENGTH(length) printf("", length)
-#define OUTPUT_LENGTH(length) printf("%d\n", length)
+#define OUTPUT_LENGTH(length) printf("%u\n", (unsigned)length)
 
 template<typename OutputStream>
 class Writer1 {
@@ -430,7 +434,7 @@ bool Writer1<rapidjson::StringBuffer>::WriteUint(unsigned u) {
 		u /= 10;
 	} while (u > 0);
 
-	char* d = os_->Allocate(p - buffer);
+	char* d = os_->Push(p - buffer);
 	do {
 		--p;
 		*d++ = *p;
@@ -597,28 +601,28 @@ private:
 template<>
 inline bool Writer3<rapidjson::StringBuffer>::WriteUint(unsigned u) {
 	unsigned digit = CountDecimalDigit_fast(u);
-	WriteUintReverse(os_->Allocate(digit) + digit, u);
+	WriteUintReverse(os_->Push(digit) + digit, u);
 	return true;
 }
 
 template<>
 inline bool Writer3<rapidjson::InsituStringStream>::WriteUint(unsigned u) {
 	unsigned digit = CountDecimalDigit_fast(u);
-	WriteUintReverse(os_->Allocate(digit) + digit, u);
+	WriteUintReverse(os_->Push(digit) + digit, u);
 	return true;
 }
 
 template<>
 inline bool Writer3<rapidjson::StringBuffer>::WriteUint64(uint64_t u) {
 	unsigned digit = CountDecimalDigit64_fast(u);
-	WriteUint64Reverse(os_->Allocate(digit) + digit, u);
+	WriteUint64Reverse(os_->Push(digit) + digit, u);
 	return true;
 }
 
 template<>
 inline bool Writer3<rapidjson::InsituStringStream>::WriteUint64(uint64_t u) {
 	unsigned digit = CountDecimalDigit64_fast(u);
-	WriteUint64Reverse(os_->Allocate(digit) + digit, u);
+	WriteUint64Reverse(os_->Push(digit) + digit, u);
 	return true;
 }
 
@@ -739,28 +743,28 @@ private:
 template<>
 inline bool Writer4<rapidjson::StringBuffer>::WriteUint(unsigned u) {
 	unsigned digit = CountDecimalDigit_fast(u);
-	WriteUintReverse(os_->Allocate(digit) + digit, u);
+	WriteUintReverse(os_->Push(digit) + digit, u);
 	return true;
 }
 
 template<>
 inline bool Writer4<rapidjson::InsituStringStream>::WriteUint(unsigned u) {
 	unsigned digit = CountDecimalDigit_fast(u);
-	WriteUintReverse(os_->Allocate(digit) + digit, u);
+	WriteUintReverse(os_->Push(digit) + digit, u);
 	return true;
 }
 
 template<>
 inline bool Writer4<rapidjson::StringBuffer>::WriteUint64(uint64_t u) {
 	unsigned digit = CountDecimalDigit64_fast(u);
-	WriteUint64Reverse(os_->Allocate(digit) + digit, u);
+	WriteUint64Reverse(os_->Push(digit) + digit, u);
 	return true;
 }
 
 template<>
 inline bool Writer4<rapidjson::InsituStringStream>::WriteUint64(uint64_t u) {
 	unsigned digit = CountDecimalDigit64_fast(u);
-	WriteUint64Reverse(os_->Allocate(digit) + digit, u);
+	WriteUint64Reverse(os_->Push(digit) + digit, u);
 	return true;
 }
 
@@ -896,35 +900,82 @@ void itoa64_Writer_InsituStringStream() {
 	OUTPUT_LENGTH(length);
 };
 
+// Full specialization for InsituStringStream to prevent memory copying 
+// (normally we will not use InsituStringStream for writing, just for testing)
+
+namespace rapidjson {
+
+template<>
+bool rapidjson::Writer<InsituStringStream>::WriteInt(int i) {
+	char *buffer = os_->Push(11);
+	const char* end = internal::i32toa(i, buffer);
+	os_->Pop(11 - (end - buffer));
+	return true;
+}
+
+template<>
+bool Writer<InsituStringStream>::WriteUint(unsigned u) {
+	char *buffer = os_->Push(10);
+	const char* end = internal::u32toa(u, buffer);
+	os_->Pop(10 - (end - buffer));
+	return true;
+}
+
+template<>
+bool Writer<InsituStringStream>::WriteInt64(int64_t i64) {
+	char *buffer = os_->Push(21);
+	const char* end = internal::i64toa(i64, buffer);
+	os_->Pop(21 - (end - buffer));
+	return true;
+}
+
+template<>
+bool Writer<InsituStringStream>::WriteUint64(uint64_t u) {
+	char *buffer = os_->Push(20);
+	const char* end = internal::u64toa(u, buffer);
+	os_->Pop(20 - (end - buffer));
+	return true;
+}
+
+} // namespace rapidjson
+
+TEST_F(Misc, itoa_Writer_StringBufferVerify) { itoa_Writer_StringBufferVerify<rapidjson::Writer<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa_Writer1_StringBufferVerify) { itoa_Writer_StringBufferVerify<Writer1<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa_Writer2_StringBufferVerify) { itoa_Writer_StringBufferVerify<Writer2<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa_Writer3_StringBufferVerify) { itoa_Writer_StringBufferVerify<Writer3<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa_Writer4_StringBufferVerify) { itoa_Writer_StringBufferVerify<Writer4<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa_Writer_InsituStringStreamVerify) { itoa_Writer_InsituStringStreamVerify<rapidjson::Writer<rapidjson::InsituStringStream> >(); }
 TEST_F(Misc, itoa_Writer1_InsituStringStreamVerify) { itoa_Writer_InsituStringStreamVerify<Writer1<rapidjson::InsituStringStream> >(); }
 TEST_F(Misc, itoa_Writer2_InsituStringStreamVerify) { itoa_Writer_InsituStringStreamVerify<Writer2<rapidjson::InsituStringStream> >(); }
 TEST_F(Misc, itoa_Writer3_InsituStringStreamVerify) { itoa_Writer_InsituStringStreamVerify<Writer3<rapidjson::InsituStringStream> >(); }
 TEST_F(Misc, itoa_Writer4_InsituStringStreamVerify) { itoa_Writer_InsituStringStreamVerify<Writer4<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa_Writer_StringBuffer) { itoa_Writer_StringBuffer<rapidjson::Writer<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa_Writer1_StringBuffer) { itoa_Writer_StringBuffer<Writer1<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa_Writer2_StringBuffer) { itoa_Writer_StringBuffer<Writer2<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa_Writer3_StringBuffer) { itoa_Writer_StringBuffer<Writer3<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa_Writer4_StringBuffer) { itoa_Writer_StringBuffer<Writer4<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa_Writer_InsituStringStream) { itoa_Writer_InsituStringStream<rapidjson::Writer<rapidjson::InsituStringStream> >(); }
 TEST_F(Misc, itoa_Writer1_InsituStringStream) { itoa_Writer_InsituStringStream<Writer1<rapidjson::InsituStringStream> >(); }
 TEST_F(Misc, itoa_Writer2_InsituStringStream) { itoa_Writer_InsituStringStream<Writer2<rapidjson::InsituStringStream> >(); }
 TEST_F(Misc, itoa_Writer3_InsituStringStream) { itoa_Writer_InsituStringStream<Writer3<rapidjson::InsituStringStream> >(); }
 TEST_F(Misc, itoa_Writer4_InsituStringStream) { itoa_Writer_InsituStringStream<Writer4<rapidjson::InsituStringStream> >(); }
 
+TEST_F(Misc, itoa64_Writer_StringBufferVerify) { itoa64_Writer_StringBufferVerify<rapidjson::Writer<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa64_Writer1_StringBufferVerify) { itoa64_Writer_StringBufferVerify<Writer1<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa64_Writer2_StringBufferVerify) { itoa64_Writer_StringBufferVerify<Writer2<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa64_Writer3_StringBufferVerify) { itoa64_Writer_StringBufferVerify<Writer3<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa64_Writer4_StringBufferVerify) { itoa64_Writer_StringBufferVerify<Writer4<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa64_Writer_InsituStringStreamVerify) { itoa64_Writer_InsituStringStreamVerify<rapidjson::Writer<rapidjson::InsituStringStream> >(); }
 TEST_F(Misc, itoa64_Writer1_InsituStringStreamVerify) { itoa64_Writer_InsituStringStreamVerify<Writer1<rapidjson::InsituStringStream> >(); }
 TEST_F(Misc, itoa64_Writer2_InsituStringStreamVerify) { itoa64_Writer_InsituStringStreamVerify<Writer2<rapidjson::InsituStringStream> >(); }
 TEST_F(Misc, itoa64_Writer3_InsituStringStreamVerify) { itoa64_Writer_InsituStringStreamVerify<Writer3<rapidjson::InsituStringStream> >(); }
 TEST_F(Misc, itoa64_Writer4_InsituStringStreamVerify) { itoa64_Writer_InsituStringStreamVerify<Writer4<rapidjson::InsituStringStream> >(); }
+TEST_F(Misc, itoa64_Writer_StringBuffer) { itoa64_Writer_StringBuffer<rapidjson::Writer<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa64_Writer1_StringBuffer) { itoa64_Writer_StringBuffer<Writer1<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa64_Writer2_StringBuffer) { itoa64_Writer_StringBuffer<Writer2<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa64_Writer3_StringBuffer) { itoa64_Writer_StringBuffer<Writer3<rapidjson::StringBuffer> >(); }
 TEST_F(Misc, itoa64_Writer4_StringBuffer) { itoa64_Writer_StringBuffer<Writer4<rapidjson::StringBuffer> >(); }
+TEST_F(Misc, itoa64_Writer_InsituStringStream) { itoa64_Writer_InsituStringStream<rapidjson::Writer<rapidjson::InsituStringStream> >(); }
 TEST_F(Misc, itoa64_Writer1_InsituStringStream) { itoa64_Writer_InsituStringStream<Writer1<rapidjson::InsituStringStream> >(); }
 TEST_F(Misc, itoa64_Writer2_InsituStringStream) { itoa64_Writer_InsituStringStream<Writer2<rapidjson::InsituStringStream> >(); }
 TEST_F(Misc, itoa64_Writer3_InsituStringStream) { itoa64_Writer_InsituStringStream<Writer3<rapidjson::InsituStringStream> >(); }

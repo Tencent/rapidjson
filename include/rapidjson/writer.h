@@ -4,6 +4,8 @@
 #include "rapidjson.h"
 #include "internal/stack.h"
 #include "internal/strfunc.h"
+#include "internal/itoa.h"
+#include "stringbuffer.h"
 #include <cstdio>	// snprintf() or _sprintf_s()
 #include <new>		// placement new
 
@@ -42,6 +44,10 @@ public:
 	*/
 	Writer(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) : 
 		os_(&os), level_stack_(allocator, levelDepth * sizeof(Level)),
+		doublePrecision_(kDefaultDoublePrecision), hasRoot_(false) {}
+
+	Writer(Allocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) :
+		os_(0), level_stack_(allocator, levelDepth * sizeof(Level)),
 		doublePrecision_(kDefaultDoublePrecision), hasRoot_(false) {}
 
 	//! Reset the writer with a new stream.
@@ -208,49 +214,34 @@ protected:
 	}
 
 	bool WriteInt(int i) {
-		if (i < 0) {
-			os_->Put('-');
-			i = -i;
-		}
-		return WriteUint((unsigned)i);
+		char buffer[11];
+		const char* end = internal::i32toa(i, buffer);
+		for (const char* p = buffer; p != end; ++p)
+			os_->Put(*p);
+		return true;
 	}
 
 	bool WriteUint(unsigned u) {
 		char buffer[10];
-		char *p = buffer;
-		do {
-			*p++ = char(u % 10) + '0';
-			u /= 10;
-		} while (u > 0);
-
-		do {
-			--p;
+		const char* end = internal::u32toa(u, buffer);
+		for (const char* p = buffer; p != end; ++p)
 			os_->Put(*p);
-		} while (p != buffer);
 		return true;
 	}
 
 	bool WriteInt64(int64_t i64) {
-		if (i64 < 0) {
-			os_->Put('-');
-			i64 = -i64;
-		}
-		WriteUint64((uint64_t)i64);
+		char buffer[21];
+		const char* end = internal::i64toa(i64, buffer);
+		for (const char* p = buffer; p != end; ++p)
+			os_->Put(*p);
 		return true;
 	}
 
 	bool WriteUint64(uint64_t u64) {
-		char buffer[20];
-		char *p = buffer;
-		do {
-			*p++ = char(u64 % 10) + '0';
-			u64 /= 10;
-		} while (u64 > 0);
-
-		do {
-			--p;
+		char buffer[11];
+		const char* end = internal::u64toa(u64, buffer);
+		for (const char* p = buffer; p != end; ++p)
 			os_->Put(*p);
-		} while (p != buffer);
 		return true;
 	}
 
@@ -377,6 +368,40 @@ private:
 	Writer(const Writer&);
 	Writer& operator=(const Writer&);
 };
+
+// Full specialization for StringStream to prevent memory copying
+
+template<>
+inline bool Writer<StringBuffer>::WriteInt(int i) {
+	char *buffer = os_->Push(11);
+	const char* end = internal::i32toa(i, buffer);
+	os_->Pop(11 - (end - buffer));
+	return true;
+}
+
+template<>
+inline bool Writer<StringBuffer>::WriteUint(unsigned u) {
+	char *buffer = os_->Push(10);
+	const char* end = internal::u32toa(u, buffer);
+	os_->Pop(10 - (end - buffer));
+	return true;
+}
+
+template<>
+inline bool Writer<StringBuffer>::WriteInt64(int64_t i64) {
+	char *buffer = os_->Push(21);
+	const char* end = internal::i64toa(i64, buffer);
+	os_->Pop(21 - (end - buffer));
+	return true;
+}
+
+template<>
+inline bool Writer<StringBuffer>::WriteUint64(uint64_t u) {
+	char *buffer = os_->Push(20);
+	const char* end = internal::u64toa(u, buffer);
+	os_->Pop(20 - (end - buffer));
+	return true;
+}
 
 } // namespace rapidjson
 
