@@ -829,44 +829,52 @@ private:
 	};
 
 	// Tokens
-	enum IterativeParsingToken {
-		IterativeParsingLeftBracketToken = 0,
-		IterativeParsingRightBracketToken,
+	enum Token {
+		LeftBracketToken = 0,
+		RightBracketToken,
 
-		IterativeParsingLeftCurlyBracketToken,
-		IterativeParsingRightCurlyBracketToken,
+		LeftCurlyBracketToken,
+		RightCurlyBracketToken,
 
-		IterativeParsingCommaToken,
-		IterativeParsingColonToken,
+		CommaToken,
+		ColonToken,
 
-		IterativeParsingStringToken,
-		IterativeParsingFalseToken,
-		IterativeParsingTrueToken,
-		IterativeParsingNullToken,
-		IterativeParsingNumberToken,
+		StringToken,
+		FalseToken,
+		TrueToken,
+		NullToken,
+		NumberToken,
 
-		cIterativeParsingTokenCount
+		kTokenCount
 	};
 
-	IterativeParsingToken Tokenize(Ch c) {
-		switch (c) {
-		case '[': return IterativeParsingLeftBracketToken;
-		case ']': return IterativeParsingRightBracketToken;
-		case '{': return IterativeParsingLeftCurlyBracketToken;
-		case '}': return IterativeParsingRightCurlyBracketToken;
-		case ',': return IterativeParsingCommaToken;
-		case ':': return IterativeParsingColonToken;
-		case '"': return IterativeParsingStringToken;
-		case 'f': return IterativeParsingFalseToken;
-		case 't': return IterativeParsingTrueToken;
-		case 'n': return IterativeParsingNullToken;
-		default: return IterativeParsingNumberToken;
-		}
+	RAPIDJSON_FORCEINLINE Token Tokenize(Ch c) {
+#define N NumberToken
+#define N16 N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N
+		// Maps from ASCII to Token
+		static const unsigned char tokenMap[256] = {
+			N16, // 00~0F
+			N16, // 10~1F
+			N, N, StringToken, N, N, N, N, N, N, N, N, N, CommaToken, N, N, N, // 20~2F
+			N, N, N, N, N, N, N, N, N, N, ColonToken, N, N, N, N, N, // 30~3F
+			N16, // 40~4F
+			N, N, N, N, N, N, N, N, N, N, N, LeftBracketToken, N, RightBracketToken, N, N, // 50~5F
+			N, N, N, N, N, N, FalseToken, N, N, N, N, N, N, N, NullToken, N, // 60~6F
+			N, N, N, N, TrueToken, N, N, N, N, N, N, LeftCurlyBracketToken, N, RightCurlyBracketToken, N, N, // 70~7F
+			N16, N16, N16, N16, N16, N16, N16, N16 // 80~FF
+		};
+#undef N
+#undef N16
+		
+		if (sizeof(Ch) == 1 || unsigned(c) < 256)
+			return (Token)tokenMap[(unsigned char)c];
+		else
+			return NumberToken;
 	}
 
-	IterativeParsingState Predict(IterativeParsingState state, IterativeParsingToken token) {
+	IterativeParsingState Predict(IterativeParsingState state, Token token) {
 		// current state x one lookahead token -> new state
-		static const char G[cIterativeParsingStateCount][cIterativeParsingTokenCount] = {
+		static const char G[cIterativeParsingStateCount][kTokenCount] = {
 			// Start
 			{
 				IterativeParsingArrayInitialState,	// Left bracket
@@ -1025,7 +1033,7 @@ private:
 	// Make an advance in the token stream and state based on the candidate destination state which was returned by Transit().
 	// May return a new state on state pop.
 	template <unsigned parseFlags, typename InputStream, typename Handler>
-	IterativeParsingState Transit(IterativeParsingState src, IterativeParsingToken token, IterativeParsingState dst, InputStream& is, Handler& handler) {
+	IterativeParsingState Transit(IterativeParsingState src, Token token, IterativeParsingState dst, InputStream& is, Handler& handler) {
 		//int c = 0;
 		//IterativeParsingState n;
 		//bool hr;
@@ -1081,7 +1089,7 @@ private:
 				return dst;
 
 		case IterativeParsingKeyValueDelimiterState:
-			if (token == IterativeParsingColonToken) {
+			if (token == ColonToken) {
 				is.Take();
 				return dst;
 			}
@@ -1207,7 +1215,7 @@ private:
 
 		SkipWhitespace(is);
 		while (is.Peek() != '\0') {
-			IterativeParsingToken t = Tokenize(is.Peek());
+			Token t = Tokenize(is.Peek());
 			IterativeParsingState n = Predict(state, t);
 			IterativeParsingState d = Transit<parseFlags>(state, t, n, is, handler);
 
