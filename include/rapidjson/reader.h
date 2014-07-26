@@ -512,7 +512,7 @@ private:
 		typedef typename TargetEncoding::Ch Ch;
 
 		StackStream(internal::Stack<Allocator>& stack) : stack_(stack), length_(0) {}
-		void Put(Ch c) {
+		RAPIDJSON_FORCEINLINE void Put(Ch c) {
 			*stack_.template Push<Ch>() = c;
 			++length_;
 		}
@@ -861,7 +861,7 @@ private:
 			return NumberToken;
 	}
 
-	IterativeParsingState Predict(IterativeParsingState state, Token token) {
+	RAPIDJSON_FORCEINLINE IterativeParsingState Predict(IterativeParsingState state, Token token) {
 		// current state x one lookahead token -> new state
 		static const char G[cIterativeParsingStateCount][kTokenCount] = {
 			// Start
@@ -1022,7 +1022,7 @@ private:
 	// Make an advance in the token stream and state based on the candidate destination state which was returned by Transit().
 	// May return a new state on state pop.
 	template <unsigned parseFlags, typename InputStream, typename Handler>
-	IterativeParsingState Transit(IterativeParsingState src, Token token, IterativeParsingState dst, InputStream& is, Handler& handler) {
+	RAPIDJSON_FORCEINLINE IterativeParsingState Transit(IterativeParsingState src, Token token, IterativeParsingState dst, InputStream& is, Handler& handler) {
 		switch (dst) {
 		case IterativeParsingStartState:
 			RAPIDJSON_ASSERT(false);
