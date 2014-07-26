@@ -104,48 +104,37 @@ TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_ValidateEncoding)) {
 }
 
 TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseInsitu_MemoryPoolAllocator)) {
-	//const size_t userBufferSize = 128 * 1024;
-	//char* userBuffer = (char*)malloc(userBufferSize);
-
 	for (size_t i = 0; i < kTrialCount; i++) {
 		memcpy(temp_, json_, length_ + 1);
-		//MemoryPoolAllocator<> allocator(userBuffer, userBufferSize);
-		//Document doc(&allocator);
 		Document doc;
 		doc.ParseInsitu(temp_);
 		ASSERT_TRUE(doc.IsObject());
-		//if (i == 0) {
-		//	size_t size = doc.GetAllocator().Size();
-		//	size_t capacity = doc.GetAllocator().Capacity();
-		//	size_t stack_capacity = doc.GetStackCapacity();
-		//	size_t actual = size - stack_capacity;
-		//	std::cout << "Size:" << size << " Capacity:" << capacity  << " Stack:" << stack_capacity << " Actual:" << actual << std::endl;
-		//}
 	}
+}
 
-	//free(userBuffer);
+TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseIterativeInsitu_MemoryPoolAllocator)) {
+	for (size_t i = 0; i < kTrialCount; i++) {
+		memcpy(temp_, json_, length_ + 1);
+		Document doc;
+		doc.ParseInsitu<kParseIterativeFlag>(temp_);
+		ASSERT_TRUE(doc.IsObject());
+	}
 }
 
 TEST_F(RapidJson, SIMD_SUFFIX(DocumentParse_MemoryPoolAllocator)) {
-	//const size_t userBufferSize = 128 * 1024;
-	//char* userBuffer = (char*)malloc(userBufferSize);
-
 	for (size_t i = 0; i < kTrialCount; i++) {
-		//MemoryPoolAllocator<> allocator(userBuffer, userBufferSize);
-		//Document doc(&allocator);
 		Document doc;
 		doc.Parse(json_);
 		ASSERT_TRUE(doc.IsObject());
-		//if (i == 0) {
-		//	size_t size = doc.GetAllocator().Size();
-		//	size_t capacity = doc.GetAllocator().Capacity();
-		//	size_t stack_capacity = doc.GetStackCapacity();
-		//	size_t actual = size - stack_capacity;
-		//	std::cout << "Size:" << size << " Capacity:" << capacity  << " Stack:" << stack_capacity << " Actual:" << actual << std::endl;
-		//}
 	}
+}
 
-	//free(userBuffer);
+TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseIterative_MemoryPoolAllocator)) {
+	for (size_t i = 0; i < kTrialCount; i++) {
+		Document doc;
+		doc.Parse<kParseIterativeFlag>(json_);
+		ASSERT_TRUE(doc.IsObject());
+	}
 }
 
 TEST_F(RapidJson, SIMD_SUFFIX(DocumentParse_CrtAllocator)) {
