@@ -1221,13 +1221,12 @@ public:
 		\tparam SourceEncoding Encoding of input stream
 		\tparam InputStream Type of input stream, implementing Stream concept
 		\param is Input stream to be parsed.
-		\param limit Parsing stack size limit(in bytes). Pass 0 means no limit.
 		\return The document itself for fluent API.
 	*/
 	template <unsigned parseFlags, typename SourceEncoding, typename InputStream>
-	GenericDocument& ParseStream(InputStream& is, size_t limit = 0) {
+	GenericDocument& ParseStream(InputStream& is) {
 		ValueType::SetNull(); // Remove existing root if exist
-		GenericReader<SourceEncoding, Encoding, Allocator> reader(limit, &GetAllocator());
+		GenericReader<SourceEncoding, Encoding, Allocator> reader(&GetAllocator());
 		ClearStackOnExit scope(*this);
 		parseResult_ = reader.template Parse<parseFlags>(is, *this);
 		if (parseResult_) {
@@ -1241,23 +1240,21 @@ public:
 	/*! \tparam parseFlags Combination of \ref ParseFlag.
 		\tparam InputStream Type of input stream, implementing Stream concept
 		\param is Input stream to be parsed.
-		\param limit Parsing stack size limit(in bytes). Pass 0 means no limit.
 		\return The document itself for fluent API.
 	*/
 	template <unsigned parseFlags, typename InputStream>
-	GenericDocument& ParseStream(InputStream& is, size_t limit = 0) {
-		return ParseStream<parseFlags,Encoding,InputStream>(is, limit);
+	GenericDocument& ParseStream(InputStream& is) {
+		return ParseStream<parseFlags,Encoding,InputStream>(is);
 	}
 
 	//! Parse JSON text from an input stream (with \ref kParseDefaultFlags)
 	/*! \tparam InputStream Type of input stream, implementing Stream concept
 		\param is Input stream to be parsed.
-		\param limit Parsing stack size limit(in bytes). Pass 0 means no limit.
 		\return The document itself for fluent API.
 	*/
 	template <typename InputStream>
-	GenericDocument& ParseStream(InputStream& is, size_t limit = 0) {
-		return ParseStream<kParseDefaultFlags, Encoding, InputStream>(is, limit);
+	GenericDocument& ParseStream(InputStream& is) {
+		return ParseStream<kParseDefaultFlags, Encoding, InputStream>(is);
 	}
 	//!@}
 
@@ -1268,33 +1265,30 @@ public:
 	/*! \tparam parseFlags Combination of \ref ParseFlag.
 		\tparam SourceEncoding Transcoding from input Encoding
 		\param str Mutable zero-terminated string to be parsed.
-		\param limit Parsing stack size limit(in bytes). Pass 0 means no limit.
 		\return The document itself for fluent API.
 	*/
 	template <unsigned parseFlags, typename SourceEncoding>
-	GenericDocument& ParseInsitu(Ch* str, size_t limit = 0) {
+	GenericDocument& ParseInsitu(Ch* str) {
 		GenericInsituStringStream<Encoding> s(str);
-		return ParseStream<parseFlags | kParseInsituFlag, SourceEncoding>(s, limit);
+		return ParseStream<parseFlags | kParseInsituFlag, SourceEncoding>(s);
 	}
 
 	//! Parse JSON text from a mutable string
 	/*! \tparam parseFlags Combination of \ref ParseFlag.
 		\param str Mutable zero-terminated string to be parsed.
-		\param limit Parsing stack size limit(in bytes). Pass 0 means no limit.
 		\return The document itself for fluent API.
 	*/
 	template <unsigned parseFlags>
-	GenericDocument& ParseInsitu(Ch* str, size_t limit = 0) {
-		return ParseInsitu<parseFlags, Encoding>(str, limit);
+	GenericDocument& ParseInsitu(Ch* str) {
+		return ParseInsitu<parseFlags, Encoding>(str);
 	}
 
 	//! Parse JSON text from a mutable string (with \ref kParseDefaultFlags)
 	/*! \param str Mutable zero-terminated string to be parsed.
-		\param limit Parsing stack size limit(in bytes). Pass 0 means no limit.
 		\return The document itself for fluent API.
 	*/
-	GenericDocument& ParseInsitu(Ch* str, size_t limit = 0) {
-		return ParseInsitu<kParseDefaultFlags, Encoding>(str, limit);
+	GenericDocument& ParseInsitu(Ch* str) {
+		return ParseInsitu<kParseDefaultFlags, Encoding>(str);
 	}
 	//!@}
 
@@ -1305,31 +1299,28 @@ public:
 	/*! \tparam parseFlags Combination of \ref ParseFlag (must not contain \ref kParseInsituFlag).
 		\tparam SourceEncoding Transcoding from input Encoding
 		\param str Read-only zero-terminated string to be parsed.
-		\param limit Parsing stack size limit(in bytes). Pass 0 means no limit.
 	*/
 	template <unsigned parseFlags, typename SourceEncoding>
-	GenericDocument& Parse(const Ch* str, size_t limit = 0) {
+	GenericDocument& Parse(const Ch* str) {
 		RAPIDJSON_ASSERT(!(parseFlags & kParseInsituFlag));
 		GenericStringStream<SourceEncoding> s(str);
-		return ParseStream<parseFlags, SourceEncoding>(s, limit);
+		return ParseStream<parseFlags, SourceEncoding>(s);
 	}
 
 	//! Parse JSON text from a read-only string
 	/*! \tparam parseFlags Combination of \ref ParseFlag (must not contain \ref kParseInsituFlag).
 		\param str Read-only zero-terminated string to be parsed.
-		\param limit Parsing stack size limit(in bytes). Pass 0 means no limit.
 	*/
 	template <unsigned parseFlags>
-	GenericDocument& Parse(const Ch* str, size_t limit = 0) {
-		return Parse<parseFlags, Encoding>(str, limit);
+	GenericDocument& Parse(const Ch* str) {
+		return Parse<parseFlags, Encoding>(str);
 	}
 
 	//! Parse JSON text from a read-only string (with \ref kParseDefaultFlags)
 	/*! \param str Read-only zero-terminated string to be parsed.
-		\param limit Parsing stack size limit(in bytes). Pass 0 means no limit.
 	*/
-	GenericDocument& Parse(const Ch* str, size_t limit = 0) {
-		return Parse<kParseDefaultFlags>(str, limit);
+	GenericDocument& Parse(const Ch* str) {
+		return Parse<kParseDefaultFlags>(str);
 	}
 	//!@}
 

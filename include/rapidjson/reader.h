@@ -273,11 +273,10 @@ public:
 	typedef typename SourceEncoding::Ch Ch; //!< SourceEncoding character type
 
 	//! Constructor.
-	/*! \param limit Parsing stack size limit(in bytes). Pass 0 means no limit.
-		\param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
+	/*! \param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
 		\param stackCapacity stack capacity in bytes for storing a single decoded string.  (Only use for non-destructive parsing)
 	*/
-	GenericReader(size_t limit = 0, Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), kStackSizeLimit_(limit), parseResult_() {}
+	GenericReader(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseResult_() {}
 
 	//! Parse JSON text.
 	/*! \tparam parseFlags Combination of \ref ParseFlag.
@@ -572,11 +571,6 @@ private:
 				is.Take();
 				Ch e = is.Take();
 				if ((sizeof(Ch) == 1 || unsigned(e) < 256) && escape[(unsigned char)e]) {
-					if (!(parseFlags & kParseInsituFlag)) {
-						if (!CheckStackSpaceQuota(sizeof(Ch))) {
-							RAPIDJSON_PARSE_ERROR(kParseErrorStackSizeLimitExceeded, is.Tell() - 1);
-						}
-					}
 					os.Put(escape[(unsigned char)e]);
 				}
 				else if (e == 'u') {	// Unicode
@@ -597,11 +591,6 @@ private:
 			}
 			else if (c == '"') {	// Closing double quote
 				is.Take();
-				if (!(parseFlags & kParseInsituFlag)) {
-					if (!CheckStackSpaceQuota(sizeof(Ch))) {
-						RAPIDJSON_PARSE_ERROR(kParseErrorStackSizeLimitExceeded, is.Tell() - 1);
-					}
-				}
 				os.Put('\0');	// null-terminate the string
 				return;
 			}
@@ -1059,11 +1048,6 @@ private:
 				n = IterativeParsingElementState;
 			else if (src == IterativeParsingKeyValueDelimiterState)
 				n = IterativeParsingMemberValueState;
-			// Check stack space limit.
-			if (!CheckStackSpaceQuota(sizeof(IterativeParsingState) + sizeof(int))) {
-				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorStackSizeLimitExceeded, is.Tell());
-				return IterativeParsingErrorState;
-			}
 			// Push current state.
 			*stack_.template Push<IterativeParsingState>(1) = n;
 			// Initialize and push the member/element count.
@@ -1235,13 +1219,8 @@ private:
 		return parseResult_;
 	}
 
-	bool CheckStackSpaceQuota(size_t size) const {
-		return kStackSizeLimit_ == 0 || (stack_.GetSize() + size <= kStackSizeLimit_);
-	}
-
 	static const size_t kDefaultStackCapacity = 256;	//!< Default stack capacity in bytes for storing a single decoded string.
 	internal::Stack<Allocator> stack_;	//!< A stack for storing decoded string temporarily during non-destructive parsing.
-	const size_t kStackSizeLimit_; //!< Stack size limit(in bytes). A value of 0 means no limit.
 	ParseResult parseResult_;
 }; // class GenericReader
 
