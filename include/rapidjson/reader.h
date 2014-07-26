@@ -1026,9 +1026,9 @@ private:
 	// May return a new state on state pop.
 	template <unsigned parseFlags, typename InputStream, typename Handler>
 	IterativeParsingState Transit(IterativeParsingState src, IterativeParsingToken token, IterativeParsingState dst, InputStream& is, Handler& handler) {
-		int c = 0;
-		IterativeParsingState n;
-		bool hr;
+		//int c = 0;
+		//IterativeParsingState n;
+		//bool hr;
 
 		switch (dst) {
 		case IterativeParsingStartState:
@@ -1043,9 +1043,10 @@ private:
 
 		case IterativeParsingObjectInitialState:
 		case IterativeParsingArrayInitialState:
+		{
 			// Push the state(Element or MemeberValue) if we are nested in another array or value of member.
 			// In this way we can get the correct state on ObjectFinish or ArrayFinish by frame pop.
-			n = src;
+			IterativeParsingState n = src;
 			if (src == IterativeParsingArrayInitialState || src == IterativeParsingElementDelimiterState)
 				n = IterativeParsingElementState;
 			else if (src == IterativeParsingKeyValueDelimiterState)
@@ -1060,10 +1061,7 @@ private:
 			// Initialize and push the member/element count.
 			*stack_.template Push<int>(1) = 0;
 			// Call handler
-			if (dst == IterativeParsingObjectInitialState)
-				hr = handler.StartObject();
-			else
-				hr = handler.StartArray();
+			bool hr = (dst == IterativeParsingObjectInitialState) ? handler.StartObject() : handler.StartArray();
 			// On handler short circuits the parsing.
 			if (!hr) {
 				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorTermination, is.Tell());
@@ -1073,6 +1071,7 @@ private:
 				is.Take();
 				return dst;
 			}
+		}
 
 		case IterativeParsingMemberKeyState:
 			ParseString<parseFlags>(is, handler);
@@ -1113,18 +1112,19 @@ private:
 			return dst;
 
 		case IterativeParsingObjectFinishState:
+		{
 			// Get member count.
-			c = *stack_.template Pop<int>(1);
+			int c = *stack_.template Pop<int>(1);
 			// If the object is not empty, count the last member.
 			if (src == IterativeParsingMemberValueState)
 				++c;
 			// Restore the state.
-			n = *stack_.template Pop<IterativeParsingState>(1);
+			IterativeParsingState n = *stack_.template Pop<IterativeParsingState>(1);
 			// Transit to Finish state if this is the topmost scope.
 			if (n == IterativeParsingStartState)
 				n = IterativeParsingFinishState;
 			// Call handler
-			hr = handler.EndObject(c);
+			bool hr = handler.EndObject(c);
 			// On handler short circuits the parsing.
 			if (!hr) {
 				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorTermination, is.Tell());
@@ -1134,20 +1134,22 @@ private:
 				is.Take();
 				return n;
 			}
+		}
 
 		case IterativeParsingArrayFinishState:
+		{
 			// Get element count.
-			c = *stack_.template Pop<int>(1);
+			int c = *stack_.template Pop<int>(1);
 			// If the array is not empty, count the last element.
 			if (src == IterativeParsingElementState)
 				++c;
 			// Restore the state.
-			n = *stack_.template Pop<IterativeParsingState>(1);
+			IterativeParsingState n = *stack_.template Pop<IterativeParsingState>(1);
 			// Transit to Finish state if this is the topmost scope.
 			if (n == IterativeParsingStartState)
 				n = IterativeParsingFinishState;
 			// Call handler
-			hr = handler.EndArray(c);
+			bool hr = handler.EndArray(c);
 			// On handler short circuits the parsing.
 			if (!hr) {
 				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorTermination, is.Tell());
@@ -1157,6 +1159,7 @@ private:
 				is.Take();
 				return n;
 			}
+		}
 
 		default:
 			RAPIDJSON_ASSERT(false);
