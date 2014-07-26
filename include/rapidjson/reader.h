@@ -1023,10 +1023,6 @@ private:
 	// May return a new state on state pop.
 	template <unsigned parseFlags, typename InputStream, typename Handler>
 	IterativeParsingState Transit(IterativeParsingState src, Token token, IterativeParsingState dst, InputStream& is, Handler& handler) {
-		//int c = 0;
-		//IterativeParsingState n;
-		//bool hr;
-
 		switch (dst) {
 		case IterativeParsingStartState:
 			RAPIDJSON_ASSERT(false);
@@ -1166,29 +1162,16 @@ private:
 			return;
 		}
 		
-		if (src == IterativeParsingStartState && is.Peek() == '\0')
-			RAPIDJSON_PARSE_ERROR(kParseErrorDocumentEmpty, is.Tell());
-
-		else if (src == IterativeParsingStartState)
-			RAPIDJSON_PARSE_ERROR(kParseErrorDocumentRootNotObjectOrArray, is.Tell());
-
-		else if (src == IterativeParsingFinishState)
-			RAPIDJSON_PARSE_ERROR(kParseErrorDocumentRootNotSingular, is.Tell());
-
-		else if (src == IterativeParsingObjectInitialState || src == IterativeParsingMemberDelimiterState)
-			RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
-
-		else if (src == IterativeParsingMemberKeyState)
-			RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissColon, is.Tell());
-
-		else if (src == IterativeParsingMemberValueState)
-			RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell());
-
-		else if (src == IterativeParsingElementState)
-			RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell());
-
-		else
-			RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell());
+		switch (src) {
+		case IterativeParsingStartState:			RAPIDJSON_PARSE_ERROR(is.Peek() == '\0' ? kParseErrorDocumentEmpty : kParseErrorDocumentRootNotObjectOrArray, is.Tell());
+		case IterativeParsingFinishState:			RAPIDJSON_PARSE_ERROR(kParseErrorDocumentRootNotSingular, is.Tell());
+		case IterativeParsingObjectInitialState:
+		case IterativeParsingMemberDelimiterState:	RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
+		case IterativeParsingMemberKeyState:		RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissColon, is.Tell());
+		case IterativeParsingMemberValueState:		RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell());
+		case IterativeParsingElementState:			RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell());
+		default:									RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell());
+		}		
 	}
 
 	template <unsigned parseFlags, typename InputStream, typename Handler>
