@@ -28,20 +28,14 @@ public:
 
 	void Clear() { /*stack_top_ = 0;*/ stack_top_ = stack_; }
 
+	// Optimization note: try to minimize the size of this function for force inline.
+	// Expansion is run very infrequently, so it is moved to another (probably non-inline) function.
 	template<typename T>
-	T* Push(size_t count = 1) {
+	RAPIDJSON_FORCEINLINE T* Push(size_t count = 1) {
 		 // Expand the stack if needed
-		if (stack_top_ + sizeof(T) * count >= stack_end_) {
-			size_t new_capacity = stack_capacity_ * 2;
-			size_t size = GetSize();
-			size_t new_size = GetSize() + sizeof(T) * count;
-			if (new_capacity < new_size)
-				new_capacity = new_size;
-			stack_ = (char*)allocator_->Realloc(stack_, stack_capacity_, new_capacity);
-			stack_capacity_ = new_capacity;
-			stack_top_ = stack_ + size;
-			stack_end_ = stack_ + stack_capacity_;
-		}
+		if (stack_top_ + sizeof(T) * count >= stack_end_)
+			Expand<T>(count);
+
 		T* ret = reinterpret_cast<T*>(stack_top_);
 		stack_top_ += sizeof(T) * count;
 		return ret;
@@ -69,6 +63,19 @@ public:
 	size_t GetCapacity() const { return stack_capacity_; }
 
 private:
+	template<typename T>
+	void Expand(size_t count) {
+		size_t new_capacity = stack_capacity_ * 2;
+		size_t size = GetSize();
+		size_t new_size = GetSize() + sizeof(T) * count;
+		if (new_capacity < new_size)
+			new_capacity = new_size;
+		stack_ = (char*)allocator_->Realloc(stack_, stack_capacity_, new_capacity);
+		stack_capacity_ = new_capacity;
+		stack_top_ = stack_ + size;
+		stack_end_ = stack_ + stack_capacity_;
+	}
+
 	// Prohibit copy constructor & assignment operator.
 	Stack(const Stack&);
 	Stack& operator=(const Stack&);
