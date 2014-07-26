@@ -41,6 +41,8 @@
 #ifndef RAPIDJSON_FORCEINLINE
 #ifdef _MSC_VER
 #define RAPIDJSON_FORCEINLINE __forceinline
+#elif defined(__GNUC__) && __GNUC__ >= 4
+#define RAPIDJSON_FORCEINLINE __attribute__((always_inline))
 #else
 #define RAPIDJSON_FORCEINLINE
 #endif
