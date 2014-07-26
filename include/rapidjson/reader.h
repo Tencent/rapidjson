@@ -1045,9 +1045,9 @@ private:
 			else if (src == IterativeParsingKeyValueDelimiterState)
 				n = IterativeParsingMemberValueState;
 			// Push current state.
-			*stack_.template Push<IterativeParsingState>(1) = n;
+			*stack_.template Push<SizeType>(1) = n;
 			// Initialize and push the member/element count.
-			*stack_.template Push<int>(1) = 0;
+			*stack_.template Push<SizeType>(1) = 0;
 			// Call handler
 			bool hr = (dst == IterativeParsingObjectInitialState) ? handler.StartObject() : handler.StartArray();
 			// On handler short circuits the parsing.
@@ -1096,18 +1096,18 @@ private:
 		case IterativeParsingElementDelimiterState:
 			is.Take();
 			// Update member/element count.
-			*stack_.template Top<int>() = *stack_.template Top<int>() + 1;
+			*stack_.template Top<SizeType>() = *stack_.template Top<SizeType>() + 1;
 			return dst;
 
 		case IterativeParsingObjectFinishState:
 		{
 			// Get member count.
-			int c = *stack_.template Pop<int>(1);
+			SizeType c = *stack_.template Pop<SizeType>(1);
 			// If the object is not empty, count the last member.
 			if (src == IterativeParsingMemberValueState)
 				++c;
 			// Restore the state.
-			IterativeParsingState n = *stack_.template Pop<IterativeParsingState>(1);
+			IterativeParsingState n = static_cast<IterativeParsingState>(*stack_.template Pop<SizeType>(1));
 			// Transit to Finish state if this is the topmost scope.
 			if (n == IterativeParsingStartState)
 				n = IterativeParsingFinishState;
@@ -1127,12 +1127,12 @@ private:
 		case IterativeParsingArrayFinishState:
 		{
 			// Get element count.
-			int c = *stack_.template Pop<int>(1);
+			SizeType c = *stack_.template Pop<SizeType>(1);
 			// If the array is not empty, count the last element.
 			if (src == IterativeParsingElementState)
 				++c;
 			// Restore the state.
-			IterativeParsingState n = *stack_.template Pop<IterativeParsingState>(1);
+			IterativeParsingState n = static_cast<IterativeParsingState>(*stack_.template Pop<SizeType>(1));
 			// Transit to Finish state if this is the topmost scope.
 			if (n == IterativeParsingStartState)
 				n = IterativeParsingFinishState;
