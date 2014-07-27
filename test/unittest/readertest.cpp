@@ -559,14 +559,15 @@ struct ParseMultipleRootHandler : BaseReaderHandler<> {
 
 template <unsigned parseFlags>
 void TestMultipleRoot() {
-	StringStream s("{}[]a");
+	StringStream s("{}[] a");
 	ParseMultipleRootHandler h;
 	Reader reader;
 	EXPECT_TRUE(reader.Parse<parseFlags>(s, h));
 	EXPECT_EQ(2u, h.step_);
 	EXPECT_TRUE(reader.Parse<parseFlags>(s, h));
 	EXPECT_EQ(4u, h.step_);
-	EXPECT_EQ('a', s.Peek());
+	EXPECT_EQ(' ', s.Take());
+	EXPECT_EQ('a', s.Take());
 }
 
 TEST(Reader, Parse_MultipleRoot) {
