@@ -273,11 +273,10 @@ public:
 	typedef typename SourceEncoding::Ch Ch; //!< SourceEncoding character type
 
 	//! Constructor.
-	/*! \param limit Parsing stack size limit(in bytes). Pass 0 means no limit.
-		\param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
+	/*! \param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
 		\param stackCapacity stack capacity in bytes for storing a single decoded string.  (Only use for non-destructive parsing)
 	*/
-	GenericReader(size_t limit = 0, Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), kStackSizeLimit_(limit), parseResult_() {}
+	GenericReader(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseResult_() {}
 
 	//! Parse JSON text.
 	/*! \tparam parseFlags Combination of \ref ParseFlag.
@@ -513,7 +512,7 @@ private:
 		typedef typename TargetEncoding::Ch Ch;
 
 		StackStream(internal::Stack<Allocator>& stack) : stack_(stack), length_(0) {}
-		void Put(Ch c) {
+		RAPIDJSON_FORCEINLINE void Put(Ch c) {
 			*stack_.template Push<Ch>() = c;
 			++length_;
 		}
@@ -572,11 +571,6 @@ private:
 				is.Take();
 				Ch e = is.Take();
 				if ((sizeof(Ch) == 1 || unsigned(e) < 256) && escape[(unsigned char)e]) {
-					if (!(parseFlags & kParseInsituFlag)) {
-						if (!CheckStackSpaceQuota(sizeof(Ch))) {
-							RAPIDJSON_PARSE_ERROR(kParseErrorStackSizeLimitExceeded, is.Tell() - 1);
-						}
-					}
 					os.Put(escape[(unsigned char)e]);
 				}
 				else if (e == 'u') {	// Unicode
@@ -597,11 +591,6 @@ private:
 			}
 			else if (c == '"') {	// Closing double quote
 				is.Take();
-				if (!(parseFlags & kParseInsituFlag)) {
-					if (!CheckStackSpaceQuota(sizeof(Ch))) {
-						RAPIDJSON_PARSE_ERROR(kParseErrorStackSizeLimitExceeded, is.Tell() - 1);
-					}
-				}
 				os.Put('\0');	// null-terminate the string
 				return;
 			}
@@ -829,44 +818,52 @@ private:
 	};
 
 	// Tokens
-	enum IterativeParsingToken {
-		IterativeParsingLeftBracketToken = 0,
-		IterativeParsingRightBracketToken,
+	enum Token {
+		LeftBracketToken = 0,
+		RightBracketToken,
 
-		IterativeParsingLeftCurlyBracketToken,
-		IterativeParsingRightCurlyBracketToken,
+		LeftCurlyBracketToken,
+		RightCurlyBracketToken,
 
-		IterativeParsingCommaToken,
-		IterativeParsingColonToken,
+		CommaToken,
+		ColonToken,
 
-		IterativeParsingStringToken,
-		IterativeParsingFalseToken,
-		IterativeParsingTrueToken,
-		IterativeParsingNullToken,
-		IterativeParsingNumberToken,
+		StringToken,
+		FalseToken,
+		TrueToken,
+		NullToken,
+		NumberToken,
 
-		cIterativeParsingTokenCount
+		kTokenCount
 	};
 
-	IterativeParsingToken Tokenize(Ch c) {
-		switch (c) {
-		case '[': return IterativeParsingLeftBracketToken;
-		case ']': return IterativeParsingRightBracketToken;
-		case '{': return IterativeParsingLeftCurlyBracketToken;
-		case '}': return IterativeParsingRightCurlyBracketToken;
-		case ',': return IterativeParsingCommaToken;
-		case ':': return IterativeParsingColonToken;
-		case '"': return IterativeParsingStringToken;
-		case 'f': return IterativeParsingFalseToken;
-		case 't': return IterativeParsingTrueToken;
-		case 'n': return IterativeParsingNullToken;
-		default: return IterativeParsingNumberToken;
-		}
+	RAPIDJSON_FORCEINLINE Token Tokenize(Ch c) {
+#define N NumberToken
+#define N16 N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N
+		// Maps from ASCII to Token
+		static const unsigned char tokenMap[256] = {
+			N16, // 00~0F
+			N16, // 10~1F
+			N, N, StringToken, N, N, N, N, N, N, N, N, N, CommaToken, N, N, N, // 20~2F
+			N, N, N, N, N, N, N, N, N, N, ColonToken, N, N, N, N, N, // 30~3F
+			N16, // 40~4F
+			N, N, N, N, N, N, N, N, N, N, N, LeftBracketToken, N, RightBracketToken, N, N, // 50~5F
+			N, N, N, N, N, N, FalseToken, N, N, N, N, N, N, N, NullToken, N, // 60~6F
+			N, N, N, N, TrueToken, N, N, N, N, N, N, LeftCurlyBracketToken, N, RightCurlyBracketToken, N, N, // 70~7F
+			N16, N16, N16, N16, N16, N16, N16, N16 // 80~FF
+		};
+#undef N
+#undef N16
+		
+		if (sizeof(Ch) == 1 || unsigned(c) < 256)
+			return (Token)tokenMap[(unsigned char)c];
+		else
+			return NumberToken;
 	}
 
-	IterativeParsingState Predict(IterativeParsingState state, IterativeParsingToken token) {
+	RAPIDJSON_FORCEINLINE IterativeParsingState Predict(IterativeParsingState state, Token token) {
 		// current state x one lookahead token -> new state
-		static const char G[cIterativeParsingStateCount][cIterativeParsingTokenCount] = {
+		static const char G[cIterativeParsingStateCount][kTokenCount] = {
 			// Start
 			{
 				IterativeParsingArrayInitialState,	// Left bracket
@@ -1025,11 +1022,7 @@ private:
 	// Make an advance in the token stream and state based on the candidate destination state which was returned by Transit().
 	// May return a new state on state pop.
 	template <unsigned parseFlags, typename InputStream, typename Handler>
-	IterativeParsingState Transit(IterativeParsingState src, IterativeParsingToken token, IterativeParsingState dst, InputStream& is, Handler& handler) {
-		int c = 0;
-		IterativeParsingState n;
-		bool hr;
-
+	RAPIDJSON_FORCEINLINE IterativeParsingState Transit(IterativeParsingState src, Token token, IterativeParsingState dst, InputStream& is, Handler& handler) {
 		switch (dst) {
 		case IterativeParsingStartState:
 			RAPIDJSON_ASSERT(false);
@@ -1043,27 +1036,20 @@ private:
 
 		case IterativeParsingObjectInitialState:
 		case IterativeParsingArrayInitialState:
+		{
 			// Push the state(Element or MemeberValue) if we are nested in another array or value of member.
 			// In this way we can get the correct state on ObjectFinish or ArrayFinish by frame pop.
-			n = src;
+			IterativeParsingState n = src;
 			if (src == IterativeParsingArrayInitialState || src == IterativeParsingElementDelimiterState)
 				n = IterativeParsingElementState;
 			else if (src == IterativeParsingKeyValueDelimiterState)
 				n = IterativeParsingMemberValueState;
-			// Check stack space limit.
-			if (!CheckStackSpaceQuota(sizeof(IterativeParsingState) + sizeof(int))) {
-				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorStackSizeLimitExceeded, is.Tell());
-				return IterativeParsingErrorState;
-			}
 			// Push current state.
-			*stack_.template Push<IterativeParsingState>(1) = n;
+			*stack_.template Push<SizeType>(1) = n;
 			// Initialize and push the member/element count.
-			*stack_.template Push<int>(1) = 0;
+			*stack_.template Push<SizeType>(1) = 0;
 			// Call handler
-			if (dst == IterativeParsingObjectInitialState)
-				hr = handler.StartObject();
-			else
-				hr = handler.StartArray();
+			bool hr = (dst == IterativeParsingObjectInitialState) ? handler.StartObject() : handler.StartArray();
 			// On handler short circuits the parsing.
 			if (!hr) {
 				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorTermination, is.Tell());
@@ -1073,6 +1059,7 @@ private:
 				is.Take();
 				return dst;
 			}
+		}
 
 		case IterativeParsingMemberKeyState:
 			ParseString<parseFlags>(is, handler);
@@ -1082,7 +1069,7 @@ private:
 				return dst;
 
 		case IterativeParsingKeyValueDelimiterState:
-			if (token == IterativeParsingColonToken) {
+			if (token == ColonToken) {
 				is.Take();
 				return dst;
 			}
@@ -1109,22 +1096,23 @@ private:
 		case IterativeParsingElementDelimiterState:
 			is.Take();
 			// Update member/element count.
-			*stack_.template Top<int>() = *stack_.template Top<int>() + 1;
+			*stack_.template Top<SizeType>() = *stack_.template Top<SizeType>() + 1;
 			return dst;
 
 		case IterativeParsingObjectFinishState:
+		{
 			// Get member count.
-			c = *stack_.template Pop<int>(1);
+			SizeType c = *stack_.template Pop<SizeType>(1);
 			// If the object is not empty, count the last member.
 			if (src == IterativeParsingMemberValueState)
 				++c;
 			// Restore the state.
-			n = *stack_.template Pop<IterativeParsingState>(1);
+			IterativeParsingState n = static_cast<IterativeParsingState>(*stack_.template Pop<SizeType>(1));
 			// Transit to Finish state if this is the topmost scope.
 			if (n == IterativeParsingStartState)
 				n = IterativeParsingFinishState;
 			// Call handler
-			hr = handler.EndObject(c);
+			bool hr = handler.EndObject(c);
 			// On handler short circuits the parsing.
 			if (!hr) {
 				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorTermination, is.Tell());
@@ -1134,20 +1122,22 @@ private:
 				is.Take();
 				return n;
 			}
+		}
 
 		case IterativeParsingArrayFinishState:
+		{
 			// Get element count.
-			c = *stack_.template Pop<int>(1);
+			SizeType c = *stack_.template Pop<SizeType>(1);
 			// If the array is not empty, count the last element.
 			if (src == IterativeParsingElementState)
 				++c;
 			// Restore the state.
-			n = *stack_.template Pop<IterativeParsingState>(1);
+			IterativeParsingState n = static_cast<IterativeParsingState>(*stack_.template Pop<SizeType>(1));
 			// Transit to Finish state if this is the topmost scope.
 			if (n == IterativeParsingStartState)
 				n = IterativeParsingFinishState;
 			// Call handler
-			hr = handler.EndArray(c);
+			bool hr = handler.EndArray(c);
 			// On handler short circuits the parsing.
 			if (!hr) {
 				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorTermination, is.Tell());
@@ -1157,6 +1147,7 @@ private:
 				is.Take();
 				return n;
 			}
+		}
 
 		default:
 			RAPIDJSON_ASSERT(false);
@@ -1171,29 +1162,16 @@ private:
 			return;
 		}
 		
-		if (src == IterativeParsingStartState && is.Peek() == '\0')
-			RAPIDJSON_PARSE_ERROR(kParseErrorDocumentEmpty, is.Tell());
-
-		else if (src == IterativeParsingStartState)
-			RAPIDJSON_PARSE_ERROR(kParseErrorDocumentRootNotObjectOrArray, is.Tell());
-
-		else if (src == IterativeParsingFinishState)
-			RAPIDJSON_PARSE_ERROR(kParseErrorDocumentRootNotSingular, is.Tell());
-
-		else if (src == IterativeParsingObjectInitialState || src == IterativeParsingMemberDelimiterState)
-			RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
-
-		else if (src == IterativeParsingMemberKeyState)
-			RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissColon, is.Tell());
-
-		else if (src == IterativeParsingMemberValueState)
-			RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell());
-
-		else if (src == IterativeParsingElementState)
-			RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell());
-
-		else
-			RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell());
+		switch (src) {
+		case IterativeParsingStartState:			RAPIDJSON_PARSE_ERROR(is.Peek() == '\0' ? kParseErrorDocumentEmpty : kParseErrorDocumentRootNotObjectOrArray, is.Tell());
+		case IterativeParsingFinishState:			RAPIDJSON_PARSE_ERROR(kParseErrorDocumentRootNotSingular, is.Tell());
+		case IterativeParsingObjectInitialState:
+		case IterativeParsingMemberDelimiterState:	RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
+		case IterativeParsingMemberKeyState:		RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissColon, is.Tell());
+		case IterativeParsingMemberValueState:		RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell());
+		case IterativeParsingElementState:			RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell());
+		default:									RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell());
+		}		
 	}
 
 	template <unsigned parseFlags, typename InputStream, typename Handler>
@@ -1204,7 +1182,7 @@ private:
 
 		SkipWhitespace(is);
 		while (is.Peek() != '\0') {
-			IterativeParsingToken t = Tokenize(is.Peek());
+			Token t = Tokenize(is.Peek());
 			IterativeParsingState n = Predict(state, t);
 			IterativeParsingState d = Transit<parseFlags>(state, t, n, is, handler);
 
@@ -1224,13 +1202,8 @@ private:
 		return parseResult_;
 	}
 
-	bool CheckStackSpaceQuota(size_t size) const {
-		return kStackSizeLimit_ == 0 || (stack_.GetSize() + size <= kStackSizeLimit_);
-	}
-
 	static const size_t kDefaultStackCapacity = 256;	//!< Default stack capacity in bytes for storing a single decoded string.
 	internal::Stack<Allocator> stack_;	//!< A stack for storing decoded string temporarily during non-destructive parsing.
-	const size_t kStackSizeLimit_; //!< Stack size limit(in bytes). A value of 0 means no limit.
 	ParseResult parseResult_;
 }; // class GenericReader
 
