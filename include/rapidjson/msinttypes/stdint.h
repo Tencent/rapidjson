@@ -42,8 +42,44 @@
 #endif
 
 // miloyip: Originally Visual Studio 2010 uses its own stdint.h. However it generates warning with INT64_C(), so change to use this file for vs2010.
-#if _MSC_VER >= 1700 // [
+#if _MSC_VER >= 1600 // [
 #include <stdint.h>
+
+#if !defined(__cplusplus) || defined(__STDC_CONSTANT_MACROS) // [   See footnote 224 at page 260
+
+#undef INT8_C
+#undef INT16_C
+#undef INT32_C
+#undef INT64_C
+#undef UINT8_C
+#undef UINT16_C
+#undef UINT32_C
+#undef UINT64_C
+
+// 7.18.4.1 Macros for minimum-width integer constants
+
+#define INT8_C(val)  val##i8
+#define INT16_C(val) val##i16
+#define INT32_C(val) val##i32
+#define INT64_C(val) val##i64
+
+#define UINT8_C(val)  val##ui8
+#define UINT16_C(val) val##ui16
+#define UINT32_C(val) val##ui32
+#define UINT64_C(val) val##ui64
+
+// 7.18.4.2 Macros for greatest-width integer constants
+// These #ifndef's are needed to prevent collisions with <boost/cstdint.hpp>.
+// Check out Issue 9 for the details.
+#ifndef INTMAX_C //   [
+#  define INTMAX_C   INT64_C
+#endif // INTMAX_C    ]
+#ifndef UINTMAX_C //  [
+#  define UINTMAX_C  UINT64_C
+#endif // UINTMAX_C   ]
+
+#endif // __STDC_CONSTANT_MACROS ]
+
 #else // ] _MSC_VER >= 1700 [
 
 #include <limits.h>
