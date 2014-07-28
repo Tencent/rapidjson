@@ -3,6 +3,8 @@
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/encodedstream.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/memorystream.h"
+#include "rapidjson/memorybuffer.h"
 
 using namespace rapidjson;
 
@@ -55,61 +57,154 @@ protected:
 
 	template <typename FileEncoding, typename MemoryEncoding>
 	void TestEncodedInputStream(const char* filename) {
-		char buffer[16];
-		FILE *fp = Open(filename);
-		ASSERT_TRUE(fp != 0);
-		FileReadStream fs(fp, buffer, sizeof(buffer));
-		EncodedInputStream<FileEncoding, FileReadStream> eis(fs);
-		StringStream s(json_);
+		// Test FileReadStream
+		{
+			char buffer[16];
+			FILE *fp = Open(filename);
+			ASSERT_TRUE(fp != 0);
+			FileReadStream fs(fp, buffer, sizeof(buffer));
+			EncodedInputStream<FileEncoding, FileReadStream> eis(fs);
+			StringStream s(json_);
 
-		while (eis.Peek() != '\0') {
-			unsigned expected, actual;
-			EXPECT_TRUE(UTF8<>::Decode(s, &expected));
-			EXPECT_TRUE(MemoryEncoding::Decode(eis, &actual));
-			EXPECT_EQ(expected, actual);
+			while (eis.Peek() != '\0') {
+				unsigned expected, actual;
+				EXPECT_TRUE(UTF8<>::Decode(s, &expected));
+				EXPECT_TRUE(MemoryEncoding::Decode(eis, &actual));
+				EXPECT_EQ(expected, actual);
+			}
+			EXPECT_EQ('\0', s.Peek());
+			fclose(fp);
 		}
-		EXPECT_EQ('\0', s.Peek());
-		fclose(fp);
+
+		// Test MemoryStream
+		{
+			size_t size;
+			char* data = ReadFile(filename, true, &size);
+			MemoryStream ms(data, size);
+			EncodedInputStream<FileEncoding, MemoryStream> eis(ms);
+			StringStream s(json_);
+
+			while (eis.Peek() != '\0') {
+				unsigned expected, actual;
+				EXPECT_TRUE(UTF8<>::Decode(s, &expected));
+				EXPECT_TRUE(MemoryEncoding::Decode(eis, &actual));
+				EXPECT_EQ(expected, actual);
+			}
+			EXPECT_EQ('\0', s.Peek());
+			free(data);
+		}
 	}
 
 	void TestAutoUTFInputStream(const char *filename) {
-		char buffer[16];
-		FILE *fp = Open(filename);
-		ASSERT_TRUE(fp != 0);
-		FileReadStream fs(fp, buffer, sizeof(buffer));
-		AutoUTFInputStream<unsigned, FileReadStream> eis(fs);
-		StringStream s(json_);
-		while (eis.Peek() != '\0') {
-			unsigned expected, actual;
-			EXPECT_TRUE(UTF8<>::Decode(s, &expected));
-			EXPECT_TRUE(AutoUTF<unsigned>::Decode(eis, &actual));
-			EXPECT_EQ(expected, actual);
+		// Test FileReadStream
+		{
+			char buffer[16];
+			FILE *fp = Open(filename);
+			ASSERT_TRUE(fp != 0);
+			FileReadStream fs(fp, buffer, sizeof(buffer));
+			AutoUTFInputStream<unsigned, FileReadStream> eis(fs);
+			StringStream s(json_);
+			while (eis.Peek() != '\0') {
+				unsigned expected, actual;
+				EXPECT_TRUE(UTF8<>::Decode(s, &expected));
+				EXPECT_TRUE(AutoUTF<unsigned>::Decode(eis, &actual));
+				EXPECT_EQ(expected, actual);
+			}
+			EXPECT_EQ('\0', s.Peek());
+			fclose(fp);
 		}
-		EXPECT_EQ('\0', s.Peek());
-		fclose(fp);
+
+		// Test MemoryStream
+		{
+			size_t size;
+			char* data = ReadFile(filename, true, &size);
+			MemoryStream ms(data, size);
+			AutoUTFInputStream<unsigned, MemoryStream> eis(ms);
+			StringStream s(json_);
+
+			while (eis.Peek() != '\0') {
+				unsigned expected, actual;
+				EXPECT_TRUE(UTF8<>::Decode(s, &expected));
+				EXPECT_TRUE(AutoUTF<unsigned>::Decode(eis, &actual));
+				EXPECT_EQ(expected, actual);
+			}
+			EXPECT_EQ('\0', s.Peek());
+			free(data);
+		}
 	}
 
 	template <typename FileEncoding, typename MemoryEncoding>
 	void TestEncodedOutputStream(const char* expectedFilename, bool putBOM) {
-		char filename[L_tmpnam];
-		TempFilename(filename);
+		// Test FileWriteStream
+		{
+			char filename[L_tmpnam];
+			TempFilename(filename);
 
-		FILE *fp = fopen(filename, "wb");
-		char buffer[16];
-		FileWriteStream os(fp, buffer, sizeof(buffer));
-		EncodedOutputStream<FileEncoding, FileWriteStream> eos(os, putBOM);
-		StringStream s(json_);
-		while (s.Peek() != '\0') {
-			bool success = Transcoder<UTF8<>, MemoryEncoding>::Transcode(s, eos);
-			EXPECT_TRUE(success);
+			FILE *fp = fopen(filename, "wb");
+			char buffer[16];
+			FileWriteStream os(fp, buffer, sizeof(buffer));
+			EncodedOutputStream<FileEncoding, FileWriteStream> eos(os, putBOM);
+			StringStream s(json_);
+			while (s.Peek() != '\0') {
+				bool success = Transcoder<UTF8<>, MemoryEncoding>::Transcode(s, eos);
+				EXPECT_TRUE(success);
+			}
+			eos.Flush();
+			fclose(fp);
+			EXPECT_TRUE(CompareFile(filename, expectedFilename));
+			remove(filename);
 		}
-		eos.Flush();
-		fclose(fp);
-		EXPECT_TRUE(CompareFile(filename, expectedFilename));
-		remove(filename);
+
+		// Test MemoryBuffer
+		{
+			MemoryBuffer mb;
+			EncodedOutputStream<FileEncoding, MemoryBuffer> eos(mb, putBOM);
+			StringStream s(json_);
+			while (s.Peek() != '\0') {
+				bool success = Transcoder<UTF8<>, MemoryEncoding>::Transcode(s, eos);
+				EXPECT_TRUE(success);
+			}
+			eos.Flush();
+			EXPECT_TRUE(CompareBufferFile(mb.GetBuffer(), mb.GetSize(), expectedFilename));
+		}
 	}
 
-	bool CompareFile(char * filename, const char* expectedFilename) {
+	void TestAutoUTFOutputStream(UTFType type, bool putBOM, const char *expectedFilename) {
+		// Test FileWriteStream
+		{
+			char filename[L_tmpnam];
+			TempFilename(filename);
+
+			FILE *fp = fopen(filename, "wb");
+			char buffer[16];
+			FileWriteStream os(fp, buffer, sizeof(buffer));
+			AutoUTFOutputStream<unsigned, FileWriteStream> eos(os, type, putBOM);
+			StringStream s(json_);
+			while (s.Peek() != '\0') {
+				bool success = Transcoder<UTF8<>, AutoUTF<unsigned> >::Transcode(s, eos);
+				EXPECT_TRUE(success);
+			}
+			eos.Flush();
+			fclose(fp);
+			EXPECT_TRUE(CompareFile(filename, expectedFilename));
+			remove(filename);
+		}
+
+		// Test MemoryBuffer
+		{
+			MemoryBuffer mb;
+			AutoUTFOutputStream<unsigned, MemoryBuffer> eos(mb, type, putBOM);
+			StringStream s(json_);
+			while (s.Peek() != '\0') {
+				bool success = Transcoder<UTF8<>, AutoUTF<unsigned> >::Transcode(s, eos);
+				EXPECT_TRUE(success);
+			}
+			eos.Flush();
+			EXPECT_TRUE(CompareBufferFile(mb.GetBuffer(), mb.GetSize(), expectedFilename));
+		}
+	}
+
+	bool CompareFile(const char* filename, const char* expectedFilename) {
 		size_t actualLength, expectedLength;
 		char* actualBuffer = ReadFile(filename, false, &actualLength);
 		char* expectedBuffer = ReadFile(expectedFilename, true, &expectedLength);
@@ -119,23 +214,12 @@ protected:
 		return ret;
 	}
 
-	void TestAutoUTFOutputStream(UTFType type, bool putBOM, const char *expectedFilename) {
-		char filename[L_tmpnam];
-		TempFilename(filename);
-
-		FILE *fp = fopen(filename, "wb");
-		char buffer[16];
-		FileWriteStream os(fp, buffer, sizeof(buffer));
-		AutoUTFOutputStream<unsigned, FileWriteStream> eos(os, type, putBOM);
-		StringStream s(json_);
-		while (s.Peek() != '\0') {
-			bool success = Transcoder<UTF8<>, AutoUTF<unsigned> >::Transcode(s, eos);
-			EXPECT_TRUE(success);
-		}
-		eos.Flush();
-		fclose(fp);
-		EXPECT_TRUE(CompareFile(filename, expectedFilename));
-		remove(filename);
+	bool CompareBufferFile(const char* actualBuffer, size_t actualLength, const char* expectedFilename) {
+		size_t expectedLength;
+		char* expectedBuffer = ReadFile(expectedFilename, true, &expectedLength);
+		bool ret = (expectedLength == actualLength) && memcmp(expectedBuffer, actualBuffer, actualLength) == 0;
+		free(expectedBuffer);
+		return ret;
 	}
 
 	char *json_;
