@@ -65,7 +65,8 @@ enum ParseFlag {
 	kParseDefaultFlags = 0,			//!< Default parse flags. Non-destructive parsing. Text strings are decoded into allocated buffer.
 	kParseInsituFlag = 1,			//!< In-situ(destructive) parsing.
 	kParseValidateEncodingFlag = 2,	//!< Validate encoding of JSON strings.
-	kParseIterativeFlag = 4			//!< Iterative(constant complexity in terms of function call stack size) parsing.
+	kParseIterativeFlag = 4,		//!< Iterative(constant complexity in terms of function call stack size) parsing.
+	kParseStopWhenDoneFlag = 8 		//!< After parsing a complete JSON root from stream, stop further processing the rest of stream. When this flag is used, parser will not generate kParseErrorDocumentRootNotSingular error.
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -309,11 +310,13 @@ public:
 			}
 			RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
 
-			SkipWhitespace(is);
+			if (!(parseFlags & kParseStopWhenDoneFlag)) {
+				SkipWhitespace(is);
 
-			if (is.Peek() != '\0') {
-				RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotSingular, is.Tell());
-				RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
+				if (is.Peek() != '\0') {
+					RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotSingular, is.Tell());
+					RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
+				}
 			}
 		}
 
@@ -1192,6 +1195,11 @@ private:
 			}
 
 			state = d;
+
+			// Do not further consume streams if a root JSON has been parsed.
+			if ((parseFlags & kParseStopWhenDoneFlag) && state == IterativeParsingFinishState)
+				break;
+
 			SkipWhitespace(is);
 		}
 

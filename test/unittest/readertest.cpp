@@ -545,6 +545,39 @@ TEST(Reader, Parse_EmptyObject) {
 	EXPECT_EQ(2u, h.step_);
 }
 
+struct ParseMultipleRootHandler : BaseReaderHandler<> {
+	ParseMultipleRootHandler() : step_(0) {}
+
+	bool Default() { ADD_FAILURE(); return false; }
+	bool StartObject() { EXPECT_EQ(0u, step_); step_++; return true; }
+	bool EndObject(SizeType) { EXPECT_EQ(1u, step_); step_++; return true; }
+	bool StartArray() { EXPECT_EQ(2u, step_); step_++; return true; }
+	bool EndArray(SizeType) { EXPECT_EQ(3u, step_); step_++; return true; }
+
+	unsigned step_;
+};
+
+template <unsigned parseFlags>
+void TestMultipleRoot() {
+	StringStream s("{}[] a");
+	ParseMultipleRootHandler h;
+	Reader reader;
+	EXPECT_TRUE(reader.Parse<parseFlags>(s, h));
+	EXPECT_EQ(2u, h.step_);
+	EXPECT_TRUE(reader.Parse<parseFlags>(s, h));
+	EXPECT_EQ(4u, h.step_);
+	EXPECT_EQ(' ', s.Take());
+	EXPECT_EQ('a', s.Take());
+}
+
+TEST(Reader, Parse_MultipleRoot) {
+	TestMultipleRoot<kParseStopWhenDoneFlag>();
+}
+
+TEST(Reader, ParseIterative_MultipleRoot) {
+	TestMultipleRoot<kParseIterativeFlag | kParseStopWhenDoneFlag>();
+}
+
 #define TEST_ERROR(errorCode, str) \
 	{ \
 		char buffer[1001]; \
