@@ -578,6 +578,29 @@ TEST(Reader, ParseIterative_MultipleRoot) {
 	TestMultipleRoot<kParseIterativeFlag | kParseStopWhenDoneFlag>();
 }
 
+template <unsigned parseFlags>
+void TestInsituMultipleRoot() {
+	char* buffer = strdup("{}[] a");
+	InsituStringStream s(buffer);
+	ParseMultipleRootHandler h;
+	Reader reader;
+	EXPECT_TRUE(reader.Parse<kParseInsituFlag | parseFlags>(s, h));
+	EXPECT_EQ(2u, h.step_);
+	EXPECT_TRUE(reader.Parse<kParseInsituFlag | parseFlags>(s, h));
+	EXPECT_EQ(4u, h.step_);
+	EXPECT_EQ(' ', s.Take());
+	EXPECT_EQ('a', s.Take());
+	free(buffer);
+}
+
+TEST(Reader, ParseInsitu_MultipleRoot) {
+	TestInsituMultipleRoot<kParseStopWhenDoneFlag>();
+}
+
+TEST(Reader, ParseInsituIterative_MultipleRoot) {
+	TestInsituMultipleRoot<kParseIterativeFlag | kParseStopWhenDoneFlag>();
+}
+
 #define TEST_ERROR(errorCode, str) \
 	{ \
 		char buffer[1001]; \
