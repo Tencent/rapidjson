@@ -967,7 +967,7 @@ int z = a[0u].GetInt();				// This works too.
 		return (*this).template PushBack<StringRefType>(value, allocator);
 	}
 
-	//! Append a primitive value at the end of the array(.)
+	//! Append a primitive value at the end of the array.
 	/*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t
 		\param value Value of primitive type T to be appended.
 		\param allocator	Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
