@@ -919,9 +919,16 @@ int z = a[0u].GetInt();				// This works too.
 	const GenericValue& operator[](SizeType index) const { return const_cast<GenericValue&>(*this)[index]; }
 
 	//! Element iterator
+	/*! \pre IsArray() == true */
 	ValueIterator Begin() { RAPIDJSON_ASSERT(IsArray()); return data_.a.elements; }
+	//! \em Past-the-end element iterator
+	/*! \pre IsArray() == true */
 	ValueIterator End() { RAPIDJSON_ASSERT(IsArray()); return data_.a.elements + data_.a.size; }
+	//! Constant element iterator
+	/*! \pre IsArray() == true */
 	ConstValueIterator Begin() const { return const_cast<GenericValue&>(*this).Begin(); }
+	//! Constant \em past-the-end element iterator
+	/*! \pre IsArray() == true */
 	ConstValueIterator End() const { return const_cast<GenericValue&>(*this).End(); }
 
 	//! Request the array to have enough capacity to store elements.
