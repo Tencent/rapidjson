@@ -137,6 +137,8 @@ TEST(Reader, ParseNumberHandler) {
 	TEST_DOUBLE("2.22507e-308", 2.22507e-308);
 	TEST_DOUBLE("-1.79769e+308", -1.79769e+308);
 	TEST_DOUBLE("-2.22507e-308", -2.22507e-308);
+	TEST_DOUBLE("4.9406564584124654e-324", 4.9406564584124654e-324); // minimum denormal
+	TEST_DOUBLE("1e-10000", 0.0); 									// must underflow
 	TEST_DOUBLE("18446744073709551616", 18446744073709551616.0);	// 2^64 (max of uint64_t + 1, force to use double)
 	TEST_DOUBLE("-9223372036854775809", -9223372036854775809.0);	// -2^63 - 1(min of int64_t + 1, force to use double)
 
