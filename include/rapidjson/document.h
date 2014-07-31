@@ -464,8 +464,7 @@ public:
 
 			case kObjectFlag:
 				for (MemberIterator m = MemberBegin(); m != MemberEnd(); ++m) {
-					m->name.~GenericValue();
-					m->value.~GenericValue();
+					m->~GenericMember();
 				}
 				Allocator::Free(data_.o.members);
 				break;
@@ -861,13 +860,11 @@ public:
 		MemberIterator last(data_.o.members + (data_.o.size - 1));
 		if (data_.o.size > 1 && m != last) {
 			// Move the last one to this place
-			m->name = last->name;
-			m->value = last->value;
+			*m = *last;
 		}
 		else {
 			// Only one left, just destroy
-			m->name.~GenericValue();
-			m->value.~GenericValue();
+			m->~GenericMember();
 		}
 		--data_.o.size;
 		return m;
