@@ -1,5 +1,6 @@
 #include "unittest.h"
 #include "rapidjson/document.h"
+#include <algorithm>
 
 using namespace rapidjson;
 
@@ -673,6 +674,22 @@ TEST(Value, Array) {
 				EXPECT_EQ(i + removeCount, x[i][0u].GetUint());
 		}
 	}
+
+	// Working in gcc without C++11, but VS2013 cannot compile. To be diagnosed.
+#if 0
+	// http://en.wikipedia.org/wiki/Erase-remove_idiom
+	x.Clear();
+	for (int i = 0; i < 10; i++)
+		if (i % 2 == 0)
+			x.PushBack(i, allocator);
+		else
+			x.PushBack(Value(kNullType).Move(), allocator);
+
+	x.Erase(std::remove(x.Begin(), x.End(), Value(kNullType)), x.End());
+	EXPECT_EQ(5u, x.Size());
+	for (int i = 0; i < 5; i++)
+		EXPECT_EQ(i * 2, x[i]);
+#endif
 
 	// SetArray()
 	Value z;
