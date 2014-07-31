@@ -556,6 +556,71 @@ public:
 	GenericValue& Move() { return *this; }
 	//@}
 
+	//!@name Equal-to and not-equal-to operators
+	//@{
+	//! Equal-to operator
+	bool operator==(const GenericValue& rhs) const {
+		if (GetType() != rhs.GetType())
+			return false;
+
+		switch (GetType()) {
+		case kObjectType: // Warning: O(n^2) inner-loop
+			if (data_.o.size != rhs.data_.o.size)
+				return false;			
+			for (ConstMemberIterator lhsMemberItr = MemberBegin(); lhsMemberItr != MemberEnd(); ++lhsMemberItr) {
+				ConstMemberIterator rhsMemberItr = rhs.FindMember(lhsMemberItr->name);
+				if (rhsMemberItr == rhs.MemberEnd() || lhsMemberItr->value != rhsMemberItr->value)
+					return false;
+			}
+			return true;
+
+			
+		case kArrayType:
+			if (data_.a.size != rhs.data_.a.size)
+				return false;
+			for (size_t i = 0; i < data_.a.size; i++)
+				if ((*this)[i] != rhs[i])
+					return false;
+			return true;
+
+		case kStringType:
+			return StringEqual(rhs);
+
+		case kNumberType:
+			if (IsDouble() || rhs.GetDouble())
+				return GetDouble() == rhs.GetDouble(); // May convert one operand from integer to double.
+			else
+				return data_.n.u64 == rhs.data_.n.u64;
+
+		default: // kTrueType, kFalseType, kNullType
+			return true;
+		}
+	}
+
+	//! Not-equal-to operator
+	bool operator!=(const GenericValue& rhs) const { return !(*this == rhs); }
+
+	//! (Not-)Equal-to operator with const C-string pointer.
+	friend bool operator==(const GenericValue& lhs, const Ch* rhs) { return lhs == GenericValue(StringRef(rhs)); }
+	friend bool operator!=(const GenericValue& lhs, const Ch* rhs) { return !(lhs == rhs); }
+	friend bool operator==(const Ch* lhs, const GenericValue& rhs) { return GenericValue(StringRef(lhs)) == rhs; }
+	friend bool operator!=(const Ch* lhs, const GenericValue& rhs) { return !(lhs == rhs); }
+
+	//! (Not-)Equal-to operator with non-const C-string pointer.
+	friend bool operator==(const GenericValue& lhs, Ch* rhs) { return lhs == GenericValue(StringRef(rhs)); }
+	friend bool operator!=(const GenericValue& lhs, Ch* rhs) { return !(lhs == rhs); }
+	friend bool operator==(Ch* lhs, const GenericValue& rhs) { return GenericValue(StringRef(lhs)) == rhs; }
+	friend bool operator!=(Ch* lhs, const GenericValue& rhs) { return !(lhs == rhs); }
+
+	//! (Not-)Equal-to operator with primitive types.
+	/*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c double, \c true, \c false
+	*/
+	template <typename T> friend bool operator==(const GenericValue& lhs, const T& rhs) { return lhs == GenericValue(rhs); }
+	template <typename T> friend bool operator!=(const GenericValue& lhs, const T& rhs) { return !(lhs == rhs); }
+	template <typename T> friend bool operator==(const T& lhs, const GenericValue& rhs) { return GenericValue(lhs) == rhs; }
+	template <typename T> friend bool operator!=(const T& lhs, const GenericValue& rhs) { return !(lhs == rhs); }
+	//@}
+
 	//!@name Type
 	//@{
 
@@ -672,10 +737,9 @@ public:
 	MemberIterator FindMember(const GenericValue& name) {
 		RAPIDJSON_ASSERT(IsObject());
 		RAPIDJSON_ASSERT(name.IsString());
-		SizeType len = name.data_.s.length;
 		MemberIterator member = MemberBegin();
 		for ( ; member != MemberEnd(); ++member)
-			if (member->name.data_.s.length == len && memcmp(member->name.data_.s.str, name.data_.s.str, len * sizeof(Ch)) == 0)
+			if (name.StringEqual(member->name))
 				break;
 		return member;
 	}
@@ -1212,6 +1276,13 @@ private:
 		data_ = rhs.data_;
 		flags_ = rhs.flags_;
 		rhs.flags_ = kNullFlag;
+	}
+
+	bool StringEqual(const GenericValue& rhs) const {
+		RAPIDJSON_ASSERT(IsString());
+		RAPIDJSON_ASSERT(rhs.IsString());
+		return data_.s.str == rhs.data_.s.str || // fast path for constant string
+			((data_.s.length == rhs.data_.s.length) && memcmp(data_.s.str, rhs.data_.s.str, sizeof(Ch) * data_.s.length) == 0);
 	}
 
 	Data data_;

@@ -44,6 +44,58 @@ TEST(Value, assignment_operator) {
 	EXPECT_EQ(y.GetString(),mstr);
 }
 
+template <typename A, typename B> 
+void TestEqual(const A& a, const B& b) {
+	EXPECT_TRUE (a == b);
+	EXPECT_FALSE(a != b);
+	EXPECT_TRUE (b == a);
+	EXPECT_FALSE(b != a);
+}
+
+template <typename A, typename B> 
+void TestUnequal(const A& a, const B& b) {
+	EXPECT_FALSE(a == b);
+	EXPECT_TRUE (a != b);
+	EXPECT_FALSE(b == a);
+	EXPECT_TRUE (b != a);
+}
+
+TEST(Value, equalto_operator) {
+	Value::AllocatorType allocator;
+	Value x(kObjectType);
+	x.AddMember("hello", "world", allocator)
+		.AddMember("t", Value(true).Move(), allocator)
+		.AddMember("f", Value(false).Move(), allocator)
+		.AddMember("n", Value(kNullType).Move(), allocator)
+		.AddMember("i", 123, allocator)
+		.AddMember("pi", 3.14, allocator)
+		.AddMember("a", Value(kArrayType).Move().PushBack(1, allocator).PushBack(2, allocator).PushBack(3, allocator), allocator);
+
+	// Test templated operator==() and operator!=()
+	TestEqual(x["hello"], "world");
+	const char* cc = "world";
+	TestEqual(x["hello"], cc);
+	char* c = strdup("world");
+	TestEqual(x["hello"], c);
+	free(c);
+
+	TestEqual(x["t"], true);
+	TestEqual(x["f"], false);
+	TestEqual(x["i"], 123);
+	TestEqual(x["pi"], 3.14);
+
+	// Test operator==()
+	Value y;
+	y.CopyFrom(x, allocator);
+	TestEqual(x, y);
+
+	// Swapping member order should be fine.
+	y.RemoveMember("t");
+	TestUnequal(x, y);
+	y.AddMember("t", Value(true).Move(), allocator);
+	TestEqual(x, y);
+}
+
 template <typename Value>
 void TestCopyFrom() {
 	typename Value::AllocatorType a;
