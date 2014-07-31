@@ -628,11 +628,11 @@ TEST(Value, Array) {
 		x.PushBack(Value(kArrayType).PushBack(i, allocator).Move(), allocator);
 
 	// Erase the first
-	itr = x.Erase(y.Begin());	// const iteator is also OK
-	EXPECT_EQ(y.Begin(), itr);
-	EXPECT_EQ(9u, y.Size());
+	itr = x.Erase(x.Begin());
+	EXPECT_EQ(x.Begin(), itr);
+	EXPECT_EQ(9u, x.Size());
 	for (int i = 0; i < 9; i++)
-		EXPECT_EQ(i + 1, y[i][0u].GetInt());
+		EXPECT_EQ(i + 1, x[i][0u].GetInt());
 
 	// Ease the last
 	itr = x.Erase(x.End() - 1);
@@ -659,7 +659,7 @@ TEST(Value, Array) {
 			for (unsigned i = 0; i < n; i++)
 				x.PushBack(Value(kArrayType).PushBack(i, allocator).Move(), allocator);
 			
-			itr = x.Erase(y.Begin() + first, y.Begin() + last); // const iterator is also OK
+			itr = x.Erase(x.Begin() + first, x.Begin() + last);
 			if (last == n)
 				EXPECT_EQ(x.End(), itr);
 			else
