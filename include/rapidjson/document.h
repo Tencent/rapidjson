@@ -1008,7 +1008,7 @@ int z = a[0u].GetInt();				// This works too.
 	//! Remove an element of array by iterator.
 	/*!
 		\param pos iterator to the element to remove
-		\pre IsArray() == true
+		\pre IsArray() == true && \ref Begin() <= \c pos < \ref End()
 		\return Iterator following the removed element. If the iterator pos refers to the last element, the End() iterator is returned.
 	*/
 	ValueIterator Erase(ValueIterator pos) {
@@ -1017,10 +1017,10 @@ int z = a[0u].GetInt();				// This works too.
 
 	//! Remove elements in the range [first, last) of the array.
 	/*!
-		\param pos iterator to the element to remove
-		\param first,last range of elements to remove
-		\pre IsArray() == true
-		\return Iterator following the last removed element. If the iterator pos refers to the last element, the End() iterator is returned.
+		\param first iterator to the first element to remove
+		\param last  iterator following the last element to remove
+		\pre IsArray() == true && \ref Begin() <= \c first <= \c last <= \ref End()
+		\return Iterator following the last removed element.
 	*/
 	ValueIterator Erase(ValueIterator first, ValueIterator last) {
 		RAPIDJSON_ASSERT(IsArray());
