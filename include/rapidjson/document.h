@@ -850,6 +850,7 @@ public:
 	/*! \param m member iterator (obtained by FindMember() or MemberBegin()).
 		\return the new iterator after removal.
 		\note Removing member is implemented by moving the last member. So the ordering of members is changed.
+		\note Use \ref Erase(ConstMemberIterator) instead, if you need to rely on a stable member ordering.
 	*/
 	MemberIterator RemoveMember(MemberIterator m) {
 		RAPIDJSON_ASSERT(IsObject());
@@ -868,6 +869,40 @@ public:
 		}
 		--data_.o.size;
 		return m;
+	}
+
+	//! Remove a member from an object by iterator.
+	/*! \param pos iterator to the member to remove
+		\pre IsObject() == true && \ref MemberBegin() <= \c pos < \ref MemberEnd()
+		\return Iterator following the removed element.
+			If the iterator \c pos refers to the last element, the \ref MemberEnd() iterator is returned.
+		\note Other than \ref RemoveMember(MemberIterator), this function preserves the ordering of the members.
+	*/
+	MemberIterator Erase(ConstMemberIterator pos) {
+		return Erase(pos, pos +1);
+	}
+
+	//! Remove members in the range [first, last) from an object.
+	/*! \param first iterator to the first member to remove
+		\param last  iterator following the last member to remove
+		\pre IsObject() == true && \ref MemberBegin() <= \c first <= \c last <= \ref MemberEnd()
+		\return Iterator following the last removed element.
+		\note Other than \ref RemoveMember(MemberIterator), this function preserves the ordering of the members.
+	*/
+	MemberIterator Erase(ConstMemberIterator first, ConstMemberIterator last) {
+		RAPIDJSON_ASSERT(IsObject());
+		RAPIDJSON_ASSERT(data_.o.size > 0);
+		RAPIDJSON_ASSERT(data_.o.members != 0);
+		RAPIDJSON_ASSERT(first >= MemberBegin());
+		RAPIDJSON_ASSERT(first <= last);
+		RAPIDJSON_ASSERT(last <= MemberEnd());
+
+		MemberIterator pos = MemberBegin() + (first - MemberBegin());
+		for (MemberIterator itr = pos; ConstMemberIterator(itr) != last; ++itr)
+			itr->~Member();
+		memmove(&*pos, &*last, (ConstMemberIterator(MemberEnd()) - last) * sizeof(Member));
+		data_.o.size -= (last - first);
+		return pos;
 	}
 
 	//@}
