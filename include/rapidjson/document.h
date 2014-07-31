@@ -1011,7 +1011,7 @@ int z = a[0u].GetInt();				// This works too.
 		\pre IsArray() == true && \ref Begin() <= \c pos < \ref End()
 		\return Iterator following the removed element. If the iterator pos refers to the last element, the End() iterator is returned.
 	*/
-	ValueIterator Erase(ValueIterator pos) {
+	ValueIterator Erase(ConstValueIterator pos) {
 		return Erase(pos, pos + 1);
 	}
 
@@ -1022,18 +1022,19 @@ int z = a[0u].GetInt();				// This works too.
 		\pre IsArray() == true && \ref Begin() <= \c first <= \c last <= \ref End()
 		\return Iterator following the last removed element.
 	*/
-	ValueIterator Erase(ValueIterator first, ValueIterator last) {
+	ValueIterator Erase(ConstValueIterator first, ConstValueIterator last) {
 		RAPIDJSON_ASSERT(IsArray());
 		RAPIDJSON_ASSERT(data_.a.size > 0);
 		RAPIDJSON_ASSERT(data_.a.elements != 0);
 		RAPIDJSON_ASSERT(first >= Begin());
 		RAPIDJSON_ASSERT(first <= last);
 		RAPIDJSON_ASSERT(last <= End());
-		for (ValueIterator itr = first; itr != last; ++itr)
+		ValueIterator pos = Begin() + (first - Begin());
+		for (ValueIterator itr = pos; itr != last; ++itr)
 			itr->~GenericValue();		
-		memmove(first, last, (End() - last) * sizeof(GenericValue));
+		memmove(pos, last, (End() - last) * sizeof(GenericValue));
 		data_.a.size -= (last - first);
-		return first;
+		return pos;
 	}
 
 	//@}
