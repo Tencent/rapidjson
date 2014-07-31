@@ -850,7 +850,7 @@ public:
 	/*! \param m member iterator (obtained by FindMember() or MemberBegin()).
 		\return the new iterator after removal.
 		\note Removing member is implemented by moving the last member. So the ordering of members is changed.
-		\note Use \ref Erase(ConstMemberIterator) instead, if you need to rely on a stable member ordering.
+		\note Use \ref EraseMember(ConstMemberIterator) instead, if you need to rely on a stable member ordering.
 	*/
 	MemberIterator RemoveMember(MemberIterator m) {
 		RAPIDJSON_ASSERT(IsObject());
@@ -878,8 +878,8 @@ public:
 			If the iterator \c pos refers to the last element, the \ref MemberEnd() iterator is returned.
 		\note Other than \ref RemoveMember(MemberIterator), this function preserves the ordering of the members.
 	*/
-	MemberIterator Erase(ConstMemberIterator pos) {
-		return Erase(pos, pos +1);
+	MemberIterator EraseMember(ConstMemberIterator pos) {
+		return EraseMember(pos, pos +1);
 	}
 
 	//! Remove members in the range [first, last) from an object.
@@ -889,7 +889,7 @@ public:
 		\return Iterator following the last removed element.
 		\note Other than \ref RemoveMember(MemberIterator), this function preserves the ordering of the members.
 	*/
-	MemberIterator Erase(ConstMemberIterator first, ConstMemberIterator last) {
+	MemberIterator EraseMember(ConstMemberIterator first, ConstMemberIterator last) {
 		RAPIDJSON_ASSERT(IsObject());
 		RAPIDJSON_ASSERT(data_.o.size > 0);
 		RAPIDJSON_ASSERT(data_.o.members != 0);

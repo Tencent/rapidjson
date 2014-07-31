@@ -789,7 +789,7 @@ TEST(Value, Object) {
 
 	EXPECT_TRUE(x.MemberBegin() == x.MemberEnd());
 
-	// Erase(ConstMemberIterator)
+	// EraseMember(ConstMemberIterator)
 
 	// Use array members to ensure removed elements' destructor is called.
 	// { "a": [0], "b": [1],[2],...]
@@ -798,7 +798,7 @@ TEST(Value, Object) {
 		x.AddMember(keys[i], Value(kArrayType).PushBack(i, allocator), allocator);
 
 	// Erase the first
-	itr = x.Erase(x.MemberBegin());
+	itr = x.EraseMember(x.MemberBegin());
 	EXPECT_FALSE(x.HasMember(keys[0]));
 	EXPECT_EQ(x.MemberBegin(), itr);
 	EXPECT_EQ(9u, x.MemberEnd() - x.MemberBegin());
@@ -809,7 +809,7 @@ TEST(Value, Object) {
 	}
 
 	// Erase the last
-	itr = x.Erase(x.MemberEnd() - 1);
+	itr = x.EraseMember(x.MemberEnd() - 1);
 	EXPECT_FALSE(x.HasMember(keys[9]));
 	EXPECT_EQ(x.MemberEnd(), itr);
 	EXPECT_EQ(8u, x.MemberEnd() - x.MemberBegin());
@@ -820,7 +820,7 @@ TEST(Value, Object) {
 	}
 
 	// Erase the middle
-	itr = x.Erase(x.MemberBegin() + 4);
+	itr = x.EraseMember(x.MemberBegin() + 4);
 	EXPECT_FALSE(x.HasMember(keys[5]));
 	EXPECT_EQ(x.MemberBegin() + 4, itr);
 	EXPECT_EQ(7u, x.MemberEnd() - x.MemberBegin());
@@ -831,7 +831,7 @@ TEST(Value, Object) {
 		EXPECT_EQ(i, itr->value[0u].GetInt());
 	}
 
-	// Erase(ConstMemberIterator, ConstMemberIterator)
+	// EraseMember(ConstMemberIterator, ConstMemberIterator)
 	// Exhaustive test with all 0 <= first < n, first <= last <= n cases
 	const unsigned n = 10;
 	for (unsigned first = 0; first < n; first++) {
@@ -840,7 +840,7 @@ TEST(Value, Object) {
 			for (unsigned i = 0; i < n; i++)
 				x.AddMember(keys[i], Value(kArrayType).PushBack(i, allocator), allocator);
 
-			itr = x.Erase(x.MemberBegin() + first, x.MemberBegin() + last);
+			itr = x.EraseMember(x.MemberBegin() + first, x.MemberBegin() + last);
 			if (last == n)
 				EXPECT_EQ(x.MemberEnd(), itr);
 			else
