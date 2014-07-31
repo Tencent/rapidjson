@@ -933,6 +933,38 @@ int z = a[0u].GetInt();				// This works too.
 		data_.a.elements[--data_.a.size].~GenericValue();
 		return *this;
 	}
+
+	//! Remove an element of array by iterator.
+	/*!
+		\param pos iterator to the element to remove
+		\pre IsArray() == true
+		\return Iterator following the removed element. If the iterator pos refers to the last element, the End() iterator is returned.
+	*/
+	ValueIterator Erase(ValueIterator pos) {
+		return Erase(pos, pos + 1);
+	}
+
+	//! Remove elements in the range [first, last) of the array.
+	/*!
+		\param pos iterator to the element to remove
+		\param first,last range of elements to remove
+		\pre IsArray() == true
+		\return Iterator following the last removed element. If the iterator pos refers to the last element, the End() iterator is returned.
+	*/
+	ValueIterator Erase(ValueIterator first, ValueIterator last) {
+		RAPIDJSON_ASSERT(IsArray());
+		RAPIDJSON_ASSERT(data_.a.size > 0);
+		RAPIDJSON_ASSERT(data_.a.elements != 0);
+		RAPIDJSON_ASSERT(first >= Begin());
+		RAPIDJSON_ASSERT(first <= last);
+		RAPIDJSON_ASSERT(last <= End());
+		for (ValueIterator itr = first; itr != last; ++itr)
+			itr->~GenericValue();		
+		memmove(first, last, (End() - last) * sizeof(GenericValue));
+		data_.a.size -= (last - first);
+		return first;
+	}
+
 	//@}
 
 	//!@name Number

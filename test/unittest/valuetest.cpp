@@ -568,6 +568,60 @@ TEST(Value, Array) {
 	EXPECT_TRUE(y.Empty());
 	EXPECT_EQ(0u, y.Size());
 
+	// Erase(ValueIterator)
+
+	// Use array of array to ensure removed elements' destructor is called.
+	// [[0],[1],[2],...]
+	for (int i = 0; i < 10; i++)
+		x.PushBack(Value(kArrayType).PushBack(i, allocator).Move(), allocator);
+
+	// Erase the first
+	itr = x.Erase(x.Begin());
+	EXPECT_EQ(x.Begin(), itr);
+	EXPECT_EQ(9u, x.Size());
+	for (int i = 0; i < 9; i++)
+		EXPECT_EQ(i + 1, x[i][0u].GetInt());
+
+	// Ease the last
+	itr = x.Erase(x.End() - 1);
+	EXPECT_EQ(x.End(), itr);
+	EXPECT_EQ(8u, x.Size());
+	for (int i = 0; i < 8; i++)
+		EXPECT_EQ(i + 1, x[i][0u].GetInt());
+
+	// Erase the middle
+	itr = x.Erase(x.Begin() + 4);
+	EXPECT_EQ(x.Begin() + 4, itr);
+	EXPECT_EQ(7u, x.Size());
+	for (int i = 0; i < 4; i++)
+		EXPECT_EQ(i + 1, x[i][0u].GetInt());
+	for (int i = 4; i < 7; i++)
+		EXPECT_EQ(i + 2, x[i][0u].GetInt());
+
+	// Erase(ValueIterator, ValueIterator)
+	// Exhaustive test with all 0 <= first < n, first <= last <= n cases
+	const unsigned n = 10;
+	for (unsigned first = 0; first < n; first++) {
+		for (unsigned last = first; last <= n; last++) {
+			x.Clear();
+			for (unsigned i = 0; i < n; i++)
+				x.PushBack(Value(kArrayType).PushBack(i, allocator).Move(), allocator);
+			
+			itr = x.Erase(x.Begin() + first, x.Begin() + last);
+			if (last == n)
+				EXPECT_EQ(x.End(), itr);
+			else
+				EXPECT_EQ(x.Begin() + first, itr);
+
+			size_t removeCount = last - first;
+			EXPECT_EQ(n - removeCount, x.Size());
+			for (unsigned i = 0; i < first; i++)
+				EXPECT_EQ(i, x[i][0u].GetUint());
+			for (unsigned i = first; i < n - removeCount; i++)
+				EXPECT_EQ(i + removeCount, x[i][0u].GetUint());
+		}
+	}
+
 	// SetArray()
 	Value z;
 	z.SetArray();
