@@ -580,7 +580,7 @@ public:
 		case kArrayType:
 			if (data_.a.size != rhs.data_.a.size)
 				return false;
-			for (size_t i = 0; i < data_.a.size; i++)
+			for (SizeType i = 0; i < data_.a.size; i++)
 				if ((*this)[i] != rhs[i])
 					return false;
 			return true;
