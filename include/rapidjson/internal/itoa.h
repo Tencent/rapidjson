@@ -109,7 +109,7 @@ inline char* i32toa(int32_t value, char* buffer) {
 inline char* u64toa(uint64_t value, char* buffer) {
     const char* cDigitsLut = GetDigitsLut();
     
-    if (value < 100000000) {
+    if (value < UINT64_C(100000000)) {
         uint32_t v = static_cast<uint32_t>(value);
         if (v < 10000) {
             const uint32_t d1 = (v / 100) << 1;
@@ -148,9 +148,9 @@ inline char* u64toa(uint64_t value, char* buffer) {
             *buffer++ = cDigitsLut[d4 + 1];
         }
     }
-    else if (value < 10000000000000000) {
-        const uint32_t v0 = static_cast<uint32_t>(value / 100000000);
-        const uint32_t v1 = static_cast<uint32_t>(value % 100000000);
+    else if (value < UINT64_C(10000000000000000)) {
+        const uint32_t v0 = static_cast<uint32_t>(value / UINT64_C(100000000));
+        const uint32_t v1 = static_cast<uint32_t>(value % UINT64_C(100000000));
         
         const uint32_t b0 = v0 / 10000;
         const uint32_t c0 = v0 % 10000;
@@ -170,21 +170,21 @@ inline char* u64toa(uint64_t value, char* buffer) {
         const uint32_t d7 = (c1 / 100) << 1;
         const uint32_t d8 = (c1 % 100) << 1;
 
-        if (value >= 1000000000000000)
+        if (value >= UINT64_C(1000000000000000))
             *buffer++ = cDigitsLut[d1];
-        if (value >= 100000000000000)
+        if (value >= UINT64_C(100000000000000))
             *buffer++ = cDigitsLut[d1 + 1];
-        if (value >= 10000000000000)
+        if (value >= UINT64_C(10000000000000))
             *buffer++ = cDigitsLut[d2];
-        if (value >= 1000000000000)
+        if (value >= UINT64_C(1000000000000))
             *buffer++ = cDigitsLut[d2 + 1];
-        if (value >= 100000000000)
+        if (value >= UINT64_C(100000000000))
             *buffer++ = cDigitsLut[d3];
-        if (value >= 10000000000)
+        if (value >= UINT64_C(10000000000))
             *buffer++ = cDigitsLut[d3 + 1];
-        if (value >= 1000000000)
+        if (value >= UINT64_C(1000000000))
             *buffer++ = cDigitsLut[d4];
-        if (value >= 100000000)
+        if (value >= UINT64_C(100000000))
             *buffer++ = cDigitsLut[d4 + 1];
         
         *buffer++ = cDigitsLut[d5];
@@ -197,8 +197,8 @@ inline char* u64toa(uint64_t value, char* buffer) {
         *buffer++ = cDigitsLut[d8 + 1];
     }
     else {
-        const uint32_t a = static_cast<uint32_t>(value / 10000000000000000); // 1 to 1844
-        value %= 10000000000000000;
+        const uint32_t a = static_cast<uint32_t>(value / UINT64_C(10000000000000000)); // 1 to 1844
+        value %= UINT64_C(10000000000000000);
         
         if (a < 10)
             *buffer++ = '0' + static_cast<char>(a);
@@ -223,8 +223,8 @@ inline char* u64toa(uint64_t value, char* buffer) {
             *buffer++ = cDigitsLut[j + 1];
         }
         
-        const uint32_t v0 = static_cast<uint32_t>(value / 100000000);
-        const uint32_t v1 = static_cast<uint32_t>(value % 100000000);
+        const uint32_t v0 = static_cast<uint32_t>(value / UINT64_C(100000000));
+        const uint32_t v1 = static_cast<uint32_t>(value % UINT64_C(100000000));
         
         const uint32_t b0 = v0 / 10000;
         const uint32_t c0 = v0 % 10000;
