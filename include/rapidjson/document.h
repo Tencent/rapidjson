@@ -1008,6 +1008,10 @@ int z = a[0u].GetInt();				// This works too.
 		return Erase(pos, pos + 1);
 	}
 
+	ValueIterator Erase(ConstValueIterator pos) {
+		return Erase(const_cast<ValueIterator>(pos));
+	}
+
 	//! Remove elements in the range [first, last) of the array.
 	/*!
 		\param pos iterator to the element to remove
@@ -1027,6 +1031,10 @@ int z = a[0u].GetInt();				// This works too.
 		memmove(first, last, (End() - last) * sizeof(GenericValue));
 		data_.a.size -= (last - first);
 		return first;
+	}
+
+	ValueIterator Erase(ConstValueIterator first, ConstValueIterator last) {
+		return Erase(const_cast<ValueIterator>(first), const_cast<ValueIterator>(last));
 	}
 
 	//@}
