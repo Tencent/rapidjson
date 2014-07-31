@@ -847,7 +847,7 @@ TEST(Value, Object) {
 				EXPECT_EQ(x.MemberBegin() + first, itr);
 
 			size_t removeCount = last - first;
-			EXPECT_EQ(n - removeCount, size_t(x.MemberEnd() - x.MemberBegin());
+			EXPECT_EQ(n - removeCount, size_t(x.MemberEnd() - x.MemberBegin()));
 			for (unsigned i = 0; i < first; i++)
 				EXPECT_EQ(i, x[keys[i]][0u].GetUint());
 			for (unsigned i = first; i < n - removeCount; i++)
