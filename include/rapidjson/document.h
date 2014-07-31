@@ -558,6 +558,10 @@ public:
 	//!@name Equal-to and not-equal-to operators
 	//@{
 	//! Equal-to operator
+	/*!
+		\note If an object contains duplicated named member, comparing equality with any object is always \c false.
+		\note Linear time complexity (number of all values in the subtree and total lengths of all strings).
+	*/
 	bool operator==(const GenericValue& rhs) const {
 		if (GetType() != rhs.GetType())
 			return false;
@@ -572,7 +576,6 @@ public:
 					return false;
 			}
 			return true;
-
 			
 		case kArrayType:
 			if (data_.a.size != rhs.data_.a.size)
@@ -669,7 +672,8 @@ public:
 		\note In version 0.1x, if the member is not found, this function returns a null value. This makes issue 7.
 		Since 0.2, if the name is not correct, it will assert.
 		If user is unsure whether a member exists, user should use HasMember() first.
-		A better approach is to use the now public FindMember().
+		A better approach is to use FindMember().
+		\note Linear time complexity.
 	*/
 	GenericValue& operator[](const Ch* name) {
 		GenericValue n(StringRef(name));
@@ -706,16 +710,28 @@ public:
 
 	//! Check whether a member exists in the object.
 	/*!
+		\param name Member name to be searched.
+		\pre IsObject() == true
+		\return Whether a member with that name exists.
 		\note It is better to use FindMember() directly if you need the obtain the value as well.
+		\note Linear time complexity.
 	*/
 	bool HasMember(const Ch* name) const { return FindMember(name) != MemberEnd(); }
 
-	// This version is faster because it does not need a StrLen(). 
-	// It can also handle string with null character.
+	//! Check whether a member exists in the object with GenericValue name.
+	/*!
+		This version is faster because it does not need a StrLen(). It can also handle string with null character.
+		\param name Member name to be searched.
+		\pre IsObject() == true
+		\return Whether a member with that name exists.
+		\note It is better to use FindMember() directly if you need the obtain the value as well.
+		\note Linear time complexity.
+	*/
 	bool HasMember(const GenericValue& name) const { return FindMember(name) != MemberEnd(); }
 
 	//! Find member by name.
 	/*!
+		\param name Member name to be searched.
 		\pre IsObject() == true
 		\return Iterator to member, if it exists.
 			Otherwise returns \ref MemberEnd().
@@ -723,6 +739,7 @@ public:
 		\note Earlier versions of Rapidjson returned a \c NULL pointer, in case
 			the requested member doesn't exist. For consistency with e.g.
 			\c std::map, this has been changed to MemberEnd() now.
+		\note Linear time complexity.
 	*/
 	MemberIterator FindMember(const Ch* name) {
 		GenericValue n(StringRef(name));
@@ -731,8 +748,19 @@ public:
 
 	ConstMemberIterator FindMember(const Ch* name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
 
-	// This version is faster because it does not need a StrLen(). 
-	// It can also handle string with null character.
+	//! Find member by name.
+	/*!
+		This version is faster because it does not need a StrLen(). It can also handle string with null character.
+		\param name Member name to be searched.
+		\pre IsObject() == true
+		\return Iterator to member, if it exists.
+			Otherwise returns \ref MemberEnd().
+
+		\note Earlier versions of Rapidjson returned a \c NULL pointer, in case
+			the requested member doesn't exist. For consistency with e.g.
+			\c std::map, this has been changed to MemberEnd() now.
+		\note Linear time complexity.
+	*/
 	MemberIterator FindMember(const GenericValue& name) {
 		RAPIDJSON_ASSERT(IsObject());
 		RAPIDJSON_ASSERT(name.IsString());
@@ -752,6 +780,7 @@ public:
 		\note The ownership of \c name and \c value will be transferred to this object on success.
 		\pre  IsObject() && name.IsString()
 		\post name.IsNull() && value.IsNull()
+		\note Amortized Constant time complexity.
 	*/
 	GenericValue& AddMember(GenericValue& name, GenericValue& value, Allocator& allocator) {
 		RAPIDJSON_ASSERT(IsObject());
@@ -783,6 +812,7 @@ public:
 		\note The ownership of \c value will be transferred to this object on success.
 		\pre  IsObject()
 		\post value.IsNull()
+		\note Amortized Constant time complexity.
 	*/
 	GenericValue& AddMember(StringRefType name, GenericValue& value, Allocator& allocator) {
 		GenericValue n(name);
@@ -796,6 +826,7 @@ public:
 		\return The value itself for fluent API.
 		\pre  IsObject()
 		\note This overload is needed to avoid clashes with the generic primitive type AddMember(StringRefType,T,Allocator&) overload below.
+		\note Amortized Constant time complexity.
 	*/
 	GenericValue& AddMember(StringRefType name, StringRefType value, Allocator& allocator) {
 		GenericValue v(value);
@@ -817,6 +848,7 @@ public:
 			AddMember(StringRefType, StringRefType, Allocator&).
 			All other pointer types would implicitly convert to \c bool,
 			use an explicit cast instead, if needed.
+		\note Amortized Constant time complexity.
 	*/
 	template <typename T>
 	RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>,GenericValue&)
@@ -830,6 +862,7 @@ public:
 	/*! \param name Name of member to be removed.
 	    \return Whether the member existed.
 	    \note Removing member is implemented by moving the last member. So the ordering of members is changed.
+	    \note Linear time complexity.
 	*/
 	bool RemoveMember(const Ch* name) {
 		GenericValue n(StringRef(name));
@@ -851,6 +884,7 @@ public:
 		\return the new iterator after removal.
 		\note Removing member is implemented by moving the last member. So the ordering of members is changed.
 		\note Use \ref EraseMember(ConstMemberIterator) instead, if you need to rely on a stable member ordering.
+		\note Constant time complexity.
 	*/
 	MemberIterator RemoveMember(MemberIterator m) {
 		RAPIDJSON_ASSERT(IsObject());
@@ -877,6 +911,7 @@ public:
 		\return Iterator following the removed element.
 			If the iterator \c pos refers to the last element, the \ref MemberEnd() iterator is returned.
 		\note Other than \ref RemoveMember(MemberIterator), this function preserves the ordering of the members.
+		\note Linear time complexity.
 	*/
 	MemberIterator EraseMember(ConstMemberIterator pos) {
 		return EraseMember(pos, pos +1);
@@ -888,6 +923,7 @@ public:
 		\pre IsObject() == true && \ref MemberBegin() <= \c first <= \c last <= \ref MemberEnd()
 		\return Iterator following the last removed element.
 		\note Other than \ref RemoveMember(MemberIterator), this function preserves the ordering of the members.
+		\note Linear time complexity.
 	*/
 	MemberIterator EraseMember(ConstMemberIterator first, ConstMemberIterator last) {
 		RAPIDJSON_ASSERT(IsObject());
@@ -925,6 +961,7 @@ public:
 
 	//! Remove all elements in the array.
 	/*! This function do not deallocate memory in the array, i.e. the capacity is unchanged.
+		\note Linear time complexity.
 	*/
 	void Clear() {
 		RAPIDJSON_ASSERT(IsArray()); 
@@ -967,6 +1004,7 @@ int z = a[0u].GetInt();				// This works too.
 	/*! \param newCapacity	The capacity that the array at least need to have.
 		\param allocator	Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
 		\return The value itself for fluent API.
+		\note Linear time complexity.
 	*/
 	GenericValue& Reserve(SizeType newCapacity, Allocator &allocator) {
 		RAPIDJSON_ASSERT(IsArray());
@@ -985,6 +1023,7 @@ int z = a[0u].GetInt();				// This works too.
 		\return The value itself for fluent API.
 		\note The ownership of \c value will be transferred to this array on success.
 		\note If the number of elements to be appended is known, calls Reserve() once first may be more efficient.
+		\note Amortized constant time complexity.
 	*/
 	GenericValue& PushBack(GenericValue& value, Allocator& allocator) {
 		RAPIDJSON_ASSERT(IsArray());
@@ -1000,6 +1039,7 @@ int z = a[0u].GetInt();				// This works too.
 		\pre IsArray() == true
 		\return The value itself for fluent API.
 		\note If the number of elements to be appended is known, calls Reserve() once first may be more efficient.
+		\note Amortized constant time complexity.
 		\see GenericStringRef
 	*/
 	GenericValue& PushBack(StringRefType value, Allocator& allocator) {
@@ -1021,6 +1061,7 @@ int z = a[0u].GetInt();				// This works too.
 			PushBack(StringRefType, Allocator&).
 			All other pointer types would implicitly convert to \c bool,
 			use an explicit cast instead, if needed.
+		\note Amortized constant time complexity.
 	*/
 	template <typename T>
 	RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>,GenericValue&)
@@ -1030,6 +1071,9 @@ int z = a[0u].GetInt();				// This works too.
 	}
 
 	//! Remove the last element in the array.
+	/*!
+		\note Constant time complexity.
+	*/
 	GenericValue& PopBack() {
 		RAPIDJSON_ASSERT(IsArray());
 		RAPIDJSON_ASSERT(!Empty());
@@ -1042,6 +1086,7 @@ int z = a[0u].GetInt();				// This works too.
 		\param pos iterator to the element to remove
 		\pre IsArray() == true && \ref Begin() <= \c pos < \ref End()
 		\return Iterator following the removed element. If the iterator pos refers to the last element, the End() iterator is returned.
+		\note Linear time complexity.
 	*/
 	ValueIterator Erase(ConstValueIterator pos) {
 		return Erase(pos, pos + 1);
@@ -1053,6 +1098,7 @@ int z = a[0u].GetInt();				// This works too.
 		\param last  iterator following the last element to remove
 		\pre IsArray() == true && \ref Begin() <= \c first <= \c last <= \ref End()
 		\return Iterator following the last removed element.
+		\note Linear time complexity.
 	*/
 	ValueIterator Erase(ConstValueIterator first, ConstValueIterator last) {
 		RAPIDJSON_ASSERT(IsArray());
