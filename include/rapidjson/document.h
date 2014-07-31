@@ -1281,8 +1281,9 @@ private:
 	bool StringEqual(const GenericValue& rhs) const {
 		RAPIDJSON_ASSERT(IsString());
 		RAPIDJSON_ASSERT(rhs.IsString());
-		return data_.s.str == rhs.data_.s.str || // fast path for constant string
-			((data_.s.length == rhs.data_.s.length) && memcmp(data_.s.str, rhs.data_.s.str, sizeof(Ch) * data_.s.length) == 0);
+		return data_.s.length == rhs.data_.s.length &&
+			(data_.s.str == rhs.data_.s.str // fast path for constant string
+			|| memcmp(data_.s.str, rhs.data_.s.str, sizeof(Ch) * data_.s.length) == 0);
 	}
 
 	Data data_;
