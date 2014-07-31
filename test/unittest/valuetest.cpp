@@ -789,6 +789,72 @@ TEST(Value, Object) {
 
 	EXPECT_TRUE(x.MemberBegin() == x.MemberEnd());
 
+	// EraseMember(ConstMemberIterator)
+
+	// Use array members to ensure removed elements' destructor is called.
+	// { "a": [0], "b": [1],[2],...]
+	const char keys[][2] = { "a", "b", "c", "d", "e", "f", "g", "h", "i", "j" };
+	for (int i = 0; i < 10; i++)
+		x.AddMember(keys[i], Value(kArrayType).PushBack(i, allocator), allocator);
+
+	// Erase the first
+	itr = x.EraseMember(x.MemberBegin());
+	EXPECT_FALSE(x.HasMember(keys[0]));
+	EXPECT_EQ(x.MemberBegin(), itr);
+	EXPECT_EQ(9u, x.MemberEnd() - x.MemberBegin());
+	for (; itr != x.MemberEnd(); ++itr) {
+		int i = (itr - x.MemberBegin()) + 1;
+		EXPECT_STREQ(itr->name.GetString(), keys[i]);
+		EXPECT_EQ(i, itr->value[0u].GetInt());
+	}
+
+	// Erase the last
+	itr = x.EraseMember(x.MemberEnd() - 1);
+	EXPECT_FALSE(x.HasMember(keys[9]));
+	EXPECT_EQ(x.MemberEnd(), itr);
+	EXPECT_EQ(8u, x.MemberEnd() - x.MemberBegin());
+	for (; itr != x.MemberEnd(); ++itr) {
+		int i = (itr - x.MemberBegin()) + 1;
+		EXPECT_STREQ(itr->name.GetString(), keys[i]);
+		EXPECT_EQ(i, itr->value[0u].GetInt());
+	}
+
+	// Erase the middle
+	itr = x.EraseMember(x.MemberBegin() + 4);
+	EXPECT_FALSE(x.HasMember(keys[5]));
+	EXPECT_EQ(x.MemberBegin() + 4, itr);
+	EXPECT_EQ(7u, x.MemberEnd() - x.MemberBegin());
+	for (; itr != x.MemberEnd(); ++itr) {
+		int i = (itr - x.MemberBegin());
+		i += (i<4) ? 1 : 2;
+		EXPECT_STREQ(itr->name.GetString(), keys[i]);
+		EXPECT_EQ(i, itr->value[0u].GetInt());
+	}
+
+	// EraseMember(ConstMemberIterator, ConstMemberIterator)
+	// Exhaustive test with all 0 <= first < n, first <= last <= n cases
+	const unsigned n = 10;
+	for (unsigned first = 0; first < n; first++) {
+		for (unsigned last = first; last <= n; last++) {
+			Value(kObjectType).Swap(x);
+			for (unsigned i = 0; i < n; i++)
+				x.AddMember(keys[i], Value(kArrayType).PushBack(i, allocator), allocator);
+
+			itr = x.EraseMember(x.MemberBegin() + first, x.MemberBegin() + last);
+			if (last == n)
+				EXPECT_EQ(x.MemberEnd(), itr);
+			else
+				EXPECT_EQ(x.MemberBegin() + first, itr);
+
+			size_t removeCount = last - first;
+			EXPECT_EQ(n - removeCount, size_t(x.MemberEnd() - x.MemberBegin()));
+			for (unsigned i = 0; i < first; i++)
+				EXPECT_EQ(i, x[keys[i]][0u].GetUint());
+			for (unsigned i = first; i < n - removeCount; i++)
+				EXPECT_EQ(i + removeCount, x[keys[i+removeCount]][0u].GetUint());
+		}
+	}
+
 	// SetObject()
 	Value z;
 	z.SetObject();

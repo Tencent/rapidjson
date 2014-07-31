@@ -464,8 +464,7 @@ public:
 
 			case kObjectFlag:
 				for (MemberIterator m = MemberBegin(); m != MemberEnd(); ++m) {
-					m->name.~GenericValue();
-					m->value.~GenericValue();
+					m->~GenericMember();
 				}
 				Allocator::Free(data_.o.members);
 				break;
@@ -851,6 +850,7 @@ public:
 	/*! \param m member iterator (obtained by FindMember() or MemberBegin()).
 		\return the new iterator after removal.
 		\note Removing member is implemented by moving the last member. So the ordering of members is changed.
+		\note Use \ref EraseMember(ConstMemberIterator) instead, if you need to rely on a stable member ordering.
 	*/
 	MemberIterator RemoveMember(MemberIterator m) {
 		RAPIDJSON_ASSERT(IsObject());
@@ -861,16 +861,48 @@ public:
 		MemberIterator last(data_.o.members + (data_.o.size - 1));
 		if (data_.o.size > 1 && m != last) {
 			// Move the last one to this place
-			m->name = last->name;
-			m->value = last->value;
+			*m = *last;
 		}
 		else {
 			// Only one left, just destroy
-			m->name.~GenericValue();
-			m->value.~GenericValue();
+			m->~GenericMember();
 		}
 		--data_.o.size;
 		return m;
+	}
+
+	//! Remove a member from an object by iterator.
+	/*! \param pos iterator to the member to remove
+		\pre IsObject() == true && \ref MemberBegin() <= \c pos < \ref MemberEnd()
+		\return Iterator following the removed element.
+			If the iterator \c pos refers to the last element, the \ref MemberEnd() iterator is returned.
+		\note Other than \ref RemoveMember(MemberIterator), this function preserves the ordering of the members.
+	*/
+	MemberIterator EraseMember(ConstMemberIterator pos) {
+		return EraseMember(pos, pos +1);
+	}
+
+	//! Remove members in the range [first, last) from an object.
+	/*! \param first iterator to the first member to remove
+		\param last  iterator following the last member to remove
+		\pre IsObject() == true && \ref MemberBegin() <= \c first <= \c last <= \ref MemberEnd()
+		\return Iterator following the last removed element.
+		\note Other than \ref RemoveMember(MemberIterator), this function preserves the ordering of the members.
+	*/
+	MemberIterator EraseMember(ConstMemberIterator first, ConstMemberIterator last) {
+		RAPIDJSON_ASSERT(IsObject());
+		RAPIDJSON_ASSERT(data_.o.size > 0);
+		RAPIDJSON_ASSERT(data_.o.members != 0);
+		RAPIDJSON_ASSERT(first >= MemberBegin());
+		RAPIDJSON_ASSERT(first <= last);
+		RAPIDJSON_ASSERT(last <= MemberEnd());
+
+		MemberIterator pos = MemberBegin() + (first - MemberBegin());
+		for (MemberIterator itr = pos; ConstMemberIterator(itr) != last; ++itr)
+			itr->~Member();
+		memmove(&*pos, &*last, (ConstMemberIterator(MemberEnd()) - last) * sizeof(Member));
+		data_.o.size -= (last - first);
+		return pos;
 	}
 
 	//@}
@@ -919,9 +951,16 @@ int z = a[0u].GetInt();				// This works too.
 	const GenericValue& operator[](SizeType index) const { return const_cast<GenericValue&>(*this)[index]; }
 
 	//! Element iterator
+	/*! \pre IsArray() == true */
 	ValueIterator Begin() { RAPIDJSON_ASSERT(IsArray()); return data_.a.elements; }
+	//! \em Past-the-end element iterator
+	/*! \pre IsArray() == true */
 	ValueIterator End() { RAPIDJSON_ASSERT(IsArray()); return data_.a.elements + data_.a.size; }
+	//! Constant element iterator
+	/*! \pre IsArray() == true */
 	ConstValueIterator Begin() const { return const_cast<GenericValue&>(*this).Begin(); }
+	//! Constant \em past-the-end element iterator
+	/*! \pre IsArray() == true */
 	ConstValueIterator End() const { return const_cast<GenericValue&>(*this).End(); }
 
 	//! Request the array to have enough capacity to store elements.
@@ -967,7 +1006,7 @@ int z = a[0u].GetInt();				// This works too.
 		return (*this).template PushBack<StringRefType>(value, allocator);
 	}
 
-	//! Append a primitive value at the end of the array(.)
+	//! Append a primitive value at the end of the array.
 	/*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t
 		\param value Value of primitive type T to be appended.
 		\param allocator	Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
@@ -1001,32 +1040,33 @@ int z = a[0u].GetInt();				// This works too.
 	//! Remove an element of array by iterator.
 	/*!
 		\param pos iterator to the element to remove
-		\pre IsArray() == true
+		\pre IsArray() == true && \ref Begin() <= \c pos < \ref End()
 		\return Iterator following the removed element. If the iterator pos refers to the last element, the End() iterator is returned.
 	*/
-	ValueIterator Erase(ValueIterator pos) {
+	ValueIterator Erase(ConstValueIterator pos) {
 		return Erase(pos, pos + 1);
 	}
 
 	//! Remove elements in the range [first, last) of the array.
 	/*!
-		\param pos iterator to the element to remove
-		\param first,last range of elements to remove
-		\pre IsArray() == true
-		\return Iterator following the last removed element. If the iterator pos refers to the last element, the End() iterator is returned.
+		\param first iterator to the first element to remove
+		\param last  iterator following the last element to remove
+		\pre IsArray() == true && \ref Begin() <= \c first <= \c last <= \ref End()
+		\return Iterator following the last removed element.
 	*/
-	ValueIterator Erase(ValueIterator first, ValueIterator last) {
+	ValueIterator Erase(ConstValueIterator first, ConstValueIterator last) {
 		RAPIDJSON_ASSERT(IsArray());
 		RAPIDJSON_ASSERT(data_.a.size > 0);
 		RAPIDJSON_ASSERT(data_.a.elements != 0);
 		RAPIDJSON_ASSERT(first >= Begin());
 		RAPIDJSON_ASSERT(first <= last);
 		RAPIDJSON_ASSERT(last <= End());
-		for (ValueIterator itr = first; itr != last; ++itr)
+		ValueIterator pos = Begin() + (first - Begin());
+		for (ValueIterator itr = pos; itr != last; ++itr)
 			itr->~GenericValue();		
-		memmove(first, last, (End() - last) * sizeof(GenericValue));
+		memmove(pos, last, (End() - last) * sizeof(GenericValue));
 		data_.a.size -= (last - first);
-		return first;
+		return pos;
 	}
 
 	//@}
