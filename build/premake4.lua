@@ -64,7 +64,7 @@ solution "test"
 		defines { "_CRT_SECURE_NO_WARNINGS" }
 		
 	configuration "gmake"
-		buildoptions "-msse4.2 -Werror -Wall -Wextra"
+		buildoptions "-msse4.2 -Wall -Wextra"
 
 	project "gtest"
 		kind "StaticLib"
@@ -87,7 +87,7 @@ solution "test"
 		kind "ConsoleApp"
 		
 		if _ACTION == "gmake" then
-			buildoptions "-Weffc++ -Wswitch-default"
+			buildoptions "-Werror -Weffc++ -Wswitch-default"
 		end
 
 		files { 
