@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 macro(subdirlist result curdir)
     file(GLOB children RELATIVE ${curdir} ${curdir}/*)
@@ -16,6 +16,15 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
 
 project(RapidJSON CXX)
 
-add_subdirectory(example)
+option(RapidJSON_BUILD_EXAMPLES "Build Examples" ON)
+option(RapidJSON_BUILD_TESTS "Build Tests" ON)
+
+if(RapidJSON_BUILD_EXAMPLES STREQUAL "ON")
+	add_subdirectory(example)
+endif()
+
+if(RapidJSON_BUILD_TESTS STREQUAL "ON")
+	add_subdirectory(test)
+endif()
 
 install(DIRECTORY include DESTINATION include)
