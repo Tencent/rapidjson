@@ -1,6 +1,8 @@
 find_path(RapidJSON_INCLUDE_DIRS
 		  NAMES rapidjson/rapidjson.h
-		  PATHS ${RAPIDJSON_INCLUDEDIR} ENV RAPIDJSON_INCLUDEDIR)
+		  PATHS ${RAPIDJSON_INCLUDEDIR}
+		  		${CMAKE_SOURCE_DIR}/include
+		  		ENV RAPIDJSON_INCLUDEDIR)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(RapidJSON DEFAULT_MSG
