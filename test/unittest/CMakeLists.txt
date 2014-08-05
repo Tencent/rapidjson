@@ -24,6 +24,10 @@ target_include_directories(unittest
 
 target_link_libraries(unittest gtest)
 
-target_compile_definitions(unittest PRIVATE "-DGTEST_USE_OWN_TR1_TUPLE=1")
+if(MSVC)
+	target_compile_definitions(unittest PRIVATE "-DGTEST_HAS_TR1_TUPLE=0")
+else()
+	target_compile_definitions(unittest PRIVATE "-DGTEST_USE_OWN_TR1_TUPLE=1")
+endif()
 
 install(TARGETS unittest DESTINATION bin)
