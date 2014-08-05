@@ -4,6 +4,8 @@ add_executable(prettyauto prettyauto.cpp)
 
 find_package(RapidJSON)
 
-target_include_directories(prettyauto PUBLIC ${RapidJSON_INCLUDE_DIRS})
+target_include_directories(prettyauto PRIVATE ${RapidJSON_INCLUDE_DIRS})
 
-target_compile_definitions(prettyauto PUBLIC ${RapidJSON_DEFINITIONS})
+target_compile_definitions(prettyauto PRIVATE ${RapidJSON_DEFINITIONS})
+
+install(TARGETS prettyauto DESTINATION bin)

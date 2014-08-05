@@ -27,4 +27,6 @@ if(RapidJSON_BUILD_TESTS STREQUAL "ON")
 	add_subdirectory(test)
 endif()
 
-install(DIRECTORY include DESTINATION include)
+install(DIRECTORY include/ DESTINATION include)
+install(DIRECTORY share/ DESTINATION share)
+install(DIRECTORY bin/ DESTINATION bin)

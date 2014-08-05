@@ -4,6 +4,8 @@ add_executable(serialize serialize.cpp)
 
 find_package(RapidJSON)
 
-target_include_directories(serialize PUBLIC ${RapidJSON_INCLUDE_DIRS})
+target_include_directories(serialize PRIVATE ${RapidJSON_INCLUDE_DIRS})
 
-target_compile_definitions(serialize PUBLIC ${RapidJSON_DEFINITIONS})
+target_compile_definitions(serialize PRIVATE ${RapidJSON_DEFINITIONS})
+
+install(TARGETS serialize DESTINATION bin)
