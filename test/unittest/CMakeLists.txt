@@ -13,9 +13,15 @@ set(TEST_SRC
 add_executable(unittest ${TEST_SRC})
 
 find_package(RapidJSON)
+add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/gtest-1.7.0
+				 thirdparty/gtest
+				 EXCLUDE_FROM_ALL)
 
-target_include_directories(unittest PUBLIC ${RapidJSON_INCLUDE_DIRS})
+target_include_directories(unittest
+						   PRIVATE
+						   ${RapidJSON_INCLUDE_DIRS}
+						   ${gtest_SOURCE_DIR}/include)
+
 target_link_libraries(unittest gtest)
 
-set(GTEST_ROOT ${CMAKE_SOURCE_DIR}/thirdparty/gtest)
-find_package(GTest REQUIRED)
+target_compile_definitions(unittest PRIVATE "-DGTEST_USE_OWN_TR1_TUPLE=1")
