@@ -27,6 +27,8 @@ if(RapidJSON_BUILD_TESTS STREQUAL "ON")
 	add_subdirectory(test)
 endif()
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 install(DIRECTORY include/ DESTINATION include)
 install(DIRECTORY share/ DESTINATION share)
 install(DIRECTORY bin/ DESTINATION bin)

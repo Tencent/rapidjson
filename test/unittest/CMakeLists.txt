@@ -12,10 +12,14 @@ set(TEST_SRC
 
 add_executable(unittest ${TEST_SRC})
 
+set_target_properties(unittest PROPERTIES FOLDER "test")
+
 find_package(RapidJSON)
 add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/gtest-1.7.0
 				 thirdparty/gtest
 				 EXCLUDE_FROM_ALL)
+
+set_target_properties(gtest PROPERTIES FOLDER "thirdparty")
 
 target_include_directories(unittest
 						   PRIVATE

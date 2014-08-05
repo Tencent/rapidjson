@@ -2,6 +2,8 @@ project(messagereader CXX)
 
 add_executable(messagereader messagereader.cpp)
 
+set_target_properties(messagereader PROPERTIES FOLDER "example")
+
 find_package(RapidJSON)
 
 target_include_directories(messagereader PRIVATE ${RapidJSON_INCLUDE_DIRS})

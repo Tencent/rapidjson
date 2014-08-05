@@ -2,6 +2,8 @@ project(tutorial CXX)
 
 add_executable(tutorial tutorial.cpp)
 
+set_target_properties(tutorial PROPERTIES FOLDER "example")
+
 find_package(RapidJSON)
 
 target_include_directories(tutorial PRIVATE ${RapidJSON_INCLUDE_DIRS})
