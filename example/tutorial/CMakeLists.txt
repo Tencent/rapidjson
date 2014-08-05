@@ -12,6 +12,9 @@ include(${CMAKE_SOURCE_DIR}/share/rapidjson/cmake/RapidJSONConfig.cmake)
 
 target_compile_definitions(tutorial PRIVATE ${RapidJSON_DEFINITIONS})
 
+warningsetting(WARNING_SETTING)
+target_compile_options(tutorial PRIVATE ${WARNING_SETTING})
+
 if(MSVC)
     target_compile_definitions(tutorial PRIVATE "-D_CRT_SECURE_NO_WARNINGS")
 endif()

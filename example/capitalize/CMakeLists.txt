@@ -10,4 +10,7 @@ target_include_directories(capitalize PRIVATE ${RapidJSON_INCLUDE_DIRS})
 
 target_compile_definitions(capitalize PRIVATE ${RapidJSON_DEFINITIONS})
 
+warningsetting(WARNING_SETTING)
+target_compile_options(capitalize PRIVATE ${WARNING_SETTING})
+
 install(TARGETS capitalize DESTINATION bin)

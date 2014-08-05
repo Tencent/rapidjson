@@ -10,4 +10,7 @@ target_include_directories(serialize PRIVATE ${RapidJSON_INCLUDE_DIRS})
 
 target_compile_definitions(serialize PRIVATE ${RapidJSON_DEFINITIONS})
 
+warningsetting(WARNING_SETTING)
+target_compile_options(serialize PRIVATE ${WARNING_SETTING})
+
 install(TARGETS serialize DESTINATION bin)

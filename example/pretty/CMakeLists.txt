@@ -10,4 +10,7 @@ target_include_directories(pretty PRIVATE ${RapidJSON_INCLUDE_DIRS})
 
 target_compile_definitions(pretty PRIVATE ${RapidJSON_DEFINITIONS})
 
+warningsetting(WARNING_SETTING)
+target_compile_options(pretty PRIVATE ${WARNING_SETTING})
+
 install(TARGETS pretty DESTINATION bin)

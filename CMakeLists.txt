@@ -1,18 +1,26 @@
 cmake_minimum_required(VERSION 3.0)
 
 macro(subdirlist result curdir)
-    file(GLOB children RELATIVE ${curdir} ${curdir}/*)
-    set(dirlist "")
-    foreach(child ${children})
-        if(IS_DIRECTORY ${curdir}/${child})
-            list(APPEND dirlist ${child})
-        endif()
-    endforeach()
-    set(${result} ${dirlist})
+	file(GLOB children RELATIVE ${curdir} ${curdir}/*)
+	set(dirlist "")
+	foreach(child ${children})
+		if(IS_DIRECTORY ${curdir}/${child})
+		list(APPEND dirlist ${child})
+		endif()
+	endforeach()
+	set(${result} ${dirlist})
+endmacro()
+
+macro(warningsetting result)
+	if(MSVC)
+		set(${result} /W4 /WX)
+	else()
+		set(${result} -Werror -Wall -Wextra -Weffc++ -Wswitch-default)
+	endif()
 endmacro()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-                      "${CMAKE_SOURCE_DIR}/share/rapidjson/cmake/")
+					  "${CMAKE_SOURCE_DIR}/share/rapidjson/cmake/")
 
 project(RapidJSON CXX)
 
