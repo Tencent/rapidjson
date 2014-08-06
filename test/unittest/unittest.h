@@ -48,7 +48,12 @@ inline Ch* StrDup(const Ch* str) {
 }
 
 inline void TempFilename(char *filename) {
+#if defined(__clang__) || defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 	filename = tmpnam(filename);
+#pragma GCC diagnostic pop
+#endif
 
 	// For Visual Studio, tmpnam() adds a backslash in front. Remove it.
 	if (filename[0] == '\\')
