@@ -7,6 +7,7 @@ var searchData=
   ['rapidjson_5fbigendian',['RAPIDJSON_BIGENDIAN',['../rapidjson_8h.html#ac7951ebf8a2624ab85d2dcd3ec7af974',1,'rapidjson.h']]],
   ['rapidjson_5flittleendian',['RAPIDJSON_LITTLEENDIAN',['../rapidjson_8h.html#addcc0c3607c5790f35cc4c15885ff97c',1,'rapidjson.h']]],
   ['rapidjson_5fstatic_5fassert',['RAPIDJSON_STATIC_ASSERT',['../rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4',1,'rapidjson.h']]],
+  ['rapidjson_5fuint64_5fc2',['RAPIDJSON_UINT64_C2',['../rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f',1,'rapidjson.h']]],
   ['reader',['Reader',['../namespacerapidjson.html#a4eaef42a208413d1f2c8d4655ecec52d',1,'rapidjson']]],
   ['realloc',['Realloc',['../classrapidjson_1_1_memory_pool_allocator.html#a880524b17bbecb5d2691b8075050d55d',1,'rapidjson::MemoryPoolAllocator']]],
   ['reference',['Reference',['../classrapidjson_1_1_generic_member_iterator.html#a915a1b6f0a0bbe6a1df69571a789e348',1,'rapidjson::GenericMemberIterator']]],

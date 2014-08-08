@@ -11,6 +11,7 @@ var rapidjson_8h =
     [ "RAPIDJSON_FORCEINLINE", "rapidjson_8h.html#a08de57ba55122753d43b6b62d0b4deff", null ],
     [ "RAPIDJSON_LITTLEENDIAN", "rapidjson_8h.html#addcc0c3607c5790f35cc4c15885ff97c", null ],
     [ "RAPIDJSON_STATIC_ASSERT", "rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4", null ],
+    [ "RAPIDJSON_UINT64_C2", "rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f", null ],
     [ "InsituStringStream", "rapidjson_8h.html#a5660e8e601d2719796bc86c3168a1787", null ],
     [ "SizeType", "rapidjson_8h.html#a44eb33eaa523e36d466b1ced64b85c84", null ],
     [ "StringStream", "rapidjson_8h.html#ada4cef9931d4a3a0017ee776c907807b", null ],

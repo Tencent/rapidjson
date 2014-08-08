@@ -136,6 +136,9 @@ Macros</h2></td></tr>
 <tr class="memitem:a583915242504c7fdb36e826f02f76242"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rapidjson_8h.html#a583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a>(x)&#160;&#160;&#160;((x + 3u) &amp; ~3u)</td></tr>
 <tr class="memdesc:a583915242504c7fdb36e826f02f76242"><td class="mdescLeft">&#160;</td><td class="mdescRight">Endianness of the machine.  <a href="#a583915242504c7fdb36e826f02f76242">More...</a><br /></td></tr>
 <tr class="separator:a583915242504c7fdb36e826f02f76242"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaee1245f375a71be1ac9b8a07ba5fb8f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(high32, low32)&#160;&#160;&#160;((static_cast&lt;uint64_t&gt;(high32) &lt;&lt; 32) | static_cast&lt;uint64_t&gt;(low32))</td></tr>
+<tr class="memdesc:aaee1245f375a71be1ac9b8a07ba5fb8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a 64-bit literal by a pair of 32-bit integer.  <a href="#aaee1245f375a71be1ac9b8a07ba5fb8f">More...</a><br /></td></tr>
+<tr class="separator:aaee1245f375a71be1ac9b8a07ba5fb8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abeba18d612187bad2ac62aed9276d47c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rapidjson_8h.html#abeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(x)&#160;&#160;&#160;assert(x)</td></tr>
 <tr class="memdesc:abeba18d612187bad2ac62aed9276d47c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assertion.  <a href="#abeba18d612187bad2ac62aed9276d47c">More...</a><br /></td></tr>
 <tr class="separator:abeba18d612187bad2ac62aed9276d47c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -249,6 +252,35 @@ template&lt;typename Stream , typename Ch &gt; </td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="aaee1245f375a71be1ac9b8a07ba5fb8f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RAPIDJSON_UINT64_C2</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">high32, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">low32&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;((static_cast&lt;uint64_t&gt;(high32) &lt;&lt; 32) | static_cast&lt;uint64_t&gt;(low32))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Construct a 64-bit literal by a pair of 32-bit integer. </p>
+<p>64-bit literal with or without ULL suffix is prone to compiler warnings. UINT64_C() is C macro which cause compilation problems. Use this macro to define 64-bit constants by a pair of 32-bit integer. </p>
 
 </div>
 </div>
