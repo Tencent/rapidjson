@@ -464,8 +464,7 @@ public:
 
 			case kObjectFlag:
 				for (MemberIterator m = MemberBegin(); m != MemberEnd(); ++m) {
-					m->name.~GenericValue();
-					m->value.~GenericValue();
+					m->~GenericMember();
 				}
 				Allocator::Free(data_.o.members);
 				break;
@@ -556,6 +555,74 @@ public:
 	GenericValue& Move() { return *this; }
 	//@}
 
+	//!@name Equal-to and not-equal-to operators
+	//@{
+	//! Equal-to operator
+	/*!
+		\note If an object contains duplicated named member, comparing equality with any object is always \c false.
+		\note Linear time complexity (number of all values in the subtree and total lengths of all strings).
+	*/
+	bool operator==(const GenericValue& rhs) const {
+		if (GetType() != rhs.GetType())
+			return false;
+
+		switch (GetType()) {
+		case kObjectType: // Warning: O(n^2) inner-loop
+			if (data_.o.size != rhs.data_.o.size)
+				return false;			
+			for (ConstMemberIterator lhsMemberItr = MemberBegin(); lhsMemberItr != MemberEnd(); ++lhsMemberItr) {
+				ConstMemberIterator rhsMemberItr = rhs.FindMember(lhsMemberItr->name);
+				if (rhsMemberItr == rhs.MemberEnd() || lhsMemberItr->value != rhsMemberItr->value)
+					return false;
+			}
+			return true;
+			
+		case kArrayType:
+			if (data_.a.size != rhs.data_.a.size)
+				return false;
+			for (SizeType i = 0; i < data_.a.size; i++)
+				if ((*this)[i] != rhs[i])
+					return false;
+			return true;
+
+		case kStringType:
+			return StringEqual(rhs);
+
+		case kNumberType:
+			if (IsDouble() || rhs.GetDouble())
+				return GetDouble() == rhs.GetDouble(); // May convert one operand from integer to double.
+			else
+				return data_.n.u64 == rhs.data_.n.u64;
+
+		default: // kTrueType, kFalseType, kNullType
+			return true;
+		}
+	}
+
+	//! Not-equal-to operator
+	bool operator!=(const GenericValue& rhs) const { return !(*this == rhs); }
+
+	//! (Not-)Equal-to operator with const C-string pointer.
+	friend bool operator==(const GenericValue& lhs, const Ch* rhs) { return lhs == GenericValue(StringRef(rhs)); }
+	friend bool operator!=(const GenericValue& lhs, const Ch* rhs) { return !(lhs == rhs); }
+	friend bool operator==(const Ch* lhs, const GenericValue& rhs) { return GenericValue(StringRef(lhs)) == rhs; }
+	friend bool operator!=(const Ch* lhs, const GenericValue& rhs) { return !(lhs == rhs); }
+
+	//! (Not-)Equal-to operator with non-const C-string pointer.
+	friend bool operator==(const GenericValue& lhs, Ch* rhs) { return lhs == GenericValue(StringRef(rhs)); }
+	friend bool operator!=(const GenericValue& lhs, Ch* rhs) { return !(lhs == rhs); }
+	friend bool operator==(Ch* lhs, const GenericValue& rhs) { return GenericValue(StringRef(lhs)) == rhs; }
+	friend bool operator!=(Ch* lhs, const GenericValue& rhs) { return !(lhs == rhs); }
+
+	//! (Not-)Equal-to operator with primitive types.
+	/*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c double, \c true, \c false
+	*/
+	template <typename T> friend bool operator==(const GenericValue& lhs, const T& rhs) { return lhs == GenericValue(rhs); }
+	template <typename T> friend bool operator!=(const GenericValue& lhs, const T& rhs) { return !(lhs == rhs); }
+	template <typename T> friend bool operator==(const T& lhs, const GenericValue& rhs) { return GenericValue(lhs) == rhs; }
+	template <typename T> friend bool operator!=(const T& lhs, const GenericValue& rhs) { return !(lhs == rhs); }
+	//@}
+
 	//!@name Type
 	//@{
 
@@ -605,7 +672,8 @@ public:
 		\note In version 0.1x, if the member is not found, this function returns a null value. This makes issue 7.
 		Since 0.2, if the name is not correct, it will assert.
 		If user is unsure whether a member exists, user should use HasMember() first.
-		A better approach is to use the now public FindMember().
+		A better approach is to use FindMember().
+		\note Linear time complexity.
 	*/
 	GenericValue& operator[](const Ch* name) {
 		GenericValue n(StringRef(name));
@@ -642,16 +710,28 @@ public:
 
 	//! Check whether a member exists in the object.
 	/*!
+		\param name Member name to be searched.
+		\pre IsObject() == true
+		\return Whether a member with that name exists.
 		\note It is better to use FindMember() directly if you need the obtain the value as well.
+		\note Linear time complexity.
 	*/
 	bool HasMember(const Ch* name) const { return FindMember(name) != MemberEnd(); }
 
-	// This version is faster because it does not need a StrLen(). 
-	// It can also handle string with null character.
+	//! Check whether a member exists in the object with GenericValue name.
+	/*!
+		This version is faster because it does not need a StrLen(). It can also handle string with null character.
+		\param name Member name to be searched.
+		\pre IsObject() == true
+		\return Whether a member with that name exists.
+		\note It is better to use FindMember() directly if you need the obtain the value as well.
+		\note Linear time complexity.
+	*/
 	bool HasMember(const GenericValue& name) const { return FindMember(name) != MemberEnd(); }
 
 	//! Find member by name.
 	/*!
+		\param name Member name to be searched.
 		\pre IsObject() == true
 		\return Iterator to member, if it exists.
 			Otherwise returns \ref MemberEnd().
@@ -659,6 +739,7 @@ public:
 		\note Earlier versions of Rapidjson returned a \c NULL pointer, in case
 			the requested member doesn't exist. For consistency with e.g.
 			\c std::map, this has been changed to MemberEnd() now.
+		\note Linear time complexity.
 	*/
 	MemberIterator FindMember(const Ch* name) {
 		GenericValue n(StringRef(name));
@@ -667,15 +748,25 @@ public:
 
 	ConstMemberIterator FindMember(const Ch* name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
 
-	// This version is faster because it does not need a StrLen(). 
-	// It can also handle string with null character.
+	//! Find member by name.
+	/*!
+		This version is faster because it does not need a StrLen(). It can also handle string with null character.
+		\param name Member name to be searched.
+		\pre IsObject() == true
+		\return Iterator to member, if it exists.
+			Otherwise returns \ref MemberEnd().
+
+		\note Earlier versions of Rapidjson returned a \c NULL pointer, in case
+			the requested member doesn't exist. For consistency with e.g.
+			\c std::map, this has been changed to MemberEnd() now.
+		\note Linear time complexity.
+	*/
 	MemberIterator FindMember(const GenericValue& name) {
 		RAPIDJSON_ASSERT(IsObject());
 		RAPIDJSON_ASSERT(name.IsString());
-		SizeType len = name.data_.s.length;
 		MemberIterator member = MemberBegin();
 		for ( ; member != MemberEnd(); ++member)
-			if (member->name.data_.s.length == len && memcmp(member->name.data_.s.str, name.data_.s.str, len * sizeof(Ch)) == 0)
+			if (name.StringEqual(member->name))
 				break;
 		return member;
 	}
@@ -689,6 +780,7 @@ public:
 		\note The ownership of \c name and \c value will be transferred to this object on success.
 		\pre  IsObject() && name.IsString()
 		\post name.IsNull() && value.IsNull()
+		\note Amortized Constant time complexity.
 	*/
 	GenericValue& AddMember(GenericValue& name, GenericValue& value, Allocator& allocator) {
 		RAPIDJSON_ASSERT(IsObject());
@@ -720,6 +812,7 @@ public:
 		\note The ownership of \c value will be transferred to this object on success.
 		\pre  IsObject()
 		\post value.IsNull()
+		\note Amortized Constant time complexity.
 	*/
 	GenericValue& AddMember(StringRefType name, GenericValue& value, Allocator& allocator) {
 		GenericValue n(name);
@@ -733,6 +826,7 @@ public:
 		\return The value itself for fluent API.
 		\pre  IsObject()
 		\note This overload is needed to avoid clashes with the generic primitive type AddMember(StringRefType,T,Allocator&) overload below.
+		\note Amortized Constant time complexity.
 	*/
 	GenericValue& AddMember(StringRefType name, StringRefType value, Allocator& allocator) {
 		GenericValue v(value);
@@ -754,6 +848,7 @@ public:
 			AddMember(StringRefType, StringRefType, Allocator&).
 			All other pointer types would implicitly convert to \c bool,
 			use an explicit cast instead, if needed.
+		\note Amortized Constant time complexity.
 	*/
 	template <typename T>
 	RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>,GenericValue&)
@@ -767,6 +862,7 @@ public:
 	/*! \param name Name of member to be removed.
 	    \return Whether the member existed.
 	    \note Removing member is implemented by moving the last member. So the ordering of members is changed.
+	    \note Linear time complexity.
 	*/
 	bool RemoveMember(const Ch* name) {
 		GenericValue n(StringRef(name));
@@ -787,6 +883,8 @@ public:
 	/*! \param m member iterator (obtained by FindMember() or MemberBegin()).
 		\return the new iterator after removal.
 		\note Removing member is implemented by moving the last member. So the ordering of members is changed.
+		\note Use \ref EraseMember(ConstMemberIterator) instead, if you need to rely on a stable member ordering.
+		\note Constant time complexity.
 	*/
 	MemberIterator RemoveMember(MemberIterator m) {
 		RAPIDJSON_ASSERT(IsObject());
@@ -797,16 +895,50 @@ public:
 		MemberIterator last(data_.o.members + (data_.o.size - 1));
 		if (data_.o.size > 1 && m != last) {
 			// Move the last one to this place
-			m->name = last->name;
-			m->value = last->value;
+			*m = *last;
 		}
 		else {
 			// Only one left, just destroy
-			m->name.~GenericValue();
-			m->value.~GenericValue();
+			m->~GenericMember();
 		}
 		--data_.o.size;
 		return m;
+	}
+
+	//! Remove a member from an object by iterator.
+	/*! \param pos iterator to the member to remove
+		\pre IsObject() == true && \ref MemberBegin() <= \c pos < \ref MemberEnd()
+		\return Iterator following the removed element.
+			If the iterator \c pos refers to the last element, the \ref MemberEnd() iterator is returned.
+		\note Other than \ref RemoveMember(MemberIterator), this function preserves the ordering of the members.
+		\note Linear time complexity.
+	*/
+	MemberIterator EraseMember(ConstMemberIterator pos) {
+		return EraseMember(pos, pos +1);
+	}
+
+	//! Remove members in the range [first, last) from an object.
+	/*! \param first iterator to the first member to remove
+		\param last  iterator following the last member to remove
+		\pre IsObject() == true && \ref MemberBegin() <= \c first <= \c last <= \ref MemberEnd()
+		\return Iterator following the last removed element.
+		\note Other than \ref RemoveMember(MemberIterator), this function preserves the ordering of the members.
+		\note Linear time complexity.
+	*/
+	MemberIterator EraseMember(ConstMemberIterator first, ConstMemberIterator last) {
+		RAPIDJSON_ASSERT(IsObject());
+		RAPIDJSON_ASSERT(data_.o.size > 0);
+		RAPIDJSON_ASSERT(data_.o.members != 0);
+		RAPIDJSON_ASSERT(first >= MemberBegin());
+		RAPIDJSON_ASSERT(first <= last);
+		RAPIDJSON_ASSERT(last <= MemberEnd());
+
+		MemberIterator pos = MemberBegin() + (first - MemberBegin());
+		for (MemberIterator itr = pos; ConstMemberIterator(itr) != last; ++itr)
+			itr->~Member();
+		memmove(&*pos, &*last, (ConstMemberIterator(MemberEnd()) - last) * sizeof(Member));
+		data_.o.size -= (last - first);
+		return pos;
 	}
 
 	//@}
@@ -829,6 +961,7 @@ public:
 
 	//! Remove all elements in the array.
 	/*! This function do not deallocate memory in the array, i.e. the capacity is unchanged.
+		\note Linear time complexity.
 	*/
 	void Clear() {
 		RAPIDJSON_ASSERT(IsArray()); 
@@ -855,15 +988,23 @@ int z = a[0u].GetInt();				// This works too.
 	const GenericValue& operator[](SizeType index) const { return const_cast<GenericValue&>(*this)[index]; }
 
 	//! Element iterator
+	/*! \pre IsArray() == true */
 	ValueIterator Begin() { RAPIDJSON_ASSERT(IsArray()); return data_.a.elements; }
+	//! \em Past-the-end element iterator
+	/*! \pre IsArray() == true */
 	ValueIterator End() { RAPIDJSON_ASSERT(IsArray()); return data_.a.elements + data_.a.size; }
+	//! Constant element iterator
+	/*! \pre IsArray() == true */
 	ConstValueIterator Begin() const { return const_cast<GenericValue&>(*this).Begin(); }
+	//! Constant \em past-the-end element iterator
+	/*! \pre IsArray() == true */
 	ConstValueIterator End() const { return const_cast<GenericValue&>(*this).End(); }
 
 	//! Request the array to have enough capacity to store elements.
 	/*! \param newCapacity	The capacity that the array at least need to have.
 		\param allocator	Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
 		\return The value itself for fluent API.
+		\note Linear time complexity.
 	*/
 	GenericValue& Reserve(SizeType newCapacity, Allocator &allocator) {
 		RAPIDJSON_ASSERT(IsArray());
@@ -882,6 +1023,7 @@ int z = a[0u].GetInt();				// This works too.
 		\return The value itself for fluent API.
 		\note The ownership of \c value will be transferred to this array on success.
 		\note If the number of elements to be appended is known, calls Reserve() once first may be more efficient.
+		\note Amortized constant time complexity.
 	*/
 	GenericValue& PushBack(GenericValue& value, Allocator& allocator) {
 		RAPIDJSON_ASSERT(IsArray());
@@ -897,13 +1039,14 @@ int z = a[0u].GetInt();				// This works too.
 		\pre IsArray() == true
 		\return The value itself for fluent API.
 		\note If the number of elements to be appended is known, calls Reserve() once first may be more efficient.
+		\note Amortized constant time complexity.
 		\see GenericStringRef
 	*/
 	GenericValue& PushBack(StringRefType value, Allocator& allocator) {
 		return (*this).template PushBack<StringRefType>(value, allocator);
 	}
 
-	//! Append a primitive value at the end of the array(.)
+	//! Append a primitive value at the end of the array.
 	/*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t
 		\param value Value of primitive type T to be appended.
 		\param allocator	Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
@@ -918,6 +1061,7 @@ int z = a[0u].GetInt();				// This works too.
 			PushBack(StringRefType, Allocator&).
 			All other pointer types would implicitly convert to \c bool,
 			use an explicit cast instead, if needed.
+		\note Amortized constant time complexity.
 	*/
 	template <typename T>
 	RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>,GenericValue&)
@@ -927,12 +1071,50 @@ int z = a[0u].GetInt();				// This works too.
 	}
 
 	//! Remove the last element in the array.
+	/*!
+		\note Constant time complexity.
+	*/
 	GenericValue& PopBack() {
 		RAPIDJSON_ASSERT(IsArray());
 		RAPIDJSON_ASSERT(!Empty());
 		data_.a.elements[--data_.a.size].~GenericValue();
 		return *this;
 	}
+
+	//! Remove an element of array by iterator.
+	/*!
+		\param pos iterator to the element to remove
+		\pre IsArray() == true && \ref Begin() <= \c pos < \ref End()
+		\return Iterator following the removed element. If the iterator pos refers to the last element, the End() iterator is returned.
+		\note Linear time complexity.
+	*/
+	ValueIterator Erase(ConstValueIterator pos) {
+		return Erase(pos, pos + 1);
+	}
+
+	//! Remove elements in the range [first, last) of the array.
+	/*!
+		\param first iterator to the first element to remove
+		\param last  iterator following the last element to remove
+		\pre IsArray() == true && \ref Begin() <= \c first <= \c last <= \ref End()
+		\return Iterator following the last removed element.
+		\note Linear time complexity.
+	*/
+	ValueIterator Erase(ConstValueIterator first, ConstValueIterator last) {
+		RAPIDJSON_ASSERT(IsArray());
+		RAPIDJSON_ASSERT(data_.a.size > 0);
+		RAPIDJSON_ASSERT(data_.a.elements != 0);
+		RAPIDJSON_ASSERT(first >= Begin());
+		RAPIDJSON_ASSERT(first <= last);
+		RAPIDJSON_ASSERT(last <= End());
+		ValueIterator pos = Begin() + (first - Begin());
+		for (ValueIterator itr = pos; itr != last; ++itr)
+			itr->~GenericValue();		
+		memmove(pos, last, (End() - last) * sizeof(GenericValue));
+		data_.a.size -= (last - first);
+		return pos;
+	}
+
 	//@}
 
 	//!@name Number
@@ -1180,6 +1362,14 @@ private:
 		data_ = rhs.data_;
 		flags_ = rhs.flags_;
 		rhs.flags_ = kNullFlag;
+	}
+
+	bool StringEqual(const GenericValue& rhs) const {
+		RAPIDJSON_ASSERT(IsString());
+		RAPIDJSON_ASSERT(rhs.IsString());
+		return data_.s.length == rhs.data_.s.length &&
+			(data_.s.str == rhs.data_.s.str // fast path for constant string
+			|| memcmp(data_.s.str, rhs.data_.s.str, sizeof(Ch) * data_.s.length) == 0);
 	}
 
 	Data data_;
