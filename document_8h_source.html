@@ -502,7 +502,7 @@ $(document).ready(function(){initNavTree('document_8h_source.html','');});
 <div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;            <span class="keywordflow">if</span> (!(static_cast&lt;uint64_t&gt;(i64) &amp; <a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0xFFFFFFFF, 0x80000000)))</div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;                flags_ |= kIntFlag;</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;        }</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (i64 &gt;= INT64_C(-2147483648))</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (i64 &gt;= static_cast&lt;int64_t&gt;(<a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0xFFFFFFFF, 0x80000000)))</div>
 <div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;            flags_ |= kIntFlag;</div>
 <div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    }</div>
 <div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;<span class="comment"></span></div>
