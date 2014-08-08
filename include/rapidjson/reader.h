@@ -721,8 +721,8 @@ private:
 			i64 = i;
 			if (minus) 
 				while (s.Peek() >= '0' && s.Peek() <= '9') {					
-					if (i64 >= UINT64_C(922337203685477580)) // 2^63 = 9223372036854775808
-						if (i64 != UINT64_C(922337203685477580) || s.Peek() > '8') {
+					if (i64 >= RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC)) // 2^63 = 9223372036854775808
+						if (i64 != RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC) || s.Peek() > '8') {
 							useDouble = true;
 							break;
 						}
@@ -730,8 +730,8 @@ private:
 				}
 			else
 				while (s.Peek() >= '0' && s.Peek() <= '9') {					
-					if (i64 >= UINT64_C(1844674407370955161)) // 2^64 - 1 = 18446744073709551615
-						if (i64 != UINT64_C(1844674407370955161) || s.Peek() > '5') {
+					if (i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999)) // 2^64 - 1 = 18446744073709551615
+						if (i64 != RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) || s.Peek() > '5') {
 							useDouble = true;
 							break;
 						}

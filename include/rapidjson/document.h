@@ -415,9 +415,9 @@ public:
 		data_.n.i64 = i64;
 		if (i64 >= 0) {
 			flags_ |= kNumberUint64Flag;
-			if (!(static_cast<uint64_t>(i64) & UINT64_C(0xFFFFFFFF00000000)))
+			if (!(static_cast<uint64_t>(i64) & RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0x00000000)))
 				flags_ |= kUintFlag;
-			if (!(static_cast<uint64_t>(i64) & UINT64_C(0xFFFFFFFF80000000)))
+			if (!(static_cast<uint64_t>(i64) & RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0x80000000)))
 				flags_ |= kIntFlag;
 		}
 		else if (i64 >= INT64_C(-2147483648))
@@ -427,11 +427,11 @@ public:
 	//! Constructor for uint64_t value.
 	explicit GenericValue(uint64_t u64) : data_(), flags_(kNumberUint64Flag) {
 		data_.n.u64 = u64;
-		if (!(u64 & UINT64_C(0x8000000000000000)))
+		if (!(u64 & RAPIDJSON_UINT64_C2(0x80000000, 0x00000000)))
 			flags_ |= kInt64Flag;
-		if (!(u64 & UINT64_C(0xFFFFFFFF00000000)))
+		if (!(u64 & RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0x00000000)))
 			flags_ |= kUintFlag;
-		if (!(u64 & UINT64_C(0xFFFFFFFF80000000)))
+		if (!(u64 & RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0x80000000)))
 			flags_ |= kIntFlag;
 	}
 

@@ -16,14 +16,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NO_INT64DEFINE
 
-// Here defines int64_t and uint64_t types in global namespace as well as the
-// (U)INT64_C constant macros.
+// Here defines int64_t and uint64_t types in global namespace
 // If user have their own definition, can define RAPIDJSON_NO_INT64DEFINE to disable this.
 #ifndef RAPIDJSON_NO_INT64DEFINE
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
-#ifndef __STDC_CONSTANT_MACROS
-#  define __STDC_CONSTANT_MACROS 1 // required by C++ standard
-#endif
 #ifdef _MSC_VER
 #include "msinttypes/stdint.h"
 #include "msinttypes/inttypes.h"
@@ -107,6 +103,19 @@
 */
 #ifndef RAPIDJSON_ALIGN
 #define RAPIDJSON_ALIGN(x) ((x + 3u) & ~3u)
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_UINT64_C2
+
+//! Construct a 64-bit literal by a pair of 32-bit integer.
+/*!
+	64-bit literal with or without ULL suffix is prone to compiler warnings.
+	UINT64_C() is C macro which cause compilation problems.
+	Use this macro to define 64-bit constants by a pair of 32-bit integer.
+*/
+#ifndef RAPIDJSON_UINT64_C2
+#define RAPIDJSON_UINT64_C2(high32, low32) ((static_cast<uint64_t>(high32) << 32) | static_cast<uint64_t>(low32))
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
