@@ -420,7 +420,7 @@ public:
 			if (!(static_cast<uint64_t>(i64) & RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0x80000000)))
 				flags_ |= kIntFlag;
 		}
-		else if (i64 >= INT64_C(-2147483648))
+		else if (i64 >= static_cast<int64_t>(RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0x80000000)))
 			flags_ |= kIntFlag;
 	}
 
