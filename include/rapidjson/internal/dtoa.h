@@ -16,6 +16,11 @@
 namespace rapidjson {
 namespace internal {
 
+#ifdef __GNUC__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(effc++)
+#endif
+
 struct DiyFp {
 	DiyFp() {}
 
@@ -407,6 +412,10 @@ inline char* dtoa(double value, char* buffer) {
 		return Prettify(buffer, length, K);
 	}
 }
+
+#ifdef __GNUC__
+RAPIDJSON_DIAG_POP
+#endif
 
 } // namespace internal
 } // namespace rapidjson
