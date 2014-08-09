@@ -668,6 +668,18 @@ private:
 		}
 	}
 
+	inline double StrtodFastPath(double significand, int exp) {
+		// Fast path only works on limited range of values.
+		// But for simplicity and performance, currently only implement this.
+		// see http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/
+		if (exp < -308)
+			return 0.0;
+		else if (exp >= 0)
+			return significand * internal::Pow10(exp);
+		else
+			return significand / internal::Pow10(-exp);
+	}
+
 	template<unsigned parseFlags, typename InputStream, typename Handler>
 	void ParseNumber(InputStream& is, Handler& handler) {
 		internal::StreamLocalCopy<InputStream> copy(is);
@@ -813,11 +825,11 @@ private:
 			int expSum = exp + expFrac;
 			if (expSum < -308) {
 				// Prevent expSum < -308, making Pow10(expSum) = 0
-				d *= internal::Pow10(exp);
-				d *= internal::Pow10(expFrac);
+				d = StrtodFastPath(d, exp);
+				d = StrtodFastPath(d, expFrac);
 			}
 			else
-				d *= internal::Pow10(expSum);
+				d = StrtodFastPath(d, expSum);
 
 			cont = handler.Double(minus ? -d : d);
 		}
