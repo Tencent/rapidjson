@@ -31,9 +31,6 @@ public:
 	PrettyWriter(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
 		Base(os, allocator, levelDepth), indentChar_(' '), indentCharCount_(4) {}
 
-	//! Overridden for fluent API, see \ref Writer::SetDoublePrecision()
-	PrettyWriter& SetDoublePrecision(int p) { Base::SetDoublePrecision(p); return *this; }
-
 	//! Set custom indentation.
 	/*! \param indentChar		Character for indentation. Must be whitespace character (' ', '\\t', '\\n', '\\r').
 		\param indentCharCount	Number of indent characters for each indentation level.
@@ -118,15 +115,6 @@ public:
 
 	//! Simpler but slower overload.
 	bool String(const Ch* str) { return String(str, internal::StrLen(str)); }
-
-	//! Overridden for fluent API, see \ref Writer::Double()
-	bool Double(double d, int precision) {
-		int oldPrecision = Base::GetDoublePrecision();
-		SetDoublePrecision(precision);
-		bool ret = Double(d);
-		SetDoublePrecision(oldPrecision);
-		return ret;
-	}
 
 	//@}
 protected:
