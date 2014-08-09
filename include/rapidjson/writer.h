@@ -4,9 +4,9 @@
 #include "rapidjson.h"
 #include "internal/stack.h"
 #include "internal/strfunc.h"
+#include "internal/dtoa.h"
 #include "internal/itoa.h"
 #include "stringbuffer.h"
-#include <cstdio>	// snprintf() or _sprintf_s()
 #include <new>		// placement new
 
 #ifdef _MSC_VER
@@ -239,25 +239,17 @@ protected:
 
 	bool WriteUint64(uint64_t u64) {
 		char buffer[20];
-		const char* end = internal::u64toa(u64, buffer);
-		for (const char* p = buffer; p != end; ++p)
+		char* end = internal::u64toa(u64, buffer);
+		for (char* p = buffer; p != end; ++p)
 			os_->Put(*p);
 		return true;
 	}
 
-#ifdef _MSC_VER
-#define RAPIDJSON_SNPRINTF sprintf_s
-#else
-#define RAPIDJSON_SNPRINTF snprintf
-#endif
-
-	//! \todo Optimization with custom double-to-string converter.
 	bool WriteDouble(double d) {
-		char buffer[100];
-		int ret = RAPIDJSON_SNPRINTF(buffer, sizeof(buffer), "%.*g", doublePrecision_, d);
-		RAPIDJSON_ASSERT(ret >= 1);
-		for (int i = 0; i < ret; i++)
-			os_->Put(buffer[i]);
+		char buffer[25];
+		char* end = internal::dtoa(d, buffer);
+		for (char* p = buffer; p != end; ++p)
+			os_->Put(*p);
 		return true;
 	}
 #undef RAPIDJSON_SNPRINTF
@@ -400,6 +392,14 @@ inline bool Writer<StringBuffer>::WriteUint64(uint64_t u) {
 	char *buffer = os_->Push(20);
 	const char* end = internal::u64toa(u, buffer);
 	os_->Pop(20 - (end - buffer));
+	return true;
+}
+
+template<>
+inline bool Writer<StringBuffer>::WriteDouble(double d) {
+	char *buffer = os_->Push(25);
+	char* end = internal::dtoa(d, buffer);
+	os_->Pop(25 - (end - buffer));
 	return true;
 }
 
