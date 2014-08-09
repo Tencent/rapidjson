@@ -87,7 +87,8 @@ TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseIterative_DummyHandler)) {
 
 TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseIterativeInsitu_DummyHandler)) {
 	for (size_t i = 0; i < kTrialCount; i++) {
-		StringStream s(json_);
+		memcpy(temp_, json_, length_ + 1);
+		InsituStringStream s(temp_);
 		BaseReaderHandler<> h;
 		Reader reader;
 		EXPECT_TRUE(reader.Parse<kParseIterativeFlag|kParseInsituFlag>(s, h));
