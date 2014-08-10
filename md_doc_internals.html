@@ -228,7 +228,7 @@ Implementation</h3>
 <p>Based on the parsing table, a direct(or conventional) implementation that pushes the production body in reverse order while generating a production could work.</p>
 <p>In RapidJSON, several modifications(or adaptations to current design) are made to a direct implementation.</p>
 <p>First, the parsing table is encoded in a state machine in RapidJSON. States are constructed by the head and body of production. State transitions are constructed by production rules. Besides, extra states are added for productions involved with <code>array</code> and <code>object</code>. In this way the generation of array values or object members would be a single state transition, rather than several pop/push operations in the direct implementation. This also makes the estimation of stack size more easier.</p>
-<p>The states diagra is shown as follows:</p>
+<p>The state diagram is shown as follows:</p>
 <div class="image">
 <img src="iterative-parser-states-diagram.png" alt="iterative-parser-states-diagram.png"/>
 <div class="caption">
