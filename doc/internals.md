@@ -119,7 +119,7 @@ In this way the generation of array values or object members would be a single s
 rather than several pop/push operations in the direct implementation.
 This also makes the estimation of stack size more easier.
 
-The states diagra is shown as follows:
+The state diagram is shown as follows:
 
 ![State Diagram](diagram/iterative-parser-states-diagram.png)
 
