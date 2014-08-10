@@ -1,4 +1,4 @@
-# RapidJSON
+![](doc/logo/rapidjson.png)
 
 Copyright (c) 2011-2014 Milo Yip (miloyip@gmail.com)
 
