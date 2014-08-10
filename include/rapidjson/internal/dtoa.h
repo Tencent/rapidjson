@@ -218,27 +218,17 @@ inline void GrisuRound(char* buffer, int len, uint64_t delta, uint64_t rest, uin
 }
 
 inline unsigned CountDecimalDigit32(uint32_t n) {
-	static const uint32_t powers_of_10[] = {
-		0,
-		10,
-		100,
-		1000,
-		10000,
-		100000,
-		1000000,
-		10000000,
-		100000000,
-		1000000000
-	};
-
-#ifdef _MSC_VER
-	unsigned long i = 0;
-	_BitScanReverse(&i, n | 1);
-	uint32_t t = (i + 1) * 1233 >> 12;
-#elif __GNUC__
-	uint32_t t = (32 - __builtin_clz(n | 1)) * 1233 >> 12;
-#endif
-	return t - (n < powers_of_10[t]) + 1;
+	// Simple pure C++ implementation was faster than __builtin_clz version in this situation.
+	if (n < 10) return 1;
+	if (n < 100) return 2;
+	if (n < 1000) return 3;
+	if (n < 10000) return 4;
+	if (n < 100000) return 5;
+	if (n < 1000000) return 6;
+	if (n < 10000000) return 7;
+	if (n < 100000000) return 8;
+	if (n < 1000000000) return 9;
+	return 10;
 }
 
 inline void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buffer, int* len, int* K) {
