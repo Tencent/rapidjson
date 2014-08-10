@@ -963,3 +963,24 @@ TEST(Document, CrtAllocator) {
 	V a(kArrayType);
 	a.PushBack(1, allocator);	// Should not call destructor on uninitialized Value of newly allocated elements.
 }
+
+// Test for recursive find
+TEST(Document, RecursiveFind) {
+	rapidjson::Document doc;
+	doc.Parse("{ \"first1\" : {\"second1\" : \"second1_val\", \
+		\"second2\" : { \"third1\" : \"third1_val\" }}, \
+		\"first2\" : { \"second3\" : \"second3_val\"}}");
+
+	EXPECT_TRUE(doc.HasMemberRecursive("first1"));
+	EXPECT_TRUE(doc.HasMemberRecursive("first2"));
+	EXPECT_TRUE(doc.HasMemberRecursive("second1"));
+	EXPECT_TRUE(doc.HasMemberRecursive("second2"));
+	EXPECT_TRUE(doc.HasMemberRecursive("second3"));
+	EXPECT_TRUE(doc.HasMemberRecursive("third1"));
+
+	EXPECT_FALSE(doc.HasMemberRecursive("lol"));
+	EXPECT_EQ(doc.FindMemberRecursive("lol"), doc.MemberEnd());
+
+	EXPECT_TRUE(doc.FindMemberRecursive("third1")->name.IsString());
+	EXPECT_STREQ(doc.FindMemberRecursive("third1")->name.GetString(), "third1");
+}
