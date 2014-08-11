@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.7"/>
-<title>RapidJSON: rapidjson::BaseReaderHandler&lt; Encoding &gt; Struct Template Reference</title>
+<title>RapidJSON: rapidjson::BaseReaderHandler&lt; Encoding, Derived &gt; Struct Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -81,7 +81,7 @@ $(document).ready(function(){initNavTree('structrapidjson_1_1_base_reader_handle
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="structrapidjson_1_1_base_reader_handler-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">rapidjson::BaseReaderHandler&lt; Encoding &gt; Struct Template Reference</div>  </div>
+<div class="title">rapidjson::BaseReaderHandler&lt; Encoding, Derived &gt; Struct Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -92,55 +92,61 @@ $(document).ready(function(){initNavTree('structrapidjson_1_1_base_reader_handle
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:afd60fa49358b2d2b1051520308102620"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afd60fa49358b2d2b1051520308102620"></a>
+<tr class="memitem:a2932a8ecbb1997dda305f4dbef32ab0d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2932a8ecbb1997dda305f4dbef32ab0d"></a>
 typedef Encoding::Ch&#160;</td><td class="memItemRight" valign="bottom"><b>Ch</b></td></tr>
-<tr class="separator:afd60fa49358b2d2b1051520308102620"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a2932a8ecbb1997dda305f4dbef32ab0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae61944eee4cb6a3f7f34f3d4edce7eeb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae61944eee4cb6a3f7f34f3d4edce7eeb"></a>
+typedef internal::SelectIf<br class="typebreak" />
+&lt; internal::IsSame&lt; Derived, <br class="typebreak" />
+void &gt;, <a class="el" href="structrapidjson_1_1_base_reader_handler.html">BaseReaderHandler</a>, <br class="typebreak" />
+Derived &gt;::<a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Override</b></td></tr>
+<tr class="separator:ae61944eee4cb6a3f7f34f3d4edce7eeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a626d394572994b76d003c3d56eb015a7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a626d394572994b76d003c3d56eb015a7"></a>
+<tr class="memitem:a050d1b4130a924d138f762d3c914a748"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a050d1b4130a924d138f762d3c914a748"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>Default</b> ()</td></tr>
-<tr class="separator:a626d394572994b76d003c3d56eb015a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a85241ae925e9a33a7a7a040e97e7074d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a85241ae925e9a33a7a7a040e97e7074d"></a>
+<tr class="separator:a050d1b4130a924d138f762d3c914a748"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a823c816871a8dd881019ee8526b517cb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a823c816871a8dd881019ee8526b517cb"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>Null</b> ()</td></tr>
-<tr class="separator:a85241ae925e9a33a7a7a040e97e7074d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab6c9af8487b473c5a0fcb16a7271d88b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab6c9af8487b473c5a0fcb16a7271d88b"></a>
+<tr class="separator:a823c816871a8dd881019ee8526b517cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aead125c32fbf2a1311a2ba9c95b8604a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aead125c32fbf2a1311a2ba9c95b8604a"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>Bool</b> (bool)</td></tr>
-<tr class="separator:ab6c9af8487b473c5a0fcb16a7271d88b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d2fae39aafa91df42d1ca07b4010852"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0d2fae39aafa91df42d1ca07b4010852"></a>
+<tr class="separator:aead125c32fbf2a1311a2ba9c95b8604a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7de3a16b56209aa2aa56a42591c426cb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7de3a16b56209aa2aa56a42591c426cb"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>Int</b> (int)</td></tr>
-<tr class="separator:a0d2fae39aafa91df42d1ca07b4010852"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a040ab8db6bbe4ea8303193a7db4fe328"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a040ab8db6bbe4ea8303193a7db4fe328"></a>
+<tr class="separator:a7de3a16b56209aa2aa56a42591c426cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9627844582969a7d79a2250bdb4f9ec0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9627844582969a7d79a2250bdb4f9ec0"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>Uint</b> (unsigned)</td></tr>
-<tr class="separator:a040ab8db6bbe4ea8303193a7db4fe328"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae5189967d6c50fcebc3ec089e1fffad4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae5189967d6c50fcebc3ec089e1fffad4"></a>
+<tr class="separator:a9627844582969a7d79a2250bdb4f9ec0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb78023dc0f5a31f9c5d5de4a55d9077"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afb78023dc0f5a31f9c5d5de4a55d9077"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>Int64</b> (int64_t)</td></tr>
-<tr class="separator:ae5189967d6c50fcebc3ec089e1fffad4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7d6a0ab03cfd8a808114215c1fb1cbb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af7d6a0ab03cfd8a808114215c1fb1cbb"></a>
+<tr class="separator:afb78023dc0f5a31f9c5d5de4a55d9077"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76b043fefd5fac0faadf3846995af6f5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a76b043fefd5fac0faadf3846995af6f5"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>Uint64</b> (uint64_t)</td></tr>
-<tr class="separator:af7d6a0ab03cfd8a808114215c1fb1cbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec9ffe6732161ce4f8f0ff0e44eba067"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aec9ffe6732161ce4f8f0ff0e44eba067"></a>
+<tr class="separator:a76b043fefd5fac0faadf3846995af6f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03e7d273b4d317b61a4ae56e0da9097a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a03e7d273b4d317b61a4ae56e0da9097a"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>Double</b> (double)</td></tr>
-<tr class="separator:aec9ffe6732161ce4f8f0ff0e44eba067"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06c0cdc73cd57b04f55c88c8f5a0e169"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a06c0cdc73cd57b04f55c88c8f5a0e169"></a>
+<tr class="separator:a03e7d273b4d317b61a4ae56e0da9097a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad48b724f01c31c1fdbd623bd31df6a3c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad48b724f01c31c1fdbd623bd31df6a3c"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>String</b> (const Ch *, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>, bool)</td></tr>
-<tr class="separator:a06c0cdc73cd57b04f55c88c8f5a0e169"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f321431f8e017f6db7b245b0ee89378"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4f321431f8e017f6db7b245b0ee89378"></a>
+<tr class="separator:ad48b724f01c31c1fdbd623bd31df6a3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f3d3bec89a751cdcf7a4236dbc6b26d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2f3d3bec89a751cdcf7a4236dbc6b26d"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>StartObject</b> ()</td></tr>
-<tr class="separator:a4f321431f8e017f6db7b245b0ee89378"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42a379b0727a45265989bc70b57230d2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a42a379b0727a45265989bc70b57230d2"></a>
+<tr class="separator:a2f3d3bec89a751cdcf7a4236dbc6b26d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6216b7af34bbae857ff06363f5b13f5d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6216b7af34bbae857ff06363f5b13f5d"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>EndObject</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>)</td></tr>
-<tr class="separator:a42a379b0727a45265989bc70b57230d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab6adefd5b0160e22b390ae969785cb5a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab6adefd5b0160e22b390ae969785cb5a"></a>
+<tr class="separator:a6216b7af34bbae857ff06363f5b13f5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c6fba36350848cb691879758b2d8d59"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c6fba36350848cb691879758b2d8d59"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>StartArray</b> ()</td></tr>
-<tr class="separator:ab6adefd5b0160e22b390ae969785cb5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a37403f4df0fb6a69f3b161947b4c4d9d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a37403f4df0fb6a69f3b161947b4c4d9d"></a>
+<tr class="separator:a0c6fba36350848cb691879758b2d8d59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fc75176ec793217d40d5a8de049cdb3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8fc75176ec793217d40d5a8de049cdb3"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>EndArray</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>)</td></tr>
-<tr class="separator:a37403f4df0fb6a69f3b161947b4c4d9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a8fc75176ec793217d40d5a8de049cdb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename Encoding = UTF8&lt;&gt;&gt;<br />
-struct rapidjson::BaseReaderHandler&lt; Encoding &gt;</h3>
+<div class="textblock"><h3>template&lt;typename Encoding = UTF8&lt;&gt;, typename Derived = void&gt;<br />
+struct rapidjson::BaseReaderHandler&lt; Encoding, Derived &gt;</h3>
 
 <p>Default implementation of <a class="el" href="classrapidjson_1_1_handler.html" title="Concept for receiving events from GenericReader upon parsing. The functions return true if no error o...">Handler</a>. </p>
 <p>This can be used as base class of any reader handler. </p><dl class="section note"><dt>Note</dt><dd>implements <a class="el" href="classrapidjson_1_1_handler.html" title="Concept for receiving events from GenericReader upon parsing. The functions return true if no error o...">Handler</a> concept </dd></dl>

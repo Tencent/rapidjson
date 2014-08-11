@@ -8,7 +8,6 @@ var searchData=
   ['kparsedefaultflags',['kParseDefaultFlags',['../namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835',1,'rapidjson']]],
   ['kparseerrorarraymisscommaorsquarebracket',['kParseErrorArrayMissCommaOrSquareBracket',['../namespacerapidjson.html#a7d3acf640886b1f2552dc8c4cd6dea60a1a4ac97731f997e9591b40f98ecd9f93',1,'rapidjson']]],
   ['kparseerrordocumentempty',['kParseErrorDocumentEmpty',['../namespacerapidjson.html#a7d3acf640886b1f2552dc8c4cd6dea60a06183076357ebd9eca228666f614c286',1,'rapidjson']]],
-  ['kparseerrordocumentrootnotobjectorarray',['kParseErrorDocumentRootNotObjectOrArray',['../namespacerapidjson.html#a7d3acf640886b1f2552dc8c4cd6dea60aed84f6f72eedbe9684309befd0e3c80c',1,'rapidjson']]],
   ['kparseerrordocumentrootnotsingular',['kParseErrorDocumentRootNotSingular',['../namespacerapidjson.html#a7d3acf640886b1f2552dc8c4cd6dea60a2022599bcd4f64d58885a026f95751d5',1,'rapidjson']]],
   ['kparseerrornone',['kParseErrorNone',['../namespacerapidjson.html#a7d3acf640886b1f2552dc8c4cd6dea60a86a60b723dca32df5debab2c3db4235f',1,'rapidjson']]],
   ['kparseerrornumbermissexponent',['kParseErrorNumberMissExponent',['../namespacerapidjson.html#a7d3acf640886b1f2552dc8c4cd6dea60a28a1c720ae63560780ccd992dc999ab7',1,'rapidjson']]],

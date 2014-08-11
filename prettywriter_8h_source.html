@@ -256,33 +256,32 @@ $(document).ready(function(){initNavTree('prettywriter_8h_source.html','');});
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;            level-&gt;valueCount++;</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        }</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;            <a class="code" href="rapidjson_8h.html#abeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(type == <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a> || type == <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;            <a class="code" href="rapidjson_8h.html#abeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(!Base::hasRoot_);  <span class="comment">// Should only has one and only one root.</span></div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;            Base::hasRoot_ = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;        }</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    }</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <span class="keywordtype">void</span> WriteIndent()  {</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        <span class="keywordtype">size_t</span> count = (Base::level_stack_.GetSize() / <span class="keyword">sizeof</span>(<span class="keyword">typename</span> Base::Level)) * indentCharCount_;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        <a class="code" href="namespacerapidjson.html#a1ac13bac5976fc06587e00fc0bcfb32a">PutN</a>(*Base::os_, indentChar_, count);</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    }</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    Ch indentChar_;</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordtype">unsigned</span> indentCharCount_;</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="comment">// Prohibit copy constructor &amp; assignment operator.</span></div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <a class="code" href="classrapidjson_1_1_pretty_writer.html#af6725eb824750e8c66fe47fa4375cf9a">PrettyWriter</a>(<span class="keyword">const</span> <a class="code" href="classrapidjson_1_1_pretty_writer.html#af6725eb824750e8c66fe47fa4375cf9a">PrettyWriter</a>&amp;);</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <a class="code" href="classrapidjson_1_1_pretty_writer.html#af6725eb824750e8c66fe47fa4375cf9a">PrettyWriter</a>&amp; operator=(<span class="keyword">const</span> <a class="code" href="classrapidjson_1_1_pretty_writer.html#af6725eb824750e8c66fe47fa4375cf9a">PrettyWriter</a>&amp;);</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;};</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;} <span class="comment">// namespace rapidjson</span></div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="preprocessor">#ifdef __GNUC__</span></div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;RAPIDJSON_DIAG_POP</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_RAPIDJSON_H_</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;            <a class="code" href="rapidjson_8h.html#abeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(!Base::hasRoot_);  <span class="comment">// Should only has one and only one root.</span></div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;            Base::hasRoot_ = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;        }</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    }</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="keywordtype">void</span> WriteIndent()  {</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        <span class="keywordtype">size_t</span> count = (Base::level_stack_.GetSize() / <span class="keyword">sizeof</span>(<span class="keyword">typename</span> Base::Level)) * indentCharCount_;</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        <a class="code" href="namespacerapidjson.html#a1ac13bac5976fc06587e00fc0bcfb32a">PutN</a>(*Base::os_, indentChar_, count);</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    }</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    Ch indentChar_;</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordtype">unsigned</span> indentCharCount_;</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="comment">// Prohibit copy constructor &amp; assignment operator.</span></div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <a class="code" href="classrapidjson_1_1_pretty_writer.html#af6725eb824750e8c66fe47fa4375cf9a">PrettyWriter</a>(<span class="keyword">const</span> <a class="code" href="classrapidjson_1_1_pretty_writer.html#af6725eb824750e8c66fe47fa4375cf9a">PrettyWriter</a>&amp;);</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <a class="code" href="classrapidjson_1_1_pretty_writer.html#af6725eb824750e8c66fe47fa4375cf9a">PrettyWriter</a>&amp; operator=(<span class="keyword">const</span> <a class="code" href="classrapidjson_1_1_pretty_writer.html#af6725eb824750e8c66fe47fa4375cf9a">PrettyWriter</a>&amp;);</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;};</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;} <span class="comment">// namespace rapidjson</span></div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="preprocessor">#ifdef __GNUC__</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;RAPIDJSON_DIAG_POP</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_RAPIDJSON_H_</span></div>
 <div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4a80d9f25b083abce45edbfdd3ba006c8e"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a80d9f25b083abce45edbfdd3ba006c8e">rapidjson::kTrueType</a></div><div class="ttdoc">true </div><div class="ttdef"><b>Definition:</b> rapidjson.h:423</div></div>
 <div class="ttc" id="namespacerapidjson_html_a44eb33eaa523e36d466b1ced64b85c84"><div class="ttname"><a href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">rapidjson::SizeType</a></div><div class="ttdeci">unsigned SizeType</div><div class="ttdoc">Use 32-bit array/string indices even for 64-bit platform, instead of using size_t. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:162</div></div>
 <div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4a9f2e7047832dce1029551b5de0f05607"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a9f2e7047832dce1029551b5de0f05607">rapidjson::kFalseType</a></div><div class="ttdoc">false </div><div class="ttdef"><b>Definition:</b> rapidjson.h:422</div></div>

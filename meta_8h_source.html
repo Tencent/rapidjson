@@ -103,80 +103,89 @@ $(document).ready(function(){initNavTree('meta_8h_source.html','');});
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#ifndef RAPIDJSON_INTERNAL_META_H_</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#define RAPIDJSON_INTERNAL_META_H_</span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="comment">//@cond RAPIDJSON_INTERNAL</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">namespace </span>rapidjson {</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">namespace </span>internal {</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> N&gt; <span class="keyword">struct </span>IntegralC { <span class="keyword">enum</span> { <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> = N }; };</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> Cond&gt; <span class="keyword">struct </span>BoolType : IntegralC&lt;Cond&gt; {};</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">struct </span>TrueType : BoolType&lt;true&gt; {};</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">struct </span>FalseType : BoolType&lt;false&gt; {};</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#ifdef __GNUC__</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;RAPIDJSON_DIAG_PUSH</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;RAPIDJSON_DIAG_OFF(effc++)</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="comment">//@cond RAPIDJSON_INTERNAL</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">namespace </span>rapidjson {</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">namespace </span>internal {</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>AddConst { <span class="keyword">typedef</span> <span class="keyword">const</span> T <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>; };</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>RemoveConst { <span class="keyword">typedef</span> T <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>; };</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>RemoveConst&lt;const T&gt; { <span class="keyword">typedef</span> T <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>; };</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> Condition, <span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2&gt; <span class="keyword">struct </span>SelectIfCond;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2&gt; <span class="keyword">struct </span>SelectIfCond&lt;true,T1,T2&gt; { <span class="keyword">typedef</span> T1 <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>; };</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2&gt; <span class="keyword">struct </span>SelectIfCond&lt;false,T1,T2&gt; { <span class="keyword">typedef</span> T2 <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>; };</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Condition, <span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2&gt;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keyword">struct </span>SelectIf : SelectIfCond&lt;Condition::Value,T1,T2&gt; {};</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> Constify, <span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="keyword">struct </span>MaybeAddConst : SelectIfCond&lt;Constify, const T, T&gt; {};</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> U&gt; <span class="keyword">struct </span>IsSame  : FalseType {};</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>IsSame&lt;T,T&gt;  : TrueType {};</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>IsConst : FalseType {};</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>IsConst&lt;const T&gt; : TrueType {};</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>IsPointer : FalseType {};</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>IsPointer&lt;T*&gt; : TrueType {};</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> CT, <span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keyword">struct </span>IsMoreConst {</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keyword">enum</span> { <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> =</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        ( <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">IsSame&lt; typename RemoveConst&lt;CT&gt;::Type</a>, <span class="keyword">typename</span> <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">RemoveConst&lt;T&gt;::Type</a>&gt;<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">::Value</a></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        &amp;&amp; ( IsConst&lt;CT&gt;::Value &gt;= IsConst&lt;T&gt;::Value ) )</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    };</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;};</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> Condition, <span class="keyword">typename</span> T = <span class="keywordtype">void</span>&gt; <span class="keyword">struct </span>EnableIfCond;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>EnableIfCond&lt;true, T&gt; { <span class="keyword">typedef</span> T <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>; };</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>EnableIfCond&lt;false, T&gt; { <span class="comment">/* empty */</span> };</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> Condition, <span class="keyword">typename</span> T = <span class="keywordtype">void</span>&gt;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">struct </span>DisableIfCond : EnableIfCond&lt;!Condition, T&gt; {};</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Condition, <span class="keyword">typename</span> T = <span class="keywordtype">void</span>&gt;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="keyword">struct </span>EnableIf : EnableIfCond&lt;Condition::Value, T&gt; {};</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Condition, <span class="keyword">typename</span> T = <span class="keywordtype">void</span>&gt;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="keyword">struct </span>DisableIf : DisableIfCond&lt;Condition::Value, T&gt; {};</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="comment">// SFINAE helpers</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="keyword">struct </span>SfinaeResultTag {};</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>RemoveSfinaeFptr {};</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>RemoveSfinaeFptr&lt;SfinaeResultTag&amp;(*)(T)&gt; { <span class="keyword">typedef</span> T <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>; };</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">int</span> N&gt; <span class="keyword">struct </span>IntegralC { <span class="keyword">enum</span> { <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> = N }; };</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> Cond&gt; <span class="keyword">struct </span>BoolType : IntegralC&lt;Cond&gt; {};</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">struct </span>TrueType : BoolType&lt;true&gt; {};</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">struct </span>FalseType : BoolType&lt;false&gt; {};</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>AddConst { <span class="keyword">typedef</span> <span class="keyword">const</span> T <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>; };</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>RemoveConst { <span class="keyword">typedef</span> T <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>; };</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>RemoveConst&lt;const T&gt; { <span class="keyword">typedef</span> T <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>; };</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> Condition, <span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2&gt; <span class="keyword">struct </span>SelectIfCond;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2&gt; <span class="keyword">struct </span>SelectIfCond&lt;true,T1,T2&gt; { <span class="keyword">typedef</span> T1 <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>; };</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2&gt; <span class="keyword">struct </span>SelectIfCond&lt;false,T1,T2&gt; { <span class="keyword">typedef</span> T2 <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>; };</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Condition, <span class="keyword">typename</span> T1, <span class="keyword">typename</span> T2&gt;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">struct </span>SelectIf : SelectIfCond&lt;Condition::Value,T1,T2&gt; {};</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> Constify, <span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">struct </span>MaybeAddConst : SelectIfCond&lt;Constify, const T, T&gt; {};</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> U&gt; <span class="keyword">struct </span>IsSame  : FalseType {};</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>IsSame&lt;T,T&gt;  : TrueType {};</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>IsConst : FalseType {};</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>IsConst&lt;const T&gt; : TrueType {};</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>IsPointer : FalseType {};</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>IsPointer&lt;T*&gt; : TrueType {};</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> CT, <span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="keyword">struct </span>IsMoreConst {</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">enum</span> { <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> =</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        ( <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">IsSame&lt; typename RemoveConst&lt;CT&gt;::Type</a>, <span class="keyword">typename</span> <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">RemoveConst&lt;T&gt;::Type</a>&gt;<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">::Value</a></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        &amp;&amp; ( IsConst&lt;CT&gt;::Value &gt;= IsConst&lt;T&gt;::Value ) )</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    };</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;};</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> Condition, <span class="keyword">typename</span> T = <span class="keywordtype">void</span>&gt; <span class="keyword">struct </span>EnableIfCond;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>EnableIfCond&lt;true, T&gt; { <span class="keyword">typedef</span> T <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>; };</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>EnableIfCond&lt;false, T&gt; { <span class="comment">/* empty */</span> };</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> Condition, <span class="keyword">typename</span> T = <span class="keywordtype">void</span>&gt;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="keyword">struct </span>DisableIfCond : EnableIfCond&lt;!Condition, T&gt; {};</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Condition, <span class="keyword">typename</span> T = <span class="keywordtype">void</span>&gt;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="keyword">struct </span>EnableIf : EnableIfCond&lt;Condition::Value, T&gt; {};</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Condition, <span class="keyword">typename</span> T = <span class="keywordtype">void</span>&gt;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="keyword">struct </span>DisableIf : DisableIfCond&lt;Condition::Value, T&gt; {};</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor">#define RAPIDJSON_REMOVEFPTR_(type) \</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="preprocessor">    typename ::rapidjson::internal::RemoveSfinaeFptr \</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="preprocessor">        &lt; ::rapidjson::internal::SfinaeResultTag&amp;(*) type&gt;::Type</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="preprocessor">#define RAPIDJSON_ENABLEIF(cond) \</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">    typename ::rapidjson::internal::EnableIf \</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">        &lt;RAPIDJSON_REMOVEFPTR_(cond)&gt;::Type * = NULL</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">#define RAPIDJSON_DISABLEIF_RETURN(cond,returntype) \</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">    typename ::rapidjson::internal::DisableIf&lt;cond,returntype&gt;::Type</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;} <span class="comment">// namespace internal</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;} <span class="comment">// namespace rapidjson</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment">//@endcond</span></div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_INTERNAL_META_H_</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">// SFINAE helpers</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="keyword">struct </span>SfinaeResultTag {};</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>RemoveSfinaeFptr {};</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt; <span class="keyword">struct </span>RemoveSfinaeFptr&lt;SfinaeResultTag&amp;(*)(T)&gt; { <span class="keyword">typedef</span> T <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>; };</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">#define RAPIDJSON_REMOVEFPTR_(type) \</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">    typename ::rapidjson::internal::RemoveSfinaeFptr \</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">        &lt; ::rapidjson::internal::SfinaeResultTag&amp;(*) type&gt;::Type</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">#define RAPIDJSON_ENABLEIF(cond) \</span></div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor">    typename ::rapidjson::internal::EnableIf \</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">        &lt;RAPIDJSON_REMOVEFPTR_(cond)&gt;::Type * = NULL</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">#define RAPIDJSON_DISABLEIF_RETURN(cond,returntype) \</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="preprocessor">    typename ::rapidjson::internal::DisableIf&lt;cond,returntype&gt;::Type</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;} <span class="comment">// namespace internal</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;} <span class="comment">// namespace rapidjson</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="comment">//@endcond</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="preprocessor">#ifdef __GNUC__</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;RAPIDJSON_DIAG_POP</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_INTERNAL_META_H_</span></div>
 <div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">rapidjson::Type</a></div><div class="ttdeci">Type</div><div class="ttdoc">Type of JSON value. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:420</div></div>
 <div class="ttc" id="namespacerapidjson_html_afb3fa116c66d834b6f4289d648cc8d6d"><div class="ttname"><a href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">rapidjson::Value</a></div><div class="ttdeci">GenericValue&lt; UTF8&lt;&gt; &gt; Value</div><div class="ttdoc">GenericValue with UTF8 encoding. </div><div class="ttdef"><b>Definition:</b> document.h:1401</div></div>
 </div><!-- fragment --></div><!-- contents -->

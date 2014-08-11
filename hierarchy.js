@@ -5,7 +5,7 @@ var hierarchy =
     [ "rapidjson::AutoUTF< CharType >", "structrapidjson_1_1_auto_u_t_f.html", null ],
     [ "rapidjson::AutoUTFInputStream< CharType, InputByteStream >", "classrapidjson_1_1_auto_u_t_f_input_stream.html", null ],
     [ "rapidjson::AutoUTFOutputStream< CharType, OutputByteStream >", "classrapidjson_1_1_auto_u_t_f_output_stream.html", null ],
-    [ "rapidjson::BaseReaderHandler< Encoding >", "structrapidjson_1_1_base_reader_handler.html", null ],
+    [ "rapidjson::BaseReaderHandler< Encoding, Derived >", "structrapidjson_1_1_base_reader_handler.html", null ],
     [ "rapidjson::CrtAllocator", "classrapidjson_1_1_crt_allocator.html", null ],
     [ "rapidjson::EncodedInputStream< Encoding, InputByteStream >", "classrapidjson_1_1_encoded_input_stream.html", null ],
     [ "rapidjson::EncodedOutputStream< Encoding, OutputByteStream >", "classrapidjson_1_1_encoded_output_stream.html", null ],

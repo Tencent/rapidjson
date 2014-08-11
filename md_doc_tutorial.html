@@ -131,7 +131,7 @@ Query Value</h1>
 <img src="tutorial.png" alt="tutorial.png"/>
 <div class="caption">
 DOM in the tutorial</div></div>
-<p> The root of a conforming JSON should be either an object or an array. In this case, the root is an object. </p><div class="fragment"><div class="line">assert(document.IsObject());</div>
+<p> Since the update to RFC7159, the root of a conforming JSON document can be any JSON value. In RFC4627, only objects or arrays were allowed as root values. In this case, the root is an object. </p><div class="fragment"><div class="line">assert(document.IsObject());</div>
 </div><!-- fragment --><p>Query whether a <code>"hello"</code> member exists in the root object. Since a <code>Value</code> can contain different types of value, we may need to verify its type and use suitable API to obtain the value. In this example, <code>"hello"</code> member associates with a JSON string. </p><div class="fragment"><div class="line">assert(document.HasMember(<span class="stringliteral">&quot;hello&quot;</span>));</div>
 <div class="line">assert(document[<span class="stringliteral">&quot;hello&quot;</span>].IsString());</div>
 <div class="line">printf(<span class="stringliteral">&quot;hello = %s\n&quot;</span>, document[<span class="stringliteral">&quot;hello&quot;</span>].GetString());</div>
