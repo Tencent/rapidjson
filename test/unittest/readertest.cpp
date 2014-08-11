@@ -31,7 +31,7 @@ RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
 template<bool expect>
-struct ParseBoolHandler : BaseReaderHandler<> {
+struct ParseBoolHandler : BaseReaderHandler<UTF8<>, ParseBoolHandler<expect> > {
     ParseBoolHandler() : step_(0) {}
     bool Default() { ADD_FAILURE(); return false; }
     // gcc 4.8.x generates warning in EXPECT_EQ(bool, bool) on this gtest version.
@@ -66,7 +66,7 @@ struct ParseIntHandler : BaseReaderHandler<UTF8<>, ParseIntHandler> {
     int actual_;
 };
 
-struct ParseUintHandler : BaseReaderHandler<> {
+struct ParseUintHandler : BaseReaderHandler<UTF8<>, ParseUintHandler> {
     ParseUintHandler() : step_(0), actual_() {}
     bool Default() { ADD_FAILURE(); return false; }
     bool Uint(unsigned i) { actual_ = i; step_++; return true; }
@@ -75,7 +75,7 @@ struct ParseUintHandler : BaseReaderHandler<> {
     unsigned actual_;
 };
 
-struct ParseInt64Handler : BaseReaderHandler<> {
+struct ParseInt64Handler : BaseReaderHandler<UTF8<>, ParseInt64Handler> {
     ParseInt64Handler() : step_(0), actual_() {}
     bool Default() { ADD_FAILURE(); return false; }
     bool Int64(int64_t i) { actual_ = i; step_++; return true; }
@@ -84,7 +84,7 @@ struct ParseInt64Handler : BaseReaderHandler<> {
     int64_t actual_;
 };
 
-struct ParseUint64Handler : BaseReaderHandler<> {
+struct ParseUint64Handler : BaseReaderHandler<UTF8<>, ParseUint64Handler> {
     ParseUint64Handler() : step_(0), actual_() {}
     bool Default() { ADD_FAILURE(); return false; }
     bool Uint64(uint64_t i) { actual_ = i; step_++; return true; }
@@ -93,7 +93,7 @@ struct ParseUint64Handler : BaseReaderHandler<> {
     uint64_t actual_;
 };
 
-struct ParseDoubleHandler : BaseReaderHandler<> {
+struct ParseDoubleHandler : BaseReaderHandler<UTF8<>, ParseDoubleHandler> {
     ParseDoubleHandler() : step_(0), actual_() {}
     bool Default() { ADD_FAILURE(); return false; }
     bool Double(double d) { actual_ = d; step_++; return true; }
@@ -209,7 +209,7 @@ TEST(Reader, ParseNumber_Error) {
 }
 
 template <typename Encoding>
-struct ParseStringHandler : BaseReaderHandler<Encoding> {
+struct ParseStringHandler : BaseReaderHandler<Encoding, ParseStringHandler<Encoding> > {
     ParseStringHandler() : str_(0), length_(0), copy_() {}
     ~ParseStringHandler() { EXPECT_TRUE(str_ != 0); if (copy_) free(const_cast<typename Encoding::Ch*>(str_)); }
     
@@ -431,7 +431,7 @@ TEST(Reader, ParseString_Error) {
 }
 
 template <unsigned count>
-struct ParseArrayHandler : BaseReaderHandler<> {
+struct ParseArrayHandler : BaseReaderHandler<UTF8<>, ParseArrayHandler<count> > {
     ParseArrayHandler() : step_(0) {}
 
     bool Default() { ADD_FAILURE(); return false; }
@@ -482,9 +482,10 @@ TEST(Reader, ParseArray_Error) {
 #undef TEST_ARRAY_ERROR
 }
 
-struct ParseObjectHandler : BaseReaderHandler<> {
+struct ParseObjectHandler : BaseReaderHandler<UTF8<>, ParseObjectHandler> {
     ParseObjectHandler() : step_(0) {}
 
+	bool Default() { ADD_FAILURE(); return false; }
     bool Null() { EXPECT_EQ(8u, step_); step_++; return true; }
     bool Bool(bool b) { 
         switch(step_) {
@@ -549,7 +550,7 @@ TEST(Reader, ParseObject) {
     }
 }
 
-struct ParseEmptyObjectHandler : BaseReaderHandler<> {
+struct ParseEmptyObjectHandler : BaseReaderHandler<UTF8<>, ParseEmptyObjectHandler> {
     ParseEmptyObjectHandler() : step_(0) {}
 
     bool Default() { ADD_FAILURE(); return false; }
@@ -567,7 +568,7 @@ TEST(Reader, Parse_EmptyObject) {
     EXPECT_EQ(2u, h.step_);
 }
 
-struct ParseMultipleRootHandler : BaseReaderHandler<> {
+struct ParseMultipleRootHandler : BaseReaderHandler<UTF8<>, ParseMultipleRootHandler> {
     ParseMultipleRootHandler() : step_(0) {}
 
     bool Default() { ADD_FAILURE(); return false; }
