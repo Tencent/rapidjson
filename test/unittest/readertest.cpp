@@ -640,13 +640,6 @@ TEST(Reader, ParseDocument_Error) {
     TEST_ERROR(kParseErrorDocumentEmpty, " ");
     TEST_ERROR(kParseErrorDocumentEmpty, " \n");
 
-    // The document root must be either object or array.
-    TEST_ERROR(kParseErrorDocumentRootNotObjectOrArray, "null");
-    TEST_ERROR(kParseErrorDocumentRootNotObjectOrArray, "true");
-    TEST_ERROR(kParseErrorDocumentRootNotObjectOrArray, "false");
-    TEST_ERROR(kParseErrorDocumentRootNotObjectOrArray, "\"s\"");
-    TEST_ERROR(kParseErrorDocumentRootNotObjectOrArray, "0");
-
     // The document root must not follow by other values.
     TEST_ERROR(kParseErrorDocumentRootNotSingular, "[] 0");
     TEST_ERROR(kParseErrorDocumentRootNotSingular, "{} 0");
@@ -802,7 +795,6 @@ TEST(Reader, IterativeParsing_ErrorHandling) {
     TESTERRORHANDLING("{\"a\": a}", kParseErrorValueInvalid, 6u);
 
     TESTERRORHANDLING("", kParseErrorDocumentEmpty, 0u);
-    TESTERRORHANDLING("1", kParseErrorDocumentRootNotObjectOrArray, 0u);
     TESTERRORHANDLING("{}{}", kParseErrorDocumentRootNotSingular, 2u);
 
     TESTERRORHANDLING("{1}", kParseErrorObjectMissName, 1u);
