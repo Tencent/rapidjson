@@ -4,9 +4,9 @@
 #include "rapidjson.h"
 #include "internal/stack.h"
 #include "internal/strfunc.h"
+#include "internal/dtoa.h"
 #include "internal/itoa.h"
 #include "stringbuffer.h"
-#include <cstdio>	// snprintf() or _sprintf_s()
 #include <new>		// placement new
 
 #ifdef _MSC_VER
@@ -43,12 +43,10 @@ public:
 		\param levelDepth Initial capacity of stack.
 	*/
 	Writer(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) : 
-		os_(&os), level_stack_(allocator, levelDepth * sizeof(Level)),
-		doublePrecision_(kDefaultDoublePrecision), hasRoot_(false) {}
+		os_(&os), level_stack_(allocator, levelDepth * sizeof(Level)), hasRoot_(false) {}
 
 	Writer(Allocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) :
-		os_(0), level_stack_(allocator, levelDepth * sizeof(Level)),
-		doublePrecision_(kDefaultDoublePrecision), hasRoot_(false) {}
+		os_(0), level_stack_(allocator, levelDepth * sizeof(Level)), hasRoot_(false) {}
 
 	//! Reset the writer with a new stream.
 	/*!
@@ -70,7 +68,6 @@ public:
 	*/
 	void Reset(OutputStream& os) {
 		os_ = &os;
-		doublePrecision_ = kDefaultDoublePrecision;
 		hasRoot_ = false;
 		level_stack_.Clear();
 	}
@@ -82,21 +79,6 @@ public:
 	bool IsComplete() const {
 		return hasRoot_ && level_stack_.Empty();
 	}
-
-	//! Set the number of significant digits for \c double values
-	/*! When writing a \c double value to the \c OutputStream, the number
-		of significant digits is limited to 6 by default.
-		\param p maximum number of significant digits (default: 6)
-		\return The Writer itself for fluent API.
-	*/
-	Writer& SetDoublePrecision(int p = kDefaultDoublePrecision) {
-		if (p < 0) p = kDefaultDoublePrecision; // negative precision is ignored
-		doublePrecision_ = p;
-		return *this;
-	}
-
-	//! \see SetDoublePrecision()
-	int GetDoublePrecision() const { return doublePrecision_; }
 
 	/*!@name Implementation of Handler
 		\see Handler
@@ -112,12 +94,6 @@ public:
 
 	//! Writes the given \c double value to the stream
 	/*!
-		The number of significant digits (the precision) to be written
-		can be set by \ref SetDoublePrecision() for the Writer:
-		\code
-		Writer<...> writer(...);
-		writer.SetDoublePrecision(12).Double(M_PI);
-		\endcode
 		\param d The value to be written.
 		\return Whether it is succeed.
 	*/
@@ -166,23 +142,6 @@ public:
 
 	/*! @name Convenience extensions */
 	//@{
-
-	//! Writes the given \c double value to the stream (explicit precision)
-	/*!
-		The currently set double precision is ignored in favor of the explicitly
-		given precision for this value.
-		\see Double(), SetDoublePrecision(), GetDoublePrecision()
-		\param d The value to be written
-		\param precision The number of significant digits for this value
-		\return Whether it is succeeded.
-	*/
-	bool Double(double d, int precision) {
-		int oldPrecision = GetDoublePrecision();
-		SetDoublePrecision(precision);
-		bool ret = Double(d);
-		SetDoublePrecision(oldPrecision);
-		return ret;
-	}
 
 	//! Simpler but slower overload.
 	bool String(const Ch* str) { return String(str, internal::StrLen(str)); }
@@ -239,25 +198,17 @@ protected:
 
 	bool WriteUint64(uint64_t u64) {
 		char buffer[20];
-		const char* end = internal::u64toa(u64, buffer);
-		for (const char* p = buffer; p != end; ++p)
+		char* end = internal::u64toa(u64, buffer);
+		for (char* p = buffer; p != end; ++p)
 			os_->Put(*p);
 		return true;
 	}
 
-#ifdef _MSC_VER
-#define RAPIDJSON_SNPRINTF sprintf_s
-#else
-#define RAPIDJSON_SNPRINTF snprintf
-#endif
-
-	//! \todo Optimization with custom double-to-string converter.
 	bool WriteDouble(double d) {
-		char buffer[100];
-		int ret = RAPIDJSON_SNPRINTF(buffer, sizeof(buffer), "%.*g", doublePrecision_, d);
-		RAPIDJSON_ASSERT(ret >= 1);
-		for (int i = 0; i < ret; i++)
-			os_->Put(buffer[i]);
+		char buffer[25];
+		char* end = internal::dtoa(d, buffer);
+		for (char* p = buffer; p != end; ++p)
+			os_->Put(*p);
 		return true;
 	}
 #undef RAPIDJSON_SNPRINTF
@@ -358,10 +309,7 @@ protected:
 
 	OutputStream* os_;
 	internal::Stack<Allocator> level_stack_;
-	int doublePrecision_;
 	bool hasRoot_;
-
-	static const int kDefaultDoublePrecision = 6;
 
 private:
 	// Prohibit copy constructor & assignment operator.
@@ -400,6 +348,14 @@ inline bool Writer<StringBuffer>::WriteUint64(uint64_t u) {
 	char *buffer = os_->Push(20);
 	const char* end = internal::u64toa(u, buffer);
 	os_->Pop(20 - (end - buffer));
+	return true;
+}
+
+template<>
+inline bool Writer<StringBuffer>::WriteDouble(double d) {
+	char *buffer = os_->Push(25);
+	char* end = internal::dtoa(d, buffer);
+	os_->Pop(25 - (end - buffer));
 	return true;
 }
 
