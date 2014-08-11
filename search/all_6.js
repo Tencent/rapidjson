@@ -18,7 +18,6 @@ var searchData=
   ['genericvalue_3c_20rapidjson_3a_3aencoding_2c_20rapidjson_3a_3aallocator_20_3e',['GenericValue&lt; rapidjson::Encoding, rapidjson::Allocator &gt;',['../classrapidjson_1_1_generic_value.html',1,'rapidjson']]],
   ['getallocator',['GetAllocator',['../classrapidjson_1_1_generic_document.html#ab7c160e20a34a99a8576fc5d69c2def4',1,'rapidjson::GenericDocument']]],
   ['getbool',['GetBool',['../classrapidjson_1_1_generic_value.html#a69d917b47799f63fc588bf294fa71483',1,'rapidjson::GenericValue']]],
-  ['getdoubleprecision',['GetDoublePrecision',['../classrapidjson_1_1_writer.html#ae10a165f6ee2d7099e82c9ae7eb98e08',1,'rapidjson::Writer']]],
   ['geterroroffset',['GetErrorOffset',['../classrapidjson_1_1_generic_document.html#a9861f690f4320006aebde1a27e6ecb9b',1,'rapidjson::GenericDocument::GetErrorOffset()'],['../classrapidjson_1_1_generic_reader.html#a0206b6d42978b63f11475e6444aa97e9',1,'rapidjson::GenericReader::GetErrorOffset()']]],
   ['getparseerror',['GetParseError',['../classrapidjson_1_1_generic_document.html#a7c0d7f52f76da718099acd797bc47056',1,'rapidjson::GenericDocument']]],
   ['getparseerror_5fen',['GetParseError_En',['../namespacerapidjson.html#abdaf1a7a4db30fb0e3d927fdf0fabe79',1,'rapidjson']]],

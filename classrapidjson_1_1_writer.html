@@ -129,11 +129,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6a999ae6a4365236877b15bd4797c144"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#a6a999ae6a4365236877b15bd4797c144">IsComplete</a> () const </td></tr>
 <tr class="memdesc:a6a999ae6a4365236877b15bd4797c144"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the output is a complete JSON.  <a href="#a6a999ae6a4365236877b15bd4797c144">More...</a><br /></td></tr>
 <tr class="separator:a6a999ae6a4365236877b15bd4797c144"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae85dcf5e22d04e125e2f2cc317c87429"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_writer.html">Writer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#ae85dcf5e22d04e125e2f2cc317c87429">SetDoublePrecision</a> (int p=kDefaultDoublePrecision)</td></tr>
-<tr class="memdesc:ae85dcf5e22d04e125e2f2cc317c87429"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the number of significant digits for <code>double</code> values.  <a href="#ae85dcf5e22d04e125e2f2cc317c87429">More...</a><br /></td></tr>
-<tr class="separator:ae85dcf5e22d04e125e2f2cc317c87429"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae10a165f6ee2d7099e82c9ae7eb98e08"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#ae10a165f6ee2d7099e82c9ae7eb98e08">GetDoublePrecision</a> () const </td></tr>
-<tr class="separator:ae10a165f6ee2d7099e82c9ae7eb98e08"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Implementation of Handler</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><dl class="section see"><dt>See also</dt><dd><a class="el" href="classrapidjson_1_1_handler.html" title="Concept for receiving events from GenericReader upon parsing. The functions return true if no error o...">Handler</a> </dd></dl>
 </div></td></tr>
@@ -174,9 +169,6 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>StartArray</b> ()</td
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>EndArray</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> elementCount=0)</td></tr>
 <tr class="separator:ab098d67253741378a90d15898ad4854d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Convenience extensions</div></td></tr>
-<tr class="memitem:a764643742d5c94a957daab157a63c660"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#a764643742d5c94a957daab157a63c660">Double</a> (double d, int precision)</td></tr>
-<tr class="memdesc:a764643742d5c94a957daab157a63c660"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes the given <code>double</code> value to the stream (explicit precision)  <a href="#a764643742d5c94a957daab157a63c660">More...</a><br /></td></tr>
-<tr class="separator:a764643742d5c94a957daab157a63c660"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebc350bd48aee6667f09cf8d1936d362"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aebc350bd48aee6667f09cf8d1936d362"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#aebc350bd48aee6667f09cf8d1936d362">String</a> (const Ch *str)</td></tr>
 <tr class="memdesc:aebc350bd48aee6667f09cf8d1936d362"><td class="mdescLeft">&#160;</td><td class="mdescRight">Simpler but slower overload. <br /></td></tr>
@@ -202,7 +194,8 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteInt64</b> (int64
 <tr class="memitem:a5610c8f75db37aaf6ca161230d0dfed5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5610c8f75db37aaf6ca161230d0dfed5"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteUint64</b> (uint64_t u64)</td></tr>
 <tr class="separator:a5610c8f75db37aaf6ca161230d0dfed5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5128adb0e9385333266f33398beed55f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#a5128adb0e9385333266f33398beed55f">WriteDouble</a> (double d)</td></tr>
+<tr class="memitem:a5128adb0e9385333266f33398beed55f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5128adb0e9385333266f33398beed55f"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteDouble</b> (double d)</td></tr>
 <tr class="separator:a5128adb0e9385333266f33398beed55f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afc523fa5eb0d197822f4d284b28d232e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afc523fa5eb0d197822f4d284b28d232e"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteString</b> (const Ch *str, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length)</td></tr>
@@ -238,6 +231,10 @@ template&lt;&gt; </td></tr>
 template&lt;&gt; </td></tr>
 <tr class="memitem:a474abb8f7b704f1ef7c00bbe2a2e01b6"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>WriteUint64</b> (uint64_t u)</td></tr>
 <tr class="separator:a474abb8f7b704f1ef7c00bbe2a2e01b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d18f380070f825f48a494c8213adf9c"><td class="memTemplParams" colspan="2"><a class="anchor" id="a7d18f380070f825f48a494c8213adf9c"></a>
+template&lt;&gt; </td></tr>
+<tr class="memitem:a7d18f380070f825f48a494c8213adf9c"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>WriteDouble</b> (double d)</td></tr>
+<tr class="separator:a7d18f380070f825f48a494c8213adf9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -247,9 +244,6 @@ OutputStream *&#160;</td><td class="memItemRight" valign="bottom"><b>os_</b></td
 <tr class="memitem:a09c3372f1423f21e77cfea1ac6fa0183"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a09c3372f1423f21e77cfea1ac6fa0183"></a>
 internal::Stack&lt; <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>level_stack_</b></td></tr>
 <tr class="separator:a09c3372f1423f21e77cfea1ac6fa0183"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6bab5a66f22cff85e76645f9e9ed0f8f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6bab5a66f22cff85e76645f9e9ed0f8f"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>doublePrecision_</b></td></tr>
-<tr class="separator:a6bab5a66f22cff85e76645f9e9ed0f8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa8c6fcf877b5724a0fb7ce9b287503d7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa8c6fcf877b5724a0fb7ce9b287503d7"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>hasRoot_</b></td></tr>
 <tr class="separator:aa8c6fcf877b5724a0fb7ce9b287503d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -259,9 +253,6 @@ Static Protected Attributes</h2></td></tr>
 <tr class="memitem:a67d84b8a1ca70f603f590b9bf01b6eb2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a67d84b8a1ca70f603f590b9bf01b6eb2"></a>
 static const size_t&#160;</td><td class="memItemRight" valign="bottom"><b>kDefaultLevelDepth</b> = 32</td></tr>
 <tr class="separator:a67d84b8a1ca70f603f590b9bf01b6eb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90841b6784bf5b7d49fc114de0987200"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a90841b6784bf5b7d49fc114de0987200"></a>
-static const int&#160;</td><td class="memItemRight" valign="bottom"><b>kDefaultDoublePrecision</b> = 6</td></tr>
-<tr class="separator:a90841b6784bf5b7d49fc114de0987200"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename OutputStream, typename SourceEncoding = UTF8&lt;&gt;, typename TargetEncoding = UTF8&lt;&gt;, typename Allocator = MemoryPoolAllocator&lt;&gt;&gt;<br />
@@ -361,88 +352,13 @@ template&lt;typename OutputStream, typename SourceEncoding = UTF8&lt;&gt;, typen
 </div><div class="memdoc">
 
 <p>Writes the given <code>double</code> value to the stream. </p>
-<p>The number of significant digits (the precision) to be written can be set by <a class="el" href="classrapidjson_1_1_writer.html#ae85dcf5e22d04e125e2f2cc317c87429">SetDoublePrecision()</a> for the <a class="el" href="classrapidjson_1_1_writer.html" title="JSON writer. ">Writer</a>: </p><div class="fragment"><div class="line"><a class="code" href="classrapidjson_1_1_writer.html#a08171b32315cb764f5073a99b1399a1c">Writer</a>&lt;...&gt; writer(...);</div>
-<div class="line">writer.<a class="code" href="classrapidjson_1_1_writer.html#ae85dcf5e22d04e125e2f2cc317c87429">SetDoublePrecision</a>(12).Double(M_PI);</div>
-</div><!-- fragment --> <dl class="params"><dt>Parameters</dt><dd>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">d</td><td>The value to be written. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether it is succeed. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a764643742d5c94a957daab157a63c660"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename OutputStream, typename SourceEncoding = UTF8&lt;&gt;, typename TargetEncoding  = UTF8&lt;&gt;, typename Allocator  = MemoryPoolAllocator&lt;&gt;&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer</a>&lt; OutputStream, SourceEncoding, TargetEncoding, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::Double </td>
-          <td>(</td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>d</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>precision</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Writes the given <code>double</code> value to the stream (explicit precision) </p>
-<p>The currently set double precision is ignored in favor of the explicitly given precision for this value. </p><dl class="section see"><dt>See also</dt><dd><a class="el" href="classrapidjson_1_1_writer.html#a4b6ae81230f722b1c282a6bdb526cca8" title="Writes the given double value to the stream. ">Double()</a>, <a class="el" href="classrapidjson_1_1_writer.html#ae85dcf5e22d04e125e2f2cc317c87429" title="Set the number of significant digits for double values. ">SetDoublePrecision()</a>, <a class="el" href="classrapidjson_1_1_writer.html#ae10a165f6ee2d7099e82c9ae7eb98e08">GetDoublePrecision()</a> </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">d</td><td>The value to be written </td></tr>
-    <tr><td class="paramname">precision</td><td>The number of significant digits for this value </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Whether it is succeeded. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ae10a165f6ee2d7099e82c9ae7eb98e08"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename OutputStream, typename SourceEncoding = UTF8&lt;&gt;, typename TargetEncoding  = UTF8&lt;&gt;, typename Allocator  = MemoryPoolAllocator&lt;&gt;&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer</a>&lt; OutputStream, SourceEncoding, TargetEncoding, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::GetDoublePrecision </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classrapidjson_1_1_writer.html#ae85dcf5e22d04e125e2f2cc317c87429" title="Set the number of significant digits for double values. ">SetDoublePrecision()</a> </dd></dl>
 
 </div>
 </div>
@@ -515,68 +431,6 @@ template&lt;typename OutputStream, typename SourceEncoding = UTF8&lt;&gt;, typen
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a class="anchor" id="ae85dcf5e22d04e125e2f2cc317c87429"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename OutputStream, typename SourceEncoding = UTF8&lt;&gt;, typename TargetEncoding  = UTF8&lt;&gt;, typename Allocator  = MemoryPoolAllocator&lt;&gt;&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classrapidjson_1_1_writer.html">Writer</a>&amp; <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer</a>&lt; OutputStream, SourceEncoding, TargetEncoding, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::SetDoublePrecision </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>p</em> = <code>kDefaultDoublePrecision</code></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Set the number of significant digits for <code>double</code> values. </p>
-<p>When writing a <code>double</code> value to the <code>OutputStream</code>, the number of significant digits is limited to 6 by default. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">p</td><td>maximum number of significant digits (default: 6) </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="classrapidjson_1_1_writer.html" title="JSON writer. ">Writer</a> itself for fluent API. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a5128adb0e9385333266f33398beed55f"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename OutputStream, typename SourceEncoding = UTF8&lt;&gt;, typename TargetEncoding  = UTF8&lt;&gt;, typename Allocator  = MemoryPoolAllocator&lt;&gt;&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer</a>&lt; OutputStream, SourceEncoding, TargetEncoding, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::WriteDouble </td>
-          <td>(</td>
-          <td class="paramtype">double&#160;</td>
-          <td class="paramname"><em>d</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>Optimization with custom double-to-string converter. </dd></dl>
 
 </div>
 </div>

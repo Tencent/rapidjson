@@ -261,7 +261,7 @@ Writer</h1>
 <p>There are various reasons:</p><ol type="1">
 <li><code>Writer</code> must output a well-formed JSON. If there is incorrect event sequence (e.g. <code>Int()</code> just after <code>StartObject()</code>), it generates assertion fail in debug mode.</li>
 <li><code>Writer::String()</code> can handle string escaping (e.g. converting code point <code>U+000A</code> to <code>\n</code>) and Unicode transcoding.</li>
-<li><code>Writer</code> handles number output consistently. For example, user can set precision for <code>Double()</code>.</li>
+<li><code>Writer</code> handles number output consistently.</li>
 <li><code>Writer</code> implements the event handler concept. It can be used to handle events from <code>Reader</code>, <code>Document</code> or other event publisher.</li>
 <li><code>Writer</code> can be optimized for different platforms.</li>
 </ol>
@@ -284,14 +284,7 @@ Writer</h1>
 <p>The <code>TargetEncoding</code> template parameter specifies the encoding in the output stream.</p>
 <p>The last one, <code>Allocator</code> is the type of allocator, which is used for allocating internal data structure (a stack).</p>
 <p>Besides, the constructor of <code>Writer</code> has a <code>levelDepth</code> parameter. This parameter affects the initial memory allocated for storing information per hierarchy level.</p>
-<h2>Precision (#WriterPrecision)</h2>
-<p>When using <code>Double()</code>, the precision of output can be specified, for example:</p>
-<div class="fragment"><div class="line">writer.<a class="code" href="classrapidjson_1_1_writer.html#ae85dcf5e22d04e125e2f2cc317c87429">SetDoublePrecision</a>(4);</div>
-<div class="line">writer.StartArary();</div>
-<div class="line">writer.<a class="code" href="classrapidjson_1_1_writer.html#a4b6ae81230f722b1c282a6bdb526cca8">Double</a>(3.14159265359);</div>
-<div class="line">writer.EndArray();</div>
-</div><!-- fragment --> <div class="fragment"><div class="line">[3.1416]</div>
-</div><!-- fragment --><h2><a class="anchor" id="PrettyWriter"></a>
+<h2><a class="anchor" id="PrettyWriter"></a>
 PrettyWriter</h2>
 <p>While the output of <code>Writer</code> is the most condensed JSON without white-spaces, suitable for network transfer or storage, it is not easily readable by human.</p>
 <p>Therefore, RapidJSON provides a <code>PrettyWriter</code>, which adds indentation and line feeds in the output.</p>
