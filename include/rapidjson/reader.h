@@ -381,11 +381,7 @@ public:
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
         }
         else {
-            switch (is.Peek()) {
-                case '{': ParseObject<parseFlags>(is, handler); break;
-                case '[': ParseArray<parseFlags>(is, handler); break;
-                default: RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotObjectOrArray, is.Tell());
-            }
+			ParseValue<parseFlags>(is, handler);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
 
             if (!(parseFlags & kParseStopWhenDoneFlag)) {
