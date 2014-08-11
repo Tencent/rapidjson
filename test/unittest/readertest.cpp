@@ -20,7 +20,6 @@
 
 #include "unittest.h"
 
-#define private public  // For testing private members
 #include "rapidjson/reader.h"
 
 using namespace rapidjson;
@@ -733,7 +732,7 @@ TEST(Reader, CustomStringStream) {
     CustomStringStream<UTF8<char> > s(json);
     ParseObjectHandler h;
     Reader reader;
-    reader.ParseObject<0>(s, h);
+    reader.Parse(s, h);
     EXPECT_EQ(20u, h.step_);
 }
 
@@ -777,7 +776,7 @@ TEST(Reader, Parse_IStreamWrapper_StringStream) {
 
     Reader reader;
     ParseArrayHandler<4> h;
-    reader.ParseArray<0>(is, h);
+    reader.Parse(is, h);
     EXPECT_FALSE(reader.HasParseError());   
 }
 
@@ -788,7 +787,7 @@ TEST(Reader, Parse_IStreamWrapper_StringStream) {
     StringStream json(text); \
     BaseReaderHandler<> handler; \
     Reader reader; \
-    reader.IterativeParse<kParseDefaultFlags>(json, handler); \
+    reader.Parse<kParseIterativeFlag>(json, handler); \
     EXPECT_TRUE(reader.HasParseError()); \
     EXPECT_EQ(errorCode, reader.GetParseErrorCode()); \
     EXPECT_EQ(offset, reader.GetErrorOffset()); \
@@ -872,7 +871,7 @@ TEST(Reader, IterativeParsing_General) {
         Reader reader;
         IterativeParsingReaderHandler<> handler;
 
-        ParseResult r = reader.IterativeParse<kParseIterativeFlag>(is, handler);
+        ParseResult r = reader.Parse<kParseIterativeFlag>(is, handler);
 
         EXPECT_FALSE(r.IsError());
         EXPECT_FALSE(reader.HasParseError());
@@ -909,7 +908,7 @@ TEST(Reader, IterativeParsing_Count) {
         Reader reader;
         IterativeParsingReaderHandler<> handler;
 
-        ParseResult r = reader.IterativeParse<kParseIterativeFlag>(is, handler);
+        ParseResult r = reader.Parse<kParseIterativeFlag>(is, handler);
 
         EXPECT_FALSE(r.IsError());
         EXPECT_FALSE(reader.HasParseError());
