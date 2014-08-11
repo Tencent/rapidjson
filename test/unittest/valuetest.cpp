@@ -838,7 +838,7 @@ TEST(Value, Object) {
     itr = x.EraseMember(x.MemberBegin());
     EXPECT_FALSE(x.HasMember(keys[0]));
     EXPECT_EQ(x.MemberBegin(), itr);
-    EXPECT_EQ(9u, x.MemberEnd() - x.MemberBegin());
+    EXPECT_EQ(9, x.MemberEnd() - x.MemberBegin());
     for (; itr != x.MemberEnd(); ++itr) {
         int i = (itr - x.MemberBegin()) + 1;
         EXPECT_STREQ(itr->name.GetString(), keys[i]);
@@ -849,7 +849,7 @@ TEST(Value, Object) {
     itr = x.EraseMember(x.MemberEnd() - 1);
     EXPECT_FALSE(x.HasMember(keys[9]));
     EXPECT_EQ(x.MemberEnd(), itr);
-    EXPECT_EQ(8u, x.MemberEnd() - x.MemberBegin());
+    EXPECT_EQ(8, x.MemberEnd() - x.MemberBegin());
     for (; itr != x.MemberEnd(); ++itr) {
         int i = (itr - x.MemberBegin()) + 1;
         EXPECT_STREQ(itr->name.GetString(), keys[i]);
@@ -860,7 +860,7 @@ TEST(Value, Object) {
     itr = x.EraseMember(x.MemberBegin() + 4);
     EXPECT_FALSE(x.HasMember(keys[5]));
     EXPECT_EQ(x.MemberBegin() + 4, itr);
-    EXPECT_EQ(7u, x.MemberEnd() - x.MemberBegin());
+    EXPECT_EQ(7, x.MemberEnd() - x.MemberBegin());
     for (; itr != x.MemberEnd(); ++itr) {
         int i = (itr - x.MemberBegin());
         i += (i<4) ? 1 : 2;
