@@ -46,6 +46,8 @@ TEST(JsonChecker, Reader) {
 
     // jsonchecker/failXX.json
     for (int i = 1; i <= 33; i++) {
+		if (i == 1)	// fail1.json is valid in rapidjson, which has no limitation on type of root element (RFC 7159).
+			continue;
         if (i == 18)    // fail18.json is valid in rapidjson, which has no limitation on depth of nesting.
             continue;
 
@@ -57,14 +59,15 @@ TEST(JsonChecker, Reader) {
             json = ReadFile(filename, length);
             if (!json) {
                 printf("jsonchecker file %s not found", filename);
+				ADD_FAILURE();
                 continue;
             }
         }
 
         GenericDocument<UTF8<>, CrtAllocator> document; // Use Crt allocator to check exception-safety (no memory leak)
         if (!document.Parse((const char*)json).HasParseError())
-            FAIL();
-        //printf("%s(%u):%s\n", filename, (unsigned)document.GetErrorOffset(), document.GetParseError());
+			ADD_FAILURE_AT(filename, document.GetErrorOffset());
+
         free(json);
     }
 
