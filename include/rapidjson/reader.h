@@ -26,6 +26,7 @@
 
 #include "rapidjson.h"
 #include "encodings.h"
+#include "internal/meta.h"
 #include "internal/pow10.h"
 #include "internal/stack.h"
 
@@ -120,25 +121,25 @@ concept Handler {
 
 //! Default implementation of Handler.
 /*! This can be used as base class of any reader handler.
-    \note implements Handler concept
+	\note implements Handler concept
 */
-template<typename Encoding = UTF8<> >
+template<typename Encoding = UTF8<>, typename Derived = void>
 struct BaseReaderHandler {
-    typedef typename Encoding::Ch Ch;
+	typedef typename Encoding::Ch Ch;
 
-    bool Default() { return true; }
-    bool Null() { return Default(); }
-    bool Bool(bool) { return Default(); }
-    bool Int(int) { return Default(); }
-    bool Uint(unsigned) { return Default(); }
-    bool Int64(int64_t) { return Default(); }
-    bool Uint64(uint64_t) { return Default(); }
-    bool Double(double) { return Default(); }
-    bool String(const Ch*, SizeType, bool) { return Default(); }
-    bool StartObject() { return Default(); }
-    bool EndObject(SizeType) { return Default(); }
-    bool StartArray() { return Default(); }
-    bool EndArray(SizeType) { return Default(); }
+	bool Default() { return true; }
+	bool Null() { return static_cast<Override&>(*this).Default(); }
+	bool Bool(bool) { return static_cast<Override&>(*this).Default(); }
+	bool Int(int) { return static_cast<Override&>(*this).Default(); }
+	bool Uint(unsigned) { return static_cast<Override&>(*this).Default(); }
+	bool Int64(int64_t) { return static_cast<Override&>(*this).Default(); }
+	bool Uint64(uint64_t) { return static_cast<Override&>(*this).Default(); }
+	bool Double(double) { return static_cast<Override&>(*this).Default(); }
+	bool String(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
+	bool StartObject() { return static_cast<Override&>(*this).Default(); }
+	bool EndObject(SizeType) { return static_cast<Override&>(*this).Default(); }
+	bool StartArray() { return static_cast<Override&>(*this).Default(); }
+	bool EndArray(SizeType) { return static_cast<Override&>(*this).Default(); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
