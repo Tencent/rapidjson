@@ -121,25 +121,27 @@ concept Handler {
 
 //! Default implementation of Handler.
 /*! This can be used as base class of any reader handler.
-	\note implements Handler concept
+    \note implements Handler concept
 */
 template<typename Encoding = UTF8<>, typename Derived = void>
 struct BaseReaderHandler {
-	typedef typename Encoding::Ch Ch;
+    typedef typename Encoding::Ch Ch;
 
-	bool Default() { return true; }
-	bool Null() { return static_cast<Override&>(*this).Default(); }
-	bool Bool(bool) { return static_cast<Override&>(*this).Default(); }
-	bool Int(int) { return static_cast<Override&>(*this).Default(); }
-	bool Uint(unsigned) { return static_cast<Override&>(*this).Default(); }
-	bool Int64(int64_t) { return static_cast<Override&>(*this).Default(); }
-	bool Uint64(uint64_t) { return static_cast<Override&>(*this).Default(); }
-	bool Double(double) { return static_cast<Override&>(*this).Default(); }
-	bool String(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
-	bool StartObject() { return static_cast<Override&>(*this).Default(); }
-	bool EndObject(SizeType) { return static_cast<Override&>(*this).Default(); }
-	bool StartArray() { return static_cast<Override&>(*this).Default(); }
-	bool EndArray(SizeType) { return static_cast<Override&>(*this).Default(); }
+    typedef typename internal::SelectIf<internal::IsSame<Derived, void>, BaseReaderHandler, Derived>::Type Override;
+
+    bool Default() { return true; }
+    bool Null() { return static_cast<Override&>(*this).Default(); }
+    bool Bool(bool) { return static_cast<Override&>(*this).Default(); }
+    bool Int(int) { return static_cast<Override&>(*this).Default(); }
+    bool Uint(unsigned) { return static_cast<Override&>(*this).Default(); }
+    bool Int64(int64_t) { return static_cast<Override&>(*this).Default(); }
+    bool Uint64(uint64_t) { return static_cast<Override&>(*this).Default(); }
+    bool Double(double) { return static_cast<Override&>(*this).Default(); }
+    bool String(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
+    bool StartObject() { return static_cast<Override&>(*this).Default(); }
+    bool EndObject(SizeType) { return static_cast<Override&>(*this).Default(); }
+    bool StartArray() { return static_cast<Override&>(*this).Default(); }
+    bool EndArray(SizeType) { return static_cast<Override&>(*this).Default(); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -382,7 +384,7 @@ public:
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
         }
         else {
-			ParseValue<parseFlags>(is, handler);
+            ParseValue<parseFlags>(is, handler);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
 
             if (!(parseFlags & kParseStopWhenDoneFlag)) {
@@ -904,8 +906,8 @@ private:
         IterativeParsingElementDelimiterState,
         IterativeParsingArrayFinishState,
 
-		// Single value state
-		IterativeParsingValueState,
+        // Single value state
+        IterativeParsingValueState,
 
         cIterativeParsingStateCount
     };
@@ -965,11 +967,11 @@ private:
                 IterativeParsingErrorState,         // Right curly bracket
                 IterativeParsingErrorState,         // Comma
                 IterativeParsingErrorState,         // Colon
-				IterativeParsingValueState,			// String
-				IterativeParsingValueState,			// False
-				IterativeParsingValueState,			// True
-				IterativeParsingValueState,			// Null
-				IterativeParsingValueState			// Number
+                IterativeParsingValueState,         // String
+                IterativeParsingValueState,         // False
+                IterativeParsingValueState,         // True
+                IterativeParsingValueState,         // Null
+                IterativeParsingValueState          // Number
             },
             // Finish(sink state)
             {
@@ -1106,12 +1108,12 @@ private:
                 IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState,
                 IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState,
                 IterativeParsingErrorState
-			},
-			// Single Value (sink state)
-			{
-				IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState,
-				IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState,
-				IterativeParsingErrorState
+            },
+            // Single Value (sink state)
+            {
+                IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState,
+                IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState,
+                IterativeParsingErrorState
             }
         }; // End of G
 
@@ -1248,13 +1250,13 @@ private:
             }
         }
 
-		case IterativeParsingValueState:
-			// Must be non-compound value. Or it would be ObjectInitial or ArrayInitial state.
-			ParseValue<parseFlags>(is, handler);
-			if (HasParseError()) {
-				return IterativeParsingErrorState;
-			}
-			return IterativeParsingFinishState;
+        case IterativeParsingValueState:
+            // Must be non-compound value. Or it would be ObjectInitial or ArrayInitial state.
+            ParseValue<parseFlags>(is, handler);
+            if (HasParseError()) {
+                return IterativeParsingErrorState;
+            }
+            return IterativeParsingFinishState;
 
         default:
             RAPIDJSON_ASSERT(false);
@@ -1270,7 +1272,7 @@ private:
         }
         
         switch (src) {
-		case IterativeParsingStartState:			RAPIDJSON_PARSE_ERROR(kParseErrorDocumentEmpty, is.Tell());
+        case IterativeParsingStartState:            RAPIDJSON_PARSE_ERROR(kParseErrorDocumentEmpty, is.Tell());
         case IterativeParsingFinishState:           RAPIDJSON_PARSE_ERROR(kParseErrorDocumentRootNotSingular, is.Tell());
         case IterativeParsingObjectInitialState:
         case IterativeParsingMemberDelimiterState:  RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());

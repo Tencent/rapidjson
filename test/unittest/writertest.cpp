@@ -51,13 +51,13 @@ TEST(Writer, Compact) {
     }
 
 TEST(Writer, Root) {
-	TEST_ROUNDTRIP("null");
-	TEST_ROUNDTRIP("true");
-	TEST_ROUNDTRIP("false");
-	TEST_ROUNDTRIP("0");
-	TEST_ROUNDTRIP("\"foo\"");
-	TEST_ROUNDTRIP("[]");
-	TEST_ROUNDTRIP("{}");
+    TEST_ROUNDTRIP("null");
+    TEST_ROUNDTRIP("true");
+    TEST_ROUNDTRIP("false");
+    TEST_ROUNDTRIP("0");
+    TEST_ROUNDTRIP("\"foo\"");
+    TEST_ROUNDTRIP("[]");
+    TEST_ROUNDTRIP("{}");
 }
 
 TEST(Writer, Int) {
@@ -170,7 +170,7 @@ TEST(Writer, AssertRootMayBeAnyValue) {
     {\
         StringBuffer buffer;\
         Writer<StringBuffer> writer(buffer);\
-		EXPECT_TRUE(x);\
+        EXPECT_TRUE(x);\
     }
     T(writer.Bool(false));
     T(writer.Bool(true));
@@ -243,18 +243,18 @@ TEST(Writer, AssertMultipleRoot) {
     writer.EndObject();
     ASSERT_THROW(writer.StartObject(), AssertException);
 
-	writer.Reset(buffer);
-	writer.Null();
-	ASSERT_THROW(writer.Int(0), AssertException);
+    writer.Reset(buffer);
+    writer.Null();
+    ASSERT_THROW(writer.Int(0), AssertException);
 
-	writer.Reset(buffer);
-	writer.String("foo");
-	ASSERT_THROW(writer.StartArray(), AssertException);
+    writer.Reset(buffer);
+    writer.String("foo");
+    ASSERT_THROW(writer.StartArray(), AssertException);
 
-	writer.Reset(buffer);
-	writer.StartArray();
-	writer.EndArray();
-	ASSERT_THROW(writer.Double(3.14), AssertException);
+    writer.Reset(buffer);
+    writer.StartArray();
+    writer.EndArray();
+    ASSERT_THROW(writer.Double(3.14), AssertException);
 }
 
 TEST(Writer, RootObjectIsComplete) {
@@ -287,21 +287,21 @@ TEST(Writer, RootArrayIsComplete) {
 
 TEST(Writer, RootValueIsComplete) {
 #define T(x)\
-	{\
-		StringBuffer buffer;\
-		Writer<StringBuffer> writer(buffer);\
-		EXPECT_FALSE(writer.IsComplete()); \
-		x; \
-		EXPECT_TRUE(writer.IsComplete()); \
-	}
-	T(writer.Null());
-	T(writer.Bool(true));
-	T(writer.Bool(false));
-	T(writer.Int(0));
-	T(writer.Uint(0));
-	T(writer.Int64(0));
-	T(writer.Uint64(0));
-	T(writer.Double(0));
-	T(writer.String(""));
+    {\
+        StringBuffer buffer;\
+        Writer<StringBuffer> writer(buffer);\
+        EXPECT_FALSE(writer.IsComplete()); \
+        x; \
+        EXPECT_TRUE(writer.IsComplete()); \
+    }
+    T(writer.Null());
+    T(writer.Bool(true));
+    T(writer.Bool(false));
+    T(writer.Int(0));
+    T(writer.Uint(0));
+    T(writer.Int64(0));
+    T(writer.Uint64(0));
+    T(writer.Double(0));
+    T(writer.String(""));
 #undef T
 }

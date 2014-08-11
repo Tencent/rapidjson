@@ -45,7 +45,7 @@ TEST(Reader, ParseTrue) {
     StringStream s("true");
     ParseBoolHandler<true> h;
     Reader reader;
-	reader.Parse(s, h);
+    reader.Parse(s, h);
     EXPECT_EQ(1u, h.step_);
 }
 
@@ -53,7 +53,7 @@ TEST(Reader, ParseFalse) {
     StringStream s("false");
     ParseBoolHandler<false> h;
     Reader reader;
-	reader.Parse(s, h);
+    reader.Parse(s, h);
     EXPECT_EQ(1u, h.step_);
 }
 
@@ -108,7 +108,7 @@ TEST(Reader, ParseNumberHandler) {
         StringStream s(str); \
         Handler h; \
         Reader reader; \
-		reader.Parse(s, h); \
+        reader.Parse(s, h); \
         EXPECT_EQ(1u, h.step_); \
         EXPECT_EQ(double(x), h.actual_); \
     }
@@ -118,7 +118,7 @@ TEST(Reader, ParseNumberHandler) {
         StringStream s(str); \
         ParseDoubleHandler h; \
         Reader reader; \
-		reader.Parse(s, h); \
+        reader.Parse(s, h); \
         EXPECT_EQ(1u, h.step_); \
         EXPECT_DOUBLE_EQ(x, h.actual_); \
     }
@@ -178,11 +178,11 @@ TEST(Reader, ParseNumber_Error) {
 #define TEST_NUMBER_ERROR(errorCode, str) \
     { \
         char buffer[1001]; \
-		sprintf(buffer, "%s", str); \
+        sprintf(buffer, "%s", str); \
         InsituStringStream s(buffer); \
         BaseReaderHandler<> h; \
         Reader reader; \
-		EXPECT_FALSE(reader.Parse(s, h)); \
+        EXPECT_FALSE(reader.Parse(s, h)); \
         EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
     }
 
@@ -242,14 +242,14 @@ TEST(Reader, ParseString) {
         GenericInsituStringStream<Encoding> is(buffer); \
         ParseStringHandler<Encoding> h; \
         GenericReader<Encoding, Encoding> reader; \
-		reader.Parse<kParseInsituFlag | kParseValidateEncodingFlag>(is, h); \
+        reader.Parse<kParseInsituFlag | kParseValidateEncodingFlag>(is, h); \
         EXPECT_EQ(0, StrCmp<Encoding::Ch>(e, h.str_)); \
         EXPECT_EQ(StrLen(e), h.length_); \
         free(buffer); \
         GenericStringStream<Encoding> s(x); \
         ParseStringHandler<Encoding> h2; \
         GenericReader<Encoding, Encoding> reader2; \
-		reader2.Parse(s, h2); \
+        reader2.Parse(s, h2); \
         EXPECT_EQ(0, StrCmp<Encoding::Ch>(e, h2.str_)); \
         EXPECT_EQ(StrLen(e), h2.length_); \
     }
@@ -314,7 +314,7 @@ TEST(Reader, ParseString) {
         const char e[] = "Hello\0World";
         ParseStringHandler<UTF8<> > h;
         Reader reader;
-		reader.Parse(s, h);
+        reader.Parse(s, h);
         EXPECT_EQ(0, memcmp(e, h.str_, h.length_ + 1));
         EXPECT_EQ(11u, h.length_);
     }
@@ -326,7 +326,7 @@ TEST(Reader, ParseString_Transcoding) {
     GenericStringStream<UTF8<> > is(x);
     GenericReader<UTF8<>, UTF16<> > reader;
     ParseStringHandler<UTF16<> > h;
-	reader.Parse(is, h);
+    reader.Parse(is, h);
     EXPECT_EQ(0, StrCmp<UTF16<>::Ch>(e, h.str_));
     EXPECT_EQ(StrLen(e), h.length_);
 }
@@ -335,7 +335,7 @@ TEST(Reader, ParseString_NonDestructive) {
     StringStream s("\"Hello\\nWorld\"");
     ParseStringHandler<UTF8<> > h;
     Reader reader;
-	reader.Parse(s, h);
+    reader.Parse(s, h);
     EXPECT_EQ(0, StrCmp("Hello\nWorld", h.str_));
     EXPECT_EQ(11u, h.length_);
 }
@@ -447,7 +447,7 @@ TEST(Reader, ParseEmptyArray) {
     InsituStringStream s(json);
     ParseArrayHandler<0> h;
     Reader reader;
-	reader.Parse(s, h);
+    reader.Parse(s, h);
     EXPECT_EQ(2u, h.step_);
     free(json);
 }
@@ -457,7 +457,7 @@ TEST(Reader, ParseArray) {
     InsituStringStream s(json);
     ParseArrayHandler<4> h;
     Reader reader;
-	reader.Parse(s, h);
+    reader.Parse(s, h);
     EXPECT_EQ(6u, h.step_);
     free(json);
 }
@@ -470,7 +470,7 @@ TEST(Reader, ParseArray_Error) {
         InsituStringStream s(buffer); \
         BaseReaderHandler<> h; \
         GenericReader<UTF8<>, UTF8<>, CrtAllocator> reader; \
-		EXPECT_FALSE(reader.Parse(s, h)); \
+        EXPECT_FALSE(reader.Parse(s, h)); \
         EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
     }
 
@@ -485,7 +485,7 @@ TEST(Reader, ParseArray_Error) {
 struct ParseObjectHandler : BaseReaderHandler<UTF8<>, ParseObjectHandler> {
     ParseObjectHandler() : step_(0) {}
 
-	bool Default() { ADD_FAILURE(); return false; }
+    bool Default() { ADD_FAILURE(); return false; }
     bool Null() { EXPECT_EQ(8u, step_); step_++; return true; }
     bool Bool(bool b) { 
         switch(step_) {
@@ -535,7 +535,7 @@ TEST(Reader, ParseObject) {
         InsituStringStream s(json2);
         ParseObjectHandler h;
         Reader reader;
-		reader.Parse<kParseInsituFlag>(s, h);
+        reader.Parse<kParseInsituFlag>(s, h);
         EXPECT_EQ(20u, h.step_);
         free(json2);
     }
@@ -545,7 +545,7 @@ TEST(Reader, ParseObject) {
         StringStream s(json);
         ParseObjectHandler h;
         Reader reader;
-		reader.Parse(s, h);
+        reader.Parse(s, h);
         EXPECT_EQ(20u, h.step_);
     }
 }
@@ -564,7 +564,7 @@ TEST(Reader, Parse_EmptyObject) {
     StringStream s("{ } ");
     ParseEmptyObjectHandler h;
     Reader reader;
-	reader.Parse(s, h);
+    reader.Parse(s, h);
     EXPECT_EQ(2u, h.step_);
 }
 
@@ -631,7 +631,7 @@ TEST(Reader, ParseInsituIterative_MultipleRoot) {
         InsituStringStream s(buffer); \
         BaseReaderHandler<> h; \
         Reader reader; \
-		EXPECT_FALSE(reader.Parse(s, h)); \
+        EXPECT_FALSE(reader.Parse(s, h)); \
         EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
     }
 
@@ -644,17 +644,17 @@ TEST(Reader, ParseDocument_Error) {
     // The document root must not follow by other values.
     TEST_ERROR(kParseErrorDocumentRootNotSingular, "[] 0");
     TEST_ERROR(kParseErrorDocumentRootNotSingular, "{} 0");
-	TEST_ERROR(kParseErrorDocumentRootNotSingular, "null []");
-	TEST_ERROR(kParseErrorDocumentRootNotSingular, "0 {}");
+    TEST_ERROR(kParseErrorDocumentRootNotSingular, "null []");
+    TEST_ERROR(kParseErrorDocumentRootNotSingular, "0 {}");
 }
 
 TEST(Reader, ParseValue_Error) {
     // Invalid value.
-	TEST_ERROR(kParseErrorValueInvalid, "nulL");
-	TEST_ERROR(kParseErrorValueInvalid, "truE");
-	TEST_ERROR(kParseErrorValueInvalid, "falsE");
-	TEST_ERROR(kParseErrorValueInvalid, "a]");
-	TEST_ERROR(kParseErrorValueInvalid, ".1");
+    TEST_ERROR(kParseErrorValueInvalid, "nulL");
+    TEST_ERROR(kParseErrorValueInvalid, "truE");
+    TEST_ERROR(kParseErrorValueInvalid, "falsE");
+    TEST_ERROR(kParseErrorValueInvalid, "a]");
+    TEST_ERROR(kParseErrorValueInvalid, ".1");
 }
 
 TEST(Reader, ParseObject_Error) {

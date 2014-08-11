@@ -46,8 +46,8 @@ TEST(JsonChecker, Reader) {
 
     // jsonchecker/failXX.json
     for (int i = 1; i <= 33; i++) {
-		if (i == 1)	// fail1.json is valid in rapidjson, which has no limitation on type of root element (RFC 7159).
-			continue;
+        if (i == 1) // fail1.json is valid in rapidjson, which has no limitation on type of root element (RFC 7159).
+            continue;
         if (i == 18)    // fail18.json is valid in rapidjson, which has no limitation on depth of nesting.
             continue;
 
@@ -59,17 +59,17 @@ TEST(JsonChecker, Reader) {
             json = ReadFile(filename, length);
             if (!json) {
                 printf("jsonchecker file %s not found", filename);
-				ADD_FAILURE();
+                ADD_FAILURE();
                 continue;
             }
         }
 
         GenericDocument<UTF8<>, CrtAllocator> document; // Use Crt allocator to check exception-safety (no memory leak)
-		document.Parse((const char*)json);
-		EXPECT_TRUE(document.HasParseError());
+        document.Parse((const char*)json);
+        EXPECT_TRUE(document.HasParseError());
 
-		document.Parse<kParseIterativeFlag>((const char*)json);
-		EXPECT_TRUE(document.HasParseError());
+        document.Parse<kParseIterativeFlag>((const char*)json);
+        EXPECT_TRUE(document.HasParseError());
 
         free(json);
     }
@@ -90,10 +90,10 @@ TEST(JsonChecker, Reader) {
 
         GenericDocument<UTF8<>, CrtAllocator> document; // Use Crt allocator to check exception-safety (no memory leak)
         document.Parse((const char*)json);
-		EXPECT_FALSE(document.HasParseError());
+        EXPECT_FALSE(document.HasParseError());
 
-		document.Parse<kParseIterativeFlag>((const char*)json);
-		EXPECT_FALSE(document.HasParseError());
+        document.Parse<kParseIterativeFlag>((const char*)json);
+        EXPECT_FALSE(document.HasParseError());
 
         free(json);
     }
