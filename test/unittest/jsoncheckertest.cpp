@@ -65,8 +65,11 @@ TEST(JsonChecker, Reader) {
         }
 
         GenericDocument<UTF8<>, CrtAllocator> document; // Use Crt allocator to check exception-safety (no memory leak)
-        if (!document.Parse((const char*)json).HasParseError())
-			ADD_FAILURE_AT(filename, document.GetErrorOffset());
+		document.Parse((const char*)json);
+		EXPECT_TRUE(document.HasParseError());
+
+		document.Parse<kParseIterativeFlag>((const char*)json);
+		EXPECT_TRUE(document.HasParseError());
 
         free(json);
     }
@@ -87,7 +90,11 @@ TEST(JsonChecker, Reader) {
 
         GenericDocument<UTF8<>, CrtAllocator> document; // Use Crt allocator to check exception-safety (no memory leak)
         document.Parse((const char*)json);
-        EXPECT_TRUE(!document.HasParseError());
+		EXPECT_FALSE(document.HasParseError());
+
+		document.Parse<kParseIterativeFlag>((const char*)json);
+		EXPECT_FALSE(document.HasParseError());
+
         free(json);
     }
 }
