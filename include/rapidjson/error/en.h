@@ -37,7 +37,6 @@ inline const RAPIDJSON_ERROR_CHARTYPE* GetParseError_En(ParseErrorCode parseErro
         case kParseErrorNone:                           return RAPIDJSON_ERROR_STRING("No error.");
 
         case kParseErrorDocumentEmpty:                  return RAPIDJSON_ERROR_STRING("The document is empty.");
-        case kParseErrorDocumentRootNotObjectOrArray:   return RAPIDJSON_ERROR_STRING("The document root must be either object or array.");
         case kParseErrorDocumentRootNotSingular:        return RAPIDJSON_ERROR_STRING("The document root must not follow by other values.");
     
         case kParseErrorValueInvalid:                   return RAPIDJSON_ERROR_STRING("Invalid value.");
