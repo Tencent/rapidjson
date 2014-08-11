@@ -321,7 +321,6 @@ protected:
             level->valueCount++;
         }
         else {
-            RAPIDJSON_ASSERT(type == kObjectType || type == kArrayType);
             RAPIDJSON_ASSERT(!hasRoot_);    // Should only has one and only one root.
             hasRoot_ = true;
         }
