@@ -50,6 +50,16 @@ TEST(Writer, Compact) {
         EXPECT_TRUE(writer.IsComplete()); \
     }
 
+TEST(Writer, Root) {
+	TEST_ROUNDTRIP("null");
+	TEST_ROUNDTRIP("true");
+	TEST_ROUNDTRIP("false");
+	TEST_ROUNDTRIP("0");
+	TEST_ROUNDTRIP("\"foo\"");
+	TEST_ROUNDTRIP("[]");
+	TEST_ROUNDTRIP("{}");
+}
+
 TEST(Writer, Int) {
     TEST_ROUNDTRIP("[-1]");
     TEST_ROUNDTRIP("[-123]");
