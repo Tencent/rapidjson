@@ -42,7 +42,7 @@ The JSON is now parsed into `document` as a *DOM tree*:
 
 ![DOM in the tutorial](diagram/tutorial.png)
 
-The root of a conforming JSON should be either an object or an array. In this case, the root is an object.
+Since the update to RFC7159, the root of a conforming JSON document can be any JSON value.  In RFC4627, only objects or arrays were allowed as root values. In this case, the root is an object.
 ~~~~~~~~~~cpp
 assert(document.IsObject());
 ~~~~~~~~~~
