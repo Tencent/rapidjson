@@ -903,6 +903,9 @@ private:
         IterativeParsingElementDelimiterState,
         IterativeParsingArrayFinishState,
 
+		// Single value state
+		IterativeParsingValueState,
+
         cIterativeParsingStateCount
     };
 
@@ -961,11 +964,11 @@ private:
                 IterativeParsingErrorState,         // Right curly bracket
                 IterativeParsingErrorState,         // Comma
                 IterativeParsingErrorState,         // Colon
-                IterativeParsingErrorState,         // String
-                IterativeParsingErrorState,         // False
-                IterativeParsingErrorState,         // True
-                IterativeParsingErrorState,         // Null
-                IterativeParsingErrorState          // Number
+				IterativeParsingValueState,			// String
+				IterativeParsingValueState,			// False
+				IterativeParsingValueState,			// True
+				IterativeParsingValueState,			// Null
+				IterativeParsingValueState			// Number
             },
             // Finish(sink state)
             {
@@ -1102,6 +1105,12 @@ private:
                 IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState,
                 IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState,
                 IterativeParsingErrorState
+			},
+			// Single Value (sink state)
+			{
+				IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState,
+				IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState, IterativeParsingErrorState,
+				IterativeParsingErrorState
             }
         }; // End of G
 
@@ -1238,6 +1247,14 @@ private:
             }
         }
 
+		case IterativeParsingValueState:
+			// Must be non-compound value. Or it would be ObjectInitial or ArrayInitial state.
+			ParseValue<parseFlags>(is, handler);
+			if (HasParseError()) {
+				return IterativeParsingErrorState;
+			}
+			return IterativeParsingFinishState;
+
         default:
             RAPIDJSON_ASSERT(false);
             return IterativeParsingErrorState;
@@ -1252,7 +1269,7 @@ private:
         }
         
         switch (src) {
-        case IterativeParsingStartState:            RAPIDJSON_PARSE_ERROR(is.Peek() == '\0' ? kParseErrorDocumentEmpty : kParseErrorDocumentRootNotObjectOrArray, is.Tell());
+		case IterativeParsingStartState:			RAPIDJSON_PARSE_ERROR(kParseErrorDocumentEmpty, is.Tell());
         case IterativeParsingFinishState:           RAPIDJSON_PARSE_ERROR(kParseErrorDocumentRootNotSingular, is.Tell());
         case IterativeParsingObjectInitialState:
         case IterativeParsingMemberDelimiterState:  RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
