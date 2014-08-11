@@ -50,6 +50,16 @@ TEST(Writer, Compact) {
         EXPECT_TRUE(writer.IsComplete()); \
     }
 
+TEST(Writer, Root) {
+    TEST_ROUNDTRIP("null");
+    TEST_ROUNDTRIP("true");
+    TEST_ROUNDTRIP("false");
+    TEST_ROUNDTRIP("0");
+    TEST_ROUNDTRIP("\"foo\"");
+    TEST_ROUNDTRIP("[]");
+    TEST_ROUNDTRIP("{}");
+}
+
 TEST(Writer, Int) {
     TEST_ROUNDTRIP("[-1]");
     TEST_ROUNDTRIP("[-123]");
@@ -155,12 +165,12 @@ TEST(Writer, OStreamWrapper) {
     EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3]}", actual.c_str());
 }
 
-TEST(Writer, AssertRootMustBeArrayOrObject) {
+TEST(Writer, AssertRootMayBeAnyValue) {
 #define T(x)\
     {\
         StringBuffer buffer;\
         Writer<StringBuffer> writer(buffer);\
-        ASSERT_THROW(x, AssertException);\
+        EXPECT_TRUE(x);\
     }
     T(writer.Bool(false));
     T(writer.Bool(true));
@@ -228,9 +238,23 @@ TEST(Writer, AssertObjectKeyNotString) {
 TEST(Writer, AssertMultipleRoot) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
+
     writer.StartObject();
     writer.EndObject();
     ASSERT_THROW(writer.StartObject(), AssertException);
+
+    writer.Reset(buffer);
+    writer.Null();
+    ASSERT_THROW(writer.Int(0), AssertException);
+
+    writer.Reset(buffer);
+    writer.String("foo");
+    ASSERT_THROW(writer.StartArray(), AssertException);
+
+    writer.Reset(buffer);
+    writer.StartArray();
+    writer.EndArray();
+    ASSERT_THROW(writer.Double(3.14), AssertException);
 }
 
 TEST(Writer, RootObjectIsComplete) {
@@ -259,4 +283,25 @@ TEST(Writer, RootArrayIsComplete) {
     EXPECT_FALSE(writer.IsComplete());
     writer.EndArray();
     EXPECT_TRUE(writer.IsComplete());
+}
+
+TEST(Writer, RootValueIsComplete) {
+#define T(x)\
+    {\
+        StringBuffer buffer;\
+        Writer<StringBuffer> writer(buffer);\
+        EXPECT_FALSE(writer.IsComplete()); \
+        x; \
+        EXPECT_TRUE(writer.IsComplete()); \
+    }
+    T(writer.Null());
+    T(writer.Bool(true));
+    T(writer.Bool(false));
+    T(writer.Int(0));
+    T(writer.Uint(0));
+    T(writer.Int64(0));
+    T(writer.Uint64(0));
+    T(writer.Double(0));
+    T(writer.String(""));
+#undef T
 }

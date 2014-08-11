@@ -21,6 +21,11 @@
 #ifndef RAPIDJSON_INTERNAL_META_H_
 #define RAPIDJSON_INTERNAL_META_H_
 
+#ifdef __GNUC__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(effc++)
+#endif
+
 //@cond RAPIDJSON_INTERNAL
 namespace rapidjson {
 namespace internal {
@@ -93,5 +98,9 @@ template <typename T> struct RemoveSfinaeFptr<SfinaeResultTag&(*)(T)> { typedef 
 } // namespace internal
 } // namespace rapidjson
 //@endcond
+
+#ifdef __GNUC__
+RAPIDJSON_DIAG_POP
+#endif
 
 #endif // RAPIDJSON_INTERNAL_META_H_

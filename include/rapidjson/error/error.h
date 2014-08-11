@@ -57,7 +57,6 @@ enum ParseErrorCode {
     kParseErrorNone = 0,                        //!< No error.
 
     kParseErrorDocumentEmpty,                   //!< The document is empty.
-    kParseErrorDocumentRootNotObjectOrArray,    //!< The document root must be either object or array.
     kParseErrorDocumentRootNotSingular,         //!< The document root must not follow by other values.
 
     kParseErrorValueInvalid,                    //!< Invalid value.
