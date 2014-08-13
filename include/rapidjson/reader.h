@@ -775,7 +775,7 @@ private:
         if (useDouble) {
             d = (double)i64;
             while (s.Peek() >= '0' && s.Peek() <= '9') {
-                if (d >= 1E307)
+                if (d >= 1.7976931348623157e307) // DBL_MAX / 10.0
                     RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
                 d = d * 10 + (s.Take() - '0');
             }
