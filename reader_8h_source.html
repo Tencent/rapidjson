@@ -857,7 +857,7 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;        <span class="keywordflow">if</span> (useDouble) {</div>
 <div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;            d = (double)i64;</div>
 <div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;            <span class="keywordflow">while</span> (s.Peek() &gt;= <span class="charliteral">&#39;0&#39;</span> &amp;&amp; s.Peek() &lt;= <span class="charliteral">&#39;9&#39;</span>) {</div>
-<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;                <span class="keywordflow">if</span> (d &gt;= 1E307)</div>
+<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;                <span class="keywordflow">if</span> (d &gt;= 1.7976931348623157e307) <span class="comment">// DBL_MAX / 10.0</span></div>
 <div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;                    RAPIDJSON_PARSE_ERROR(<a class="code" href="namespacerapidjson.html#a7d3acf640886b1f2552dc8c4cd6dea60a240cebadea89f7282ab263b5a22c9805">kParseErrorNumberTooBig</a>, s.Tell());</div>
 <div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;                d = d * 10 + (s.Take() - <span class="charliteral">&#39;0&#39;</span>);</div>
 <div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;            }</div>
