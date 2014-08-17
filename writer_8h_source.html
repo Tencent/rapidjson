@@ -313,160 +313,159 @@ $(document).ready(function(){initNavTree('writer_8h_source.html','');});
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;            os_-&gt;Put(*p);</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    }</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;<span class="preprocessor">#undef RAPIDJSON_SNPRINTF</span></div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <span class="keywordtype">bool</span> WriteString(<span class="keyword">const</span> Ch* str, <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length)  {</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> hexDigits[16] = { <span class="charliteral">&#39;0&#39;</span>, <span class="charliteral">&#39;1&#39;</span>, <span class="charliteral">&#39;2&#39;</span>, <span class="charliteral">&#39;3&#39;</span>, <span class="charliteral">&#39;4&#39;</span>, <span class="charliteral">&#39;5&#39;</span>, <span class="charliteral">&#39;6&#39;</span>, <span class="charliteral">&#39;7&#39;</span>, <span class="charliteral">&#39;8&#39;</span>, <span class="charliteral">&#39;9&#39;</span>, <span class="charliteral">&#39;A&#39;</span>, <span class="charliteral">&#39;B&#39;</span>, <span class="charliteral">&#39;C&#39;</span>, <span class="charliteral">&#39;D&#39;</span>, <span class="charliteral">&#39;E&#39;</span>, <span class="charliteral">&#39;F&#39;</span> };</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> escape[256] = {</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;<span class="preprocessor">#define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</span></div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            <span class="comment">//0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F</span></div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;            <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;b&#39;</span>, <span class="charliteral">&#39;t&#39;</span>, <span class="charliteral">&#39;n&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;f&#39;</span>, <span class="charliteral">&#39;r&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="comment">// 00</span></div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;            <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="comment">// 10</span></div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;              0,   0, <span class="charliteral">&#39;&quot;&#39;</span>,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, <span class="comment">// 20</span></div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;            Z16, Z16,                                                                       <span class="comment">// 30~4F</span></div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;              0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,<span class="charliteral">&#39;\\&#39;</span>,   0,   0,   0, <span class="comment">// 50</span></div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;            Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16                                <span class="comment">// 60~FF</span></div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;<span class="preprocessor">#undef Z16</span></div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;        };</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        os_-&gt;Put(<span class="charliteral">&#39;\&quot;&#39;</span>);</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        GenericStringStream&lt;SourceEncoding&gt; is(str);</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        <span class="keywordflow">while</span> (is.Tell() &lt; length) {</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;            <span class="keyword">const</span> Ch c = is.Peek();</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;            <span class="keywordflow">if</span> (!TargetEncoding::supportUnicode &amp;&amp; (<span class="keywordtype">unsigned</span>)c &gt;= 0x80) {</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;                <span class="comment">// Unicode escaping</span></div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;                <span class="keywordtype">unsigned</span> codepoint;</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;                <span class="keywordflow">if</span> (!SourceEncoding::Decode(is, &amp;codepoint))</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;                    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;                os_-&gt;Put(<span class="charliteral">&#39;\\&#39;</span>);</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;                os_-&gt;Put(<span class="charliteral">&#39;u&#39;</span>);</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;                <span class="keywordflow">if</span> (codepoint &lt;= 0xD7FF || (codepoint &gt;= 0xE000 &amp;&amp; codepoint &lt;= 0xFFFF)) {</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;                    os_-&gt;Put(hexDigits[(codepoint &gt;&gt; 12) &amp; 15]);</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;                    os_-&gt;Put(hexDigits[(codepoint &gt;&gt;  8) &amp; 15]);</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;                    os_-&gt;Put(hexDigits[(codepoint &gt;&gt;  4) &amp; 15]);</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;                    os_-&gt;Put(hexDigits[(codepoint      ) &amp; 15]);</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;                }</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (codepoint &gt;= 0x010000 &amp;&amp; codepoint &lt;= 0x10FFFF)    {</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;                    <span class="comment">// Surrogate pair</span></div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;                    <span class="keywordtype">unsigned</span> s = codepoint - 0x010000;</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;                    <span class="keywordtype">unsigned</span> lead = (s &gt;&gt; 10) + 0xD800;</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;                    <span class="keywordtype">unsigned</span> trail = (s &amp; 0x3FF) + 0xDC00;</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;                    os_-&gt;Put(hexDigits[(lead &gt;&gt; 12) &amp; 15]);</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;                    os_-&gt;Put(hexDigits[(lead &gt;&gt;  8) &amp; 15]);</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;                    os_-&gt;Put(hexDigits[(lead &gt;&gt;  4) &amp; 15]);</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;                    os_-&gt;Put(hexDigits[(lead      ) &amp; 15]);</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;                    os_-&gt;Put(<span class="charliteral">&#39;\\&#39;</span>);</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;                    os_-&gt;Put(<span class="charliteral">&#39;u&#39;</span>);</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;                    os_-&gt;Put(hexDigits[(trail &gt;&gt; 12) &amp; 15]);</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;                    os_-&gt;Put(hexDigits[(trail &gt;&gt;  8) &amp; 15]);</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;                    os_-&gt;Put(hexDigits[(trail &gt;&gt;  4) &amp; 15]);</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;                    os_-&gt;Put(hexDigits[(trail      ) &amp; 15]);                    </div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;                }</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;                <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;                    <span class="keywordflow">return</span> <span class="keyword">false</span>;   <span class="comment">// invalid code point</span></div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;            }</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> ((<span class="keyword">sizeof</span>(Ch) == 1 || (<span class="keywordtype">unsigned</span>)c &lt; 256) &amp;&amp; escape[(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>)c])  {</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;                is.Take();</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;                os_-&gt;Put(<span class="charliteral">&#39;\\&#39;</span>);</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;                os_-&gt;Put(escape[(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>)c]);</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;                <span class="keywordflow">if</span> (escape[(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>)c] == <span class="charliteral">&#39;u&#39;</span>) {</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="keywordtype">bool</span> WriteString(<span class="keyword">const</span> Ch* str, <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length)  {</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> hexDigits[16] = { <span class="charliteral">&#39;0&#39;</span>, <span class="charliteral">&#39;1&#39;</span>, <span class="charliteral">&#39;2&#39;</span>, <span class="charliteral">&#39;3&#39;</span>, <span class="charliteral">&#39;4&#39;</span>, <span class="charliteral">&#39;5&#39;</span>, <span class="charliteral">&#39;6&#39;</span>, <span class="charliteral">&#39;7&#39;</span>, <span class="charliteral">&#39;8&#39;</span>, <span class="charliteral">&#39;9&#39;</span>, <span class="charliteral">&#39;A&#39;</span>, <span class="charliteral">&#39;B&#39;</span>, <span class="charliteral">&#39;C&#39;</span>, <span class="charliteral">&#39;D&#39;</span>, <span class="charliteral">&#39;E&#39;</span>, <span class="charliteral">&#39;F&#39;</span> };</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> escape[256] = {</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;<span class="preprocessor">#define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</span></div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;            <span class="comment">//0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F</span></div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;b&#39;</span>, <span class="charliteral">&#39;t&#39;</span>, <span class="charliteral">&#39;n&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;f&#39;</span>, <span class="charliteral">&#39;r&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="comment">// 00</span></div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;            <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="charliteral">&#39;u&#39;</span>, <span class="comment">// 10</span></div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;              0,   0, <span class="charliteral">&#39;&quot;&#39;</span>,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, <span class="comment">// 20</span></div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;            Z16, Z16,                                                                       <span class="comment">// 30~4F</span></div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;              0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,<span class="charliteral">&#39;\\&#39;</span>,   0,   0,   0, <span class="comment">// 50</span></div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;            Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16                                <span class="comment">// 60~FF</span></div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="preprocessor">#undef Z16</span></div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        };</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        os_-&gt;Put(<span class="charliteral">&#39;\&quot;&#39;</span>);</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        GenericStringStream&lt;SourceEncoding&gt; is(str);</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        <span class="keywordflow">while</span> (is.Tell() &lt; length) {</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;            <span class="keyword">const</span> Ch c = is.Peek();</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;            <span class="keywordflow">if</span> (!TargetEncoding::supportUnicode &amp;&amp; (<span class="keywordtype">unsigned</span>)c &gt;= 0x80) {</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;                <span class="comment">// Unicode escaping</span></div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;                <span class="keywordtype">unsigned</span> codepoint;</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;                <span class="keywordflow">if</span> (!SourceEncoding::Decode(is, &amp;codepoint))</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;                    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;                os_-&gt;Put(<span class="charliteral">&#39;\\&#39;</span>);</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;                os_-&gt;Put(<span class="charliteral">&#39;u&#39;</span>);</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;                <span class="keywordflow">if</span> (codepoint &lt;= 0xD7FF || (codepoint &gt;= 0xE000 &amp;&amp; codepoint &lt;= 0xFFFF)) {</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;                    os_-&gt;Put(hexDigits[(codepoint &gt;&gt; 12) &amp; 15]);</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;                    os_-&gt;Put(hexDigits[(codepoint &gt;&gt;  8) &amp; 15]);</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;                    os_-&gt;Put(hexDigits[(codepoint &gt;&gt;  4) &amp; 15]);</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;                    os_-&gt;Put(hexDigits[(codepoint      ) &amp; 15]);</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;                }</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (codepoint &gt;= 0x010000 &amp;&amp; codepoint &lt;= 0x10FFFF)    {</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;                    <span class="comment">// Surrogate pair</span></div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;                    <span class="keywordtype">unsigned</span> s = codepoint - 0x010000;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;                    <span class="keywordtype">unsigned</span> lead = (s &gt;&gt; 10) + 0xD800;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;                    <span class="keywordtype">unsigned</span> trail = (s &amp; 0x3FF) + 0xDC00;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;                    os_-&gt;Put(hexDigits[(lead &gt;&gt; 12) &amp; 15]);</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;                    os_-&gt;Put(hexDigits[(lead &gt;&gt;  8) &amp; 15]);</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;                    os_-&gt;Put(hexDigits[(lead &gt;&gt;  4) &amp; 15]);</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;                    os_-&gt;Put(hexDigits[(lead      ) &amp; 15]);</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;                    os_-&gt;Put(<span class="charliteral">&#39;\\&#39;</span>);</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;                    os_-&gt;Put(<span class="charliteral">&#39;u&#39;</span>);</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;                    os_-&gt;Put(hexDigits[(trail &gt;&gt; 12) &amp; 15]);</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;                    os_-&gt;Put(hexDigits[(trail &gt;&gt;  8) &amp; 15]);</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;                    os_-&gt;Put(hexDigits[(trail &gt;&gt;  4) &amp; 15]);</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;                    os_-&gt;Put(hexDigits[(trail      ) &amp; 15]);                    </div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;                }</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;                <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;                    <span class="keywordflow">return</span> <span class="keyword">false</span>;   <span class="comment">// invalid code point</span></div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;            }</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> ((<span class="keyword">sizeof</span>(Ch) == 1 || (<span class="keywordtype">unsigned</span>)c &lt; 256) &amp;&amp; escape[(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>)c])  {</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;                is.Take();</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;                os_-&gt;Put(<span class="charliteral">&#39;\\&#39;</span>);</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;                os_-&gt;Put(escape[(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>)c]);</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;                <span class="keywordflow">if</span> (escape[(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>)c] == <span class="charliteral">&#39;u&#39;</span>) {</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;                    os_-&gt;Put(<span class="charliteral">&#39;0&#39;</span>);</div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;                    os_-&gt;Put(<span class="charliteral">&#39;0&#39;</span>);</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;                    os_-&gt;Put(<span class="charliteral">&#39;0&#39;</span>);</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;                    os_-&gt;Put(hexDigits[(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>)c &gt;&gt; 4]);</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;                    os_-&gt;Put(hexDigits[(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>)c &amp; 0xF]);</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;                }</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;            }</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;                <a class="code" href="structrapidjson_1_1_transcoder.html#a3a1de7069d3cf7f1d4f4e2f96ceb7664">Transcoder&lt;SourceEncoding, TargetEncoding&gt;::Transcode</a>(is, *os_);</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;        }</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;        os_-&gt;Put(<span class="charliteral">&#39;\&quot;&#39;</span>);</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    }</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    <span class="keywordtype">bool</span> WriteStartObject() { os_-&gt;Put(<span class="charliteral">&#39;{&#39;</span>); <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    <span class="keywordtype">bool</span> WriteEndObject()   { os_-&gt;Put(<span class="charliteral">&#39;}&#39;</span>); <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <span class="keywordtype">bool</span> WriteStartArray()  { os_-&gt;Put(<span class="charliteral">&#39;[&#39;</span>); <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <span class="keywordtype">bool</span> WriteEndArray()    { os_-&gt;Put(<span class="charliteral">&#39;]&#39;</span>); <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <span class="keywordtype">void</span> Prefix(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> type) {</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;        (void)type;</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;        <span class="keywordflow">if</span> (level_stack_.GetSize() != 0) { <span class="comment">// this value is not at root</span></div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;            Level* level = level_stack_.template Top&lt;Level&gt;();</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;            <span class="keywordflow">if</span> (level-&gt;valueCount &gt; 0) {</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;                <span class="keywordflow">if</span> (level-&gt;inArray) </div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;                    os_-&gt;Put(<span class="charliteral">&#39;,&#39;</span>); <span class="comment">// add comma if it is not the first element in array</span></div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;                <span class="keywordflow">else</span>  <span class="comment">// in object</span></div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;                    os_-&gt;Put((level-&gt;valueCount % 2 == 0) ? <span class="charliteral">&#39;,&#39;</span> : <span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;            }</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;            <span class="keywordflow">if</span> (!level-&gt;inArray &amp;&amp; level-&gt;valueCount % 2 == 0)</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;                <a class="code" href="rapidjson_8h.html#abeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(type == <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4ad6379da3dc04b83a591992bfb9fabba7">kStringType</a>);  <span class="comment">// if it&#39;s in object, then even number should be a name</span></div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;            level-&gt;valueCount++;</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;        }</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;        <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;            <a class="code" href="rapidjson_8h.html#abeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(!hasRoot_);    <span class="comment">// Should only has one and only one root.</span></div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;            hasRoot_ = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;        }</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    }</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    OutputStream* os_;</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    internal::Stack&lt;Allocator&gt; level_stack_;</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    <span class="keywordtype">bool</span> hasRoot_;</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    <span class="comment">// Prohibit copy constructor &amp; assignment operator.</span></div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    <a class="code" href="classrapidjson_1_1_writer.html#a08171b32315cb764f5073a99b1399a1c">Writer</a>(<span class="keyword">const</span> <a class="code" href="classrapidjson_1_1_writer.html#a08171b32315cb764f5073a99b1399a1c">Writer</a>&amp;);</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    <a class="code" href="classrapidjson_1_1_writer.html#a08171b32315cb764f5073a99b1399a1c">Writer</a>&amp; operator=(<span class="keyword">const</span> <a class="code" href="classrapidjson_1_1_writer.html#a08171b32315cb764f5073a99b1399a1c">Writer</a>&amp;);</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;};</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;<span class="comment">// Full specialization for StringStream to prevent memory copying</span></div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;<span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> Writer&lt;StringBuffer&gt;::WriteInt(<span class="keywordtype">int</span> i) {</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    <span class="keywordtype">char</span> *buffer = os_-&gt;Push(11);</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span>* end = internal::i32toa(i, buffer);</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    os_-&gt;Pop(11 - (end - buffer));</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;}</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;<span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> Writer&lt;StringBuffer&gt;::WriteUint(<span class="keywordtype">unsigned</span> u) {</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    <span class="keywordtype">char</span> *buffer = os_-&gt;Push(10);</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span>* end = internal::u32toa(u, buffer);</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    os_-&gt;Pop(10 - (end - buffer));</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;}</div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;</div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;<span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> Writer&lt;StringBuffer&gt;::WriteInt64(int64_t i64) {</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    <span class="keywordtype">char</span> *buffer = os_-&gt;Push(21);</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span>* end = internal::i64toa(i64, buffer);</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    os_-&gt;Pop(21 - (end - buffer));</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;}</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;<span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> Writer&lt;StringBuffer&gt;::WriteUint64(uint64_t u) {</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    <span class="keywordtype">char</span> *buffer = os_-&gt;Push(20);</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span>* end = internal::u64toa(u, buffer);</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    os_-&gt;Pop(20 - (end - buffer));</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;}</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;<span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> Writer&lt;StringBuffer&gt;::WriteDouble(<span class="keywordtype">double</span> d) {</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    <span class="keywordtype">char</span> *buffer = os_-&gt;Push(25);</div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    <span class="keywordtype">char</span>* end = internal::dtoa(d, buffer);</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    os_-&gt;Pop(25 - (end - buffer));</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;}</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;} <span class="comment">// namespace rapidjson</span></div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;<span class="preprocessor">#ifdef _MSC_VER</span></div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;RAPIDJSON_DIAG_POP</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_RAPIDJSON_H_</span></div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;                    os_-&gt;Put(hexDigits[(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>)c &gt;&gt; 4]);</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;                    os_-&gt;Put(hexDigits[(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>)c &amp; 0xF]);</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;                }</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;            }</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;                <a class="code" href="structrapidjson_1_1_transcoder.html#a3a1de7069d3cf7f1d4f4e2f96ceb7664">Transcoder&lt;SourceEncoding, TargetEncoding&gt;::Transcode</a>(is, *os_);</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;        }</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;        os_-&gt;Put(<span class="charliteral">&#39;\&quot;&#39;</span>);</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    }</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="keywordtype">bool</span> WriteStartObject() { os_-&gt;Put(<span class="charliteral">&#39;{&#39;</span>); <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    <span class="keywordtype">bool</span> WriteEndObject()   { os_-&gt;Put(<span class="charliteral">&#39;}&#39;</span>); <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    <span class="keywordtype">bool</span> WriteStartArray()  { os_-&gt;Put(<span class="charliteral">&#39;[&#39;</span>); <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <span class="keywordtype">bool</span> WriteEndArray()    { os_-&gt;Put(<span class="charliteral">&#39;]&#39;</span>); <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    <span class="keywordtype">void</span> Prefix(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> type) {</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;        (void)type;</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;        <span class="keywordflow">if</span> (level_stack_.GetSize() != 0) { <span class="comment">// this value is not at root</span></div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;            Level* level = level_stack_.template Top&lt;Level&gt;();</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;            <span class="keywordflow">if</span> (level-&gt;valueCount &gt; 0) {</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;                <span class="keywordflow">if</span> (level-&gt;inArray) </div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;                    os_-&gt;Put(<span class="charliteral">&#39;,&#39;</span>); <span class="comment">// add comma if it is not the first element in array</span></div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;                <span class="keywordflow">else</span>  <span class="comment">// in object</span></div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;                    os_-&gt;Put((level-&gt;valueCount % 2 == 0) ? <span class="charliteral">&#39;,&#39;</span> : <span class="charliteral">&#39;:&#39;</span>);</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;            }</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;            <span class="keywordflow">if</span> (!level-&gt;inArray &amp;&amp; level-&gt;valueCount % 2 == 0)</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;                <a class="code" href="rapidjson_8h.html#abeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(type == <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4ad6379da3dc04b83a591992bfb9fabba7">kStringType</a>);  <span class="comment">// if it&#39;s in object, then even number should be a name</span></div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;            level-&gt;valueCount++;</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;        }</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;        <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;            <a class="code" href="rapidjson_8h.html#abeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(!hasRoot_);    <span class="comment">// Should only has one and only one root.</span></div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;            hasRoot_ = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;        }</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    }</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    OutputStream* os_;</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    internal::Stack&lt;Allocator&gt; level_stack_;</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <span class="keywordtype">bool</span> hasRoot_;</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    <span class="comment">// Prohibit copy constructor &amp; assignment operator.</span></div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    <a class="code" href="classrapidjson_1_1_writer.html#a08171b32315cb764f5073a99b1399a1c">Writer</a>(<span class="keyword">const</span> <a class="code" href="classrapidjson_1_1_writer.html#a08171b32315cb764f5073a99b1399a1c">Writer</a>&amp;);</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    <a class="code" href="classrapidjson_1_1_writer.html#a08171b32315cb764f5073a99b1399a1c">Writer</a>&amp; operator=(<span class="keyword">const</span> <a class="code" href="classrapidjson_1_1_writer.html#a08171b32315cb764f5073a99b1399a1c">Writer</a>&amp;);</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;};</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;<span class="comment">// Full specialization for StringStream to prevent memory copying</span></div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;<span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> Writer&lt;StringBuffer&gt;::WriteInt(<span class="keywordtype">int</span> i) {</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;    <span class="keywordtype">char</span> *buffer = os_-&gt;Push(11);</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span>* end = internal::i32toa(i, buffer);</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    os_-&gt;Pop(11 - (end - buffer));</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;}</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;<span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> Writer&lt;StringBuffer&gt;::WriteUint(<span class="keywordtype">unsigned</span> u) {</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;    <span class="keywordtype">char</span> *buffer = os_-&gt;Push(10);</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span>* end = internal::u32toa(u, buffer);</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    os_-&gt;Pop(10 - (end - buffer));</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;}</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;<span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> Writer&lt;StringBuffer&gt;::WriteInt64(int64_t i64) {</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    <span class="keywordtype">char</span> *buffer = os_-&gt;Push(21);</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span>* end = internal::i64toa(i64, buffer);</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    os_-&gt;Pop(21 - (end - buffer));</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;}</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;<span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> Writer&lt;StringBuffer&gt;::WriteUint64(uint64_t u) {</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;    <span class="keywordtype">char</span> *buffer = os_-&gt;Push(20);</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span>* end = internal::u64toa(u, buffer);</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    os_-&gt;Pop(20 - (end - buffer));</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;}</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;<span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">bool</span> Writer&lt;StringBuffer&gt;::WriteDouble(<span class="keywordtype">double</span> d) {</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <span class="keywordtype">char</span> *buffer = os_-&gt;Push(25);</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    <span class="keywordtype">char</span>* end = internal::dtoa(d, buffer);</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;    os_-&gt;Pop(25 - (end - buffer));</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;}</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;} <span class="comment">// namespace rapidjson</span></div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;<span class="preprocessor">#ifdef _MSC_VER</span></div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;RAPIDJSON_DIAG_POP</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_RAPIDJSON_H_</span></div>
 <div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4a80d9f25b083abce45edbfdd3ba006c8e"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a80d9f25b083abce45edbfdd3ba006c8e">rapidjson::kTrueType</a></div><div class="ttdoc">true </div><div class="ttdef"><b>Definition:</b> rapidjson.h:423</div></div>
 <div class="ttc" id="classrapidjson_1_1_writer_html_a6a999ae6a4365236877b15bd4797c144"><div class="ttname"><a href="classrapidjson_1_1_writer.html#a6a999ae6a4365236877b15bd4797c144">rapidjson::Writer::IsComplete</a></div><div class="ttdeci">bool IsComplete() const </div><div class="ttdoc">Checks whether the output is a complete JSON. </div><div class="ttdef"><b>Definition:</b> writer.h:99</div></div>
 <div class="ttc" id="namespacerapidjson_html_a44eb33eaa523e36d466b1ced64b85c84"><div class="ttname"><a href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">rapidjson::SizeType</a></div><div class="ttdeci">unsigned SizeType</div><div class="ttdoc">Use 32-bit array/string indices even for 64-bit platform, instead of using size_t. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:162</div></div>
