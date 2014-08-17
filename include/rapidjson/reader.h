@@ -347,9 +347,9 @@ template<> inline void SkipWhitespace(StringStream& is) {
     
     \tparam SourceEncoding Encoding of the input stream.
     \tparam TargetEncoding Encoding of the parse output.
-    \tparam Allocator Allocator type for stack.
+    \tparam StackAllocator Allocator type for stack.
 */
-template <typename SourceEncoding, typename TargetEncoding, typename Allocator = MemoryPoolAllocator<> >
+template <typename SourceEncoding, typename TargetEncoding, typename StackAllocator = CrtAllocator>
 class GenericReader {
 public:
     typedef typename SourceEncoding::Ch Ch; //!< SourceEncoding character type
@@ -358,7 +358,7 @@ public:
     /*! \param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
         \param stackCapacity stack capacity in bytes for storing a single decoded string.  (Only use for non-destructive parsing)
     */
-    GenericReader(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseResult_() {}
+    GenericReader(StackAllocator* stackAllocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(stackAllocator, stackCapacity), parseResult_() {}
 
     //! Parse JSON text.
     /*! \tparam parseFlags Combination of \ref ParseFlag.
@@ -591,12 +591,12 @@ private:
     public:
         typedef typename TargetEncoding::Ch Ch;
 
-        StackStream(internal::Stack<Allocator>& stack) : stack_(stack), length_(0) {}
+        StackStream(internal::Stack<StackAllocator>& stack) : stack_(stack), length_(0) {}
         RAPIDJSON_FORCEINLINE void Put(Ch c) {
             *stack_.template Push<Ch>() = c;
             ++length_;
         }
-        internal::Stack<Allocator>& stack_;
+        internal::Stack<StackAllocator>& stack_;
         SizeType length_;
 
     private:
@@ -1317,7 +1317,7 @@ private:
     }
 
     static const size_t kDefaultStackCapacity = 256;    //!< Default stack capacity in bytes for storing a single decoded string.
-    internal::Stack<Allocator> stack_;  //!< A stack for storing decoded string temporarily during non-destructive parsing.
+    internal::Stack<StackAllocator> stack_;  //!< A stack for storing decoded string temporarily during non-destructive parsing.
     ParseResult parseResult_;
 }; // class GenericReader
 
