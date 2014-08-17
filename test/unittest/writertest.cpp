@@ -31,6 +31,7 @@ TEST(Writer, Compact) {
     StringStream s("{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] } ");
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
+    buffer.ShrinkToFit();
     Reader reader;
     reader.Parse<0>(s, writer);
     EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3]}", buffer.GetString());
