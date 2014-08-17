@@ -1259,7 +1259,7 @@ int z = a[0u].GetInt();             // This works too.
     }
 
 private:
-    template <typename, typename>
+    template <typename, typename, typename>
     friend class GenericDocument;
 
     enum {
@@ -1406,11 +1406,12 @@ typedef GenericValue<UTF8<> > Value;
 //! A document for parsing JSON text as DOM.
 /*!
     \note implements Handler concept
-    \tparam Encoding encoding for both parsing and string storage.
-    \tparam Allocator allocator for allocating memory for the DOM, and the stack during parsing.
-    \warning Although GenericDocument inherits from GenericValue, the API does \b not provide any virtual functions, especially no virtual destructors.  To avoid memory leaks, do not \c delete a GenericDocument object via a pointer to a GenericValue.
+    \tparam Encoding Encoding for both parsing and string storage.
+    \tparam Allocator Allocator for allocating memory for the DOM
+    \tparam StackAllocator Allocator for allocating memory for stack during parsing.
+    \warning Although GenericDocument inherits from GenericValue, the API does \b not provide any virtual functions, especially no virtual destructor.  To avoid memory leaks, do not \c delete a GenericDocument object via a pointer to a GenericValue.
 */
-template <typename Encoding, typename Allocator = MemoryPoolAllocator<> >
+template <typename Encoding, typename Allocator = MemoryPoolAllocator<>, typename StackAllocator = CrtAllocator>
 class GenericDocument : public GenericValue<Encoding, Allocator> {
 public:
     typedef typename Encoding::Ch Ch;                       //!< Character type derived from Encoding.
@@ -1418,10 +1419,20 @@ public:
     typedef Allocator AllocatorType;                        //!< Allocator type from template parameter.
 
     //! Constructor
-    /*! \param allocator        Optional allocator for allocating stack memory.
-        \param stackCapacity    Initial capacity of stack in bytes.
+    /*! \param allocator        Optional allocator for allocating memory.
+        \param stackCapacity    Optional initial capacity of stack in bytes.
+        \param stackAllocator   Optional allocator for allocating memory for stack.
     */
-    GenericDocument(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(allocator, stackCapacity), parseResult_() {}
+    GenericDocument(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity, StackAllocator* stackAllocator = 0) : 
+        allocator_(allocator), ownAllocator_(0), stack_(stackAllocator, stackCapacity), parseResult_()
+    {
+        if (!allocator_)
+            ownAllocator_ = allocator_ = new Allocator();
+    }
+
+    ~GenericDocument() {
+        delete ownAllocator_;
+    }
 
     //!@name Parse from stream
     //!@{
@@ -1549,7 +1560,7 @@ public:
     //!@}
 
     //! Get the allocator of this document.
-    Allocator& GetAllocator() { return stack_.GetAllocator(); }
+    Allocator& GetAllocator() { return *allocator_; }
 
     //! Get the capacity of stack in bytes.
     size_t GetStackCapacity() const { return stack_.GetCapacity(); }
@@ -1612,10 +1623,13 @@ private:
                 (stack_.template Pop<ValueType>(1))->~ValueType();
         else
             stack_.Clear();
+        stack_.ShrinkToFit();
     }
 
     static const size_t kDefaultStackCapacity = 1024;
-    internal::Stack<Allocator> stack_;
+    Allocator* allocator_;
+    Allocator* ownAllocator_;
+    internal::Stack<StackAllocator> stack_;
     ParseResult parseResult_;
 };
 
