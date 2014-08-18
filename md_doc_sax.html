@@ -161,7 +161,7 @@ Reader</h1>
 <div class="line">    MyHandler handler;</div>
 <div class="line">    <a class="code" href="classrapidjson_1_1_generic_reader.html">Reader</a> reader;</div>
 <div class="line">    <a class="code" href="structrapidjson_1_1_generic_string_stream.html">StringStream</a> ss(json);</div>
-<div class="line">    reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#a7c05995d4e4fcd650bb0a80a9b0ec11f">Parse</a>(ss, handler);</div>
+<div class="line">    reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b">Parse</a>(ss, handler);</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>Note that, RapidJSON uses template to statically bind the <code>Reader</code> type and the handler type, instead of using class with virtual functions. This paradigm can improve the performance by inlining functions.</p>
 <h2><a class="anchor" id="Handler"></a>
@@ -244,7 +244,7 @@ Writer</h1>
 <div class="line">    writer.String(<span class="stringliteral">&quot;i&quot;</span>);</div>
 <div class="line">    writer.Uint(123);</div>
 <div class="line">    writer.String(<span class="stringliteral">&quot;pi&quot;</span>);</div>
-<div class="line">    writer.<a class="code" href="classrapidjson_1_1_writer.html#a4b6ae81230f722b1c282a6bdb526cca8">Double</a>(3.1416);</div>
+<div class="line">    writer.<a class="code" href="classrapidjson_1_1_writer.html#ad5f042d9c1a8ce5be2d52e18255b4390">Double</a>(3.1416);</div>
 <div class="line">    writer.String(<span class="stringliteral">&quot;a&quot;</span>);</div>
 <div class="line">    writer.StartArray();</div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; 4; i++)</div>
@@ -274,7 +274,7 @@ Writer</h1>
 <div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> OutputStream, <span class="keyword">typename</span> SourceEncoding = UTF8&lt;&gt;, <span class="keyword">typename</span> TargetEncoding = UTF8&lt;&gt;, <span class="keyword">typename</span> Allocator = CrtAllocator&lt;&gt; &gt;</div>
 <div class="line"><span class="keyword">class </span>Writer {</div>
 <div class="line"><span class="keyword">public</span>:</div>
-<div class="line">    <a class="code" href="classrapidjson_1_1_writer.html#a08171b32315cb764f5073a99b1399a1c">Writer</a>(OutputStream&amp; os, Allocator* allocator = 0, <span class="keywordtype">size_t</span> levelDepth = kDefaultLevelDepth)</div>
+<div class="line">    <a class="code" href="classrapidjson_1_1_writer.html#ac592904fad01d9d0f29bb0585fb02aa7">Writer</a>(OutputStream&amp; os, Allocator* allocator = 0, <span class="keywordtype">size_t</span> levelDepth = kDefaultLevelDepth)</div>
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line">};</div>
 <div class="line"></div>
@@ -357,11 +357,11 @@ Parsing JSON to Custom Data Structure</h2>
 <div class="line">    <a class="code" href="classrapidjson_1_1_generic_reader.html">Reader</a> reader;</div>
 <div class="line">    MessageHandler handler;</div>
 <div class="line">    <a class="code" href="structrapidjson_1_1_generic_string_stream.html">StringStream</a> ss(json);</div>
-<div class="line">    <span class="keywordflow">if</span> (reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#a7c05995d4e4fcd650bb0a80a9b0ec11f">Parse</a>(ss, handler))</div>
+<div class="line">    <span class="keywordflow">if</span> (reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b">Parse</a>(ss, handler))</div>
 <div class="line">        messages.swap(handler.messages_);   <span class="comment">// Only change it if success.</span></div>
 <div class="line">    <span class="keywordflow">else</span> {</div>
-<div class="line">        <a class="code" href="namespacerapidjson.html#a7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> e = reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#a78a991c5177aff35c29695cf20394fb1">GetParseErrorCode</a>();</div>
-<div class="line">        <span class="keywordtype">size_t</span> o = reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#a0206b6d42978b63f11475e6444aa97e9">GetErrorOffset</a>();</div>
+<div class="line">        <a class="code" href="namespacerapidjson.html#a7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> e = reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#a40fd326bad7d7033f096b549cbf159db">GetParseErrorCode</a>();</div>
+<div class="line">        <span class="keywordtype">size_t</span> o = reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#ab907a36c410e96154c99797a6a0ce16d">GetErrorOffset</a>();</div>
 <div class="line">        cout &lt;&lt; <span class="stringliteral">&quot;Error: &quot;</span> &lt;&lt; <a class="code" href="namespacerapidjson.html#abdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(e) &lt;&lt; endl;;</div>
 <div class="line">        cout &lt;&lt; <span class="stringliteral">&quot; at offset &quot;</span> &lt;&lt; o &lt;&lt; <span class="stringliteral">&quot; near &#39;&quot;</span> &lt;&lt; string(json).substr(o, 10) &lt;&lt; <span class="stringliteral">&quot;...&#39;&quot;</span> &lt;&lt; endl;</div>
 <div class="line">    }</div>
@@ -448,8 +448,8 @@ Filtering of JSON</h2>
 <div class="line"></div>
 <div class="line">    <span class="comment">// JSON reader parse from the input stream and let writer generate the output.</span></div>
 <div class="line">    CapitalizeFilter&lt;Writer&lt;FileWriteStream&gt; &gt; filter(writer);</div>
-<div class="line">    <span class="keywordflow">if</span> (!reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#a7c05995d4e4fcd650bb0a80a9b0ec11f">Parse</a>(is, filter)) {</div>
-<div class="line">        fprintf(stderr, <span class="stringliteral">&quot;\nError(%u): %s\n&quot;</span>, (<span class="keywordtype">unsigned</span>)reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#a0206b6d42978b63f11475e6444aa97e9">GetErrorOffset</a>(), <a class="code" href="namespacerapidjson.html#abdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#a78a991c5177aff35c29695cf20394fb1">GetParseErrorCode</a>()));</div>
+<div class="line">    <span class="keywordflow">if</span> (!reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b">Parse</a>(is, filter)) {</div>
+<div class="line">        fprintf(stderr, <span class="stringliteral">&quot;\nError(%u): %s\n&quot;</span>, (<span class="keywordtype">unsigned</span>)reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#ab907a36c410e96154c99797a6a0ce16d">GetErrorOffset</a>(), <a class="code" href="namespacerapidjson.html#abdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#a40fd326bad7d7033f096b549cbf159db">GetParseErrorCode</a>()));</div>
 <div class="line">        <span class="keywordflow">return</span> 1;</div>
 <div class="line">    }</div>
 <div class="line"></div>

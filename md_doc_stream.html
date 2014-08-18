@@ -118,7 +118,7 @@ StringStream (Input)</h2>
 <div class="line"><a class="code" href="structrapidjson_1_1_generic_string_stream.html">StringStream</a> s(json);</div>
 <div class="line"></div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> d;</div>
-<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#aaf77c5c76453b1a04e2df4658ff00757">ParseStream</a>(s);</div>
+<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>(s);</div>
 </div><!-- fragment --><p>Since this is very common usage, <code>Document::Parse(const char*)</code> is provided to do exactly the same as above:</p>
 <div class="fragment"><div class="line"><span class="comment">// ...</span></div>
 <div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span> json[] = <span class="stringliteral">&quot;[1, 2, 3, 4]&quot;</span>;</div>
@@ -158,7 +158,7 @@ FileReadStream (Input)</h2>
 <div class="line"><a class="code" href="classrapidjson_1_1_file_read_stream.html">FileReadStream</a> is(fp, readBuffer, <span class="keyword">sizeof</span>(readBuffer));</div>
 <div class="line"></div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> d;</div>
-<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#aaf77c5c76453b1a04e2df4658ff00757">ParseStream</a>(is);</div>
+<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>(is);</div>
 <div class="line"></div>
 <div class="line">fclose(fp);</div>
 </div><!-- fragment --><p>Different from string streams, <code>FileReadStream</code> is byte stream. It does not handle encodings. If the file is not UTF-8, the byte stream can be wrapped in a <code>EncodedInputStream</code>. It will be discussed very soon.</p>
@@ -172,7 +172,7 @@ FileWriteStream (Output)</h2>
 <div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
 <div class="line"></div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> d;</div>
-<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#aed942fafd833c88f52b535daef620f8d">Parse</a>(json);</div>
+<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a5bb026ab42705b2c2cfbbf904108b3f5">Parse</a>(json);</div>
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"></div>
 <div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;output.json&quot;</span>, <span class="stringliteral">&quot;wb&quot;</span>); <span class="comment">// non-Windows use &quot;w&quot;</span></div>
@@ -210,7 +210,7 @@ EncodedInputStream</h2>
 <div class="line"><a class="code" href="classrapidjson_1_1_encoded_input_stream.html">EncodedInputStream&lt;UTF16LE&lt;&gt;</a>, <a class="code" href="classrapidjson_1_1_file_read_stream.html">FileReadStream</a>&gt; eis(bis);  <span class="comment">// wraps bis into eis</span></div>
 <div class="line"></div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> d; <span class="comment">// Document is GenericDocument&lt;UTF8&lt;&gt; &gt; </span></div>
-<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#aaf77c5c76453b1a04e2df4658ff00757">ParseStream</a>&lt;0, <a class="code" href="structrapidjson_1_1_u_t_f16_l_e.html">UTF16LE&lt;&gt;</a> &gt;(eis);  <span class="comment">// Parses UTF-16LE file into UTF-8 in memory</span></div>
+<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>&lt;0, <a class="code" href="structrapidjson_1_1_u_t_f16_l_e.html">UTF16LE&lt;&gt;</a> &gt;(eis);  <span class="comment">// Parses UTF-16LE file into UTF-8 in memory</span></div>
 <div class="line"></div>
 <div class="line">fclose(fp);</div>
 </div><!-- fragment --><h2><a class="anchor" id="EncodedOutputStream"></a>
@@ -254,7 +254,7 @@ AutoUTFInputStream</h2>
 <div class="line"><a class="code" href="classrapidjson_1_1_auto_u_t_f_input_stream.html">AutoUTFInputStream&lt;unsigned, FileReadStream&gt;</a> eis(bis);  <span class="comment">// wraps bis into eis</span></div>
 <div class="line"></div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> d;         <span class="comment">// Document is GenericDocument&lt;UTF8&lt;&gt; &gt; </span></div>
-<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#aaf77c5c76453b1a04e2df4658ff00757">ParseStream</a>&lt;0, <a class="code" href="structrapidjson_1_1_auto_u_t_f.html">AutoUTF&lt;unsigned&gt;</a> &gt;(eis); <span class="comment">// This parses any UTF file into UTF-8 in memory</span></div>
+<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>&lt;0, <a class="code" href="structrapidjson_1_1_auto_u_t_f.html">AutoUTF&lt;unsigned&gt;</a> &gt;(eis); <span class="comment">// This parses any UTF file into UTF-8 in memory</span></div>
 <div class="line"></div>
 <div class="line">fclose(fp);</div>
 </div><!-- fragment --><p>When specifying the encoding of stream, uses <code>AutoUTF&lt;CharType&gt;</code> as in <code>ParseStream()</code> above.</p>
@@ -347,7 +347,7 @@ Example: istream wrapper</h2>
 <div class="line">IStreamWrapper is(ss);</div>
 <div class="line"></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
-<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#aed942fafd833c88f52b535daef620f8d">Parse</a>(is);</div>
+<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a5bb026ab42705b2c2cfbbf904108b3f5">Parse</a>(is);</div>
 </div><!-- fragment --><p>Note that, this implementation may not be as efficient as RapidJSON's memory or file streams, due to internal overheads of the standard library.</p>
 <h2><a class="anchor" id="ExampleOStreamWrapper"></a>
 Example: ostream wrapper</h2>

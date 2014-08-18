@@ -9,5 +9,6 @@ var structrapidjson_1_1_generic_string_buffer =
     [ "Pop", "structrapidjson_1_1_generic_string_buffer.html#afb41bae09405ddd9aa9250ac47ab235e", null ],
     [ "Push", "structrapidjson_1_1_generic_string_buffer.html#aa848ba1b8220afb4103d8099cbd6d3ff", null ],
     [ "Put", "structrapidjson_1_1_generic_string_buffer.html#a495081cfdd864623565606daf02f1187", null ],
+    [ "ShrinkToFit", "structrapidjson_1_1_generic_string_buffer.html#a7e688f68b88820655f717d3cc352b842", null ],
     [ "stack_", "structrapidjson_1_1_generic_string_buffer.html#a061b1ffdcd0d660d98ab4a8e3ab49975", null ]
 ];

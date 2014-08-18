@@ -9,5 +9,6 @@ var structrapidjson_1_1_generic_memory_buffer =
     [ "Pop", "structrapidjson_1_1_generic_memory_buffer.html#abcbad3bf8a20a90b6b586e63b07aed40", null ],
     [ "Push", "structrapidjson_1_1_generic_memory_buffer.html#a070ea27ab1e80df671ced9edb7d03150", null ],
     [ "Put", "structrapidjson_1_1_generic_memory_buffer.html#a882b45865eb98aa84241ef8b87bae96d", null ],
+    [ "ShrinkToFit", "structrapidjson_1_1_generic_memory_buffer.html#af10d96902f7aea2eae23269c11398fbb", null ],
     [ "stack_", "structrapidjson_1_1_generic_memory_buffer.html#a80a159ebb64cee80b5e7fc37f971d5a5", null ]
 ];

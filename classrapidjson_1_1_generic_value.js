@@ -107,7 +107,7 @@ var classrapidjson_1_1_generic_value =
     [ "SetUint64", "classrapidjson_1_1_generic_value.html#a8c89bdc7f8dd14e4ab974e587b99405a", null ],
     [ "Size", "classrapidjson_1_1_generic_value.html#a2e6e849cfb368a3fa708f8bcf1d56ec9", null ],
     [ "Swap", "classrapidjson_1_1_generic_value.html#a8e7c85b91b5ae7d4506dbf23ca4605fc", null ],
-    [ "GenericDocument", "classrapidjson_1_1_generic_value.html#a5b2924ea2cf77b44211aee066f84a42d", null ],
+    [ "GenericDocument", "classrapidjson_1_1_generic_value.html#ab05bc9e52e201a2867ea5bac141ee1ae", null ],
     [ "operator!=", "classrapidjson_1_1_generic_value.html#a7b272426df3ffce088014901c00dbc92", null ],
     [ "operator!=", "classrapidjson_1_1_generic_value.html#a8b0bf5df5ef27b68993b522a4a5f3c05", null ],
     [ "operator!=", "classrapidjson_1_1_generic_value.html#a916021505ec955b0840f52491fadda4c", null ],

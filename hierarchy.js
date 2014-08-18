@@ -16,12 +16,12 @@ var hierarchy =
     [ "rapidjson::GenericInsituStringStream< Encoding >", "structrapidjson_1_1_generic_insitu_string_stream.html", null ],
     [ "rapidjson::GenericMember< Encoding, Allocator >", "structrapidjson_1_1_generic_member.html", null ],
     [ "rapidjson::GenericMemoryBuffer< Allocator >", "structrapidjson_1_1_generic_memory_buffer.html", null ],
-    [ "rapidjson::GenericReader< SourceEncoding, TargetEncoding, Allocator >", "classrapidjson_1_1_generic_reader.html", null ],
+    [ "rapidjson::GenericReader< SourceEncoding, TargetEncoding, StackAllocator >", "classrapidjson_1_1_generic_reader.html", null ],
     [ "rapidjson::GenericStringBuffer< Encoding, Allocator >", "structrapidjson_1_1_generic_string_buffer.html", null ],
     [ "rapidjson::GenericStringRef< CharType >", "structrapidjson_1_1_generic_string_ref.html", null ],
     [ "rapidjson::GenericStringStream< Encoding >", "structrapidjson_1_1_generic_string_stream.html", null ],
     [ "rapidjson::GenericValue< Encoding, Allocator >", "classrapidjson_1_1_generic_value.html", [
-      [ "rapidjson::GenericDocument< Encoding, Allocator >", "classrapidjson_1_1_generic_document.html", null ]
+      [ "rapidjson::GenericDocument< Encoding, Allocator, StackAllocator >", "classrapidjson_1_1_generic_document.html", null ]
     ] ],
     [ "rapidjson::GenericValue< rapidjson::Encoding, rapidjson::Allocator >", "classrapidjson_1_1_generic_value.html", null ],
     [ "rapidjson::Handler", "classrapidjson_1_1_handler.html", null ],
@@ -29,7 +29,7 @@ var hierarchy =
     [ "iterator", null, [
       [ "rapidjson::GenericMemberIterator< Const, Encoding, Allocator >", "classrapidjson_1_1_generic_member_iterator.html", null ]
     ] ],
-    [ "rapidjson::Writer< OutputStream, SourceEncoding, TargetEncoding, Allocator >::Level", "structrapidjson_1_1_writer_1_1_level.html", null ],
+    [ "rapidjson::Writer< OutputStream, SourceEncoding, TargetEncoding, StackAllocator >::Level", "structrapidjson_1_1_writer_1_1_level.html", null ],
     [ "rapidjson::MemoryPoolAllocator< BaseAllocator >", "classrapidjson_1_1_memory_pool_allocator.html", null ],
     [ "rapidjson::MemoryStream", "structrapidjson_1_1_memory_stream.html", null ],
     [ "rapidjson::ParseResult", "structrapidjson_1_1_parse_result.html", null ],
@@ -49,6 +49,7 @@ var hierarchy =
       [ "rapidjson::UTF32LE< CharType >", "structrapidjson_1_1_u_t_f32_l_e.html", null ]
     ] ],
     [ "rapidjson::UTF8< CharType >", "structrapidjson_1_1_u_t_f8.html", null ],
+    [ "rapidjson::Writer< OutputStream, SourceEncoding, TargetEncoding, StackAllocator >", "classrapidjson_1_1_writer.html", null ],
     [ "rapidjson::Writer< OutputStream, SourceEncoding, TargetEncoding, Allocator >", "classrapidjson_1_1_writer.html", [
       [ "rapidjson::PrettyWriter< OutputStream, SourceEncoding, TargetEncoding, Allocator >", "classrapidjson_1_1_pretty_writer.html", null ]
     ] ]

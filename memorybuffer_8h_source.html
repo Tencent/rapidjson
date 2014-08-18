@@ -131,30 +131,31 @@ $(document).ready(function(){initNavTree('memorybuffer_8h_source.html','');});
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordtype">void</span> Flush() {}</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">void</span> Clear() { stack_.Clear(); }</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    Ch* Push(<span class="keywordtype">size_t</span> count) { <span class="keywordflow">return</span> stack_.template Push&lt;Ch&gt;(count); }</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordtype">void</span> Pop(<span class="keywordtype">size_t</span> count) { stack_.template Pop&lt;Ch&gt;(count); }</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">const</span> Ch* GetBuffer()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordflow">return</span> stack_.template Bottom&lt;Ch&gt;();</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    }</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keywordtype">size_t</span> GetSize()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> stack_.GetSize(); }</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">size_t</span> kDefaultCapacity = 256;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keyword">mutable</span> internal::Stack&lt;Allocator&gt; stack_;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;};</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="keyword">typedef</span> <a class="code" href="structrapidjson_1_1_generic_memory_buffer.html">GenericMemoryBuffer&lt;&gt;</a> <a class="code" href="structrapidjson_1_1_generic_memory_buffer.html">MemoryBuffer</a>;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">//! Implement specialized version of PutN() with memset() for better performance.</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment"></span><span class="keyword">template</span>&lt;&gt;</div>
-<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#aba27b0c8dcf724aa2b288a24fda0811b">   69</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespacerapidjson.html#a1ac13bac5976fc06587e00fc0bcfb32a">PutN</a>(<a class="code" href="structrapidjson_1_1_generic_memory_buffer.html">MemoryBuffer</a>&amp; memoryBuffer, <span class="keywordtype">char</span> c, <span class="keywordtype">size_t</span> n) {</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    memset(memoryBuffer.stack_.Push&lt;<span class="keywordtype">char</span>&gt;(n), c, n * <span class="keyword">sizeof</span>(c));</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;}</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;} <span class="comment">// namespace rapidjson</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_MEMORYBUFFER_H_</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordtype">void</span> ShrinkToFit() { stack_.ShrinkToFit(); }</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    Ch* Push(<span class="keywordtype">size_t</span> count) { <span class="keywordflow">return</span> stack_.template Push&lt;Ch&gt;(count); }</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keywordtype">void</span> Pop(<span class="keywordtype">size_t</span> count) { stack_.template Pop&lt;Ch&gt;(count); }</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">const</span> Ch* GetBuffer()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keywordflow">return</span> stack_.template Bottom&lt;Ch&gt;();</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">size_t</span> GetSize()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> stack_.GetSize(); }</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">size_t</span> kDefaultCapacity = 256;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">mutable</span> internal::Stack&lt;Allocator&gt; stack_;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;};</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="keyword">typedef</span> <a class="code" href="structrapidjson_1_1_generic_memory_buffer.html">GenericMemoryBuffer&lt;&gt;</a> <a class="code" href="structrapidjson_1_1_generic_memory_buffer.html">MemoryBuffer</a>;</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="comment">//! Implement specialized version of PutN() with memset() for better performance.</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment"></span><span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#aba27b0c8dcf724aa2b288a24fda0811b">   70</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespacerapidjson.html#a1ac13bac5976fc06587e00fc0bcfb32a">PutN</a>(<a class="code" href="structrapidjson_1_1_generic_memory_buffer.html">MemoryBuffer</a>&amp; memoryBuffer, <span class="keywordtype">char</span> c, <span class="keywordtype">size_t</span> n) {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    memset(memoryBuffer.stack_.Push&lt;<span class="keywordtype">char</span>&gt;(n), c, n * <span class="keyword">sizeof</span>(c));</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;}</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;} <span class="comment">// namespace rapidjson</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_MEMORYBUFFER_H_</span></div>
 <div class="ttc" id="structrapidjson_1_1_generic_memory_buffer_html"><div class="ttname"><a href="structrapidjson_1_1_generic_memory_buffer.html">rapidjson::GenericMemoryBuffer</a></div><div class="ttdoc">Represents an in-memory output byte stream. </div><div class="ttdef"><b>Definition:</b> memorybuffer.h:43</div></div>
 <div class="ttc" id="namespacerapidjson_html_a1ac13bac5976fc06587e00fc0bcfb32a"><div class="ttname"><a href="namespacerapidjson.html#a1ac13bac5976fc06587e00fc0bcfb32a">rapidjson::PutN</a></div><div class="ttdeci">void PutN(FileWriteStream &amp;stream, char c, size_t n)</div><div class="ttdoc">Implement specialized version of PutN() with memset() for better performance. </div><div class="ttdef"><b>Definition:</b> filewritestream.h:91</div></div>
 <div class="ttc" id="rapidjson_8h_html"><div class="ttname"><a href="rapidjson_8h.html">rapidjson.h</a></div><div class="ttdoc">common definitions and configuration </div></div>
