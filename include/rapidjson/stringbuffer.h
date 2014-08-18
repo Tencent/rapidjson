@@ -42,6 +42,12 @@ struct GenericStringBuffer {
     void Flush() {}
 
     void Clear() { stack_.Clear(); }
+    void ShrinkToFit() {
+        // Push and pop a null terminator. This is safe.
+        *stack_.template Push<Ch>() = '\0';
+        stack_.ShrinkToFit();
+        stack_.template Pop<Ch>(1);
+    }
     Ch* Push(size_t count) { return stack_.template Push<Ch>(count); }
     void Pop(size_t count) { stack_.template Pop<Ch>(count); }
 

@@ -49,10 +49,10 @@ namespace rapidjson {
     \tparam OutputStream Type of output stream.
     \tparam SourceEncoding Encoding of source string.
     \tparam TargetEncoding Encoding of output stream.
-    \tparam Allocator Type of allocator for allocating memory of stack.
+    \tparam StackAllocator Type of allocator for allocating memory of stack.
     \note implements Handler concept
 */
-template<typename OutputStream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename Allocator = MemoryPoolAllocator<> >
+template<typename OutputStream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename StackAllocator = CrtAllocator>
 class Writer {
 public:
     typedef typename SourceEncoding::Ch Ch;
@@ -62,10 +62,10 @@ public:
         \param allocator User supplied allocator. If it is null, it will create a private one.
         \param levelDepth Initial capacity of stack.
     */
-    Writer(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) : 
-        os_(&os), level_stack_(allocator, levelDepth * sizeof(Level)), hasRoot_(false) {}
+    Writer(OutputStream& os, StackAllocator* stackAllocator = 0, size_t levelDepth = kDefaultLevelDepth) : 
+        os_(&os), level_stack_(stackAllocator, levelDepth * sizeof(Level)), hasRoot_(false) {}
 
-    Writer(Allocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) :
+    Writer(StackAllocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) :
         os_(0), level_stack_(allocator, levelDepth * sizeof(Level)), hasRoot_(false) {}
 
     //! Reset the writer with a new stream.
@@ -326,7 +326,7 @@ protected:
     }
 
     OutputStream* os_;
-    internal::Stack<Allocator> level_stack_;
+    internal::Stack<StackAllocator> level_stack_;
     bool hasRoot_;
 
 private:

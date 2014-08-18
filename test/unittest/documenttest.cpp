@@ -28,46 +28,56 @@
 
 using namespace rapidjson;
 
-TEST(Document, Parse) {
-    Document doc;
+template <typename Allocator, typename StackAllocator>
+void ParseTest() {
+    typedef GenericDocument<UTF8<>, Allocator, StackAllocator> DocumentType;
+    typedef typename DocumentType::ValueType ValueType;
+    DocumentType doc;
 
     doc.Parse(" { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3, 4] } ");
 
     EXPECT_TRUE(doc.IsObject());
 
     EXPECT_TRUE(doc.HasMember("hello"));
-    Value& hello = doc["hello"];
+    const ValueType& hello = doc["hello"];
     EXPECT_TRUE(hello.IsString());
     EXPECT_STREQ("world", hello.GetString());
 
     EXPECT_TRUE(doc.HasMember("t"));
-    Value& t = doc["t"];
+    const ValueType& t = doc["t"];
     EXPECT_TRUE(t.IsTrue());
 
     EXPECT_TRUE(doc.HasMember("f"));
-    Value& f = doc["f"];
+    const ValueType& f = doc["f"];
     EXPECT_TRUE(f.IsFalse());
 
     EXPECT_TRUE(doc.HasMember("n"));
-    Value& n = doc["n"];
+    const ValueType& n = doc["n"];
     EXPECT_TRUE(n.IsNull());
 
     EXPECT_TRUE(doc.HasMember("i"));
-    Value& i = doc["i"];
+    const ValueType& i = doc["i"];
     EXPECT_TRUE(i.IsNumber());
     EXPECT_EQ(123, i.GetInt());
 
     EXPECT_TRUE(doc.HasMember("pi"));
-    Value& pi = doc["pi"];
+    const ValueType& pi = doc["pi"];
     EXPECT_TRUE(pi.IsNumber());
     EXPECT_EQ(3.1416, pi.GetDouble());
 
     EXPECT_TRUE(doc.HasMember("a"));
-    Value& a = doc["a"];
+    const ValueType& a = doc["a"];
     EXPECT_TRUE(a.IsArray());
     EXPECT_EQ(4u, a.Size());
     for (SizeType i = 0; i < 4; i++)
         EXPECT_EQ(i + 1, a[i].GetUint());
+}
+
+TEST(Document, Parse) {
+    ParseTest<MemoryPoolAllocator<>, CrtAllocator>();
+    ParseTest<MemoryPoolAllocator<>, MemoryPoolAllocator<> >();
+    ParseTest<CrtAllocator, MemoryPoolAllocator<> >();
+    ParseTest<CrtAllocator, CrtAllocator>();
 }
 
 static FILE* OpenEncodedFile(const char* filename) {
