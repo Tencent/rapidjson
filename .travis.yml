@@ -12,6 +12,7 @@ env:
     - CONF=release BITS=32
   global:
     - GITHUB_REPO='miloyip/rapidjson'
+    - DEFINES='-DRAPIDJSON_HAS_STDSTRING'
     - secure: "HrsaCb+N66EG1HR+LWH1u51SjaJyRwJEDzqJGYMB7LJ/bfqb9mWKF1fLvZGk46W5t7TVaXRDD5KHFx9DPWvKn4gRUVkwTHEy262ah5ORh8M6n/6VVVajeV/AYt2C0sswdkDBDO4Xq+xy5gdw3G8s1A4Inbm73pUh+6vx+7ltBbk="
 
 before_install:
