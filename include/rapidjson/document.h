@@ -619,28 +619,28 @@ public:
         }
     }
 
-    //! Not-equal-to operator
-    bool operator!=(const GenericValue& rhs) const { return !(*this == rhs); }
+    //! Equal-to operator with const C-string pointer
+    bool operator==(const Ch* rhs) const { return *this == GenericValue(StringRef(rhs)); }
 
-    //! (Not-)Equal-to operator with const C-string pointer.
-    friend bool operator==(const GenericValue& lhs, const Ch* rhs) { return lhs == GenericValue(StringRef(rhs)); }
-    friend bool operator!=(const GenericValue& lhs, const Ch* rhs) { return !(lhs == rhs); }
-    friend bool operator==(const Ch* lhs, const GenericValue& rhs) { return GenericValue(StringRef(lhs)) == rhs; }
-    friend bool operator!=(const Ch* lhs, const GenericValue& rhs) { return !(lhs == rhs); }
-
-    //! (Not-)Equal-to operator with non-const C-string pointer.
-    friend bool operator==(const GenericValue& lhs, Ch* rhs) { return lhs == GenericValue(StringRef(rhs)); }
-    friend bool operator!=(const GenericValue& lhs, Ch* rhs) { return !(lhs == rhs); }
-    friend bool operator==(Ch* lhs, const GenericValue& rhs) { return GenericValue(StringRef(lhs)) == rhs; }
-    friend bool operator!=(Ch* lhs, const GenericValue& rhs) { return !(lhs == rhs); }
-
-    //! (Not-)Equal-to operator with primitive types.
+    //! Equal-to operator with primitive types
     /*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c double, \c true, \c false
     */
-    template <typename T> friend bool operator==(const GenericValue& lhs, const T& rhs) { return lhs == GenericValue(rhs); }
-    template <typename T> friend bool operator!=(const GenericValue& lhs, const T& rhs) { return !(lhs == rhs); }
-    template <typename T> friend bool operator==(const T& lhs, const GenericValue& rhs) { return GenericValue(lhs) == rhs; }
-    template <typename T> friend bool operator!=(const T& lhs, const GenericValue& rhs) { return !(lhs == rhs); }
+    template <typename T> RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>, bool) operator==(const T& rhs) const { return *this == GenericValue(rhs); }
+
+    //! Not-equal-to operator with arbitrary types
+    /*! \return !(*this == rhs)
+     */
+    template <typename T> bool operator!=(const T& rhs) const { return !(*this == rhs); }
+
+    //! Equal-to operator with arbitrary types (symmetric version)
+    /*! \return (rhs == lhs)
+     */
+    template <typename T> friend bool operator==(const T& lhs, const GenericValue& rhs) { return rhs == lhs; }
+
+    //! Not-Equal-to operator with arbitrary types (symmetric version)
+    /*! \return !(rhs == lhs)
+     */
+    template <typename T> friend bool operator!=(const T& lhs, const GenericValue& rhs) { return !(rhs == lhs); }
     //@}
 
     //!@name Type
