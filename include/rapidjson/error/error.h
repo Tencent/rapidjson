@@ -21,12 +21,17 @@
 #ifndef RAPIDJSON_ERROR_ERROR_H__
 #define RAPIDJSON_ERROR_ERROR_H__
 
+/*! \file error.h */
+
+/*! \defgroup RAPIDJSON_ERRORS RapidJSON error handling */
+
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_ERROR_CHARTYPE
 
 //! Character type of error messages.
-/*! The default charater type is char.
-    On Windows, user can define this macro as TCHAR for supporting both
+/*! \ingroup RAPIDJSON_ERRORS
+    The default character type is \c char.
+    On Windows, user can define this macro as \c TCHAR for supporting both
     unicode/non-unicode settings.
 */
 #ifndef RAPIDJSON_ERROR_CHARTYPE
@@ -36,9 +41,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_ERROR_STRING
 
-//! Macro for converting string literial to RAPIDJSON_ERROR_CHARTYPE[].
-/*! By default this conversion macro does nothing.
-    On Windows, user can define this macro as _T(x) for supporting both 
+//! Macro for converting string literial to \ref RAPIDJSON_ERROR_CHARTYPE[].
+/*! \ingroup RAPIDJSON_ERRORS
+    By default this conversion macro does nothing.
+    On Windows, user can define this macro as \c _T(x) for supporting both
     unicode/non-unicode settings.
 */
 #ifndef RAPIDJSON_ERROR_STRING
@@ -51,7 +57,8 @@ namespace rapidjson {
 // ParseErrorCode
 
 //! Error code of parsing.
-/*! \see GenericReader::Parse, GenericReader::GetParseErrorCode
+/*! \ingroup RAPIDJSON_ERRORS
+    \see GenericReader::Parse, GenericReader::GetParseErrorCode
 */
 enum ParseErrorCode {
     kParseErrorNone = 0,                        //!< No error.
@@ -83,6 +90,7 @@ enum ParseErrorCode {
 
 //! Result of parsing (wraps ParseErrorCode)
 /*!
+    \ingroup RAPIDJSON_ERRORS
     \code
         Document doc;
         ParseResult ok = doc.Parse("[42]");
@@ -126,15 +134,15 @@ private:
 };
 
 //! Function pointer type of GetParseError().
-/*! This is the prototype for GetParseError_X(), where X is a locale.
-    User can dynamically change locale in runtime, e.g.:
+/*! \ingroup RAPIDJSON_ERRORS
 
+    This is the prototype for \c GetParseError_X(), where \c X is a locale.
+    User can dynamically change locale in runtime, e.g.:
 \code
     GetParseErrorFunc GetParseError = GetParseError_En; // or whatever
     const RAPIDJSON_ERROR_CHARTYPE* s = GetParseError(document.GetParseErrorCode());
 \endcode
 */
-
 typedef const RAPIDJSON_ERROR_CHARTYPE* (*GetParseErrorFunc)(ParseErrorCode);
 
 } // namespace rapidjson

@@ -243,6 +243,9 @@ typedef unsigned SizeType;
 /*! \ingroup RAPIDJSON_CONFIG
     By default, rapidjson uses C \c assert() for internal assertions.
     User can override it by defining RAPIDJSON_ASSERT(x) macro.
+
+    \note Parsing errors are handled and can be customized by the
+          \ref RAPIDJSON_ERRORS APIs.
 */
 #ifndef RAPIDJSON_ASSERT
 #include <cassert>
@@ -274,7 +277,7 @@ template<int x> struct StaticAssertTest {};
 //!@endcond
 
 /*! \def RAPIDJSON_STATIC_ASSERT
-    \brief (internal) macro to check for conditions at compile-time
+    \brief (Internal) macro to check for conditions at compile-time
     \param x compile-time condition
     \hideinitializer
  */

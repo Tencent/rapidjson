@@ -764,7 +764,8 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ./include/ \
+INPUT                  = ./include/rapidjson/rapidjson.h \
+                         ./include/ \
                          ./readme.md \
                          ./doc/features.md \
                          ./doc/tutorial.md \
