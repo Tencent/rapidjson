@@ -537,6 +537,44 @@ TEST(Value, String) {
     s[0] = '\0';
     EXPECT_STREQ("World", w.GetString());
     EXPECT_EQ(5u, w.GetStringLength());
+
+#ifdef RAPIDJSON_HAS_STDSTRING
+    {
+        std::string str = "Hello World";
+        str[5] = '\0';
+        EXPECT_STREQ(str.data(),"Hello"); // embedded '\0'
+        EXPECT_EQ(str.size(), 11u);
+
+        // no copy
+        Value vs0(StringRef(str));
+        EXPECT_TRUE(vs0.IsString());
+        EXPECT_EQ(vs0.GetString(), str.data());
+        EXPECT_EQ(vs0.GetStringLength(), str.size());
+        TestEqual(vs0, str);
+
+        // do copy
+        Value vs1(str, allocator);
+        EXPECT_TRUE(vs1.IsString());
+        EXPECT_NE(vs1.GetString(), str.data());
+        EXPECT_NE(vs1.GetString(), str); // not equal due to embedded '\0'
+        EXPECT_EQ(vs1.GetStringLength(), str.size());
+        TestEqual(vs1, str);
+
+        // SetString
+        str = "World";
+        vs0.SetNull().SetString(str, allocator);
+        EXPECT_TRUE(vs0.IsString());
+        EXPECT_STREQ(vs0.GetString(), str.c_str());
+        EXPECT_EQ(vs0.GetStringLength(), str.size());
+        TestEqual(str, vs0);
+        TestUnequal(str, vs1);
+
+        // vs1 = str; // should not compile
+        vs1 = StringRef(str);
+        TestEqual(str, vs1);
+        TestEqual(vs0, vs1);
+    }
+#endif // RAPIDJSON_HAS_STDSTRING
 }
 
 TEST(Value, Array) {
