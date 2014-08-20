@@ -21,8 +21,7 @@
 #ifndef RAPIDJSON_READER_H_
 #define RAPIDJSON_READER_H_
 
-// Copyright (c) 2011 Milo Yip (miloyip@gmail.com)
-// Version 0.1
+/*! \file reader.h */
 
 #include "rapidjson.h"
 #include "encodings.h"
@@ -46,6 +45,7 @@ RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
 RAPIDJSON_DIAG_OFF(4702)  // unreachable code
 #endif
 
+//!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 #define RAPIDJSON_NOTHING /* deliberately empty */
 #ifndef RAPIDJSON_PARSE_ERROR_EARLY_RETURN
 #define RAPIDJSON_PARSE_ERROR_EARLY_RETURN(value) \
@@ -55,15 +55,57 @@ RAPIDJSON_DIAG_OFF(4702)  // unreachable code
 #endif
 #define RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID \
     RAPIDJSON_PARSE_ERROR_EARLY_RETURN(RAPIDJSON_NOTHING)
+//!@endcond
 
+/*! \def RAPIDJSON_PARSE_ERROR_NORETURN
+    \ingroup RAPIDJSON_ERRORS
+    \brief Macro to indicate a parse error.
+    \param parseErrorCode \ref rapidjson::ParseErrorCode of the error
+    \param offset  position of the error in JSON input (\c size_t)
+
+    This macros can be used as a customization point for the internal
+    error handling mechanism of RapidJSON.
+
+    A common usage model is to throw an exception instead of requiring the
+    caller to explicitly check the \ref rapidjson::GenericReader::Parse's
+    return value:
+
+    \code
+    #define RAPIDJSON_PARSE_ERROR_NORETURN(parseErrorCode,offset) \
+       throw ParseException(parseErrorCode, #parseErrorCode, offset)
+
+    #include <stdexcept>               // std::runtime_error
+    #include "rapidjson/error/error.h" // rapidjson::ParseResult
+
+    struct ParseException : std::runtime_error, rapidjson::ParseResult {
+      ParseException(rapidjson::ParseErrorCode code, const char* msg, size_t offset)
+        : std::runtime_error(msg), ParseResult(code, offset) {}
+    };
+
+    #include "rapidjson/reader.h"
+    \endcode
+
+    \see RAPIDJSON_PARSE_ERROR, rapidjson::GenericReader::Parse
+ */
 #ifndef RAPIDJSON_PARSE_ERROR_NORETURN
 #define RAPIDJSON_PARSE_ERROR_NORETURN(parseErrorCode, offset) \
     RAPIDJSON_MULTILINEMACRO_BEGIN \
     RAPIDJSON_ASSERT(!HasParseError()); /* Error can only be assigned once */ \
-    parseResult_.Set(parseErrorCode,offset); \
+    SetParseError(parseErrorCode, offset); \
     RAPIDJSON_MULTILINEMACRO_END
 #endif
 
+/*! \def RAPIDJSON_PARSE_ERROR
+    \ingroup RAPIDJSON_ERRORS
+    \brief (Internal) macro to indicate and handle a parse error.
+    \param parseErrorCode \ref rapidjson::ParseErrorCode of the error
+    \param offset  position of the error in JSON input (\c size_t)
+
+    Invokes RAPIDJSON_PARSE_ERROR_NORETURN and stops the parsing.
+
+    \see RAPIDJSON_PARSE_ERROR_NORETURN
+    \hideinitializer
+ */
 #ifndef RAPIDJSON_PARSE_ERROR
 #define RAPIDJSON_PARSE_ERROR(parseErrorCode, offset) \
     RAPIDJSON_MULTILINEMACRO_BEGIN \
@@ -421,6 +463,9 @@ public:
     //! Get the position of last parsing error in input, 0 otherwise.
     size_t GetErrorOffset() const { return parseResult_.Offset(); }
 
+protected:
+    void SetParseError(ParseErrorCode code, size_t offset) { parseResult_.Set(code, offset); }
+
 private:
     // Prohibit copy constructor & assignment operator.
     GenericReader(const GenericReader&);
@@ -632,6 +677,7 @@ private:
     // This function handles the prefix/suffix double quotes, escaping, and optional encoding validation.
     template<unsigned parseFlags, typename SEncoding, typename TEncoding, typename InputStream, typename OutputStream>
     RAPIDJSON_FORCEINLINE void ParseStringToStream(InputStream& is, OutputStream& os) {
+//!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 #define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
         static const char escape[256] = {
             Z16, Z16, 0, 0,'\"', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,'/', 
@@ -641,6 +687,7 @@ private:
             Z16, Z16, Z16, Z16, Z16, Z16, Z16, Z16
         };
 #undef Z16
+//!@endcond
 
         RAPIDJSON_ASSERT(is.Peek() == '\"');
         is.Take();  // Skip '\"'
@@ -933,6 +980,8 @@ private:
     };
 
     RAPIDJSON_FORCEINLINE Token Tokenize(Ch c) {
+
+//!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 #define N NumberToken
 #define N16 N,N,N,N,N,N,N,N,N,N,N,N,N,N,N,N
         // Maps from ASCII to Token
@@ -949,6 +998,7 @@ private:
         };
 #undef N
 #undef N16
+//!@endcond
         
         if (sizeof(Ch) == 1 || unsigned(c) < 256)
             return (Token)tokenMap[(unsigned char)c];

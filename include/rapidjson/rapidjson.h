@@ -27,7 +27,22 @@
 /*!\file rapidjson.h
     \brief common definitions and configuration
 
-    \todo Complete Doxygen documentation for configure macros.
+    \see RAPIDJSON_CONFIG
+ */
+
+/*! \defgroup RAPIDJSON_CONFIG RapidJSON configuration
+    \brief Configuration macros for library features
+
+    Some RapidJSON features are configurable to adapt the library to a wide
+    variety of platforms, environments and usage scenarios.  Most of the
+    features can be configured in terms of overriden or predefined
+    preprocessor macros at compile-time.
+
+    Some additional customization is available in the \ref RAPIDJSON_ERRORS APIs.
+
+    \note These macros should be given on the compiler command-line
+          (where applicable)  to avoid inconsistent values when compiling
+          different translation units of a single application.
  */
 
 #include <cstdlib>  // malloc(), realloc(), free()
@@ -36,8 +51,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NO_INT64DEFINE
 
-// Here defines int64_t and uint64_t types in global namespace
-// If user have their own definition, can define RAPIDJSON_NO_INT64DEFINE to disable this.
+/*! \def RAPIDJSON_NO_INT64DEFINE
+    \ingroup RAPIDJSON_CONFIG
+    \brief Use external 64-bit integer types.
+
+    RapidJSON requires the 64-bit integer types \c int64_t and  \c uint64_t types
+    to be available at global scope.
+
+    If users have their own definition, define RAPIDJSON_NO_INT64DEFINE to
+    prevent RapidJSON from defining its own types.
+*/
 #ifndef RAPIDJSON_NO_INT64DEFINE
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 #ifdef _MSC_VER
@@ -49,12 +72,16 @@
 #include <inttypes.h>
 #endif
 //!@endcond
+#ifdef RAPIDJSON_DOXYGEN_RUNNING
+#define RAPIDJSON_NO_INT64DEFINE
+#endif
 #endif // RAPIDJSON_NO_INT64TYPEDEF
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_FORCEINLINE
 
 #ifndef RAPIDJSON_FORCEINLINE
+//!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 #ifdef _MSC_VER
 #define RAPIDJSON_FORCEINLINE __forceinline
 #elif defined(__GNUC__) && __GNUC__ >= 4
@@ -62,6 +89,7 @@
 #else
 #define RAPIDJSON_FORCEINLINE
 #endif
+//!@endcond
 #endif // RAPIDJSON_FORCEINLINE
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -70,13 +98,17 @@
 #define RAPIDJSON_BIGENDIAN     1   //!< Big endian machine
 
 //! Endianness of the machine.
-/*! GCC 4.6 provided macro for detecting endianness of the target machine. But other
+/*!
+    \def RAPIDJSON_ENDIAN
+    \ingroup RAPIDJSON_CONFIG
+
+    GCC 4.6 provided macro for detecting endianness of the target machine. But other
     compilers may not have this. User can define RAPIDJSON_ENDIAN to either
     \ref RAPIDJSON_LITTLEENDIAN or \ref RAPIDJSON_BIGENDIAN.
 
-    Implemented with reference to 
-    https://gcc.gnu.org/onlinedocs/gcc-4.6.0/cpp/Common-Predefined-Macros.html
-    http://www.boost.org/doc/libs/1_42_0/boost/detail/endian.hpp
+    Default detection implemented with reference to
+    \li https://gcc.gnu.org/onlinedocs/gcc-4.6.0/cpp/Common-Predefined-Macros.html
+    \li http://www.boost.org/doc/libs/1_42_0/boost/detail/endian.hpp
 */
 #ifndef RAPIDJSON_ENDIAN
 // Detect with GCC 4.6's macro
@@ -108,18 +140,22 @@
 #    define RAPIDJSON_ENDIAN RAPIDJSON_BIGENDIAN
 #  elif defined(__i386__) || defined(__alpha__) || defined(__ia64) || defined(__ia64__) || defined(_M_IX86) || defined(_M_IA64) || defined(_M_ALPHA) || defined(__amd64) || defined(__amd64__) || defined(_M_AMD64) || defined(__x86_64) || defined(__x86_64__) || defined(_M_X64) || defined(__bfin__)
 #    define RAPIDJSON_ENDIAN RAPIDJSON_LITTLEENDIAN
+#  elif defined(RAPIDJSON_DOXYGEN_RUNNING)
+#    define RAPIDJSON_ENDIAN
 #  else
 #    error Unknown machine endianess detected. User needs to define RAPIDJSON_ENDIAN.   
 #  endif
 #endif // RAPIDJSON_ENDIAN
 
 ///////////////////////////////////////////////////////////////////////////////
-// RAPIDJSON_ALIGNSIZE
+// RAPIDJSON_ALIGN
 
 //! Data alignment of the machine.
-/*!
-    Some machine requires strict data alignment.
-    Currently the default uses 4 bytes alignment. User can customize this.
+/*! \ingroup RAPIDJSON_CONFIG
+    \param x pointer to align
+
+    Some machines require strict data alignment. Currently the default uses 4 bytes
+    alignment. User can customize by defining the RAPIDJSON_ALIGN function macro.,
 */
 #ifndef RAPIDJSON_ALIGN
 #define RAPIDJSON_ALIGN(x) ((x + 3u) & ~3u)
@@ -141,13 +177,30 @@
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_SSE2/RAPIDJSON_SSE42/RAPIDJSON_SIMD
 
-// Enable SSE2 optimization.
-//#define RAPIDJSON_SSE2
+/*! \def RAPIDJSON_SIMD
+    \ingroup RAPIDJSON_CONFIG
+    \brief Enable SSE2/SSE4.2 optimization.
 
-// Enable SSE4.2 optimization.
-//#define RAPIDJSON_SSE42
+    RapidJSON supports optimized implementations for some parsing operations
+    based on the SSE2 or SSE4.2 SIMD extensions on modern Intel-compatible
+    processors.
 
-#if defined(RAPIDJSON_SSE2) || defined(RAPIDJSON_SSE42)
+    To enable these optimizations, two different symbols can be defined;
+    \code
+    // Enable SSE2 optimization.
+    #define RAPIDJSON_SSE2
+
+    // Enable SSE4.2 optimization.
+    #define RAPIDJSON_SSE42
+    \endcode
+
+    \c RAPIDJSON_SSE42 takes precedence, if both are defined.
+
+    If any of these symbols is defined, RapidJSON defines the macro
+    \c RAPIDJSON_SIMD to indicate the availability of the optimized code.
+*/
+#if defined(RAPIDJSON_SSE2) || defined(RAPIDJSON_SSE42) \
+    || defined(RAPIDJSON_DOXYGEN_RUNNING)
 #define RAPIDJSON_SIMD
 #endif
 
@@ -155,9 +208,29 @@
 // RAPIDJSON_NO_SIZETYPEDEFINE
 
 #ifndef RAPIDJSON_NO_SIZETYPEDEFINE
+/*! \def RAPIDJSON_NO_SIZETYPEDEFINE
+    \ingroup RAPIDJSON_CONFIG
+    \brief User-provided \c SizeType definition.
+
+    In order to avoid using 32-bit size types for indexing strings and arrays,
+    define this preprocessor symbol and provide the type rapidjson::SizeType
+    before including RapidJSON:
+    \code
+    #define RAPIDJSON_NO_SIZETYPEDEFINE
+    namespace rapidjson { typedef ::std::size_t SizeType; }
+    #include "rapidjson/..."
+    \endcode
+
+    \see rapidjson::SizeType
+*/
+#ifdef RAPIDJSON_DOXYGEN_RUNNING
+#define RAPIDJSON_NO_SIZETYPEDEFINE
+#endif
 namespace rapidjson {
-//! Use 32-bit array/string indices even for 64-bit platform, instead of using size_t.
-/*! User may override the SizeType by defining RAPIDJSON_NO_SIZETYPEDEFINE.
+//! Size type (for string lengths, array sizes, etc.)
+/*! RapidJSON uses 32-bit array/string indices even on 64-bit platforms,
+    instead of using \c size_t. Users may override the SizeType by defining
+    \ref RAPIDJSON_NO_SIZETYPEDEFINE.
 */
 typedef unsigned SizeType;
 } // namespace rapidjson
@@ -167,8 +240,12 @@ typedef unsigned SizeType;
 // RAPIDJSON_ASSERT
 
 //! Assertion.
-/*! By default, rapidjson uses C assert() for assertion.
+/*! \ingroup RAPIDJSON_CONFIG
+    By default, rapidjson uses C \c assert() for internal assertions.
     User can override it by defining RAPIDJSON_ASSERT(x) macro.
+
+    \note Parsing errors are handled and can be customized by the
+          \ref RAPIDJSON_ERRORS APIs.
 */
 #ifndef RAPIDJSON_ASSERT
 #include <cassert>
@@ -200,7 +277,7 @@ template<int x> struct StaticAssertTest {};
 //!@endcond
 
 /*! \def RAPIDJSON_STATIC_ASSERT
-    \brief (internal) macro to check for conditions at compile-time
+    \brief (Internal) macro to check for conditions at compile-time
     \param x compile-time condition
     \hideinitializer
  */

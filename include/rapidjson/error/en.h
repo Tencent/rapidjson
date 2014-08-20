@@ -27,6 +27,7 @@ namespace rapidjson {
 
 //! Maps error code of parsing into error message.
 /*!
+    \ingroup RAPIDJSON_ERRORS
     \param parseErrorCode Error code obtained in parsing.
     \return the error message.
     \note User can make a copy of this function for localization.
