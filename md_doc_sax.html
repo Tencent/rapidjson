@@ -66,7 +66,7 @@ $(document).ready(function(){initNavTree('md_doc_sax.html','');});
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>Groups</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(12)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -131,7 +131,7 @@ Reader</h1>
 <div class="line">EndArray(4)</div>
 <div class="line">EndObject(7)</div>
 </div><!-- fragment --><p>These events can be easily matched with the JSON, except some event parameters need further explanation. Let's see the <code>simplereader</code> example which produces exactly the same output as above:</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/reader.h&quot;</span></div>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="reader_8h.html">rapidjson/reader.h</a>&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;iostream&gt;</span></div>
 <div class="line"></div>
 <div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
@@ -300,7 +300,7 @@ Parsing JSON to Custom Data Structure</h2>
 <p><code>Document</code>'s parsing capability is completely based on <code>Reader</code>. Actually <code>Document</code> is a handler which receives events from a reader to build a DOM during parsing.</p>
 <p>User may uses <code>Reader</code> to build other data structures directly. This eliminates building of DOM, thus reducing memory and improving performance.</p>
 <p>In the following <code>messagereader</code> example, <code>ParseMessages()</code> parses a JSON which should be an object with key-string pairs.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/reader.h&quot;</span></div>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="reader_8h.html">rapidjson/reader.h</a>&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/error/en.h&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;iostream&gt;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;string&gt;</span></div>
@@ -360,9 +360,9 @@ Parsing JSON to Custom Data Structure</h2>
 <div class="line">    <span class="keywordflow">if</span> (reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b">Parse</a>(ss, handler))</div>
 <div class="line">        messages.swap(handler.messages_);   <span class="comment">// Only change it if success.</span></div>
 <div class="line">    <span class="keywordflow">else</span> {</div>
-<div class="line">        <a class="code" href="namespacerapidjson.html#a7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> e = reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#a40fd326bad7d7033f096b549cbf159db">GetParseErrorCode</a>();</div>
+<div class="line">        <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> e = reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#a40fd326bad7d7033f096b549cbf159db">GetParseErrorCode</a>();</div>
 <div class="line">        <span class="keywordtype">size_t</span> o = reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#ab907a36c410e96154c99797a6a0ce16d">GetErrorOffset</a>();</div>
-<div class="line">        cout &lt;&lt; <span class="stringliteral">&quot;Error: &quot;</span> &lt;&lt; <a class="code" href="namespacerapidjson.html#abdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(e) &lt;&lt; endl;;</div>
+<div class="line">        cout &lt;&lt; <span class="stringliteral">&quot;Error: &quot;</span> &lt;&lt; <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(e) &lt;&lt; endl;;</div>
 <div class="line">        cout &lt;&lt; <span class="stringliteral">&quot; at offset &quot;</span> &lt;&lt; o &lt;&lt; <span class="stringliteral">&quot; near &#39;&quot;</span> &lt;&lt; string(json).substr(o, 10) &lt;&lt; <span class="stringliteral">&quot;...&#39;&quot;</span> &lt;&lt; endl;</div>
 <div class="line">    }</div>
 <div class="line">}</div>
@@ -398,7 +398,7 @@ Parsing JSON to Custom Data Structure</h2>
 Filtering of JSON</h2>
 <p>As mentioned earlier, <code>Writer</code> can handle the events published by <code>Reader</code>. <code>condense</code> example simply set a <code>Writer</code> as handler of a <code>Reader</code>, so it can remove all white-spaces in JSON. <code>pretty</code> example uses the same relationship, but replacing <code>Writer</code> by <code>PrettyWriter</code>. So <code>pretty</code> can be used to reformat a JSON with indentation and line feed.</p>
 <p>Actually, we can add intermediate layer(s) to filter the contents of JSON via these SAX-style API. For example, <code>capitalize</code> example capitalize all strings in a JSON.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/reader.h&quot;</span></div>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="reader_8h.html">rapidjson/reader.h</a>&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/writer.h&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/filereadstream.h&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/filewritestream.h&quot;</span></div>
@@ -449,7 +449,7 @@ Filtering of JSON</h2>
 <div class="line">    <span class="comment">// JSON reader parse from the input stream and let writer generate the output.</span></div>
 <div class="line">    CapitalizeFilter&lt;Writer&lt;FileWriteStream&gt; &gt; filter(writer);</div>
 <div class="line">    <span class="keywordflow">if</span> (!reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b">Parse</a>(is, filter)) {</div>
-<div class="line">        fprintf(stderr, <span class="stringliteral">&quot;\nError(%u): %s\n&quot;</span>, (<span class="keywordtype">unsigned</span>)reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#ab907a36c410e96154c99797a6a0ce16d">GetErrorOffset</a>(), <a class="code" href="namespacerapidjson.html#abdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#a40fd326bad7d7033f096b549cbf159db">GetParseErrorCode</a>()));</div>
+<div class="line">        fprintf(stderr, <span class="stringliteral">&quot;\nError(%u): %s\n&quot;</span>, (<span class="keywordtype">unsigned</span>)reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#ab907a36c410e96154c99797a6a0ce16d">GetErrorOffset</a>(), <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#a40fd326bad7d7033f096b549cbf159db">GetParseErrorCode</a>()));</div>
 <div class="line">        <span class="keywordflow">return</span> 1;</div>
 <div class="line">    }</div>
 <div class="line"></div>

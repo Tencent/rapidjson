@@ -26,7 +26,7 @@ var namespacerapidjson =
     [ "Handler", "classrapidjson_1_1_handler.html", null ],
     [ "MemoryPoolAllocator", "classrapidjson_1_1_memory_pool_allocator.html", "classrapidjson_1_1_memory_pool_allocator" ],
     [ "MemoryStream", "structrapidjson_1_1_memory_stream.html", "structrapidjson_1_1_memory_stream" ],
-    [ "ParseResult", "structrapidjson_1_1_parse_result.html", "structrapidjson_1_1_parse_result" ],
+    [ "ParseResult", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_structrapidjson_1_1_parse_result" ],
     [ "PrettyWriter", "classrapidjson_1_1_pretty_writer.html", "classrapidjson_1_1_pretty_writer" ],
     [ "Stream", "classrapidjson_1_1_stream.html", null ],
     [ "StreamTraits", "structrapidjson_1_1_stream_traits.html", "structrapidjson_1_1_stream_traits" ],

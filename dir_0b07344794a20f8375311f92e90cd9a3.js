@@ -13,7 +13,7 @@ var dir_0b07344794a20f8375311f92e90cd9a3 =
     [ "memorystream.h", "memorystream_8h_source.html", null ],
     [ "prettywriter.h", "prettywriter_8h_source.html", null ],
     [ "rapidjson.h", "rapidjson_8h.html", "rapidjson_8h" ],
-    [ "reader.h", "reader_8h_source.html", null ],
+    [ "reader.h", "reader_8h.html", "reader_8h" ],
     [ "stringbuffer.h", "stringbuffer_8h_source.html", null ],
     [ "writer.h", "writer_8h_source.html", null ]
 ];

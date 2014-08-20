@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['offset',['Offset',['../structrapidjson_1_1_parse_result.html#a056e5792c1554fbc05b5f1cc168d82ae',1,'rapidjson::ParseResult']]],
-  ['operator_20bool',['operator bool',['../structrapidjson_1_1_parse_result.html#ac8865f9231951740a99d3f3ab10f9a4e',1,'rapidjson::ParseResult']]],
+  ['offset',['Offset',['../group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a056e5792c1554fbc05b5f1cc168d82ae',1,'rapidjson::ParseResult']]],
+  ['operator_20bool',['operator bool',['../group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ac8865f9231951740a99d3f3ab10f9a4e',1,'rapidjson::ParseResult']]],
   ['operator_20const_20ch_20_2a',['operator const Ch *',['../structrapidjson_1_1_generic_string_ref.html#af535787e3593802222f7b3f3096beff0',1,'rapidjson::GenericStringRef']]],
   ['operator_21_3d',['operator!=',['../classrapidjson_1_1_generic_value.html#a0c0d84589cdfb9f8990e92483ef9a466',1,'rapidjson::GenericValue']]],
   ['operator_2d',['operator-',['../classrapidjson_1_1_generic_member_iterator.html#ad13508f46ee9db2dd81576ebd0de7b72',1,'rapidjson::GenericMemberIterator']]],

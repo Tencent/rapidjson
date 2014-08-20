@@ -6,5 +6,6 @@ var classrapidjson_1_1_generic_reader =
     [ "GetParseErrorCode", "classrapidjson_1_1_generic_reader.html#a40fd326bad7d7033f096b549cbf159db", null ],
     [ "HasParseError", "classrapidjson_1_1_generic_reader.html#a46ded2951b8fa395ed421989d66e71fe", null ],
     [ "Parse", "classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b", null ],
-    [ "Parse", "classrapidjson_1_1_generic_reader.html#a2bac14d193873d661d79ad000473a908", null ]
+    [ "Parse", "classrapidjson_1_1_generic_reader.html#a2bac14d193873d661d79ad000473a908", null ],
+    [ "SetParseError", "classrapidjson_1_1_generic_reader.html#a544704abdce535d93ae0f45d0cf0bc0d", null ]
 ];

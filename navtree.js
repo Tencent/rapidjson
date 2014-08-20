@@ -102,7 +102,7 @@ var NAVTREE =
       ] ]
     ] ],
     [ "FAQ", "md_doc_faq.html", null ],
-    [ "Todo List", "todo.html", null ],
+    [ "Modules", "modules.html", "modules" ],
     [ "Namespace Members", "namespacemembers.html", [
       [ "All", "namespacemembers.html", null ],
       [ "Functions", "namespacemembers_func.html", null ],
@@ -134,8 +134,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "allocators_8h_source.html",
-"classrapidjson_1_1_generic_value.html#aec193a145bd3e2d21a7896e2faa2a608",
-"structrapidjson_1_1_generic_insitu_string_stream.html#a3a7ed47ee193d1e5f850aa841b743631"
+"classrapidjson_1_1_generic_value.html#ae6351043ec30d8a151b0a072cfbc46d5",
+"md_doc_tutorial.html#DeepCopyValue"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
