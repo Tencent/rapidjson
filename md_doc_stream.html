@@ -109,7 +109,7 @@ Memory Streams</h1>
 <h2><a class="anchor" id="StringStream"></a>
 StringStream (Input)</h2>
 <p><code>StringStream</code> is the most basic input stream. It represents a complete, read-only JSON stored in memory. It is defined in <code><a class="el" href="rapidjson_8h.html" title="common definitions and configuration ">rapidjson/rapidjson.h</a></code>.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/document.h&quot;</span> <span class="comment">// will include &quot;rapidjson/rapidjson.h&quot;</span></div>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="document_8h.html">rapidjson/document.h</a>&quot;</span> <span class="comment">// will include &quot;rapidjson/rapidjson.h&quot;</span></div>
 <div class="line"></div>
 <div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
 <div class="line"></div>
@@ -195,7 +195,7 @@ Encoded Streams</h1>
 <h2><a class="anchor" id="EncodedInputStream"></a>
 EncodedInputStream</h2>
 <p><code>EncodedInputStream</code> has two template parameters. The first one is a <code>Encoding</code> class, such as <code>UTF8</code>, <code>UTF16LE</code>, defined in <code><a class="el" href="encodings_8h_source.html">rapidjson/encodings.h</a></code>. The second one is the class of stream to be wrapped.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/document.h&quot;</span></div>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="document_8h.html">rapidjson/document.h</a>&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/filereadstream.h&quot;</span>   <span class="comment">// FileReadStream</span></div>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/encodedstream.h&quot;</span>    <span class="comment">// EncodedInputStream</span></div>
 <div class="line"><span class="preprocessor">#include &lt;cstdio&gt;</span></div>
@@ -239,7 +239,7 @@ EncodedOutputStream</h2>
 AutoUTFInputStream</h2>
 <p>Sometimes an application may want to handle all supported JSON encoding. <code>AutoUTFInputStream</code> will detection encoding by BOM first. If BOM is unavailable, it will use characteristics of valid JSON to make detection. If neither method success, it falls back to the UTF type provided in constructor.</p>
 <p>Since the characters (code units) may be 8-bit, 16-bit or 32-bit. <code>AutoUTFInputStream</code> requires a character type which can hold at least 32-bit. We may use <code>unsigned</code>, as in the template parameter:</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/document.h&quot;</span></div>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="document_8h.html">rapidjson/document.h</a>&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/filereadstream.h&quot;</span>   <span class="comment">// FileReadStream</span></div>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/encodedstream.h&quot;</span>    <span class="comment">// AutoUTFInputStream</span></div>
 <div class="line"><span class="preprocessor">#include &lt;cstdio&gt;</span></div>

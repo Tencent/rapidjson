@@ -338,6 +338,10 @@ template&lt;typename Stream , typename Ch &gt; </td></tr>
 <tr class="memitem:a578c51ab574a50a9c760b9da7c7562f2"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structrapidjson_1_1_generic_string_ref.html">GenericStringRef</a>&lt; CharType &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a578c51ab574a50a9c760b9da7c7562f2">StringRef</a> (const CharType *str, size_t length)</td></tr>
 <tr class="memdesc:a578c51ab574a50a9c760b9da7c7562f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mark a character pointer as constant string.  <a href="#a578c51ab574a50a9c760b9da7c7562f2">More...</a><br /></td></tr>
 <tr class="separator:a578c51ab574a50a9c760b9da7c7562f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af94951529a5d51e8c4e6e770bb707c1f"><td class="memTemplParams" colspan="2">template&lt;typename CharType &gt; </td></tr>
+<tr class="memitem:af94951529a5d51e8c4e6e770bb707c1f"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="structrapidjson_1_1_generic_string_ref.html">GenericStringRef</a>&lt; CharType &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#af94951529a5d51e8c4e6e770bb707c1f">StringRef</a> (const std::basic_string&lt; CharType &gt; &amp;str)</td></tr>
+<tr class="memdesc:af94951529a5d51e8c4e6e770bb707c1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mark a string object as constant string.  <a href="#af94951529a5d51e8c4e6e770bb707c1f">More...</a><br /></td></tr>
+<tr class="separator:af94951529a5d51e8c4e6e770bb707c1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gabdaf1a7a4db30fb0e3d927fdf0fabe79"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7e4636fd48d0148f102b8a13f0539d8c">RAPIDJSON_ERROR_CHARTYPE</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a> (<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> parseErrorCode)</td></tr>
 <tr class="memdesc:gabdaf1a7a4db30fb0e3d927fdf0fabe79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps error code of parsing into error message.  <a href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">More...</a><br /></td></tr>
 <tr class="separator:gabdaf1a7a4db30fb0e3d927fdf0fabe79"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -611,6 +615,49 @@ template&lt;typename CharType &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="structrapidjson_1_1_generic_string_ref.html" title="Reference to a constant string (not taking a copy) ">GenericStringRef</a> string reference object </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="af94951529a5d51e8c4e6e770bb707c1f"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename CharType &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structrapidjson_1_1_generic_string_ref.html">GenericStringRef</a>&lt; CharType &gt; StringRef </td>
+          <td>(</td>
+          <td class="paramtype">const std::basic_string&lt; CharType &gt; &amp;&#160;</td>
+          <td class="paramname"><em>str</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Mark a string object as constant string. </p>
+<p>Mark a string object (e.g. <code>std::string</code>) as a "string literal". This function can be used to avoid copying a string to be referenced as a value in a JSON <a class="el" href="classrapidjson_1_1_generic_value.html" title="Represents a JSON value. Use Value for UTF8 encoding and default allocator. ">GenericValue</a> object, if the string's lifetime is known to be valid long enough.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">CharType</td><td>character type of the string </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">str</td><td>Constant string, lifetime assumed to be longer than the use of the string in e.g. a <a class="el" href="classrapidjson_1_1_generic_value.html" title="Represents a JSON value. Use Value for UTF8 encoding and default allocator. ">GenericValue</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="structrapidjson_1_1_generic_string_ref.html" title="Reference to a constant string (not taking a copy) ">GenericStringRef</a> string reference object</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Requires the definition of the preprocessor symbol <a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga2f2eef0ee4477f3fe5874703a66e997f">RAPIDJSON_HAS_STDSTRING</a>. </dd></dl>
 
 </div>
 </div>
