@@ -760,7 +760,8 @@ private:
 
         // Parse int: zero / ( digit1-9 *DIGIT )
         unsigned i = 0;
-        bool try64bit = false;
+        uint64_t i64 = 0;
+        bool use64bit = false;
         if (s.Peek() == '0') {
             i = 0;
             s.Take();
@@ -772,7 +773,8 @@ private:
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
                     if (i >= 214748364) { // 2^31 = 2147483648
                         if (i != 214748364 || s.Peek() > '8') {
-                            try64bit = true;
+                            i64 = i;
+                            use64bit = true;
                             break;
                         }
                     }
@@ -782,7 +784,8 @@ private:
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
                     if (i >= 429496729) { // 2^32 - 1 = 4294967295
                         if (i != 429496729 || s.Peek() > '5') {
-                            try64bit = true;
+                            i64 = i;
+                            use64bit = true;
                             break;
                         }
                     }
@@ -793,14 +796,14 @@ private:
             RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
 
         // Parse 64bit int
-        uint64_t i64 = 0;
+        double d = 0.0;
         bool useDouble = false;
-        if (try64bit) {
-            i64 = i;
+        if (use64bit) {
             if (minus) 
                 while (s.Peek() >= '0' && s.Peek() <= '9') {                    
-                    if (i64 >= RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC)) // 2^63 = 9223372036854775808
+                     if (i64 >= RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC)) // 2^63 = 9223372036854775808
                         if (i64 != RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC) || s.Peek() > '8') {
+                            d = (double)i64;
                             useDouble = true;
                             break;
                         }
@@ -810,6 +813,7 @@ private:
                 while (s.Peek() >= '0' && s.Peek() <= '9') {                    
                     if (i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999)) // 2^64 - 1 = 18446744073709551615
                         if (i64 != RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) || s.Peek() > '5') {
+                            d = (double)i64;
                             useDouble = true;
                             break;
                         }
@@ -818,9 +822,7 @@ private:
         }
 
         // Force double for big integer
-        double d = 0.0;
         if (useDouble) {
-            d = (double)i64;
             while (s.Peek() >= '0' && s.Peek() <= '9') {
                 if (d >= 1.7976931348623157e307) // DBL_MAX / 10.0
                     RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
@@ -831,33 +833,46 @@ private:
         // Parse frac = decimal-point 1*DIGIT
         int expFrac = 0;
         if (s.Peek() == '.') {
-            if (!useDouble) {
-                d = try64bit ? (double)i64 : (double)i;
-                useDouble = true;
-            }
             s.Take();
 
-            if (s.Peek() >= '0' && s.Peek() <= '9') {
+#if RAPIDJSON_64BIT
+            // Use i64 to store significand in 64-bit architecture
+            if (!useDouble) {
+                if (!use64bit)
+                    i64 = i;
+        
+                while (s.Peek() >= '0' && s.Peek() <= '9') {
+                    if (i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999))
+                        break;
+                    else {
+                        i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
+                        --expFrac;
+                    }
+                }
+
+                d = (double)i64;
+            }
+#else
+            // Use double to store significand in 32-bit architecture
+            if (!useDouble)
+                d = use64bit ? (double)i64 : (double)i;
+#endif
+            useDouble = true;
+
+            while (s.Peek() >= '0' && s.Peek() <= '9') {
                 d = d * 10 + (s.Take() - '0');
                 --expFrac;
             }
-            else
-                RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, s.Tell());
 
-            while (s.Peek() >= '0' && s.Peek() <= '9') {
-                if (expFrac > -16) {
-                    d = d * 10 + (s.Peek() - '0');
-                    --expFrac;
-                }
-                s.Take();
-            }
+            if (expFrac == 0)
+                RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, s.Tell());
         }
 
         // Parse exp = e [ minus / plus ] 1*DIGIT
         int exp = 0;
         if (s.Peek() == 'e' || s.Peek() == 'E') {
             if (!useDouble) {
-                d = try64bit ? (double)i64 : (double)i;
+                d = use64bit ? (double)i64 : (double)i;
                 useDouble = true;
             }
             s.Take();
@@ -900,7 +915,7 @@ private:
             cont = handler.Double(minus ? -d : d);
         }
         else {
-            if (try64bit) {
+            if (use64bit) {
                 if (minus)
                     cont = handler.Int64(-(int64_t)i64);
                 else
