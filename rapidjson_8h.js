@@ -5,6 +5,7 @@ var rapidjson_8h =
     [ "StreamTraits< GenericStringStream< Encoding > >", "structrapidjson_1_1_stream_traits_3_01_generic_string_stream_3_01_encoding_01_4_01_4.html", "structrapidjson_1_1_stream_traits_3_01_generic_string_stream_3_01_encoding_01_4_01_4" ],
     [ "GenericInsituStringStream", "structrapidjson_1_1_generic_insitu_string_stream.html", "structrapidjson_1_1_generic_insitu_string_stream" ],
     [ "StreamTraits< GenericInsituStringStream< Encoding > >", "structrapidjson_1_1_stream_traits_3_01_generic_insitu_string_stream_3_01_encoding_01_4_01_4.html", "structrapidjson_1_1_stream_traits_3_01_generic_insitu_string_stream_3_01_encoding_01_4_01_4" ],
+    [ "RAPIDJSON_64BIT", "rapidjson_8h.html#a93973847cb99354b6b5bb5605aa7fe52", null ],
     [ "RAPIDJSON_ALIGN", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242", null ],
     [ "RAPIDJSON_ASSERT", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c", null ],
     [ "RAPIDJSON_BIGENDIAN", "rapidjson_8h.html#ac7951ebf8a2624ab85d2dcd3ec7af974", null ],
