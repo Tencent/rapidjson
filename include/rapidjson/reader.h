@@ -242,57 +242,34 @@ void SkipWhitespace(InputStream& is) {
 #ifdef RAPIDJSON_SSE42
 //! Skip whitespace with SSE 4.2 pcmpistrm instruction, testing 16 8-byte characters at once.
 inline const char *SkipWhitespace_SIMD(const char* p) {
-    static const char whitespace[16] = " \n\r\t";
-    static const char whitespaces[4][17] = {
-        "                ",
-        "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
-        "\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r",
-        "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"};
+	// Fast return for single non-whitespace
+	if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
+		++p;
+	else
+		return p;
 
-    // 16-byte align to the lower boundary
-    const char* ap = reinterpret_cast<const char*>(reinterpret_cast<size_t>(p) & ~15);
+	// 16-byte align to the next boundary
+	const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & ~15);
+	while (p != nextAligned)
+		if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
+			++p;
+		else
+			return p;
 
-    // Test first unaligned characters
-    // Cannot make use of _mm_cmpistrm() because it stops when encounters '\0' before p
-    if (ap != p) {
-        const __m128i w0 = _mm_loadu_si128((const __m128i *)&whitespaces[0][0]);
-        const __m128i w1 = _mm_loadu_si128((const __m128i *)&whitespaces[1][0]);
-        const __m128i w2 = _mm_loadu_si128((const __m128i *)&whitespaces[2][0]);
-        const __m128i w3 = _mm_loadu_si128((const __m128i *)&whitespaces[3][0]);
+    // The rest of string using SIMD
+	static const char whitespace[16] = " \n\r\t";
+	const __m128i w = _mm_loadu_si128((const __m128i *)&whitespace[0]);
 
-        unsigned char shift = reinterpret_cast<size_t>(p) & 15;
-        const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i*>(ap));
-        __m128i x = _mm_cmpeq_epi8(s, w0);
-        x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w1));
-        x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w2));
-        x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w3));
-        unsigned short r = (unsigned short)~_mm_movemask_epi8(x);
-        r = r >> shift << shift; // Clear results before p
-        if (r != 0) {
-#ifdef _MSC_VER     // Find the index of first non-whitespace
-            unsigned long offset;
-            _BitScanForward(&offset, r);
-            return ap + offset;
-#else
-            return ap + __builtin_ffs(r) - 1;
-#endif
-        }
-        ap += 16;
-    }
-
-    const __m128i w = _mm_loadu_si128((const __m128i *)&whitespace[0]);
-
-    // The rest of string
-    for (;; ap += 16) {
-        const __m128i s = _mm_load_si128((const __m128i *)ap);
+    for (;; p += 16) {
+        const __m128i s = _mm_load_si128((const __m128i *)p);
         const unsigned r = _mm_cvtsi128_si32(_mm_cmpistrm(w, s, _SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_BIT_MASK | _SIDD_NEGATIVE_POLARITY));
         if (r != 0) {   // some of characters is non-whitespace
 #ifdef _MSC_VER         // Find the index of first non-whitespace
             unsigned long offset;
             _BitScanForward(&offset, r);
-            return ap + offset;
+            return p + offset;
 #else
-            return ap + __builtin_ffs(r) - 1;
+            return p + __builtin_ffs(r) - 1;
 #endif
         }
     }
@@ -302,45 +279,34 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
 
 //! Skip whitespace with SSE2 instructions, testing 16 8-byte characters at once.
 inline const char *SkipWhitespace_SIMD(const char* p) {
-    static const char whitespaces[4][17] = {
-        "                ",
-        "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
-        "\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r",
-        "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"};
+	// Fast return for single non-whitespace
+	if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
+		++p;
+	else
+		return p;
 
-    const __m128i w0 = _mm_loadu_si128((const __m128i *)&whitespaces[0][0]);
-    const __m128i w1 = _mm_loadu_si128((const __m128i *)&whitespaces[1][0]);
-    const __m128i w2 = _mm_loadu_si128((const __m128i *)&whitespaces[2][0]);
-    const __m128i w3 = _mm_loadu_si128((const __m128i *)&whitespaces[3][0]);
-
-    // 16-byte align to the lower boundary
-    const char* ap = reinterpret_cast<const char*>(reinterpret_cast<size_t>(p) & ~15);
-
-    // Test first unaligned characters
-    if (ap != p) {
-        unsigned char shift = reinterpret_cast<size_t>(p) & 15;
-        const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i*>(ap));
-        __m128i x = _mm_cmpeq_epi8(s, w0);
-        x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w1));
-        x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w2));
-        x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w3));
-        unsigned short r = (unsigned short)~_mm_movemask_epi8(x);
-        r = r >> shift << shift; // Clear results before p
-        if (r != 0) {
-#ifdef _MSC_VER     // Find the index of first non-whitespace
-            unsigned long offset;
-            _BitScanForward(&offset, r);
-            return ap + offset;
-#else
-            return ap + __builtin_ffs(r) - 1;
-#endif
-        }
-        ap += 16;
-    }
+    // 16-byte align to the next boundary
+	const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & ~15);
+	while (p != nextAligned)
+		if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
+			++p;
+		else
+			return p;
 
     // The rest of string
-    for (;; ap += 16) {
-        const __m128i s = _mm_load_si128((const __m128i *)ap);
+	static const char whitespaces[4][17] = {
+		"                ",
+		"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+		"\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r",
+		"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"};
+
+		const __m128i w0 = _mm_loadu_si128((const __m128i *)&whitespaces[0][0]);
+		const __m128i w1 = _mm_loadu_si128((const __m128i *)&whitespaces[1][0]);
+		const __m128i w2 = _mm_loadu_si128((const __m128i *)&whitespaces[2][0]);
+		const __m128i w3 = _mm_loadu_si128((const __m128i *)&whitespaces[3][0]);
+
+    for (;; p += 16) {
+        const __m128i s = _mm_load_si128((const __m128i *)p);
         __m128i x = _mm_cmpeq_epi8(s, w0);
         x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w1));
         x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w2));
@@ -350,9 +316,9 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
 #ifdef _MSC_VER         // Find the index of first non-whitespace
             unsigned long offset;
             _BitScanForward(&offset, r);
-            return ap + offset;
+            return p + offset;
 #else
-            return ap + __builtin_ffs(r) - 1;
+            return p + __builtin_ffs(r) - 1;
 #endif
         }
     }
@@ -760,7 +726,8 @@ private:
 
         // Parse int: zero / ( digit1-9 *DIGIT )
         unsigned i = 0;
-        bool try64bit = false;
+        uint64_t i64 = 0;
+        bool use64bit = false;
         if (s.Peek() == '0') {
             i = 0;
             s.Take();
@@ -772,7 +739,8 @@ private:
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
                     if (i >= 214748364) { // 2^31 = 2147483648
                         if (i != 214748364 || s.Peek() > '8') {
-                            try64bit = true;
+                            i64 = i;
+                            use64bit = true;
                             break;
                         }
                     }
@@ -782,7 +750,8 @@ private:
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
                     if (i >= 429496729) { // 2^32 - 1 = 4294967295
                         if (i != 429496729 || s.Peek() > '5') {
-                            try64bit = true;
+                            i64 = i;
+                            use64bit = true;
                             break;
                         }
                     }
@@ -793,14 +762,14 @@ private:
             RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
 
         // Parse 64bit int
-        uint64_t i64 = 0;
+        double d = 0.0;
         bool useDouble = false;
-        if (try64bit) {
-            i64 = i;
+        if (use64bit) {
             if (minus) 
                 while (s.Peek() >= '0' && s.Peek() <= '9') {                    
-                    if (i64 >= RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC)) // 2^63 = 9223372036854775808
+                     if (i64 >= RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC)) // 2^63 = 9223372036854775808
                         if (i64 != RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC) || s.Peek() > '8') {
+                            d = (double)i64;
                             useDouble = true;
                             break;
                         }
@@ -810,6 +779,7 @@ private:
                 while (s.Peek() >= '0' && s.Peek() <= '9') {                    
                     if (i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999)) // 2^64 - 1 = 18446744073709551615
                         if (i64 != RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) || s.Peek() > '5') {
+                            d = (double)i64;
                             useDouble = true;
                             break;
                         }
@@ -818,9 +788,7 @@ private:
         }
 
         // Force double for big integer
-        double d = 0.0;
         if (useDouble) {
-            d = (double)i64;
             while (s.Peek() >= '0' && s.Peek() <= '9') {
                 if (d >= 1.7976931348623157e307) // DBL_MAX / 10.0
                     RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
@@ -831,33 +799,46 @@ private:
         // Parse frac = decimal-point 1*DIGIT
         int expFrac = 0;
         if (s.Peek() == '.') {
-            if (!useDouble) {
-                d = try64bit ? (double)i64 : (double)i;
-                useDouble = true;
-            }
             s.Take();
 
-            if (s.Peek() >= '0' && s.Peek() <= '9') {
+#if RAPIDJSON_64BIT
+            // Use i64 to store significand in 64-bit architecture
+            if (!useDouble) {
+                if (!use64bit)
+                    i64 = i;
+        
+                while (s.Peek() >= '0' && s.Peek() <= '9') {
+                    if (i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999))
+                        break;
+                    else {
+                        i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
+                        --expFrac;
+                    }
+                }
+
+                d = (double)i64;
+            }
+#else
+            // Use double to store significand in 32-bit architecture
+            if (!useDouble)
+                d = use64bit ? (double)i64 : (double)i;
+#endif
+            useDouble = true;
+
+            while (s.Peek() >= '0' && s.Peek() <= '9') {
                 d = d * 10 + (s.Take() - '0');
                 --expFrac;
             }
-            else
-                RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, s.Tell());
 
-            while (s.Peek() >= '0' && s.Peek() <= '9') {
-                if (expFrac > -16) {
-                    d = d * 10 + (s.Peek() - '0');
-                    --expFrac;
-                }
-                s.Take();
-            }
+            if (expFrac == 0)
+                RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, s.Tell());
         }
 
         // Parse exp = e [ minus / plus ] 1*DIGIT
         int exp = 0;
         if (s.Peek() == 'e' || s.Peek() == 'E') {
             if (!useDouble) {
-                d = try64bit ? (double)i64 : (double)i;
+                d = use64bit ? (double)i64 : (double)i;
                 useDouble = true;
             }
             s.Take();
@@ -900,7 +881,7 @@ private:
             cont = handler.Double(minus ? -d : d);
         }
         else {
-            if (try64bit) {
+            if (use64bit) {
                 if (minus)
                     cont = handler.Int64(-(int64_t)i64);
                 else
