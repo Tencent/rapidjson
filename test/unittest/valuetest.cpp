@@ -852,6 +852,31 @@ TEST(Value, Object) {
     ++citr;
     EXPECT_FALSE(citr != y.MemberEnd());
 
+    // member iterator conversions/relations
+    itr  = x.MemberBegin();
+    citr = x.MemberBegin(); // const conversion
+    TestEqual(itr, citr);
+    EXPECT_TRUE(itr < x.MemberEnd());
+    EXPECT_FALSE(itr > y.MemberEnd());
+    EXPECT_TRUE(citr < x.MemberEnd());
+    EXPECT_FALSE(citr > y.MemberEnd());
+    ++citr;
+    TestUnequal(itr, citr);
+    EXPECT_FALSE(itr < itr);
+    EXPECT_TRUE(itr < citr);
+    EXPECT_FALSE(itr > itr);
+    EXPECT_TRUE(citr > itr);
+    EXPECT_EQ(1, citr - x.MemberBegin());
+    EXPECT_EQ(0, itr - y.MemberBegin());
+    itr += citr - x.MemberBegin();
+    EXPECT_EQ(1, itr - y.MemberBegin());
+    TestEqual(citr, itr);
+    EXPECT_TRUE(itr <= citr);
+    EXPECT_TRUE(citr <= itr);
+    itr++;
+    EXPECT_TRUE(itr >= citr);
+    EXPECT_FALSE(citr >= itr);
+
     // RemoveMember()
     x.RemoveMember("A");
     EXPECT_FALSE(x.HasMember("A"));
