@@ -1012,9 +1012,9 @@ public:
         RAPIDJSON_ASSERT(last <= MemberEnd());
 
         MemberIterator pos = MemberBegin() + (first - MemberBegin());
-        for (MemberIterator itr = pos; ConstMemberIterator(itr) != last; ++itr)
+        for (MemberIterator itr = pos; itr != last; ++itr)
             itr->~Member();
-        memmove(&*pos, &*last, (ConstMemberIterator(MemberEnd()) - last) * sizeof(Member));
+        memmove(&*pos, &*last, (MemberEnd() - last) * sizeof(Member));
         data_.o.size -= (last - first);
         return pos;
     }
