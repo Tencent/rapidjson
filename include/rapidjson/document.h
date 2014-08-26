@@ -1265,7 +1265,7 @@ int z = a[0u].GetInt();             // This works too.
     */
     GenericValue& SetString(const Ch* s, Allocator& allocator) { return SetString(s, internal::StrLen(s), allocator); }
 
-#if RAPIDJSON_HAS_STDSTRING
+#ifdef RAPIDJSON_HAS_STDSTRING
     //! Set this value as a string by copying from source string.
     /*! \param s source string.
         \param allocator Allocator for allocating copied buffer. Commonly use GenericDocument::GetAllocator().
