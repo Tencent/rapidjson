@@ -685,6 +685,11 @@ public:
     */
     template <typename T> RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>, bool) operator==(const T& rhs) const { return *this == GenericValue(rhs); }
 
+    //! Not-equal-to operator
+    /*! \return !(*this == rhs)
+     */
+    bool operator!=(const GenericValue& rhs) const { return !(*this == rhs); }
+
     //! Not-equal-to operator with arbitrary types
     /*! \return !(*this == rhs)
      */
