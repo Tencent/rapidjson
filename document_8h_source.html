@@ -617,7 +617,7 @@ $(document).ready(function(){initNavTree('document_8h_source.html','');});
 <div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;</div>
 <div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;            <span class="keywordflow">case</span> kObjectFlag:</div>
 <div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;                <span class="keywordflow">for</span> (<a class="code" href="classrapidjson_1_1_generic_member_iterator.html">MemberIterator</a> m = <a class="code" href="classrapidjson_1_1_generic_value.html#a469c0cc3e72f846757fb64fa52fafee5">MemberBegin</a>(); m != <a class="code" href="classrapidjson_1_1_generic_value.html#a88d2c5b861cd8a6a14976456dfbc1f64">MemberEnd</a>(); ++m) {</div>
-<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;                    m-&gt;~GenericMember();</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;                    m-&gt;~Member();</div>
 <div class="line"><a name="l00539"></a><span class="lineno">  539</span>&#160;                }</div>
 <div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;                Allocator::Free(data_.o.members);</div>
 <div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;                <span class="keywordflow">break</span>;</div>
@@ -1059,7 +1059,7 @@ $(document).ready(function(){initNavTree('document_8h_source.html','');});
 <div class="line"><a name="l00977"></a><span class="lineno">  977</span>&#160;        }</div>
 <div class="line"><a name="l00978"></a><span class="lineno">  978</span>&#160;        <span class="keywordflow">else</span> {</div>
 <div class="line"><a name="l00979"></a><span class="lineno">  979</span>&#160;            <span class="comment">// Only one left, just destroy</span></div>
-<div class="line"><a name="l00980"></a><span class="lineno">  980</span>&#160;            m-&gt;~GenericMember();</div>
+<div class="line"><a name="l00980"></a><span class="lineno">  980</span>&#160;            m-&gt;~Member();</div>
 <div class="line"><a name="l00981"></a><span class="lineno">  981</span>&#160;        }</div>
 <div class="line"><a name="l00982"></a><span class="lineno">  982</span>&#160;        --data_.o.size;</div>
 <div class="line"><a name="l00983"></a><span class="lineno">  983</span>&#160;        <span class="keywordflow">return</span> m;</div>
