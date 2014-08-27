@@ -534,9 +534,8 @@ public:
                 break;
 
             case kObjectFlag:
-                for (MemberIterator m = MemberBegin(); m != MemberEnd(); ++m) {
+                for (MemberIterator m = MemberBegin(); m != MemberEnd(); ++m)
                     m->~Member();
-                }
                 Allocator::Free(data_.o.members);
                 break;
 
@@ -745,6 +744,12 @@ public:
     /*! \post IsObject() == true */
     GenericValue& SetObject() { this->~GenericValue(); new (this) GenericValue(kObjectType); return *this; }
 
+    //! Get the number of members in the object.
+    SizeType MemberCount() const { RAPIDJSON_ASSERT(IsObject()); return data_.o.size; }
+
+    //! Check whether the object is empty.
+    bool MemberEmpty() const { RAPIDJSON_ASSERT(IsObject()); return data_.o.size == 0; }
+
     //! Get the value associated with the name.
     /*!
         \note In version 0.1x, if the member is not found, this function returns a null value. This makes issue 7.
@@ -934,6 +939,17 @@ public:
         GenericValue n(name);
         GenericValue v(value);
         return AddMember(n, v, allocator);
+    }
+
+    //! Remove all members in the object.
+    /*! This function do not deallocate memory in the object, i.e. the capacity is unchanged.
+        \note Linear time complexity.
+    */
+    void RemoveAllMembers() {
+        RAPIDJSON_ASSERT(IsObject()); 
+        for (MemberIterator m = MemberBegin(); m != MemberEnd(); ++m)
+            m->~Member();
+        data_.o.size = 0;
     }
 
     //! Remove a member in object by its name.
