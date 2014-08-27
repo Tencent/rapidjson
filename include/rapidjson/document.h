@@ -535,7 +535,7 @@ public:
 
             case kObjectFlag:
                 for (MemberIterator m = MemberBegin(); m != MemberEnd(); ++m) {
-                    m->~GenericMember();
+                    m->~Member();
                 }
                 Allocator::Free(data_.o.members);
                 break;
@@ -977,7 +977,7 @@ public:
         }
         else {
             // Only one left, just destroy
-            m->~GenericMember();
+            m->~Member();
         }
         --data_.o.size;
         return m;
