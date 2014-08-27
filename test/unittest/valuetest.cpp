@@ -106,15 +106,35 @@ TEST(Value, equalto_operator) {
     TestEqual(x["pi"], 3.14);
 
     // Test operator==()
+#ifdef RAPIDJSON_COMPARE_DIFFERENT_ALLOCATORS
+    CrtAllocator crtAllocator;
+    GenericValue<UTF8<>, CrtAllocator> y;
+    GenericDocument<UTF8<>, CrtAllocator> z(&crtAllocator);
+    CrtAllocator& yAllocator = crtAllocator;
+#else
+    Value::AllocatorType& yAllocator = allocator;
     Value y;
-    y.CopyFrom(x, allocator);
+    Document z;
+#endif // RAPIDJSON_COMPARE_DIFFERENT_ALLOCATORS
+    y.CopyFrom(x, yAllocator);
+    z.CopyFrom(y, z.GetAllocator());
+
     TestEqual(x, y);
+    TestEqual(y, z);
+    TestEqual(z, x);
 
     // Swapping member order should be fine.
-    y.RemoveMember("t");
+    EXPECT_TRUE(y.RemoveMember("t"));
     TestUnequal(x, y);
-    y.AddMember("t", Value(true).Move(), allocator);
+    TestUnequal(z, y);
+    EXPECT_TRUE(z.RemoveMember("t"));
+    TestUnequal(x, z);
+    TestEqual(y, z);
+    y.AddMember("t", true, yAllocator);
+    z.AddMember("t", true, z.GetAllocator());
     TestEqual(x, y);
+    TestEqual(y, z);
+    TestEqual(z, x);
 }
 
 template <typename Value>
