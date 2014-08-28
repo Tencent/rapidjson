@@ -67,13 +67,21 @@ inline Ch* StrDup(const Ch* str) {
     return buffer;
 }
 
-inline void TempFilename(char *filename) {
+inline FILE* TempFile(char *filename) {
+#if _MSC_VER
     filename = tmpnam(filename);
 
     // For Visual Studio, tmpnam() adds a backslash in front. Remove it.
     if (filename[0] == '\\')
         for (int i = 0; filename[i] != '\0'; i++)
             filename[i] = filename[i + 1];
+        
+    return fopen(filename, "wb");
+#else
+    strcpy(filename, "/tmp/fileXXXXXX");
+    int fd = mkstemp(filename);
+    return fdopen(fd, "w");
+#endif
 }
 
 // Use exception for catching assert

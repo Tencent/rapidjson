@@ -98,9 +98,8 @@ TEST_F(FileStreamTest, FileReadStream) {
 
 TEST_F(FileStreamTest, FileWriteStream) {
     char filename[L_tmpnam];
-    TempFilename(filename);
+    FILE* fp = TempFile(filename);
 
-    FILE *fp = fopen(filename, "wb");
     char buffer[65536];
     FileWriteStream os(fp, buffer, sizeof(buffer));
     for (size_t i = 0; i < length_; i++)
