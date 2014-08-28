@@ -748,7 +748,7 @@ public:
     SizeType MemberCount() const { RAPIDJSON_ASSERT(IsObject()); return data_.o.size; }
 
     //! Check whether the object is empty.
-    bool MemberEmpty() const { RAPIDJSON_ASSERT(IsObject()); return data_.o.size == 0; }
+    bool ObjectEmpty() const { RAPIDJSON_ASSERT(IsObject()); return data_.o.size == 0; }
 
     //! Get the value associated with the name.
     /*!

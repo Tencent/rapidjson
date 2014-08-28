@@ -763,16 +763,16 @@ TEST(Value, Object) {
 
     EXPECT_EQ(kObjectType, x.GetType());
     EXPECT_TRUE(x.IsObject());
-    EXPECT_TRUE(x.MemberEmpty());
+    EXPECT_TRUE(x.ObjectEmpty());
     EXPECT_EQ(0u, x.MemberCount());
     EXPECT_EQ(kObjectType, y.GetType());
     EXPECT_TRUE(y.IsObject());
-    EXPECT_TRUE(y.MemberEmpty());
+    EXPECT_TRUE(y.ObjectEmpty());
     EXPECT_EQ(0u, y.MemberCount());
 
     // AddMember()
     x.AddMember("A", "Apple", allocator);
-    EXPECT_FALSE(x.MemberEmpty());
+    EXPECT_FALSE(x.ObjectEmpty());
     EXPECT_EQ(1u, x.MemberCount());
 
     Value value("Banana", 6);
@@ -965,7 +965,7 @@ TEST(Value, Object) {
 
     // RemoveAllMembers()
     x.RemoveAllMembers();
-    EXPECT_TRUE(x.MemberEmpty());
+    EXPECT_TRUE(x.ObjectEmpty());
     EXPECT_EQ(0u, x.MemberCount());
 
     // SetObject()
