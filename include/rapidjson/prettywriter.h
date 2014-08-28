@@ -35,12 +35,12 @@ namespace rapidjson {
     \tparam OutputStream Type of ouptut os.
     \tparam SourceEncoding Encoding of source string.
     \tparam TargetEncoding Encoding of output stream.
-    \tparam Allocator Type of allocator for allocating memory of stack.
+    \tparam StackAllocator Type of allocator for allocating memory of stack.
 */
-template<typename OutputStream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename Allocator = MemoryPoolAllocator<> >
-class PrettyWriter : public Writer<OutputStream, SourceEncoding, TargetEncoding, Allocator> {
+template<typename OutputStream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename StackAllocator = CrtAllocator>
+class PrettyWriter : public Writer<OutputStream, SourceEncoding, TargetEncoding, StackAllocator> {
 public:
-    typedef Writer<OutputStream, SourceEncoding, TargetEncoding, Allocator> Base;
+    typedef Writer<OutputStream, SourceEncoding, TargetEncoding, StackAllocator> Base;
     typedef typename Base::Ch Ch;
 
     //! Constructor
@@ -48,7 +48,7 @@ public:
         \param allocator User supplied allocator. If it is null, it will create a private one.
         \param levelDepth Initial capacity of stack.
     */
-    PrettyWriter(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
+    PrettyWriter(OutputStream& os, StackAllocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
         Base(os, allocator, levelDepth), indentChar_(' '), indentCharCount_(4) {}
 
     //! Set custom indentation.
