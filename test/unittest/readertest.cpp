@@ -160,6 +160,7 @@ TEST(Reader, ParseNumberHandler) {
     TEST_DOUBLE("1e-10000", 0.0);                                   // must underflow
     TEST_DOUBLE("18446744073709551616", 18446744073709551616.0);    // 2^64 (max of uint64_t + 1, force to use double)
     TEST_DOUBLE("-9223372036854775809", -9223372036854775809.0);    // -2^63 - 1(min of int64_t + 1, force to use double)
+    TEST_DOUBLE("0.9868011474609375", 0.9868011474609375);          // https://github.com/miloyip/rapidjson/issues/120
 
     {
         char n1e308[310];   // '1' followed by 308 '0'
