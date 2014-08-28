@@ -145,7 +145,7 @@ $(document).ready(function(){initNavTree('writer_8h_source.html','');});
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment">        \param levelDepth Initial capacity of stack.</span></div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">    */</span></div>
 <div class="line"><a name="l00065"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_writer.html#ac592904fad01d9d0f29bb0585fb02aa7">   65</a></span>&#160;    <a class="code" href="classrapidjson_1_1_writer.html#ac592904fad01d9d0f29bb0585fb02aa7">Writer</a>(OutputStream&amp; os, StackAllocator* stackAllocator = 0, <span class="keywordtype">size_t</span> levelDepth = kDefaultLevelDepth) : </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        os_(&amp;os), level_stack_(stackAllocator, levelDepth * sizeof(Level)), hasRoot_(false) {}</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        os_(&amp;os), level_stack_(stackAllocator, levelDepth * sizeof(<a class="code" href="structrapidjson_1_1_writer_1_1_level.html">Level</a>)), hasRoot_(false) {}</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <a class="code" href="classrapidjson_1_1_writer.html#ac592904fad01d9d0f29bb0585fb02aa7">Writer</a>(StackAllocator* allocator = 0, <span class="keywordtype">size_t</span> levelDepth = kDefaultLevelDepth) :</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        os_(0), level_stack_(allocator, levelDepth * sizeof(Level)), hasRoot_(false) {}</div>

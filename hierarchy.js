@@ -49,8 +49,7 @@ var hierarchy =
       [ "rapidjson::UTF32LE< CharType >", "structrapidjson_1_1_u_t_f32_l_e.html", null ]
     ] ],
     [ "rapidjson::UTF8< CharType >", "structrapidjson_1_1_u_t_f8.html", null ],
-    [ "rapidjson::Writer< OutputStream, SourceEncoding, TargetEncoding, StackAllocator >", "classrapidjson_1_1_writer.html", null ],
-    [ "rapidjson::Writer< OutputStream, SourceEncoding, TargetEncoding, Allocator >", "classrapidjson_1_1_writer.html", [
-      [ "rapidjson::PrettyWriter< OutputStream, SourceEncoding, TargetEncoding, Allocator >", "classrapidjson_1_1_pretty_writer.html", null ]
+    [ "rapidjson::Writer< OutputStream, SourceEncoding, TargetEncoding, StackAllocator >", "classrapidjson_1_1_writer.html", [
+      [ "rapidjson::PrettyWriter< OutputStream, SourceEncoding, TargetEncoding, StackAllocator >", "classrapidjson_1_1_pretty_writer.html", null ]
     ] ]
 ];
