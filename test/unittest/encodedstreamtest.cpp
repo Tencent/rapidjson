@@ -158,9 +158,7 @@ protected:
         // Test FileWriteStream
         {
             char filename[L_tmpnam];
-            TempFilename(filename);
-
-            FILE *fp = fopen(filename, "wb");
+            FILE* fp = TempFile(filename);
             char buffer[16];
             FileWriteStream os(fp, buffer, sizeof(buffer));
             EncodedOutputStream<FileEncoding, FileWriteStream> eos(os, putBOM);
@@ -193,9 +191,8 @@ protected:
         // Test FileWriteStream
         {
             char filename[L_tmpnam];
-            TempFilename(filename);
+            FILE* fp = TempFile(filename);
 
-            FILE *fp = fopen(filename, "wb");
             char buffer[16];
             FileWriteStream os(fp, buffer, sizeof(buffer));
             AutoUTFOutputStream<unsigned, FileWriteStream> eos(os, type, putBOM);
