@@ -1,5 +1,30 @@
+// Copyright (C) 2011 Milo Yip
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 #ifndef RAPIDJSON_INTERNAL_META_H_
 #define RAPIDJSON_INTERNAL_META_H_
+
+#ifdef __GNUC__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(effc++)
+#endif
 
 //@cond RAPIDJSON_INTERNAL
 namespace rapidjson {
@@ -35,10 +60,10 @@ template <typename T> struct IsPointer<T*> : TrueType {};
 
 template <typename CT, typename T>
 struct IsMoreConst {
-	enum { Value =
-		( IsSame< typename RemoveConst<CT>::Type, typename RemoveConst<T>::Type>::Value
-		&& ( IsConst<CT>::Value >= IsConst<T>::Value ) )
-	};
+    enum { Value =
+        ( IsSame< typename RemoveConst<CT>::Type, typename RemoveConst<T>::Type>::Value
+        && ( IsConst<CT>::Value >= IsConst<T>::Value ) )
+    };
 };
 
 template <bool Condition, typename T = void> struct EnableIfCond;
@@ -60,18 +85,22 @@ template <typename T> struct RemoveSfinaeFptr {};
 template <typename T> struct RemoveSfinaeFptr<SfinaeResultTag&(*)(T)> { typedef T Type; };
 
 #define RAPIDJSON_REMOVEFPTR_(type) \
-	typename ::rapidjson::internal::RemoveSfinaeFptr \
-		< ::rapidjson::internal::SfinaeResultTag&(*) type>::Type
+    typename ::rapidjson::internal::RemoveSfinaeFptr \
+        < ::rapidjson::internal::SfinaeResultTag&(*) type>::Type
 
 #define RAPIDJSON_ENABLEIF(cond) \
-	typename ::rapidjson::internal::EnableIf \
-		<RAPIDJSON_REMOVEFPTR_(cond)>::Type * = NULL
+    typename ::rapidjson::internal::EnableIf \
+        <RAPIDJSON_REMOVEFPTR_(cond)>::Type * = NULL
 
 #define RAPIDJSON_DISABLEIF_RETURN(cond,returntype) \
-	typename ::rapidjson::internal::DisableIf<cond,returntype>::Type
+    typename ::rapidjson::internal::DisableIf<cond,returntype>::Type
 
 } // namespace internal
 } // namespace rapidjson
 //@endcond
+
+#ifdef __GNUC__
+RAPIDJSON_DIAG_POP
+#endif
 
 #endif // RAPIDJSON_INTERNAL_META_H_

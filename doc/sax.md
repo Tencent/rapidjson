@@ -225,7 +225,7 @@ You may doubt that, why not just using `sprintf()` or `std::stringstream` to bui
 There are various reasons:
 1. `Writer` must output a well-formed JSON. If there is incorrect event sequence (e.g. `Int()` just after `StartObject()`), it generates assertion fail in debug mode.
 2. `Writer::String()` can handle string escaping (e.g. converting code point `U+000A` to `\n`) and Unicode transcoding.
-3. `Writer` handles number output consistently. For example, user can set precision for `Double()`.
+3. `Writer` handles number output consistently.
 4. `Writer` implements the event handler concept. It can be used to handle events from `Reader`, `Document` or other event publisher.
 5. `Writer` can be optimized for different platforms.
 
@@ -257,20 +257,6 @@ The `TargetEncoding` template parameter specifies the encoding in the output str
 The last one, `Allocator` is the type of allocator, which is used for allocating internal data structure (a stack).
 
 Besides, the constructor of `Writer` has a `levelDepth` parameter. This parameter affects the initial memory allocated for storing information per hierarchy level.
-
-## Precision (#WriterPrecision)
-
-When using `Double()`, the precision of output can be specified, for example:
-
-~~~~~~~~~~cpp
-writer.SetDoublePrecision(4);
-writer.StartArary();
-writer.Double(3.14159265359);
-writer.EndArray();
-~~~~~~~~~~
-~~~~~~~~~~
-[3.1416]
-~~~~~~~~~~
 
 ## PrettyWriter {#PrettyWriter}
 

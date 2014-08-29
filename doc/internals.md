@@ -119,9 +119,9 @@ In this way the generation of array values or object members would be a single s
 rather than several pop/push operations in the direct implementation.
 This also makes the estimation of stack size more easier.
 
-The final states diagram is shown below:
+The state diagram is shown as follows:
 
-<img src="diagram/iterative-parser-states-diagram.png" alt="States Diagram" height="400px"/>
+![State Diagram](diagram/iterative-parser-states-diagram.png)
 
 Second, the iterative parser also keeps track of array's value count and object's member count
 in its internal stack, which may be different from a conventional implementation.

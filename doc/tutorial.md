@@ -42,7 +42,7 @@ The JSON is now parsed into `document` as a *DOM tree*:
 
 ![DOM in the tutorial](diagram/tutorial.png)
 
-The root of a conforming JSON should be either an object or an array. In this case, the root is an object.
+Since the update to RFC7159, the root of a conforming JSON document can be any JSON value.  In RFC4627, only objects or arrays were allowed as root values. In this case, the root is an object.
 ~~~~~~~~~~cpp
 assert(document.IsObject());
 ~~~~~~~~~~
@@ -222,10 +222,25 @@ The correct length of the value `"a\u0000b"` is 3. But `strlen()` returns 1.
 Besides, `std::string` also support a constructor:
 
 ~~~~~~~~~~cpp
-string( const char* s, size_type count);
+string(const char* s, size_t count);
 ~~~~~~~~~~
 
 which accepts the length of string as parameter. This constructor supports storing null character within the string, and should also provide better performance.
+
+## Comparing values
+
+You can use `==` and `!=` to compare values. Two values are equal if and only if they are have same type and contents. You can also compare values with primitive types. Here is an example.
+
+~~~~~~~~~~cpp
+if (document["hello"] == document["n"]) /*...*/;    // Compare values
+if (document["hello"] == "world") /*...*/;          // Compare value with literal string
+if (document["i"] != 123) /*...*/;                  // Compare with integers
+if (document["pi"] != 3.14) /*...*/;                // Compare with double.
+~~~~~~~~~~
+
+Array and object must be `Value`s in order to be compared. They are equal if and only if their whole subtrees are equal.
+
+Note that, currently if an object contains duplicated named member, comparing equality with any object is always `false`.
 
 # Create/Modify Values {#CreateModifyValues}
 
@@ -380,6 +395,8 @@ Value with array type provides similar APIs as `std::vector`.
 * `Value& PushBack(Value&, Allocator&)`
 * `template <typename T> GenericValue& PushBack(T, Allocator&)`
 * `Value& PopBack()`
+* `ValueIterator Erase(ConstValueIterator pos)`
+* `ValueIterator Erase(ConstValueIterator first, ConstValueIterator last)`
 
 Note that, `Reserve(...)` and `PushBack(...)` may allocate memory for the array elements, therefore require an allocator.
 
@@ -411,12 +428,11 @@ contact.PushBack(val, document.GetAllocator());
 ~~~~~~~~~~
 
 ## Modify Object {#ModifyObject}
-Object is a collection of key-value pairs. Each key must be a string value. The way to manipulating object is to add/remove members:
+Object is a collection of key-value pairs. Each key must be a string value. The way to manipulating object is to add members:
 
 * `Value& AddMember(Value&, Value&, Allocator& allocator)`
 * `Value& AddMember(StringRefType, Value&, Allocator&)`
 * `template <typename T> Value& AddMember(StringRefType, T value, Allocator&)`
-* `bool RemoveMember(const Ch*)`
 
 Here is an example.
 
@@ -442,6 +458,16 @@ Value val(42);                             // some value
 contact.AddMember(key, val, document.GetAllocator());
 ~~~~~~~~~~
 
+For removing members, there are several choices: 
+
+* `bool RemoveMember(const Ch* name)`: Remove a member by search its name (linear time complexity).
+* `bool RemoveMember(const Value& name)`: same as above but `name` is a Value.
+* `MemberIterator RemoveMember(MemberIterator)`: Remove a member by iterator (_constant_ time complexity).
+* `MemberIterator EraseMember(MemberIterator)`: similar to the above but it preserves order of members (linear time complexity).
+* `MemberIterator EraseMember(MemberIterator first, MemberIterator last)`: remove a range of members, preserves order (linear time complexity).
+
+`MemberIterator RemoveMember(MemberIterator)` uses a "move-last" trick to archive constant time complexity. Basically the member at iterator is destructed, and then the last element is moved to that position. So the order of the remaining members are changed.
+
 ## Deep Copy Value {#DeepCopyValue}
 If we really need to copy a DOM tree, we can use two APIs for deep copy: constructor with allocator, and `CopyFrom()`.
 
@@ -458,8 +484,8 @@ assert(v1.IsNull() && v2.IsNull());   // both moved to d
 
 v2.CopyFrom(d, a);                    // copy whole document to v2
 assert(d.IsArray() && d.Size() == 2); // d untouched
-v1.SetObject().AddMember( "array", v2, a );
-d.PushBack(v1,a);
+v1.SetObject().AddMember("array", v2, a);
+d.PushBack(v1, a);
 ~~~~~~~~~~
 
 ## Swap Values {#SwapValues}
@@ -474,7 +500,7 @@ assert(a.IsString());
 assert(b.IsInt());
 ~~~~~~~~~~
 
-Swapping two DOM trees is fast (constant time), despite the complexity of the tress.
+Swapping two DOM trees is fast (constant time), despite the complexity of the trees.
 
 # What's next {#WhatsNext}
 

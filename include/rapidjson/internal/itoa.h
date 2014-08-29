@@ -1,11 +1,28 @@
+// Copyright (C) 2011 Milo Yip
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 #ifndef RAPIDJSON_ITOA_
 #define RAPIDJSON_ITOA_
 
 namespace rapidjson {
 namespace internal {
-
-// Modified from https://github.com/miloyip/itoa-benchmark/blob/master/src/branchlut.cpp
-// API is changed to return the character passed the end of string, without writing '\0'
 
 inline const char* GetDigitsLut() {
     static const char cDigitsLut[200] = {
@@ -98,18 +115,27 @@ inline char* u32toa(uint32_t value, char* buffer) {
 }
 
 inline char* i32toa(int32_t value, char* buffer) {
-	if (value < 0) {
-		*buffer++ = '-';
-		value = -value;
-	}
+    if (value < 0) {
+        *buffer++ = '-';
+        value = -value;
+    }
 
-	return u32toa(static_cast<uint32_t>(value), buffer);
+    return u32toa(static_cast<uint32_t>(value), buffer);
 }
 
 inline char* u64toa(uint64_t value, char* buffer) {
     const char* cDigitsLut = GetDigitsLut();
+    const uint64_t  kTen8 = 100000000;
+    const uint64_t  kTen9 = kTen8 * 10;
+    const uint64_t kTen10 = kTen8 * 100;
+    const uint64_t kTen11 = kTen8 * 1000;
+    const uint64_t kTen12 = kTen8 * 10000;
+    const uint64_t kTen13 = kTen8 * 100000;
+    const uint64_t kTen14 = kTen8 * 1000000;
+    const uint64_t kTen15 = kTen8 * 10000000;
+    const uint64_t kTen16 = kTen8 * kTen8;
     
-    if (value < UINT64_C(100000000)) {
+    if (value < kTen8) {
         uint32_t v = static_cast<uint32_t>(value);
         if (v < 10000) {
             const uint32_t d1 = (v / 100) << 1;
@@ -148,9 +174,9 @@ inline char* u64toa(uint64_t value, char* buffer) {
             *buffer++ = cDigitsLut[d4 + 1];
         }
     }
-    else if (value < UINT64_C(10000000000000000)) {
-        const uint32_t v0 = static_cast<uint32_t>(value / UINT64_C(100000000));
-        const uint32_t v1 = static_cast<uint32_t>(value % UINT64_C(100000000));
+    else if (value < kTen16) {
+        const uint32_t v0 = static_cast<uint32_t>(value / kTen8);
+        const uint32_t v1 = static_cast<uint32_t>(value % kTen8);
         
         const uint32_t b0 = v0 / 10000;
         const uint32_t c0 = v0 % 10000;
@@ -170,21 +196,21 @@ inline char* u64toa(uint64_t value, char* buffer) {
         const uint32_t d7 = (c1 / 100) << 1;
         const uint32_t d8 = (c1 % 100) << 1;
 
-        if (value >= UINT64_C(1000000000000000))
+        if (value >= kTen15)
             *buffer++ = cDigitsLut[d1];
-        if (value >= UINT64_C(100000000000000))
+        if (value >= kTen14)
             *buffer++ = cDigitsLut[d1 + 1];
-        if (value >= UINT64_C(10000000000000))
+        if (value >= kTen13)
             *buffer++ = cDigitsLut[d2];
-        if (value >= UINT64_C(1000000000000))
+        if (value >= kTen12)
             *buffer++ = cDigitsLut[d2 + 1];
-        if (value >= UINT64_C(100000000000))
+        if (value >= kTen11)
             *buffer++ = cDigitsLut[d3];
-        if (value >= UINT64_C(10000000000))
+        if (value >= kTen10)
             *buffer++ = cDigitsLut[d3 + 1];
-        if (value >= UINT64_C(1000000000))
+        if (value >= kTen9)
             *buffer++ = cDigitsLut[d4];
-        if (value >= UINT64_C(100000000))
+        if (value >= kTen8)
             *buffer++ = cDigitsLut[d4 + 1];
         
         *buffer++ = cDigitsLut[d5];
@@ -197,8 +223,8 @@ inline char* u64toa(uint64_t value, char* buffer) {
         *buffer++ = cDigitsLut[d8 + 1];
     }
     else {
-        const uint32_t a = static_cast<uint32_t>(value / UINT64_C(10000000000000000)); // 1 to 1844
-        value %= UINT64_C(10000000000000000);
+        const uint32_t a = static_cast<uint32_t>(value / kTen16); // 1 to 1844
+        value %= kTen16;
         
         if (a < 10)
             *buffer++ = '0' + static_cast<char>(a);
@@ -223,8 +249,8 @@ inline char* u64toa(uint64_t value, char* buffer) {
             *buffer++ = cDigitsLut[j + 1];
         }
         
-        const uint32_t v0 = static_cast<uint32_t>(value / UINT64_C(100000000));
-        const uint32_t v1 = static_cast<uint32_t>(value % UINT64_C(100000000));
+        const uint32_t v0 = static_cast<uint32_t>(value / kTen8);
+        const uint32_t v1 = static_cast<uint32_t>(value % kTen8);
         
         const uint32_t b0 = v0 / 10000;
         const uint32_t c0 = v0 % 10000;
@@ -262,16 +288,16 @@ inline char* u64toa(uint64_t value, char* buffer) {
         *buffer++ = cDigitsLut[d8 + 1];
     }
     
-	return buffer;
+    return buffer;
 }
 
 inline char* i64toa(int64_t value, char* buffer) {
-	if (value < 0) {
-		*buffer++ = '-';
-		value = -value;
-	}
+    if (value < 0) {
+        *buffer++ = '-';
+        value = -value;
+    }
 
-	return u64toa(static_cast<uint64_t>(value), buffer);
+    return u64toa(static_cast<uint64_t>(value), buffer);
 }
 
 } // namespace internal
