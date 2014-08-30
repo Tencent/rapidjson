@@ -105,20 +105,12 @@ TEST(Value, equalto_operator) {
     TestEqual(x["i"], 123);
     TestEqual(x["pi"], 3.14);
 
-    // Test operator==()
-#ifdef RAPIDJSON_COMPARE_DIFFERENT_ALLOCATORS
+    // Test operator==() (including different allocators)
     CrtAllocator crtAllocator;
     GenericValue<UTF8<>, CrtAllocator> y;
     GenericDocument<UTF8<>, CrtAllocator> z(&crtAllocator);
-    CrtAllocator& yAllocator = crtAllocator;
-#else
-    Value::AllocatorType& yAllocator = allocator;
-    Value y;
-    Document z;
-#endif // RAPIDJSON_COMPARE_DIFFERENT_ALLOCATORS
-    y.CopyFrom(x, yAllocator);
+    y.CopyFrom(x, crtAllocator);
     z.CopyFrom(y, z.GetAllocator());
-
     TestEqual(x, y);
     TestEqual(y, z);
     TestEqual(z, x);
@@ -130,7 +122,7 @@ TEST(Value, equalto_operator) {
     EXPECT_TRUE(z.RemoveMember("t"));
     TestUnequal(x, z);
     TestEqual(y, z);
-    y.AddMember("t", true, yAllocator);
+    y.AddMember("t", true, crtAllocator);
     z.AddMember("t", true, z.GetAllocator());
     TestEqual(x, y);
     TestEqual(y, z);
