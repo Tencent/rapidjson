@@ -25,6 +25,14 @@
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
+#if defined(_MSC_VER)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(6334)
+#endif
+
+#ifdef RAPIDJSON_HAS_CXX11_TYPETRAITS
+#include <type_traits>
+#endif
 
 //@cond RAPIDJSON_INTERNAL
 namespace rapidjson {
@@ -87,8 +95,39 @@ struct IsMoreConst
 template <typename T> struct IsPointer : FalseType {};
 template <typename T> struct IsPointer<T*> : TrueType {};
 
+///////////////////////////////////////////////////////////////////////////////
+// IsBaseOf
+//
+#ifdef RAPIDJSON_HAS_CXX11_TYPETRAITS
+
+template <typename B, typename D> struct IsBaseOf
+    : BoolType< ::std::is_base_of<B,D>::value> {};
+
+#else // simplified version adopted from Boost
+
+template<typename B, typename D> struct IsBaseOfImpl {
+    RAPIDJSON_STATIC_ASSERT(sizeof(B) != 0);
+    RAPIDJSON_STATIC_ASSERT(sizeof(D) != 0);
+
+    typedef char (&Yes)[1];
+    typedef char (&No) [2];
+
+    template <typename T>
+    static Yes Check(const D*, T);
+    static No  Check(const B*, int);
+
+    struct Host {
+        operator const B*() const;
+        operator const D*();
     };
+
+    enum { Value = (sizeof(Check(Host(), 0)) == sizeof(Yes)) };
 };
+
+template <typename B, typename D> struct IsBaseOf
+    : OrExpr<IsSame<B, D>, BoolExpr<IsBaseOfImpl<B, D> > >::Type {};
+
+#endif // RAPIDJSON_HAS_CXX11_TYPETRAITS
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -137,7 +176,7 @@ template <typename T> struct RemoveSfinaeTag<SfinaeTag&(*)(T)> { typedef T Type;
 } // namespace rapidjson
 //@endcond
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || defined(_MSC_VER)
 RAPIDJSON_DIAG_POP
 #endif
 
