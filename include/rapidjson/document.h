@@ -383,6 +383,22 @@ inline GenericStringRef<CharType> StringRef(const std::basic_string<CharType>& s
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// GenericValue type traits
+namespace internal {
+
+template <typename T, typename Encoding = void, typename Allocator = void>
+struct IsGenericValueImpl : FalseType {};
+
+// select candidates according to nested encoding and allocator types
+template <typename T> struct IsGenericValueImpl<T, typename Void<typename T::EncodingType>::Type, typename Void<typename T::AllocatorType>::Type>
+    : IsBaseOf<GenericValue<typename T::EncodingType, typename T::AllocatorType>, T>::Type {};
+
+// helper to match arbitrary GenericValue instantiations, including derived classes
+template <typename T> struct IsGenericValue : IsGenericValueImpl<T>::Type {};
+
+} // namespace internal
+
+///////////////////////////////////////////////////////////////////////////////
 // GenericValue
 
 //! Represents a JSON value. Use Value for UTF8 encoding and default allocator.
@@ -687,7 +703,7 @@ public:
     //! Equal-to operator with primitive types
     /*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c double, \c true, \c false
     */
-    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>,internal::IsBaseOf<GenericValue,T> >), (bool)) operator==(const T& rhs) const { return *this == GenericValue(rhs); }
+    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>,internal::IsGenericValue<T> >), (bool)) operator==(const T& rhs) const { return *this == GenericValue(rhs); }
 
     //! Not-equal-to operator
     /*! \return !(*this == rhs)
@@ -698,17 +714,17 @@ public:
     //! Not-equal-to operator with arbitrary types
     /*! \return !(*this == rhs)
      */
-    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::IsBaseOf<GenericValue,T>), (bool)) operator!=(const T& rhs) const { return !(*this == rhs); }
+    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::IsGenericValue<T>), (bool)) operator!=(const T& rhs) const { return !(*this == rhs); }
 
     //! Equal-to operator with arbitrary types (symmetric version)
     /*! \return (rhs == lhs)
      */
-    template <typename T> friend RAPIDJSON_DISABLEIF_RETURN((internal::IsBaseOf<GenericValue,T>), (bool)) operator==(const T& lhs, const GenericValue& rhs) { return rhs == lhs; }
+    template <typename T> friend RAPIDJSON_DISABLEIF_RETURN((internal::IsGenericValue<T>), (bool)) operator==(const T& lhs, const GenericValue& rhs) { return rhs == lhs; }
 
     //! Not-Equal-to operator with arbitrary types (symmetric version)
     /*! \return !(rhs == lhs)
      */
-    template <typename T> friend RAPIDJSON_DISABLEIF_RETURN((internal::IsBaseOf<GenericValue,T>), (bool)) operator!=(const T& lhs, const GenericValue& rhs) { return !(rhs == lhs); }
+    template <typename T> friend RAPIDJSON_DISABLEIF_RETURN((internal::IsGenericValue<T>), (bool)) operator!=(const T& lhs, const GenericValue& rhs) { return !(rhs == lhs); }
     //@}
 
     //!@name Type
@@ -949,7 +965,7 @@ public:
         \note Amortized Constant time complexity.
     */
     template <typename T>
-    RAPIDJSON_DISABLEIF_RETURN((internal::IsPointer<T>), (GenericValue&))
+    RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (GenericValue&))
     AddMember(StringRefType name, T value, Allocator& allocator) {
         GenericValue n(name);
         GenericValue v(value);
@@ -1174,7 +1190,7 @@ int z = a[0u].GetInt();             // This works too.
         \note Amortized constant time complexity.
     */
     template <typename T>
-    RAPIDJSON_DISABLEIF_RETURN((internal::IsPointer<T>), (GenericValue&))
+    RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (GenericValue&))
     PushBack(T value, Allocator& allocator) {
         GenericValue v(value);
         return PushBack(v, allocator);

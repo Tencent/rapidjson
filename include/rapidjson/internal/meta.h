@@ -38,6 +38,8 @@ RAPIDJSON_DIAG_OFF(6334)
 namespace rapidjson {
 namespace internal {
 
+// Helper to wrap/convert arbitrary types to void, useful for arbitrary type matching
+template <typename T> struct Void { typedef void Type; };
 
 ///////////////////////////////////////////////////////////////////////////////
 // BoolType, TrueType, FalseType
