@@ -711,6 +711,9 @@ public:
     template <typename SourceAllocator>
     bool operator!=(const GenericValue<Encoding, SourceAllocator>& rhs) const { return !(*this == rhs); }
 
+    //! Not-equal-to operator with const C-string pointer
+    bool operator!=(const Ch* rhs) const { return !(*this == rhs); }
+
     //! Not-equal-to operator with arbitrary types
     /*! \return !(*this == rhs)
      */
