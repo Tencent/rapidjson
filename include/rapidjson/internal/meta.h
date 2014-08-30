@@ -66,6 +66,9 @@ struct IsMoreConst {
     };
 };
 
+//////////////////////////////////////////////////////////////////////////
+// EnableIf / DisableIf
+//
 template <bool Condition, typename T = void> struct EnableIfCond;
 template <typename T> struct EnableIfCond<true, T> { typedef T Type; };
 template <typename T> struct EnableIfCond<false, T> { /* empty */ };
@@ -92,8 +95,19 @@ template <typename T> struct RemoveSfinaeFptr<SfinaeResultTag&(*)(T)> { typedef 
     typename ::rapidjson::internal::EnableIf \
         <RAPIDJSON_REMOVEFPTR_(cond)>::Type * = NULL
 
+#define RAPIDJSON_DISABLEIF(cond) \
+    typename ::rapidjson::internal::DisableIf \
+        <RAPIDJSON_REMOVEFPTR_(cond)>::Type * = NULL
+
+#define RAPIDJSON_ENABLEIF_RETURN(cond,returntype) \
+    typename ::rapidjson::internal::EnableIf \
+        <RAPIDJSON_REMOVEFPTR_(cond), \
+         RAPIDJSON_REMOVEFPTR_(returntype)>::Type
+
 #define RAPIDJSON_DISABLEIF_RETURN(cond,returntype) \
-    typename ::rapidjson::internal::DisableIf<cond,returntype>::Type
+    typename ::rapidjson::internal::DisableIf \
+        <RAPIDJSON_REMOVEFPTR_(cond), \
+         RAPIDJSON_REMOVEFPTR_(returntype)>::Type
 
 } // namespace internal
 } // namespace rapidjson
