@@ -444,7 +444,7 @@ public:
         \see CopyFrom()
     */
     template< typename SourceAllocator >
-    GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator & allocator);
+    GenericValue(const GenericValue<Encoding, SourceAllocator>& rhs, Allocator & allocator);
 
     //! Constructor for boolean value.
     /*! \param b Boolean value
@@ -603,10 +603,10 @@ public:
         \param allocator Allocator to use for copying
      */
     template <typename SourceAllocator>
-    GenericValue& CopyFrom(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator) {
+    GenericValue& CopyFrom(const GenericValue<Encoding, SourceAllocator>& rhs, Allocator& allocator) {
         RAPIDJSON_ASSERT((void*)this != (void const*)&rhs);
         this->~GenericValue();
-        new (this) GenericValue(rhs,allocator);
+        new (this) GenericValue(rhs, allocator);
         return *this;
     }
 
@@ -635,7 +635,9 @@ public:
         \note If an object contains duplicated named member, comparing equality with any object is always \c false.
         \note Linear time complexity (number of all values in the subtree and total lengths of all strings).
     */
-    bool operator==(const GenericValue& rhs) const {
+    template <typename SourceAllocator>
+    bool operator==(const GenericValue<Encoding, SourceAllocator>& rhs) const {
+        typedef GenericValue<Encoding, SourceAllocator> RhsType;
         if (GetType() != rhs.GetType())
             return false;
 
@@ -644,7 +646,7 @@ public:
             if (data_.o.size != rhs.data_.o.size)
                 return false;           
             for (ConstMemberIterator lhsMemberItr = MemberBegin(); lhsMemberItr != MemberEnd(); ++lhsMemberItr) {
-                ConstMemberIterator rhsMemberItr = rhs.FindMember(lhsMemberItr->name);
+                typename RhsType::ConstMemberIterator rhsMemberItr = rhs.FindMember(lhsMemberItr->name);
                 if (rhsMemberItr == rhs.MemberEnd() || lhsMemberItr->value != rhsMemberItr->value)
                     return false;
             }
@@ -690,7 +692,8 @@ public:
     //! Not-equal-to operator
     /*! \return !(*this == rhs)
      */
-    bool operator!=(const GenericValue& rhs) const { return !(*this == rhs); }
+    template <typename SourceAllocator>
+    bool operator!=(const GenericValue<Encoding, SourceAllocator>& rhs) const { return !(*this == rhs); }
 
     //! Not-equal-to operator with arbitrary types
     /*! \return !(*this == rhs)
@@ -774,7 +777,8 @@ public:
 
     // This version is faster because it does not need a StrLen(). 
     // It can also handle string with null character.
-    GenericValue& operator[](const GenericValue& name) {
+    template <typename SourceAllocator>
+    GenericValue& operator[](const GenericValue<Encoding, SourceAllocator>& name) {
         MemberIterator member = FindMember(name);
         if (member != MemberEnd())
             return member->value;
@@ -784,7 +788,8 @@ public:
             return NullValue;
         }
     }
-    const GenericValue& operator[](const GenericValue& name) const { return const_cast<GenericValue&>(*this)[name]; }
+    template <typename SourceAllocator>
+    const GenericValue& operator[](const GenericValue<Encoding, SourceAllocator>& name) const { return const_cast<GenericValue&>(*this)[name]; }
 
     //! Const member iterator
     /*! \pre IsObject() == true */
@@ -818,7 +823,8 @@ public:
         \note It is better to use FindMember() directly if you need the obtain the value as well.
         \note Linear time complexity.
     */
-    bool HasMember(const GenericValue& name) const { return FindMember(name) != MemberEnd(); }
+    template <typename SourceAllocator>
+    bool HasMember(const GenericValue<Encoding, SourceAllocator>& name) const { return FindMember(name) != MemberEnd(); }
 
     //! Find member by name.
     /*!
@@ -852,7 +858,8 @@ public:
             \c std::map, this has been changed to MemberEnd() now.
         \note Linear time complexity.
     */
-    MemberIterator FindMember(const GenericValue& name) {
+    template <typename SourceAllocator>
+    MemberIterator FindMember(const GenericValue<Encoding, SourceAllocator>& name) {
         RAPIDJSON_ASSERT(IsObject());
         RAPIDJSON_ASSERT(name.IsString());
         MemberIterator member = MemberBegin();
@@ -861,7 +868,7 @@ public:
                 break;
         return member;
     }
-    ConstMemberIterator FindMember(const GenericValue& name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
+    template <typename SourceAllocator> ConstMemberIterator FindMember(const GenericValue<Encoding, SourceAllocator>& name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
 
     //! Add a member (name-value pair) to the object.
     /*! \param name A string value as name of member.
@@ -971,7 +978,8 @@ public:
         return RemoveMember(n);
     }
 
-    bool RemoveMember(const GenericValue& name) {
+    template <typename SourceAllocator>
+    bool RemoveMember(const GenericValue<Encoding, SourceAllocator>& name) {
         MemberIterator m = FindMember(name);
         if (m != MemberEnd()) {
             RemoveMember(m);
@@ -1352,8 +1360,8 @@ int z = a[0u].GetInt();             // This works too.
     }
 
 private:
-    template <typename, typename, typename>
-    friend class GenericDocument;
+    template <typename, typename> friend class GenericValue;
+    template <typename, typename, typename> friend class GenericDocument;
 
     enum {
         kBoolFlag = 0x100,
@@ -1477,7 +1485,8 @@ private:
         rhs.flags_ = kNullFlag;
     }
 
-    bool StringEqual(const GenericValue& rhs) const {
+    template <typename SourceAllocator>
+    bool StringEqual(const GenericValue<Encoding, SourceAllocator>& rhs) const {
         RAPIDJSON_ASSERT(IsString());
         RAPIDJSON_ASSERT(rhs.IsString());
         return data_.s.length == rhs.data_.s.length &&
@@ -1671,7 +1680,7 @@ private:
 
     // callers of the following private Handler functions
     template <typename,typename,typename> friend class GenericReader; // for parsing
-    friend class GenericValue<Encoding,Allocator>; // for deep copying
+    template <typename, typename> friend class GenericValue; // for deep copying
 
     // Implementation of Handler
     bool Null() { new (stack_.template Push<ValueType>()) ValueType(); return true; }
