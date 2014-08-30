@@ -458,7 +458,10 @@ public:
 #else
     explicit GenericValue(bool b)
 #endif
-        : data_(), flags_(b ? kTrueFlag : kFalseFlag) {}
+        : data_(), flags_(b ? kTrueFlag : kFalseFlag) {
+            // safe-guard against failing SFINAE
+            RAPIDJSON_STATIC_ASSERT((internal::IsSame<bool,T>::Value));
+    }
 
     //! Constructor for int value.
     explicit GenericValue(int i) : data_(), flags_(kNumberIntFlag) {
