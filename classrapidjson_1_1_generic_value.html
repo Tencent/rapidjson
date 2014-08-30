@@ -514,6 +514,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:ae6c196979931e8283bcbd499133169ed"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#ae6c196979931e8283bcbd499133169ed">operator==</a> (const T &amp;rhs) const </td></tr>
 <tr class="memdesc:ae6c196979931e8283bcbd499133169ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Equal-to operator with primitive types.  <a href="#ae6c196979931e8283bcbd499133169ed">More...</a><br /></td></tr>
 <tr class="separator:ae6c196979931e8283bcbd499133169ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c0d84589cdfb9f8990e92483ef9a466"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#a0c0d84589cdfb9f8990e92483ef9a466">operator!=</a> (const <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> &amp;rhs) const </td></tr>
+<tr class="memdesc:a0c0d84589cdfb9f8990e92483ef9a466"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not-equal-to operator.  <a href="#a0c0d84589cdfb9f8990e92483ef9a466">More...</a><br /></td></tr>
+<tr class="separator:a0c0d84589cdfb9f8990e92483ef9a466"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7e6ef7acbbfef57485b9f2dee620dbf"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:ad7e6ef7acbbfef57485b9f2dee620dbf"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#ad7e6ef7acbbfef57485b9f2dee620dbf">operator!=</a> (const T &amp;rhs) const </td></tr>
 <tr class="memdesc:ad7e6ef7acbbfef57485b9f2dee620dbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Not-equal-to operator with arbitrary types.  <a href="#ad7e6ef7acbbfef57485b9f2dee620dbf">More...</a><br /></td></tr>
@@ -1692,6 +1695,35 @@ template&lt;typename Encoding, typename Allocator&gt; </div>
 
 <p>Prepare Value for move semantics. </p>
 <dl class="section return"><dt>Returns</dt><dd>*this </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a0c0d84589cdfb9f8990e92483ef9a466"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Encoding, typename Allocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classrapidjson_1_1_generic_value.html">rapidjson::GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::operator!= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Not-equal-to operator. </p>
+<dl class="section return"><dt>Returns</dt><dd>!(*this == rhs) </dd></dl>
 
 </div>
 </div>

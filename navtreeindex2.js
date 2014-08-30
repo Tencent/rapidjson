@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"md_doc_stream.html#StringBuffer":[2,0,1],
 "md_doc_stream.html#StringStream":[2,0,0],
 "md_doc_stream.html#Summary":[2,4],
 "md_doc_tutorial.html":[1],
