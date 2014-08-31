@@ -416,11 +416,11 @@ public:
     //@{
 
     //! Default constructor creates a null value.
-    GenericValue() : data_(), flags_(kNullFlag) {}
+    GenericValue() RAPIDJSON_NOEXCEPT : data_(), flags_(kNullFlag) {}
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     //! Move constructor in C++11
-    GenericValue(GenericValue&& rhs) : data_(rhs.data_), flags_(rhs.flags_) {
+    GenericValue(GenericValue&& rhs) RAPIDJSON_NOEXCEPT : data_(rhs.data_), flags_(rhs.flags_) {
         rhs.flags_ = kNullFlag; // give up contents
     }
 #endif
@@ -436,7 +436,7 @@ public:
         \param type Type of the value.
         \note Default content for number is zero.
     */
-    GenericValue(Type type) : data_(), flags_() {
+    GenericValue(Type type) RAPIDJSON_NOEXCEPT : data_(), flags_() {
         static const unsigned defaultFlags[7] = {
             kNullFlag, kFalseFlag, kTrueFlag, kObjectFlag, kArrayFlag, kConstStringFlag,
             kNumberAnyFlag
@@ -463,9 +463,9 @@ public:
      */
 #ifndef RAPIDJSON_DOXYGEN_RUNNING // hide SFINAE from Doxygen
     template <typename T>
-    explicit GenericValue(T b, RAPIDJSON_ENABLEIF((internal::IsSame<T,bool>)))
+    explicit GenericValue(T b, RAPIDJSON_ENABLEIF((internal::IsSame<T,bool>))) RAPIDJSON_NOEXCEPT
 #else
-    explicit GenericValue(bool b)
+    explicit GenericValue(bool b) RAPIDJSON_NOEXCEPT
 #endif
         : data_(), flags_(b ? kTrueFlag : kFalseFlag) {
             // safe-guard against failing SFINAE
@@ -473,21 +473,21 @@ public:
     }
 
     //! Constructor for int value.
-    explicit GenericValue(int i) : data_(), flags_(kNumberIntFlag) {
+    explicit GenericValue(int i) RAPIDJSON_NOEXCEPT : data_(), flags_(kNumberIntFlag) {
         data_.n.i64 = i;
         if (i >= 0)
             flags_ |= kUintFlag | kUint64Flag;
     }
 
     //! Constructor for unsigned value.
-    explicit GenericValue(unsigned u) : data_(), flags_(kNumberUintFlag) {
+    explicit GenericValue(unsigned u) RAPIDJSON_NOEXCEPT : data_(), flags_(kNumberUintFlag) {
         data_.n.u64 = u; 
         if (!(u & 0x80000000))
             flags_ |= kIntFlag | kInt64Flag;
     }
 
     //! Constructor for int64_t value.
-    explicit GenericValue(int64_t i64) : data_(), flags_(kNumberInt64Flag) {
+    explicit GenericValue(int64_t i64) RAPIDJSON_NOEXCEPT : data_(), flags_(kNumberInt64Flag) {
         data_.n.i64 = i64;
         if (i64 >= 0) {
             flags_ |= kNumberUint64Flag;
@@ -501,7 +501,7 @@ public:
     }
 
     //! Constructor for uint64_t value.
-    explicit GenericValue(uint64_t u64) : data_(), flags_(kNumberUint64Flag) {
+    explicit GenericValue(uint64_t u64) RAPIDJSON_NOEXCEPT : data_(), flags_(kNumberUint64Flag) {
         data_.n.u64 = u64;
         if (!(u64 & RAPIDJSON_UINT64_C2(0x80000000, 0x00000000)))
             flags_ |= kInt64Flag;
@@ -512,13 +512,13 @@ public:
     }
 
     //! Constructor for double value.
-    explicit GenericValue(double d) : data_(), flags_(kNumberDoubleFlag) { data_.n.d = d; }
+    explicit GenericValue(double d) RAPIDJSON_NOEXCEPT : data_(), flags_(kNumberDoubleFlag) { data_.n.d = d; }
 
     //! Constructor for constant string (i.e. do not make a copy of string)
-    GenericValue(const Ch* s, SizeType length) : data_(), flags_() { SetStringRaw(StringRef(s, length)); }
+    GenericValue(const Ch* s, SizeType length) RAPIDJSON_NOEXCEPT : data_(), flags_() { SetStringRaw(StringRef(s, length)); }
 
     //! Constructor for constant string (i.e. do not make a copy of string)
-    explicit GenericValue(StringRefType s) : data_(), flags_() { SetStringRaw(s); }
+    explicit GenericValue(StringRefType s) RAPIDJSON_NOEXCEPT : data_(), flags_() { SetStringRaw(s); }
 
     //! Constructor for copy-string (i.e. do make a copy of string)
     GenericValue(const Ch* s, SizeType length, Allocator& allocator) : data_(), flags_() { SetStringRaw(StringRef(s, length), allocator); }
@@ -569,7 +569,7 @@ public:
     //! Assignment with move semantics.
     /*! \param rhs Source of the assignment. It will become a null value after assignment.
     */
-    GenericValue& operator=(GenericValue& rhs) {
+    GenericValue& operator=(GenericValue& rhs) RAPIDJSON_NOEXCEPT {
         RAPIDJSON_ASSERT(this != &rhs);
         this->~GenericValue();
         RawAssign(rhs);
@@ -578,7 +578,7 @@ public:
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     //! Move assignment in C++11
-    GenericValue& operator=(GenericValue&& rhs) {
+    GenericValue& operator=(GenericValue&& rhs) RAPIDJSON_NOEXCEPT {
         return *this = rhs.Move();
     }
 #endif
@@ -588,7 +588,7 @@ public:
         \note This overload is needed to avoid clashes with the generic primitive type assignment overload below.
         \see GenericStringRef, operator=(T)
     */
-    GenericValue& operator=(StringRefType str) {
+    GenericValue& operator=(StringRefType str) RAPIDJSON_NOEXCEPT {
         GenericValue s(str);
         return *this = s;
     }
@@ -631,7 +631,7 @@ public:
         \param other Another value.
         \note Constant complexity.
     */
-    GenericValue& Swap(GenericValue& other) {
+    GenericValue& Swap(GenericValue& other) RAPIDJSON_NOEXCEPT {
         GenericValue temp;
         temp.RawAssign(*this);
         RawAssign(other);
