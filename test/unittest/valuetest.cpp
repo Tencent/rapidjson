@@ -925,11 +925,14 @@ TEST(Value, Object) {
     for (int i = 0; i < 10; i++)
         x.AddMember(keys[i], Value(kArrayType).PushBack(i, allocator), allocator);
 
+    // MemberCount, iterator difference
+    EXPECT_EQ(x.MemberCount(), SizeType(x.MemberEnd() - x.MemberBegin()));
+
     // Erase the first
     itr = x.EraseMember(x.MemberBegin());
     EXPECT_FALSE(x.HasMember(keys[0]));
     EXPECT_EQ(x.MemberBegin(), itr);
-    EXPECT_EQ(9, x.MemberEnd() - x.MemberBegin());
+    EXPECT_EQ(9u, x.MemberCount());
     for (; itr != x.MemberEnd(); ++itr) {
         int i = (itr - x.MemberBegin()) + 1;
         EXPECT_STREQ(itr->name.GetString(), keys[i]);
@@ -940,7 +943,7 @@ TEST(Value, Object) {
     itr = x.EraseMember(x.MemberEnd() - 1);
     EXPECT_FALSE(x.HasMember(keys[9]));
     EXPECT_EQ(x.MemberEnd(), itr);
-    EXPECT_EQ(8, x.MemberEnd() - x.MemberBegin());
+    EXPECT_EQ(8u, x.MemberCount());
     for (; itr != x.MemberEnd(); ++itr) {
         int i = (itr - x.MemberBegin()) + 1;
         EXPECT_STREQ(itr->name.GetString(), keys[i]);
@@ -951,7 +954,7 @@ TEST(Value, Object) {
     itr = x.EraseMember(x.MemberBegin() + 4);
     EXPECT_FALSE(x.HasMember(keys[5]));
     EXPECT_EQ(x.MemberBegin() + 4, itr);
-    EXPECT_EQ(7, x.MemberEnd() - x.MemberBegin());
+    EXPECT_EQ(7u, x.MemberCount());
     for (; itr != x.MemberEnd(); ++itr) {
         int i = (itr - x.MemberBegin());
         i += (i<4) ? 1 : 2;
@@ -975,7 +978,7 @@ TEST(Value, Object) {
                 EXPECT_EQ(x.MemberBegin() + first, itr);
 
             size_t removeCount = last - first;
-            EXPECT_EQ(n - removeCount, size_t(x.MemberEnd() - x.MemberBegin()));
+            EXPECT_EQ(n - removeCount, x.MemberCount());
             for (unsigned i = 0; i < first; i++)
                 EXPECT_EQ(i, x[keys[i]][0u].GetUint());
             for (unsigned i = first; i < n - removeCount; i++)
