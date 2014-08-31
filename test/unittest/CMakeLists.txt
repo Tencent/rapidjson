@@ -18,10 +18,10 @@ find_package(RapidJSON)
 # Do not use EXCLUDE_FROM_ALL for Xcode IDE,
 # Since it would ignore that project even there is a dependency on it.
 if(CMAKE_GENERATOR STREQUAL "Xcode")
-	add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/gtest-1.7.0
+	add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/gtest
 					 thirdparty/gtest)
 else()
-	add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/gtest-1.7.0
+	add_subdirectory(${CMAKE_SOURCE_DIR}/thirdparty/gtest
 					 thirdparty/gtest
 					 EXCLUDE_FROM_ALL)
 endif()
