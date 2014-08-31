@@ -911,6 +911,23 @@ public:
         return *this;
     }
 
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    GenericValue& AddMember(GenericValue&& name, GenericValue&& value, Allocator& allocator) {
+        return AddMember(name, value, allocator);
+    }
+    GenericValue& AddMember(GenericValue&& name, GenericValue& value, Allocator& allocator) {
+        return AddMember(name, value, allocator);
+    }
+    GenericValue& AddMember(GenericValue& name, GenericValue&& value, Allocator& allocator) {
+        return AddMember(name, value, allocator);
+    }
+    GenericValue& AddMember(StringRefType name, GenericValue&& value, Allocator& allocator) {
+        GenericValue n(name);
+        return AddMember(n, value, allocator);
+    }
+#endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
+
     //! Add a member (name-value pair) to the object.
     /*! \param name A constant string reference as name of member.
         \param value Value of any type.
@@ -1150,6 +1167,12 @@ int z = a[0u].GetInt();             // This works too.
         data_.a.elements[data_.a.size++].RawAssign(value);
         return *this;
     }
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    GenericValue& PushBack(GenericValue&& value, Allocator& allocator) {
+        return PushBack(value, allocator);
+    }
+#endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
     //! Append a constant string reference at the end of the array.
     /*! \param value        Constant string reference to be appended.
