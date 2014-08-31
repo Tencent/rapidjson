@@ -416,6 +416,13 @@ public:
     //! Default constructor creates a null value.
     GenericValue() : data_(), flags_(kNullFlag) {}
 
+#ifdef RAPIDJSON_CXX11
+    //! Move constructor in C++11
+    GenericValue(GenericValue&& rhs) : data_(rhs.data_), flags_(rhs.flags_) {
+        rhs.flags_ = kNullFlag; // give up contents
+    }
+#endif
+
 private:
     //! Copy constructor is not permitted.
     GenericValue(const GenericValue& rhs);
@@ -566,6 +573,13 @@ public:
         RawAssign(rhs);
         return *this;
     }
+
+#ifdef RAPIDJSON_CXX11
+    //! Move assignment in C++11
+    GenericValue& operator=(GenericValue&& rhs) {
+        return *this = rhs.Move();
+    }
+#endif
 
     //! Assignment of constant string reference (no copy)
     /*! \param str Constant string reference to be assigned
