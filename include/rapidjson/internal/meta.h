@@ -34,7 +34,7 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(6334)
 #endif
 
-#ifdef RAPIDJSON_HAS_CXX11_TYPETRAITS
+#if RAPIDJSON_HAS_CXX11_TYPETRAITS
 #include <type_traits>
 #endif
 
@@ -102,7 +102,7 @@ template <typename T> struct IsPointer<T*> : TrueType {};
 ///////////////////////////////////////////////////////////////////////////////
 // IsBaseOf
 //
-#ifdef RAPIDJSON_HAS_CXX11_TYPETRAITS
+#if RAPIDJSON_HAS_CXX11_TYPETRAITS
 
 template <typename B, typename D> struct IsBaseOf
     : BoolType< ::std::is_base_of<B,D>::value> {};

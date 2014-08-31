@@ -357,6 +357,26 @@ template<int x> struct StaticAssertTest {};
 
 #endif // RAPIDJSON_DIAG_*
 
+///////////////////////////////////////////////////////////////////////////////
+// C++11 features
+
+#ifndef RAPIDJSON_HAS_CXX11_RVALUE_REFS
+#if defined(__clang__)
+#define RAPIDJSON_HAS_CXX11_RVALUE_REFS __has_feature(cxx_rvalue_references)
+#elif (defined(RAPIDJSON_GNUC) && (RAPIDJSON_GNUC >= RAPIDJSON_VERSION_CODE(4,3,0)) && defined(__GXX_EXPERIMENTAL_CXX0X__)) || \
+      (defined(_MSC_VER) && _MSC_VER >= 1600)
+
+#define RAPIDJSON_HAS_CXX11_RVALUE_REFS 1
+#else
+#define RAPIDJSON_HAS_CXX11_RVALUE_REFS 0
+#endif
+#endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
+// no automatic detection, yet
+#ifndef RAPIDJSON_HAS_CXX11_TYPETRAITS
+#define RAPIDJSON_HAS_CXX11_TYPETRAITS 0
+#endif
+
 //!@endcond
 
 ///////////////////////////////////////////////////////////////////////////////

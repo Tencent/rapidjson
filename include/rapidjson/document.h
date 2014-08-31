@@ -416,7 +416,7 @@ public:
     //! Default constructor creates a null value.
     GenericValue() : data_(), flags_(kNullFlag) {}
 
-#ifdef RAPIDJSON_CXX11
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     //! Move constructor in C++11
     GenericValue(GenericValue&& rhs) : data_(rhs.data_), flags_(rhs.flags_) {
         rhs.flags_ = kNullFlag; // give up contents
@@ -574,7 +574,7 @@ public:
         return *this;
     }
 
-#ifdef RAPIDJSON_CXX11
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     //! Move assignment in C++11
     GenericValue& operator=(GenericValue&& rhs) {
         return *this = rhs.Move();
