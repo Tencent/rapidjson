@@ -830,10 +830,18 @@ TEST(Value, Object) {
     EXPECT_TRUE(x.HasMember(name));
     EXPECT_TRUE(y.HasMember(name));
 
+    GenericValue<UTF8<>, CrtAllocator> othername("A");
+    EXPECT_TRUE(x.HasMember(othername));
+    EXPECT_TRUE(y.HasMember(othername));
+    othername.SetString("C\0D");
+    EXPECT_TRUE(x.HasMember(othername));
+    EXPECT_TRUE(y.HasMember(othername));
+
     // operator[]
     EXPECT_STREQ("Apple", x["A"].GetString());
     EXPECT_STREQ("Banana", x["B"].GetString());
     EXPECT_STREQ("CherryD", x[C0D].GetString());
+    EXPECT_STREQ("CherryD", x[othername].GetString());
 
     // const operator[]
     EXPECT_STREQ("Apple", y["A"].GetString());
@@ -904,7 +912,7 @@ TEST(Value, Object) {
     x.RemoveMember("B");
     EXPECT_FALSE(x.HasMember("B"));
 
-    x.RemoveMember(name);
+    x.RemoveMember(othername);
     EXPECT_FALSE(x.HasMember(name));
 
     EXPECT_TRUE(x.MemberBegin() == x.MemberEnd());
