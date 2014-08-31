@@ -24,6 +24,7 @@
 /*! \file document.h */
 
 #include "reader.h"
+#include "internal/meta.h"
 #include "internal/strfunc.h"
 #include <new>      // placement new
 
@@ -56,7 +57,6 @@ RAPIDJSON_DIAG_OFF(effc++)
 #endif // RAPIDJSON_HAS_STDSTRING
 
 #ifndef RAPIDJSON_NOMEMBERITERATORCLASS
-#include "internal/meta.h"
 #include <iterator> // std::iterator, std::random_access_iterator_tag
 #endif
 
