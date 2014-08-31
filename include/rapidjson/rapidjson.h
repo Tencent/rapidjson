@@ -318,7 +318,12 @@ template<int x> struct StaticAssertTest {};
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_DIAG_PUSH/POP, RAPIDJSON_DIAG_OFF
 
-#if defined(__clang__) || (defined(__GNUC__) && RAPIDJSON_VERSION_CODE(__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__) >= RAPIDJSON_VERSION_CODE(4,2,0))
+#if defined(__GNUC__)
+#define RAPIDJSON_GNUC \
+    RAPIDJSON_VERSION_CODE(__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__)
+#endif
+
+#if defined(__clang__) || (defined(RAPIDJSON_GNUC) && RAPIDJSON_GNUC >= RAPIDJSON_VERSION_CODE(4,2,0))
 
 #define RAPIDJSON_PRAGMA(x) _Pragma(RAPIDJSON_STRINGIFY(x))
 #define RAPIDJSON_DIAG_PRAGMA(x) RAPIDJSON_PRAGMA(GCC diagnostic x)
@@ -326,7 +331,7 @@ template<int x> struct StaticAssertTest {};
     RAPIDJSON_DIAG_PRAGMA(ignored RAPIDJSON_STRINGIFY(RAPIDJSON_JOIN(-W,x)))
 
 // push/pop support in Clang and GCC>=4.6
-#if defined(__clang__) || (defined(__GNUC__) && RAPIDJSON_VERSION_CODE(__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__) >= RAPIDJSON_VERSION_CODE(4,6,0))
+#if defined(__clang__) || (defined(RAPIDJSON_GNUC) && RAPIDJSON_GNUC >= RAPIDJSON_VERSION_CODE(4,6,0))
 #define RAPIDJSON_DIAG_PUSH RAPIDJSON_DIAG_PRAGMA(push)
 #define RAPIDJSON_DIAG_POP  RAPIDJSON_DIAG_PRAGMA(pop)
 #else // GCC >= 4.2, < 4.6
