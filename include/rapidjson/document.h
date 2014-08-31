@@ -279,7 +279,7 @@ struct GenericStringRef {
             GenericValue instead.
      */
     template<SizeType N>
-    GenericStringRef(const CharType (&str)[N])
+    GenericStringRef(const CharType (&str)[N]) RAPIDJSON_NOEXCEPT
         : s(str), length(N-1) {}
 
     //! Explicitly create string reference from \c const character pointer
@@ -302,7 +302,7 @@ struct GenericStringRef {
             GenericValue instead.
      */
     explicit GenericStringRef(const CharType* str)
-        : s(str), length(internal::StrLen(str)){}
+        : s(str), length(internal::StrLen(str)){ RAPIDJSON_ASSERT(s != NULL); }
 
     //! Create constant string reference from pointer and length
     /*! \param str constant string, lifetime assumed to be longer than the use of the string in e.g. a GenericValue
