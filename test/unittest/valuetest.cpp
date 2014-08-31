@@ -24,7 +24,7 @@
 
 using namespace rapidjson;
 
-TEST(Value, default_constructor) {
+TEST(Value, DefaultConstructor) {
     Value x;
     EXPECT_EQ(kNullType, x.GetType());
     EXPECT_TRUE(x.IsNull());
@@ -38,7 +38,7 @@ TEST(Value, default_constructor) {
 //  Value y = x;
 //}
 
-TEST(Value, assignment_operator) {
+TEST(Value, AssignmentOperator) {
     Value x(1234);
     Value y;
     y = x;
@@ -81,7 +81,7 @@ void TestUnequal(const A& a, const B& b) {
     EXPECT_TRUE (b != a);
 }
 
-TEST(Value, equalto_operator) {
+TEST(Value, EqualtoOperator) {
     Value::AllocatorType allocator;
     Value x(kObjectType);
     x.AddMember("hello", "world", allocator)
