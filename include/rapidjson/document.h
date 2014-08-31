@@ -39,15 +39,17 @@ RAPIDJSON_DIAG_OFF(effc++)
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_HAS_STDSTRING
 
+#ifndef RAPIDJSON_HAS_STDSTRING
 #ifdef RAPIDJSON_DOXYGEN_RUNNING
 #define RAPIDJSON_HAS_STDSTRING 1 // force generation of documentation
+#else
+#define RAPIDJSON_HAS_STDSTRING 0 // no std::string support by default
 #endif
-#ifdef RAPIDJSON_HAS_STDSTRING
 /*! \def RAPIDJSON_HAS_STDSTRING
     \ingroup RAPIDJSON_CONFIG
     \brief Enable RapidJSON support for \c std::string
 
-    By defining this preprocessor symbol, several convenience functions for using
+    By defining this preprocessor symbol to \c 1, several convenience functions for using
     \ref rapidjson::GenericValue with \c std::string are enabled, especially
     for construction and comparison.
 
@@ -363,7 +365,7 @@ inline GenericStringRef<CharType> StringRef(const CharType* str, size_t length) 
     return GenericStringRef<CharType>(str, SizeType(length));
 }
 
-#ifdef RAPIDJSON_HAS_STDSTRING
+#if RAPIDJSON_HAS_STDSTRING
 //! Mark a string object as constant string
 /*! Mark a string object (e.g. \c std::string) as a "string literal".
     This function can be used to avoid copying a string to be referenced as a
@@ -524,7 +526,7 @@ public:
     //! Constructor for copy-string (i.e. do make a copy of string)
     GenericValue(const Ch*s, Allocator& allocator) : data_(), flags_() { SetStringRaw(StringRef(s), allocator); }
 
-#ifdef RAPIDJSON_HAS_STDSTRING
+#if RAPIDJSON_HAS_STDSTRING
     //! Constructor for copy-string from a string object (i.e. do make a copy of string)
     /*! \note Requires the definition of the preprocessor symbol \ref RAPIDJSON_HAS_STDSTRING.
      */
@@ -689,7 +691,7 @@ public:
     //! Equal-to operator with const C-string pointer
     bool operator==(const Ch* rhs) const { return *this == GenericValue(StringRef(rhs)); }
 
-#ifdef RAPIDJSON_HAS_STDSTRING
+#if RAPIDJSON_HAS_STDSTRING
     //! Equal-to operator with string object
     /*! \note Requires the definition of the preprocessor symbol \ref RAPIDJSON_HAS_STDSTRING.
      */
@@ -1303,7 +1305,7 @@ int z = a[0u].GetInt();             // This works too.
     */
     GenericValue& SetString(const Ch* s, Allocator& allocator) { return SetString(s, internal::StrLen(s), allocator); }
 
-#ifdef RAPIDJSON_HAS_STDSTRING
+#if RAPIDJSON_HAS_STDSTRING
     //! Set this value as a string by copying from source string.
     /*! \param s source string.
         \param allocator Allocator for allocating copied buffer. Commonly use GenericDocument::GetAllocator().

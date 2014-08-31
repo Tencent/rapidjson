@@ -558,7 +558,7 @@ TEST(Value, String) {
     EXPECT_STREQ("World", w.GetString());
     EXPECT_EQ(5u, w.GetStringLength());
 
-#ifdef RAPIDJSON_HAS_STDSTRING
+#if RAPIDJSON_HAS_STDSTRING
     {
         std::string str = "Hello World";
         str[5] = '\0';
