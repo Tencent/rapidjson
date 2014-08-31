@@ -662,7 +662,7 @@ public:
             return StringEqual(rhs);
 
         case kNumberType:
-            if (IsDouble() || rhs.GetDouble())
+            if (IsDouble() || rhs.IsDouble())
                 return GetDouble() == rhs.GetDouble(); // May convert one operand from integer to double.
             else
                 return data_.n.u64 == rhs.data_.n.u64;
