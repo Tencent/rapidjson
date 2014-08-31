@@ -641,7 +641,7 @@ public:
 
     //! Prepare Value for move semantics
     /*! \return *this */
-    GenericValue& Move() { return *this; }
+    GenericValue& Move() RAPIDJSON_NOEXCEPT { return *this; }
     //@}
 
     //!@name Equal-to and not-equal-to operators
@@ -1494,7 +1494,7 @@ private:
     }
 
     //! Initialize this value as constant string, without calling destructor.
-    void SetStringRaw(StringRefType s) {
+    void SetStringRaw(StringRefType s) RAPIDJSON_NOEXCEPT {
         flags_ = kConstStringFlag;
         data_.s.str = s;
         data_.s.length = s.length;
@@ -1510,7 +1510,7 @@ private:
     }
 
     //! Assignment without calling destructor
-    void RawAssign(GenericValue& rhs) {
+    void RawAssign(GenericValue& rhs) RAPIDJSON_NOEXCEPT {
         data_ = rhs.data_;
         flags_ = rhs.flags_;
         rhs.flags_ = kNullFlag;
