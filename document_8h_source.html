@@ -744,7 +744,7 @@ $(document).ready(function(){initNavTree('document_8h_source.html','');});
 <div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;            <span class="keywordflow">return</span> StringEqual(rhs);</div>
 <div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;</div>
 <div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;        <span class="keywordflow">case</span> <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a">kNumberType</a>:</div>
-<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;            <span class="keywordflow">if</span> (IsDouble() || rhs.GetDouble())</div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;            <span class="keywordflow">if</span> (IsDouble() || rhs.IsDouble())</div>
 <div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;                <span class="keywordflow">return</span> GetDouble() == rhs.GetDouble(); <span class="comment">// May convert one operand from integer to double.</span></div>
 <div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;            <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;                <span class="keywordflow">return</span> data_.n.u64 == rhs.data_.n.u64;</div>
