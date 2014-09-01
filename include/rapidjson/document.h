@@ -1336,7 +1336,7 @@ int z = a[0u].GetInt();             // This works too.
             return handler.EndArray(data_.a.size);
     
         case kStringType:
-            return handler.String(data_.GetString(), data_.GetStringLength(), (flags_ & kCopyFlag) != 0);
+            return handler.String(GetString(), GetStringLength(), (flags_ & kCopyFlag) != 0);
     
         case kNumberType:
             if (IsInt())            return handler.Int(data_.n.i.i);
