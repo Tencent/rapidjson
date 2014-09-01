@@ -1252,7 +1252,7 @@ int z = a[0u].GetInt();             // This works too.
     //! Get the length of string.
     /*! Since rapidjson permits "\\u0000" in the json string, strlen(v.GetString()) may not equal to v.GetStringLength().
     */
-    SizeType GetStringLength() const { RAPIDJSON_ASSERT(IsString()); return ((flags_ & kInlineStrFlag) ? data_.ss.length : data_.s.length); }
+    SizeType GetStringLength() const { RAPIDJSON_ASSERT(IsString()); return ((flags_ & kInlineStrFlag) ? (data_.ss.GetLength()) : data_.s.length); }
 
     //! Set this value as a string without copying source string.
     /*! This version has better performance with supplied length, and also support string containing null character.
@@ -1395,10 +1395,21 @@ private:
         unsigned hashcode;  //!< reserved
     };  // 12 bytes in 32-bit mode, 16 bytes in 64-bit mode
 
+    // implementation detail: ShortString can represent zero-terminated strings up to MaxSize chars
+    // (excluding the terminating zero) and store a value to determine the length of the contained
+    // string in the last character str[LenPos] by storing "MaxSize - length" there. If the string
+    // to store has the maximal length of MaxSize then str[LenPos] will be 0 and therefore act as
+    // the string terminator as well. For getting the string length back from that value just use
+    // "MaxSize - str[LenPos]".
+    // This allows to store 11-chars strings in 32-bit mode and 15-chars strings in 64-bit mode
+    // inline (for `UTF8`-encoded strings).
     struct ShortString {
-        enum { MaxSize = sizeof(String) / sizeof(Ch) - sizeof(unsigned char) };
-        Ch str[MaxSize];
-        unsigned char length;
+        enum { MaxChars = sizeof(String) / sizeof(Ch), MaxSize = MaxChars - 1, LenPos = MaxSize };
+        Ch str[MaxChars];
+
+        inline static bool Usable(SizeType len) { return            (MaxSize >= len); }
+        inline void     SetLength(SizeType len) { str[LenPos] = (Ch)(MaxSize -  len); }
+        inline SizeType GetLength() const       { return  (SizeType)(MaxSize -  str[LenPos]); }
     };  // at most as many bytes as "String" above => 12 bytes in 32-bit mode, 16 bytes in 64-bit mode
 
     // By using proper binary layout, retrieval of different integer types do not need conversions.
@@ -1473,9 +1484,9 @@ private:
     //! Initialize this value as copy string with initial data, without calling destructor.
     void SetStringRaw(StringRefType s, Allocator& allocator) {
         Ch* str = NULL;
-        if(s.length < ShortString::MaxSize) {
+        if(ShortString::Usable(s.length)) {
             flags_ = kShortStringFlag;
-            data_.ss.length = s.length;
+            data_.ss.SetLength(s.length);
             str = data_.ss.str;
         } else {
             flags_ = kCopyStringFlag;
