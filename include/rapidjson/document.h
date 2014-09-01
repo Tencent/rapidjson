@@ -1498,12 +1498,12 @@ private:
         RAPIDJSON_ASSERT(IsString());
         RAPIDJSON_ASSERT(rhs.IsString());
 
-        const SizeType len1 = (flags_     == kShortStringFlag) ? data_.ss.length     : data_.s.length;
-        const SizeType len2 = (rhs.flags_ == kShortStringFlag) ? rhs.data_.ss.length : rhs.data_.s.length;
+        const SizeType len1 = GetStringLength();
+        const SizeType len2 = rhs.GetStringLength();
         if(len1 != len2) { return false; }
 
-        const Ch* const str1 = (flags_     == kShortStringFlag) ? data_.ss.str     : data_.s.str;
-        const Ch* const str2 = (rhs.flags_ == kShortStringFlag) ? rhs.data_.ss.str : rhs.data_.s.str;
+        const Ch* const str1 = GetString();
+        const Ch* const str2 = rhs.GetString();
         if(str1 == str2) { return true; } // fast path for constant string
 
         return (memcmp(str1, str2, sizeof(Ch) * len1) == 0);
