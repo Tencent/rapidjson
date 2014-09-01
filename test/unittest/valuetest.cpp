@@ -1084,3 +1084,26 @@ TEST(Document, CrtAllocator) {
     V a(kArrayType);
     a.PushBack(1, allocator);   // Should not call destructor on uninitialized Value of newly allocated elements.
 }
+
+static void TestShortStringOptimization(const char* str) {
+    const int len = (int)strlen(str);
+	
+    rapidjson::Document doc;
+    rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+    rapidjson::Value objVal(rapidjson::kObjectType);        
+	
+    objVal.AddMember(str, str, allocator);
+    EXPECT_TRUE(objVal.HasMember(str));
+	
+	const rapidjson::Value& member =  objVal[str];
+	EXPECT_EQ(member.GetStringLength(), strlen(str));
+}
+
+TEST(Value, AllocateShortString) {
+	TestShortStringOptimization("");                 // edge case: empty string
+	TestShortStringOptimization("12345678");         // regular case for short strings: 8 chars
+	TestShortStringOptimization("12345678901");      // edge case: 11 chars in 32-bit mode (=> short string)
+	TestShortStringOptimization("123456789012");     // edge case: 12 chars in 32-bit mode (=> regular string)
+	TestShortStringOptimization("123456789012345");  // edge case: 15 chars in 64-bit mode (=> short string)
+	TestShortStringOptimization("1234567890123456"); // edge case: 16 chars in 64-bit mode (=> regular string)
+}
