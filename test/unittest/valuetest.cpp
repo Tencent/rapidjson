@@ -135,6 +135,11 @@ TEST(Value, equalto_operator) {
     TestEqual(x, y);
     TestEqual(y, z);
     TestEqual(z, x);
+
+    // Issue #129: compare Uint64
+    x.SetUint64(RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0xFFFFFFF0));
+    y.SetUint64(RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0xFFFFFFFF));
+    TestUnequal(x, y);
 }
 
 template <typename Value>
