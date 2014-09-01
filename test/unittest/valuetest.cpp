@@ -1092,7 +1092,7 @@ static void TestShortStringOptimization(const char* str) {
     rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
     rapidjson::Value objVal(rapidjson::kObjectType);        
 	
-    objVal.AddMember(str, str, allocator);
+    objVal.AddMember(str, len, allocator);
     EXPECT_TRUE(objVal.HasMember(str));
 	
 	const rapidjson::Value& member =  objVal[str];
