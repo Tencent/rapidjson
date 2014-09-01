@@ -1086,7 +1086,7 @@ TEST(Document, CrtAllocator) {
 }
 
 static void TestShortStringOptimization(const char* str) {
-    const rapidjson::Value::SizeType len = (rapidjson::Value::SizeType)strlen(str);
+    const rapidjson::SizeType len = (rapidjson::SizeType)strlen(str);
 	
     rapidjson::Document doc;
     rapidjson::Value val;
