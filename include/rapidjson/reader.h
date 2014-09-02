@@ -29,6 +29,9 @@
 #include "internal/pow10.h"
 #include "internal/stack.h"
 
+#include <cstdlib>  // strtod()
+#include <cmath>    // HUGE_VAL
+
 #if defined(RAPIDJSON_SIMD) && defined(_MSC_VER)
 #include <intrin.h>
 #pragma intrinsic(_BitScanForward)
@@ -598,21 +601,27 @@ private:
         return codepoint;
     }
 
+    template <typename CharType>
     class StackStream {
     public:
-        typedef typename TargetEncoding::Ch Ch;
+        typedef CharType Ch;
 
         StackStream(internal::Stack<StackAllocator>& stack) : stack_(stack), length_(0) {}
         RAPIDJSON_FORCEINLINE void Put(Ch c) {
             *stack_.template Push<Ch>() = c;
             ++length_;
         }
-        internal::Stack<StackAllocator>& stack_;
-        SizeType length_;
+        size_t Length() const { return length_; }
+        Ch* Pop() {
+            return stack_.template Pop<Ch>(length_);
+        }
 
     private:
         StackStream(const StackStream&);
         StackStream& operator=(const StackStream&);
+
+        internal::Stack<StackAllocator>& stack_;
+        SizeType length_;
     };
 
     // Parse string and generate String event. Different code paths for kParseInsituFlag.
@@ -631,10 +640,11 @@ private:
                 RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
         }
         else {
-            StackStream stackStream(stack_);
+            StackStream<typename TargetEncoding::Ch> stackStream(stack_);
             ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
-            if (!handler.String(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, true))
+            size_t length = stackStream.Length();
+            if (!handler.String(stackStream.Pop(), length - 1, true))
                 RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
         }
     }
@@ -700,27 +710,17 @@ private:
         }
     }
 
-    inline double StrtodFastPath(double significand, int exp) {
-        // Fast path only works on limited range of values.
-        // But for simplicity and performance, currently only implement this.
-        // see http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/
-        if (exp < -308)
-            return 0.0;
-        else if (exp >= 0)
-            return significand * internal::Pow10(exp);
-        else
-            return significand / internal::Pow10(-exp);
-    }
-
     template<unsigned parseFlags, typename InputStream, typename Handler>
     void ParseNumber(InputStream& is, Handler& handler) {
         internal::StreamLocalCopy<InputStream> copy(is);
         InputStream& s(copy.s);
+        StackStream<char> stackStream(stack_);    // Backup string for slow path double conversion.
 
         // Parse minus
         bool minus = false;
         if (s.Peek() == '-') {
             minus = true;
+            stackStream.Put(s.Peek());
             s.Take();
         }
 
@@ -730,9 +730,11 @@ private:
         bool use64bit = false;
         if (s.Peek() == '0') {
             i = 0;
+            stackStream.Put(s.Peek());
             s.Take();
         }
         else if (s.Peek() >= '1' && s.Peek() <= '9') {
+            stackStream.Put(s.Peek());
             i = static_cast<unsigned>(s.Take() - '0');
 
             if (minus)
@@ -744,6 +746,7 @@ private:
                             break;
                         }
                     }
+                    stackStream.Put(s.Peek());
                     i = i * 10 + static_cast<unsigned>(s.Take() - '0');
                 }
             else
@@ -755,6 +758,7 @@ private:
                             break;
                         }
                     }
+                    stackStream.Put(s.Peek());
                     i = i * 10 + static_cast<unsigned>(s.Take() - '0');
                 }
         }
@@ -762,71 +766,67 @@ private:
             RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
 
         // Parse 64bit int
-        double d = 0.0;
         bool useDouble = false;
+        bool useStrtod = false;
         if (use64bit) {
             if (minus) 
                 while (s.Peek() >= '0' && s.Peek() <= '9') {                    
                      if (i64 >= RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC)) // 2^63 = 9223372036854775808
                         if (i64 != RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC) || s.Peek() > '8') {
-                            d = (double)i64;
                             useDouble = true;
                             break;
                         }
+                    stackStream.Put(s.Peek());
                     i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
                 }
             else
                 while (s.Peek() >= '0' && s.Peek() <= '9') {                    
                     if (i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999)) // 2^64 - 1 = 18446744073709551615
                         if (i64 != RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) || s.Peek() > '5') {
-                            d = (double)i64;
                             useDouble = true;
                             break;
                         }
+                    stackStream.Put(s.Peek());
                     i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
                 }
         }
 
         // Force double for big integer
         if (useDouble) {
-            while (s.Peek() >= '0' && s.Peek() <= '9') {
-                if (d >= 1.7976931348623157e307) // DBL_MAX / 10.0
-                    RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
-                d = d * 10 + (s.Take() - '0');
-            }
+            while (s.Peek() >= '0' && s.Peek() <= '9')
+                stackStream.Put(s.Take());
+            useStrtod = true;
         }
 
         // Parse frac = decimal-point 1*DIGIT
         int expFrac = 0;
         if (s.Peek() == '.') {
+            stackStream.Put(s.Peek());
             s.Take();
 
-#if RAPIDJSON_64BIT
-            // Use i64 to store significand in 64-bit architecture
             if (!useDouble) {
-                if (!use64bit)
+                if (!use64bit) {
                     i64 = i;
+                    use64bit = true;
+                }
         
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
-                    if (i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999))
+                    if (i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999)) {
+                        useStrtod = true;
                         break;
+                    }
                     else {
+                        stackStream.Put(s.Peek());
                         i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
                         --expFrac;
                     }
                 }
-
-                d = (double)i64;
             }
-#else
-            // Use double to store significand in 32-bit architecture
-            if (!useDouble)
-                d = use64bit ? (double)i64 : (double)i;
-#endif
+
             useDouble = true;
 
             while (s.Peek() >= '0' && s.Peek() <= '9') {
-                d = d * 10 + (s.Take() - '0');
+                stackStream.Put(s.Take());
                 --expFrac;
             }
 
@@ -837,23 +837,24 @@ private:
         // Parse exp = e [ minus / plus ] 1*DIGIT
         int exp = 0;
         if (s.Peek() == 'e' || s.Peek() == 'E') {
-            if (!useDouble) {
-                d = use64bit ? (double)i64 : (double)i;
-                useDouble = true;
-            }
+            useDouble = true;
+            stackStream.Put(s.Peek());
             s.Take();
 
             bool expMinus = false;
             if (s.Peek() == '+')
                 s.Take();
             else if (s.Peek() == '-') {
+                stackStream.Put(s.Peek());
                 s.Take();
                 expMinus = true;
             }
 
             if (s.Peek() >= '0' && s.Peek() <= '9') {
+                stackStream.Put(s.Peek());
                 exp = s.Take() - '0';
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
+                    stackStream.Put(s.Peek());
                     exp = exp * 10 + (s.Take() - '0');
                     if (exp > 308 && !expMinus) // exp > 308 should be rare, so it should be checked first.
                         RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
@@ -868,17 +869,36 @@ private:
 
         // Finish parsing, call event according to the type of number.
         bool cont = true;
-        if (useDouble) {
-            int expSum = exp + expFrac;
-            if (expSum < -308) {
-                // Prevent expSum < -308, making Pow10(expSum) = 0
-                d = StrtodFastPath(d, exp);
-                d = StrtodFastPath(d, expFrac);
-            }
-            else
-                d = StrtodFastPath(d, expSum);
 
-            cont = handler.Double(minus ? -d : d);
+        // Pop stack no matter if it will be used or not.
+        stackStream.Put('\0');
+        const char* str = stackStream.Pop();
+
+        if (useDouble) {
+            int p = exp + expFrac;
+            double d;
+            uint64_t significand = use64bit ? i64 : i;
+
+            // Use fast path for string-to-double conversion if possible
+            // see http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/
+            if (!useStrtod && p >= -22 && p <= 22 && significand <= RAPIDJSON_UINT64_C2(0x001FFFFF, 0xFFFFFFFF)) {
+                if (p >= 0)
+                    d = significand * internal::Pow10(p);
+                else
+                    d = significand / internal::Pow10(-p);
+                
+                if (minus)
+                    d = -d;
+            }
+            else {
+                char* end = 0;
+                d = strtod(str, &end);
+                RAPIDJSON_ASSERT(*end == '\0'); // Should have consumed the whole string.
+
+                if (d == HUGE_VAL || d == -HUGE_VAL)
+                    RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());   
+            }
+            cont = handler.Double(d);
         }
         else {
             if (use64bit) {

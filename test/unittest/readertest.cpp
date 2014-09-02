@@ -119,7 +119,9 @@ TEST(Reader, ParseNumberHandler) {
         Reader reader; \
         reader.Parse(s, h); \
         EXPECT_EQ(1u, h.step_); \
-        EXPECT_DOUBLE_EQ(x, h.actual_); \
+        EXPECT_EQ(x, h.actual_); \
+        if (x != h.actual_) \
+            printf("  Actual: %.17g\nExpected: %.17g\n", h.actual_, x);\
     }
 
     TEST_NUMBER(ParseUintHandler, "0", 0);
