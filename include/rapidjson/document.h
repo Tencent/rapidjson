@@ -1247,12 +1247,12 @@ int z = a[0u].GetInt();             // This works too.
     //!@name String
     //@{
 
-    const Ch* GetString() const { RAPIDJSON_ASSERT(IsString()); return data_.s.str; }
+    const Ch* GetString() const { RAPIDJSON_ASSERT(IsString()); return ((flags_ & kInlineStrFlag) ? data_.ss.str : data_.s.str); }
 
     //! Get the length of string.
     /*! Since rapidjson permits "\\u0000" in the json string, strlen(v.GetString()) may not equal to v.GetStringLength().
     */
-    SizeType GetStringLength() const { RAPIDJSON_ASSERT(IsString()); return data_.s.length; }
+    SizeType GetStringLength() const { RAPIDJSON_ASSERT(IsString()); return ((flags_ & kInlineStrFlag) ? (data_.ss.GetLength()) : data_.s.length); }
 
     //! Set this value as a string without copying source string.
     /*! This version has better performance with supplied length, and also support string containing null character.
@@ -1320,7 +1320,7 @@ int z = a[0u].GetInt();             // This works too.
             if (!handler.StartObject())
                 return false;
             for (ConstMemberIterator m = MemberBegin(); m != MemberEnd(); ++m) {
-                if (!handler.String(m->name.data_.s.str, m->name.data_.s.length, (m->name.flags_ & kCopyFlag) != 0))
+                if (!handler.String(m->name.GetString(), m->name.GetStringLength(), (m->name.flags_ & kCopyFlag) != 0))
                     return false;
                 if (!m->value.Accept(handler))
                     return false;
@@ -1336,7 +1336,7 @@ int z = a[0u].GetInt();             // This works too.
             return handler.EndArray(data_.a.size);
     
         case kStringType:
-            return handler.String(data_.s.str, data_.s.length, (flags_ & kCopyFlag) != 0);
+            return handler.String(GetString(), GetStringLength(), (flags_ & kCopyFlag) != 0);
     
         case kNumberType:
             if (IsInt())            return handler.Int(data_.n.i.i);
@@ -1365,6 +1365,7 @@ private:
         kDoubleFlag = 0x4000,
         kStringFlag = 0x100000,
         kCopyFlag = 0x200000,
+        kInlineStrFlag = 0x400000,
 
         // Initial flags of different types.
         kNullFlag = kNullType,
@@ -1378,6 +1379,7 @@ private:
         kNumberAnyFlag = kNumberType | kNumberFlag | kIntFlag | kInt64Flag | kUintFlag | kUint64Flag | kDoubleFlag,
         kConstStringFlag = kStringType | kStringFlag,
         kCopyStringFlag = kStringType | kStringFlag | kCopyFlag,
+        kShortStringFlag = kStringType | kStringFlag | kCopyFlag | kInlineStrFlag,
         kObjectFlag = kObjectType,
         kArrayFlag = kArrayType,
 
@@ -1392,6 +1394,23 @@ private:
         SizeType length;
         unsigned hashcode;  //!< reserved
     };  // 12 bytes in 32-bit mode, 16 bytes in 64-bit mode
+
+    // implementation detail: ShortString can represent zero-terminated strings up to MaxSize chars
+    // (excluding the terminating zero) and store a value to determine the length of the contained
+    // string in the last character str[LenPos] by storing "MaxSize - length" there. If the string
+    // to store has the maximal length of MaxSize then str[LenPos] will be 0 and therefore act as
+    // the string terminator as well. For getting the string length back from that value just use
+    // "MaxSize - str[LenPos]".
+    // This allows to store 11-chars strings in 32-bit mode and 15-chars strings in 64-bit mode
+    // inline (for `UTF8`-encoded strings).
+    struct ShortString {
+        enum { MaxChars = sizeof(String) / sizeof(Ch), MaxSize = MaxChars - 1, LenPos = MaxSize };
+        Ch str[MaxChars];
+
+        inline static bool Usable(SizeType len) { return            (MaxSize >= len); }
+        inline void     SetLength(SizeType len) { str[LenPos] = (Ch)(MaxSize -  len); }
+        inline SizeType GetLength() const       { return  (SizeType)(MaxSize -  str[LenPos]); }
+    };  // at most as many bytes as "String" above => 12 bytes in 32-bit mode, 16 bytes in 64-bit mode
 
     // By using proper binary layout, retrieval of different integer types do not need conversions.
     union Number {
@@ -1433,6 +1452,7 @@ private:
 
     union Data {
         String s;
+        ShortString ss;
         Number n;
         Object o;
         Array a;
@@ -1463,11 +1483,19 @@ private:
 
     //! Initialize this value as copy string with initial data, without calling destructor.
     void SetStringRaw(StringRefType s, Allocator& allocator) {
-        flags_ = kCopyStringFlag;
-        data_.s.str = (Ch *)allocator.Malloc((s.length + 1) * sizeof(Ch));
-        data_.s.length = s.length;
-        memcpy(const_cast<Ch*>(data_.s.str), s, s.length * sizeof(Ch));
-        const_cast<Ch*>(data_.s.str)[s.length] = '\0';
+        Ch* str = NULL;
+        if(ShortString::Usable(s.length)) {
+            flags_ = kShortStringFlag;
+            data_.ss.SetLength(s.length);
+            str = data_.ss.str;
+        } else {
+            flags_ = kCopyStringFlag;
+            data_.s.length = s.length;
+            str = (Ch *)allocator.Malloc((s.length + 1) * sizeof(Ch));
+            data_.s.str = str;
+        }
+        memcpy(str, s, s.length * sizeof(Ch));
+        str[s.length] = '\0';
     }
 
     //! Assignment without calling destructor
@@ -1480,9 +1508,16 @@ private:
     bool StringEqual(const GenericValue& rhs) const {
         RAPIDJSON_ASSERT(IsString());
         RAPIDJSON_ASSERT(rhs.IsString());
-        return data_.s.length == rhs.data_.s.length &&
-            (data_.s.str == rhs.data_.s.str // fast path for constant string
-            || memcmp(data_.s.str, rhs.data_.s.str, sizeof(Ch) * data_.s.length) == 0);
+
+        const SizeType len1 = GetStringLength();
+        const SizeType len2 = rhs.GetStringLength();
+        if(len1 != len2) { return false; }
+
+        const Ch* const str1 = GetString();
+        const Ch* const str2 = rhs.GetString();
+        if(str1 == str2) { return true; } // fast path for constant string
+
+        return (memcmp(str1, str2, sizeof(Ch) * len1) == 0);
     }
 
     Data data_;
