@@ -885,7 +885,7 @@ public:
             }
             else {
                 SizeType oldCapacity = o.capacity;
-                o.capacity *= 2;
+                o.capacity += (oldCapacity + 1) / 2; // grow by factor 1.5
                 o.members = reinterpret_cast<Member*>(allocator.Realloc(o.members, oldCapacity * sizeof(Member), o.capacity * sizeof(Member)));
             }
         }
@@ -1130,7 +1130,7 @@ int z = a[0u].GetInt();             // This works too.
     GenericValue& PushBack(GenericValue& value, Allocator& allocator) {
         RAPIDJSON_ASSERT(IsArray());
         if (data_.a.size >= data_.a.capacity)
-            Reserve(data_.a.capacity == 0 ? kDefaultArrayCapacity : data_.a.capacity * 2, allocator);
+            Reserve(data_.a.capacity == 0 ? kDefaultArrayCapacity : (data_.a.capacity + (data_.a.capacity + 1) / 2), allocator);
         data_.a.elements[data_.a.size++].RawAssign(value);
         return *this;
     }
