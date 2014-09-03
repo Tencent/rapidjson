@@ -105,20 +105,12 @@ TEST(Value, equalto_operator) {
     TestEqual(x["i"], 123);
     TestEqual(x["pi"], 3.14);
 
-    // Test operator==()
-#ifdef RAPIDJSON_COMPARE_DIFFERENT_ALLOCATORS
+    // Test operator==() (including different allocators)
     CrtAllocator crtAllocator;
     GenericValue<UTF8<>, CrtAllocator> y;
     GenericDocument<UTF8<>, CrtAllocator> z(&crtAllocator);
-    CrtAllocator& yAllocator = crtAllocator;
-#else
-    Value::AllocatorType& yAllocator = allocator;
-    Value y;
-    Document z;
-#endif // RAPIDJSON_COMPARE_DIFFERENT_ALLOCATORS
-    y.CopyFrom(x, yAllocator);
+    y.CopyFrom(x, crtAllocator);
     z.CopyFrom(y, z.GetAllocator());
-
     TestEqual(x, y);
     TestEqual(y, z);
     TestEqual(z, x);
@@ -130,7 +122,7 @@ TEST(Value, equalto_operator) {
     EXPECT_TRUE(z.RemoveMember("t"));
     TestUnequal(x, z);
     TestEqual(y, z);
-    y.AddMember("t", true, yAllocator);
+    y.AddMember("t", true, crtAllocator);
     z.AddMember("t", true, z.GetAllocator());
     TestEqual(x, y);
     TestEqual(y, z);
@@ -843,10 +835,18 @@ TEST(Value, Object) {
     EXPECT_TRUE(x.HasMember(name));
     EXPECT_TRUE(y.HasMember(name));
 
+    GenericValue<UTF8<>, CrtAllocator> othername("A");
+    EXPECT_TRUE(x.HasMember(othername));
+    EXPECT_TRUE(y.HasMember(othername));
+    othername.SetString("C\0D");
+    EXPECT_TRUE(x.HasMember(othername));
+    EXPECT_TRUE(y.HasMember(othername));
+
     // operator[]
     EXPECT_STREQ("Apple", x["A"].GetString());
     EXPECT_STREQ("Banana", x["B"].GetString());
     EXPECT_STREQ("CherryD", x[C0D].GetString());
+    EXPECT_STREQ("CherryD", x[othername].GetString());
 
     // const operator[]
     EXPECT_STREQ("Apple", y["A"].GetString());
@@ -917,7 +917,7 @@ TEST(Value, Object) {
     x.RemoveMember("B");
     EXPECT_FALSE(x.HasMember("B"));
 
-    x.RemoveMember(name);
+    x.RemoveMember(othername);
     EXPECT_FALSE(x.HasMember(name));
 
     EXPECT_TRUE(x.MemberBegin() == x.MemberEnd());
@@ -930,11 +930,14 @@ TEST(Value, Object) {
     for (int i = 0; i < 10; i++)
         x.AddMember(keys[i], Value(kArrayType).PushBack(i, allocator), allocator);
 
+    // MemberCount, iterator difference
+    EXPECT_EQ(x.MemberCount(), SizeType(x.MemberEnd() - x.MemberBegin()));
+
     // Erase the first
     itr = x.EraseMember(x.MemberBegin());
     EXPECT_FALSE(x.HasMember(keys[0]));
     EXPECT_EQ(x.MemberBegin(), itr);
-    EXPECT_EQ(9, x.MemberEnd() - x.MemberBegin());
+    EXPECT_EQ(9u, x.MemberCount());
     for (; itr != x.MemberEnd(); ++itr) {
         int i = (itr - x.MemberBegin()) + 1;
         EXPECT_STREQ(itr->name.GetString(), keys[i]);
@@ -945,7 +948,7 @@ TEST(Value, Object) {
     itr = x.EraseMember(x.MemberEnd() - 1);
     EXPECT_FALSE(x.HasMember(keys[9]));
     EXPECT_EQ(x.MemberEnd(), itr);
-    EXPECT_EQ(8, x.MemberEnd() - x.MemberBegin());
+    EXPECT_EQ(8u, x.MemberCount());
     for (; itr != x.MemberEnd(); ++itr) {
         int i = (itr - x.MemberBegin()) + 1;
         EXPECT_STREQ(itr->name.GetString(), keys[i]);
@@ -956,7 +959,7 @@ TEST(Value, Object) {
     itr = x.EraseMember(x.MemberBegin() + 4);
     EXPECT_FALSE(x.HasMember(keys[5]));
     EXPECT_EQ(x.MemberBegin() + 4, itr);
-    EXPECT_EQ(7, x.MemberEnd() - x.MemberBegin());
+    EXPECT_EQ(7u, x.MemberCount());
     for (; itr != x.MemberEnd(); ++itr) {
         int i = (itr - x.MemberBegin());
         i += (i<4) ? 1 : 2;
@@ -980,7 +983,7 @@ TEST(Value, Object) {
                 EXPECT_EQ(x.MemberBegin() + first, itr);
 
             size_t removeCount = last - first;
-            EXPECT_EQ(n - removeCount, size_t(x.MemberEnd() - x.MemberBegin()));
+            EXPECT_EQ(n - removeCount, x.MemberCount());
             for (unsigned i = 0; i < first; i++)
                 EXPECT_EQ(i, x[keys[i]][0u].GetUint());
             for (unsigned i = first; i < n - removeCount; i++)
