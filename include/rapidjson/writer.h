@@ -127,7 +127,7 @@ public:
 
     bool Key(const Ch* str, SizeType length, bool copy = false) {
         (void)copy;
-        Prefix(kStringType);
+        Prefix(kStringType, true);
         return WriteString(str, length); // keys are written like strings
     }
 
@@ -312,8 +312,9 @@ protected:
     bool WriteStartArray()  { os_->Put('['); return true; }
     bool WriteEndArray()    { os_->Put(']'); return true; }
 
-    void Prefix(Type type) {
+    void Prefix(Type type, bool isKey = false) {
         (void)type;
+        (void)isKey;
         if (level_stack_.GetSize() != 0) { // this value is not at root
             Level* level = level_stack_.template Top<Level>();
             if (level->valueCount > 0) {
@@ -322,8 +323,14 @@ protected:
                 else  // in object
                     os_->Put((level->valueCount % 2 == 0) ? ',' : ':');
             }
-            if (!level->inArray && level->valueCount % 2 == 0)
-                RAPIDJSON_ASSERT(type == kStringType);  // if it's in object, then even number should be a name
+            if (!level->inArray) {
+                if (level->valueCount % 2 == 0) {
+                    RAPIDJSON_ASSERT(type == kStringType);  // if it's in object, then even number should be a name/string
+                    RAPIDJSON_ASSERT(isKey);  // if it's in object, then even number should be a key
+                } else {
+                    RAPIDJSON_ASSERT(!isKey);  // if it's in object, then odd number should not be a key
+                }
+            }
             level->valueCount++;
         }
         else {

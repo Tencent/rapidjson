@@ -84,7 +84,7 @@ public:
 
     bool Key(const Ch* str, SizeType length, bool copy = false) {
         (void)copy;
-        PrettyPrefix(kStringType);
+        PrettyPrefix(kStringType, true);
         return Base::WriteString(str, length); // keys are written like strings
     }
 
@@ -145,7 +145,7 @@ public:
 
     //@}
 protected:
-    void PrettyPrefix(Type type) {
+    void PrettyPrefix(Type type, bool isKey = false) {
         (void)type;
         if (Base::level_stack_.GetSize() != 0) { // this value is not at root
             typename Base::Level* level = Base::level_stack_.template Top<typename Base::Level>();
@@ -176,8 +176,16 @@ protected:
                 if (level->valueCount % 2 == 0)
                     WriteIndent();
             }
-            if (!level->inArray && level->valueCount % 2 == 0)
-                RAPIDJSON_ASSERT(type == kStringType);  // if it's in object, then even number should be a name
+
+            if (!level->inArray) {
+                if (level->valueCount % 2 == 0) {
+                    RAPIDJSON_ASSERT(type == kStringType);  // if it's in object, then even number should be a name/string
+                    RAPIDJSON_ASSERT(isKey);  // if it's in object, then even number should be a key
+                } else {
+                    RAPIDJSON_ASSERT(!isKey);  // if it's in object, then odd number should not be a key
+                }
+            }
+
             level->valueCount++;
         }
         else {
