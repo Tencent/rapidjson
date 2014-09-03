@@ -20,5 +20,5 @@ var classrapidjson_1_1_generic_document =
     [ "ParseStream", "classrapidjson_1_1_generic_document.html#ae4ee7d86b8c906c83dbe15e57eb6ac6a", null ],
     [ "ParseStream", "classrapidjson_1_1_generic_document.html#acf96a3c7fd61486d049c701b1fe5d414", null ],
     [ "GenericReader", "classrapidjson_1_1_generic_document.html#a22b985b0f7f78ef254a566655ee0550f", null ],
-    [ "GenericValue< Encoding, Allocator >", "classrapidjson_1_1_generic_document.html#a82bdd5798f1a5ac0e3e7ba4bd6938cfc", null ]
+    [ "GenericValue", "classrapidjson_1_1_generic_document.html#a899449e1a645b5e377af059fb61113d8", null ]
 ];
