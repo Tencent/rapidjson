@@ -21,6 +21,10 @@
 #ifndef RAPIDJSON_INTERNAL_META_H_
 #define RAPIDJSON_INTERNAL_META_H_
 
+#ifndef RAPIDJSON_RAPIDJSON_H_
+#error <rapidjson.h> not yet included. Do not include this file directly.
+#endif
+
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
@@ -30,7 +34,7 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(6334)
 #endif
 
-#ifdef RAPIDJSON_HAS_CXX11_TYPETRAITS
+#if RAPIDJSON_HAS_CXX11_TYPETRAITS
 #include <type_traits>
 #endif
 
@@ -38,6 +42,8 @@ RAPIDJSON_DIAG_OFF(6334)
 namespace rapidjson {
 namespace internal {
 
+// Helper to wrap/convert arbitrary types to void, useful for arbitrary type matching
+template <typename T> struct Void { typedef void Type; };
 
 ///////////////////////////////////////////////////////////////////////////////
 // BoolType, TrueType, FalseType
@@ -98,7 +104,7 @@ template <typename T> struct IsPointer<T*> : TrueType {};
 ///////////////////////////////////////////////////////////////////////////////
 // IsBaseOf
 //
-#ifdef RAPIDJSON_HAS_CXX11_TYPETRAITS
+#if RAPIDJSON_HAS_CXX11_TYPETRAITS
 
 template <typename B, typename D> struct IsBaseOf
     : BoolType< ::std::is_base_of<B,D>::value> {};
