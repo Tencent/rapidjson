@@ -1784,15 +1784,8 @@ private:
     bool Uint64(uint64_t i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
     bool Double(double d) { new (stack_.template Push<ValueType>()) ValueType(d); return true; }
 
-    bool String(const Ch* str, SizeType length, bool copy) { 
-        if (copy) 
-            new (stack_.template Push<ValueType>()) ValueType(str, length, GetAllocator());
-        else
-            new (stack_.template Push<ValueType>()) ValueType(str, length);
-        return true;
-    }
-
-    bool Key(const Ch* str, SizeType length, bool copy) { return String(str, length, copy); }
+    bool String(const Ch* str, SizeType length, bool copy) { return ProcessStringOrKey(str, length, copy); }
+    bool Key(const Ch* str, SizeType length, bool copy) { return ProcessStringOrKey(str, length, copy); }
 
     bool StartObject() { new (stack_.template Push<ValueType>()) ValueType(kObjectType); return true; }
     
@@ -1821,6 +1814,14 @@ private:
         else
             stack_.Clear();
         stack_.ShrinkToFit();
+    }
+
+    bool ProcessStringOrKey(const Ch* str, SizeType length, bool copy) { 
+        if (copy) 
+            new (stack_.template Push<ValueType>()) ValueType(str, length, GetAllocator());
+        else
+            new (stack_.template Push<ValueType>()) ValueType(str, length);
+        return true;
     }
 
     static const size_t kDefaultStackCapacity = 1024;

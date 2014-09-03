@@ -124,10 +124,12 @@ public:
         Prefix(kStringType);
         return WriteString(str, length);
     }
-	
-	bool Key(const Ch* str, SizeType length, bool copy = false) {
-	    return String(str, length, copy);
-	}
+
+    bool Key(const Ch* str, SizeType length, bool copy = false) {
+        (void)copy;
+        Prefix(kStringType);
+        return WriteString(str, length);
+    }
 
     bool StartObject() {
         Prefix(kObjectType);
@@ -170,7 +172,7 @@ public:
     //! Simpler but slower overload.
     bool String(const Ch* str) { return String(str, internal::StrLen(str)); }
     bool Key(const Ch* str) { return Key(str, internal::StrLen(str)); }
-	
+
     //@}
 
 protected:
