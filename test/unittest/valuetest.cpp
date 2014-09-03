@@ -24,7 +24,7 @@
 
 using namespace rapidjson;
 
-TEST(Value, default_constructor) {
+TEST(Value, DefaultConstructor) {
     Value x;
     EXPECT_EQ(kNullType, x.GetType());
     EXPECT_TRUE(x.IsNull());
@@ -38,7 +38,32 @@ TEST(Value, default_constructor) {
 //  Value y = x;
 //}
 
-TEST(Value, assignment_operator) {
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+TEST(Value, MoveConstructor) {
+    typedef GenericValue<UTF8<>, CrtAllocator> Value;
+    Value::AllocatorType allocator;
+
+    Value x((Value(kArrayType)));
+    x.Reserve(4u, allocator);
+    x.PushBack(1, allocator).PushBack(2, allocator).PushBack(3, allocator).PushBack(4, allocator);
+    EXPECT_TRUE(x.IsArray());
+    EXPECT_EQ(4u, x.Size());
+
+    // Value y(x); // should not compile
+    Value y(std::move(x));
+    EXPECT_TRUE(x.IsNull());
+    EXPECT_TRUE(y.IsArray());
+    EXPECT_EQ(4u, y.Size());
+
+    // Value z = y; // should not compile
+    Value z = std::move(y);
+    EXPECT_TRUE(y.IsNull());
+    EXPECT_TRUE(z.IsArray());
+    EXPECT_EQ(4u, z.Size());
+}
+#endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
+TEST(Value, AssignmentOperator) {
     Value x(1234);
     Value y;
     y = x;
@@ -63,6 +88,22 @@ TEST(Value, assignment_operator) {
     y = StringRef(mstr);
     EXPECT_TRUE(y.IsString());
     EXPECT_EQ(y.GetString(),mstr);
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    // C++11 move assignment
+    x = Value("World");
+    EXPECT_TRUE(x.IsString());
+    EXPECT_STREQ("World", x.GetString());
+
+    x = std::move(y);
+    EXPECT_TRUE(y.IsNull());
+    EXPECT_TRUE(x.IsString());
+    EXPECT_EQ(x.GetString(), mstr);
+
+    y = std::move(Value().SetInt(1234));
+    EXPECT_TRUE(y.IsInt());
+    EXPECT_EQ(1234, y);
+#endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
 }
 
 template <typename A, typename B> 
@@ -81,7 +122,7 @@ void TestUnequal(const A& a, const B& b) {
     EXPECT_TRUE (b != a);
 }
 
-TEST(Value, equalto_operator) {
+TEST(Value, EqualtoOperator) {
     Value::AllocatorType allocator;
     Value x(kObjectType);
     x.AddMember("hello", "world", allocator)
@@ -555,7 +596,7 @@ TEST(Value, String) {
     EXPECT_STREQ("World", w.GetString());
     EXPECT_EQ(5u, w.GetStringLength());
 
-#ifdef RAPIDJSON_HAS_STDSTRING
+#if RAPIDJSON_HAS_STDSTRING
     {
         std::string str = "Hello World";
         str[5] = '\0';
@@ -642,6 +683,21 @@ TEST(Value, Array) {
     EXPECT_EQ(123, y[3u].GetInt());
     EXPECT_TRUE(y[4u].IsString());
     EXPECT_STREQ("foo", y[4u].GetString());
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    // PushBack(GenericValue&&, Allocator&);
+    {
+        Value y(kArrayType);
+        y.PushBack(Value(true), allocator);
+        y.PushBack(std::move(Value(kArrayType).PushBack(Value(1), allocator).PushBack("foo", allocator)), allocator);
+        EXPECT_EQ(2u, y.Size());
+        EXPECT_TRUE(y[0u].IsTrue());
+        EXPECT_TRUE(y[1u].IsArray());
+        EXPECT_EQ(2u, y[1u].Size());
+        EXPECT_TRUE(y[1u][0u].IsInt());
+        EXPECT_TRUE(y[1u][1u].IsString());
+    }
+#endif
 
     // iterator
     Value::ValueIterator itr = x.Begin();
@@ -751,7 +807,6 @@ TEST(Value, Array) {
     }
 
     // Working in gcc without C++11, but VS2013 cannot compile. To be diagnosed.
-#if 0
     // http://en.wikipedia.org/wiki/Erase-remove_idiom
     x.Clear();
     for (int i = 0; i < 10; i++)
@@ -760,11 +815,11 @@ TEST(Value, Array) {
         else
             x.PushBack(Value(kNullType).Move(), allocator);
 
-    x.Erase(std::remove(x.Begin(), x.End(), Value(kNullType)), x.End());
+    const Value null(kNullType);
+    x.Erase(std::remove(x.Begin(), x.End(), null), x.End());
     EXPECT_EQ(5u, x.Size());
     for (int i = 0; i < 5; i++)
         EXPECT_EQ(i * 2, x[i]);
-#endif
 
     // SetArray()
     Value z;
@@ -817,6 +872,22 @@ TEST(Value, Object) {
         EXPECT_STREQ("Jelly",o["string"].GetString());
         EXPECT_EQ(8u, o.MemberCount());
     }
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    // AddMember(GenericValue&&, ...) variants
+    {
+        Value o(kObjectType);
+        o.AddMember(Value("true"), Value(true), allocator);
+        o.AddMember(Value("false"), Value(false).Move(), allocator);    // value is lvalue ref
+        o.AddMember(Value("int").Move(), Value(-1), allocator);         // name is lvalue ref
+        o.AddMember("uint", std::move(Value().SetUint(1u)), allocator); // name is literal, value is rvalue
+        EXPECT_TRUE(o["true"].GetBool());
+        EXPECT_FALSE(o["false"].GetBool());
+        EXPECT_EQ(-1, o["int"].GetInt());
+        EXPECT_EQ(1u, o["uint"].GetUint());
+        EXPECT_EQ(4u, o.MemberCount());
+    }
+#endif
 
     // Tests a member with null character
     Value name;
