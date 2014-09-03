@@ -8,7 +8,7 @@
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/error/en.h"
-#include <vector>
+#include <algorithm>
 #include <cctype>
 
 using namespace rapidjson;
@@ -25,18 +25,18 @@ struct CapitalizeFilter {
     bool Uint64(uint64_t u) { return out_.Uint64(u); }
     bool Double(double d) { return out_.Double(d); }
     bool String(const char* str, SizeType length, bool) { 
-        buffer_.clear();
-        for (SizeType i = 0; i < length; i++)
-            buffer_.push_back(std::toupper(str[i]));
-        return out_.String(&buffer_.front(), length, true); // true = output handler need to copy the string
+        buffer_.assign(str, str + length);
+		std::transform(buffer_.begin(), buffer_.end(), buffer_.begin(), [](char c) { return std::toupper(c); });
+        return out_.String(buffer_.data(), length, true); // true = output handler need to copy the string
     }
     bool StartObject() { return out_.StartObject(); }
+    bool Key(const char* str, SizeType length, bool copy) { return String(str, length, copy); }
     bool EndObject(SizeType memberCount) { return out_.EndObject(memberCount); }
     bool StartArray() { return out_.StartArray(); }
     bool EndArray(SizeType elementCount) { return out_.EndArray(elementCount); }
 
     OutputHandler& out_;
-    std::vector<char> buffer_;
+    std::string buffer_;
 
 private:
     CapitalizeFilter(const CapitalizeFilter&);

@@ -124,6 +124,10 @@ public:
         Prefix(kStringType);
         return WriteString(str, length);
     }
+	
+	bool Key(const Ch* str, SizeType length, bool copy = false) {
+	    return String(str, length, copy);
+	}
 
     bool StartObject() {
         Prefix(kObjectType);

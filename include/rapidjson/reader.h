@@ -152,6 +152,7 @@ concept Handler {
     bool Double(double d);
     bool String(const Ch* str, SizeType length, bool copy);
     bool StartObject();
+    bool Key(const Ch* str, SizeType length, bool copy);
     bool EndObject(SizeType memberCount);
     bool StartArray();
     bool EndArray(SizeType elementCount);
@@ -181,6 +182,7 @@ struct BaseReaderHandler {
     bool Double(double) { return static_cast<Override&>(*this).Default(); }
     bool String(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
     bool StartObject() { return static_cast<Override&>(*this).Default(); }
+    bool Key(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
     bool EndObject(SizeType) { return static_cast<Override&>(*this).Default(); }
     bool StartArray() { return static_cast<Override&>(*this).Default(); }
     bool EndArray(SizeType) { return static_cast<Override&>(*this).Default(); }
@@ -471,7 +473,7 @@ private:
             if (is.Peek() != '"')
                 RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
 
-            ParseString<parseFlags>(is, handler);
+            ParseKey<parseFlags>(is, handler);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
             SkipWhitespace(is);
@@ -617,7 +619,7 @@ private:
 
     // Parse string and generate String event. Different code paths for kParseInsituFlag.
     template<unsigned parseFlags, typename InputStream, typename Handler>
-    void ParseString(InputStream& is, Handler& handler) {
+    void ParseStringOrKey(InputStream& is, Handler& handler, bool isString) {
         internal::StreamLocalCopy<InputStream> copy(is);
         InputStream& s(copy.s);
 
@@ -634,9 +636,24 @@ private:
             StackStream stackStream(stack_);
             ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
-            if (!handler.String(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, true))
-                RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
+            if(isString) {
+                if (!handler.String(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, true))
+                    RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
+            } else {
+                if (!handler.Key(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, true))
+                    RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
+            }
         }
+    }
+
+    template<unsigned parseFlags, typename InputStream, typename Handler>
+    inline void ParseString(InputStream& is, Handler& handler) {
+        return ParseStringOrKey<parseFlags>(is, handler, true); // true => this is a "string" value
+    }
+
+    template<unsigned parseFlags, typename InputStream, typename Handler>
+    inline void ParseKey(InputStream& is, Handler& handler) {
+        return ParseStringOrKey<parseFlags>(is, handler, false); // false => this is the "key" of an object
     }
 
     // Parse string to an output is

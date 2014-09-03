@@ -10,19 +10,19 @@ int main() {
     Writer<StringBuffer> writer(s);
     
     writer.StartObject();
-    writer.String("hello");
+    writer.Key("hello");
     writer.String("world");
-    writer.String("t");
+    writer.Key("t");
     writer.Bool(true);
-    writer.String("f");
+    writer.Key("f");
     writer.Bool(false);
-    writer.String("n");
+    writer.Key("n");
     writer.Null();
-    writer.String("i");
+    writer.Key("i");
     writer.Uint(123);
-    writer.String("pi");
+    writer.Key("pi");
     writer.Double(3.1416);
-    writer.String("a");
+    writer.Key("a");
     writer.StartArray();
     for (unsigned i = 0; i < 4; i++)
         writer.Uint(i);

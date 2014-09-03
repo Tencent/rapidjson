@@ -82,6 +82,10 @@ public:
         return Base::WriteString(str, length);
     }
 
+    bool Key(const Ch* str, SizeType length, bool copy = false) {
+		return String(str, length, copy);
+	}
+	
     bool StartObject() {
         PrettyPrefix(kObjectType);
         new (Base::level_stack_.template Push<typename Base::Level>()) typename Base::Level(false);

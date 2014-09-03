@@ -506,8 +506,14 @@ struct ParseObjectHandler : BaseReaderHandler<UTF8<>, ParseObjectHandler> {
     bool Double(double d) { EXPECT_EQ(12u, step_); EXPECT_EQ(3.1416, d); step_++; return true; }
     bool String(const char* str, size_t, bool) { 
         switch(step_) {
-            case 1: EXPECT_STREQ("hello", str); step_++; return true;
             case 2: EXPECT_STREQ("world", str); step_++; return true;
+            default: ADD_FAILURE(); return false;
+        }
+    }
+    bool StartObject() { EXPECT_EQ(0u, step_); step_++; return true; }
+    bool Key(const char* str, size_t, bool) { 
+        switch(step_) {
+            case 1: EXPECT_STREQ("hello", str); step_++; return true;
             case 3: EXPECT_STREQ("t", str); step_++; return true;
             case 5: EXPECT_STREQ("f", str); step_++; return true;
             case 7: EXPECT_STREQ("n", str); step_++; return true;
@@ -517,7 +523,6 @@ struct ParseObjectHandler : BaseReaderHandler<UTF8<>, ParseObjectHandler> {
             default: ADD_FAILURE(); return false;
         }
     }
-    bool StartObject() { EXPECT_EQ(0u, step_); step_++; return true; }
     bool EndObject(SizeType memberCount) { EXPECT_EQ(19u, step_); EXPECT_EQ(7u, memberCount); step_++; return true; }
     bool StartArray() { EXPECT_EQ(14u, step_); step_++; return true; }
     bool EndArray(SizeType elementCount) { EXPECT_EQ(18u, step_); EXPECT_EQ(3u, elementCount); step_++; return true; }
@@ -819,9 +824,10 @@ struct IterativeParsingReaderHandler {
     const static int LOG_DOUBLE = -7;
     const static int LOG_STRING = -8;
     const static int LOG_STARTOBJECT = -9;
-    const static int LOG_ENDOBJECT = -10;
-    const static int LOG_STARTARRAY = -11;
-    const static int LOG_ENDARRAY = -12;
+    const static int LOG_KEY = -10;
+    const static int LOG_ENDOBJECT = -11;
+    const static int LOG_STARTARRAY = -12;
+    const static int LOG_ENDARRAY = -13;
 
     const static size_t LogCapacity = 256;
     int Logs[LogCapacity];
@@ -848,6 +854,8 @@ struct IterativeParsingReaderHandler {
 
     bool StartObject() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STARTOBJECT; return true; }
 
+    bool Key(const Ch*, SizeType, bool) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_KEY; return true; }
+	
     bool EndObject(SizeType c) {
         RAPIDJSON_ASSERT(LogCount < LogCapacity);
         Logs[LogCount++] = LOG_ENDOBJECT;
@@ -880,7 +888,7 @@ TEST(Reader, IterativeParsing_General) {
             handler.LOG_STARTARRAY,
             handler.LOG_INT,
             handler.LOG_STARTOBJECT,
-            handler.LOG_STRING,
+            handler.LOG_KEY,
             handler.LOG_STARTARRAY,
             handler.LOG_INT,
             handler.LOG_INT,
@@ -918,7 +926,7 @@ TEST(Reader, IterativeParsing_Count) {
             handler.LOG_STARTOBJECT,
             handler.LOG_ENDOBJECT, 0,
             handler.LOG_STARTOBJECT,
-            handler.LOG_STRING,
+            handler.LOG_KEY,
             handler.LOG_INT,
             handler.LOG_ENDOBJECT, 1,
             handler.LOG_STARTARRAY,

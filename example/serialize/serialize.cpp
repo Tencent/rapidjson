@@ -18,10 +18,10 @@ protected:
     template <typename Writer>
     void Serialize(Writer& writer) const {
         // This base class just write out name-value pairs, without wrapping within an object.
-        writer.String("name");
+        writer.Key("name");
         writer.String(name_.c_str(), (SizeType)name_.length()); // Suppling length of string is faster.
 
-        writer.String("age");
+        writer.Key("age");
         writer.Uint(age_);
     }
 
@@ -41,10 +41,10 @@ public:
     void Serialize(Writer& writer) const {
         writer.StartObject();
         
-        writer.String("school");
+        writer.Key("school");
         writer.String(school_.c_str(), (SizeType)school_.length());
 
-        writer.String("GPA");
+        writer.Key("GPA");
         writer.Double(GPA_);
 
         writer.EndObject();
@@ -75,7 +75,7 @@ public:
 
         Person::Serialize(writer);
 
-        writer.String("education");
+        writer.Key("education");
         if (education_)
             education_->Serialize(writer);
         else
@@ -108,10 +108,10 @@ public:
 
         Person::Serialize(writer);
 
-        writer.String("married");
+        writer.Key("married");
         writer.Bool(married_);
 
-        writer.String(("dependents"));
+        writer.Key("dependents");
         writer.StartArray();
         for (std::vector<Dependent>::const_iterator dependentItr = dependents_.begin(); dependentItr != dependents_.end(); ++dependentItr)
             dependentItr->Serialize(writer);

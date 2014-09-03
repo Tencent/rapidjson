@@ -223,16 +223,18 @@ TEST(Writer, AssertObjectKeyNotString) {
         writer.StartObject();\
         ASSERT_THROW(x, AssertException); \
     }
+    T(writer.Null());
     T(writer.Bool(false));
     T(writer.Bool(true));
-    T(writer.Null());
     T(writer.Int(0));
     T(writer.Uint(0));
     T(writer.Int64(0));
     T(writer.Uint64(0));
     T(writer.Double(0));
+    T(writer.String(""));
     T(writer.StartObject());
     T(writer.StartArray());
+    T(writer.EndArray(0));
 #undef T
 }
 
@@ -264,7 +266,7 @@ TEST(Writer, RootObjectIsComplete) {
     EXPECT_FALSE(writer.IsComplete());
     writer.StartObject();
     EXPECT_FALSE(writer.IsComplete());
-    writer.String("foo");
+    writer.Key("foo");
     EXPECT_FALSE(writer.IsComplete());
     writer.Int(1);
     EXPECT_FALSE(writer.IsComplete());

@@ -45,6 +45,10 @@ struct MessageHandler : public BaseReaderHandler<> {
         }
     }
 
+    bool Key(const char* str, SizeType length, bool copy) {
+		return String(str, length, copy);
+	}
+	
     bool EndObject(SizeType) { return state_ == kExpectNameOrObjectEnd; }
 
     bool Default() { return false; } // All other events are invalid.
