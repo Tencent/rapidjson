@@ -8,7 +8,6 @@
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/error/en.h"
-#include <algorithm>
 #include <string>
 #include <cctype>
 
@@ -26,8 +25,9 @@ struct CapitalizeFilter {
     bool Uint64(uint64_t u) { return out_.Uint64(u); }
     bool Double(double d) { return out_.Double(d); }
     bool String(const char* str, SizeType length, bool) { 
-        buffer_.assign(str, str + length);
-		std::transform(buffer_.begin(), buffer_.end(), buffer_.begin(), [](char c) { return std::toupper(c); });
+        buffer_.resize(length);
+		for (SizeType i = 0; i < length; ++i)
+            buffer_[i] = std::toupper(str[i]);
         return out_.String(buffer_.data(), length, true); // true = output handler need to copy the string
     }
     bool StartObject() { return out_.StartObject(); }
