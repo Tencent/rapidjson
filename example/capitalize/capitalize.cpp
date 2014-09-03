@@ -1,4 +1,4 @@
-// JSON condenser exmaple
+// JSON condenser example
 
 // This example parses JSON from stdin with validation, 
 // and re-output the JSON content to stdout with all string capitalized, and without whitespace.
@@ -31,7 +31,7 @@ struct CapitalizeFilter {
         return out_.String(buffer_.data(), length, true); // true = output handler need to copy the string
     }
     bool StartObject() { return out_.StartObject(); }
-    bool Key(const char* str, SizeType length, bool copy) { return String(str, length, copy); }
+    bool Key(const char* str, SizeType length, bool copy) { return String(str, length, copy); } // handle keys just like regular string values...
     bool EndObject(SizeType memberCount) { return out_.EndObject(memberCount); }
     bool StartArray() { return out_.StartArray(); }
     bool EndArray(SizeType elementCount) { return out_.EndArray(elementCount); }

@@ -85,7 +85,7 @@ public:
     bool Key(const Ch* str, SizeType length, bool copy = false) {
         (void)copy;
         PrettyPrefix(kStringType);
-        return Base::WriteString(str, length);
+        return Base::WriteString(str, length); // keys are written like strings
     }
 
     bool StartObject() {

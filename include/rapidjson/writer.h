@@ -128,7 +128,7 @@ public:
     bool Key(const Ch* str, SizeType length, bool copy = false) {
         (void)copy;
         Prefix(kStringType);
-        return WriteString(str, length);
+        return WriteString(str, length); // keys are written like strings
     }
 
     bool StartObject() {

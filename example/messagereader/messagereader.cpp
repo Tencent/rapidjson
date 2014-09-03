@@ -83,7 +83,7 @@ void ParseMessages(const char* json, MessageMap& messages) {
 int main() {
     MessageMap messages;
 
-    const char* json1 = "{ \"greeting\" : \"Hello!\", \"farewell\" : \"bye-bye!\" }";
+    const char* const json1 = "{ \"greeting\" : \"Hello!\", \"farewell\" : \"bye-bye!\" }";
     cout << json1 << endl;
     ParseMessages(json1, messages);
 
@@ -91,7 +91,7 @@ int main() {
         cout << itr->first << ": " << itr->second << endl;
 
     cout << endl << "Parse a JSON with invalid schema." << endl;
-    const char* json2 = "{ \"greeting\" : \"Hello!\", \"farewell\" : \"bye-bye!\", \"foo\" : {} }";
+    const char* const json2 = "{ \"greeting\" : \"Hello!\", \"farewell\" : \"bye-bye!\", \"foo\" : {} }";
     cout << json2 << endl;
     ParseMessages(json2, messages);
 

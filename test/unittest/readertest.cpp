@@ -488,7 +488,7 @@ struct ParseObjectHandler : BaseReaderHandler<UTF8<>, ParseObjectHandler> {
     bool Null() { EXPECT_EQ(8u, step_); step_++; return true; }
     bool Bool(bool b) { 
         switch(step_) {
-            case 4: EXPECT_TRUE(b); step_++; return true;
+            case 4: EXPECT_TRUE(b);  step_++; return true;
             case 6: EXPECT_FALSE(b); step_++; return true;
             default: ADD_FAILURE(); return false;
         }
@@ -496,9 +496,9 @@ struct ParseObjectHandler : BaseReaderHandler<UTF8<>, ParseObjectHandler> {
     bool Int(int i) { 
         switch(step_) {
             case 10: EXPECT_EQ(123, i); step_++; return true;
-            case 15: EXPECT_EQ(1, i); step_++; return true;
-            case 16: EXPECT_EQ(2, i); step_++; return true;
-            case 17: EXPECT_EQ(3, i); step_++; return true;
+            case 15: EXPECT_EQ(1,   i); step_++; return true;
+            case 16: EXPECT_EQ(2,   i); step_++; return true;
+            case 17: EXPECT_EQ(3,   i); step_++; return true;
             default: ADD_FAILURE(); return false;
         }
     }
@@ -513,13 +513,13 @@ struct ParseObjectHandler : BaseReaderHandler<UTF8<>, ParseObjectHandler> {
     bool StartObject() { EXPECT_EQ(0u, step_); step_++; return true; }
     bool Key(const char* str, size_t, bool) { 
         switch(step_) {
-            case 1: EXPECT_STREQ("hello", str); step_++; return true;
-            case 3: EXPECT_STREQ("t", str); step_++; return true;
-            case 5: EXPECT_STREQ("f", str); step_++; return true;
-            case 7: EXPECT_STREQ("n", str); step_++; return true;
-            case 9: EXPECT_STREQ("i", str); step_++; return true;
-            case 11: EXPECT_STREQ("pi", str); step_++; return true;
-            case 13: EXPECT_STREQ("a", str); step_++; return true;
+            case 1:  EXPECT_STREQ("hello", str); step_++; return true;
+            case 3:  EXPECT_STREQ("t",     str); step_++; return true;
+            case 5:  EXPECT_STREQ("f",     str); step_++; return true;
+            case 7:  EXPECT_STREQ("n",     str); step_++; return true;
+            case 9:  EXPECT_STREQ("i",     str); step_++; return true;
+            case 11: EXPECT_STREQ("pi",    str); step_++; return true;
+            case 13: EXPECT_STREQ("a",     str); step_++; return true;
             default: ADD_FAILURE(); return false;
         }
     }

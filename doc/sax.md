@@ -405,7 +405,7 @@ TODO: 2014-09-03: this example needs to be rewritten taking the new `Handler::Ke
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/error/en.h"
-#include <vector>
+#include <string>
 #include <cctype>
 
 using namespace rapidjson;
@@ -423,19 +423,19 @@ struct CapitalizeFilter {
     bool Uint64(uint64_t u) { return out_.Uint64(u); }
     bool Double(double d) { return out_.Double(d); }
     bool String(const char* str, SizeType length, bool) { 
-        buffer_.clear();
+        buffer_.resize(length);
         for (SizeType i = 0; i < length; i++)
-            buffer_.push_back(std::toupper(str[i]));
-        return out_.String(&buffer_.front(), length, true); // true = output handler need to copy the string
+            buffer_[i] = std::toupper(str[i]);
+        return out_.String(buffer_.data(), length, true); // true = output handler need to copy the string
     }
     bool StartObject() { return out_.StartObject(); }
-    bool Key(const char* str, SizeType length, bool copy) { return String(str, SizeType, copy); }
+    bool Key(const char* str, SizeType length, bool copy) { return String(str, SizeType, copy); } // handle keys just like regular string values...
     bool EndObject(SizeType memberCount) { return out_.EndObject(memberCount); }
     bool StartArray() { return out_.StartArray(); }
     bool EndArray(SizeType elementCount) { return out_.EndArray(elementCount); }
 
     OutputHandler& out_;
-    std::vector<char> buffer_;
+    std::string buffer_;
 };
 
 int main(int, char*[]) {
