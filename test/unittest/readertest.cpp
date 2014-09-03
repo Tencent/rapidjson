@@ -165,6 +165,7 @@ TEST(Reader, ParseNumberHandler) {
     TEST_DOUBLE("18446744073709551616", 18446744073709551616.0);    // 2^64 (max of uint64_t + 1, force to use double)
     TEST_DOUBLE("-9223372036854775809", -9223372036854775809.0);    // -2^63 - 1(min of int64_t + 1, force to use double)
     TEST_DOUBLE("0.9868011474609375", 0.9868011474609375);          // https://github.com/miloyip/rapidjson/issues/120
+    TEST_DOUBLE("123e34", 123e34);                                  // Fast Path Cases In Disguise
 
     {
         char n1e308[310];   // '1' followed by 308 '0'

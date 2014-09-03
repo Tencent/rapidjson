@@ -877,11 +877,21 @@ private:
         if (useDouble) {
             int p = exp + expFrac;
             double d;
-            uint64_t significand = use64bit ? i64 : i;
+            double significand = use64bit ? i64 : i;
 
             // Use fast path for string-to-double conversion if possible
             // see http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/
-            if (!useStrtod && p >= -22 && p <= 22 && significand <= RAPIDJSON_UINT64_C2(0x001FFFFF, 0xFFFFFFFF)) {
+            if (!useStrtod && p > 22) {
+                if (p < 22 + 16) {
+                    // Fast Path Cases In Disguise
+                    significand *= internal::Pow10(p - 22); 
+                    p = 22;
+                }
+                else
+                    useStrtod = true;
+            }
+
+            if (!useStrtod && p >= -22 && significand <= 9007199254740991.0) { // 2^53 - 1
                 if (p >= 0)
                     d = significand * internal::Pow10(p);
                 else
