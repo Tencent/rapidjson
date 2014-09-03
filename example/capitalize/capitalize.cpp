@@ -9,6 +9,7 @@
 #include "rapidjson/filewritestream.h"
 #include "rapidjson/error/en.h"
 #include <algorithm>
+#include <string>
 #include <cctype>
 
 using namespace rapidjson;
