@@ -101,10 +101,10 @@ typedef CharType&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8953a29062e23c7c6bd11a3464bca1de"><td class="memTemplParams" colspan="2">template&lt;SizeType N&gt; </td></tr>
-<tr class="memitem:a8953a29062e23c7c6bd11a3464bca1de"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structrapidjson_1_1_generic_string_ref.html#a8953a29062e23c7c6bd11a3464bca1de">GenericStringRef</a> (const CharType(&amp;str)[N])</td></tr>
-<tr class="memdesc:a8953a29062e23c7c6bd11a3464bca1de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create string reference from <code>const</code> character array.  <a href="#a8953a29062e23c7c6bd11a3464bca1de">More...</a><br /></td></tr>
-<tr class="separator:a8953a29062e23c7c6bd11a3464bca1de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd4d5ebac2b610ce647356aa52998002"><td class="memTemplParams" colspan="2">template&lt;SizeType N&gt; </td></tr>
+<tr class="memitem:acd4d5ebac2b610ce647356aa52998002"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="structrapidjson_1_1_generic_string_ref.html#acd4d5ebac2b610ce647356aa52998002">GenericStringRef</a> (const CharType(&amp;str)[N]) RAPIDJSON_NOEXCEPT</td></tr>
+<tr class="memdesc:acd4d5ebac2b610ce647356aa52998002"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create string reference from <code>const</code> character array.  <a href="#acd4d5ebac2b610ce647356aa52998002">More...</a><br /></td></tr>
+<tr class="separator:acd4d5ebac2b610ce647356aa52998002"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29cf407c6aa2313f13dff78d6ce02687"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrapidjson_1_1_generic_string_ref.html#a29cf407c6aa2313f13dff78d6ce02687">GenericStringRef</a> (const CharType *str)</td></tr>
 <tr class="memdesc:a29cf407c6aa2313f13dff78d6ce02687"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explicitly create string reference from <code>const</code> character pointer.  <a href="#a29cf407c6aa2313f13dff78d6ce02687">More...</a><br /></td></tr>
 <tr class="separator:a29cf407c6aa2313f13dff78d6ce02687"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -167,7 +167,7 @@ struct rapidjson::GenericStringRef&lt; CharType &gt;</h3>
 <div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> y(<a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(bar, 3));  <span class="comment">// ok, explicitly pass length</span></div>
 </div><!-- fragment --><dl class="section see"><dt>See also</dt><dd><a class="el" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5" title="Mark a character pointer as constant string. ">StringRef</a>, <a class="el" href="classrapidjson_1_1_generic_value.html#afb91480cc6242ca96ffc603e649c319f" title="Set this value as a string without copying source string. ">GenericValue::SetString</a> </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a8953a29062e23c7c6bd11a3464bca1de"></a>
+<a class="anchor" id="acd4d5ebac2b610ce647356aa52998002"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -338,7 +338,7 @@ template&lt;typename CharType &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="structrapidjson_1_1_generic_string_ref.html" title="Reference to a constant string (not taking a copy) ">GenericStringRef</a> string reference object</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classrapidjson_1_1_generic_value.html#af79ec904eba90c32246053f2bc57d57d" title="Constructor for constant string (i.e. do not make a copy of string) ">GenericValue::GenericValue(StringRefType)</a>, <a class="el" href="classrapidjson_1_1_generic_value.html#a4a906dc5c4ad87c01dd5d3206aa799a2" title="Assignment of constant string reference (no copy) ">GenericValue::operator=(StringRefType)</a>, <a class="el" href="classrapidjson_1_1_generic_value.html#aabb538578a3c1e60c86cda32d062bc1c" title="Set this value as a string without copying source string. ">GenericValue::SetString(StringRefType)</a>, <a class="el" href="classrapidjson_1_1_generic_value.html#a41946915cb219a684f6ffc9341efee22" title="Append a constant string reference at the end of the array. ">GenericValue::PushBack(StringRefType, Allocator&amp;)</a>, <a class="el" href="classrapidjson_1_1_generic_value.html#ab018d734d189532b27943bc45776ba68" title="Add a member (name-value pair) to the object. ">GenericValue::AddMember</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classrapidjson_1_1_generic_value.html#a65bfc3073fa80ee5eba8e985abe2f941" title="Constructor for constant string (i.e. do not make a copy of string) ">GenericValue::GenericValue(StringRefType)</a>, <a class="el" href="classrapidjson_1_1_generic_value.html#aecc9d0a6aafe31f4fdf9f6e75e5f089c" title="Assignment of constant string reference (no copy) ">GenericValue::operator=(StringRefType)</a>, <a class="el" href="classrapidjson_1_1_generic_value.html#aabb538578a3c1e60c86cda32d062bc1c" title="Set this value as a string without copying source string. ">GenericValue::SetString(StringRefType)</a>, <a class="el" href="classrapidjson_1_1_generic_value.html#a41946915cb219a684f6ffc9341efee22" title="Append a constant string reference at the end of the array. ">GenericValue::PushBack(StringRefType, Allocator&amp;)</a>, <a class="el" href="classrapidjson_1_1_generic_value.html#ab018d734d189532b27943bc45776ba68" title="Add a member (name-value pair) to the object. ">GenericValue::AddMember</a> </dd></dl>
 
 </div>
 </div>

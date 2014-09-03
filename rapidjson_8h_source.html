@@ -400,227 +400,268 @@ $(document).ready(function(){initNavTree('rapidjson_8h_source.html','');});
 <div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
 <div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;<span class="comment"></span><span class="comment">// RAPIDJSON_DIAG_PUSH/POP, RAPIDJSON_DIAG_OFF</span></div>
 <div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;<span class="preprocessor">#if defined(__clang__) || (defined(__GNUC__) &amp;&amp; RAPIDJSON_VERSION_CODE(__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__) &gt;= RAPIDJSON_VERSION_CODE(4,2,0))</span></div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;<span class="preprocessor">#define RAPIDJSON_PRAGMA(x) _Pragma(RAPIDJSON_STRINGIFY(x))</span></div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_PRAGMA(x) RAPIDJSON_PRAGMA(GCC diagnostic x)</span></div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_OFF(x) \</span></div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;<span class="preprocessor">    RAPIDJSON_DIAG_PRAGMA(ignored RAPIDJSON_STRINGIFY(RAPIDJSON_JOIN(-W,x)))</span></div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;<span class="preprocessor">#if defined(__GNUC__)</span></div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;<span class="preprocessor">#define RAPIDJSON_GNUC \</span></div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;<span class="preprocessor">    RAPIDJSON_VERSION_CODE(__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__)</span></div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;<span class="preprocessor">#if defined(__clang__) || (defined(RAPIDJSON_GNUC) &amp;&amp; RAPIDJSON_GNUC &gt;= RAPIDJSON_VERSION_CODE(4,2,0))</span></div>
 <div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;<span class="comment">// push/pop support in Clang and GCC&gt;=4.6</span></div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;<span class="preprocessor">#if defined(__clang__) || (defined(__GNUC__) &amp;&amp; RAPIDJSON_VERSION_CODE(__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__) &gt;= RAPIDJSON_VERSION_CODE(4,6,0))</span></div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_PUSH RAPIDJSON_DIAG_PRAGMA(push)</span></div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_POP  RAPIDJSON_DIAG_PRAGMA(pop)</span></div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;<span class="preprocessor">#else // GCC &gt;= 4.2, &lt; 4.6</span></div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_PUSH </span><span class="comment">/* ignored */</span><span class="preprocessor"></span></div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_POP </span><span class="comment">/* ignored */</span><span class="preprocessor"></span></div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;<span class="preprocessor">#elif defined(_MSC_VER)</span></div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;<span class="comment">// pragma (MSVC specific)</span></div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;<span class="preprocessor">#define RAPIDJSON_PRAGMA(x) __pragma(x)</span></div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_PRAGMA(x) RAPIDJSON_PRAGMA(warning(x))</span></div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_OFF(x) RAPIDJSON_DIAG_PRAGMA(disable: x)</span></div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_PUSH RAPIDJSON_DIAG_PRAGMA(push)</span></div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_POP  RAPIDJSON_DIAG_PRAGMA(pop)</span></div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_OFF(x) </span><span class="comment">/* ignored */</span><span class="preprocessor"></span></div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_PUSH   </span><span class="comment">/* ignored */</span><span class="preprocessor"></span></div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_POP    </span><span class="comment">/* ignored */</span><span class="preprocessor"></span></div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_DIAG_*</span></div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;<span class="comment">//!@endcond</span></div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;<span class="comment"></span><span class="comment"></span></div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;<span class="comment"></span><span class="comment">// Allocators and Encodings</span></div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;<span class="preprocessor">#include &quot;allocators.h&quot;</span></div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;<span class="preprocessor">#include &quot;encodings.h&quot;</span></div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;<span class="comment">//! main RapidJSON namespace</span></div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;<span class="comment"></span><span class="keyword">namespace </span>rapidjson {</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;<span class="comment"></span><span class="comment">//  Stream</span></div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;<span class="comment">/*! \class rapidjson::Stream</span></div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;<span class="comment">    \brief Concept for reading and writing characters.</span></div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;<span class="comment">    For read-only stream, no need to implement PutBegin(), Put(), Flush() and PutEnd().</span></div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;<span class="comment">    For write-only stream, only need to implement Put() and Flush().</span></div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;<span class="comment">\code</span></div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;<span class="comment">concept Stream {</span></div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;<span class="comment">    typename Ch;    //!&lt; Character type of the stream.</span></div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;<span class="comment"></span><span class="comment"></span></div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;<span class="comment">    //! Read the current character from stream without moving the read cursor.</span></div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;<span class="comment"></span>    Ch Peek() const;</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;<span class="comment">    //! Read the current character from stream and moving the read cursor to next character.</span></div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;<span class="comment"></span>    Ch Take();</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;<span class="comment">    //! Get the current read cursor.</span></div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;<span class="comment">    //! \return Number of characters read from start.</span></div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;<span class="comment"></span>    size_t Tell();</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;<span class="comment">    //! Begin writing operation at the current read pointer.</span></div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;<span class="comment">    //! \return The begin writer pointer.</span></div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;<span class="comment"></span>    Ch* PutBegin();</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;<span class="comment">    //! Write a character.</span></div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;<span class="comment"></span>    void Put(Ch c);</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;<span class="comment">    //! Flush the buffer.</span></div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;<span class="comment"></span>    void Flush();</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;<span class="comment">    //! End the writing operation.</span></div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;<span class="comment">    //! \param begin The begin write pointer returned by PutBegin().</span></div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;<span class="comment">    //! \return Number of characters written.</span></div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;<span class="comment"></span>    size_t PutEnd(Ch* begin);</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;}</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;\endcode</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;*/</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;<span class="comment">//! Provides additional information for stream.</span></div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;<span class="comment"></span><span class="comment">/*!</span></div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;<span class="comment">    By using traits pattern, this type provides a default configuration for stream.</span></div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;<span class="comment">    For custom stream, this type can be specialized for other configuration.</span></div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;<span class="comment">    See TEST(Reader, CustomStringStream) in readertest.cpp for example.</span></div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Stream&gt;</div>
-<div class="line"><a name="l00415"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_stream_traits.html">  415</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_stream_traits.html">StreamTraits</a> {<span class="comment"></span></div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;<span class="comment">    //! Whether to make local copy of stream for optimization during parsing.</span></div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;<span class="comment"></span><span class="comment">    /*!</span></div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;<span class="comment">        By default, for safety, streams do not use local copy optimization.</span></div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;<span class="comment">        Stream that can be copied fast should specialize this, like StreamTraits&lt;StringStream&gt;.</span></div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    <span class="keyword">enum</span> { copyOptimization = 0 };</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;};</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;<span class="preprocessor">#define RAPIDJSON_PRAGMA(x) _Pragma(RAPIDJSON_STRINGIFY(x))</span></div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_PRAGMA(x) RAPIDJSON_PRAGMA(GCC diagnostic x)</span></div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_OFF(x) \</span></div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;<span class="preprocessor">    RAPIDJSON_DIAG_PRAGMA(ignored RAPIDJSON_STRINGIFY(RAPIDJSON_JOIN(-W,x)))</span></div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;<span class="comment">// push/pop support in Clang and GCC&gt;=4.6</span></div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;<span class="preprocessor">#if defined(__clang__) || (defined(RAPIDJSON_GNUC) &amp;&amp; RAPIDJSON_GNUC &gt;= RAPIDJSON_VERSION_CODE(4,6,0))</span></div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_PUSH RAPIDJSON_DIAG_PRAGMA(push)</span></div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_POP  RAPIDJSON_DIAG_PRAGMA(pop)</span></div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;<span class="preprocessor">#else // GCC &gt;= 4.2, &lt; 4.6</span></div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_PUSH </span><span class="comment">/* ignored */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_POP </span><span class="comment">/* ignored */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;<span class="preprocessor">#elif defined(_MSC_VER)</span></div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;<span class="comment">// pragma (MSVC specific)</span></div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;<span class="preprocessor">#define RAPIDJSON_PRAGMA(x) __pragma(x)</span></div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_PRAGMA(x) RAPIDJSON_PRAGMA(warning(x))</span></div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_OFF(x) RAPIDJSON_DIAG_PRAGMA(disable: x)</span></div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_PUSH RAPIDJSON_DIAG_PRAGMA(push)</span></div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_POP  RAPIDJSON_DIAG_PRAGMA(pop)</span></div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_OFF(x) </span><span class="comment">/* ignored */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_PUSH   </span><span class="comment">/* ignored */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;<span class="preprocessor">#define RAPIDJSON_DIAG_POP    </span><span class="comment">/* ignored */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;</div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_DIAG_*</span></div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;<span class="comment"></span><span class="comment">// C++11 features</span></div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;<span class="preprocessor">#ifndef RAPIDJSON_HAS_CXX11_RVALUE_REFS</span></div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;<span class="preprocessor">#if defined(__clang__)</span></div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;<span class="preprocessor">#define RAPIDJSON_HAS_CXX11_RVALUE_REFS __has_feature(cxx_rvalue_references)</span></div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;<span class="preprocessor">#elif (defined(RAPIDJSON_GNUC) &amp;&amp; (RAPIDJSON_GNUC &gt;= RAPIDJSON_VERSION_CODE(4,3,0)) &amp;&amp; defined(__GXX_EXPERIMENTAL_CXX0X__)) || \</span></div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;<span class="preprocessor">      (defined(_MSC_VER) &amp;&amp; _MSC_VER &gt;= 1600)</span></div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;<span class="preprocessor">#define RAPIDJSON_HAS_CXX11_RVALUE_REFS 1</span></div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;<span class="preprocessor">#define RAPIDJSON_HAS_CXX11_RVALUE_REFS 0</span></div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS</span></div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;<span class="preprocessor">#ifndef RAPIDJSON_HAS_CXX11_NOEXCEPT</span></div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;<span class="preprocessor">#if defined(__clang__)</span></div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;<span class="preprocessor">#define RAPIDJSON_HAS_CXX11_NOEXCEPT __has_feature(cxx_noexcept)</span></div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;<span class="preprocessor">#elif (defined(RAPIDJSON_GNUC) &amp;&amp; (RAPIDJSON_GNUC &gt;= RAPIDJSON_VERSION_CODE(4,6,0)) &amp;&amp; defined(__GXX_EXPERIMENTAL_CXX0X__))</span></div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;<span class="comment">//    (defined(_MSC_VER) &amp;&amp; _MSC_VER &gt;= ????) // not yet supported</span></div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;<span class="preprocessor">#define RAPIDJSON_HAS_CXX11_NOEXCEPT 1</span></div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;<span class="preprocessor">#define RAPIDJSON_HAS_CXX11_NOEXCEPT 0</span></div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;<span class="preprocessor">#if RAPIDJSON_HAS_CXX11_NOEXCEPT</span></div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;<span class="preprocessor">#define RAPIDJSON_NOEXCEPT noexcept</span></div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;<span class="preprocessor">#define RAPIDJSON_NOEXCEPT </span><span class="comment">/* noexcept */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_HAS_CXX11_NOEXCEPT</span></div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;<span class="comment">// no automatic detection, yet</span></div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;<span class="preprocessor">#ifndef RAPIDJSON_HAS_CXX11_TYPETRAITS</span></div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;<span class="preprocessor">#define RAPIDJSON_HAS_CXX11_TYPETRAITS 0</span></div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;<span class="comment">//!@endcond</span></div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;<span class="comment"></span><span class="comment"></span></div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;<span class="comment"></span><span class="comment">// Allocators and Encodings</span></div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;<span class="preprocessor">#include &quot;allocators.h&quot;</span></div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;<span class="preprocessor">#include &quot;encodings.h&quot;</span></div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;<span class="comment">//! main RapidJSON namespace</span></div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;<span class="comment"></span><span class="keyword">namespace </span>rapidjson {</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;<span class="comment"></span><span class="comment">//  Stream</span></div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;<span class="comment">/*! \class rapidjson::Stream</span></div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;<span class="comment">    \brief Concept for reading and writing characters.</span></div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;<span class="comment">    For read-only stream, no need to implement PutBegin(), Put(), Flush() and PutEnd().</span></div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;<span class="comment">    For write-only stream, only need to implement Put() and Flush().</span></div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;<span class="comment">\code</span></div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;<span class="comment">concept Stream {</span></div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;<span class="comment">    typename Ch;    //!&lt; Character type of the stream.</span></div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;<span class="comment"></span><span class="comment"></span></div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;<span class="comment">    //! Read the current character from stream without moving the read cursor.</span></div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;<span class="comment"></span>    Ch Peek() const;</div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;<span class="comment">//! Put N copies of a character to a stream.</span></div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;<span class="comment"></span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Stream, <span class="keyword">typename</span> Ch&gt;</div>
-<div class="line"><a name="l00426"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#a1d49d2cab617858b53a1db23b1759f43">  426</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespacerapidjson.html#a1d49d2cab617858b53a1db23b1759f43">PutN</a>(<a class="code" href="classrapidjson_1_1_stream.html">Stream</a>&amp; stream, Ch c, <span class="keywordtype">size_t</span> n) {</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; n; i++)</div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;        stream.Put(c);</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;}</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;<span class="comment">    //! Read the current character from stream and moving the read cursor to next character.</span></div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;<span class="comment"></span>    Ch Take();</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;<span class="comment">    //! Get the current read cursor.</span></div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;<span class="comment">    //! \return Number of characters read from start.</span></div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;<span class="comment"></span>    size_t Tell();</div>
 <div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;<span class="comment"></span><span class="comment">// StringStream</span></div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;<span class="comment">//! Read-only string stream.</span></div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;<span class="comment"></span><span class="comment">/*! \note implements Stream concept</span></div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Encoding&gt;</div>
-<div class="line"><a name="l00438"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_generic_string_stream.html">  438</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_generic_string_stream.html">GenericStringStream</a> {</div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;    <span class="keyword">typedef</span> <span class="keyword">typename</span> Encoding::Ch Ch;</div>
-<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;    <a class="code" href="structrapidjson_1_1_generic_string_stream.html">GenericStringStream</a>(<span class="keyword">const</span> Ch *src) : <a class="code" href="structrapidjson_1_1_generic_string_stream.html#a9a38a9d5b1ce782cacd4ec1bdf87fc2d">src_</a>(src), <a class="code" href="structrapidjson_1_1_generic_string_stream.html#a2556705b0a0fd6393862efe6db025b32">head_</a>(src) {}</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;</div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    Ch Peek()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> *<a class="code" href="structrapidjson_1_1_generic_string_stream.html#a9a38a9d5b1ce782cacd4ec1bdf87fc2d">src_</a>; }</div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    Ch Take() { <span class="keywordflow">return</span> *<a class="code" href="structrapidjson_1_1_generic_string_stream.html#a9a38a9d5b1ce782cacd4ec1bdf87fc2d">src_</a>++; }</div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    <span class="keywordtype">size_t</span> Tell()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(<a class="code" href="structrapidjson_1_1_generic_string_stream.html#a9a38a9d5b1ce782cacd4ec1bdf87fc2d">src_</a> - <a class="code" href="structrapidjson_1_1_generic_string_stream.html#a2556705b0a0fd6393862efe6db025b32">head_</a>); }</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;</div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    Ch* PutBegin() { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); <span class="keywordflow">return</span> 0; }</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <span class="keywordtype">void</span> Put(Ch) { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); }</div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;    <span class="keywordtype">void</span> Flush() { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); }</div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    <span class="keywordtype">size_t</span> PutEnd(Ch*) { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); <span class="keywordflow">return</span> 0; }</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;</div>
-<div class="line"><a name="l00452"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_generic_string_stream.html#a9a38a9d5b1ce782cacd4ec1bdf87fc2d">  452</a></span>&#160;    <span class="keyword">const</span> Ch* <a class="code" href="structrapidjson_1_1_generic_string_stream.html#a9a38a9d5b1ce782cacd4ec1bdf87fc2d">src_</a>;     <span class="comment">//!&lt; Current read position.</span></div>
-<div class="line"><a name="l00453"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_generic_string_stream.html#a2556705b0a0fd6393862efe6db025b32">  453</a></span>&#160;<span class="comment"></span>    <span class="keyword">const</span> Ch* <a class="code" href="structrapidjson_1_1_generic_string_stream.html#a2556705b0a0fd6393862efe6db025b32">head_</a>;    <span class="comment">//!&lt; Original head of the string.</span></div>
-<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;<span class="comment"></span>};</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Encoding&gt;</div>
-<div class="line"><a name="l00457"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_stream_traits_3_01_generic_string_stream_3_01_encoding_01_4_01_4.html">  457</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_stream_traits.html">StreamTraits</a>&lt;<a class="code" href="structrapidjson_1_1_generic_string_stream.html">GenericStringStream</a>&lt;<a class="code" href="classrapidjson_1_1_encoding.html">Encoding</a>&gt; &gt; {</div>
-<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;    <span class="keyword">enum</span> { copyOptimization = 1 };</div>
-<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;};</div>
-<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;<span class="comment">//! String stream with UTF8 encoding.</span></div>
-<div class="line"><a name="l00462"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ada4cef9931d4a3a0017ee776c907807b">  462</a></span>&#160;<span class="comment"></span><span class="keyword">typedef</span> <a class="code" href="structrapidjson_1_1_generic_string_stream.html">GenericStringStream&lt;UTF8&lt;&gt;</a> &gt; <a class="code" href="namespacerapidjson.html#ada4cef9931d4a3a0017ee776c907807b">StringStream</a>;</div>
-<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;<span class="comment"></span><span class="comment">// InsituStringStream</span></div>
-<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;<span class="comment">//! A read-write string stream.</span></div>
-<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;<span class="comment"></span><span class="comment">/*! This string stream is particularly designed for in-situ parsing.</span></div>
-<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;<span class="comment">    \note implements Stream concept</span></div>
-<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Encoding&gt;</div>
-<div class="line"><a name="l00472"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_generic_insitu_string_stream.html">  472</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_generic_insitu_string_stream.html">GenericInsituStringStream</a> {</div>
-<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;    <span class="keyword">typedef</span> <span class="keyword">typename</span> Encoding::Ch Ch;</div>
-<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;</div>
-<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;    <a class="code" href="structrapidjson_1_1_generic_insitu_string_stream.html">GenericInsituStringStream</a>(Ch *src) : src_(src), dst_(0), head_(src) {}</div>
-<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;</div>
-<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;    <span class="comment">// Read</span></div>
-<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;    Ch Peek() { <span class="keywordflow">return</span> *src_; }</div>
-<div class="line"><a name="l00479"></a><span class="lineno">  479</span>&#160;    Ch Take() { <span class="keywordflow">return</span> *src_++; }</div>
-<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;    <span class="keywordtype">size_t</span> Tell() { <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(src_ - head_); }</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;<span class="comment">    //! Begin writing operation at the current read pointer.</span></div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;<span class="comment">    //! \return The begin writer pointer.</span></div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;<span class="comment"></span>    Ch* PutBegin();</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;<span class="comment">    //! Write a character.</span></div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;<span class="comment"></span>    void Put(Ch c);</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;<span class="comment">    //! Flush the buffer.</span></div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;<span class="comment"></span>    void Flush();</div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;<span class="comment">    //! End the writing operation.</span></div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;<span class="comment">    //! \param begin The begin write pointer returned by PutBegin().</span></div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;<span class="comment">    //! \return Number of characters written.</span></div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;<span class="comment"></span>    size_t PutEnd(Ch* begin);</div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;}</div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;\endcode</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;*/</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;<span class="comment">//! Provides additional information for stream.</span></div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;<span class="comment"></span><span class="comment">/*!</span></div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;<span class="comment">    By using traits pattern, this type provides a default configuration for stream.</span></div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;<span class="comment">    For custom stream, this type can be specialized for other configuration.</span></div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;<span class="comment">    See TEST(Reader, CustomStringStream) in readertest.cpp for example.</span></div>
+<div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;<span class="comment">*/</span></div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> Stream&gt;</div>
+<div class="line"><a name="l00456"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_stream_traits.html">  456</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_stream_traits.html">StreamTraits</a> {<span class="comment"></span></div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;<span class="comment">    //! Whether to make local copy of stream for optimization during parsing.</span></div>
+<div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;<span class="comment"></span><span class="comment">    /*!</span></div>
+<div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;<span class="comment">        By default, for safety, streams do not use local copy optimization.</span></div>
+<div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;<span class="comment">        Stream that can be copied fast should specialize this, like StreamTraits&lt;StringStream&gt;.</span></div>
+<div class="line"><a name="l00461"></a><span class="lineno">  461</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;    <span class="keyword">enum</span> { copyOptimization = 0 };</div>
+<div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;};</div>
+<div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;<span class="comment">//! Put N copies of a character to a stream.</span></div>
+<div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;<span class="comment"></span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Stream, <span class="keyword">typename</span> Ch&gt;</div>
+<div class="line"><a name="l00467"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#a1d49d2cab617858b53a1db23b1759f43">  467</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespacerapidjson.html#a1d49d2cab617858b53a1db23b1759f43">PutN</a>(<a class="code" href="classrapidjson_1_1_stream.html">Stream</a>&amp; stream, Ch c, <span class="keywordtype">size_t</span> n) {</div>
+<div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; n; i++)</div>
+<div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;        stream.Put(c);</div>
+<div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;}</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
+<div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;<span class="comment"></span><span class="comment">// StringStream</span></div>
+<div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00475"></a><span class="lineno">  475</span>&#160;<span class="comment">//! Read-only string stream.</span></div>
+<div class="line"><a name="l00476"></a><span class="lineno">  476</span>&#160;<span class="comment"></span><span class="comment">/*! \note implements Stream concept</span></div>
+<div class="line"><a name="l00477"></a><span class="lineno">  477</span>&#160;<span class="comment">*/</span></div>
+<div class="line"><a name="l00478"></a><span class="lineno">  478</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Encoding&gt;</div>
+<div class="line"><a name="l00479"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_generic_string_stream.html">  479</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_generic_string_stream.html">GenericStringStream</a> {</div>
+<div class="line"><a name="l00480"></a><span class="lineno">  480</span>&#160;    <span class="keyword">typedef</span> <span class="keyword">typename</span> Encoding::Ch Ch;</div>
 <div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;</div>
-<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;    <span class="comment">// Write</span></div>
-<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;    <span class="keywordtype">void</span> Put(Ch c) { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(dst_ != 0); *dst_++ = c; }</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;</div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;    Ch* PutBegin() { <span class="keywordflow">return</span> dst_ = src_; }</div>
-<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;    <span class="keywordtype">size_t</span> PutEnd(Ch* begin) { <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(dst_ - begin); }</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;    <span class="keywordtype">void</span> Flush() {}</div>
-<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    Ch* Push(<span class="keywordtype">size_t</span> count) { Ch* begin = dst_; dst_ += count; <span class="keywordflow">return</span> begin; }</div>
-<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;    <span class="keywordtype">void</span> Pop(<span class="keywordtype">size_t</span> count) { dst_ -= count; }</div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;</div>
-<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    Ch* src_;</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;    Ch* dst_;</div>
-<div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;    Ch* head_;</div>
-<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;};</div>
+<div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;    <a class="code" href="structrapidjson_1_1_generic_string_stream.html">GenericStringStream</a>(<span class="keyword">const</span> Ch *src) : <a class="code" href="structrapidjson_1_1_generic_string_stream.html#a9a38a9d5b1ce782cacd4ec1bdf87fc2d">src_</a>(src), <a class="code" href="structrapidjson_1_1_generic_string_stream.html#a2556705b0a0fd6393862efe6db025b32">head_</a>(src) {}</div>
+<div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;</div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;    Ch Peek()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> *<a class="code" href="structrapidjson_1_1_generic_string_stream.html#a9a38a9d5b1ce782cacd4ec1bdf87fc2d">src_</a>; }</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;    Ch Take() { <span class="keywordflow">return</span> *<a class="code" href="structrapidjson_1_1_generic_string_stream.html#a9a38a9d5b1ce782cacd4ec1bdf87fc2d">src_</a>++; }</div>
+<div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;    <span class="keywordtype">size_t</span> Tell()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(<a class="code" href="structrapidjson_1_1_generic_string_stream.html#a9a38a9d5b1ce782cacd4ec1bdf87fc2d">src_</a> - <a class="code" href="structrapidjson_1_1_generic_string_stream.html#a2556705b0a0fd6393862efe6db025b32">head_</a>); }</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;</div>
+<div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;    Ch* PutBegin() { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); <span class="keywordflow">return</span> 0; }</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;    <span class="keywordtype">void</span> Put(Ch) { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); }</div>
+<div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;    <span class="keywordtype">void</span> Flush() { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); }</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;    <span class="keywordtype">size_t</span> PutEnd(Ch*) { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); <span class="keywordflow">return</span> 0; }</div>
+<div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;</div>
+<div class="line"><a name="l00493"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_generic_string_stream.html#a9a38a9d5b1ce782cacd4ec1bdf87fc2d">  493</a></span>&#160;    <span class="keyword">const</span> Ch* <a class="code" href="structrapidjson_1_1_generic_string_stream.html#a9a38a9d5b1ce782cacd4ec1bdf87fc2d">src_</a>;     <span class="comment">//!&lt; Current read position.</span></div>
+<div class="line"><a name="l00494"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_generic_string_stream.html#a2556705b0a0fd6393862efe6db025b32">  494</a></span>&#160;<span class="comment"></span>    <span class="keyword">const</span> Ch* <a class="code" href="structrapidjson_1_1_generic_string_stream.html#a2556705b0a0fd6393862efe6db025b32">head_</a>;    <span class="comment">//!&lt; Original head of the string.</span></div>
+<div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;<span class="comment"></span>};</div>
 <div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;</div>
 <div class="line"><a name="l00497"></a><span class="lineno">  497</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Encoding&gt;</div>
-<div class="line"><a name="l00498"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_stream_traits_3_01_generic_insitu_string_stream_3_01_encoding_01_4_01_4.html">  498</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_stream_traits.html">StreamTraits</a>&lt;<a class="code" href="structrapidjson_1_1_generic_insitu_string_stream.html">GenericInsituStringStream</a>&lt;<a class="code" href="classrapidjson_1_1_encoding.html">Encoding</a>&gt; &gt; {</div>
+<div class="line"><a name="l00498"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_stream_traits_3_01_generic_string_stream_3_01_encoding_01_4_01_4.html">  498</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_stream_traits.html">StreamTraits</a>&lt;<a class="code" href="structrapidjson_1_1_generic_string_stream.html">GenericStringStream</a>&lt;<a class="code" href="classrapidjson_1_1_encoding.html">Encoding</a>&gt; &gt; {</div>
 <div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;    <span class="keyword">enum</span> { copyOptimization = 1 };</div>
 <div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;};</div>
 <div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;<span class="comment">//! Insitu string stream with UTF8 encoding.</span></div>
-<div class="line"><a name="l00503"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#a5660e8e601d2719796bc86c3168a1787">  503</a></span>&#160;<span class="comment"></span><span class="keyword">typedef</span> <a class="code" href="structrapidjson_1_1_generic_insitu_string_stream.html">GenericInsituStringStream&lt;UTF8&lt;&gt;</a> &gt; <a class="code" href="namespacerapidjson.html#a5660e8e601d2719796bc86c3168a1787">InsituStringStream</a>;</div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;<span class="comment">//! String stream with UTF8 encoding.</span></div>
+<div class="line"><a name="l00503"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ada4cef9931d4a3a0017ee776c907807b">  503</a></span>&#160;<span class="comment"></span><span class="keyword">typedef</span> <a class="code" href="structrapidjson_1_1_generic_string_stream.html">GenericStringStream&lt;UTF8&lt;&gt;</a> &gt; <a class="code" href="namespacerapidjson.html#ada4cef9931d4a3a0017ee776c907807b">StringStream</a>;</div>
 <div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
-<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;<span class="comment"></span><span class="comment">// Type</span></div>
+<div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;<span class="comment"></span><span class="comment">// InsituStringStream</span></div>
 <div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;<span class="comment">//! Type of JSON value</span></div>
-<div class="line"><a name="l00509"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">  509</a></span>&#160;<span class="comment"></span><span class="keyword">enum</span> <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> {</div>
-<div class="line"><a name="l00510"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a952871e4326b527154fc8aac1ac1f6ff">  510</a></span>&#160;    <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a952871e4326b527154fc8aac1ac1f6ff">kNullType</a> = 0,      <span class="comment">//!&lt; null</span></div>
-<div class="line"><a name="l00511"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a9f2e7047832dce1029551b5de0f05607">  511</a></span>&#160;<span class="comment"></span>    <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a9f2e7047832dce1029551b5de0f05607">kFalseType</a> = 1,     <span class="comment">//!&lt; false</span></div>
-<div class="line"><a name="l00512"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a80d9f25b083abce45edbfdd3ba006c8e">  512</a></span>&#160;<span class="comment"></span>    <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a80d9f25b083abce45edbfdd3ba006c8e">kTrueType</a> = 2,      <span class="comment">//!&lt; true</span></div>
-<div class="line"><a name="l00513"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">  513</a></span>&#160;<span class="comment"></span>    <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a> = 3,    <span class="comment">//!&lt; object</span></div>
-<div class="line"><a name="l00514"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">  514</a></span>&#160;<span class="comment"></span>    <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a> = 4,     <span class="comment">//!&lt; array </span></div>
-<div class="line"><a name="l00515"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4ad6379da3dc04b83a591992bfb9fabba7">  515</a></span>&#160;<span class="comment"></span>    <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4ad6379da3dc04b83a591992bfb9fabba7">kStringType</a> = 5,    <span class="comment">//!&lt; string</span></div>
-<div class="line"><a name="l00516"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a">  516</a></span>&#160;<span class="comment"></span>    <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a">kNumberType</a> = 6     <span class="comment">//!&lt; number</span></div>
-<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;<span class="comment"></span>};</div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;</div>
-<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;} <span class="comment">// namespace rapidjson</span></div>
-<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;</div>
-<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_RAPIDJSON_H_</span></div>
-<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4a80d9f25b083abce45edbfdd3ba006c8e"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a80d9f25b083abce45edbfdd3ba006c8e">rapidjson::kTrueType</a></div><div class="ttdoc">true </div><div class="ttdef"><b>Definition:</b> rapidjson.h:512</div></div>
-<div class="ttc" id="structrapidjson_1_1_generic_string_stream_html"><div class="ttname"><a href="structrapidjson_1_1_generic_string_stream.html">rapidjson::GenericStringStream</a></div><div class="ttdoc">Read-only string stream. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:438</div></div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;<span class="comment">//! A read-write string stream.</span></div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;<span class="comment"></span><span class="comment">/*! This string stream is particularly designed for in-situ parsing.</span></div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;<span class="comment">    \note implements Stream concept</span></div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;<span class="comment">*/</span></div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Encoding&gt;</div>
+<div class="line"><a name="l00513"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_generic_insitu_string_stream.html">  513</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_generic_insitu_string_stream.html">GenericInsituStringStream</a> {</div>
+<div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160;    <span class="keyword">typedef</span> <span class="keyword">typename</span> Encoding::Ch Ch;</div>
+<div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;</div>
+<div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;    <a class="code" href="structrapidjson_1_1_generic_insitu_string_stream.html">GenericInsituStringStream</a>(Ch *src) : src_(src), dst_(0), head_(src) {}</div>
+<div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;    <span class="comment">// Read</span></div>
+<div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;    Ch Peek() { <span class="keywordflow">return</span> *src_; }</div>
+<div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;    Ch Take() { <span class="keywordflow">return</span> *src_++; }</div>
+<div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;    <span class="keywordtype">size_t</span> Tell() { <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(src_ - head_); }</div>
+<div class="line"><a name="l00522"></a><span class="lineno">  522</span>&#160;</div>
+<div class="line"><a name="l00523"></a><span class="lineno">  523</span>&#160;    <span class="comment">// Write</span></div>
+<div class="line"><a name="l00524"></a><span class="lineno">  524</span>&#160;    <span class="keywordtype">void</span> Put(Ch c) { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(dst_ != 0); *dst_++ = c; }</div>
+<div class="line"><a name="l00525"></a><span class="lineno">  525</span>&#160;</div>
+<div class="line"><a name="l00526"></a><span class="lineno">  526</span>&#160;    Ch* PutBegin() { <span class="keywordflow">return</span> dst_ = src_; }</div>
+<div class="line"><a name="l00527"></a><span class="lineno">  527</span>&#160;    <span class="keywordtype">size_t</span> PutEnd(Ch* begin) { <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(dst_ - begin); }</div>
+<div class="line"><a name="l00528"></a><span class="lineno">  528</span>&#160;    <span class="keywordtype">void</span> Flush() {}</div>
+<div class="line"><a name="l00529"></a><span class="lineno">  529</span>&#160;</div>
+<div class="line"><a name="l00530"></a><span class="lineno">  530</span>&#160;    Ch* Push(<span class="keywordtype">size_t</span> count) { Ch* begin = dst_; dst_ += count; <span class="keywordflow">return</span> begin; }</div>
+<div class="line"><a name="l00531"></a><span class="lineno">  531</span>&#160;    <span class="keywordtype">void</span> Pop(<span class="keywordtype">size_t</span> count) { dst_ -= count; }</div>
+<div class="line"><a name="l00532"></a><span class="lineno">  532</span>&#160;</div>
+<div class="line"><a name="l00533"></a><span class="lineno">  533</span>&#160;    Ch* src_;</div>
+<div class="line"><a name="l00534"></a><span class="lineno">  534</span>&#160;    Ch* dst_;</div>
+<div class="line"><a name="l00535"></a><span class="lineno">  535</span>&#160;    Ch* head_;</div>
+<div class="line"><a name="l00536"></a><span class="lineno">  536</span>&#160;};</div>
+<div class="line"><a name="l00537"></a><span class="lineno">  537</span>&#160;</div>
+<div class="line"><a name="l00538"></a><span class="lineno">  538</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Encoding&gt;</div>
+<div class="line"><a name="l00539"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_stream_traits_3_01_generic_insitu_string_stream_3_01_encoding_01_4_01_4.html">  539</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_stream_traits.html">StreamTraits</a>&lt;<a class="code" href="structrapidjson_1_1_generic_insitu_string_stream.html">GenericInsituStringStream</a>&lt;<a class="code" href="classrapidjson_1_1_encoding.html">Encoding</a>&gt; &gt; {</div>
+<div class="line"><a name="l00540"></a><span class="lineno">  540</span>&#160;    <span class="keyword">enum</span> { copyOptimization = 1 };</div>
+<div class="line"><a name="l00541"></a><span class="lineno">  541</span>&#160;};</div>
+<div class="line"><a name="l00542"></a><span class="lineno">  542</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00543"></a><span class="lineno">  543</span>&#160;<span class="comment">//! Insitu string stream with UTF8 encoding.</span></div>
+<div class="line"><a name="l00544"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#a5660e8e601d2719796bc86c3168a1787">  544</a></span>&#160;<span class="comment"></span><span class="keyword">typedef</span> <a class="code" href="structrapidjson_1_1_generic_insitu_string_stream.html">GenericInsituStringStream&lt;UTF8&lt;&gt;</a> &gt; <a class="code" href="namespacerapidjson.html#a5660e8e601d2719796bc86c3168a1787">InsituStringStream</a>;</div>
+<div class="line"><a name="l00545"></a><span class="lineno">  545</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00546"></a><span class="lineno">  546</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
+<div class="line"><a name="l00547"></a><span class="lineno">  547</span>&#160;<span class="comment"></span><span class="comment">// Type</span></div>
+<div class="line"><a name="l00548"></a><span class="lineno">  548</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00549"></a><span class="lineno">  549</span>&#160;<span class="comment">//! Type of JSON value</span></div>
+<div class="line"><a name="l00550"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">  550</a></span>&#160;<span class="comment"></span><span class="keyword">enum</span> <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> {</div>
+<div class="line"><a name="l00551"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a952871e4326b527154fc8aac1ac1f6ff">  551</a></span>&#160;    <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a952871e4326b527154fc8aac1ac1f6ff">kNullType</a> = 0,      <span class="comment">//!&lt; null</span></div>
+<div class="line"><a name="l00552"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a9f2e7047832dce1029551b5de0f05607">  552</a></span>&#160;<span class="comment"></span>    <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a9f2e7047832dce1029551b5de0f05607">kFalseType</a> = 1,     <span class="comment">//!&lt; false</span></div>
+<div class="line"><a name="l00553"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a80d9f25b083abce45edbfdd3ba006c8e">  553</a></span>&#160;<span class="comment"></span>    <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a80d9f25b083abce45edbfdd3ba006c8e">kTrueType</a> = 2,      <span class="comment">//!&lt; true</span></div>
+<div class="line"><a name="l00554"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">  554</a></span>&#160;<span class="comment"></span>    <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a> = 3,    <span class="comment">//!&lt; object</span></div>
+<div class="line"><a name="l00555"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">  555</a></span>&#160;<span class="comment"></span>    <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a> = 4,     <span class="comment">//!&lt; array </span></div>
+<div class="line"><a name="l00556"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4ad6379da3dc04b83a591992bfb9fabba7">  556</a></span>&#160;<span class="comment"></span>    <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4ad6379da3dc04b83a591992bfb9fabba7">kStringType</a> = 5,    <span class="comment">//!&lt; string</span></div>
+<div class="line"><a name="l00557"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a">  557</a></span>&#160;<span class="comment"></span>    <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a">kNumberType</a> = 6     <span class="comment">//!&lt; number</span></div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;<span class="comment"></span>};</div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;</div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;} <span class="comment">// namespace rapidjson</span></div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;</div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_RAPIDJSON_H_</span></div>
+<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4a80d9f25b083abce45edbfdd3ba006c8e"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a80d9f25b083abce45edbfdd3ba006c8e">rapidjson::kTrueType</a></div><div class="ttdoc">true </div><div class="ttdef"><b>Definition:</b> rapidjson.h:553</div></div>
+<div class="ttc" id="structrapidjson_1_1_generic_string_stream_html"><div class="ttname"><a href="structrapidjson_1_1_generic_string_stream.html">rapidjson::GenericStringStream</a></div><div class="ttdoc">Read-only string stream. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:479</div></div>
 <div class="ttc" id="namespacerapidjson_html_a44eb33eaa523e36d466b1ced64b85c84"><div class="ttname"><a href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">rapidjson::SizeType</a></div><div class="ttdeci">unsigned SizeType</div><div class="ttdoc">Size type (for string lengths, array sizes, etc.) </div><div class="ttdef"><b>Definition:</b> rapidjson.h:247</div></div>
-<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4a9f2e7047832dce1029551b5de0f05607"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a9f2e7047832dce1029551b5de0f05607">rapidjson::kFalseType</a></div><div class="ttdoc">false </div><div class="ttdef"><b>Definition:</b> rapidjson.h:511</div></div>
-<div class="ttc" id="structrapidjson_1_1_generic_string_stream_html_a2556705b0a0fd6393862efe6db025b32"><div class="ttname"><a href="structrapidjson_1_1_generic_string_stream.html#a2556705b0a0fd6393862efe6db025b32">rapidjson::GenericStringStream::head_</a></div><div class="ttdeci">const Ch * head_</div><div class="ttdoc">Original head of the string. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:453</div></div>
-<div class="ttc" id="structrapidjson_1_1_generic_string_stream_html_a9a38a9d5b1ce782cacd4ec1bdf87fc2d"><div class="ttname"><a href="structrapidjson_1_1_generic_string_stream.html#a9a38a9d5b1ce782cacd4ec1bdf87fc2d">rapidjson::GenericStringStream::src_</a></div><div class="ttdeci">const Ch * src_</div><div class="ttdoc">Current read position. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:452</div></div>
-<div class="ttc" id="namespacerapidjson_html_a5660e8e601d2719796bc86c3168a1787"><div class="ttname"><a href="namespacerapidjson.html#a5660e8e601d2719796bc86c3168a1787">rapidjson::InsituStringStream</a></div><div class="ttdeci">GenericInsituStringStream&lt; UTF8&lt;&gt; &gt; InsituStringStream</div><div class="ttdoc">Insitu string stream with UTF8 encoding. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:503</div></div>
+<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4a9f2e7047832dce1029551b5de0f05607"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a9f2e7047832dce1029551b5de0f05607">rapidjson::kFalseType</a></div><div class="ttdoc">false </div><div class="ttdef"><b>Definition:</b> rapidjson.h:552</div></div>
+<div class="ttc" id="structrapidjson_1_1_generic_string_stream_html_a2556705b0a0fd6393862efe6db025b32"><div class="ttname"><a href="structrapidjson_1_1_generic_string_stream.html#a2556705b0a0fd6393862efe6db025b32">rapidjson::GenericStringStream::head_</a></div><div class="ttdeci">const Ch * head_</div><div class="ttdoc">Original head of the string. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:494</div></div>
+<div class="ttc" id="structrapidjson_1_1_generic_string_stream_html_a9a38a9d5b1ce782cacd4ec1bdf87fc2d"><div class="ttname"><a href="structrapidjson_1_1_generic_string_stream.html#a9a38a9d5b1ce782cacd4ec1bdf87fc2d">rapidjson::GenericStringStream::src_</a></div><div class="ttdeci">const Ch * src_</div><div class="ttdoc">Current read position. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:493</div></div>
+<div class="ttc" id="namespacerapidjson_html_a5660e8e601d2719796bc86c3168a1787"><div class="ttname"><a href="namespacerapidjson.html#a5660e8e601d2719796bc86c3168a1787">rapidjson::InsituStringStream</a></div><div class="ttdeci">GenericInsituStringStream&lt; UTF8&lt;&gt; &gt; InsituStringStream</div><div class="ttdoc">Insitu string stream with UTF8 encoding. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:544</div></div>
 <div class="ttc" id="classrapidjson_1_1_encoding_html"><div class="ttname"><a href="classrapidjson_1_1_encoding.html">rapidjson::Encoding</a></div><div class="ttdoc">Concept for encoding of Unicode characters. </div></div>
-<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">rapidjson::Type</a></div><div class="ttdeci">Type</div><div class="ttdoc">Type of JSON value. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:509</div></div>
-<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">rapidjson::kObjectType</a></div><div class="ttdoc">object </div><div class="ttdef"><b>Definition:</b> rapidjson.h:513</div></div>
-<div class="ttc" id="namespacerapidjson_html_ada4cef9931d4a3a0017ee776c907807b"><div class="ttname"><a href="namespacerapidjson.html#ada4cef9931d4a3a0017ee776c907807b">rapidjson::StringStream</a></div><div class="ttdeci">GenericStringStream&lt; UTF8&lt;&gt; &gt; StringStream</div><div class="ttdoc">String stream with UTF8 encoding. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:462</div></div>
-<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">rapidjson::kArrayType</a></div><div class="ttdoc">array </div><div class="ttdef"><b>Definition:</b> rapidjson.h:514</div></div>
-<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4a952871e4326b527154fc8aac1ac1f6ff"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a952871e4326b527154fc8aac1ac1f6ff">rapidjson::kNullType</a></div><div class="ttdoc">null </div><div class="ttdef"><b>Definition:</b> rapidjson.h:510</div></div>
+<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">rapidjson::Type</a></div><div class="ttdeci">Type</div><div class="ttdoc">Type of JSON value. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:550</div></div>
+<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">rapidjson::kObjectType</a></div><div class="ttdoc">object </div><div class="ttdef"><b>Definition:</b> rapidjson.h:554</div></div>
+<div class="ttc" id="namespacerapidjson_html_ada4cef9931d4a3a0017ee776c907807b"><div class="ttname"><a href="namespacerapidjson.html#ada4cef9931d4a3a0017ee776c907807b">rapidjson::StringStream</a></div><div class="ttdeci">GenericStringStream&lt; UTF8&lt;&gt; &gt; StringStream</div><div class="ttdoc">String stream with UTF8 encoding. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:503</div></div>
+<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">rapidjson::kArrayType</a></div><div class="ttdoc">array </div><div class="ttdef"><b>Definition:</b> rapidjson.h:555</div></div>
+<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4a952871e4326b527154fc8aac1ac1f6ff"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a952871e4326b527154fc8aac1ac1f6ff">rapidjson::kNullType</a></div><div class="ttdoc">null </div><div class="ttdef"><b>Definition:</b> rapidjson.h:551</div></div>
 <div class="ttc" id="classrapidjson_1_1_stream_html"><div class="ttname"><a href="classrapidjson_1_1_stream.html">rapidjson::Stream</a></div><div class="ttdoc">Concept for reading and writing characters. </div></div>
-<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4ad6379da3dc04b83a591992bfb9fabba7"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4ad6379da3dc04b83a591992bfb9fabba7">rapidjson::kStringType</a></div><div class="ttdoc">string </div><div class="ttdef"><b>Definition:</b> rapidjson.h:515</div></div>
+<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4ad6379da3dc04b83a591992bfb9fabba7"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4ad6379da3dc04b83a591992bfb9fabba7">rapidjson::kStringType</a></div><div class="ttdoc">string </div><div class="ttdef"><b>Definition:</b> rapidjson.h:556</div></div>
 <div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:264</div></div>
-<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a">rapidjson::kNumberType</a></div><div class="ttdoc">number </div><div class="ttdef"><b>Definition:</b> rapidjson.h:516</div></div>
-<div class="ttc" id="structrapidjson_1_1_stream_traits_html"><div class="ttname"><a href="structrapidjson_1_1_stream_traits.html">rapidjson::StreamTraits</a></div><div class="ttdoc">Provides additional information for stream. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:415</div></div>
-<div class="ttc" id="structrapidjson_1_1_generic_insitu_string_stream_html"><div class="ttname"><a href="structrapidjson_1_1_generic_insitu_string_stream.html">rapidjson::GenericInsituStringStream</a></div><div class="ttdoc">A read-write string stream. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:472</div></div>
-<div class="ttc" id="namespacerapidjson_html_a1d49d2cab617858b53a1db23b1759f43"><div class="ttname"><a href="namespacerapidjson.html#a1d49d2cab617858b53a1db23b1759f43">rapidjson::PutN</a></div><div class="ttdeci">void PutN(Stream &amp;stream, Ch c, size_t n)</div><div class="ttdoc">Put N copies of a character to a stream. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:426</div></div>
+<div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a">rapidjson::kNumberType</a></div><div class="ttdoc">number </div><div class="ttdef"><b>Definition:</b> rapidjson.h:557</div></div>
+<div class="ttc" id="structrapidjson_1_1_stream_traits_html"><div class="ttname"><a href="structrapidjson_1_1_stream_traits.html">rapidjson::StreamTraits</a></div><div class="ttdoc">Provides additional information for stream. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:456</div></div>
+<div class="ttc" id="structrapidjson_1_1_generic_insitu_string_stream_html"><div class="ttname"><a href="structrapidjson_1_1_generic_insitu_string_stream.html">rapidjson::GenericInsituStringStream</a></div><div class="ttdoc">A read-write string stream. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:513</div></div>
+<div class="ttc" id="namespacerapidjson_html_a1d49d2cab617858b53a1db23b1759f43"><div class="ttname"><a href="namespacerapidjson.html#a1d49d2cab617858b53a1db23b1759f43">rapidjson::PutN</a></div><div class="ttdeci">void PutN(Stream &amp;stream, Ch c, size_t n)</div><div class="ttdoc">Put N copies of a character to a stream. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:467</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->
