@@ -139,6 +139,7 @@ public:
 
     //! Simpler but slower overload.
     bool String(const Ch* str) { return String(str, internal::StrLen(str)); }
+    bool Key(const Ch* str) { return Key(str, internal::StrLen(str)); }
 
     //@}
 protected:
