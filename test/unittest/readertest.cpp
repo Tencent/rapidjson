@@ -21,6 +21,8 @@
 #include "unittest.h"
 
 #include "rapidjson/reader.h"
+#include "rapidjson/internal/dtoa.h"
+#include "rapidjson/internal/itoa.h"
 
 using namespace rapidjson;
 
@@ -172,6 +174,75 @@ TEST(Reader, ParseNumberHandler) {
         n1e308[309] = '\0';
         TEST_DOUBLE(n1e308, 1E308);
     }
+
+    // Random test for uint32_t/int32_t
+    {
+        union {
+            uint32_t u;
+            int32_t i;
+        }u;
+        Random r;
+
+        for (unsigned i = 0; i < 100000; i++) {
+            u.u = r();
+
+            char buffer[32];
+            *internal::u32toa(u.u, buffer) = '\0';
+            TEST_NUMBER(ParseUintHandler, buffer, u.u);
+
+            if (u.i < 0) {
+                *internal::i32toa(u.i, buffer) = '\0';
+                TEST_NUMBER(ParseIntHandler, buffer, u.i);
+            }
+        }
+    }
+
+    // Random test for uint64_t/int64_t
+    {
+        union {
+            uint64_t u;
+            int64_t i;
+        }u;
+        Random r;
+
+        for (unsigned i = 0; i < 100000; i++) {
+            u.u = uint64_t(r()) << 32;
+            u.u |= r();
+
+            char buffer[32];
+            if (u.u >= 4294967296ULL) {
+                *internal::u64toa(u.u, buffer) = '\0';
+                TEST_NUMBER(ParseUint64Handler, buffer, u.u);
+            }
+
+            if (u.i <= -2147483649LL) {
+                *internal::i64toa(u.i, buffer) = '\0';
+                TEST_NUMBER(ParseInt64Handler, buffer, u.i);
+            }
+        }
+    }
+
+    // Random test for double
+    {
+        union {
+            double d;
+            uint64_t u;
+        }u;
+        Random r;
+
+        for (unsigned i = 0; i < 100000; i++) {
+            do {
+                // Need to call r() in two statements for cross-platform coherent sequence.
+                u.u = uint64_t(r()) << 32;
+                u.u |= uint64_t(r());
+            } while (isnan(u.d) || isinf(u.d));
+
+            char buffer[32];
+            *internal::dtoa(u.d, buffer) = '\0';
+            TEST_DOUBLE(buffer, u.d);
+        }
+    }
+
 #undef TEST_NUMBER
 #undef TEST_DOUBLE
 }
