@@ -848,6 +848,8 @@ struct IterativeParsingReaderHandler {
 
     bool StartObject() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STARTOBJECT; return true; }
 
+    bool Key (const Ch* str, SizeType len, bool copy) { return String(str, len, copy); }
+	
     bool EndObject(SizeType c) {
         RAPIDJSON_ASSERT(LogCount < LogCapacity);
         Logs[LogCount++] = LOG_ENDOBJECT;
