@@ -637,8 +637,10 @@ private:
             StackStream stackStream(stack_);
             ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
-            const typename TargetEncoding::Ch* const str = stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_);
-            success = (isKey ? handler.Key(str, stackStream.length_ - 1, false) : handler.String(str, stackStream.length_ - 1, false));
+            success = (isKey
+                ? handler.Key(   stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, false)
+                : handler.String(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, false)
+            );
         }
 
         if(!success)
