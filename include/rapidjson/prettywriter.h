@@ -147,8 +147,18 @@ public:
 protected:
     void PrettyPrefix(Type type, bool isKey = false) {
         (void)type;
+        (void)isKey;
         if (Base::level_stack_.GetSize() != 0) { // this value is not at root
             typename Base::Level* level = Base::level_stack_.template Top<typename Base::Level>();
+
+            // paramater validation / invariant checking
+            if (level->isObject) {
+                RAPIDJSON_ASSERT( isKey || (level->valueCount % 2 == 1));  // it needs to be either a key or the number of objects needs to be odd
+                RAPIDJSON_ASSERT(!isKey || (type == kStringType));  // keys need to be strings
+            }
+            else {
+                RAPIDJSON_ASSERT(!isKey);  // it cannot be a key
+            }
 
             if (level->inArray) {
                 if (level->valueCount > 0) {
@@ -170,25 +180,18 @@ protected:
                         Base::os_->Put(' ');
                     }
                 }
-                else
+                else {
                     Base::os_->Put('\n');
+                }
 
                 if (level->valueCount % 2 == 0)
                     WriteIndent();
             }
 
-            if (!level->inArray) {
-                if (level->valueCount % 2 == 0) {
-                    RAPIDJSON_ASSERT(type == kStringType);  // if it's in object, then even number should be a name/string
-                    RAPIDJSON_ASSERT(isKey);  // if it's in object, then even number should be a key
-                } else {
-                    RAPIDJSON_ASSERT(!isKey);  // if it's in object, then odd number should not be a key
-                }
-            }
-
             level->valueCount++;
         }
         else {
+            RAPIDJSON_ASSERT(!isKey);  // it cannot be a key
             RAPIDJSON_ASSERT(!Base::hasRoot_);  // Should only has one and only one root.
             Base::hasRoot_ = true;
         }

@@ -317,23 +317,26 @@ protected:
         (void)isKey;
         if (level_stack_.GetSize() != 0) { // this value is not at root
             Level* level = level_stack_.template Top<Level>();
+
+            // paramater validation / invariant checking
+            if (level->isObject) {
+                RAPIDJSON_ASSERT( isKey || (level->valueCount % 2 == 1));  // it needs to be either a key or the number of objects needs to be odd
+                RAPIDJSON_ASSERT(!isKey || (type == kStringType));  // keys need to be strings
+            }
+            else {
+                RAPIDJSON_ASSERT(!isKey);  // it cannot be a key
+            }
+
             if (level->valueCount > 0) {
                 if (level->inArray) 
                     os_->Put(','); // add comma if it is not the first element in array
                 else  // in object
                     os_->Put((level->valueCount % 2 == 0) ? ',' : ':');
             }
-            if (!level->inArray) {
-                if (level->valueCount % 2 == 0) {
-                    RAPIDJSON_ASSERT(type == kStringType);  // if it's in object, then even number should be a name/string
-                    RAPIDJSON_ASSERT(isKey);  // if it's in object, then even number should be a key
-                } else {
-                    RAPIDJSON_ASSERT(!isKey);  // if it's in object, then odd number should not be a key
-                }
-            }
             level->valueCount++;
         }
         else {
+            RAPIDJSON_ASSERT(!isKey);  // it cannot be a key
             RAPIDJSON_ASSERT(!hasRoot_);    // Should only has one and only one root.
             hasRoot_ = true;
         }
