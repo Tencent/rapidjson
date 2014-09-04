@@ -473,7 +473,7 @@ private:
             if (is.Peek() != '"')
                 RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
 
-            ParseKey<parseFlags>(is, handler);
+            ParseString<parseFlags>(is, handler, true);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
             SkipWhitespace(is);
@@ -578,7 +578,7 @@ private:
             RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell() - 1);
     }
 
-    // Helper function to parse four hexidecimal digits in \uXXXX in ParseStringOrKey().
+    // Helper function to parse four hexidecimal digits in \uXXXX in ParseString().
     template<typename InputStream>
     unsigned ParseHex4(InputStream& is) {
         unsigned codepoint = 0;
@@ -618,10 +618,13 @@ private:
     };
 
     // Parse string and generate String event. Different code paths for kParseInsituFlag.
-    template<unsigned parseFlags, bool isKey, typename InputStream, typename Handler>
-    void ParseStringOrKey(InputStream& is, Handler& handler) {
+    template<unsigned parseFlags, typename InputStream, typename Handler>
+    void ParseString(InputStream& is, Handler& handler, bool isKey = false) {
         internal::StreamLocalCopy<InputStream> copy(is);
         InputStream& s(copy.s);
+
+        const typename TargetEncoding::Ch* str = NULL;
+        SizeType len = 0;
 
         if (parseFlags & kParseInsituFlag) {
             typename InputStream::Ch *head = s.PutBegin();
@@ -629,36 +632,19 @@ private:
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
             size_t length = s.PutEnd(head) - 1;
             RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
-            if (isKey) {
-                if (!handler.Key((typename TargetEncoding::Ch*)head, SizeType(length), false))
-                    RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
-            } else {
-                if (!handler.String((typename TargetEncoding::Ch*)head, SizeType(length), false))
-                    RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
-            }
+            str = (const typename TargetEncoding::Ch*)head;
+            len = SizeType(length);
         }
         else {
             StackStream stackStream(stack_);
             ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
-            if (isKey) {
-                if (!handler.Key(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, true))
-                    RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
-            } else {
-                if (!handler.String(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, true))
-                    RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
-            }
+            str = stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_);
+            len = stackStream.length_ - 1;
         }
-    }
 
-    template<unsigned parseFlags, typename InputStream, typename Handler>
-    void ParseKey(InputStream& is, Handler& handler) {
-        return ParseStringOrKey<parseFlags, true>(is, handler);
-    }
-
-    template<unsigned parseFlags, typename InputStream, typename Handler>
-    void ParseString(InputStream& is, Handler& handler) {
-        return ParseStringOrKey<parseFlags, false>(is, handler);
+        if(!(isKey ? handler.Key(str, len, false) : handler.String(str, len, false)))
+            RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
     }
 
     // Parse string to an output is
@@ -1216,7 +1202,7 @@ private:
         }
 
         case IterativeParsingMemberKeyState:
-            ParseKey<parseFlags>(is, handler);
+            ParseString<parseFlags>(is, handler, true);
             if (HasParseError())
                 return IterativeParsingErrorState;
             else
