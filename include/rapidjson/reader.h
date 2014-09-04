@@ -630,20 +630,17 @@ private:
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
             size_t length = s.PutEnd(head) - 1;
             RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
-            const typename TargetEncoding::Ch* const str = (const typename TargetEncoding::Ch*)head;
+            const typename TargetEncoding::Ch* const str = (typename TargetEncoding::Ch*)head;
             success = (isKey ? handler.Key(str, SizeType(length), false) : handler.String(str, SizeType(length), false));
         }
         else {
             StackStream stackStream(stack_);
             ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
-            success = (isKey
-                ? handler.Key(   stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, false)
-                : handler.String(stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_), stackStream.length_ - 1, false)
-            );
+            const typename TargetEncoding::Ch* const str = stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_);
+            success = (isKey ? handler.Key(str, stackStream.length_ - 1, true) : handler.String(str, stackStream.length_ - 1, true));
         }
-
-        if(!success)
+        if (!success)
             RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
     }
 
