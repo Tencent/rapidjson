@@ -623,27 +623,25 @@ private:
         internal::StreamLocalCopy<InputStream> copy(is);
         InputStream& s(copy.s);
 
-        const typename TargetEncoding::Ch* str = NULL;
-        SizeType len = 0;
-
+        bool success = false;
         if (parseFlags & kParseInsituFlag) {
             typename InputStream::Ch *head = s.PutBegin();
             ParseStringToStream<parseFlags, SourceEncoding, SourceEncoding>(s, s);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
             size_t length = s.PutEnd(head) - 1;
             RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
-            str = (const typename TargetEncoding::Ch*)head;
-            len = SizeType(length);
+            const typename TargetEncoding::Ch* const str = (const typename TargetEncoding::Ch*)head;
+            success = (isKey ? handler.Key(str, SizeType(length), false) : handler.String(str, SizeType(length), false));
         }
         else {
             StackStream stackStream(stack_);
             ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
-            str = stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_);
-            len = stackStream.length_ - 1;
+            const typename TargetEncoding::Ch* const str = stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_);
+            success = (isKey ? handler.Key(str, stackStream.length_ - 1, false) : handler.String(str, stackStream.length_ - 1, false));
         }
 
-        if(!(isKey ? handler.Key(str, len, false) : handler.String(str, len, false)))
+        if(!success)
             RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
     }
 

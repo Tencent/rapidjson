@@ -4,7 +4,7 @@
 using namespace rapidjson;
 using namespace std;
 
-struct MyHandler {
+struct MyHandler : public BaseReaderHandler<UTF8<>, MyHandler> {
     bool Null() { cout << "Null()" << endl; return true; }
     bool Bool(bool b) { cout << "Bool(" << boolalpha << b << ")" << endl; return true; }
     bool Int(int i) { cout << "Int(" << i << ")" << endl; return true; }
@@ -17,7 +17,10 @@ struct MyHandler {
         return true;
     }
     bool StartObject() { cout << "StartObject()" << endl; return true; }
-    bool Key(const char* str, SizeType length, bool copy) { return String(str, length, copy); }
+    bool Key(const char* str, SizeType length, bool copy) {
+        cout << "Key(" << str << ", " << length << ", " << boolalpha << copy << ")" << endl;
+        return true;
+    }
     bool EndObject(SizeType memberCount) { cout << "EndObject(" << memberCount << ")" << endl; return true; }
     bool StartArray() { cout << "StartArray()" << endl; return true; }
     bool EndArray(SizeType elementCount) { cout << "EndArray(" << elementCount << ")" << endl; return true; }
