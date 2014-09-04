@@ -1386,7 +1386,7 @@ int z = a[0u].GetInt();             // This works too.
             if (!handler.StartObject())
                 return false;
             for (ConstMemberIterator m = MemberBegin(); m != MemberEnd(); ++m) {
-                if (!handler.String(m->name.GetString(), m->name.GetStringLength(), (m->name.flags_ & kCopyFlag) != 0))
+                if (!handler.Key(m->name.GetString(), m->name.GetStringLength(), (m->name.flags_ & kCopyFlag) != 0))
                     return false;
                 if (!m->value.Accept(handler))
                     return false;
@@ -1794,6 +1794,8 @@ private:
 
     bool StartObject() { new (stack_.template Push<ValueType>()) ValueType(kObjectType); return true; }
     
+    bool Key(const Ch* str, SizeType length, bool copy) { return String(str, length, copy); }
+
     bool EndObject(SizeType memberCount) {
         typename ValueType::Member* members = stack_.template Pop<typename ValueType::Member>(memberCount);
         stack_.template Top<ValueType>()->SetObjectRaw(members, (SizeType)memberCount, GetAllocator());
