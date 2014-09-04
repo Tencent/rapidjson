@@ -182,7 +182,7 @@ struct BaseReaderHandler {
     bool Double(double) { return static_cast<Override&>(*this).Default(); }
     bool String(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
     bool StartObject() { return static_cast<Override&>(*this).Default(); }
-    bool Key(const Ch* str, SizeType len, bool copy) { return String(str, len, copy); }
+    bool Key(const Ch* str, SizeType len, bool copy) { return static_cast<Override&>(*this).String(str, len, copy); }
     bool EndObject(SizeType) { return static_cast<Override&>(*this).Default(); }
     bool StartArray() { return static_cast<Override&>(*this).Default(); }
     bool EndArray(SizeType) { return static_cast<Override&>(*this).Default(); }
