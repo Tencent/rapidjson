@@ -24,6 +24,7 @@
 /*! \file document.h */
 
 #include "reader.h"
+#include "internal/meta.h"
 #include "internal/strfunc.h"
 #include <new>      // placement new
 
@@ -38,15 +39,17 @@ RAPIDJSON_DIAG_OFF(effc++)
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_HAS_STDSTRING
 
+#ifndef RAPIDJSON_HAS_STDSTRING
 #ifdef RAPIDJSON_DOXYGEN_RUNNING
 #define RAPIDJSON_HAS_STDSTRING 1 // force generation of documentation
+#else
+#define RAPIDJSON_HAS_STDSTRING 0 // no std::string support by default
 #endif
-#ifdef RAPIDJSON_HAS_STDSTRING
 /*! \def RAPIDJSON_HAS_STDSTRING
     \ingroup RAPIDJSON_CONFIG
     \brief Enable RapidJSON support for \c std::string
 
-    By defining this preprocessor symbol, several convenience functions for using
+    By defining this preprocessor symbol to \c 1, several convenience functions for using
     \ref rapidjson::GenericValue with \c std::string are enabled, especially
     for construction and comparison.
 
@@ -56,7 +59,6 @@ RAPIDJSON_DIAG_OFF(effc++)
 #endif // RAPIDJSON_HAS_STDSTRING
 
 #ifndef RAPIDJSON_NOMEMBERITERATORCLASS
-#include "internal/meta.h"
 #include <iterator> // std::iterator, std::random_access_iterator_tag
 #endif
 
@@ -277,7 +279,7 @@ struct GenericStringRef {
             GenericValue instead.
      */
     template<SizeType N>
-    GenericStringRef(const CharType (&str)[N])
+    GenericStringRef(const CharType (&str)[N]) RAPIDJSON_NOEXCEPT
         : s(str), length(N-1) {}
 
     //! Explicitly create string reference from \c const character pointer
@@ -300,7 +302,7 @@ struct GenericStringRef {
             GenericValue instead.
      */
     explicit GenericStringRef(const CharType* str)
-        : s(str), length(internal::StrLen(str)){}
+        : s(str), length(internal::StrLen(str)){ RAPIDJSON_ASSERT(s != NULL); }
 
     //! Create constant string reference from pointer and length
     /*! \param str constant string, lifetime assumed to be longer than the use of the string in e.g. a GenericValue
@@ -363,7 +365,7 @@ inline GenericStringRef<CharType> StringRef(const CharType* str, size_t length) 
     return GenericStringRef<CharType>(str, SizeType(length));
 }
 
-#ifdef RAPIDJSON_HAS_STDSTRING
+#if RAPIDJSON_HAS_STDSTRING
 //! Mark a string object as constant string
 /*! Mark a string object (e.g. \c std::string) as a "string literal".
     This function can be used to avoid copying a string to be referenced as a
@@ -381,6 +383,22 @@ inline GenericStringRef<CharType> StringRef(const std::basic_string<CharType>& s
     return GenericStringRef<CharType>(str.data(), SizeType(str.size()));
 }
 #endif
+
+///////////////////////////////////////////////////////////////////////////////
+// GenericValue type traits
+namespace internal {
+
+template <typename T, typename Encoding = void, typename Allocator = void>
+struct IsGenericValueImpl : FalseType {};
+
+// select candidates according to nested encoding and allocator types
+template <typename T> struct IsGenericValueImpl<T, typename Void<typename T::EncodingType>::Type, typename Void<typename T::AllocatorType>::Type>
+    : IsBaseOf<GenericValue<typename T::EncodingType, typename T::AllocatorType>, T>::Type {};
+
+// helper to match arbitrary GenericValue instantiations, including derived classes
+template <typename T> struct IsGenericValue : IsGenericValueImpl<T>::Type {};
+
+} // namespace internal
 
 ///////////////////////////////////////////////////////////////////////////////
 // GenericValue
@@ -414,7 +432,14 @@ public:
     //@{
 
     //! Default constructor creates a null value.
-    GenericValue() : data_(), flags_(kNullFlag) {}
+    GenericValue() RAPIDJSON_NOEXCEPT : data_(), flags_(kNullFlag) {}
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    //! Move constructor in C++11
+    GenericValue(GenericValue&& rhs) RAPIDJSON_NOEXCEPT : data_(rhs.data_), flags_(rhs.flags_) {
+        rhs.flags_ = kNullFlag; // give up contents
+    }
+#endif
 
 private:
     //! Copy constructor is not permitted.
@@ -427,7 +452,7 @@ public:
         \param type Type of the value.
         \note Default content for number is zero.
     */
-    GenericValue(Type type) : data_(), flags_() {
+    GenericValue(Type type) RAPIDJSON_NOEXCEPT : data_(), flags_() {
         static const unsigned defaultFlags[7] = {
             kNullFlag, kFalseFlag, kTrueFlag, kObjectFlag, kArrayFlag, kConstStringFlag,
             kNumberAnyFlag
@@ -444,7 +469,7 @@ public:
         \see CopyFrom()
     */
     template< typename SourceAllocator >
-    GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator & allocator);
+    GenericValue(const GenericValue<Encoding, SourceAllocator>& rhs, Allocator & allocator);
 
     //! Constructor for boolean value.
     /*! \param b Boolean value
@@ -454,28 +479,31 @@ public:
      */
 #ifndef RAPIDJSON_DOXYGEN_RUNNING // hide SFINAE from Doxygen
     template <typename T>
-    explicit GenericValue(T b, RAPIDJSON_ENABLEIF((internal::IsSame<T,bool>)))
+    explicit GenericValue(T b, RAPIDJSON_ENABLEIF((internal::IsSame<T,bool>))) RAPIDJSON_NOEXCEPT
 #else
-    explicit GenericValue(bool b)
+    explicit GenericValue(bool b) RAPIDJSON_NOEXCEPT
 #endif
-        : data_(), flags_(b ? kTrueFlag : kFalseFlag) {}
+        : data_(), flags_(b ? kTrueFlag : kFalseFlag) {
+            // safe-guard against failing SFINAE
+            RAPIDJSON_STATIC_ASSERT((internal::IsSame<bool,T>::Value));
+    }
 
     //! Constructor for int value.
-    explicit GenericValue(int i) : data_(), flags_(kNumberIntFlag) {
+    explicit GenericValue(int i) RAPIDJSON_NOEXCEPT : data_(), flags_(kNumberIntFlag) {
         data_.n.i64 = i;
         if (i >= 0)
             flags_ |= kUintFlag | kUint64Flag;
     }
 
     //! Constructor for unsigned value.
-    explicit GenericValue(unsigned u) : data_(), flags_(kNumberUintFlag) {
+    explicit GenericValue(unsigned u) RAPIDJSON_NOEXCEPT : data_(), flags_(kNumberUintFlag) {
         data_.n.u64 = u; 
         if (!(u & 0x80000000))
             flags_ |= kIntFlag | kInt64Flag;
     }
 
     //! Constructor for int64_t value.
-    explicit GenericValue(int64_t i64) : data_(), flags_(kNumberInt64Flag) {
+    explicit GenericValue(int64_t i64) RAPIDJSON_NOEXCEPT : data_(), flags_(kNumberInt64Flag) {
         data_.n.i64 = i64;
         if (i64 >= 0) {
             flags_ |= kNumberUint64Flag;
@@ -489,7 +517,7 @@ public:
     }
 
     //! Constructor for uint64_t value.
-    explicit GenericValue(uint64_t u64) : data_(), flags_(kNumberUint64Flag) {
+    explicit GenericValue(uint64_t u64) RAPIDJSON_NOEXCEPT : data_(), flags_(kNumberUint64Flag) {
         data_.n.u64 = u64;
         if (!(u64 & RAPIDJSON_UINT64_C2(0x80000000, 0x00000000)))
             flags_ |= kInt64Flag;
@@ -500,13 +528,13 @@ public:
     }
 
     //! Constructor for double value.
-    explicit GenericValue(double d) : data_(), flags_(kNumberDoubleFlag) { data_.n.d = d; }
+    explicit GenericValue(double d) RAPIDJSON_NOEXCEPT : data_(), flags_(kNumberDoubleFlag) { data_.n.d = d; }
 
     //! Constructor for constant string (i.e. do not make a copy of string)
-    GenericValue(const Ch* s, SizeType length) : data_(), flags_() { SetStringRaw(StringRef(s, length)); }
+    GenericValue(const Ch* s, SizeType length) RAPIDJSON_NOEXCEPT : data_(), flags_() { SetStringRaw(StringRef(s, length)); }
 
     //! Constructor for constant string (i.e. do not make a copy of string)
-    explicit GenericValue(StringRefType s) : data_(), flags_() { SetStringRaw(s); }
+    explicit GenericValue(StringRefType s) RAPIDJSON_NOEXCEPT : data_(), flags_() { SetStringRaw(s); }
 
     //! Constructor for copy-string (i.e. do make a copy of string)
     GenericValue(const Ch* s, SizeType length, Allocator& allocator) : data_(), flags_() { SetStringRaw(StringRef(s, length), allocator); }
@@ -514,7 +542,7 @@ public:
     //! Constructor for copy-string (i.e. do make a copy of string)
     GenericValue(const Ch*s, Allocator& allocator) : data_(), flags_() { SetStringRaw(StringRef(s), allocator); }
 
-#ifdef RAPIDJSON_HAS_STDSTRING
+#if RAPIDJSON_HAS_STDSTRING
     //! Constructor for copy-string from a string object (i.e. do make a copy of string)
     /*! \note Requires the definition of the preprocessor symbol \ref RAPIDJSON_HAS_STDSTRING.
      */
@@ -557,19 +585,26 @@ public:
     //! Assignment with move semantics.
     /*! \param rhs Source of the assignment. It will become a null value after assignment.
     */
-    GenericValue& operator=(GenericValue& rhs) {
+    GenericValue& operator=(GenericValue& rhs) RAPIDJSON_NOEXCEPT {
         RAPIDJSON_ASSERT(this != &rhs);
         this->~GenericValue();
         RawAssign(rhs);
         return *this;
     }
 
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    //! Move assignment in C++11
+    GenericValue& operator=(GenericValue&& rhs) RAPIDJSON_NOEXCEPT {
+        return *this = rhs.Move();
+    }
+#endif
+
     //! Assignment of constant string reference (no copy)
     /*! \param str Constant string reference to be assigned
         \note This overload is needed to avoid clashes with the generic primitive type assignment overload below.
         \see GenericStringRef, operator=(T)
     */
-    GenericValue& operator=(StringRefType str) {
+    GenericValue& operator=(StringRefType str) RAPIDJSON_NOEXCEPT {
         GenericValue s(str);
         return *this = s;
     }
@@ -587,7 +622,7 @@ public:
             use \ref SetBool() instead.
     */
     template <typename T>
-    RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>,GenericValue&)
+    RAPIDJSON_DISABLEIF_RETURN((internal::IsPointer<T>), (GenericValue&))
     operator=(T value) {
         GenericValue v(value);
         return *this = v;
@@ -600,10 +635,10 @@ public:
         \param allocator Allocator to use for copying
      */
     template <typename SourceAllocator>
-    GenericValue& CopyFrom(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator) {
+    GenericValue& CopyFrom(const GenericValue<Encoding, SourceAllocator>& rhs, Allocator& allocator) {
         RAPIDJSON_ASSERT((void*)this != (void const*)&rhs);
         this->~GenericValue();
-        new (this) GenericValue(rhs,allocator);
+        new (this) GenericValue(rhs, allocator);
         return *this;
     }
 
@@ -612,7 +647,7 @@ public:
         \param other Another value.
         \note Constant complexity.
     */
-    GenericValue& Swap(GenericValue& other) {
+    GenericValue& Swap(GenericValue& other) RAPIDJSON_NOEXCEPT {
         GenericValue temp;
         temp.RawAssign(*this);
         RawAssign(other);
@@ -622,7 +657,7 @@ public:
 
     //! Prepare Value for move semantics
     /*! \return *this */
-    GenericValue& Move() { return *this; }
+    GenericValue& Move() RAPIDJSON_NOEXCEPT { return *this; }
     //@}
 
     //!@name Equal-to and not-equal-to operators
@@ -632,7 +667,9 @@ public:
         \note If an object contains duplicated named member, comparing equality with any object is always \c false.
         \note Linear time complexity (number of all values in the subtree and total lengths of all strings).
     */
-    bool operator==(const GenericValue& rhs) const {
+    template <typename SourceAllocator>
+    bool operator==(const GenericValue<Encoding, SourceAllocator>& rhs) const {
+        typedef GenericValue<Encoding, SourceAllocator> RhsType;
         if (GetType() != rhs.GetType())
             return false;
 
@@ -641,7 +678,7 @@ public:
             if (data_.o.size != rhs.data_.o.size)
                 return false;           
             for (ConstMemberIterator lhsMemberItr = MemberBegin(); lhsMemberItr != MemberEnd(); ++lhsMemberItr) {
-                ConstMemberIterator rhsMemberItr = rhs.FindMember(lhsMemberItr->name);
+                typename RhsType::ConstMemberIterator rhsMemberItr = rhs.FindMember(lhsMemberItr->name);
                 if (rhsMemberItr == rhs.MemberEnd() || lhsMemberItr->value != rhsMemberItr->value)
                     return false;
             }
@@ -659,7 +696,7 @@ public:
             return StringEqual(rhs);
 
         case kNumberType:
-            if (IsDouble() || rhs.GetDouble())
+            if (IsDouble() || rhs.IsDouble())
                 return GetDouble() == rhs.GetDouble(); // May convert one operand from integer to double.
             else
                 return data_.n.u64 == rhs.data_.n.u64;
@@ -672,7 +709,7 @@ public:
     //! Equal-to operator with const C-string pointer
     bool operator==(const Ch* rhs) const { return *this == GenericValue(StringRef(rhs)); }
 
-#ifdef RAPIDJSON_HAS_STDSTRING
+#if RAPIDJSON_HAS_STDSTRING
     //! Equal-to operator with string object
     /*! \note Requires the definition of the preprocessor symbol \ref RAPIDJSON_HAS_STDSTRING.
      */
@@ -682,22 +719,31 @@ public:
     //! Equal-to operator with primitive types
     /*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c double, \c true, \c false
     */
-    template <typename T> RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>, bool) operator==(const T& rhs) const { return *this == GenericValue(rhs); }
+    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>,internal::IsGenericValue<T> >), (bool)) operator==(const T& rhs) const { return *this == GenericValue(rhs); }
+
+    //! Not-equal-to operator
+    /*! \return !(*this == rhs)
+     */
+    template <typename SourceAllocator>
+    bool operator!=(const GenericValue<Encoding, SourceAllocator>& rhs) const { return !(*this == rhs); }
+
+    //! Not-equal-to operator with const C-string pointer
+    bool operator!=(const Ch* rhs) const { return !(*this == rhs); }
 
     //! Not-equal-to operator with arbitrary types
     /*! \return !(*this == rhs)
      */
-    template <typename T> bool operator!=(const T& rhs) const { return !(*this == rhs); }
+    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::IsGenericValue<T>), (bool)) operator!=(const T& rhs) const { return !(*this == rhs); }
 
     //! Equal-to operator with arbitrary types (symmetric version)
     /*! \return (rhs == lhs)
      */
-    template <typename T> friend bool operator==(const T& lhs, const GenericValue& rhs) { return rhs == lhs; }
+    template <typename T> friend RAPIDJSON_DISABLEIF_RETURN((internal::IsGenericValue<T>), (bool)) operator==(const T& lhs, const GenericValue& rhs) { return rhs == lhs; }
 
     //! Not-Equal-to operator with arbitrary types (symmetric version)
     /*! \return !(rhs == lhs)
      */
-    template <typename T> friend bool operator!=(const T& lhs, const GenericValue& rhs) { return !(rhs == lhs); }
+    template <typename T> friend RAPIDJSON_DISABLEIF_RETURN((internal::IsGenericValue<T>), (bool)) operator!=(const T& lhs, const GenericValue& rhs) { return !(rhs == lhs); }
     //@}
 
     //!@name Type
@@ -766,7 +812,8 @@ public:
 
     // This version is faster because it does not need a StrLen(). 
     // It can also handle string with null character.
-    GenericValue& operator[](const GenericValue& name) {
+    template <typename SourceAllocator>
+    GenericValue& operator[](const GenericValue<Encoding, SourceAllocator>& name) {
         MemberIterator member = FindMember(name);
         if (member != MemberEnd())
             return member->value;
@@ -776,7 +823,8 @@ public:
             return NullValue;
         }
     }
-    const GenericValue& operator[](const GenericValue& name) const { return const_cast<GenericValue&>(*this)[name]; }
+    template <typename SourceAllocator>
+    const GenericValue& operator[](const GenericValue<Encoding, SourceAllocator>& name) const { return const_cast<GenericValue&>(*this)[name]; }
 
     //! Const member iterator
     /*! \pre IsObject() == true */
@@ -810,7 +858,8 @@ public:
         \note It is better to use FindMember() directly if you need the obtain the value as well.
         \note Linear time complexity.
     */
-    bool HasMember(const GenericValue& name) const { return FindMember(name) != MemberEnd(); }
+    template <typename SourceAllocator>
+    bool HasMember(const GenericValue<Encoding, SourceAllocator>& name) const { return FindMember(name) != MemberEnd(); }
 
     //! Find member by name.
     /*!
@@ -844,7 +893,8 @@ public:
             \c std::map, this has been changed to MemberEnd() now.
         \note Linear time complexity.
     */
-    MemberIterator FindMember(const GenericValue& name) {
+    template <typename SourceAllocator>
+    MemberIterator FindMember(const GenericValue<Encoding, SourceAllocator>& name) {
         RAPIDJSON_ASSERT(IsObject());
         RAPIDJSON_ASSERT(name.IsString());
         MemberIterator member = MemberBegin();
@@ -853,7 +903,7 @@ public:
                 break;
         return member;
     }
-    ConstMemberIterator FindMember(const GenericValue& name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
+    template <typename SourceAllocator> ConstMemberIterator FindMember(const GenericValue<Encoding, SourceAllocator>& name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
 
     //! Add a member (name-value pair) to the object.
     /*! \param name A string value as name of member.
@@ -877,7 +927,7 @@ public:
             }
             else {
                 SizeType oldCapacity = o.capacity;
-                o.capacity *= 2;
+                o.capacity += (oldCapacity + 1) / 2; // grow by factor 1.5
                 o.members = reinterpret_cast<Member*>(allocator.Realloc(o.members, oldCapacity * sizeof(Member), o.capacity * sizeof(Member)));
             }
         }
@@ -886,6 +936,23 @@ public:
         o.size++;
         return *this;
     }
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    GenericValue& AddMember(GenericValue&& name, GenericValue&& value, Allocator& allocator) {
+        return AddMember(name, value, allocator);
+    }
+    GenericValue& AddMember(GenericValue&& name, GenericValue& value, Allocator& allocator) {
+        return AddMember(name, value, allocator);
+    }
+    GenericValue& AddMember(GenericValue& name, GenericValue&& value, Allocator& allocator) {
+        return AddMember(name, value, allocator);
+    }
+    GenericValue& AddMember(StringRefType name, GenericValue&& value, Allocator& allocator) {
+        GenericValue n(name);
+        return AddMember(n, value, allocator);
+    }
+#endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
 
     //! Add a member (name-value pair) to the object.
     /*! \param name A constant string reference as name of member.
@@ -934,7 +1001,7 @@ public:
         \note Amortized Constant time complexity.
     */
     template <typename T>
-    RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>,GenericValue&)
+    RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (GenericValue&))
     AddMember(StringRefType name, T value, Allocator& allocator) {
         GenericValue n(name);
         GenericValue v(value);
@@ -963,7 +1030,8 @@ public:
         return RemoveMember(n);
     }
 
-    bool RemoveMember(const GenericValue& name) {
+    template <typename SourceAllocator>
+    bool RemoveMember(const GenericValue<Encoding, SourceAllocator>& name) {
         MemberIterator m = FindMember(name);
         if (m != MemberEnd()) {
             RemoveMember(m);
@@ -1122,10 +1190,16 @@ int z = a[0u].GetInt();             // This works too.
     GenericValue& PushBack(GenericValue& value, Allocator& allocator) {
         RAPIDJSON_ASSERT(IsArray());
         if (data_.a.size >= data_.a.capacity)
-            Reserve(data_.a.capacity == 0 ? kDefaultArrayCapacity : data_.a.capacity * 2, allocator);
+            Reserve(data_.a.capacity == 0 ? kDefaultArrayCapacity : (data_.a.capacity + (data_.a.capacity + 1) / 2), allocator);
         data_.a.elements[data_.a.size++].RawAssign(value);
         return *this;
     }
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    GenericValue& PushBack(GenericValue&& value, Allocator& allocator) {
+        return PushBack(value, allocator);
+    }
+#endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
     //! Append a constant string reference at the end of the array.
     /*! \param value        Constant string reference to be appended.
@@ -1158,7 +1232,7 @@ int z = a[0u].GetInt();             // This works too.
         \note Amortized constant time complexity.
     */
     template <typename T>
-    RAPIDJSON_DISABLEIF_RETURN(internal::IsPointer<T>,GenericValue&)
+    RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (GenericValue&))
     PushBack(T value, Allocator& allocator) {
         GenericValue v(value);
         return PushBack(v, allocator);
@@ -1239,12 +1313,12 @@ int z = a[0u].GetInt();             // This works too.
     //!@name String
     //@{
 
-    const Ch* GetString() const { RAPIDJSON_ASSERT(IsString()); return data_.s.str; }
+    const Ch* GetString() const { RAPIDJSON_ASSERT(IsString()); return ((flags_ & kInlineStrFlag) ? data_.ss.str : data_.s.str); }
 
     //! Get the length of string.
     /*! Since rapidjson permits "\\u0000" in the json string, strlen(v.GetString()) may not equal to v.GetStringLength().
     */
-    SizeType GetStringLength() const { RAPIDJSON_ASSERT(IsString()); return data_.s.length; }
+    SizeType GetStringLength() const { RAPIDJSON_ASSERT(IsString()); return ((flags_ & kInlineStrFlag) ? (data_.ss.GetLength()) : data_.s.length); }
 
     //! Set this value as a string without copying source string.
     /*! This version has better performance with supplied length, and also support string containing null character.
@@ -1281,7 +1355,7 @@ int z = a[0u].GetInt();             // This works too.
     */
     GenericValue& SetString(const Ch* s, Allocator& allocator) { return SetString(s, internal::StrLen(s), allocator); }
 
-#ifdef RAPIDJSON_HAS_STDSTRING
+#if RAPIDJSON_HAS_STDSTRING
     //! Set this value as a string by copying from source string.
     /*! \param s source string.
         \param allocator Allocator for allocating copied buffer. Commonly use GenericDocument::GetAllocator().
@@ -1312,7 +1386,7 @@ int z = a[0u].GetInt();             // This works too.
             if (!handler.StartObject())
                 return false;
             for (ConstMemberIterator m = MemberBegin(); m != MemberEnd(); ++m) {
-                if (!handler.String(m->name.data_.s.str, m->name.data_.s.length, (m->name.flags_ & kCopyFlag) != 0))
+                if (!handler.Key(m->name.GetString(), m->name.GetStringLength(), (m->name.flags_ & kCopyFlag) != 0))
                     return false;
                 if (!m->value.Accept(handler))
                     return false;
@@ -1328,7 +1402,7 @@ int z = a[0u].GetInt();             // This works too.
             return handler.EndArray(data_.a.size);
     
         case kStringType:
-            return handler.String(data_.s.str, data_.s.length, (flags_ & kCopyFlag) != 0);
+            return handler.String(GetString(), GetStringLength(), (flags_ & kCopyFlag) != 0);
     
         case kNumberType:
             if (IsInt())            return handler.Int(data_.n.i.i);
@@ -1344,8 +1418,8 @@ int z = a[0u].GetInt();             // This works too.
     }
 
 private:
-    template <typename, typename, typename>
-    friend class GenericDocument;
+    template <typename, typename> friend class GenericValue;
+    template <typename, typename, typename> friend class GenericDocument;
 
     enum {
         kBoolFlag = 0x100,
@@ -1357,6 +1431,7 @@ private:
         kDoubleFlag = 0x4000,
         kStringFlag = 0x100000,
         kCopyFlag = 0x200000,
+        kInlineStrFlag = 0x400000,
 
         // Initial flags of different types.
         kNullFlag = kNullType,
@@ -1370,6 +1445,7 @@ private:
         kNumberAnyFlag = kNumberType | kNumberFlag | kIntFlag | kInt64Flag | kUintFlag | kUint64Flag | kDoubleFlag,
         kConstStringFlag = kStringType | kStringFlag,
         kCopyStringFlag = kStringType | kStringFlag | kCopyFlag,
+        kShortStringFlag = kStringType | kStringFlag | kCopyFlag | kInlineStrFlag,
         kObjectFlag = kObjectType,
         kArrayFlag = kArrayType,
 
@@ -1384,6 +1460,23 @@ private:
         SizeType length;
         unsigned hashcode;  //!< reserved
     };  // 12 bytes in 32-bit mode, 16 bytes in 64-bit mode
+
+    // implementation detail: ShortString can represent zero-terminated strings up to MaxSize chars
+    // (excluding the terminating zero) and store a value to determine the length of the contained
+    // string in the last character str[LenPos] by storing "MaxSize - length" there. If the string
+    // to store has the maximal length of MaxSize then str[LenPos] will be 0 and therefore act as
+    // the string terminator as well. For getting the string length back from that value just use
+    // "MaxSize - str[LenPos]".
+    // This allows to store 11-chars strings in 32-bit mode and 15-chars strings in 64-bit mode
+    // inline (for `UTF8`-encoded strings).
+    struct ShortString {
+        enum { MaxChars = sizeof(String) / sizeof(Ch), MaxSize = MaxChars - 1, LenPos = MaxSize };
+        Ch str[MaxChars];
+
+        inline static bool Usable(SizeType len) { return            (MaxSize >= len); }
+        inline void     SetLength(SizeType len) { str[LenPos] = (Ch)(MaxSize -  len); }
+        inline SizeType GetLength() const       { return  (SizeType)(MaxSize -  str[LenPos]); }
+    };  // at most as many bytes as "String" above => 12 bytes in 32-bit mode, 16 bytes in 64-bit mode
 
     // By using proper binary layout, retrieval of different integer types do not need conversions.
     union Number {
@@ -1425,6 +1518,7 @@ private:
 
     union Data {
         String s;
+        ShortString ss;
         Number n;
         Object o;
         Array a;
@@ -1447,7 +1541,7 @@ private:
     }
 
     //! Initialize this value as constant string, without calling destructor.
-    void SetStringRaw(StringRefType s) {
+    void SetStringRaw(StringRefType s) RAPIDJSON_NOEXCEPT {
         flags_ = kConstStringFlag;
         data_.s.str = s;
         data_.s.length = s.length;
@@ -1455,26 +1549,42 @@ private:
 
     //! Initialize this value as copy string with initial data, without calling destructor.
     void SetStringRaw(StringRefType s, Allocator& allocator) {
-        flags_ = kCopyStringFlag;
-        data_.s.str = (Ch *)allocator.Malloc((s.length + 1) * sizeof(Ch));
-        data_.s.length = s.length;
-        memcpy(const_cast<Ch*>(data_.s.str), s, s.length * sizeof(Ch));
-        const_cast<Ch*>(data_.s.str)[s.length] = '\0';
+        Ch* str = NULL;
+        if(ShortString::Usable(s.length)) {
+            flags_ = kShortStringFlag;
+            data_.ss.SetLength(s.length);
+            str = data_.ss.str;
+        } else {
+            flags_ = kCopyStringFlag;
+            data_.s.length = s.length;
+            str = (Ch *)allocator.Malloc((s.length + 1) * sizeof(Ch));
+            data_.s.str = str;
+        }
+        memcpy(str, s, s.length * sizeof(Ch));
+        str[s.length] = '\0';
     }
 
     //! Assignment without calling destructor
-    void RawAssign(GenericValue& rhs) {
+    void RawAssign(GenericValue& rhs) RAPIDJSON_NOEXCEPT {
         data_ = rhs.data_;
         flags_ = rhs.flags_;
         rhs.flags_ = kNullFlag;
     }
 
-    bool StringEqual(const GenericValue& rhs) const {
+    template <typename SourceAllocator>
+    bool StringEqual(const GenericValue<Encoding, SourceAllocator>& rhs) const {
         RAPIDJSON_ASSERT(IsString());
         RAPIDJSON_ASSERT(rhs.IsString());
-        return data_.s.length == rhs.data_.s.length &&
-            (data_.s.str == rhs.data_.s.str // fast path for constant string
-            || memcmp(data_.s.str, rhs.data_.s.str, sizeof(Ch) * data_.s.length) == 0);
+
+        const SizeType len1 = GetStringLength();
+        const SizeType len2 = rhs.GetStringLength();
+        if(len1 != len2) { return false; }
+
+        const Ch* const str1 = GetString();
+        const Ch* const str2 = rhs.GetString();
+        if(str1 == str2) { return true; } // fast path for constant string
+
+        return (memcmp(str1, str2, sizeof(Ch) * len1) == 0);
     }
 
     Data data_;
@@ -1663,7 +1773,7 @@ private:
 
     // callers of the following private Handler functions
     template <typename,typename,typename> friend class GenericReader; // for parsing
-    friend class GenericValue<Encoding,Allocator>; // for deep copying
+    template <typename, typename> friend class GenericValue; // for deep copying
 
     // Implementation of Handler
     bool Null() { new (stack_.template Push<ValueType>()) ValueType(); return true; }
@@ -1684,6 +1794,8 @@ private:
 
     bool StartObject() { new (stack_.template Push<ValueType>()) ValueType(kObjectType); return true; }
     
+    bool Key(const Ch* str, SizeType length, bool copy) { return String(str, length, copy); }
+
     bool EndObject(SizeType memberCount) {
         typename ValueType::Member* members = stack_.template Pop<typename ValueType::Member>(memberCount);
         stack_.template Top<ValueType>()->SetObjectRaw(members, (SizeType)memberCount, GetAllocator());

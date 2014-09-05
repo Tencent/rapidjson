@@ -1993,7 +1993,9 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = \
 	RAPIDJSON_DOXYGEN_RUNNING \
-	RAPIDJSON_DISABLEIF_RETURN(cond,returntype)=returntype
+	RAPIDJSON_REMOVEFPTR_(x)=x \
+	RAPIDJSON_ENABLEIF_RETURN(cond,returntype)="RAPIDJSON_REMOVEFPTR_ returntype" \
+	RAPIDJSON_DISABLEIF_RETURN(cond,returntype)="RAPIDJSON_REMOVEFPTR_ returntype"
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
@@ -2002,7 +2004,8 @@ PREDEFINED             = \
 # definition found in the source code.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-EXPAND_AS_DEFINED      =
+EXPAND_AS_DEFINED      = \
+	RAPIDJSON_NOEXCEPT
 
 # If the SKIP_FUNCTION_MACROS tag is set to YES then doxygen's preprocessor will
 # remove all references to function-like macros that are alone on a line, have

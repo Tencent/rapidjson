@@ -103,8 +103,8 @@ struct ParseDoubleHandler : BaseReaderHandler<UTF8<>, ParseDoubleHandler> {
     double actual_;
 };
 
-TEST(Reader, ParseNumberHandler) {
-#define TEST_NUMBER(Handler, str, x) \
+TEST(Reader, ParseNumber_Integer) {
+#define TEST_INTEGER(Handler, str, x) \
     { \
         StringStream s(str); \
         Handler h; \
@@ -114,67 +114,19 @@ TEST(Reader, ParseNumberHandler) {
         EXPECT_EQ(double(x), h.actual_); \
     }
 
-#define TEST_DOUBLE(str, x) \
-    { \
-        StringStream s(str); \
-        ParseDoubleHandler h; \
-        Reader reader; \
-        reader.Parse(s, h); \
-        EXPECT_EQ(1u, h.step_); \
-        EXPECT_EQ(x, h.actual_); \
-        if (x != h.actual_) \
-            printf("  Actual: %.17g\nExpected: %.17g\n", h.actual_, x);\
-    }
+    TEST_INTEGER(ParseUintHandler, "0", 0);
+    TEST_INTEGER(ParseUintHandler, "123", 123);
+    TEST_INTEGER(ParseUintHandler, "2147483648", 2147483648u);       // 2^31 - 1 (cannot be stored in int)
+    TEST_INTEGER(ParseUintHandler, "4294967295", 4294967295u);
 
-    TEST_NUMBER(ParseUintHandler, "0", 0);
-    TEST_NUMBER(ParseUintHandler, "123", 123);
-    TEST_NUMBER(ParseUintHandler, "2147483648", 2147483648u);       // 2^31 - 1 (cannot be stored in int)
-    TEST_NUMBER(ParseUintHandler, "4294967295", 4294967295u);
+    TEST_INTEGER(ParseIntHandler, "-123", -123);
+    TEST_INTEGER(ParseIntHandler, "-2147483648", -2147483648LL);     // -2^31 (min of int)
 
-    TEST_NUMBER(ParseIntHandler, "-123", -123);
-    TEST_NUMBER(ParseIntHandler, "-2147483648", -2147483648LL);     // -2^31 (min of int)
+    TEST_INTEGER(ParseUint64Handler, "4294967296", 4294967296ULL);   // 2^32 (max of unsigned + 1, force to use uint64_t)
+    TEST_INTEGER(ParseUint64Handler, "18446744073709551615", 18446744073709551615ULL);   // 2^64 - 1 (max of uint64_t)
 
-    TEST_NUMBER(ParseUint64Handler, "4294967296", 4294967296ULL);   // 2^32 (max of unsigned + 1, force to use uint64_t)
-    TEST_NUMBER(ParseUint64Handler, "18446744073709551615", 18446744073709551615ULL);   // 2^64 - 1 (max of uint64_t)
-
-    TEST_NUMBER(ParseInt64Handler, "-2147483649", -2147483649LL);   // -2^31 -1 (min of int - 1, force to use int64_t)
-    TEST_NUMBER(ParseInt64Handler, "-9223372036854775808", (-9223372036854775807LL - 1));       // -2^63 (min of int64_t)
-
-    TEST_DOUBLE("0.0", 0.0);
-    TEST_DOUBLE("1.0", 1.0);
-    TEST_DOUBLE("-1.0", -1.0);
-    TEST_DOUBLE("1.5", 1.5);
-    TEST_DOUBLE("-1.5", -1.5);
-    TEST_DOUBLE("3.1416", 3.1416);
-    TEST_DOUBLE("1E10", 1E10);
-    TEST_DOUBLE("1e10", 1e10);
-    TEST_DOUBLE("1E+10", 1E+10);
-    TEST_DOUBLE("1E-10", 1E-10);
-    TEST_DOUBLE("-1E10", -1E10);
-    TEST_DOUBLE("-1e10", -1e10);
-    TEST_DOUBLE("-1E+10", -1E+10);
-    TEST_DOUBLE("-1E-10", -1E-10);
-    TEST_DOUBLE("1.234E+10", 1.234E+10);
-    TEST_DOUBLE("1.234E-10", 1.234E-10);
-    TEST_DOUBLE("1.79769e+308", 1.79769e+308);
-    TEST_DOUBLE("2.22507e-308", 2.22507e-308);
-    TEST_DOUBLE("-1.79769e+308", -1.79769e+308);
-    TEST_DOUBLE("-2.22507e-308", -2.22507e-308);
-    TEST_DOUBLE("4.9406564584124654e-324", 4.9406564584124654e-324); // minimum denormal
-    TEST_DOUBLE("1e-10000", 0.0);                                   // must underflow
-    TEST_DOUBLE("18446744073709551616", 18446744073709551616.0);    // 2^64 (max of uint64_t + 1, force to use double)
-    TEST_DOUBLE("-9223372036854775809", -9223372036854775809.0);    // -2^63 - 1(min of int64_t + 1, force to use double)
-    TEST_DOUBLE("0.9868011474609375", 0.9868011474609375);          // https://github.com/miloyip/rapidjson/issues/120
-    TEST_DOUBLE("123e34", 123e34);                                  // Fast Path Cases In Disguise
-
-    {
-        char n1e308[310];   // '1' followed by 308 '0'
-        n1e308[0] = '1';
-        for (int i = 1; i < 309; i++)
-            n1e308[i] = '0';
-        n1e308[309] = '\0';
-        TEST_DOUBLE(n1e308, 1E308);
-    }
+    TEST_INTEGER(ParseInt64Handler, "-2147483649", -2147483649LL);   // -2^31 -1 (min of int - 1, force to use int64_t)
+    TEST_INTEGER(ParseInt64Handler, "-9223372036854775808", (-9223372036854775807LL - 1));       // -2^63 (min of int64_t)
 
     // Random test for uint32_t/int32_t
     {
@@ -189,11 +141,11 @@ TEST(Reader, ParseNumberHandler) {
 
             char buffer[32];
             *internal::u32toa(u.u, buffer) = '\0';
-            TEST_NUMBER(ParseUintHandler, buffer, u.u);
+            TEST_INTEGER(ParseUintHandler, buffer, u.u);
 
             if (u.i < 0) {
                 *internal::i32toa(u.i, buffer) = '\0';
-                TEST_NUMBER(ParseIntHandler, buffer, u.i);
+                TEST_INTEGER(ParseIntHandler, buffer, u.i);
             }
         }
     }
@@ -213,39 +165,107 @@ TEST(Reader, ParseNumberHandler) {
             char buffer[32];
             if (u.u >= 4294967296ULL) {
                 *internal::u64toa(u.u, buffer) = '\0';
-                TEST_NUMBER(ParseUint64Handler, buffer, u.u);
+                TEST_INTEGER(ParseUint64Handler, buffer, u.u);
             }
 
             if (u.i <= -2147483649LL) {
                 *internal::i64toa(u.i, buffer) = '\0';
-                TEST_NUMBER(ParseInt64Handler, buffer, u.i);
+                TEST_INTEGER(ParseInt64Handler, buffer, u.i);
             }
         }
     }
+#undef TEST_INTEGER
+}
 
-    // Random test for double
-    {
-        union {
-            double d;
-            uint64_t u;
-        }u;
-        Random r;
-
-        for (unsigned i = 0; i < 100000; i++) {
-            do {
-                // Need to call r() in two statements for cross-platform coherent sequence.
-                u.u = uint64_t(r()) << 32;
-                u.u |= uint64_t(r());
-            } while (isnan(u.d) || isinf(u.d));
-
-            char buffer[32];
-            *internal::dtoa(u.d, buffer) = '\0';
-            TEST_DOUBLE(buffer, u.d);
-        }
+template<bool fullPrecision>
+static void TestParseDouble() {
+#define TEST_DOUBLE(fullPrecision, str, x) \
+    { \
+        StringStream s(str); \
+        ParseDoubleHandler h; \
+        Reader reader; \
+        reader.Parse<fullPrecision ? kParseFullPrecisionFlag : 0>(s, h); \
+        EXPECT_EQ(1u, h.step_); \
+        if (fullPrecision) { \
+            EXPECT_EQ(x, h.actual_); \
+            if (x != h.actual_) \
+            printf("  String: %s\n  Actual: %.17g\nExpected: %.17g\n", str, h.actual_, x); \
+        } \
+        else \
+            EXPECT_DOUBLE_EQ(x, h.actual_); \
     }
 
-#undef TEST_NUMBER
+TEST_DOUBLE(fullPrecision, "0.0", 0.0);
+TEST_DOUBLE(fullPrecision, "1.0", 1.0);
+TEST_DOUBLE(fullPrecision, "-1.0", -1.0);
+TEST_DOUBLE(fullPrecision, "1.5", 1.5);
+TEST_DOUBLE(fullPrecision, "-1.5", -1.5);
+TEST_DOUBLE(fullPrecision, "3.1416", 3.1416);
+TEST_DOUBLE(fullPrecision, "1E10", 1E10);
+TEST_DOUBLE(fullPrecision, "1e10", 1e10);
+TEST_DOUBLE(fullPrecision, "1E+10", 1E+10);
+TEST_DOUBLE(fullPrecision, "1E-10", 1E-10);
+TEST_DOUBLE(fullPrecision, "-1E10", -1E10);
+TEST_DOUBLE(fullPrecision, "-1e10", -1e10);
+TEST_DOUBLE(fullPrecision, "-1E+10", -1E+10);
+TEST_DOUBLE(fullPrecision, "-1E-10", -1E-10);
+TEST_DOUBLE(fullPrecision, "1.234E+10", 1.234E+10);
+TEST_DOUBLE(fullPrecision, "1.234E-10", 1.234E-10);
+TEST_DOUBLE(fullPrecision, "1.79769e+308", 1.79769e+308);
+TEST_DOUBLE(fullPrecision, "2.22507e-308", 2.22507e-308);
+TEST_DOUBLE(fullPrecision, "-1.79769e+308", -1.79769e+308);
+TEST_DOUBLE(fullPrecision, "-2.22507e-308", -2.22507e-308);
+TEST_DOUBLE(fullPrecision, "4.9406564584124654e-324", 4.9406564584124654e-324); // minimum denormal
+TEST_DOUBLE(fullPrecision, "1e-10000", 0.0);                                   // must underflow
+TEST_DOUBLE(fullPrecision, "18446744073709551616", 18446744073709551616.0);    // 2^64 (max of uint64_t + 1, force to use double)
+TEST_DOUBLE(fullPrecision, "-9223372036854775809", -9223372036854775809.0);    // -2^63 - 1(min of int64_t + 1, force to use double)
+TEST_DOUBLE(fullPrecision, "0.9868011474609375", 0.9868011474609375);          // https://github.com/miloyip/rapidjson/issues/120
+TEST_DOUBLE(fullPrecision, "123e34", 123e34);                                  // Fast Path Cases In Disguise
+
+{
+    char n1e308[310];   // '1' followed by 308 '0'
+    n1e308[0] = '1';
+    for (int i = 1; i < 309; i++)
+        n1e308[i] = '0';
+    n1e308[309] = '\0';
+    TEST_DOUBLE(fullPrecision, n1e308, 1E308);
+}
+
+// Random test for double
+{
+    union {
+        double d;
+        uint64_t u;
+    }u;
+    Random r;
+
+    for (unsigned i = 0; i < 100000; i++) {
+        do {
+            // Need to call r() in two statements for cross-platform coherent sequence.
+            u.u = uint64_t(r()) << 32;
+            u.u |= uint64_t(r());
+        } while (std::isnan(u.d) || std::isinf(u.d)
+#ifdef _MSC_VER
+            // VC's strtod() has problem with denormal numbers
+            || !std::isnormal(u.d)
+#endif
+            );
+
+        char buffer[32];
+        *internal::dtoa(u.d, buffer) = '\0';
+        TEST_DOUBLE(fullPrecision, buffer, u.d);
+    }
+}
+
 #undef TEST_DOUBLE
+}
+
+TEST(Reader, ParseNumber_NormalPrecisionDouble) {
+    TestParseDouble<false>();
+}
+
+TEST(Reader, ParseNumber_FullPrecisionDouble) {
+    TestParseDouble<true>();
 }
 
 TEST(Reader, ParseNumber_Error) {
@@ -894,9 +914,10 @@ struct IterativeParsingReaderHandler {
     const static int LOG_DOUBLE = -7;
     const static int LOG_STRING = -8;
     const static int LOG_STARTOBJECT = -9;
-    const static int LOG_ENDOBJECT = -10;
-    const static int LOG_STARTARRAY = -11;
-    const static int LOG_ENDARRAY = -12;
+    const static int LOG_KEY = -10;
+    const static int LOG_ENDOBJECT = -11;
+    const static int LOG_STARTARRAY = -12;
+    const static int LOG_ENDARRAY = -13;
 
     const static size_t LogCapacity = 256;
     int Logs[LogCapacity];
@@ -923,6 +944,8 @@ struct IterativeParsingReaderHandler {
 
     bool StartObject() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STARTOBJECT; return true; }
 
+    bool Key (const Ch*, SizeType, bool) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_KEY; return true; }
+	
     bool EndObject(SizeType c) {
         RAPIDJSON_ASSERT(LogCount < LogCapacity);
         Logs[LogCount++] = LOG_ENDOBJECT;
@@ -955,7 +978,7 @@ TEST(Reader, IterativeParsing_General) {
             handler.LOG_STARTARRAY,
             handler.LOG_INT,
             handler.LOG_STARTOBJECT,
-            handler.LOG_STRING,
+            handler.LOG_KEY,
             handler.LOG_STARTARRAY,
             handler.LOG_INT,
             handler.LOG_INT,
@@ -993,7 +1016,7 @@ TEST(Reader, IterativeParsing_Count) {
             handler.LOG_STARTOBJECT,
             handler.LOG_ENDOBJECT, 0,
             handler.LOG_STARTOBJECT,
-            handler.LOG_STRING,
+            handler.LOG_KEY,
             handler.LOG_INT,
             handler.LOG_ENDOBJECT, 1,
             handler.LOG_STARTARRAY,

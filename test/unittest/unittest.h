@@ -89,15 +89,9 @@ inline FILE* TempFile(char *filename) {
 #pragma warning(disable : 4127)
 #endif
 
-class AssertException : public std::exception {
+class AssertException : public std::logic_error {
 public:
-    AssertException(const char* w) : what_(w) {}
-    AssertException(const AssertException& other) : what_(other.what_) {}
-    AssertException& operator=(const AssertException& rhs) { what_ = rhs.what_; return *this;  }
-    virtual const char* what() const throw() { return what_; }
-
-private:
-    const char* what_;
+    AssertException(const char* w) : std::logic_error(w) {}
 };
 
 #define RAPIDJSON_ASSERT(x) if (!(x)) throw AssertException(RAPIDJSON_STRINGIFY(x))
