@@ -111,11 +111,11 @@ TEST(Reader, ParseNumber_Integer) {
         Reader reader; \
         reader.Parse(s, h); \
         EXPECT_EQ(1u, h.step_); \
-        EXPECT_EQ(double(x), h.actual_); \
+        EXPECT_EQ(x, h.actual_); \
     }
 
-    TEST_INTEGER(ParseUintHandler, "0", 0);
-    TEST_INTEGER(ParseUintHandler, "123", 123);
+    TEST_INTEGER(ParseUintHandler, "0", 0u);
+    TEST_INTEGER(ParseUintHandler, "123", 123u);
     TEST_INTEGER(ParseUintHandler, "2147483648", 2147483648u);       // 2^31 - 1 (cannot be stored in int)
     TEST_INTEGER(ParseUintHandler, "4294967295", 4294967295u);
 
