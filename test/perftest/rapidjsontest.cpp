@@ -96,6 +96,15 @@ TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler)) {
     }
 }
 
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_FullPrecision)) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        StringStream s(json_);
+        BaseReaderHandler<> h;
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseFullPrecisionFlag>(s, h));
+    }
+}
+
 TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseIterative_DummyHandler)) {
     for (size_t i = 0; i < kTrialCount; i++) {
         StringStream s(json_);

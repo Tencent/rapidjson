@@ -184,7 +184,7 @@ static void TestParseDouble() {
         StringStream s(str); \
         ParseDoubleHandler h; \
         Reader reader; \
-        reader.Parse<fullPrecision ? kParseFullPrecisionFlag : 0>(s, h); \
+        ASSERT_EQ(kParseErrorNone, reader.Parse<fullPrecision ? kParseFullPrecisionFlag : 0>(s, h).Code()); \
         EXPECT_EQ(1u, h.step_); \
         if (fullPrecision) { \
             EXPECT_EQ(x, h.actual_); \
@@ -195,67 +195,65 @@ static void TestParseDouble() {
             EXPECT_DOUBLE_EQ(x, h.actual_); \
     }
 
-TEST_DOUBLE(fullPrecision, "0.0", 0.0);
-TEST_DOUBLE(fullPrecision, "1.0", 1.0);
-TEST_DOUBLE(fullPrecision, "-1.0", -1.0);
-TEST_DOUBLE(fullPrecision, "1.5", 1.5);
-TEST_DOUBLE(fullPrecision, "-1.5", -1.5);
-TEST_DOUBLE(fullPrecision, "3.1416", 3.1416);
-TEST_DOUBLE(fullPrecision, "1E10", 1E10);
-TEST_DOUBLE(fullPrecision, "1e10", 1e10);
-TEST_DOUBLE(fullPrecision, "1E+10", 1E+10);
-TEST_DOUBLE(fullPrecision, "1E-10", 1E-10);
-TEST_DOUBLE(fullPrecision, "-1E10", -1E10);
-TEST_DOUBLE(fullPrecision, "-1e10", -1e10);
-TEST_DOUBLE(fullPrecision, "-1E+10", -1E+10);
-TEST_DOUBLE(fullPrecision, "-1E-10", -1E-10);
-TEST_DOUBLE(fullPrecision, "1.234E+10", 1.234E+10);
-TEST_DOUBLE(fullPrecision, "1.234E-10", 1.234E-10);
-TEST_DOUBLE(fullPrecision, "1.79769e+308", 1.79769e+308);
-TEST_DOUBLE(fullPrecision, "2.22507e-308", 2.22507e-308);
-TEST_DOUBLE(fullPrecision, "-1.79769e+308", -1.79769e+308);
-TEST_DOUBLE(fullPrecision, "-2.22507e-308", -2.22507e-308);
-TEST_DOUBLE(fullPrecision, "4.9406564584124654e-324", 4.9406564584124654e-324); // minimum denormal
-TEST_DOUBLE(fullPrecision, "1e-10000", 0.0);                                   // must underflow
-TEST_DOUBLE(fullPrecision, "18446744073709551616", 18446744073709551616.0);    // 2^64 (max of uint64_t + 1, force to use double)
-TEST_DOUBLE(fullPrecision, "-9223372036854775809", -9223372036854775809.0);    // -2^63 - 1(min of int64_t + 1, force to use double)
-TEST_DOUBLE(fullPrecision, "0.9868011474609375", 0.9868011474609375);          // https://github.com/miloyip/rapidjson/issues/120
-TEST_DOUBLE(fullPrecision, "123e34", 123e34);                                  // Fast Path Cases In Disguise
+    TEST_DOUBLE(fullPrecision, "0.0", 0.0);
+    TEST_DOUBLE(fullPrecision, "1.0", 1.0);
+    TEST_DOUBLE(fullPrecision, "-1.0", -1.0);
+    TEST_DOUBLE(fullPrecision, "1.5", 1.5);
+    TEST_DOUBLE(fullPrecision, "-1.5", -1.5);
+    TEST_DOUBLE(fullPrecision, "3.1416", 3.1416);
+    TEST_DOUBLE(fullPrecision, "1E10", 1E10);
+    TEST_DOUBLE(fullPrecision, "1e10", 1e10);
+    TEST_DOUBLE(fullPrecision, "1E+10", 1E+10);
+    TEST_DOUBLE(fullPrecision, "1E-10", 1E-10);
+    TEST_DOUBLE(fullPrecision, "-1E10", -1E10);
+    TEST_DOUBLE(fullPrecision, "-1e10", -1e10);
+    TEST_DOUBLE(fullPrecision, "-1E+10", -1E+10);
+    TEST_DOUBLE(fullPrecision, "-1E-10", -1E-10);
+    TEST_DOUBLE(fullPrecision, "1.234E+10", 1.234E+10);
+    TEST_DOUBLE(fullPrecision, "1.234E-10", 1.234E-10);
+    TEST_DOUBLE(fullPrecision, "1.79769e+308", 1.79769e+308);
+    TEST_DOUBLE(fullPrecision, "2.22507e-308", 2.22507e-308);
+    TEST_DOUBLE(fullPrecision, "-1.79769e+308", -1.79769e+308);
+    TEST_DOUBLE(fullPrecision, "-2.22507e-308", -2.22507e-308);
+    TEST_DOUBLE(fullPrecision, "4.9406564584124654e-324", 4.9406564584124654e-324); // minimum denormal
+    TEST_DOUBLE(fullPrecision, "1e-10000", 0.0);                                   // must underflow
+    TEST_DOUBLE(fullPrecision, "18446744073709551616", 18446744073709551616.0);    // 2^64 (max of uint64_t + 1, force to use double)
+    TEST_DOUBLE(fullPrecision, "-9223372036854775809", -9223372036854775809.0);    // -2^63 - 1(min of int64_t + 1, force to use double)
+    TEST_DOUBLE(fullPrecision, "0.9868011474609375", 0.9868011474609375);          // https://github.com/miloyip/rapidjson/issues/120
+    TEST_DOUBLE(fullPrecision, "123e34", 123e34);                                  // Fast Path Cases In Disguise
+    TEST_DOUBLE(fullPrecision, "45913141877270640000.0", 45913141877270640000.0);
 
-{
-    char n1e308[310];   // '1' followed by 308 '0'
-    n1e308[0] = '1';
-    for (int i = 1; i < 309; i++)
-        n1e308[i] = '0';
-    n1e308[309] = '\0';
-    TEST_DOUBLE(fullPrecision, n1e308, 1E308);
-}
-
-// Random test for double
-{
-    union {
-        double d;
-        uint64_t u;
-    }u;
-    Random r;
-
-    for (unsigned i = 0; i < 100000; i++) {
-        do {
-            // Need to call r() in two statements for cross-platform coherent sequence.
-            u.u = uint64_t(r()) << 32;
-            u.u |= uint64_t(r());
-        } while (std::isnan(u.d) || std::isinf(u.d)
-#ifdef _MSC_VER
-            // VC's strtod() has problem with denormal numbers
-            || !std::isnormal(u.d)
-#endif
-            );
-
-        char buffer[32];
-        *internal::dtoa(u.d, buffer) = '\0';
-        TEST_DOUBLE(fullPrecision, buffer, u.d);
+    {
+        char n1e308[310];   // '1' followed by 308 '0'
+        n1e308[0] = '1';
+        for (int i = 1; i < 309; i++)
+            n1e308[i] = '0';
+        n1e308[309] = '\0';
+        TEST_DOUBLE(fullPrecision, n1e308, 1E308);
     }
-}
+
+#if 1
+    // Random test for double
+    {
+        union {
+            double d;
+            uint64_t u;
+        }u;
+        Random r;
+
+        for (unsigned i = 0; i < 100000; i++) {
+            do {
+                // Need to call r() in two statements for cross-platform coherent sequence.
+                u.u = uint64_t(r()) << 32;
+                u.u |= uint64_t(r());
+            } while (std::isnan(u.d) || std::isinf(u.d) || !std::isnormal(u.d));
+
+            char buffer[32];
+            *internal::dtoa(u.d, buffer) = '\0';
+            TEST_DOUBLE(fullPrecision, buffer, u.d);
+        }
+    }
+#endif
 
 #undef TEST_DOUBLE
 }

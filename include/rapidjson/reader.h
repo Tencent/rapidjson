@@ -730,8 +730,8 @@ private:
         NumberStream(GenericReader& reader, InputStream& is) : is(is) { (void)reader;  }
         ~NumberStream() {}
 
-        Ch Peek() { return is.Peek(); }
-        Ch Take() { return is.Take(); }
+        RAPIDJSON_FORCEINLINE Ch Peek() const { return is.Peek(); }
+        RAPIDJSON_FORCEINLINE Ch Take() { return is.Take(); }
         size_t Tell() { return is.Tell(); }
         const char* Pop() { return 0; }
 
@@ -748,7 +748,7 @@ private:
         NumberStream(GenericReader& reader, InputStream& is) : NumberStream<InputStream, false>(reader, is), stackStream(reader.stack_) {}
         ~NumberStream() {}
 
-        Ch Take() {
+        RAPIDJSON_FORCEINLINE Ch Take() {
             stackStream.Put((char)Base::is.Peek());
             return Base::is.Take();
         }
@@ -869,28 +869,45 @@ private:
             s.Take();
 
             if (!useDouble) {
-                d = use64bit ? i64 : i;
-                useDouble = true;
-
+#if RAPIDJSON_64BIT
+                // Use i64 to store significand in 64-bit architecture
+                if (!use64bit)
+                    i64 = i;
+        
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
-                    if (d >= 9007199254740991.0) {
-                        if (parseFlags & kParseFullPrecisionFlag)
+                    if (i64 > RAPIDJSON_UINT64_C2(0x1FFFFF, 0xFFFFFFFF)) { // 2^53 - 1 for fast path
+                        if (parseFlags & kParseFullPrecisionFlag) {
+                            while (s.Peek() >= '0' && s.Peek() <= '9')
+                                s.Take();
                             useStrtod = true;
+                            --expFrac;
+                        }
                         break;
                     }
                     else {
-                        d = d * 10.0 + static_cast<unsigned>(s.Take() - '0');
+                        i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
                         --expFrac;
                     }
                 }
+
+                if (!useStrtod)
+                    d = (double)i64;
+#else
+                // Use double to store significand in 32-bit architecture
+                d = use64bit ? (double)i64 : (double)i;
+#endif
+                useDouble = true;
             }
 
-            while (s.Peek() >= '0' && s.Peek() <= '9') {
-                //s.Take();
-                if (parseFlags & kParseFullPrecisionFlag)
+            if ((parseFlags & kParseFullPrecisionFlag) == 0 || !useStrtod) {
+                while (s.Peek() >= '0' && s.Peek() <= '9') {
+                    d = d * 10.0 + (s.Take() - '0');
+                    --expFrac;
+                }
+            }
+            else {
+                while (s.Peek() >= '0' && s.Peek() <= '9')
                     s.Take();
-                else
-                    d = d * 10 + (s.Take() - '0');
                 --expFrac;
             }
 
