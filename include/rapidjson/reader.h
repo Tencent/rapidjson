@@ -132,7 +132,8 @@ enum ParseFlag {
     kParseInsituFlag = 1,           //!< In-situ(destructive) parsing.
     kParseValidateEncodingFlag = 2, //!< Validate encoding of JSON strings.
     kParseIterativeFlag = 4,        //!< Iterative(constant complexity in terms of function call stack size) parsing.
-    kParseStopWhenDoneFlag = 8      //!< After parsing a complete JSON root from stream, stop further processing the rest of stream. When this flag is used, parser will not generate kParseErrorDocumentRootNotSingular error.
+    kParseStopWhenDoneFlag = 8,     //!< After parsing a complete JSON root from stream, stop further processing the rest of stream. When this flag is used, parser will not generate kParseErrorDocumentRootNotSingular error.
+    kParseFullPrecisionFlag = 16    //!< Parse number in full precision (but slower).
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -644,7 +645,7 @@ private:
             ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
             size_t length = stackStream.Length();
-            if (!handler.String(stackStream.Pop(), length - 1, true))
+            if (!handler.String(stackStream.Pop(), SizeType(length - 1), true))
                 RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
         }
     }
@@ -710,17 +711,52 @@ private:
         }
     }
 
+    template<typename InputStream, bool backup>
+    class NumberStream {
+    public:
+        NumberStream(GenericReader& reader, InputStream& is) : reader(reader), is(is) {}
+        Ch Peek() { return is.Peek(); }
+        Ch Take() { return is.Take(); }
+        size_t Tell() { return is.Tell(); }
+        const char* Pop() { return 0; }
+
+    private:
+        NumberStream& operator=(const NumberStream&);
+
+        GenericReader& reader;
+        InputStream& is;
+    };
+
+    template<typename InputStream>
+    struct NumberStream<InputStream, true> {
+    public:
+        NumberStream(GenericReader& reader, InputStream& is) : reader(reader), is(is), stackStream(reader.stack_) {}
+
+        Ch Take() {
+            stackStream.Put((char)is.Peek());
+            return is.Take();
+        }
+
+        const char* Pop() {
+            stackStream.Put('\0');
+            return stackStream.Pop();
+        }
+
+    private:
+        GenericReader& reader;
+        InputStream& is;
+        StackStream<char> stackStream;
+    };
+
     template<unsigned parseFlags, typename InputStream, typename Handler>
     void ParseNumber(InputStream& is, Handler& handler) {
         internal::StreamLocalCopy<InputStream> copy(is);
-        InputStream& s(copy.s);
-        StackStream<char> stackStream(stack_);    // Backup string for slow path double conversion.
+        NumberStream<InputStream, parseFlags & kParseFullPrecisionFlag> s(*this, copy.s);
 
         // Parse minus
         bool minus = false;
         if (s.Peek() == '-') {
             minus = true;
-            stackStream.Put(s.Peek());
             s.Take();
         }
 
@@ -730,11 +766,9 @@ private:
         bool use64bit = false;
         if (s.Peek() == '0') {
             i = 0;
-            stackStream.Put(s.Peek());
             s.Take();
         }
         else if (s.Peek() >= '1' && s.Peek() <= '9') {
-            stackStream.Put(s.Peek());
             i = static_cast<unsigned>(s.Take() - '0');
 
             if (minus)
@@ -746,7 +780,6 @@ private:
                             break;
                         }
                     }
-                    stackStream.Put(s.Peek());
                     i = i * 10 + static_cast<unsigned>(s.Take() - '0');
                 }
             else
@@ -758,7 +791,6 @@ private:
                             break;
                         }
                     }
-                    stackStream.Put(s.Peek());
                     i = i * 10 + static_cast<unsigned>(s.Take() - '0');
                 }
         }
@@ -776,7 +808,6 @@ private:
                             useDouble = true;
                             break;
                         }
-                    stackStream.Put(s.Peek());
                     i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
                 }
             else
@@ -786,7 +817,6 @@ private:
                             useDouble = true;
                             break;
                         }
-                    stackStream.Put(s.Peek());
                     i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
                 }
         }
@@ -794,14 +824,13 @@ private:
         // Force double for big integer
         if (useDouble) {
             while (s.Peek() >= '0' && s.Peek() <= '9')
-                stackStream.Put(s.Take());
+                s.Take();
             useStrtod = true;
         }
 
         // Parse frac = decimal-point 1*DIGIT
         int expFrac = 0;
         if (s.Peek() == '.') {
-            stackStream.Put(s.Peek());
             s.Take();
 
             if (!useDouble) {
@@ -816,7 +845,6 @@ private:
                         break;
                     }
                     else {
-                        stackStream.Put(s.Peek());
                         i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
                         --expFrac;
                     }
@@ -826,7 +854,7 @@ private:
             useDouble = true;
 
             while (s.Peek() >= '0' && s.Peek() <= '9') {
-                stackStream.Put(s.Take());
+                s.Take();
                 --expFrac;
             }
 
@@ -838,23 +866,19 @@ private:
         int exp = 0;
         if (s.Peek() == 'e' || s.Peek() == 'E') {
             useDouble = true;
-            stackStream.Put(s.Peek());
             s.Take();
 
             bool expMinus = false;
             if (s.Peek() == '+')
                 s.Take();
             else if (s.Peek() == '-') {
-                stackStream.Put(s.Peek());
                 s.Take();
                 expMinus = true;
             }
 
             if (s.Peek() >= '0' && s.Peek() <= '9') {
-                stackStream.Put(s.Peek());
                 exp = s.Take() - '0';
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
-                    stackStream.Put(s.Peek());
                     exp = exp * 10 + (s.Take() - '0');
                     if (exp > 308 && !expMinus) // exp > 308 should be rare, so it should be checked first.
                         RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
@@ -871,8 +895,7 @@ private:
         bool cont = true;
 
         // Pop stack no matter if it will be used or not.
-        stackStream.Put('\0');
-        const char* str = stackStream.Pop();
+        const char* str = s.Pop();
 
         if (useDouble) {
             int p = exp + expFrac;
