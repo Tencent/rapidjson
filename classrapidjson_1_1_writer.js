@@ -11,6 +11,8 @@ var classrapidjson_1_1_writer =
     [ "Int", "classrapidjson_1_1_writer.html#af9340eb570fb46d1937bdc0df816ea0d", null ],
     [ "Int64", "classrapidjson_1_1_writer.html#adb9bc84304f8b45f192a0bcc19d39681", null ],
     [ "IsComplete", "classrapidjson_1_1_writer.html#ad70218827efbda426bbc8620a9339c3e", null ],
+    [ "Key", "classrapidjson_1_1_writer.html#aa15723b3ee548ca9499c8e146b69ddce", null ],
+    [ "Key", "classrapidjson_1_1_writer.html#a1fd39e3bf6e2f8759ecc1ec289191214", null ],
     [ "Null", "classrapidjson_1_1_writer.html#a00fdf35590c8325be281373b75c9663b", null ],
     [ "Prefix", "classrapidjson_1_1_writer.html#ad7a45f586a7143980cd4c0a144fb1699", null ],
     [ "Reset", "classrapidjson_1_1_writer.html#af4411235dd75ae34274e7eb74d435147", null ],

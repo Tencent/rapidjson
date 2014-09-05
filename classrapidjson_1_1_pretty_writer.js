@@ -9,6 +9,8 @@ var classrapidjson_1_1_pretty_writer =
     [ "EndObject", "classrapidjson_1_1_pretty_writer.html#a89d891859943f45fb361d18500d22c89", null ],
     [ "Int", "classrapidjson_1_1_pretty_writer.html#a7f868149fbaffd72df307cddb09dc250", null ],
     [ "Int64", "classrapidjson_1_1_pretty_writer.html#a1c0484da45d1200a1ba27a856494b45c", null ],
+    [ "Key", "classrapidjson_1_1_pretty_writer.html#af565ad95092f80f3db34c6e5e372540b", null ],
+    [ "Key", "classrapidjson_1_1_pretty_writer.html#a16cfd8a385d04f24203cb99e12e432d1", null ],
     [ "Null", "classrapidjson_1_1_pretty_writer.html#acd221a42b42a20db28b1c964d46fecc1", null ],
     [ "PrettyPrefix", "classrapidjson_1_1_pretty_writer.html#ab0ef3cc15c5a9612eaef0f7543244015", null ],
     [ "SetIndent", "classrapidjson_1_1_pretty_writer.html#ad85cd16f7cc2bcd563becab6b555aefc", null ],
