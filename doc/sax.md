@@ -27,21 +27,21 @@ For example, here is a JSON.
 While a `Reader` parses this JSON, it publishes the following events to the handler sequentially:
 
 ~~~~~~~~~~
-BeginObject()
-String("hello", 5, true)
+StartObject()
+Key("hello", 5, true)
 String("world", 5, true)
-String("t", 1, true)
+Key("t", 1, true)
 Bool(true)
-String("f", 1, true)
+Key("f", 1, true)
 Bool(false)
-String("n", 1, true)
+Key("n", 1, true)
 Null()
-String("i")
+Key("i")
 UInt(123)
-String("pi")
+Key("pi")
 Double(3.1416)
-String("a")
-BeginArray()
+Key("a")
+StartArray()
 Uint(1)
 Uint(2)
 Uint(3)
@@ -72,6 +72,10 @@ struct MyHandler {
         return true;
     }
     bool StartObject() { cout << "StartObject()" << endl; return true; }
+    bool Key(const char* str, SizeType length, bool copy) { 
+        cout << "Key(" << str << ", " << length << ", " << boolalpha << copy << ")" << endl;
+        return true;
+    }
     bool EndObject(SizeType memberCount) { cout << "EndObject(" << memberCount << ")" << endl; return true; }
     bool StartArray() { cout << "StartArray()" << endl; return true; }
     bool EndArray(SizeType elementCount) { cout << "EndArray(" << elementCount << ")" << endl; return true; }
@@ -104,6 +108,7 @@ class Handler {
     bool Double(double d);
     bool String(const Ch* str, SizeType length, bool copy);
     bool StartObject();
+    bool Key(const Ch* str, SizeType length, bool copy);
     bool EndObject(SizeType memberCount);
     bool StartArray();
     bool EndArray(SizeType elementCount);
@@ -118,7 +123,7 @@ When the `Reader` encounters a JSON number, it chooses a suitable C++ type mappi
 
 `String(const char* str, SizeType length, bool copy)` is called when the `Reader` encounters a string. The first parameter is pointer to the string. The second parameter is the length of the string (excluding the null terminator). Note that RapidJSON supports null character `'\0'` inside a string. If such situation happens, `strlen(str) < length`. The last `copy` indicates whether the handler needs to make a copy of the string. For normal parsing, `copy = true`. Only when *insitu* parsing is used, `copy = false`. And beware that, the character type depends on the target encoding, which will be explained later.
 
-When the `Reader` encounters the beginning of an object, it calls `StartObject()`. An object in JSON is a set of name-value pairs. If the object contains members it first calls `String()` for the name of member, and then calls functions depending on the type of the value. These calls of name-value pairs repeats until calling `EndObject(SizeType memberCount)`. Note that the `memberCount` parameter is just an aid for the handler, user may not need this parameter.
+When the `Reader` encounters the beginning of an object, it calls `StartObject()`. An object in JSON is a set of name-value pairs. If the object contains members it first calls `Key()` for the name of member, and then calls functions depending on the type of the value. These calls of name-value pairs repeats until calling `EndObject(SizeType memberCount)`. Note that the `memberCount` parameter is just an aid for the handler, user may not need this parameter.
 
 Array is similar to object but simpler. At the beginning of an array, the `Reader` calls `BeginArary()`. If there is elements, it calls functions according to the types of element. Similarly, in the last call `EndArray(SizeType elementCount)`, the parameter `elementCount` is just an aid for the handler.
 
@@ -189,19 +194,19 @@ void main() {
     Writer<StringBuffer> writer(s);
     
     writer.StartObject();
-    writer.String("hello");
+    writer.Key("hello");
     writer.String("world");
-    writer.String("t");
+    writer.Key("t");
     writer.Bool(true);
-    writer.String("f");
+    writer.Key("f");
     writer.Bool(false);
-    writer.String("n");
+    writer.Key("n");
     writer.Null();
-    writer.String("i");
+    writer.Key("i");
     writer.Uint(123);
-    writer.String("pi");
+    writer.Key("pi");
     writer.Double(3.1416);
-    writer.String("a");
+    writer.Key("a");
     writer.StartArray();
     for (unsigned i = 0; i < 4; i++)
         writer.Uint(i);
@@ -216,7 +221,7 @@ void main() {
 {"hello":"world","t":true,"f":false,"n":null,"i":123,"pi":3.1416,"a":[0,1,2,3]}
 ~~~~~~~~~~
 
-There is two `String()` overloads. One is the same as defined in handler concept with 3 parameters. It can handle string with null characters. Another one is the simpler version used in the above example.
+There are two `String()` and `Key()` overloads. One is the same as defined in handler concept with 3 parameters. It can handle string with null characters. Another one is the simpler version used in the above example.
 
 Note that, the example code does not pass any parameters in `EndArray()` and `EndObject()`. An `SizeType` can be passed but it will be simply ignored by `Writer`.
 
@@ -420,6 +425,7 @@ struct CapitalizeFilter {
         return out_.String(&buffer_.front(), length, true); // true = output handler need to copy the string
     }
     bool StartObject() { return out_.StartObject(); }
+    bool Key(const char* str, SizeType length, bool copy) { return String(str, length, copy); }
     bool EndObject(SizeType memberCount) { return out_.EndObject(memberCount); }
     bool StartArray() { return out_.StartArray(); }
     bool EndArray(SizeType elementCount) { return out_.EndArray(elementCount); }
