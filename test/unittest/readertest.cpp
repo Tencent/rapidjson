@@ -266,6 +266,51 @@ TEST(Reader, ParseNumber_FullPrecisionDouble) {
     TestParseDouble<true>();
 }
 
+TEST(Reader, ParseNumber_NormalPrecisionError) {
+    static unsigned count = 1000000;
+    static const uint64_t kSignMask = RAPIDJSON_UINT64_C2(0x80000000, 0);
+
+    union {
+        double d;
+        uint64_t u;
+
+        uint64_t ToBias() const {
+            if (u & kSignMask)
+                return ~u + 1;
+            else
+                return u | kSignMask;
+        }
+    }u, a;
+    Random r;
+
+    double ulpSum = 0.0;
+    double ulpMax = 0.0;
+    for (unsigned i = 0; i < count; i++) {
+        do {
+            // Need to call r() in two statements for cross-platform coherent sequence.
+            u.u = uint64_t(r()) << 32;
+            u.u |= uint64_t(r());
+        } while (std::isnan(u.d) || std::isinf(u.d) || !std::isnormal(u.d));
+
+        char buffer[32];
+        *internal::dtoa(u.d, buffer) = '\0';
+
+        StringStream s(buffer);
+        ParseDoubleHandler h;
+        Reader reader;
+        ASSERT_EQ(kParseErrorNone, reader.Parse(s, h).Code());
+        EXPECT_EQ(1u, h.step_);
+
+        a.d = h.actual_;
+        uint64_t bias1 = u.ToBias();
+        uint64_t bias2 = a.ToBias();
+        double ulp = bias1 >= bias2 ? bias1 - bias2 : bias2 - bias1;
+        ulpMax = std::max(ulpMax, ulp);
+        ulpSum += ulp;
+    }
+    printf("ULP Average = %g, Max = %g \n", ulpSum / count, ulpMax);
+}
+
 TEST(Reader, ParseNumber_Error) {
 #define TEST_NUMBER_ERROR(errorCode, str) \
     { \
