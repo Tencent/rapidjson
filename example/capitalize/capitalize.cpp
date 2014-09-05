@@ -31,6 +31,7 @@ struct CapitalizeFilter {
         return out_.String(&buffer_.front(), length, true); // true = output handler need to copy the string
     }
     bool StartObject() { return out_.StartObject(); }
+    bool Key(const char* str, SizeType length, bool copy) { return String(str, length, copy); }
     bool EndObject(SizeType memberCount) { return out_.EndObject(memberCount); }
     bool StartArray() { return out_.StartArray(); }
     bool EndArray(SizeType elementCount) { return out_.EndArray(elementCount); }

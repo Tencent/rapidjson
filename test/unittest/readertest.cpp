@@ -819,9 +819,10 @@ struct IterativeParsingReaderHandler {
     const static int LOG_DOUBLE = -7;
     const static int LOG_STRING = -8;
     const static int LOG_STARTOBJECT = -9;
-    const static int LOG_ENDOBJECT = -10;
-    const static int LOG_STARTARRAY = -11;
-    const static int LOG_ENDARRAY = -12;
+    const static int LOG_KEY = -10;
+    const static int LOG_ENDOBJECT = -11;
+    const static int LOG_STARTARRAY = -12;
+    const static int LOG_ENDARRAY = -13;
 
     const static size_t LogCapacity = 256;
     int Logs[LogCapacity];
@@ -848,6 +849,8 @@ struct IterativeParsingReaderHandler {
 
     bool StartObject() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STARTOBJECT; return true; }
 
+    bool Key (const Ch*, SizeType, bool) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_KEY; return true; }
+	
     bool EndObject(SizeType c) {
         RAPIDJSON_ASSERT(LogCount < LogCapacity);
         Logs[LogCount++] = LOG_ENDOBJECT;
@@ -880,7 +883,7 @@ TEST(Reader, IterativeParsing_General) {
             handler.LOG_STARTARRAY,
             handler.LOG_INT,
             handler.LOG_STARTOBJECT,
-            handler.LOG_STRING,
+            handler.LOG_KEY,
             handler.LOG_STARTARRAY,
             handler.LOG_INT,
             handler.LOG_INT,
@@ -918,7 +921,7 @@ TEST(Reader, IterativeParsing_Count) {
             handler.LOG_STARTOBJECT,
             handler.LOG_ENDOBJECT, 0,
             handler.LOG_STARTOBJECT,
-            handler.LOG_STRING,
+            handler.LOG_KEY,
             handler.LOG_INT,
             handler.LOG_ENDOBJECT, 1,
             handler.LOG_STARTARRAY,

@@ -88,6 +88,8 @@ public:
         return Base::WriteStartObject();
     }
 
+    bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy); }
+	
     bool EndObject(SizeType memberCount = 0) {
         (void)memberCount;
         RAPIDJSON_ASSERT(Base::level_stack_.GetSize() >= sizeof(typename Base::Level));
@@ -135,6 +137,7 @@ public:
 
     //! Simpler but slower overload.
     bool String(const Ch* str) { return String(str, internal::StrLen(str)); }
+    bool Key(const Ch* str) { return Key(str, internal::StrLen(str)); }
 
     //@}
 protected:
