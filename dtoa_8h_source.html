@@ -187,7 +187,7 @@ $(document).ready(function(){initNavTree('dtoa_8h_source.html','');});
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        _BitScanReverse64(&amp;index, f);</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        <span class="keywordflow">return</span> DiyFp(f &lt;&lt; (63 - index), e - (63 - index));</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="preprocessor">#elif defined(__GNUC__)</span></div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        <span class="keywordtype">int</span> s = __builtin_clzll(f) + 1;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        <span class="keywordtype">int</span> s = __builtin_clzll(f);</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        <span class="keywordflow">return</span> DiyFp(f &lt;&lt; s, e - s);</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="preprocessor">#else</span></div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        DiyFp res = *<span class="keyword">this</span>;</div>
