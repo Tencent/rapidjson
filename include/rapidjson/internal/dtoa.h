@@ -105,7 +105,7 @@ struct DiyFp {
         _BitScanReverse64(&index, f);
         return DiyFp(f << (63 - index), e - (63 - index));
 #elif defined(__GNUC__)
-        int s = __builtin_clzll(f) + 1;
+        int s = __builtin_clzll(f);
         return DiyFp(f << s, e - s);
 #else
         DiyFp res = *this;
