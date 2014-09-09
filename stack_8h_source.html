@@ -180,37 +180,43 @@ $(document).ready(function(){initNavTree('stack_8h_source.html','');});
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordtype">void</span> Expand(<span class="keywordtype">size_t</span> count) {</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        <span class="comment">// Only expand the capacity if the current stack exists. Otherwise just create a stack with initial capacity.</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="keywordtype">size_t</span> newCapacity = (stack_ == 0) ? initialCapacity_ : GetCapacity() * 2;</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <span class="keywordtype">size_t</span> newSize = GetSize() + <span class="keyword">sizeof</span>(T) * count;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <span class="keywordflow">if</span> (newCapacity &lt; newSize)</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;            newCapacity = newSize;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        Resize(newCapacity);</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    }</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordtype">void</span> Resize(<span class="keywordtype">size_t</span> newCapacity) {</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> size = GetSize();  <span class="comment">// Backup the current size</span></div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        stack_ = (<span class="keywordtype">char</span>*)allocator_-&gt;Realloc(stack_, GetCapacity(), newCapacity);</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        stackTop_ = stack_ + size;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        stackEnd_ = stack_ + newCapacity;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    }</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="comment">// Prohibit copy constructor &amp; assignment operator.</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    Stack(<span class="keyword">const</span> Stack&amp;);</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    Stack&amp; operator=(<span class="keyword">const</span> Stack&amp;);</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    Allocator* allocator_;</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    Allocator* ownAllocator;</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keywordtype">char</span> *stack_;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordtype">char</span> *stackTop_;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keywordtype">char</span> *stackEnd_;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keywordtype">size_t</span> initialCapacity_;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;};</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;} <span class="comment">// namespace internal</span></div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;} <span class="comment">// namespace rapidjson</span></div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_STACK_H_</span></div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="keywordtype">size_t</span> newCapacity;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <span class="keywordflow">if</span> (stack_ == 0)</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            newCapacity = initialCapacity_;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;        <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;            newCapacity = GetCapacity();</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;            newCapacity += (newCapacity + 1) / 2;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        }</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        <span class="keywordtype">size_t</span> newSize = GetSize() + <span class="keyword">sizeof</span>(T) * count;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        <span class="keywordflow">if</span> (newCapacity &lt; newSize)</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;            newCapacity = newSize;</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        Resize(newCapacity);</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    }</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keywordtype">void</span> Resize(<span class="keywordtype">size_t</span> newCapacity) {</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> size = GetSize();  <span class="comment">// Backup the current size</span></div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        stack_ = (<span class="keywordtype">char</span>*)allocator_-&gt;Realloc(stack_, GetCapacity(), newCapacity);</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        stackTop_ = stack_ + size;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        stackEnd_ = stack_ + newCapacity;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    }</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="comment">// Prohibit copy constructor &amp; assignment operator.</span></div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    Stack(<span class="keyword">const</span> Stack&amp;);</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    Stack&amp; operator=(<span class="keyword">const</span> Stack&amp;);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    Allocator* allocator_;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    Allocator* ownAllocator;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordtype">char</span> *stack_;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordtype">char</span> *stackTop_;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordtype">char</span> *stackEnd_;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keywordtype">size_t</span> initialCapacity_;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;};</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;} <span class="comment">// namespace internal</span></div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;} <span class="comment">// namespace rapidjson</span></div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_STACK_H_</span></div>
 <div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:264</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
