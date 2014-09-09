@@ -113,6 +113,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p>RapidJSON is a header-only C++ library. Just copy the <code>include/rapidjson</code> folder to system or project's include path.</p>
 <p>To build the tests and examples:</p>
 <ol type="1">
+<li>Execute <code>git submodule update --init</code> to get the files of thirdparty submodules (google test).</li>
 <li>Obtain <a href="http://industriousone.com/premake/download">premake4</a>.</li>
 <li>Copy premake4 executable to <code>rapidjson/build</code> (or system path).</li>
 <li>Change directory to <code>rapidjson/build/</code>, run <code>premake.bat</code> on Windows, <code>premake.sh</code> on Linux or other platforms.</li>
