@@ -98,7 +98,13 @@ private:
     template<typename T>
     void Expand(size_t count) {
         // Only expand the capacity if the current stack exists. Otherwise just create a stack with initial capacity.
-        size_t newCapacity = (stack_ == 0) ? initialCapacity_ : GetCapacity() * 2;
+        size_t newCapacity;
+        if (stack_ == 0)
+            newCapacity = initialCapacity_;
+        else {
+            newCapacity = GetCapacity();
+            newCapacity += (newCapacity + 1) / 2;
+        }
         size_t newSize = GetSize() + sizeof(T) * count;
         if (newCapacity < newSize)
             newCapacity = newSize;
