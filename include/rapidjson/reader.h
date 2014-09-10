@@ -731,6 +731,7 @@ private:
         ~NumberStream() {}
 
         RAPIDJSON_FORCEINLINE Ch Peek() const { return is.Peek(); }
+        RAPIDJSON_FORCEINLINE Ch TakePush() { return is.Take(); }
         RAPIDJSON_FORCEINLINE Ch Take() { return is.Take(); }
         size_t Tell() { return is.Tell(); }
         const char* Pop() { return 0; }
@@ -748,7 +749,7 @@ private:
         NumberStream(GenericReader& reader, InputStream& is) : NumberStream<InputStream, false>(reader, is), stackStream(reader.stack_) {}
         ~NumberStream() {}
 
-        RAPIDJSON_FORCEINLINE Ch Take() {
+        RAPIDJSON_FORCEINLINE Ch TakePush() {
             stackStream.Put((char)Base::is.Peek());
             return Base::is.Take();
         }
@@ -762,13 +763,24 @@ private:
         StackStream<char> stackStream;
     };
 
-    double StrtodFastPath(double significand, int exp) {
+    static double StrtodFastPath(double significand, int exp) {
         if (exp < -308)
             return 0.0;
         else if (exp >= 0)
             return significand * internal::Pow10(exp);
         else
             return significand / internal::Pow10(-exp);
+    }
+
+    static double NormalPrecision(double d, int p, int exp, int expFrac) {
+        if (p < -308) {
+            // Prevent expSum < -308, making Pow10(p) = 0
+            d = StrtodFastPath(d, exp);
+            d = StrtodFastPath(d, expFrac);
+        }
+        else
+            d = StrtodFastPath(d, p);
+        return d;
     }
 
     template<unsigned parseFlags, typename InputStream, typename Handler>
@@ -789,10 +801,10 @@ private:
         bool use64bit = false;
         if (s.Peek() == '0') {
             i = 0;
-            s.Take();
+            s.TakePush();
         }
         else if (s.Peek() >= '1' && s.Peek() <= '9') {
-            i = static_cast<unsigned>(s.Take() - '0');
+            i = static_cast<unsigned>(s.TakePush() - '0');
 
             if (minus)
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
@@ -803,7 +815,7 @@ private:
                             break;
                         }
                     }
-                    i = i * 10 + static_cast<unsigned>(s.Take() - '0');
+                    i = i * 10 + static_cast<unsigned>(s.TakePush() - '0');
                 }
             else
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
@@ -814,7 +826,7 @@ private:
                             break;
                         }
                     }
-                    i = i * 10 + static_cast<unsigned>(s.Take() - '0');
+                    i = i * 10 + static_cast<unsigned>(s.TakePush() - '0');
                 }
         }
         else
@@ -833,7 +845,7 @@ private:
                             useDouble = true;
                             break;
                         }
-                    i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
+                    i64 = i64 * 10 + static_cast<unsigned>(s.TakePush() - '0');
                 }
             else
                 while (s.Peek() >= '0' && s.Peek() <= '9') {                    
@@ -843,23 +855,19 @@ private:
                             useDouble = true;
                             break;
                         }
-                    i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
+                    i64 = i64 * 10 + static_cast<unsigned>(s.TakePush() - '0');
                 }
         }
 
         // Force double for big integer
         if (useDouble) {
-            if (parseFlags & kParseFullPrecisionFlag) {
-                while (s.Peek() >= '0' && s.Peek() <= '9')
-                    s.Take();
+            if (parseFlags & kParseFullPrecisionFlag)
                 useStrtod = true;
-            }
-            else {
-                while (s.Peek() >= '0' && s.Peek() <= '9') {
-                    if (d >= 1.7976931348623157e307) // DBL_MAX / 10.0
-                        RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
-                    d = d * 10 + (s.Take() - '0');
-                }
+
+            while (s.Peek() >= '0' && s.Peek() <= '9') {
+                if (d >= 1.7976931348623157e307) // DBL_MAX / 10.0
+                    RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
+                d = d * 10 + (s.TakePush() - '0');
             }
         }
 
@@ -877,15 +885,16 @@ private:
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
                     if (i64 > RAPIDJSON_UINT64_C2(0x1FFFFF, 0xFFFFFFFF)) { // 2^53 - 1 for fast path
                         if (parseFlags & kParseFullPrecisionFlag) {
-                            while (s.Peek() >= '0' && s.Peek() <= '9')
-                                s.Take();
+                            while (s.Peek() >= '0' && s.Peek() <= '9') {
+                                s.TakeAndPush();
+                                --expFrac;
+                            }
                             useStrtod = true;
-                            --expFrac;
                         }
                         break;
                     }
                     else {
-                        i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
+                        i64 = i64 * 10 + static_cast<unsigned>(s.TakeAndPush() - '0');
                         --expFrac;
                     }
                 }
@@ -901,14 +910,15 @@ private:
 
             if ((parseFlags & kParseFullPrecisionFlag) == 0 || !useStrtod) {
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
-                    d = d * 10.0 + (s.Take() - '0');
+                    d = d * 10.0 + (s.TakePush() - '0');
                     --expFrac;
                 }
             }
             else {
-                while (s.Peek() >= '0' && s.Peek() <= '9')
-                    s.Take();
-                --expFrac;
+                while (s.Peek() >= '0' && s.Peek() <= '9') {
+                    s.TakePush();
+                    --expFrac;
+                }
             }
 
             if (expFrac == 0)
@@ -966,33 +976,18 @@ private:
                         useStrtod = true;
                 }
 
-                if (!useStrtod && p >= -22 && d <= 9007199254740991.0) { // 2^53 - 1
+                if (!useStrtod && p >= -22 && d <= 9007199254740991.0) // 2^53 - 1
                     d = StrtodFastPath(d, p);
-                    if (minus)
-                        d = -d;
-                }
                 else {
-                    char* end = 0;
-                    d = strtod(str, &end);
-                    RAPIDJSON_ASSERT(*end == '\0'); // Should have consumed the whole string.
-
-                    if (d == HUGE_VAL || d == -HUGE_VAL)
-                        RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
+                    printf("s=%s p=%d\n", str, p);
+                    double guess = NormalPrecision(d, p, exp, expFrac);
+                    d = guess;
                 }
             }
             else {
-                if (p < -308) {
-                    // Prevent expSum < -308, making Pow10(p) = 0
-                    d = StrtodFastPath(d, exp);
-                    d = StrtodFastPath(d, expFrac);
-                }
-                else
-                    d = StrtodFastPath(d, p);
-
-                if (minus)
-                    d = -d;
+                d = NormalPrecision(d, p, exp, expFrac);
             }
-            cont = handler.Double(d);
+            cont = handler.Double(minus ? -d : d);
         }
         else {
             if (use64bit) {
