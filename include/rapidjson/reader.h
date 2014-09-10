@@ -26,11 +26,8 @@
 #include "rapidjson.h"
 #include "encodings.h"
 #include "internal/meta.h"
-#include "internal/pow10.h"
 #include "internal/stack.h"
-
-#include <cstdlib>  // strtod()
-#include <cmath>    // HUGE_VAL
+#include "internal/strtod.h"
 
 #if defined(RAPIDJSON_SIMD) && defined(_MSC_VER)
 #include <intrin.h>
@@ -763,26 +760,6 @@ private:
         StackStream<char> stackStream;
     };
 
-    static double StrtodFastPath(double significand, int exp) {
-        if (exp < -308)
-            return 0.0;
-        else if (exp >= 0)
-            return significand * internal::Pow10(exp);
-        else
-            return significand / internal::Pow10(-exp);
-    }
-
-    static double NormalPrecision(double d, int p, int exp, int expFrac) {
-        if (p < -308) {
-            // Prevent expSum < -308, making Pow10(p) = 0
-            d = StrtodFastPath(d, exp);
-            d = StrtodFastPath(d, expFrac);
-        }
-        else
-            d = StrtodFastPath(d, p);
-        return d;
-    }
-
     template<unsigned parseFlags, typename InputStream, typename Handler>
     void ParseNumber(InputStream& is, Handler& handler) {
         internal::StreamLocalCopy<InputStream> copy(is);
@@ -886,7 +863,7 @@ private:
                     if (i64 > RAPIDJSON_UINT64_C2(0x1FFFFF, 0xFFFFFFFF)) { // 2^53 - 1 for fast path
                         if (parseFlags & kParseFullPrecisionFlag) {
                             while (s.Peek() >= '0' && s.Peek() <= '9') {
-                                s.TakeAndPush();
+                                s.TakePush();
                                 --expFrac;
                             }
                             useStrtod = true;
@@ -894,7 +871,7 @@ private:
                         break;
                     }
                     else {
-                        i64 = i64 * 10 + static_cast<unsigned>(s.TakeAndPush() - '0');
+                        i64 = i64 * 10 + static_cast<unsigned>(s.TakePush() - '0');
                         --expFrac;
                     }
                 }
@@ -963,30 +940,11 @@ private:
 
         if (useDouble) {
             int p = exp + expFrac;
-            if (parseFlags & kParseFullPrecisionFlag) {
-                // Use fast path for string-to-double conversion if possible
-                // see http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/
-                if (!useStrtod && p > 22) {
-                    if (p < 22 + 16) {
-                        // Fast Path Cases In Disguise
-                        d *= internal::Pow10(p - 22);
-                        p = 22;
-                    }
-                    else
-                        useStrtod = true;
-                }
+            if (parseFlags & kParseFullPrecisionFlag)
+                d = internal::FullPrecision(useStrtod, d, p, str);
+            else
+                d = internal::NormalPrecision(d, p);
 
-                if (!useStrtod && p >= -22 && d <= 9007199254740991.0) // 2^53 - 1
-                    d = StrtodFastPath(d, p);
-                else {
-                    printf("s=%s p=%d\n", str, p);
-                    double guess = NormalPrecision(d, p, exp, expFrac);
-                    d = guess;
-                }
-            }
-            else {
-                d = NormalPrecision(d, p, exp, expFrac);
-            }
             cont = handler.Double(minus ? -d : d);
         }
         else {

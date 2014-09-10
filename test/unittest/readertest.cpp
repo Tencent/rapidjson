@@ -262,7 +262,7 @@ static void TestParseDouble() {
         TEST_DOUBLE(fullPrecision, n1e308, 1E308);
     }
 
-#if 1
+#if 0
     // Random test for double
     {
         union {
