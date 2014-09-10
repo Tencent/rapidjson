@@ -31,6 +31,36 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
+// Implement functions that may not be provided pre-C++11
+bool IsNan(double x) {
+	union {
+		double x;
+		uint64_t u;
+	}u = { x };
+	// E == 0x7FF && M != 0
+	return (u.u & RAPIDJSON_UINT64_C2(0x7FF00000, 0x00000000)) == RAPIDJSON_UINT64_C2(0x7FF00000, 0x00000000) && 
+		(u.u & RAPIDJSON_UINT64_C2(0x000FFFFF, 0xFFFFFFFF)) != 0;
+}
+
+bool IsInf(double x) {
+	union {
+		double x;
+		uint64_t u;
+	}u = { x };
+	// E = 0x7FF and M == 0
+	return (u.u & RAPIDJSON_UINT64_C2(0x7FFFFFFF, 0xFFFFFFFF)) == RAPIDJSON_UINT64_C2(0x7FF00000, 0x00000000);
+}
+
+bool IsNormal(double x) {
+	union {
+		double x;
+		uint64_t u;
+	}u = { x };
+	// E != 0 || M == 0
+	return (u.u & RAPIDJSON_UINT64_C2(0x7FF00000, 0x00000000)) != 0 || 
+		(u.u & RAPIDJSON_UINT64_C2(0x000FFFFF, 0xFFFFFFFF)) == 0;
+}
+
 template<bool expect>
 struct ParseBoolHandler : BaseReaderHandler<UTF8<>, ParseBoolHandler<expect> > {
     ParseBoolHandler() : step_(0) {}
@@ -120,13 +150,13 @@ TEST(Reader, ParseNumber_Integer) {
     TEST_INTEGER(ParseUintHandler, "4294967295", 4294967295u);
 
     TEST_INTEGER(ParseIntHandler, "-123", -123);
-    TEST_INTEGER(ParseIntHandler, "-2147483648", -2147483648LL);     // -2^31 (min of int)
+    TEST_INTEGER(ParseIntHandler, "-2147483648", static_cast<int32_t>(0x80000000));     // -2^31 (min of int)
 
-    TEST_INTEGER(ParseUint64Handler, "4294967296", 4294967296ULL);   // 2^32 (max of unsigned + 1, force to use uint64_t)
-    TEST_INTEGER(ParseUint64Handler, "18446744073709551615", 18446744073709551615ULL);   // 2^64 - 1 (max of uint64_t)
+    TEST_INTEGER(ParseUint64Handler, "4294967296", RAPIDJSON_UINT64_C2(1, 0));   // 2^32 (max of unsigned + 1, force to use uint64_t)
+    TEST_INTEGER(ParseUint64Handler, "18446744073709551615", RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0xFFFFFFFF));   // 2^64 - 1 (max of uint64_t)
 
-    TEST_INTEGER(ParseInt64Handler, "-2147483649", -2147483649LL);   // -2^31 -1 (min of int - 1, force to use int64_t)
-    TEST_INTEGER(ParseInt64Handler, "-9223372036854775808", (-9223372036854775807LL - 1));       // -2^63 (min of int64_t)
+    TEST_INTEGER(ParseInt64Handler, "-2147483649", static_cast<int64_t>(RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0x7FFFFFFF)));   // -2^31 -1 (min of int - 1, force to use int64_t)
+    TEST_INTEGER(ParseInt64Handler, "-9223372036854775808", static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x80000000, 0x00000000)));       // -2^63 (min of int64_t)
 
     // Random test for uint32_t/int32_t
     {
@@ -246,7 +276,7 @@ static void TestParseDouble() {
                 // Need to call r() in two statements for cross-platform coherent sequence.
                 u.u = uint64_t(r()) << 32;
                 u.u |= uint64_t(r());
-            } while (std::isnan(u.d) || std::isinf(u.d) || !std::isnormal(u.d));
+            } while (IsNan(u.d) || IsInf(u.d) || !IsNormal(u.d));
 
             char buffer[32];
             *internal::dtoa(u.d, buffer) = '\0';
@@ -290,7 +320,7 @@ TEST(Reader, ParseNumber_NormalPrecisionError) {
             // Need to call r() in two statements for cross-platform coherent sequence.
             u.u = uint64_t(r()) << 32;
             u.u |= uint64_t(r());
-        } while (std::isnan(u.d) || std::isinf(u.d) || !std::isnormal(u.d));
+        } while (IsNan(u.d) || IsInf(u.d) || !IsNormal(u.d));
 
         char buffer[32];
         *internal::dtoa(u.d, buffer) = '\0';
