@@ -170,7 +170,7 @@ public:
     //! Allocates a memory block. (concept Allocator)
     void* Malloc(size_t size) {
         size = RAPIDJSON_ALIGN(size);
-        if (chunkHead_->size + size > chunkHead_->capacity)
+        if (chunkHead_ == 0 || chunkHead_->size + size > chunkHead_->capacity)
             AddChunk(chunk_capacity_ > size ? chunk_capacity_ : size);
 
         void *buffer = reinterpret_cast<char *>(chunkHead_ + 1) + chunkHead_->size;
