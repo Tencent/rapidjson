@@ -731,6 +731,7 @@ private:
         RAPIDJSON_FORCEINLINE Ch TakePush() { return is.Take(); }
         RAPIDJSON_FORCEINLINE Ch Take() { return is.Take(); }
         size_t Tell() { return is.Tell(); }
+        size_t Length() { return 0; }
         const char* Pop() { return 0; }
 
     protected:
@@ -750,6 +751,8 @@ private:
             stackStream.Put((char)Base::is.Peek());
             return Base::is.Take();
         }
+
+        size_t Length() { return stackStream.Length(); }
 
         const char* Pop() {
             stackStream.Put('\0');
@@ -811,7 +814,6 @@ private:
 
         // Parse 64bit int
         bool useDouble = false;
-        bool useStrtod = false;
         double d = 0.0;
         if (use64bit) {
             if (minus) 
@@ -838,9 +840,6 @@ private:
 
         // Force double for big integer
         if (useDouble) {
-            if (parseFlags & kParseFullPrecisionFlag)
-                useStrtod = true;
-
             while (s.Peek() >= '0' && s.Peek() <= '9') {
                 if (d >= 1.7976931348623157e307) // DBL_MAX / 10.0
                     RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
@@ -860,24 +859,15 @@ private:
                     i64 = i;
         
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
-                    if (i64 > RAPIDJSON_UINT64_C2(0x1FFFFF, 0xFFFFFFFF)) { // 2^53 - 1 for fast path
-                        if (parseFlags & kParseFullPrecisionFlag) {
-                            while (s.Peek() >= '0' && s.Peek() <= '9') {
-                                s.TakePush();
-                                --expFrac;
-                            }
-                            useStrtod = true;
-                        }
+                    if (i64 > RAPIDJSON_UINT64_C2(0x1FFFFF, 0xFFFFFFFF)) // 2^53 - 1 for fast path
                         break;
-                    }
                     else {
                         i64 = i64 * 10 + static_cast<unsigned>(s.TakePush() - '0');
                         --expFrac;
                     }
                 }
 
-                if (!useStrtod)
-                    d = (double)i64;
+                d = (double)i64;
 #else
                 // Use double to store significand in 32-bit architecture
                 d = use64bit ? (double)i64 : (double)i;
@@ -885,17 +875,9 @@ private:
                 useDouble = true;
             }
 
-            if ((parseFlags & kParseFullPrecisionFlag) == 0 || !useStrtod) {
-                while (s.Peek() >= '0' && s.Peek() <= '9') {
-                    d = d * 10.0 + (s.TakePush() - '0');
-                    --expFrac;
-                }
-            }
-            else {
-                while (s.Peek() >= '0' && s.Peek() <= '9') {
-                    s.TakePush();
-                    --expFrac;
-                }
+            while (s.Peek() >= '0' && s.Peek() <= '9') {
+                d = d * 10.0 + (s.TakePush() - '0');
+                --expFrac;
             }
 
             if (expFrac == 0)
@@ -936,12 +918,13 @@ private:
 
         // Finish parsing, call event according to the type of number.
         bool cont = true;
-        const char* str = s.Pop();  // Pop stack no matter if it will be used or not.
+        size_t length = s.Length();
+        const char* decimal = s.Pop();  // Pop stack no matter if it will be used or not.
 
         if (useDouble) {
             int p = exp + expFrac;
             if (parseFlags & kParseFullPrecisionFlag)
-                d = internal::FullPrecision(useStrtod, d, p, str);
+                d = internal::FullPrecision(d, p, decimal, length);
             else
                 d = internal::NormalPrecision(d, p);
 
