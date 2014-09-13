@@ -31,36 +31,6 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
-// Implement functions that may not be provided pre-C++11
-bool IsNan(double x) {
-	union {
-		double x;
-		uint64_t u;
-	}u = { x };
-	// E == 0x7FF && M != 0
-	return (u.u & RAPIDJSON_UINT64_C2(0x7FF00000, 0x00000000)) == RAPIDJSON_UINT64_C2(0x7FF00000, 0x00000000) && 
-		(u.u & RAPIDJSON_UINT64_C2(0x000FFFFF, 0xFFFFFFFF)) != 0;
-}
-
-bool IsInf(double x) {
-	union {
-		double x;
-		uint64_t u;
-	}u = { x };
-	// E = 0x7FF and M == 0
-	return (u.u & RAPIDJSON_UINT64_C2(0x7FFFFFFF, 0xFFFFFFFF)) == RAPIDJSON_UINT64_C2(0x7FF00000, 0x00000000);
-}
-
-bool IsNormal(double x) {
-	union {
-		double x;
-		uint64_t u;
-	}u = { x };
-	// E != 0 || M == 0
-	return (u.u & RAPIDJSON_UINT64_C2(0x7FF00000, 0x00000000)) != 0 || 
-		(u.u & RAPIDJSON_UINT64_C2(0x000FFFFF, 0xFFFFFFFF)) == 0;
-}
-
 template<bool expect>
 struct ParseBoolHandler : BaseReaderHandler<UTF8<>, ParseBoolHandler<expect> > {
     ParseBoolHandler() : step_(0) {}
@@ -242,16 +212,22 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "1.234E+10", 1.234E+10);
     TEST_DOUBLE(fullPrecision, "1.234E-10", 1.234E-10);
     TEST_DOUBLE(fullPrecision, "1.79769e+308", 1.79769e+308);
-    //TEST_DOUBLE(fullPrecision, "2.22507e-308", 2.22507e-308);
+    TEST_DOUBLE(fullPrecision, "2.22507e-308", 2.22507e-308);
     TEST_DOUBLE(fullPrecision, "-1.79769e+308", -1.79769e+308);
-    //TEST_DOUBLE(fullPrecision, "-2.22507e-308", -2.22507e-308);
-    //TEST_DOUBLE(fullPrecision, "4.9406564584124654e-324", 4.9406564584124654e-324); // minimum denormal
+    TEST_DOUBLE(fullPrecision, "-2.22507e-308", -2.22507e-308);
+    TEST_DOUBLE(fullPrecision, "4.9406564584124654e-324", 4.9406564584124654e-324); // minimum denormal
+    TEST_DOUBLE(fullPrecision, "2.2250738585072009e-308", 2.2250738585072009e-308); // Max subnormal double
+    TEST_DOUBLE(fullPrecision, "2.2250738585072014e-308", 2.2250738585072014e-308); // Min normal positive double
+    TEST_DOUBLE(fullPrecision, "1.7976931348623157e+308", 1.7976931348623157e+308); // Max double
     TEST_DOUBLE(fullPrecision, "1e-10000", 0.0);                                   // must underflow
     TEST_DOUBLE(fullPrecision, "18446744073709551616", 18446744073709551616.0);    // 2^64 (max of uint64_t + 1, force to use double)
     TEST_DOUBLE(fullPrecision, "-9223372036854775809", -9223372036854775809.0);    // -2^63 - 1(min of int64_t + 1, force to use double)
     TEST_DOUBLE(fullPrecision, "0.9868011474609375", 0.9868011474609375);          // https://github.com/miloyip/rapidjson/issues/120
     TEST_DOUBLE(fullPrecision, "123e34", 123e34);                                  // Fast Path Cases In Disguise
     TEST_DOUBLE(fullPrecision, "45913141877270640000.0", 45913141877270640000.0);
+    TEST_DOUBLE(fullPrecision, "2.2250738585072011e-308", 2.2250738585072011e-308); // http://www.exploringbinary.com/php-hangs-on-numeric-value-2-2250738585072011e-308/
+    TEST_DOUBLE(fullPrecision, "2.2250738585072012e-308", 2.2250738585072012e-308); // http://www.exploringbinary.com/java-hangs-when-converting-2-2250738585072012e-308/
+    TEST_DOUBLE(fullPrecision, "4503599627370495.9999999999", 4503599627370495.9999999999); // slightly smaller than 2^52 for power of two case
 
     {
         char n1e308[310];   // '1' followed by 308 '0'
@@ -263,24 +239,23 @@ static void TestParseDouble() {
     }
 
 #if 1
+    static const unsigned count = 1000000;
     // Random test for double
     {
-        union {
-            double d;
-            uint64_t u;
-        }u;
         Random r;
 
-        for (unsigned i = 0; i < 100000; i++) {
+        for (unsigned i = 0; i < count; i++) {
+            internal::Double d;
             do {
                 // Need to call r() in two statements for cross-platform coherent sequence.
-                u.u = uint64_t(r()) << 32;
-                u.u |= uint64_t(r());
-            } while (IsNan(u.d) || IsInf(u.d) || !IsNormal(u.d));
+                uint64_t u = uint64_t(r()) << 32;
+                u |= uint64_t(r());
+                d = internal::Double(u);
+            } while (d.IsNan() || d.IsInf()/* || !d.IsNormal()*/);  // Also work for subnormal now
 
             char buffer[32];
-            *internal::dtoa(u.d, buffer) = '\0';
-            TEST_DOUBLE(fullPrecision, buffer, u.d);
+            *internal::dtoa(d.Value(), buffer) = '\0';
+            TEST_DOUBLE(fullPrecision, buffer, d.Value());
         }
     }
 #endif
@@ -298,32 +273,21 @@ TEST(Reader, ParseNumber_FullPrecisionDouble) {
 
 TEST(Reader, ParseNumber_NormalPrecisionError) {
     static unsigned count = 1000000;
-    static const uint64_t kSignMask = RAPIDJSON_UINT64_C2(0x80000000, 0);
-
-    union {
-        double d;
-        uint64_t u;
-
-        uint64_t ToBias() const {
-            if (u & kSignMask)
-                return ~u + 1;
-            else
-                return u | kSignMask;
-        }
-    }u, a;
     Random r;
 
     double ulpSum = 0.0;
     double ulpMax = 0.0;
     for (unsigned i = 0; i < count; i++) {
+        internal::Double e, a;
         do {
             // Need to call r() in two statements for cross-platform coherent sequence.
-            u.u = uint64_t(r()) << 32;
-            u.u |= uint64_t(r());
-        } while (IsNan(u.d) || IsInf(u.d) || !IsNormal(u.d));
+            uint64_t u = uint64_t(r()) << 32;
+            u |= uint64_t(r());
+            e = u;
+        } while (e.IsNan() || e.IsInf() || !e.IsNormal());
 
         char buffer[32];
-        *internal::dtoa(u.d, buffer) = '\0';
+        *internal::dtoa(e.Value(), buffer) = '\0';
 
         StringStream s(buffer);
         ParseDoubleHandler h;
@@ -331,8 +295,8 @@ TEST(Reader, ParseNumber_NormalPrecisionError) {
         ASSERT_EQ(kParseErrorNone, reader.Parse(s, h).Code());
         EXPECT_EQ(1u, h.step_);
 
-        a.d = h.actual_;
-        uint64_t bias1 = u.ToBias();
+        a = h.actual_;
+        uint64_t bias1 = e.ToBias();
         uint64_t bias2 = a.ToBias();
         double ulp = bias1 >= bias2 ? bias1 - bias2 : bias2 - bias1;
         ulpMax = std::max(ulpMax, ulp);

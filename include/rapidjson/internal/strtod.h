@@ -29,8 +29,12 @@ namespace internal {
 
 class Double {
 public:
+    Double() {}
     Double(double d) : d(d) {}
     Double(uint64_t u) : u(u) {}
+
+    double Value() const { return d; }
+    uint64_t Uint64Value() const { return u; }
 
     double NextDouble() const {
         RAPIDJSON_ASSERT(!Sign());
@@ -47,12 +51,20 @@ public:
 
     bool Sign() const { return (u & kSignMask) != 0; }
     uint64_t Significand() const { return u & kSignificandMask; }
-    int Exponent() const { return (u & kExponentMask) - kExponentBias; }
-    double Value() const { return d;}
+    int Exponent() const { return ((u & kExponentMask) >> kSignificandSize) - kExponentBias; }
+
+    bool IsNan() const { return (u & kExponentMask) == kExponentMask && Significand() != 0; }
+    bool IsInf() const { return (u & kExponentMask) == kExponentMask && Significand() == 0; }
+    bool IsNormal() const { return (u & kExponentMask) != 0 || Significand() == 0; }
+
+    uint64_t IntegerSignificand() const { return IsNormal() ? Significand() | kHiddenBit : Significand(); }
+    int IntegerExponent() const { return (IsNormal() ? Exponent() : kDenormalExponent) - kSignificandSize; }
+    uint64_t ToBias() const { return (u & kSignMask) ? ~u + 1 : u | kSignMask; }
 
 private:
     static const int kSignificandSize = 52;
     static const int kExponentBias = 0x3FF;
+    static const int kDenormalExponent = 1 - kExponentBias;
     static const uint64_t kSignMask = RAPIDJSON_UINT64_C2(0x80000000, 0x00000000);
     static const uint64_t kExponentMask = RAPIDJSON_UINT64_C2(0x7FF00000, 0x00000000);
     static const uint64_t kSignificandMask = RAPIDJSON_UINT64_C2(0x000FFFFF, 0xFFFFFFFF);
@@ -328,19 +340,10 @@ inline double NormalPrecision(double d, int p) {
 }
 
 inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp, bool* adjustToNegative) {
-    static const int kSignificandSize = 52;
-    static const int kExponentBias = 0x3FF;
-    static const uint64_t kExponentMask = RAPIDJSON_UINT64_C2(0x7FF00000, 0x00000000);
-    static const uint64_t kSignificandMask = RAPIDJSON_UINT64_C2(0x000FFFFF, 0xFFFFFFFF);
-    static const uint64_t kHiddenBit = RAPIDJSON_UINT64_C2(0x00100000, 0x00000000);
+    const Double db(b);
+    const uint64_t bInt = db.IntegerSignificand();
+    const int bExp = db.IntegerExponent();
 
-    union {
-        double d;
-        uint64_t u;
-    }u;
-    u.d = b;
-    const uint64_t bInt = (u.u & kSignificandMask) | kHiddenBit;
-    const int bExp = ((u.u & kExponentMask) >> kSignificandSize) - kExponentBias - kSignificandSize;
     const int hExp = bExp - 1;
 
     int dS_Exp2 = 0;
@@ -396,7 +399,19 @@ inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp, bool* adj
     BigInteger delta(0);
     *adjustToNegative = dS.Difference(bS, &delta);
 
-    return delta.Compare(hS);
+    int cmp = delta.Compare(hS);
+
+    // If delta is within 1/2 ULP, check for special case when significand is power of two.
+    // In this case, need to compare with 1/2h in the lower bound.
+    if (cmp < 0 && *adjustToNegative && db.IsNormal() && (bInt & (bInt - 1)) == 0) {
+        delta <<= 1;
+
+        if (delta.Compare(hS) <= 0)
+            return -1;
+        else
+            return 1;
+    }
+    return cmp;
 }
 
 inline double FullPrecision(double d, int dExp, const char* decimals, size_t length) {
@@ -413,17 +428,16 @@ inline double FullPrecision(double d, int dExp, const char* decimals, size_t len
         }
     }
 
-    if (p >= -22 && d <= 9007199254740991.0) // 2^53 - 1
+    if (p >= -22 && p <= 22 && d <= 9007199254740991.0) // 2^53 - 1
         return StrtodFastPath(d, p);
 
     if (p + int(length) < -324)
         return 0.0;
 
-    //printf("s=%s p=%d\n", decimals, p);
     const BigInteger dInt(decimals, length);
     Double approx = NormalPrecision(d, p);
-    for (;;) {
-        //printf("approx=%.17g\n", approx.Value());
+    bool lastAdjustToNegative;
+    for (int i = 0; i < 10; i++) {
         bool adjustToNegative;
         int cmp = CheckWithinHalfULP(approx.Value(), dInt, dExp, &adjustToNegative);
         if (cmp < 0)
@@ -436,13 +450,21 @@ inline double FullPrecision(double d, int dExp, const char* decimals, size_t len
                 return approx.Value();
         }
         else {
+            // If oscillate between negative/postive, terminate
+            if (i > 0 && adjustToNegative != lastAdjustToNegative)
+                break;
+
             // adjustment
             if (adjustToNegative)
                 approx = approx.PreviousDouble();
             else
                 approx = approx.NextDouble();
-        }            
+        }
+        lastAdjustToNegative = adjustToNegative;
     }
+
+    // This should not happen, but in case there is really a bug, break the infinite-loop
+    return approx.Value();
 }
 
 } // namespace internal
