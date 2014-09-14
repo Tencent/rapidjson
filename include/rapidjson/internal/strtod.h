@@ -80,13 +80,13 @@ class BigInteger {
 public:
     typedef uint64_t Type;
 
-    explicit BigInteger(uint64_t u) {
-        *this = u;
+    explicit BigInteger(uint64_t u) : count_(1) {
+        digits_[0] = u;
     }
 
-    BigInteger(const char* decimals, size_t length)  {
+    BigInteger(const char* decimals, size_t length) : count_(1) {
         RAPIDJSON_ASSERT(length > 0);
-        *this = 0u;
+        digits_[0] = 0;
         size_t i = 0;
         const size_t kMaxDigitPerIteration = 19;  // 2^64 = 18446744073709551616 > 10^19
         while (length >= kMaxDigitPerIteration) {
@@ -302,10 +302,12 @@ private:
         uint64_t outLow = low + k;
         if (outLow < low)
             (*outHigh)++;
-        //uint64_t outLow;
-        //unsigned char carry = _addcarryx_u64(0, low, k, &outLow);
-        //_addcarry_u64(carry, *outHigh, 0, outHigh);
         return outLow;
+#elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) && defined(__x86_64__)
+        unsigned __int128 p = static_cast<unsigned __int128>(a) * static_cast<unsigned __int128>(b);
+        p += k;
+        *outHigh = p >> 64;
+        return static_cast<uint64_t>(p);
 #else
         // TODO
 #endif
@@ -337,6 +339,14 @@ inline double NormalPrecision(double d, int p) {
     else
         d = StrtodFastPath(d, p);
     return d;
+}
+
+template <typename T>
+inline T Min3(T a, T b, T c) {
+    T m = a;
+    if (m > b) m = b;
+    if (m > c) m = c;
+    return m;
 }
 
 inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp, bool* adjustToNegative) {
@@ -382,7 +392,7 @@ inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp, bool* adj
     }
 
     // Remove common power of two factor from all three scaled values
-    int common_Exp2 = std::min(dS_Exp2, std::min(bS_Exp2, hS_Exp2));
+    int common_Exp2 = Min3(dS_Exp2, bS_Exp2, hS_Exp2);
     dS_Exp2 -= common_Exp2;
     bS_Exp2 -= common_Exp2;
     hS_Exp2 -= common_Exp2;
@@ -436,7 +446,7 @@ inline double FullPrecision(double d, int dExp, const char* decimals, size_t len
 
     const BigInteger dInt(decimals, length);
     Double approx = NormalPrecision(d, p);
-    bool lastAdjustToNegative;
+    bool lastAdjustToNegative = false;
     for (int i = 0; i < 10; i++) {
         bool adjustToNegative;
         int cmp = CheckWithinHalfULP(approx.Value(), dInt, dExp, &adjustToNegative);
