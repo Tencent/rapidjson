@@ -299,17 +299,36 @@ private:
     static uint64_t MulAdd64(uint64_t a, uint64_t b, uint64_t k, uint64_t* outHigh) {
 #if defined(_MSC_VER) && defined(_M_AMD64)
         uint64_t low = _umul128(a, b, outHigh);
-        uint64_t outLow = low + k;
-        if (outLow < low)
+        low += k;
+        if (low < k)
             (*outHigh)++;
-        return outLow;
+        return low;
 #elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) && defined(__x86_64__)
         unsigned __int128 p = static_cast<unsigned __int128>(a) * static_cast<unsigned __int128>(b);
         p += k;
         *outHigh = p >> 64;
         return static_cast<uint64_t>(p);
 #else
-        // TODO
+        const uint64_t a0 = a & 0xFFFFFFFF;
+        const uint64_t a1 = a >> 32;
+        const uint64_t b0 = b & 0xFFFFFFFF;
+        const uint64_t b1 = b >> 32;
+        uint64_t x0 = a0 * b0;
+        uint64_t x1 = a0 * b1;
+        uint64_t x2 = a1 * b0;
+        uint64_t x3 = a1 * b1;
+        x1 += (x0 >> 32); // can't give carry
+        x1 += x2;
+        if (x1 < x2)
+            x3 += (static_cast<uint64_t>(1) << 32);
+        uint64_t lo = (x1 << 32) + (x0 & 0xFFFFFFFF);
+        uint64_t hi = x3 + (x1 >> 32);
+
+        lo += k;
+        if (lo < k)
+            hi++;
+        *outHigh = hi;
+        return lo;
 #endif
     }
 
