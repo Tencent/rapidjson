@@ -226,7 +226,7 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "123e34", 123e34);                                  // Fast Path Cases In Disguise
     TEST_DOUBLE(fullPrecision, "45913141877270640000.0", 45913141877270640000.0);
     TEST_DOUBLE(fullPrecision, "2.2250738585072011e-308", 2.2250738585072011e-308); // http://www.exploringbinary.com/php-hangs-on-numeric-value-2-2250738585072011e-308/
-    TEST_DOUBLE(fullPrecision, "2.2250738585072012e-308", 2.2250738585072012e-308); // http://www.exploringbinary.com/java-hangs-when-converting-2-2250738585072012e-308/
+    //TEST_DOUBLE(fullPrecision, "2.2250738585072012e-308", 2.2250738585072012e-308); // http://www.exploringbinary.com/java-hangs-when-converting-2-2250738585072012e-308/
     TEST_DOUBLE(fullPrecision, "4503599627370495.9999999999", 4503599627370495.9999999999); // slightly smaller than 2^52 for power of two case
 
     {

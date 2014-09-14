@@ -160,7 +160,7 @@ TEST(Strtod, CheckApproximationCase) {
     const uint64_t bInt = (u.u & kSignificandMask) | kHiddenBit;
     const int bExp = ((u.u & kExponentMask) >> kSignificandSize) - kExponentBias - kSignificandSize;
     EXPECT_DOUBLE_EQ(1.7864e-45, b);
-    EXPECT_EQ(5741268244528520, bInt);
+    EXPECT_EQ(RAPIDJSON_UINT64_C2(0x001465a7, 0x2e467d88), bInt);
     EXPECT_EQ(-201, bExp);
 
     // Let d = 17864 x 10-49
