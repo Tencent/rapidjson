@@ -122,6 +122,22 @@ public:
         return *this;
     }
 
+    BigInteger& operator+=(const BigInteger& rhs) {
+        size_t count = count_ > rhs.count_ ? count_ : rhs.count_;
+        bool carry = false;
+        for (size_t i = 0; i < count; i++) {
+            bool outCarry;
+            digits_[i] = FullAdd(i < count_ ? digits_[i] : 0, i < rhs.count_ ? rhs.digits_[i] : 0, carry, &outCarry);
+            carry = outCarry;
+        }
+        count_ = count;
+
+        if (carry)
+            PushBack(1);
+
+        return *this;
+    }
+
     BigInteger& operator*=(uint64_t u) {
         if (u == 0) return *this = 0;
         if (u == 1) return *this;
@@ -332,6 +348,12 @@ private:
 #endif
     }
 
+    static Type FullAdd(Type a, Type b, bool inCarry, bool* outCarry) {
+        Type c = a + b + (inCarry ? 1 : 0);
+        *outCarry = c < a;
+        return c;
+    }
+
     static const size_t kBitCount = 3328;  // 64bit * 54 > 10^1000
     static const size_t kCapacity = kBitCount / sizeof(Type);
     static const size_t kTypeBit = sizeof(Type) * 8;
@@ -429,16 +451,14 @@ inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp, bool* adj
     *adjustToNegative = dS.Difference(bS, &delta);
 
     int cmp = delta.Compare(hS);
-
     // If delta is within 1/2 ULP, check for special case when significand is power of two.
     // In this case, need to compare with 1/2h in the lower bound.
-    if (cmp < 0 && *adjustToNegative && db.IsNormal() && (bInt & (bInt - 1)) == 0) {
+    if (cmp < 0 && *adjustToNegative && // within and dS < bS
+        db.IsNormal() && (bInt & (bInt - 1)) == 0 && // Power of 2
+        db.Uint64Value() != RAPIDJSON_UINT64_C2(0x00100000, 0x00000000)) // minimum normal number must not do this
+    {
         delta <<= 1;
-
-        if (delta.Compare(hS) <= 0)
-            return -1;
-        else
-            return 1;
+        return delta.Compare(hS);
     }
     return cmp;
 }
@@ -465,7 +485,6 @@ inline double FullPrecision(double d, int dExp, const char* decimals, size_t len
 
     const BigInteger dInt(decimals, length);
     Double approx = NormalPrecision(d, p);
-    bool lastAdjustToNegative = false;
     for (int i = 0; i < 10; i++) {
         bool adjustToNegative;
         int cmp = CheckWithinHalfULP(approx.Value(), dInt, dExp, &adjustToNegative);
@@ -479,17 +498,12 @@ inline double FullPrecision(double d, int dExp, const char* decimals, size_t len
                 return approx.Value();
         }
         else {
-            // If oscillate between negative/postive, terminate
-            if (i > 0 && adjustToNegative != lastAdjustToNegative)
-                break;
-
             // adjustment
             if (adjustToNegative)
                 approx = approx.PreviousDouble();
             else
                 approx = approx.NextDouble();
         }
-        lastAdjustToNegative = adjustToNegative;
     }
 
     // This should not happen, but in case there is really a bug, break the infinite-loop
