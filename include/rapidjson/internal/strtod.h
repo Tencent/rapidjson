@@ -122,22 +122,6 @@ public:
         return *this;
     }
 
-    BigInteger& operator+=(const BigInteger& rhs) {
-        size_t count = count_ > rhs.count_ ? count_ : rhs.count_;
-        bool carry = false;
-        for (size_t i = 0; i < count; i++) {
-            bool outCarry;
-            digits_[i] = FullAdd(i < count_ ? digits_[i] : 0, i < rhs.count_ ? rhs.digits_[i] : 0, carry, &outCarry);
-            carry = outCarry;
-        }
-        count_ = count;
-
-        if (carry)
-            PushBack(1);
-
-        return *this;
-    }
-
     BigInteger& operator*=(uint64_t u) {
         if (u == 0) return *this = 0;
         if (u == 1) return *this;

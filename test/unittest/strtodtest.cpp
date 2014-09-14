@@ -66,30 +66,6 @@ TEST(Strtod, BigInteger_AddUint64) {
     EXPECT_TRUE(BIGINTEGER_LITERAL("36893488147419103231") == b);
 }
 
-TEST(Strtod, BigInteger_Add) {
-    BigInteger a = kZero;
-    a += kZero;
-    EXPECT_TRUE(kZero == a);
-
-    a += kOne;
-    EXPECT_TRUE(kOne == a);
-
-    a += kOne;
-    EXPECT_TRUE(BigInteger(2) == a);
-
-    a = kUint64Max;
-    a += kOne;
-    EXPECT_TRUE(kTwo64 == a);
-
-    a = kOne;
-    a += kTwo64;
-    EXPECT_TRUE(BIGINTEGER_LITERAL("18446744073709551617") == a);
-    
-    a = kTwo64;
-    a += kOne;
-    EXPECT_TRUE(BIGINTEGER_LITERAL("18446744073709551617") == a);
-}
-
 TEST(Strtod, BigInteger_MultiplyUint64) {
     BigInteger a = kZero;
     a *= static_cast <uint64_t>(0);
