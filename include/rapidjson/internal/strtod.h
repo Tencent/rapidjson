@@ -477,7 +477,7 @@ inline double FullPrecision(double d, int p, const char* decimals, size_t length
         else if (cmp == 0) {
             // Round towards even
             if (approx.Significand() & 1)
-                return approx.NextDouble();
+                return adjustToNegative ? approx.PreviousDouble() : approx.NextDouble();
             else
                 return approx.Value();
         }
