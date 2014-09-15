@@ -121,7 +121,7 @@ inline unsigned CountDecimalDigit64_enroll4(uint64_t n) {
     return count + 3;
 }
 
-inline unsigned CountDecimalDigit_fast(unsigned n) {
+inline unsigned CountDecimalDigit_fast(uint32_t n) {
     static const uint32_t powers_of_10[] = {
         0,
         10,
@@ -370,15 +370,15 @@ public:
         os_ = &os;
     }
 
-    bool WriteInt(int i) {
+    bool WriteInt(int32_t i) {
         if (i < 0) {
             os_->Put('-');
             i = -i;
         }
-        return WriteUint((unsigned)i);
+        return WriteUint(static_cast<uint32_t>(i));
     }
 
-    bool WriteUint(unsigned u) {
+    bool WriteUint(uint32_t u) {
         char buffer[10];
         char *p = buffer;
         do {
@@ -422,7 +422,7 @@ private:
 };
 
 template<>
-bool Writer1<rapidjson::StringBuffer>::WriteUint(unsigned u) {
+bool Writer1<rapidjson::StringBuffer>::WriteUint(uint32_t u) {
     char buffer[10];
     char* p = buffer;
     do {
@@ -449,19 +449,19 @@ public:
         os_ = &os;
     }
 
-    bool WriteInt(int i) {
+    bool WriteInt(int32_t i) {
         if (i < 0) {
             os_->Put('-');
             i = -i;
         }
-        return WriteUint((unsigned)i);
+        return WriteUint(static_cast<uint32_t>(i));
     }
 
-    bool WriteUint(unsigned u) {
+    bool WriteUint(uint32_t u) {
         char buffer[10];
         char* p = buffer;
         while (u >= 100) {
-            const unsigned i = (u % 100) << 1;
+            const unsigned i = static_cast<unsigned>(u % 100) << 1;
             u /= 100;
             *p++ = digits[i + 1];
             *p++ = digits[i];
@@ -469,7 +469,7 @@ public:
         if (u < 10)
             *p++ = char(u) + '0';
         else {
-            const unsigned i = u << 1;
+            const unsigned i = static_cast<unsigned>(u) << 1;
             *p++ = digits[i + 1];
             *p++ = digits[i];
         }
@@ -529,15 +529,15 @@ public:
         os_ = &os;
     }
 
-    bool WriteInt(int i) {
+    bool WriteInt(int32_t i) {
         if (i < 0) {
             os_->Put('-');
             i = -i;
         }
-        return WriteUint((unsigned)i);
+        return WriteUint(static_cast<uint32_t>(i));
     }
 
-    bool WriteUint(unsigned u) {
+    bool WriteUint(uint32_t u) {
         char buffer[10];
         char *p = buffer;
         do {
@@ -577,7 +577,7 @@ public:
     }
 
 private:
-    void WriteUintReverse(char* d, unsigned u) {
+    void WriteUintReverse(char* d, uint32_t u) {
         do {
             *--d = char(u % 10) + '0';
             u /= 10;
@@ -595,14 +595,14 @@ private:
 };
 
 template<>
-inline bool Writer3<rapidjson::StringBuffer>::WriteUint(unsigned u) {
+inline bool Writer3<rapidjson::StringBuffer>::WriteUint(uint32_t u) {
     unsigned digit = CountDecimalDigit_fast(u);
     WriteUintReverse(os_->Push(digit) + digit, u);
     return true;
 }
 
 template<>
-inline bool Writer3<rapidjson::InsituStringStream>::WriteUint(unsigned u) {
+inline bool Writer3<rapidjson::InsituStringStream>::WriteUint(uint32_t u) {
     unsigned digit = CountDecimalDigit_fast(u);
     WriteUintReverse(os_->Push(digit) + digit, u);
     return true;
@@ -633,19 +633,19 @@ public:
         os_ = &os;
     }
 
-    bool WriteInt(int i) {
+    bool WriteInt(int32_t i) {
         if (i < 0) {
             os_->Put('-');
             i = -i;
         }
-        return WriteUint((unsigned)i);
+        return WriteUint(static_cast<uint32_t>(i));
     }
 
-    bool WriteUint(unsigned u) {
+    bool WriteUint(uint32_t u) {
         char buffer[10];
         char* p = buffer;
         while (u >= 100) {
-            const unsigned i = (u % 100) << 1;
+            const unsigned i = static_cast<unsigned>(u % 100) << 1;
             u /= 100;
             *p++ = digits[i + 1];
             *p++ = digits[i];
@@ -653,7 +653,7 @@ public:
         if (u < 10)
             *p++ = char(u) + '0';
         else {
-            const unsigned i = u << 1;
+            const unsigned i = static_cast<unsigned>(u) << 1;
             *p++ = digits[i + 1];
             *p++ = digits[i];
         }
@@ -699,9 +699,9 @@ public:
     }
 
 private:
-    void WriteUintReverse(char* d, unsigned u) {
+    void WriteUintReverse(char* d, uint32_t u) {
         while (u >= 100) {
-            const unsigned i = (u % 100) << 1;
+            const unsigned i = static_cast<unsigned>(u % 100) << 1;
             u /= 100;
             *--d = digits[i + 1];
             *--d = digits[i];
@@ -710,7 +710,7 @@ private:
             *--d = char(u) + '0';
         }
         else {
-            const unsigned i = u << 1;
+            const unsigned i = static_cast<unsigned>(u) << 1;
             *--d = digits[i + 1];
             *--d = digits[i];
         }
@@ -718,7 +718,7 @@ private:
 
     void WriteUint64Reverse(char* d, uint64_t u) {
         while (u >= 100) {
-            const unsigned i = (u % 100) << 1;
+            const unsigned i = static_cast<unsigned>(u % 100) << 1;
             u /= 100;
             *--d = digits[i + 1];
             *--d = digits[i];
@@ -727,7 +727,7 @@ private:
             *--d = char(u) + '0';
         }
         else {
-            const unsigned i = u << 1;
+            const unsigned i = static_cast<unsigned>(u) << 1;
             *--d = digits[i + 1];
             *--d = digits[i];
         }
@@ -737,14 +737,14 @@ private:
 };
 
 template<>
-inline bool Writer4<rapidjson::StringBuffer>::WriteUint(unsigned u) {
+inline bool Writer4<rapidjson::StringBuffer>::WriteUint(uint32_t u) {
     unsigned digit = CountDecimalDigit_fast(u);
     WriteUintReverse(os_->Push(digit) + digit, u);
     return true;
 }
 
 template<>
-inline bool Writer4<rapidjson::InsituStringStream>::WriteUint(unsigned u) {
+inline bool Writer4<rapidjson::InsituStringStream>::WriteUint(uint32_t u) {
     unsigned digit = CountDecimalDigit_fast(u);
     WriteUintReverse(os_->Push(digit) + digit, u);
     return true;
@@ -902,7 +902,7 @@ void itoa64_Writer_InsituStringStream() {
 namespace rapidjson {
 
 template<>
-bool rapidjson::Writer<InsituStringStream>::WriteInt(int i) {
+bool rapidjson::Writer<InsituStringStream>::WriteInt(int32_t i) {
     char *buffer = os_->Push(11);
     const char* end = internal::i32toa(i, buffer);
     os_->Pop(11 - (end - buffer));
@@ -910,7 +910,7 @@ bool rapidjson::Writer<InsituStringStream>::WriteInt(int i) {
 }
 
 template<>
-bool Writer<InsituStringStream>::WriteUint(unsigned u) {
+bool Writer<InsituStringStream>::WriteUint(uint32_t u) {
     char *buffer = os_->Push(10);
     const char* end = internal::u32toa(u, buffer);
     os_->Pop(10 - (end - buffer));

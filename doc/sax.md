@@ -62,8 +62,8 @@ using namespace std;
 struct MyHandler {
     bool Null() { cout << "Null()" << endl; return true; }
     bool Bool(bool b) { cout << "Bool(" << boolalpha << b << ")" << endl; return true; }
-    bool Int(int i) { cout << "Int(" << i << ")" << endl; return true; }
-    bool Uint(unsigned u) { cout << "Uint(" << u << ")" << endl; return true; }
+    bool Int(int32_t i) { cout << "Int(" << i << ")" << endl; return true; }
+    bool Uint(uint32_t u) { cout << "Uint(" << u << ")" << endl; return true; }
     bool Int64(int64_t i) { cout << "Int64(" << i << ")" << endl; return true; }
     bool Uint64(uint64_t u) { cout << "Uint64(" << u << ")" << endl; return true; }
     bool Double(double d) { cout << "Double(" << d << ")" << endl; return true; }
@@ -101,8 +101,8 @@ As the previous example showed, user needs to implement a handler, which consume
 class Handler {
     bool Null();
     bool Bool(bool b);
-    bool Int(int i);
-    bool Uint(unsigned i);
+    bool Int(int32_t i);
+    bool Uint(uint32_t i);
     bool Int64(int64_t i);
     bool Uint64(uint64_t i);
     bool Double(double d);
@@ -119,7 +119,7 @@ class Handler {
 
 `Bool(bool)` is called when the `Reader` encounters a JSON true or false value.
 
-When the `Reader` encounters a JSON number, it chooses a suitable C++ type mapping. And then it calls *one* function out of `Int(int)`, `Uint(unsigned)`, `Int64(int64_t)`, `Uint64(uint64_t)` and `Double(double)`.
+When the `Reader` encounters a JSON number, it chooses a suitable C++ type mapping. And then it calls *one* function out of `Int(int32_t)`, `Uint(uint32_t)`, `Int64(int64_t)`, `Uint64(uint64_t)` and `Double(double)`.
 
 `String(const char* str, SizeType length, bool copy)` is called when the `Reader` encounters a string. The first parameter is pointer to the string. The second parameter is the length of the string (excluding the null terminator). Note that RapidJSON supports null character `'\0'` inside a string. If such situation happens, `strlen(str) < length`. The last `copy` indicates whether the handler needs to make a copy of the string. For normal parsing, `copy = true`. Only when *insitu* parsing is used, `copy = false`. And beware that, the character type depends on the target encoding, which will be explained later.
 
@@ -413,8 +413,8 @@ struct CapitalizeFilter {
 
     bool Null() { return out_.Null(); }
     bool Bool(bool b) { return out_.Bool(b); }
-    bool Int(int i) { return out_.Int(i); }
-    bool Uint(unsigned u) { return out_.Uint(u); }
+    bool Int(int32_t i) { return out_.Int(i); }
+    bool Uint(uint32_t u) { return out_.Uint(u); }
     bool Int64(int64_t i) { return out_.Int64(i); }
     bool Uint64(uint64_t u) { return out_.Uint64(u); }
     bool Double(double d) { return out_.Double(d); }

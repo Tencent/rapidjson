@@ -7,8 +7,8 @@ using namespace std;
 struct MyHandler {
     bool Null() { cout << "Null()" << endl; return true; }
     bool Bool(bool b) { cout << "Bool(" << boolalpha << b << ")" << endl; return true; }
-    bool Int(int i) { cout << "Int(" << i << ")" << endl; return true; }
-    bool Uint(unsigned u) { cout << "Uint(" << u << ")" << endl; return true; }
+    bool Int(int32_t i) { cout << "Int(" << i << ")" << endl; return true; }
+    bool Uint(uint32_t u) { cout << "Uint(" << u << ")" << endl; return true; }
     bool Int64(int64_t i) { cout << "Int64(" << i << ")" << endl; return true; }
     bool Uint64(uint64_t u) { cout << "Uint64(" << u << ")" << endl; return true; }
     bool Double(double d) { cout << "Double(" << d << ")" << endl; return true; }

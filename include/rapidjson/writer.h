@@ -107,8 +107,8 @@ public:
 
     bool Null()                 { Prefix(kNullType);   return WriteNull(); }
     bool Bool(bool b)           { Prefix(b ? kTrueType : kFalseType); return WriteBool(b); }
-    bool Int(int i)             { Prefix(kNumberType); return WriteInt(i); }
-    bool Uint(unsigned u)       { Prefix(kNumberType); return WriteUint(u); }
+    bool Int(int32_t i)         { Prefix(kNumberType); return WriteInt(i); }
+    bool Uint(uint32_t u)       { Prefix(kNumberType); return WriteUint(u); }
     bool Int64(int64_t i64)     { Prefix(kNumberType); return WriteInt64(i64); }
     bool Uint64(uint64_t u64)   { Prefix(kNumberType); return WriteUint64(u64); }
 
@@ -195,7 +195,7 @@ protected:
         return true;
     }
 
-    bool WriteInt(int i) {
+    bool WriteInt(int32_t i) {
         char buffer[11];
         const char* end = internal::i32toa(i, buffer);
         for (const char* p = buffer; p != end; ++p)
@@ -203,7 +203,7 @@ protected:
         return true;
     }
 
-    bool WriteUint(unsigned u) {
+    bool WriteUint(uint32_t u) {
         char buffer[10];
         const char* end = internal::u32toa(u, buffer);
         for (const char* p = buffer; p != end; ++p)
@@ -341,7 +341,7 @@ private:
 // Full specialization for StringStream to prevent memory copying
 
 template<>
-inline bool Writer<StringBuffer>::WriteInt(int i) {
+inline bool Writer<StringBuffer>::WriteInt(int32_t i) {
     char *buffer = os_->Push(11);
     const char* end = internal::i32toa(i, buffer);
     os_->Pop(11 - (end - buffer));
@@ -349,7 +349,7 @@ inline bool Writer<StringBuffer>::WriteInt(int i) {
 }
 
 template<>
-inline bool Writer<StringBuffer>::WriteUint(unsigned u) {
+inline bool Writer<StringBuffer>::WriteUint(uint32_t u) {
     char *buffer = os_->Push(10);
     const char* end = internal::u32toa(u, buffer);
     os_->Pop(10 - (end - buffer));

@@ -487,16 +487,16 @@ public:
             RAPIDJSON_STATIC_ASSERT((internal::IsSame<bool,T>::Value));
     }
 
-    //! Constructor for int value.
-    explicit GenericValue(int i) RAPIDJSON_NOEXCEPT : data_(), flags_(kNumberIntFlag) {
-        data_.n.i64 = i;
+    //! Constructor for int32_t value.
+    explicit GenericValue(int32_t i) RAPIDJSON_NOEXCEPT : data_(), flags_(kNumberIntFlag) {
+        data_.n.i64 = static_cast<int64_t>(i);
         if (i >= 0)
             flags_ |= kUintFlag | kUint64Flag;
     }
 
-    //! Constructor for unsigned value.
-    explicit GenericValue(unsigned u) RAPIDJSON_NOEXCEPT : data_(), flags_(kNumberUintFlag) {
-        data_.n.u64 = u; 
+    //! Constructor for uint32_t value.
+    explicit GenericValue(uint32_t u) RAPIDJSON_NOEXCEPT : data_(), flags_(kNumberUintFlag) {
+        data_.n.u64 = static_cast<uint64_t>(u);
         if (!(u & 0x80000000))
             flags_ |= kIntFlag | kInt64Flag;
     }
@@ -609,7 +609,7 @@ public:
     }
 
     //! Assignment with primitive types.
-    /*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t
+    /*! \tparam T Either \ref Type, \c int32_t, \c uint32_t, \c int64_t, \c uint64_t
         \param value The value to be assigned.
 
         \note The source type \c T explicitly disallows all pointer types,
@@ -716,7 +716,7 @@ public:
 #endif
 
     //! Equal-to operator with primitive types
-    /*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c double, \c true, \c false
+    /*! \tparam T Either \ref Type, \c int32_t, \c uint32_t, \c int64_t, \c uint64_t, \c double, \c true, \c false
     */
     template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>,internal::IsGenericValue<T> >), (bool)) operator==(const T& rhs) const { return *this == GenericValue(rhs); }
 
@@ -983,7 +983,7 @@ public:
     }
 
     //! Add any primitive value as member (name-value pair) to the object.
-    /*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t
+    /*! \tparam T Either \ref Type, \c int32_t, \c uint32_t, \c int64_t, \c uint64_t
         \param name A constant string reference as name of member.
         \param value Value of primitive type \c T as value of member
         \param allocator Allocator for reallocating memory. Commonly use GenericDocument::GetAllocator().
@@ -1136,9 +1136,9 @@ public:
 \code
 Value a(kArrayType);
 a.PushBack(123);
-int x = a[0].GetInt();              // Error: operator[ is ambiguous, as 0 also mean a null pointer of const char* type.
-int y = a[SizeType(0)].GetInt();    // Cast to SizeType will work.
-int z = a[0u].GetInt();             // This works too.
+int32_t x = a[0].GetInt();              // Error: operator[ is ambiguous, as 0 also mean a null pointer of const char* type.
+int32_t y = a[SizeType(0)].GetInt();    // Cast to SizeType will work.
+int32_t z = a[0u].GetInt();             // This works too.
 \endcode
     */
     GenericValue& operator[](SizeType index) {
@@ -1214,7 +1214,7 @@ int z = a[0u].GetInt();             // This works too.
     }
 
     //! Append a primitive value at the end of the array.
-    /*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t
+    /*! \tparam T Either \ref Type, \c int32_t, \c uint32_t, \c int64_t, \c uint64_t
         \param value Value of primitive type T to be appended.
         \param allocator    Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
         \pre IsArray() == true
@@ -1287,22 +1287,22 @@ int z = a[0u].GetInt();             // This works too.
     //!@name Number
     //@{
 
-    int GetInt() const          { RAPIDJSON_ASSERT(flags_ & kIntFlag);   return data_.n.i.i;   }
-    unsigned GetUint() const    { RAPIDJSON_ASSERT(flags_ & kUintFlag);  return data_.n.u.u;   }
+    int32_t GetInt() const      { RAPIDJSON_ASSERT(flags_ & kIntFlag);   return data_.n.i.i; }
+    uint32_t GetUint() const    { RAPIDJSON_ASSERT(flags_ & kUintFlag);  return data_.n.u.u; }
     int64_t GetInt64() const    { RAPIDJSON_ASSERT(flags_ & kInt64Flag); return data_.n.i64; }
     uint64_t GetUint64() const  { RAPIDJSON_ASSERT(flags_ & kUint64Flag); return data_.n.u64; }
 
     double GetDouble() const {
         RAPIDJSON_ASSERT(IsNumber());
         if ((flags_ & kDoubleFlag) != 0)                return data_.n.d;   // exact type, no conversion.
-        if ((flags_ & kIntFlag) != 0)                   return data_.n.i.i; // int -> double
-        if ((flags_ & kUintFlag) != 0)                  return data_.n.u.u; // unsigned -> double
-        if ((flags_ & kInt64Flag) != 0)                 return (double)data_.n.i64; // int64_t -> double (may lose precision)
-        RAPIDJSON_ASSERT((flags_ & kUint64Flag) != 0);  return (double)data_.n.u64; // uint64_t -> double (may lose precision)
+        if ((flags_ & kIntFlag) != 0)                   return static_cast<double>(data_.n.i.i); // int32_t -> double
+        if ((flags_ & kUintFlag) != 0)                  return static_cast<double>(data_.n.u.u); // uint32_t -> double
+        if ((flags_ & kInt64Flag) != 0)                 return static_cast<double>(data_.n.i64); // int64_t -> double (may lose precision)
+        RAPIDJSON_ASSERT((flags_ & kUint64Flag) != 0);  return static_cast<double>(data_.n.u64); // uint64_t -> double (may lose precision)
     }
 
-    GenericValue& SetInt(int i)             { this->~GenericValue(); new (this) GenericValue(i);    return *this; }
-    GenericValue& SetUint(unsigned u)       { this->~GenericValue(); new (this) GenericValue(u);    return *this; }
+    GenericValue& SetInt(int32_t i)         { this->~GenericValue(); new (this) GenericValue(i);    return *this; }
+    GenericValue& SetUint(uint32_t u)       { this->~GenericValue(); new (this) GenericValue(u);    return *this; }
     GenericValue& SetInt64(int64_t i64)     { this->~GenericValue(); new (this) GenericValue(i64);  return *this; }
     GenericValue& SetUint64(uint64_t u64)   { this->~GenericValue(); new (this) GenericValue(u64);  return *this; }
     GenericValue& SetDouble(double d)       { this->~GenericValue(); new (this) GenericValue(d);    return *this; }
@@ -1481,21 +1481,21 @@ private:
     union Number {
 #if RAPIDJSON_ENDIAN == RAPIDJSON_LITTLEENDIAN
         struct I {
-            int i;
+            int32_t i;
             char padding[4];
         }i;
         struct U {
-            unsigned u;
+            uint32_t u;
             char padding2[4];
         }u;
 #else
         struct I {
             char padding[4];
-            int i;
+            int32_t i;
         }i;
         struct U {
             char padding2[4];
-            unsigned u;
+            uint32_t u;
         }u;
 #endif
         int64_t i64;
@@ -1776,8 +1776,8 @@ private:
     // Implementation of Handler
     bool Null() { new (stack_.template Push<ValueType>()) ValueType(); return true; }
     bool Bool(bool b) { new (stack_.template Push<ValueType>()) ValueType(b); return true; }
-    bool Int(int i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
-    bool Uint(unsigned i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
+    bool Int(int32_t i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
+    bool Uint(uint32_t i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
     bool Int64(int64_t i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
     bool Uint64(uint64_t i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
     bool Double(double d) { new (stack_.template Push<ValueType>()) ValueType(d); return true; }

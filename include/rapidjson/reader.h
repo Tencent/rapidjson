@@ -145,8 +145,8 @@ concept Handler {
 
     bool Null();
     bool Bool(bool b);
-    bool Int(int i);
-    bool Uint(unsigned i);
+    bool Int(int32_t i);
+    bool Uint(uint32_t i);
     bool Int64(int64_t i);
     bool Uint64(uint64_t i);
     bool Double(double d);
@@ -175,8 +175,8 @@ struct BaseReaderHandler {
     bool Default() { return true; }
     bool Null() { return static_cast<Override&>(*this).Default(); }
     bool Bool(bool) { return static_cast<Override&>(*this).Default(); }
-    bool Int(int) { return static_cast<Override&>(*this).Default(); }
-    bool Uint(unsigned) { return static_cast<Override&>(*this).Default(); }
+    bool Int(int32_t) { return static_cast<Override&>(*this).Default(); }
+    bool Uint(uint32_t) { return static_cast<Override&>(*this).Default(); }
     bool Int64(int64_t) { return static_cast<Override&>(*this).Default(); }
     bool Uint64(uint64_t) { return static_cast<Override&>(*this).Default(); }
     bool Double(double) { return static_cast<Override&>(*this).Default(); }
@@ -730,7 +730,7 @@ private:
         }
 
         // Parse int: zero / ( digit1-9 *DIGIT )
-        unsigned i = 0;
+        uint32_t i = 0;
         uint64_t i64 = 0;
         bool use64bit = false;
         if (s.Peek() == '0') {
@@ -738,29 +738,29 @@ private:
             s.Take();
         }
         else if (s.Peek() >= '1' && s.Peek() <= '9') {
-            i = static_cast<unsigned>(s.Take() - '0');
+            i = static_cast<uint32_t>(s.Take() - '0');
 
             if (minus)
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
                     if (i >= 214748364) { // 2^31 = 2147483648
                         if (i != 214748364 || s.Peek() > '8') {
-                            i64 = i;
+                            i64 = static_cast<uint64_t>(i);
                             use64bit = true;
                             break;
                         }
                     }
-                    i = i * 10 + static_cast<unsigned>(s.Take() - '0');
+                    i = i * 10 + static_cast<uint32_t>(s.Take() - '0');
                 }
             else
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
                     if (i >= 429496729) { // 2^32 - 1 = 4294967295
                         if (i != 429496729 || s.Peek() > '5') {
-                            i64 = i;
+                            i64 = static_cast<uint64_t>(i);
                             use64bit = true;
                             break;
                         }
                     }
-                    i = i * 10 + static_cast<unsigned>(s.Take() - '0');
+                    i = i * 10 + static_cast<uint32_t>(s.Take() - '0');
                 }
         }
         else
@@ -774,7 +774,7 @@ private:
                 while (s.Peek() >= '0' && s.Peek() <= '9') {                    
                      if (i64 >= RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC)) // 2^63 = 9223372036854775808
                         if (i64 != RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC) || s.Peek() > '8') {
-                            d = (double)i64;
+                            d = static_cast<double>(i64);
                             useDouble = true;
                             break;
                         }
@@ -784,11 +784,11 @@ private:
                 while (s.Peek() >= '0' && s.Peek() <= '9') {                    
                     if (i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999)) // 2^64 - 1 = 18446744073709551615
                         if (i64 != RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) || s.Peek() > '5') {
-                            d = (double)i64;
+                            d = static_cast<double>(i64);
                             useDouble = true;
                             break;
                         }
-                    i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
+                    i64 = i64 * 10 + static_cast<uint64_t>(s.Take() - '0');
                 }
         }
 
@@ -797,7 +797,7 @@ private:
             while (s.Peek() >= '0' && s.Peek() <= '9') {
                 if (d >= 1.7976931348623157e307) // DBL_MAX / 10.0
                     RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
-                d = d * 10 + (s.Take() - '0');
+                d = d * 10 + static_cast<double>(s.Take() - '0');
             }
         }
 
@@ -810,28 +810,28 @@ private:
             // Use i64 to store significand in 64-bit architecture
             if (!useDouble) {
                 if (!use64bit)
-                    i64 = i;
+                    i64 = static_cast<uint64_t>(i);
         
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
                     if (i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999))
                         break;
                     else {
-                        i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
+                        i64 = i64 * 10 + static_cast<uint64_t>(s.Take() - '0');
                         --expFrac;
                     }
                 }
 
-                d = (double)i64;
+                d = static_cast<double>(i64);
             }
 #else
             // Use double to store significand in 32-bit architecture
             if (!useDouble)
-                d = use64bit ? (double)i64 : (double)i;
+                d = use64bit ? static_cast<double>(i64) : static_cast<double>(i);
 #endif
             useDouble = true;
 
             while (s.Peek() >= '0' && s.Peek() <= '9') {
-                d = d * 10 + (s.Take() - '0');
+                d = d * 10 + static_cast<double>(s.Take() - '0');
                 --expFrac;
             }
 
@@ -843,7 +843,7 @@ private:
         int exp = 0;
         if (s.Peek() == 'e' || s.Peek() == 'E') {
             if (!useDouble) {
-                d = use64bit ? (double)i64 : (double)i;
+                d = use64bit ? static_cast<double>(i64) : static_cast<double>(i);
                 useDouble = true;
             }
             s.Take();
@@ -888,13 +888,13 @@ private:
         else {
             if (use64bit) {
                 if (minus)
-                    cont = handler.Int64(-(int64_t)i64);
+                    cont = handler.Int64(-static_cast<int64_t>(i64));
                 else
                     cont = handler.Uint64(i64);
             }
             else {
                 if (minus)
-                    cont = handler.Int(-(int)i);
+                    cont = handler.Int(-static_cast<int32_t>(i));
                 else
                     cont = handler.Uint(i);
             }
