@@ -779,6 +779,7 @@ private:
         unsigned i = 0;
         uint64_t i64 = 0;
         bool use64bit = false;
+        int significandDigit = 0;
         if (s.Peek() == '0') {
             i = 0;
             s.TakePush();
@@ -796,6 +797,7 @@ private:
                         }
                     }
                     i = i * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                    significandDigit++;
                 }
             else
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
@@ -807,6 +809,7 @@ private:
                         }
                     }
                     i = i * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                    significandDigit++;
                 }
         }
         else
@@ -825,6 +828,7 @@ private:
                             break;
                         }
                     i64 = i64 * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                    significandDigit++;
                 }
             else
                 while (s.Peek() >= '0' && s.Peek() <= '9') {                    
@@ -835,6 +839,7 @@ private:
                             break;
                         }
                     i64 = i64 * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                    significandDigit++;
                 }
         }
 
@@ -849,8 +854,13 @@ private:
 
         // Parse frac = decimal-point 1*DIGIT
         int expFrac = 0;
+        size_t decimalPosition;
         if (s.Peek() == '.') {
             s.Take();
+            decimalPosition = s.Length();
+
+            if (!(s.Peek() >= '0' && s.Peek() <= '9'))
+                RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, s.Tell());
 
             if (!useDouble) {
 #if RAPIDJSON_64BIT
@@ -864,6 +874,8 @@ private:
                     else {
                         i64 = i64 * 10 + static_cast<unsigned>(s.TakePush() - '0');
                         --expFrac;
+                        if (i64 != 0)
+                            significandDigit++;
                     }
                 }
 
@@ -876,13 +888,18 @@ private:
             }
 
             while (s.Peek() >= '0' && s.Peek() <= '9') {
-                d = d * 10.0 + (s.TakePush() - '0');
-                --expFrac;
+                if (significandDigit < 17) {
+                    d = d * 10.0 + (s.TakePush() - '0');
+                    --expFrac;
+                    if (d != 0.0)
+                        significandDigit++;
+                }
+                else
+                    s.TakePush();
             }
-
-            if (expFrac == 0)
-                RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, s.Tell());
         }
+        else
+            decimalPosition = s.Length(); // decimal position at the end of integer.
 
         // Parse exp = e [ minus / plus ] 1*DIGIT
         int exp = 0;
@@ -924,7 +941,7 @@ private:
         if (useDouble) {
             int p = exp + expFrac;
             if (parseFlags & kParseFullPrecisionFlag)
-                d = internal::FullPrecision(d, p, decimal, length);
+                d = internal::FullPrecision(d, p, decimal, length, decimalPosition, exp);
             else
                 d = internal::NormalPrecision(d, p);
 
