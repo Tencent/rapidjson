@@ -941,9 +941,9 @@ private:
         if (useDouble) {
             int p = exp + expFrac;
             if (parseFlags & kParseFullPrecisionFlag)
-                d = internal::FullPrecision(d, p, decimal, length, decimalPosition, exp);
+                d = internal::StrtodFullPrecision(d, p, decimal, length, decimalPosition, exp);
             else
-                d = internal::NormalPrecision(d, p);
+                d = internal::StrtodNormalPrecision(d, p);
 
             cont = handler.Double(minus ? -d : d);
         }

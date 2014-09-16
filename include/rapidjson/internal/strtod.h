@@ -29,7 +29,7 @@
 namespace rapidjson {
 namespace internal {
 
-inline double StrtodFastPath(double significand, int exp) {
+inline double FastPath(double significand, int exp) {
     if (exp < -308)
         return 0.0;
     else if (exp >= 0)
@@ -38,14 +38,14 @@ inline double StrtodFastPath(double significand, int exp) {
         return significand / internal::Pow10(-exp);
 }
 
-inline double NormalPrecision(double d, int p) {
+inline double StrtodNormalPrecision(double d, int p) {
     if (p < -308) {
         // Prevent expSum < -308, making Pow10(p) = 0
-        d = StrtodFastPath(d, -308);
-        d = StrtodFastPath(d, p + 308);
+        d = FastPath(d, -308);
+        d = FastPath(d, p + 308);
     }
     else
-        d = StrtodFastPath(d, p);
+        d = FastPath(d, p);
     return d;
 }
 
@@ -124,25 +124,24 @@ inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp, bool* adj
     return cmp;
 }
 
-inline double FullPrecision(double d, int p, const char* decimals, size_t length, size_t decimalPosition, int exp) {
-    RAPIDJSON_ASSERT(d >= 0.0);
-    RAPIDJSON_ASSERT(length >= 1);
-
+inline bool StrtodFast(double d, int p, double* result) {
     // Use fast path for string-to-double conversion if possible
     // see http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/
-    if (p > 22) {
-        if (p < 22 + 16) {
-            // Fast Path Cases In Disguise
-            d *= internal::Pow10(p - 22);
-            p = 22;
-        }
+    if (p > 22  && p < 22 + 16) {
+        // Fast Path Cases In Disguise
+        d *= internal::Pow10(p - 22);
+        p = 22;
     }
 
-    if (p >= -22 && p <= 22 && d <= 9007199254740991.0) // 2^53 - 1
-        return StrtodFastPath(d, p);
+    if (p >= -22 && p <= 22 && d <= 9007199254740991.0) { // 2^53 - 1
+        *result = FastPath(d, p);
+        return true;
+    }
+    else
+        return false;
+}
 
-    // Use slow-path with BigInteger comparison
-
+inline double StrtodBigInteger(double d, int p, const char* decimals, size_t length, size_t decimalPosition, int exp) {
     // Trim leading zeros
     while (*decimals == '0' && length > 1) {
         length--;
@@ -170,7 +169,7 @@ inline double FullPrecision(double d, int p, const char* decimals, size_t length
 
     const BigInteger dInt(decimals, length);
     const int dExp = (int)decimalPosition - (int)length + exp;
-    Double approx = NormalPrecision(d, p);
+    Double approx = StrtodNormalPrecision(d, p);
     for (int i = 0; i < 10; i++) {
         bool adjustToNegative;
         int cmp = CheckWithinHalfULP(approx.Value(), dInt, dExp, &adjustToNegative);
@@ -189,6 +188,17 @@ inline double FullPrecision(double d, int p, const char* decimals, size_t length
 
     // This should not happen, but in case there is really a bug, break the infinite-loop
     return approx.Value();
+}
+
+inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t length, size_t decimalPosition, int exp) {
+    RAPIDJSON_ASSERT(d >= 0.0);
+    RAPIDJSON_ASSERT(length >= 1);
+
+    double result;
+    if (StrtodFast(d, p, &result))
+        return result;
+
+    return StrtodBigInteger(d, p, decimals, length, decimalPosition, exp);
 }
 
 } // namespace internal
