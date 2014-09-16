@@ -45,7 +45,7 @@
           different translation units of a single application.
  */
 
-#include <cstdlib>  // malloc(), realloc(), free()
+#include <cstdlib>  // malloc(), realloc(), free(), size_t
 #include <cstring>  // memcpy()
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -247,6 +247,11 @@ namespace rapidjson {
 typedef unsigned SizeType;
 } // namespace rapidjson
 #endif
+
+// always import std::size_t to rapidjson namespace
+namespace rapidjson {
+using std::size_t;
+} // namespace rapidjson
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_ASSERT
