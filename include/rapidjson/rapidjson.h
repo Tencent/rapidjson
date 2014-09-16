@@ -45,8 +45,13 @@
           different translation units of a single application.
  */
 
+#if defined (__SUNPRO_CC)
+#include <stdlib.h>
+#include <string.h>
+#else
 #include <cstdlib>  // malloc(), realloc(), free()
 #include <cstring>  // memcpy()
+#endif //__SUNPRO_CC
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NO_INT64DEFINE
