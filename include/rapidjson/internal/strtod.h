@@ -36,12 +36,12 @@ public:
     double Value() const { return d; }
     uint64_t Uint64Value() const { return u; }
 
-    double NextDouble() const {
+    double NextPositiveDouble() const {
         RAPIDJSON_ASSERT(!Sign());
         return Double(u + 1).Value();
     }
 
-    double PreviousDouble() const {
+    double PreviousPositiveDouble() const {
         RAPIDJSON_ASSERT(!Sign());
         if (d == 0.0)
             return 0.0;
@@ -245,29 +245,19 @@ public:
     }
 
     int Compare(const BigInteger& rhs) const {
-        if (count_ != rhs.count_) {
-            if (count_ < rhs.count_)
-                return -1;
-            else
-                return 1;
-        }
+        if (count_ != rhs.count_)
+            return count_ < rhs.count_ ? -1 : 1;
 
-        for (size_t i = count_; i > 0;) {
-            i--;
-            if (digits_[i] != rhs.digits_[i]) {
-                if (digits_[i] < rhs.digits_[i])
-                    return -1;
-                else
-                    return 1;
-            }
-        }
+        for (size_t i = count_; i-- > 0;)
+            if (digits_[i] != rhs.digits_[i])
+                return digits_[i] < rhs.digits_[i] ? -1 : 1;
 
         return 0;
     }
 
     size_t GetCount() const { return count_; }
-    Type GetDigit(size_t index) const { RAPIDJSON_ASSERT(index < count_);  return digits_[index]; }
-    bool IsZero() const { return count_ == 1 && digits_[0] == 0;  }
+    Type GetDigit(size_t index) const { RAPIDJSON_ASSERT(index < count_); return digits_[index]; }
+    bool IsZero() const { return count_ == 1 && digits_[0] == 0; }
 
 private:
     void AppendDecimal64(const char* begin, const char* end) {
@@ -276,8 +266,7 @@ private:
             *this = u;
         else {
             unsigned exp = end - begin;
-            MultiplyPow5(exp) <<= exp;    // *this *= 10^exp
-            *this += u;
+            (MultiplyPow5(exp) <<= exp) += u;   // *this = *this * 10^exp + u
         }
     }
 
@@ -298,8 +287,7 @@ private:
     // Assume a * b + k < 2^128
     static uint64_t MulAdd64(uint64_t a, uint64_t b, uint64_t k, uint64_t* outHigh) {
 #if defined(_MSC_VER) && defined(_M_AMD64)
-        uint64_t low = _umul128(a, b, outHigh);
-        low += k;
+        uint64_t low = _umul128(a, b, outHigh) + k;
         if (low < k)
             (*outHigh)++;
         return low;
@@ -309,14 +297,8 @@ private:
         *outHigh = p >> 64;
         return static_cast<uint64_t>(p);
 #else
-        const uint64_t a0 = a & 0xFFFFFFFF;
-        const uint64_t a1 = a >> 32;
-        const uint64_t b0 = b & 0xFFFFFFFF;
-        const uint64_t b1 = b >> 32;
-        uint64_t x0 = a0 * b0;
-        uint64_t x1 = a0 * b1;
-        uint64_t x2 = a1 * b0;
-        uint64_t x3 = a1 * b1;
+        const uint64_t a0 = a & 0xFFFFFFFF, a1 = a >> 32, b0 = b & 0xFFFFFFFF, b1 = b >> 32;
+        uint64_t x0 = a0 * b0, x1 = a0 * b1, x2 = a1 * b0, x3 = a1 * b1;
         x1 += (x0 >> 32); // can't give carry
         x1 += x2;
         if (x1 < x2)
@@ -378,15 +360,9 @@ inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp, bool* adj
     const Double db(b);
     const uint64_t bInt = db.IntegerSignificand();
     const int bExp = db.IntegerExponent();
-
     const int hExp = bExp - 1;
 
-    int dS_Exp2 = 0;
-    int dS_Exp5 = 0;
-    int bS_Exp2 = 0;
-    int bS_Exp5 = 0;
-    int hS_Exp2 = 0;
-    int hS_Exp5 = 0;
+    int dS_Exp2 = 0, dS_Exp5 = 0, bS_Exp2 = 0, bS_Exp5 = 0, hS_Exp2 = 0, hS_Exp5 = 0;
 
     // Adjust for decimal exponent
     if (dExp >= 0) {
@@ -467,24 +443,24 @@ inline double FullPrecision(double d, int p, const char* decimals, size_t length
     // Use slow-path with BigInteger comparison
 
     // Trim leading zeros
-    while (decimals[0] == '0' && length > 1) {
-        decimals++;
+    while (*decimals == '0' && length > 1) {
         length--;
+        decimals++;
         decimalPosition--;
     }
 
     // Trim trailing zeros
     while (decimals[length - 1] == '0' && length > 1) {
         length--;
-        exp++;
         decimalPosition--;
+        exp++;
     }
 
     // Trim right-most digits
     const int kMaxDecimalDigit = 780;
     if (length > kMaxDecimalDigit) {
         exp += (int(length) - kMaxDecimalDigit);
-        length = kMaxDecimalDigit;        
+        length = kMaxDecimalDigit;
     }
 
     // If too small, underflow to zero
@@ -502,17 +478,12 @@ inline double FullPrecision(double d, int p, const char* decimals, size_t length
         else if (cmp == 0) {
             // Round towards even
             if (approx.Significand() & 1)
-                return adjustToNegative ? approx.PreviousDouble() : approx.NextDouble();
+                return adjustToNegative ? approx.PreviousPositiveDouble() : approx.NextPositiveDouble();
             else
                 return approx.Value();
         }
-        else {
-            // adjustment
-            if (adjustToNegative)
-                approx = approx.PreviousDouble();
-            else
-                approx = approx.NextDouble();
-        }
+        else // adjustment
+            approx = adjustToNegative ? approx.PreviousPositiveDouble() : approx.NextPositiveDouble();
     }
 
     // This should not happen, but in case there is really a bug, break the infinite-loop
