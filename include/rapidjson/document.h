@@ -413,7 +413,6 @@ template <typename T> struct IsGenericValue : IsGenericValueImpl<T>::Type {};
     \tparam Encoding    Encoding of the value. (Even non-string values need to have the same encoding in a document)
     \tparam Allocator   Allocator type for allocating memory of object, array and string.
 */
-#pragma pack (push, 4)
 template <typename Encoding, typename Allocator = MemoryPoolAllocator<> > 
 class GenericValue {
 public:
@@ -1098,7 +1097,7 @@ public:
         MemberIterator pos = MemberBegin() + (first - MemberBegin());
         for (MemberIterator itr = pos; itr != last; ++itr)
             itr->~Member();
-        memmove(&*pos, &*last, (MemberEnd() - last) * sizeof(Member));
+        std::memmove(&*pos, &*last, (MemberEnd() - last) * sizeof(Member));
         data_.o.size -= (last - first);
         return pos;
     }
@@ -1278,7 +1277,7 @@ int z = a[0u].GetInt();             // This works too.
         ValueIterator pos = Begin() + (first - Begin());
         for (ValueIterator itr = pos; itr != last; ++itr)
             itr->~GenericValue();       
-        memmove(pos, last, (End() - last) * sizeof(GenericValue));
+        std::memmove(pos, last, (End() - last) * sizeof(GenericValue));
         data_.a.size -= (last - first);
         return pos;
     }
@@ -1528,7 +1527,7 @@ private:
     void SetArrayRaw(GenericValue* values, SizeType count, Allocator& allocator) {
         flags_ = kArrayFlag;
         data_.a.elements = (GenericValue*)allocator.Malloc(count * sizeof(GenericValue));
-        memcpy(data_.a.elements, values, count * sizeof(GenericValue));
+        std::memcpy(data_.a.elements, values, count * sizeof(GenericValue));
         data_.a.size = data_.a.capacity = count;
     }
 
@@ -1536,7 +1535,7 @@ private:
     void SetObjectRaw(Member* members, SizeType count, Allocator& allocator) {
         flags_ = kObjectFlag;
         data_.o.members = (Member*)allocator.Malloc(count * sizeof(Member));
-        memcpy(data_.o.members, members, count * sizeof(Member));
+        std::memcpy(data_.o.members, members, count * sizeof(Member));
         data_.o.size = data_.o.capacity = count;
     }
 
@@ -1560,7 +1559,7 @@ private:
             str = (Ch *)allocator.Malloc((s.length + 1) * sizeof(Ch));
             data_.s.str = str;
         }
-        memcpy(str, s, s.length * sizeof(Ch));
+        std::memcpy(str, s, s.length * sizeof(Ch));
         str[s.length] = '\0';
     }
 
@@ -1584,13 +1583,12 @@ private:
         const Ch* const str2 = rhs.GetString();
         if(str1 == str2) { return true; } // fast path for constant string
 
-        return (memcmp(str1, str2, sizeof(Ch) * len1) == 0);
+        return (std::memcmp(str1, str2, sizeof(Ch) * len1) == 0);
     }
 
     Data data_;
     unsigned flags_;
 };
-#pragma pack (pop)
 
 //! GenericValue with UTF8 encoding
 typedef GenericValue<UTF8<> > Value;

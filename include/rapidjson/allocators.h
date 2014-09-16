@@ -68,9 +68,9 @@ concept Allocator {
 class CrtAllocator {
 public:
     static const bool kNeedFree = true;
-    void* Malloc(size_t size) { return malloc(size); }
-    void* Realloc(void* originalPtr, size_t originalSize, size_t newSize) { (void)originalSize; return realloc(originalPtr, newSize); }
-    static void Free(void *ptr) { free(ptr); }
+    void* Malloc(size_t size) { return std::malloc(size); }
+    void* Realloc(void* originalPtr, size_t originalSize, size_t newSize) { (void)originalSize; return std::realloc(originalPtr, newSize); }
+    static void Free(void *ptr) { std::free(ptr); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -200,7 +200,7 @@ public:
         // Realloc process: allocate and copy memory, do not free original buffer.
         void* newBuffer = Malloc(newSize);
         RAPIDJSON_ASSERT(newBuffer != 0);   // Do not handle out-of-memory explicitly.
-        return memcpy(newBuffer, originalPtr, originalSize);
+        return std::memcpy(newBuffer, originalPtr, originalSize);
     }
 
     //! Frees a memory block (concept Allocator)
