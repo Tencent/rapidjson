@@ -444,14 +444,14 @@ $(document).ready(function(){initNavTree('dtoa_8h_source.html','');});
 <div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    }</div>
 <div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (0 &lt; kk &amp;&amp; kk &lt;= 21) {</div>
 <div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;        <span class="comment">// 1234e-2 -&gt; 12.34</span></div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        memmove(&amp;buffer[kk + 1], &amp;buffer[kk], length - kk);</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;        std::memmove(&amp;buffer[kk + 1], &amp;buffer[kk], length - kk);</div>
 <div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;        buffer[kk] = <span class="charliteral">&#39;.&#39;</span>;</div>
 <div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;        <span class="keywordflow">return</span> &amp;buffer[length + 1];</div>
 <div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    }</div>
 <div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (-6 &lt; kk &amp;&amp; kk &lt;= 0) {</div>
 <div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;        <span class="comment">// 1234e-6 -&gt; 0.001234</span></div>
 <div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">int</span> offset = 2 - kk;</div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;        memmove(&amp;buffer[offset], &amp;buffer[0], length);</div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;        std::memmove(&amp;buffer[offset], &amp;buffer[0], length);</div>
 <div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;        buffer[0] = <span class="charliteral">&#39;0&#39;</span>;</div>
 <div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;        buffer[1] = <span class="charliteral">&#39;.&#39;</span>;</div>
 <div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 2; i &lt; offset; i++)</div>
@@ -465,7 +465,7 @@ $(document).ready(function(){initNavTree('dtoa_8h_source.html','');});
 <div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    }</div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    <span class="keywordflow">else</span> {</div>
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        <span class="comment">// 1234e30 -&gt; 1.234e33</span></div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;        memmove(&amp;buffer[2], &amp;buffer[1], length - 1);</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;        std::memmove(&amp;buffer[2], &amp;buffer[1], length - 1);</div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;        buffer[1] = <span class="charliteral">&#39;.&#39;</span>;</div>
 <div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;        buffer[length + 1] = <span class="charliteral">&#39;e&#39;</span>;</div>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;        <span class="keywordflow">return</span> WriteExponent(kk - 1, &amp;buffer[0 + length + 2]);</div>
