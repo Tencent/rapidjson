@@ -46,7 +46,7 @@
  */
 
 #include <cstdlib>  // malloc(), realloc(), free(), size_t
-#include <cstring>  // memcpy()
+#include <cstring>  // memset(), memcpy(), memmove(), memcmp()
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NO_INT64DEFINE

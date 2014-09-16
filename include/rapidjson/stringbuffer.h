@@ -71,7 +71,7 @@ typedef GenericStringBuffer<UTF8<> > StringBuffer;
 //! Implement specialized version of PutN() with memset() for better performance.
 template<>
 inline void PutN(GenericStringBuffer<UTF8<> >& stream, char c, size_t n) {
-    memset(stream.stack_.Push<char>(n), c, n * sizeof(c));
+    std::memset(stream.stack_.Push<char>(n), c, n * sizeof(c));
 }
 
 } // namespace rapidjson

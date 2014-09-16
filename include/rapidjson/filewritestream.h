@@ -48,7 +48,7 @@ public:
     void PutN(char c, size_t n) {
         size_t avail = static_cast<size_t>(bufferEnd_ - current_);
         while (n > avail) {
-            memset(current_, c, avail);
+            std::memset(current_, c, avail);
             current_ += avail;
             Flush();
             n -= avail;
@@ -56,7 +56,7 @@ public:
         }
 
         if (n > 0) {
-            memset(current_, c, n);
+            std::memset(current_, c, n);
             current_ += n;
         }
     }
