@@ -413,7 +413,6 @@ template <typename T> struct IsGenericValue : IsGenericValueImpl<T>::Type {};
     \tparam Encoding    Encoding of the value. (Even non-string values need to have the same encoding in a document)
     \tparam Allocator   Allocator type for allocating memory of object, array and string.
 */
-#pragma pack (push, 4)
 template <typename Encoding, typename Allocator = MemoryPoolAllocator<> > 
 class GenericValue {
 public:
@@ -1590,7 +1589,6 @@ private:
     Data data_;
     unsigned flags_;
 };
-#pragma pack (pop)
 
 //! GenericValue with UTF8 encoding
 typedef GenericValue<UTF8<> > Value;
