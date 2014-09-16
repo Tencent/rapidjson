@@ -449,6 +449,7 @@ inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp, bool* adj
 
 inline double FullPrecision(double d, int p, const char* decimals, size_t length, size_t decimalPosition, int exp) {
     RAPIDJSON_ASSERT(d >= 0.0);
+    RAPIDJSON_ASSERT(length >= 1);
 
     // Use fast path for string-to-double conversion if possible
     // see http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/
@@ -463,7 +464,31 @@ inline double FullPrecision(double d, int p, const char* decimals, size_t length
     if (p >= -22 && p <= 22 && d <= 9007199254740991.0) // 2^53 - 1
         return StrtodFastPath(d, p);
 
-    if (p + int(length) < -324)
+    // Use slow-path with BigInteger comparison
+
+    // Trim leading zeros
+    while (decimals[0] == '0' && length > 1) {
+        decimals++;
+        length--;
+        decimalPosition--;
+    }
+
+    // Trim trailing zeros
+    while (decimals[length - 1] == '0' && length > 1) {
+        length--;
+        exp++;
+        decimalPosition--;
+    }
+
+    // Trim right-most digits
+    const int kMaxDecimalDigit = 780;
+    if (length > kMaxDecimalDigit) {
+        exp += (int(length) - kMaxDecimalDigit);
+        length = kMaxDecimalDigit;        
+    }
+
+    // If too small, underflow to zero
+    if (int(length) + exp < -324)
         return 0.0;
 
     const BigInteger dInt(decimals, length);
