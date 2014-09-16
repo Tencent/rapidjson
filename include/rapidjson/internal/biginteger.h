@@ -30,6 +30,10 @@ class BigInteger {
 public:
     typedef uint64_t Type;
 
+    BigInteger(const BigInteger& rhs) : count_(rhs.count_) {
+        std::memcpy(digits_, rhs.digits_, count_ * sizeof(Type));
+    }
+
     explicit BigInteger(uint64_t u) : count_(1) {
         digits_[0] = u;
     }
@@ -75,6 +79,8 @@ public:
     BigInteger& operator*=(uint64_t u) {
         if (u == 0) return *this = 0;
         if (u == 1) return *this;
+        if (*this == 1) return *this = u;
+
         uint64_t k = 0;
         for (size_t i = 0; i < count_; i++) {
             uint64_t hi;
@@ -91,6 +97,8 @@ public:
     BigInteger& operator*=(uint32_t u) {
         if (u == 0) return *this = 0;
         if (u == 1) return *this;
+        if (*this == 1) return *this = u;
+
         uint32_t k = 0;
         for (size_t i = 0; i < count_; i++) {
             const uint64_t c = digits_[i] >> 32;
@@ -110,38 +118,37 @@ public:
     }
 
     BigInteger& operator<<=(size_t shift) {
-        if (IsZero()) return *this;
+        if (IsZero() || shift == 0) return *this;
 
-        if (shift >= kTypeBit) {
-            size_t offset = shift / kTypeBit;
-            RAPIDJSON_ASSERT(count_ + offset <= kCapacity);
-            for (size_t i = count_; i > 0; i--)
-                digits_[i - 1 + offset] = digits_[i - 1];
-            for (size_t i = 0; i < offset; i++)
-                digits_[i] = 0;
+        size_t offset = shift / kTypeBit;
+        size_t interShift = shift % kTypeBit;
+        RAPIDJSON_ASSERT(count_ + offset <= kCapacity);
+
+        if (interShift == 0) {
+            std::memmove(&digits_[count_ - 1 + offset], &digits_[count_ - 1], count_ * sizeof(Type));
             count_ += offset;
-            shift -= offset * kTypeBit;
+        }
+        else {
+            digits_[count_] = 0;
+            for (size_t i = count_; i > 0; i--)
+                digits_[i + offset] = (digits_[i] << interShift) | (digits_[i - 1] >> (kTypeBit - interShift));
+            digits_[offset] = digits_[0] << interShift;
+            count_ += offset;
+            if (digits_[count_])
+                count_++;
         }
 
-        if (shift > 0) {
-            // Inter-digit shifts
-            Type carry = 0;
-            for (size_t i = 0; i < count_; i++) {
-                Type newCarry = digits_[i] >> (kTypeBit - shift);
-                digits_[i] = (digits_[i] << shift) | carry;
-                carry = newCarry;
-            }
-
-            // Last carry
-            if (carry)
-                PushBack(carry);
-        }
+        std::memset(digits_, 0, offset * sizeof(Type));
 
         return *this;
     }
 
     bool operator==(const BigInteger& rhs) const {
         return count_ == rhs.count_ && memcmp(digits_, rhs.digits_, count_ * sizeof(Type)) == 0;
+    }
+
+    bool operator==(const Type rhs) const {
+        return count_ == 1 && digits_[0] == rhs;
     }
 
     BigInteger& MultiplyPow5(unsigned exp) {
@@ -160,10 +167,9 @@ public:
             5 * 5 * 5 * 5 * 5 * 5 * 5 * 5 * 5 * 5 * 5 * 5
         };
         if (exp == 0) return *this;
-        unsigned e = exp;
-        for (; e >= 27; e -= 27) *this *= RAPIDJSON_UINT64_C2(0X6765C793, 0XFA10079D); // 5^27
-        for (; e >= 13; e -= 13) *this *= 1220703125u; // 5^13
-        if (e > 0)               *this *= kPow5[e - 1];
+        for (; exp >= 27; exp -= 27) *this *= RAPIDJSON_UINT64_C2(0X6765C793, 0XFA10079D); // 5^27
+        for (; exp >= 13; exp -= 13) *this *= 1220703125u; // 5^13
+        if (exp > 0)                 *this *= kPow5[exp - 1];
         return *this;
     }
 
@@ -277,6 +283,7 @@ private:
     Type digits_[kCapacity];
     size_t count_;
 };
+
 } // namespace internal
 } // namespace rapidjson
 
