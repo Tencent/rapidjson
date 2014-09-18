@@ -53,7 +53,7 @@ struct DiyFp {
             uint64_t u64;
         } u = { d };
 
-        int biased_e = (u.u64 & kDpExponentMask) >> kDpSignificandSize;
+        int biased_e = static_cast<int>((u.u64 & kDpExponentMask) >> kDpSignificandSize);
         uint64_t significand = (u.u64 & kDpSignificandMask);
         if (biased_e != 0) {
             f = significand + kDpHiddenBit;
@@ -78,7 +78,7 @@ struct DiyFp {
         return DiyFp(h, e + rhs.e + 64);
 #elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) && defined(__x86_64__)
         unsigned __int128 p = static_cast<unsigned __int128>(f) * static_cast<unsigned __int128>(rhs.f);
-        uint64_t h = p >> 64;
+        uint64_t h = static_cast<uint64_t>(p >> 64);
         uint64_t l = static_cast<uint64_t>(p);
         if (l & (uint64_t(1) << 63)) // rounding
             h++;
@@ -284,7 +284,7 @@ inline void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buff
 #endif
         }
         if (d || *len)
-            buffer[(*len)++] = '0' + static_cast<char>(d);
+            buffer[(*len)++] = static_cast<char>('0' + static_cast<char>(d));
         kappa--;
         uint64_t tmp = (static_cast<uint64_t>(p1) << -one.e) + p2;
         if (tmp <= delta) {
@@ -300,7 +300,7 @@ inline void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buff
         delta *= 10;
         char d = static_cast<char>(p2 >> -one.e);
         if (d || *len)
-            buffer[(*len)++] = '0' + d;
+            buffer[(*len)++] = static_cast<char>('0' + d);
         p2 &= one.f - 1;
         kappa--;
         if (p2 < delta) {
@@ -332,7 +332,7 @@ inline char* WriteExponent(int K, char* buffer) {
     }
 
     if (K >= 100) {
-        *buffer++ = '0' + static_cast<char>(K / 100);
+        *buffer++ = static_cast<char>('0' + static_cast<char>(K / 100));
         K %= 100;
         const char* d = GetDigitsLut() + K * 2;
         *buffer++ = d[0];
@@ -344,7 +344,7 @@ inline char* WriteExponent(int K, char* buffer) {
         *buffer++ = d[1];
     }
     else
-        *buffer++ = '0' + static_cast<char>(K);
+        *buffer++ = static_cast<char>('0' + static_cast<char>(K));
 
     return buffer;
 }
