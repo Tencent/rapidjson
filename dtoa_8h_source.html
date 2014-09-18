@@ -135,7 +135,7 @@ $(document).ready(function(){initNavTree('dtoa_8h_source.html','');});
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;            uint64_t u64;</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        } u = { d };</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordtype">int</span> biased_e = (u.u64 &amp; kDpExponentMask) &gt;&gt; kDpSignificandSize;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordtype">int</span> biased_e = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>((u.u64 &amp; kDpExponentMask) &gt;&gt; kDpSignificandSize);</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        uint64_t significand = (u.u64 &amp; kDpSignificandMask);</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordflow">if</span> (biased_e != 0) {</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;            f = significand + kDpHiddenBit;</div>
@@ -160,7 +160,7 @@ $(document).ready(function(){initNavTree('dtoa_8h_source.html','');});
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        <span class="keywordflow">return</span> DiyFp(h, e + rhs.e + 64);</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor">#elif (__GNUC__ &gt; 4 || (__GNUC__ == 4 &amp;&amp; __GNUC_MINOR__ &gt;= 6)) &amp;&amp; defined(__x86_64__)</span></div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <span class="keywordtype">unsigned</span> __int128 p = <span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span> __int128<span class="keyword">&gt;</span>(f) * static_cast&lt;unsigned __int128&gt;(rhs.f);</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        uint64_t h = p &gt;&gt; 64;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        uint64_t h = <span class="keyword">static_cast&lt;</span>uint64_t<span class="keyword">&gt;</span>(p &gt;&gt; 64);</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        uint64_t l = <span class="keyword">static_cast&lt;</span>uint64_t<span class="keyword">&gt;</span>(p);</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        <span class="keywordflow">if</span> (l &amp; (uint64_t(1) &lt;&lt; 63)) <span class="comment">// rounding</span></div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            h++;</div>
@@ -366,7 +366,7 @@ $(document).ready(function(){initNavTree('dtoa_8h_source.html','');});
 <div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;        }</div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;        <span class="keywordflow">if</span> (d || *len)</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;            buffer[(*len)++] = <span class="charliteral">&#39;0&#39;</span> + <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(d);</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;            buffer[(*len)++] = <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(<span class="charliteral">&#39;0&#39;</span> + <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(d));</div>
 <div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        kappa--;</div>
 <div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        uint64_t tmp = (<span class="keyword">static_cast&lt;</span>uint64_t<span class="keyword">&gt;</span>(p1) &lt;&lt; -one.e) + p2;</div>
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        <span class="keywordflow">if</span> (tmp &lt;= delta) {</div>
@@ -382,7 +382,7 @@ $(document).ready(function(){initNavTree('dtoa_8h_source.html','');});
 <div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;        delta *= 10;</div>
 <div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;        <span class="keywordtype">char</span> d = <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(p2 &gt;&gt; -one.e);</div>
 <div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;        <span class="keywordflow">if</span> (d || *len)</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;            buffer[(*len)++] = <span class="charliteral">&#39;0&#39;</span> + d;</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;            buffer[(*len)++] = <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(<span class="charliteral">&#39;0&#39;</span> + d);</div>
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;        p2 &amp;= one.f - 1;</div>
 <div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;        kappa--;</div>
 <div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        <span class="keywordflow">if</span> (p2 &lt; delta) {</div>
@@ -414,7 +414,7 @@ $(document).ready(function(){initNavTree('dtoa_8h_source.html','');});
 <div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    }</div>
 <div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;</div>
 <div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    <span class="keywordflow">if</span> (K &gt;= 100) {</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;        *buffer++ = <span class="charliteral">&#39;0&#39;</span> + <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(K / 100);</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;        *buffer++ = <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(<span class="charliteral">&#39;0&#39;</span> + <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(K / 100));</div>
 <div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;        K %= 100;</div>
 <div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">char</span>* d = GetDigitsLut() + K * 2;</div>
 <div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;        *buffer++ = d[0];</div>
@@ -426,7 +426,7 @@ $(document).ready(function(){initNavTree('dtoa_8h_source.html','');});
 <div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;        *buffer++ = d[1];</div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    }</div>
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        *buffer++ = <span class="charliteral">&#39;0&#39;</span> + <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(K);</div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        *buffer++ = <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(<span class="charliteral">&#39;0&#39;</span> + <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(K));</div>
 <div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;</div>
 <div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;    <span class="keywordflow">return</span> buffer;</div>
 <div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;}</div>

@@ -173,7 +173,7 @@ $(document).ready(function(){initNavTree('itoa_8h_source.html','');});
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;            *buffer++ = cDigitsLut[i + 1];</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        }</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            *buffer++ = <span class="charliteral">&#39;0&#39;</span> + <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(a);</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;            *buffer++ = <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(<span class="charliteral">&#39;0&#39;</span> + <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(a));</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;        <span class="keyword">const</span> uint32_t b = value / 10000; <span class="comment">// 0 to 9999</span></div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keyword">const</span> uint32_t c = value % 10000; <span class="comment">// 0 to 9999</span></div>
@@ -309,14 +309,14 @@ $(document).ready(function(){initNavTree('itoa_8h_source.html','');});
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;        value %= kTen16;</div>
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;        </div>
 <div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;        <span class="keywordflow">if</span> (a &lt; 10)</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;            *buffer++ = <span class="charliteral">&#39;0&#39;</span> + <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(a);</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;            *buffer++ = <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(<span class="charliteral">&#39;0&#39;</span> + <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(a));</div>
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (a &lt; 100) {</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;            <span class="keyword">const</span> uint32_t i = a &lt;&lt; 1;</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;            *buffer++ = cDigitsLut[i];</div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;            *buffer++ = cDigitsLut[i + 1];</div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        }</div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (a &lt; 1000) {</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            *buffer++ = <span class="charliteral">&#39;0&#39;</span> + <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(a / 100);</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;            *buffer++ = <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(<span class="charliteral">&#39;0&#39;</span> + <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(a / 100));</div>
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;            </div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;            <span class="keyword">const</span> uint32_t i = (a % 100) &lt;&lt; 1;</div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            *buffer++ = cDigitsLut[i];</div>
