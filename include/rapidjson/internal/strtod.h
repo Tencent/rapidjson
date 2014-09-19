@@ -24,6 +24,7 @@
 #include "../rapidjson.h"
 #include "ieee754.h"
 #include "biginteger.h"
+#include "diyfp.h"
 #include "pow10.h"
 
 namespace rapidjson {
@@ -141,7 +142,84 @@ inline bool StrtodFast(double d, int p, double* result) {
         return false;
 }
 
-inline double StrtodBigInteger(double d, int p, const char* decimals, size_t length, size_t decimalPosition, int exp) {
+// Compute an approximation and see if it is within 1/2 ULP
+inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosition, int exp, double* result) {
+    uint64_t significand = 0;
+    size_t i = 0;   // 2^64 - 1 = 18446744073709551615, 1844674407370955161 = 0x199999990x99999999    
+    for (; i < length && (significand <= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) || decimals[i] <= '4'); i++)
+        significand = significand * 10 + (decimals[i] - '0');
+    
+    if (i < length && decimals[i] >= '5') // Rounding
+        significand++;
+
+    DiyFp v(significand, 0);
+    size_t remaining = length - i;
+    const int dExp = (int)decimalPosition - i + exp;
+    exp += (int)remaining;
+
+    const unsigned kUlpShift = 3;
+    const unsigned kUlp = 1 << kUlpShift;
+    int error = (remaining == 0) ? 0 : kUlp / 2;
+
+    v = v.Normalize();
+    error <<= - v.e;
+
+    int actualExp;
+    v = v * GetCachedPower10(exp, &actualExp);
+    if (actualExp != exp) {
+        static const DiyFp kPow10[] = {
+            DiyFp(RAPIDJSON_UINT64_C2(0xa0000000, 00000000), -60),  // 10^1
+            DiyFp(RAPIDJSON_UINT64_C2(0xc8000000, 00000000), -57),  // 10^2
+            DiyFp(RAPIDJSON_UINT64_C2(0xfa000000, 00000000), -54),  // 10^3
+            DiyFp(RAPIDJSON_UINT64_C2(0x9c400000, 00000000), -50),  // 10^4
+            DiyFp(RAPIDJSON_UINT64_C2(0xc3500000, 00000000), -47),  // 10^5
+            DiyFp(RAPIDJSON_UINT64_C2(0xf4240000, 00000000), -44),  // 10^6
+            DiyFp(RAPIDJSON_UINT64_C2(0x98968000, 00000000), -40)   // 10^7
+        };
+        v = v * kPow10[actualExp - exp - 1];
+    }
+
+    error += kUlp + (error == 0 ? 0 : 1);
+
+    int oldExp = v.e;
+    v = v.Normalize();
+    error <<= oldExp - v.e;
+
+    return true;
+}
+
+inline double StrtodBigInteger(double approx, const char* decimals, size_t length, size_t decimalPosition, int exp) {
+    const BigInteger dInt(decimals, length);
+    const int dExp = (int)decimalPosition - (int)length + exp;
+    Double a(approx);
+    for (int i = 0; i < 10; i++) {
+        bool adjustToNegative;
+        int cmp = CheckWithinHalfULP(a.Value(), dInt, dExp, &adjustToNegative);
+        if (cmp < 0)
+            return a.Value();  // within half ULP
+        else if (cmp == 0) {
+            // Round towards even
+            if (a.Significand() & 1)
+                return adjustToNegative ? a.PreviousPositiveDouble() : a.NextPositiveDouble();
+            else
+                return a.Value();
+        }
+        else // adjustment
+            a = adjustToNegative ? a.PreviousPositiveDouble() : a.NextPositiveDouble();
+    }
+
+    // This should not happen, but in case there is really a bug, break the infinite-loop
+    return a.Value();
+}
+
+inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t length, size_t decimalPosition, int exp) {
+    RAPIDJSON_ASSERT(d >= 0.0);
+    RAPIDJSON_ASSERT(length >= 1);
+
+    double result;
+    if (StrtodFast(d, p, &result))
+        return result;
+
     // Trim leading zeros
     while (*decimals == '0' && length > 1) {
         length--;
@@ -167,38 +245,11 @@ inline double StrtodBigInteger(double d, int p, const char* decimals, size_t len
     if (int(length) + exp < -324)
         return 0.0;
 
-    const BigInteger dInt(decimals, length);
-    const int dExp = (int)decimalPosition - (int)length + exp;
-    Double approx = StrtodNormalPrecision(d, p);
-    for (int i = 0; i < 10; i++) {
-        bool adjustToNegative;
-        int cmp = CheckWithinHalfULP(approx.Value(), dInt, dExp, &adjustToNegative);
-        if (cmp < 0)
-            return approx.Value();  // within half ULP
-        else if (cmp == 0) {
-            // Round towards even
-            if (approx.Significand() & 1)
-                return adjustToNegative ? approx.PreviousPositiveDouble() : approx.NextPositiveDouble();
-            else
-                return approx.Value();
-        }
-        else // adjustment
-            approx = adjustToNegative ? approx.PreviousPositiveDouble() : approx.NextPositiveDouble();
-    }
-
-    // This should not happen, but in case there is really a bug, break the infinite-loop
-    return approx.Value();
-}
-
-inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t length, size_t decimalPosition, int exp) {
-    RAPIDJSON_ASSERT(d >= 0.0);
-    RAPIDJSON_ASSERT(length >= 1);
-
-    double result;
-    if (StrtodFast(d, p, &result))
+    if (StrtodDiyFp(decimals, length, decimalPosition, exp, &result))
         return result;
 
-    return StrtodBigInteger(d, p, decimals, length, decimalPosition, exp);
+    // Use approximation from StrtodDiyFp and make adjustment with BigInteger comparison
+    return StrtodBigInteger(result, decimals, length, decimalPosition, exp);
 }
 
 } // namespace internal

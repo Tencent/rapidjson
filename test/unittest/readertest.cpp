@@ -258,7 +258,7 @@ static void TestParseDouble() {
     }
 
 #if 1
-    static const unsigned count = 1000000;
+    static const unsigned count = 10000000;
     // Random test for double
     {
         Random r;

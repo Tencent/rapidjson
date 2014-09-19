@@ -155,7 +155,7 @@ struct DiyFp {
     int e;
 };
 
-inline DiyFp GetCachedPower(int e, int* K) {
+inline uint64_t GetCachedPowerF(size_t index) {
     // 10^-348, 10^-340, ..., 10^340
     static const uint64_t kCachedPowers_F[] = {
         RAPIDJSON_UINT64_C2(0xfa8fd5a0, 0x081c0288), RAPIDJSON_UINT64_C2(0xbaaee17f, 0xa23ebf76),
@@ -203,6 +203,10 @@ inline DiyFp GetCachedPower(int e, int* K) {
         RAPIDJSON_UINT64_C2(0x9e19db92, 0xb4e31ba9), RAPIDJSON_UINT64_C2(0xeb96bf6e, 0xbadf77d9),
         RAPIDJSON_UINT64_C2(0xaf87023b, 0x9bf0ee6b)
     };
+    return kCachedPowers_F[index];
+}
+
+inline DiyFp GetCachedPower(int e, int* K) {
     static const int16_t kCachedPowers_E[] = {
         -1220, -1193, -1166, -1140, -1113, -1087, -1060, -1034, -1007,  -980,
          -954,  -927,  -901,  -874,  -847,  -821,  -794,  -768,  -741,  -715,
@@ -224,8 +228,25 @@ inline DiyFp GetCachedPower(int e, int* K) {
     unsigned index = static_cast<unsigned>((k >> 3) + 1);
     *K = -(-348 + static_cast<int>(index << 3));    // decimal exponent no need lookup table
 
-    return DiyFp(kCachedPowers_F[index], kCachedPowers_E[index]);
+    return DiyFp(GetCachedPowerF(index), kCachedPowers_E[index]);
 }
+
+inline DiyFp GetCachedPower10(int exp, int *outExp) {
+    // static const int16_t kCachedPowers_E10[] = {
+    //     -348, -340, -332, -324, -316, -308, -300, -292, -284, -276,
+    //     -268, -260, -252, -244, -236, -228, -220, -212, -204, -196,
+    //     -188, -180, -172, -164, -156, -148, -140, -132, -124, -116,
+    //     -108, -100,  -92,  -84,  -76,  -68,  -60,  -52,  -44,  -36,
+    //      -28,  -20,  -12,   -4,    4,   12,   20,   28,   36,   44,
+    //       52,   60,   68,   76,   84,   92,  100,  108,  116,  124,
+    //      132,  140,  148,  156,  164,  172,  180,  188,  196,  204,
+    //      212,  220,  228,  236,  244,  252,  260,  268,  276,  284,
+    //      292,  300,  308,  316,  324,  332,  340
+    //  };
+     unsigned index = (exp + 348) / 8;
+     *outExp = -348 + index * 8;
+     return GetCachedPowerF(index);
+ }
 
 #ifdef __GNUC__
 RAPIDJSON_DIAG_POP
