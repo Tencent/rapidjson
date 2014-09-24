@@ -1,6 +1,6 @@
 # Stream
 
-In RapidJSON, `rapidjson::Stream` is a concept for reading/writing JSON. Here we first show how to use streams provided. And then see how to create a custom streams.
+In RapidJSON, `rapidjson::Stream` is a concept for reading/writing JSON. Here we first show how to use streams provided. And then see how to create a custom stream.
 
 [TOC]
 
