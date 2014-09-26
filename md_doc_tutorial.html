@@ -326,9 +326,10 @@ Move semantics makes no copying.</div></div>
 Move semantics and temporary values</h3>
 <p>Sometimes, it is convenient to construct a Value in place, before passing it to one of the "moving" functions, like <code>PushBack()</code> or <code>AddMember()</code>. As temporary objects can't be converted to proper Value references, the convenience function <code>Move()</code> is available:</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
-<div class="line"><span class="comment">// a.PushBack(Value(42));       // will not compile</span></div>
-<div class="line">a.PushBack(<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>().SetInt(42)); <span class="comment">// fluent API</span></div>
-<div class="line">a.PushBack(<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>(42).Move());   <span class="comment">// same as above</span></div>
+<div class="line">Document::AllocatorType&amp; allocator = document.GetAllocator();</div>
+<div class="line"><span class="comment">// a.PushBack(Value(42), allocator);       // will not compile</span></div>
+<div class="line">a.PushBack(<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>().SetInt(42), allocator); <span class="comment">// fluent API</span></div>
+<div class="line">a.PushBack(<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>(42).Move(), allocator);   <span class="comment">// same as above</span></div>
 </div><!-- fragment --><h2><a class="anchor" id="CreateString"></a>
 Create String</h2>
 <p>RapidJSON provide two strategies for storing string.</p>
