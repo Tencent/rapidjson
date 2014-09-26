@@ -334,9 +334,10 @@ Sometimes, it is convenient to construct a Value in place, before passing it to 
 
 ~~~~~~~~~~cpp
 Value a(kArrayType);
-// a.PushBack(Value(42));       // will not compile
-a.PushBack(Value().SetInt(42)); // fluent API
-a.PushBack(Value(42).Move());   // same as above
+Document::AllocatorType& allocator = document.GetAllocator();
+// a.PushBack(Value(42), allocator);       // will not compile
+a.PushBack(Value().SetInt(42), allocator); // fluent API
+a.PushBack(Value(42).Move(), allocator);   // same as above
 ~~~~~~~~~~
 
 ## Create String {#CreateString}
