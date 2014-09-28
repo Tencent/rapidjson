@@ -145,8 +145,8 @@ concept Handler {
 
     bool Null();
     bool Bool(bool b);
-    bool Int(int i);
-    bool Uint(unsigned i);
+    bool Int(int32_t i);
+    bool Uint(uint32_t i);
     bool Int64(int64_t i);
     bool Uint64(uint64_t i);
     bool Double(double d);
@@ -175,8 +175,8 @@ struct BaseReaderHandler {
     bool Default() { return true; }
     bool Null() { return static_cast<Override&>(*this).Default(); }
     bool Bool(bool) { return static_cast<Override&>(*this).Default(); }
-    bool Int(int) { return static_cast<Override&>(*this).Default(); }
-    bool Uint(unsigned) { return static_cast<Override&>(*this).Default(); }
+    bool Int(int32_t) { return static_cast<Override&>(*this).Default(); }
+    bool Uint(uint32_t) { return static_cast<Override&>(*this).Default(); }
     bool Int64(int64_t) { return static_cast<Override&>(*this).Default(); }
     bool Uint64(uint64_t) { return static_cast<Override&>(*this).Default(); }
     bool Double(double) { return static_cast<Override&>(*this).Default(); }
@@ -894,7 +894,7 @@ private:
             }
             else {
                 if (minus)
-                    cont = handler.Int(-(int)i);
+                    cont = handler.Int(-(int32_t)i);
                 else
                     cont = handler.Uint(i);
             }
