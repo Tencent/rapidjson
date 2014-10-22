@@ -21,6 +21,7 @@
 #include "unittest.h"
 
 #include "rapidjson/reader.h"
+#include "rapidjson/memorystream.h"
 
 using namespace rapidjson;
 
@@ -674,6 +675,15 @@ TEST(Reader, ParseObject_Error) {
 
     // Must be a comma or '}' after an object member
     TEST_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, "{\"a\":1]");
+
+    // This tests that MemoryStream is checking the length in Peek().
+    {
+        MemoryStream ms("{\"a\"", 1);
+        BaseReaderHandler<> h;
+        Reader reader;
+        EXPECT_FALSE(reader.Parse<kParseStopWhenDoneFlag>(ms, h));
+        EXPECT_EQ(kParseErrorObjectMissName, reader.GetParseErrorCode());
+    }
 }
 
 #undef TEST_ERROR
