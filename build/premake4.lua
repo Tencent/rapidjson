@@ -64,7 +64,7 @@ solution "test"
         defines { "_CRT_SECURE_NO_WARNINGS" }
         
     configuration "gmake"
-        buildoptions "-msse4.2 -Wall -Wextra"
+        buildoptions "-march=native -Wall -Wextra"
 
     project "gtest"
         kind "StaticLib"
