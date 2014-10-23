@@ -72,12 +72,8 @@ int main(int, char*[]) {
         for (SizeType i = 0; i < a.Size(); i++) // rapidjson uses SizeType instead of size_t.
             printf("a[%d] = %d\n", i, a[i].GetInt());
         
-        // Note:
-        //int x = a[0].GetInt();                    // Error: operator[ is ambiguous, as 0 also mean a null pointer of const char* type.
-        int y = a[SizeType(0)].GetInt();            // Cast to SizeType will work.
-        int z = a[0u].GetInt();                     // This works too.
+        int y = a[0].GetInt();
         (void)y;
-        (void)z;
 
         // Iterating array with iterators
         printf("a = ");
