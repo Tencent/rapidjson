@@ -451,7 +451,7 @@ public:
         \param type Type of the value.
         \note Default content for number is zero.
     */
-    GenericValue(Type type) RAPIDJSON_NOEXCEPT : data_(), flags_() {
+    explicit GenericValue(Type type) RAPIDJSON_NOEXCEPT : data_(), flags_() {
         static const unsigned defaultFlags[7] = {
             kNullFlag, kFalseFlag, kTrueFlag, kObjectFlag, kArrayFlag, kConstStringFlag,
             kNumberAnyFlag
