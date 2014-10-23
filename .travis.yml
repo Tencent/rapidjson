@@ -24,7 +24,10 @@ before_install:
 install: true
 
 before_script:
-  - pushd build && premake4 'gmake' && popd
+  - (cd build && premake4 'gmake')
+#   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
+#   exposed by merging PR#163 (using -march=native)
+  - (cd build/gmake && sed -i 's/march=native/msse4.2/' *.make)
 
 script:
   - make -C build/gmake -f test.make    config=${CONF}${BITS}
