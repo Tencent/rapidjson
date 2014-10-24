@@ -134,8 +134,8 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "allocators_8h_source.html",
-"classrapidjson_1_1_generic_value.html#ae8bcedd951f50b69786aaaa1828e9fac",
-"md_doc_stream.html#FileReadStream"
+"classrapidjson_1_1_generic_value.html#ae6351043ec30d8a151b0a072cfbc46d5",
+"md_doc_stream.html#ExampleIStreamWrapper"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

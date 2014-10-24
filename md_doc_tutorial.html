@@ -168,10 +168,7 @@ DOM in the tutorial</div></div>
 <h2><a class="anchor" id="QueryArray"></a>
 Query Array</h2>
 <p>By default, <code>SizeType</code> is typedef of <code>unsigned</code>. In most systems, array is limited to store up to 2^32-1 elements.</p>
-<p>You may access the elements in array by integer literal, for example, <code>a[1]</code>, <code>a[2]</code>. However, <code>a[0]</code> will generate a compiler error. It is because two overloaded operators <code>operator[](SizeType)</code> and <code>operator[](const char*)</code> is available, and C++ can treat <code>0</code> as a null pointer. Workarounds:</p><ul>
-<li><code>a[SizeType(0)]</code></li>
-<li><code>a[0u]</code></li>
-</ul>
+<p>You may access the elements in array by integer literal, for example, <code>a[0]</code>, <code>a[1]</code>, <code>a[2]</code>.</p>
 <p>Array is similar to <code>std::vector</code>, instead of using indices, you may also use iterator to access all the elements. </p><div class="fragment"><div class="line"><span class="keywordflow">for</span> (Value::ConstValueIterator itr = a.Begin(); itr != a.End(); ++itr)</div>
 <div class="line">    printf(<span class="stringliteral">&quot;%d &quot;</span>, itr-&gt;GetInt());</div>
 </div><!-- fragment --><p>And other familiar query functions:</p><ul>
