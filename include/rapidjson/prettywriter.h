@@ -70,8 +70,8 @@ public:
 
     bool Null()                 { PrettyPrefix(kNullType);   return Base::WriteNull(); }
     bool Bool(bool b)           { PrettyPrefix(b ? kTrueType : kFalseType); return Base::WriteBool(b); }
-    bool Int(int i)             { PrettyPrefix(kNumberType); return Base::WriteInt(i); }
-    bool Uint(unsigned u)       { PrettyPrefix(kNumberType); return Base::WriteUint(u); }
+    bool Int(int32_t i)         { PrettyPrefix(kNumberType); return Base::WriteInt(i); }
+    bool Uint(uint32_t u)       { PrettyPrefix(kNumberType); return Base::WriteUint(u); }
     bool Int64(int64_t i64)     { PrettyPrefix(kNumberType); return Base::WriteInt64(i64); }
     bool Uint64(uint64_t u64)   { PrettyPrefix(kNumberType); return Base::WriteUint64(u64);  }
     bool Double(double d)       { PrettyPrefix(kNumberType); return Base::WriteDouble(d); }

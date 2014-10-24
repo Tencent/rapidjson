@@ -19,8 +19,8 @@ struct CapitalizeFilter {
 
     bool Null() { return out_.Null(); }
     bool Bool(bool b) { return out_.Bool(b); }
-    bool Int(int i) { return out_.Int(i); }
-    bool Uint(unsigned u) { return out_.Uint(u); }
+    bool Int(int32_t i) { return out_.Int(i); }
+    bool Uint(uint32_t u) { return out_.Uint(u); }
     bool Int64(int64_t i) { return out_.Int64(i); }
     bool Uint64(uint64_t u) { return out_.Uint64(u); }
     bool Double(double d) { return out_.Double(d); }

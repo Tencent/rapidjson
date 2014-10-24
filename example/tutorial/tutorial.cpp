@@ -60,7 +60,7 @@ int main(int, char*[]) {
 
     assert(document["i"].IsNumber());   // Number is a JSON type, but C++ needs more specific type.
     assert(document["i"].IsInt());      // In this case, IsUint()/IsInt64()/IsUInt64() also return true.
-    printf("i = %d\n", document["i"].GetInt()); // Alternative (int)document["i"]
+    printf("i = %d\n", document["i"].GetInt()); // Alternative (int32_t)document["i"]
 
     assert(document["pi"].IsNumber());
     assert(document["pi"].IsDouble());
@@ -73,9 +73,9 @@ int main(int, char*[]) {
             printf("a[%d] = %d\n", i, a[i].GetInt());
         
         // Note:
-        //int x = a[0].GetInt();                    // Error: operator[ is ambiguous, as 0 also mean a null pointer of const char* type.
-        int y = a[SizeType(0)].GetInt();            // Cast to SizeType will work.
-        int z = a[0u].GetInt();                     // This works too.
+        //int32_t x = a[0].GetInt();                // Error: operator[ is ambiguous, as 0 also mean a null pointer of const char* type.
+        int32_t y = a[SizeType(0)].GetInt();        // Cast to SizeType will work.
+        int32_t z = a[0u].GetInt();                 // This works too.
         (void)y;
         (void)z;
 
@@ -100,7 +100,7 @@ int main(int, char*[]) {
         for (uint64_t j = 1; j <= 20; j++)
             f20 *= j;
         document["i"] = f20;    // Alternate form: document["i"].SetUint64(f20)
-        assert(!document["i"].IsInt()); // No longer can be cast as int or uint.
+        assert(!document["i"].IsInt()); // No longer can be cast as int32_t or uint32_t.
     }
 
     // Adding values to array.

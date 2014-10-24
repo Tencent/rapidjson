@@ -49,19 +49,20 @@
 #include <cstring>  // memset(), memcpy(), memmove(), memcmp()
 
 ///////////////////////////////////////////////////////////////////////////////
-// RAPIDJSON_NO_INT64DEFINE
+// RAPIDJSON_NO_STDINT
 
-/*! \def RAPIDJSON_NO_INT64DEFINE
+/*! \def RAPIDJSON_NO_STDINT
     \ingroup RAPIDJSON_CONFIG
-    \brief Use external 64-bit integer types.
+    \brief Do not use \c stdint.h and \c inttypes.h
 
-    RapidJSON requires the 64-bit integer types \c int64_t and  \c uint64_t types
-    to be available at global scope.
+    RapidJSON uses the types \c int32_t, \c uint32_t, \c int64_t, and
+    \c uint64_t from \c stdint.h (or \c msinttypes/stdint.h on Windows).
 
-    If users have their own definition, define RAPIDJSON_NO_INT64DEFINE to
-    prevent RapidJSON from defining its own types.
+    If you prefer not to include these headers (because, for example, you have
+    your own type definitions), define \c RAPIDJSON_NO_STDINT to prevent
+    RapidJSON from including the headers.
 */
-#ifndef RAPIDJSON_NO_INT64DEFINE
+#ifndef RAPIDJSON_NO_STDINT
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 #ifdef _MSC_VER
 #include "msinttypes/stdint.h"
@@ -73,9 +74,9 @@
 #endif
 //!@endcond
 #ifdef RAPIDJSON_DOXYGEN_RUNNING
-#define RAPIDJSON_NO_INT64DEFINE
+#define RAPIDJSON_NO_STDINT
 #endif
-#endif // RAPIDJSON_NO_INT64TYPEDEF
+#endif // RAPIDJSON_NO_STDINT
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_FORCEINLINE

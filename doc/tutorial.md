@@ -85,7 +85,7 @@ assert(document["i"].IsNumber());
 // In this case, IsUint()/IsInt64()/IsUInt64() also return true.
 assert(document["i"].IsInt());          
 printf("i = %d\n", document["i"].GetInt());
-// Alternative (int)document["i"]
+// Alternative (int32_t)document["i"]
 
 assert(document["pi"].IsNumber());
 assert(document["pi"].IsDouble());
@@ -181,8 +181,8 @@ When the DOM parses a Number, it stores it as either one of the following type:
 
 Type       | Description
 -----------|---------------------------------------
-`unsigned` | 32-bit unsigned integer
-`int`      | 32-bit signed integer
+`uint32_t` | 32-bit unsigned integer
+`int32_t`  | 32-bit signed integer
 `uint64_t` | 64-bit unsigned integer
 `int64_t`  | 64-bit signed integer
 `double`   | 64-bit double precision floating point
@@ -192,15 +192,15 @@ When querying a number, you can check whether the number can be obtained as targ
 Checking          | Obtaining
 ------------------|---------------------
 `bool IsNumber()` | N/A
-`bool IsUint()`   | `unsigned GetUint()`
-`bool IsInt()`    | `int GetInt()`
+`bool IsUint()`   | `uint32_t GetUint()`
+`bool IsInt()`    | `int32_t GetInt()`
 `bool IsUint64()` | `uint64_t GetUint()`
 `bool IsInt64()`  | `int64_t GetInt64()`
 `bool IsDouble()` | `double GetDouble()`
 
 Note that, an integer value may be obtained in various ways without conversion. For example, A value `x` containing 123 will make `x.IsInt() == x.IsUint() == x.IsInt64() == x.IsUint64() == true`. But a value `y` containing -3000000000 will only makes `x.IsInt64() == true`.
 
-When obtaining the numeric values, `GetDouble()` will convert internal integer representation to a `double`. Note that, `int` and `uint` can be safely convert to `double`, but `int64_t` and `uint64_t` may lose precision (since mantissa of `double` is only 52-bits).
+When obtaining the numeric values, `GetDouble()` will convert internal integer representation to a `double`. Note that, `int32_t` and `uint32_t` can be safely convert to `double`, but `int64_t` and `uint64_t` may lose precision (since mantissa of `double` is only 52-bits).
 
 ## Query String {#QueryString}
 
@@ -263,8 +263,8 @@ There are also overloaded constructors for several types:
 
 ~~~~~~~~~~cpp
 Value b(true);    // calls Value(bool)
-Value i(-123);    // calls Value(int)
-Value u(123u);    // calls Value(unsigned)
+Value i(-123);    // calls Value(int32_t)
+Value u(123u);    // calls Value(uint32_t)
 Value d(1.5);     // calls Value(double)
 ~~~~~~~~~~
 
