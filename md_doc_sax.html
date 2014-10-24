@@ -316,7 +316,8 @@ Parsing JSON to Custom Data Structure</h2>
 <div class="line"></div>
 <div class="line"><span class="keyword">typedef</span> map&lt;string, string&gt; MessageMap;</div>
 <div class="line"></div>
-<div class="line"><span class="keyword">struct </span>MessageHandler : <span class="keyword">public</span> <a class="code" href="structrapidjson_1_1_base_reader_handler.html">BaseReaderHandler</a>&lt;&gt; {</div>
+<div class="line"><span class="keyword">struct </span>MessageHandler</div>
+<div class="line">    : <span class="keyword">public</span> <a class="code" href="structrapidjson_1_1_base_reader_handler.html">BaseReaderHandler</a>&lt;UTF8&lt;&gt;, MessageHandler&gt; {</div>
 <div class="line">    MessageHandler() : state_(kExpectObjectStart) {</div>
 <div class="line">    }</div>
 <div class="line"></div>
