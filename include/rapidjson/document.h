@@ -455,7 +455,7 @@ public:
         \param type Type of the value.
         \note Default content for number is zero.
     */
-    GenericValue(Type type) RAPIDJSON_NOEXCEPT : data_(), flags_() {
+    explicit GenericValue(Type type) RAPIDJSON_NOEXCEPT : data_(), flags_() {
         static const unsigned defaultFlags[7] = {
             kNullFlag, kFalseFlag, kTrueFlag, kObjectFlag, kArrayFlag, kConstStringFlag,
             kNumberAnyFlag
@@ -799,6 +799,15 @@ public:
     //! Check whether the object is empty.
     bool ObjectEmpty() const { RAPIDJSON_ASSERT(IsObject()); return data_.o.size == 0; }
 
+    template <typename T>
+    GenericValue& operator[](T t) {
+	    return DoIndex(t, internal::IsPointer<T>());
+    }
+
+    template <typename T>
+    const GenericValue& operator[](T t) const { return const_cast<GenericValue&>(*this)[t]; }
+
+private:
     //! Get the value associated with the name.
     /*!
         \note In version 0.1x, if the member is not found, this function returns a null value. This makes issue 7.
@@ -807,12 +816,22 @@ public:
         A better approach is to use FindMember().
         \note Linear time complexity.
     */
-    GenericValue& operator[](const Ch* name) {
+
+    GenericValue& DoIndex(const Ch* name, internal::TrueType) {
         GenericValue n(StringRef(name));
         return (*this)[n];
     }
-    const GenericValue& operator[](const Ch* name) const { return const_cast<GenericValue&>(*this)[name]; }
 
+    //! Get an element from array by index.
+    /*! \param index Zero-based index of element.
+    */
+    GenericValue& DoIndex(SizeType index, internal::FalseType) {
+        RAPIDJSON_ASSERT(IsArray());
+        RAPIDJSON_ASSERT(index < data_.a.size);
+        return data_.a.elements[index];
+    }
+
+public:
     // This version is faster because it does not need a StrLen(). 
     // It can also handle string with null character.
     template <typename SourceAllocator>
@@ -1134,23 +1153,6 @@ public:
             data_.a.elements[i].~GenericValue();
         data_.a.size = 0;
     }
-
-    //! Get an element from array by index.
-    /*! \param index Zero-based index of element.
-\code
-Value a(kArrayType);
-a.PushBack(123);
-int x = a[0].GetInt();              // Error: operator[ is ambiguous, as 0 also mean a null pointer of const char* type.
-int y = a[SizeType(0)].GetInt();    // Cast to SizeType will work.
-int z = a[0u].GetInt();             // This works too.
-\endcode
-    */
-    GenericValue& operator[](SizeType index) {
-        RAPIDJSON_ASSERT(IsArray());
-        RAPIDJSON_ASSERT(index < data_.a.size);
-        return data_.a.elements[index];
-    }
-    const GenericValue& operator[](SizeType index) const { return const_cast<GenericValue&>(*this)[index]; }
 
     //! Element iterator
     /*! \pre IsArray() == true */

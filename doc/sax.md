@@ -299,7 +299,8 @@ using namespace rapidjson;
 
 typedef map<string, string> MessageMap;
 
-struct MessageHandler : public BaseReaderHandler<> {
+struct MessageHandler
+    : public BaseReaderHandler<UTF8<>, MessageHandler> {
     MessageHandler() : state_(kExpectObjectStart) {
     }
 

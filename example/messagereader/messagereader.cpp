@@ -17,7 +17,8 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
-struct MessageHandler : public BaseReaderHandler<> {
+struct MessageHandler
+    : public BaseReaderHandler<UTF8<>, MessageHandler> {
     MessageHandler() : messages_(), state_(kExpectObjectStart), name_() {}
 
     bool StartObject() {
