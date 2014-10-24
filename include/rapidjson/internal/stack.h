@@ -41,10 +41,51 @@ public:
             ownAllocator = allocator_ = new Allocator();
     }
 
-    ~Stack() {
-        Allocator::Free(stack_);
-        delete ownAllocator; // Only delete if it is owned by the stack
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    Stack(Stack&& rhs)
+        : allocator_(rhs.allocator_),
+          ownAllocator(rhs.ownAllocator),
+          stack_(rhs.stack_),
+          stackTop_(rhs.stackTop_),
+          stackEnd_(rhs.stackEnd_),
+          initialCapacity_(rhs.initialCapacity_)
+    {
+        rhs.allocator_ = 0;
+        rhs.ownAllocator = 0;
+        rhs.stack_ = 0;
+        rhs.stackTop_ = 0;
+        rhs.stackEnd_ = 0;
+        rhs.initialCapacity_ = 0;
     }
+#endif
+
+    ~Stack() {
+        Destroy();
+    }
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    Stack& operator=(Stack&& rhs) {
+        if (&rhs != this)
+        {
+            Destroy();
+
+            allocator_ = rhs.allocator_;
+            ownAllocator = rhs.ownAllocator;
+            stack_ = rhs.stack_;
+            stackTop_ = rhs.stackTop_;
+            stackEnd_ = rhs.stackEnd_;
+            initialCapacity_ = rhs.initialCapacity_;
+
+            rhs.allocator_ = 0;
+            rhs.ownAllocator = 0;
+            rhs.stack_ = 0;
+            rhs.stackTop_ = 0;
+            rhs.stackEnd_ = 0;
+            rhs.initialCapacity_ = 0;
+        }
+        return *this;
+    }
+#endif
 
     void Clear() { stackTop_ = stack_; }
 
@@ -117,6 +158,11 @@ private:
         stack_ = (char*)allocator_->Realloc(stack_, GetCapacity(), newCapacity);
         stackTop_ = stack_ + size;
         stackEnd_ = stack_ + newCapacity;
+    }
+
+    void Destroy() {
+        Allocator::Free(stack_);
+        delete ownAllocator; // Only delete if it is owned by the stack
     }
 
     // Prohibit copy constructor & assignment operator.

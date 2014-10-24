@@ -62,6 +62,10 @@ RAPIDJSON_DIAG_OFF(effc++)
 #include <iterator> // std::iterator, std::random_access_iterator_tag
 #endif
 
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+#include <utility> // std::move
+#endif
+
 namespace rapidjson {
 
 // Forward declaration.
@@ -1623,9 +1627,46 @@ public:
             ownAllocator_ = allocator_ = new Allocator();
     }
 
-    ~GenericDocument() {
-        delete ownAllocator_;
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    //! Move constructor in C++11
+    GenericDocument(GenericDocument&& rhs) RAPIDJSON_NOEXCEPT
+        : ValueType(std::move(rhs)),
+          allocator_(rhs.allocator_),
+          ownAllocator_(rhs.ownAllocator_),
+          stack_(std::move(rhs.stack_)),
+          parseResult_(rhs.parseResult_)
+    {
+        rhs.allocator_ = 0;
+        rhs.ownAllocator_ = 0;
+        rhs.parseResult_ = ParseResult();
     }
+#endif
+
+    ~GenericDocument() {
+        Destroy();
+    }
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    //! Move assignment in C++11
+    GenericDocument& operator=(GenericDocument&& rhs) RAPIDJSON_NOEXCEPT
+    {
+        ValueType::operator=(std::move(static_cast<ValueType&&>(rhs)));
+
+        // Calling the destructor here would prematurely call stack_'s destructor
+        Destroy();
+
+        allocator_ = rhs.allocator_;
+        ownAllocator_ = rhs.ownAllocator_;
+        stack_ = std::move(rhs.stack_);
+        parseResult_ = rhs.parseResult_;
+
+        rhs.allocator_ = 0;
+        rhs.ownAllocator_ = 0;
+        rhs.parseResult_ = ParseResult();
+
+        return *this;
+    }
+#endif
 
     //!@name Parse from stream
     //!@{
@@ -1819,6 +1860,10 @@ private:
         else
             stack_.Clear();
         stack_.ShrinkToFit();
+    }
+
+    void Destroy() {
+        delete ownAllocator_;
     }
 
     static const size_t kDefaultStackCapacity = 1024;
