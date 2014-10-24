@@ -240,15 +240,15 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:a1f28a345c9b9c93c76abf695669e4378"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ec7fc7f221306925c7674dccbe02b07"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a8ec7fc7f221306925c7674dccbe02b07"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#a8ec7fc7f221306925c7674dccbe02b07">operator[]</a> (T *name)</td></tr>
-<tr class="memdesc:a8ec7fc7f221306925c7674dccbe02b07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value associated with the name.  <a href="#a8ec7fc7f221306925c7674dccbe02b07">More...</a><br /></td></tr>
+<tr class="memdesc:a8ec7fc7f221306925c7674dccbe02b07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a value from an object associated with the name.  <a href="#a8ec7fc7f221306925c7674dccbe02b07">More...</a><br /></td></tr>
 <tr class="separator:a8ec7fc7f221306925c7674dccbe02b07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a015a8559e69e0e6237ec5ce2f0b38f43"><td class="memTemplParams" colspan="2"><a class="anchor" id="a015a8559e69e0e6237ec5ce2f0b38f43"></a>
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a015a8559e69e0e6237ec5ce2f0b38f43"><td class="memTemplItemLeft" align="right" valign="top">const <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>operator[]</b> (T *name) const </td></tr>
 <tr class="separator:a015a8559e69e0e6237ec5ce2f0b38f43"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa62b57746c96ce3d264b2fe178196062"><td class="memTemplParams" colspan="2"><a class="anchor" id="aa62b57746c96ce3d264b2fe178196062"></a>
-template&lt;typename SourceAllocator &gt; </td></tr>
-<tr class="memitem:aa62b57746c96ce3d264b2fe178196062"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>operator[]</b> (const <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, SourceAllocator &gt; &amp;name)</td></tr>
+<tr class="memitem:aa62b57746c96ce3d264b2fe178196062"><td class="memTemplParams" colspan="2">template&lt;typename SourceAllocator &gt; </td></tr>
+<tr class="memitem:aa62b57746c96ce3d264b2fe178196062"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#aa62b57746c96ce3d264b2fe178196062">operator[]</a> (const <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, SourceAllocator &gt; &amp;name)</td></tr>
+<tr class="memdesc:aa62b57746c96ce3d264b2fe178196062"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a value from an object associated with the name.  <a href="#aa62b57746c96ce3d264b2fe178196062">More...</a><br /></td></tr>
 <tr class="separator:aa62b57746c96ce3d264b2fe178196062"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f135403c71fa69ba164f019e1a51fd0"><td class="memTemplParams" colspan="2"><a class="anchor" id="a8f135403c71fa69ba164f019e1a51fd0"></a>
 template&lt;typename SourceAllocator &gt; </td></tr>
@@ -2019,8 +2019,55 @@ template&lt;typename T &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Get the value associated with the name. </p>
+<p>Get a value from an object associated with the name. </p>
+<dl class="section pre"><dt>Precondition</dt><dd>IsObject() == true </dd></dl>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>Either <code>Ch</code> or <code>const</code> <code>Ch</code> (template used for disambiguation with <a class="el" href="classrapidjson_1_1_generic_value.html#adc312de070d03a63e6c692c9c61db156">operator[](SizeType)</a>) </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section note"><dt>Note</dt><dd>In version 0.1x, if the member is not found, this function returns a null value. This makes issue 7. Since 0.2, if the name is not correct, it will assert. If user is unsure whether a member exists, user should use <a class="el" href="classrapidjson_1_1_generic_value.html#af17b9b6ba6a9fb4e02d2dced5aa0ee0c" title="Check whether a member exists in the object. ">HasMember()</a> first. A better approach is to use <a class="el" href="classrapidjson_1_1_generic_value.html#ad22fdeac87ec6c370dd43075d3586811" title="Find member by name. ">FindMember()</a>. </dd>
+<dd>
+Linear time complexity. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aa62b57746c96ce3d264b2fe178196062"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Encoding, typename Allocator&gt; </div>
+<div class="memtemplate">
+template&lt;typename SourceAllocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a>&amp; <a class="el" href="classrapidjson_1_1_generic_value.html">rapidjson::GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::operator[] </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, SourceAllocator &gt; &amp;&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get a value from an object associated with the name. </p>
+<dl class="section pre"><dt>Precondition</dt><dd>IsObject() == true </dd></dl>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">SourceAllocator</td><td><a class="el" href="classrapidjson_1_1_allocator.html" title="Concept for allocating, resizing and freeing memory block. ">Allocator</a> of the <code>name</code> value</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>Compared to <a class="el" href="classrapidjson_1_1_generic_value.html#a8ec7fc7f221306925c7674dccbe02b07">operator[](T*)</a>, this version is faster because it does not need a StrLen(). And it can also handle strings with embedded null characters.</dd>
 <dd>
 Linear time complexity. </dd></dl>
 
@@ -2051,12 +2098,14 @@ template&lt;typename Encoding, typename Allocator&gt; </div>
 </div><div class="memdoc">
 
 <p>Get an element from array by index. </p>
+<dl class="section pre"><dt>Precondition</dt><dd>IsArray() == true </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">index</td><td>Zero-based index of element. </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classrapidjson_1_1_generic_value.html#a8ec7fc7f221306925c7674dccbe02b07" title="Get a value from an object associated with the name. ">operator[](T*)</a> </dd></dl>
 
 </div>
 </div>
