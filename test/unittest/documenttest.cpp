@@ -229,9 +229,17 @@ TEST(Document, UTF16_Document) {
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
-TEST(Document, MoveConstructor) {
-    typedef GenericDocument<UTF8<>, CrtAllocator> Document;
-    Document::AllocatorType allocator;
+template <typename Allocator>
+struct DocumentMove: public ::testing::Test {
+};
+
+typedef ::testing::Types< CrtAllocator, MemoryPoolAllocator<> > MoveAllocatorTypes;
+TYPED_TEST_CASE(DocumentMove, MoveAllocatorTypes);
+
+TYPED_TEST(DocumentMove, MoveConstructor) {
+    typedef TypeParam Allocator;
+    typedef GenericDocument<UTF8<>, Allocator> Document;
+    Allocator allocator;
 
     Document a(&allocator);
     a.Parse("[\"one\", \"two\", \"three\"]");
@@ -262,8 +270,9 @@ TEST(Document, MoveConstructor) {
     EXPECT_EQ(&c.GetAllocator(), &allocator);
 }
 
-TEST(Document, MoveConstructorParseError) {
-    typedef GenericDocument<UTF8<>, CrtAllocator> Document;
+TYPED_TEST(DocumentMove, MoveConstructorParseError) {
+    typedef TypeParam Allocator;
+    typedef GenericDocument<UTF8<>, Allocator> Document;
 
     ParseResult noError;
     Document a;
@@ -290,18 +299,19 @@ TEST(Document, MoveConstructorParseError) {
     EXPECT_EQ(c.GetErrorOffset(), error.Offset());
 }
 
-TEST(Document, MoveConstructorStack) {
+TYPED_TEST(DocumentMove, MoveConstructorStack) {
+    typedef TypeParam Allocator;
     typedef UTF8<> Encoding;
-    typedef GenericDocument<Encoding, CrtAllocator> Document;
+    typedef GenericDocument<Encoding, Allocator> Document;
 
     Document a;
     size_t defaultCapacity = a.GetStackCapacity();
 
     // Trick Document into getting GetStackCapacity() to return non-zero
-    typedef GenericReader<Encoding, Encoding, Document::AllocatorType> Reader;
+    typedef GenericReader<Encoding, Encoding, Allocator> Reader;
     Reader reader(&a.GetAllocator());
     GenericStringStream<Encoding> is("[\"one\", \"two\", \"three\"]");
-    reader.Parse<kParseDefaultFlags>(is, a);
+    reader.template Parse<kParseDefaultFlags>(is, a);
     size_t capacity = a.GetStackCapacity();
     EXPECT_GT(capacity, 0);
 
@@ -314,9 +324,10 @@ TEST(Document, MoveConstructorStack) {
     EXPECT_EQ(c.GetStackCapacity(), capacity);
 }
 
-TEST(Document, MoveAssignment) {
-    typedef GenericDocument<UTF8<>, CrtAllocator> Document;
-    Document::AllocatorType allocator;
+TYPED_TEST(DocumentMove, MoveAssignment) {
+    typedef TypeParam Allocator;
+    typedef GenericDocument<UTF8<>, Allocator> Document;
+    Allocator allocator;
 
     Document a(&allocator);
     a.Parse("[\"one\", \"two\", \"three\"]");
@@ -349,8 +360,9 @@ TEST(Document, MoveAssignment) {
     EXPECT_EQ(&c.GetAllocator(), &allocator);
 }
 
-TEST(Document, MoveAssignmentParseError) {
-    typedef GenericDocument<UTF8<>, CrtAllocator> Document;
+TYPED_TEST(DocumentMove, MoveAssignmentParseError) {
+    typedef TypeParam Allocator;
+    typedef GenericDocument<UTF8<>, Allocator> Document;
 
     ParseResult noError;
     Document a;
@@ -379,18 +391,19 @@ TEST(Document, MoveAssignmentParseError) {
     EXPECT_EQ(c.GetErrorOffset(), error.Offset());
 }
 
-TEST(Document, MoveAssignmentStack) {
+TYPED_TEST(DocumentMove, MoveAssignmentStack) {
+    typedef TypeParam Allocator;
     typedef UTF8<> Encoding;
-    typedef GenericDocument<Encoding, CrtAllocator> Document;
+    typedef GenericDocument<Encoding, Allocator> Document;
 
     Document a;
     size_t defaultCapacity = a.GetStackCapacity();
 
     // Trick Document into getting GetStackCapacity() to return non-zero
-    typedef GenericReader<Encoding, Encoding, Document::AllocatorType> Reader;
+    typedef GenericReader<Encoding, Encoding, Allocator> Reader;
     Reader reader(&a.GetAllocator());
     GenericStringStream<Encoding> is("[\"one\", \"two\", \"three\"]");
-    reader.Parse<kParseDefaultFlags>(is, a);
+    reader.template Parse<kParseDefaultFlags>(is, a);
     size_t capacity = a.GetStackCapacity();
     EXPECT_GT(capacity, 0);
 
