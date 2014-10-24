@@ -795,8 +795,9 @@ public:
     //! Check whether the object is empty.
     bool ObjectEmpty() const { RAPIDJSON_ASSERT(IsObject()); return data_.o.size == 0; }
 
-    //! Get the value associated with the name.
-    /*!
+    //! Get a value from an object associated with the name.
+    /*! \pre IsObject() == true
+        \tparam T Either \c Ch or \c const \c Ch (template used for disambiguation with \ref operator[](SizeType))
         \note In version 0.1x, if the member is not found, this function returns a null value. This makes issue 7.
         Since 0.2, if the name is not correct, it will assert.
         If user is unsure whether a member exists, user should use HasMember() first.
@@ -811,10 +812,15 @@ public:
     template <typename T>
     RAPIDJSON_DISABLEIF_RETURN((internal::NotExpr<internal::IsSame<typename internal::RemoveConst<T>::Type, Ch> >),(const GenericValue&)) operator[](T* name) const { return const_cast<GenericValue&>(*this)[name]; }
 
+    //! Get a value from an object associated with the name.
+    /*! \pre IsObject() == true
+        \tparam SourceAllocator Allocator of the \c name value
 
-public:
-    // This version is faster because it does not need a StrLen(). 
-    // It can also handle string with null character.
+        \note Compared to \ref operator[](T*), this version is faster because it does not need a StrLen().
+        And it can also handle strings with embedded null characters.
+
+        \note Linear time complexity.
+    */
     template <typename SourceAllocator>
     GenericValue& operator[](const GenericValue<Encoding, SourceAllocator>& name) {
         MemberIterator member = FindMember(name);
@@ -1136,7 +1142,9 @@ public:
     }
 
     //! Get an element from array by index.
-    /*! \param index Zero-based index of element.
+    /*! \pre IsArray() == true
+        \param index Zero-based index of element.
+        \see operator[](T*)
     */
     GenericValue& operator[](SizeType index) {
         RAPIDJSON_ASSERT(IsArray());
