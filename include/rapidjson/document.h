@@ -795,15 +795,6 @@ public:
     //! Check whether the object is empty.
     bool ObjectEmpty() const { RAPIDJSON_ASSERT(IsObject()); return data_.o.size == 0; }
 
-    template <typename T>
-    GenericValue& operator[](T t) {
-	    return DoIndex(t, internal::IsPointer<T>());
-    }
-
-    template <typename T>
-    const GenericValue& operator[](T t) const { return const_cast<GenericValue&>(*this)[t]; }
-
-private:
     //! Get the value associated with the name.
     /*!
         \note In version 0.1x, if the member is not found, this function returns a null value. This makes issue 7.
@@ -812,20 +803,14 @@ private:
         A better approach is to use FindMember().
         \note Linear time complexity.
     */
-
-    GenericValue& DoIndex(const Ch* name, internal::TrueType) {
+    template <typename T>
+    RAPIDJSON_DISABLEIF_RETURN((internal::NotExpr<internal::IsSame<typename internal::RemoveConst<T>::Type, Ch> >),(GenericValue&)) operator[](T* name) {
         GenericValue n(StringRef(name));
         return (*this)[n];
     }
+    template <typename T>
+    RAPIDJSON_DISABLEIF_RETURN((internal::NotExpr<internal::IsSame<typename internal::RemoveConst<T>::Type, Ch> >),(const GenericValue&)) operator[](T* name) const { return const_cast<GenericValue&>(*this)[name]; }
 
-    //! Get an element from array by index.
-    /*! \param index Zero-based index of element.
-    */
-    GenericValue& DoIndex(SizeType index, internal::FalseType) {
-        RAPIDJSON_ASSERT(IsArray());
-        RAPIDJSON_ASSERT(index < data_.a.size);
-        return data_.a.elements[index];
-    }
 
 public:
     // This version is faster because it does not need a StrLen(). 
@@ -1149,6 +1134,16 @@ public:
             data_.a.elements[i].~GenericValue();
         data_.a.size = 0;
     }
+
+    //! Get an element from array by index.
+    /*! \param index Zero-based index of element.
+    */
+    GenericValue& operator[](SizeType index) {
+        RAPIDJSON_ASSERT(IsArray());
+        RAPIDJSON_ASSERT(index < data_.a.size);
+        return data_.a.elements[index];
+    }
+    const GenericValue& operator[](SizeType index) const { return const_cast<GenericValue&>(*this)[index]; }
 
     //! Element iterator
     /*! \pre IsArray() == true */
