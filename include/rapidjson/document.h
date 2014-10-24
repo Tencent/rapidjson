@@ -1655,9 +1655,9 @@ public:
     //! Move assignment in C++11
     GenericDocument& operator=(GenericDocument&& rhs) RAPIDJSON_NOEXCEPT
     {
-        // The static cast is necessary here, because otherwise it would
+        // The cast to ValueType is necessary here, because otherwise it would
         // attempt to call GenericValue's templated assignment operator.
-        ValueType::operator=(std::move(static_cast<ValueType&&>(rhs)));
+        ValueType::operator=(std::forward<ValueType>(rhs));
 
         // Calling the destructor here would prematurely call stack_'s destructor
         Destroy();
