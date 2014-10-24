@@ -1,7 +1,5 @@
 var NAVTREEINDEX2 =
 {
-"md_doc_stream.html#ExampleIStreamWrapper":[2,3,0],
-"md_doc_stream.html#ExampleOStreamWrapper":[2,3,1],
 "md_doc_stream.html#FileReadStream":[2,1,0],
 "md_doc_stream.html#FileStreams":[2,1],
 "md_doc_stream.html#FileWriteStream":[2,1,1],
