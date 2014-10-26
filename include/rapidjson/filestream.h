@@ -26,7 +26,7 @@
 
 namespace rapidjson {
 
-//! (Depreciated) Wrapper of C file stream for input or output.
+//! (Deprecated) Wrapper of C file stream for input or output.
 /*!
     This simple wrapper does not check the validity of the stream.
     \note implements Stream concept

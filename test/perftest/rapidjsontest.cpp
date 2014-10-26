@@ -315,7 +315,7 @@ TEST_F(RapidJson, UTF8_Validate) {
     }
 }
 
-// Depreciated.
+// Deprecated.
 //TEST_F(RapidJson, FileStream_Read) {
 //  for (size_t i = 0; i < kTrialCount; i++) {
 //      FILE *fp = fopen(filename_, "rb");
