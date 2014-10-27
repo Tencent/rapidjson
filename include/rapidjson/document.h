@@ -1035,7 +1035,9 @@ public:
     //! Remove a member in object by its name.
     /*! \param name Name of member to be removed.
         \return Whether the member existed.
-        \note Removing member is implemented by moving the last member. So the ordering of members is changed.
+        \note This function may reorder the object members. Use \ref
+            EraseMember(ConstMemberIterator) if you need to preserve the
+            relative order of the remaining members.
         \note Linear time complexity.
     */
     bool RemoveMember(const Ch* name) {
@@ -1057,8 +1059,9 @@ public:
     //! Remove a member in object by iterator.
     /*! \param m member iterator (obtained by FindMember() or MemberBegin()).
         \return the new iterator after removal.
-        \note Removing member is implemented by moving the last member. So the ordering of members is changed.
-        \note Use \ref EraseMember(ConstMemberIterator) instead, if you need to rely on a stable member ordering.
+        \note This function may reorder the object members. Use \ref
+            EraseMember(ConstMemberIterator) if you need to preserve the
+            relative order of the remaining members.
         \note Constant time complexity.
     */
     MemberIterator RemoveMember(MemberIterator m) {
@@ -1085,7 +1088,8 @@ public:
         \pre IsObject() == true && \ref MemberBegin() <= \c pos < \ref MemberEnd()
         \return Iterator following the removed element.
             If the iterator \c pos refers to the last element, the \ref MemberEnd() iterator is returned.
-        \note Other than \ref RemoveMember(MemberIterator), this function preserves the ordering of the members.
+        \note This function preserves the relative order of the remaining object
+            members. If you do not need this, use the more efficient \ref RemoveMember(MemberIterator).
         \note Linear time complexity.
     */
     MemberIterator EraseMember(ConstMemberIterator pos) {
@@ -1097,7 +1101,8 @@ public:
         \param last  iterator following the last member to remove
         \pre IsObject() == true && \ref MemberBegin() <= \c first <= \c last <= \ref MemberEnd()
         \return Iterator following the last removed element.
-        \note Other than \ref RemoveMember(MemberIterator), this function preserves the ordering of the members.
+        \note This function preserves the relative order of the remaining object
+            members.
         \note Linear time complexity.
     */
     MemberIterator EraseMember(ConstMemberIterator first, ConstMemberIterator last) {
