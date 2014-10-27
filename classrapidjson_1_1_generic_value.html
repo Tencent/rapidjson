@@ -1336,7 +1336,7 @@ template&lt;typename Encoding, typename Allocator&gt; </div>
 </dl>
 <dl class="section pre"><dt>Precondition</dt><dd>IsObject() == true &amp;&amp; <a class="el" href="classrapidjson_1_1_generic_value.html#a93f0f317f397c36a24a0f3c32648623a">MemberBegin()</a> &lt;= <code>pos</code> &lt; <a class="el" href="classrapidjson_1_1_generic_value.html#adb109ae9f12615efadf9277cb5e9c4ee">MemberEnd()</a> </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>Iterator following the removed element. If the iterator <code>pos</code> refers to the last element, the <a class="el" href="classrapidjson_1_1_generic_value.html#adb109ae9f12615efadf9277cb5e9c4ee">MemberEnd()</a> iterator is returned. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Other than <a class="el" href="classrapidjson_1_1_generic_value.html#af91573ce61d798f0bc5dc88b00742697">RemoveMember(MemberIterator)</a>, this function preserves the ordering of the members. </dd>
+<dl class="section note"><dt>Note</dt><dd>This function preserves the relative order of the remaining object members. If you do not need this, use the more efficient <a class="el" href="classrapidjson_1_1_generic_value.html#af91573ce61d798f0bc5dc88b00742697">RemoveMember(MemberIterator)</a>. </dd>
 <dd>
 Linear time complexity. </dd></dl>
 
@@ -1386,7 +1386,7 @@ template&lt;typename Encoding, typename Allocator&gt; </div>
 </dl>
 <dl class="section pre"><dt>Precondition</dt><dd>IsObject() == true &amp;&amp; <a class="el" href="classrapidjson_1_1_generic_value.html#a93f0f317f397c36a24a0f3c32648623a">MemberBegin()</a> &lt;= <code>first</code> &lt;= <code>last</code> &lt;= <a class="el" href="classrapidjson_1_1_generic_value.html#adb109ae9f12615efadf9277cb5e9c4ee">MemberEnd()</a> </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>Iterator following the last removed element. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Other than <a class="el" href="classrapidjson_1_1_generic_value.html#af91573ce61d798f0bc5dc88b00742697">RemoveMember(MemberIterator)</a>, this function preserves the ordering of the members. </dd>
+<dl class="section note"><dt>Note</dt><dd>This function preserves the relative order of the remaining object members. </dd>
 <dd>
 Linear time complexity. </dd></dl>
 
@@ -2361,7 +2361,7 @@ template&lt;typename Encoding, typename Allocator&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether the member existed. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Removing member is implemented by moving the last member. So the ordering of members is changed. </dd>
+<dl class="section note"><dt>Note</dt><dd>This function may reorder the object members. Use <a class="el" href="classrapidjson_1_1_generic_value.html#a163e60b101e5ae534597c050a6eba511">EraseMember(ConstMemberIterator)</a> if you need to preserve the relative order of the remaining members. </dd>
 <dd>
 Linear time complexity. </dd></dl>
 
@@ -2399,9 +2399,7 @@ template&lt;typename Encoding, typename Allocator&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the new iterator after removal. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Removing member is implemented by moving the last member. So the ordering of members is changed. </dd>
-<dd>
-Use <a class="el" href="classrapidjson_1_1_generic_value.html#a163e60b101e5ae534597c050a6eba511">EraseMember(ConstMemberIterator)</a> instead, if you need to rely on a stable member ordering. </dd>
+<dl class="section note"><dt>Note</dt><dd>This function may reorder the object members. Use <a class="el" href="classrapidjson_1_1_generic_value.html#a163e60b101e5ae534597c050a6eba511">EraseMember(ConstMemberIterator)</a> if you need to preserve the relative order of the remaining members. </dd>
 <dd>
 Constant time complexity. </dd></dl>
 
