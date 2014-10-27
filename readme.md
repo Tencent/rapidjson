@@ -97,4 +97,4 @@ The following diagram shows the process.
 
 ![simpledom](doc/diagram/simpledom.png)
 
-More [examples](example/) are available.
+More [examples](https://github.com/miloyip/rapidjson/tree/master/example) are available.
