@@ -60,7 +60,7 @@ protected:
     size_t length_;
 };
 
-// Depreciated
+// Deprecated
 //TEST_F(FileStreamTest, FileStream_Read) {
 //  FILE *fp = fopen(filename_, "rb");
 //  ASSERT_TRUE(fp != 0);
