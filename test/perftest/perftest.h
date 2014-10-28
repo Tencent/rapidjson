@@ -22,9 +22,6 @@
 #define PERFTEST_H_
 
 #define TEST_RAPIDJSON  1
-#define TEST_JSONCPP    0
-#define TEST_YAJL       0
-#define TEST_ULTRAJSON  0
 #define TEST_PLATFORM   0
 #define TEST_MISC       0
 
@@ -37,12 +34,6 @@
 #  define RAPIDJSON_SSE42
 #elif defined(__SSE2__)
 #  define RAPIDJSON_SSE2
-#endif
-
-#if TEST_YAJL
-#include "yajl/yajl_common.h"
-#undef YAJL_MAX_DEPTH
-#define YAJL_MAX_DEPTH 1024
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////

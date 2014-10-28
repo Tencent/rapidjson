@@ -114,7 +114,6 @@ solution "test"
         files { 
             "../include/**.h",
             "../test/perftest/**.cpp",
-            "../test/perftest/**.c",
             "../test/perftest/**.h",
         }
         
@@ -122,9 +121,6 @@ solution "test"
             "../include/",
             "../thirdparty/gtest/include/",
             "../thirdparty/",
-            "../thirdparty/jsoncpp/include/",
-            "../thirdparty/libjson/",
-            "../thirdparty/yajl/include/",
         }
 
         libdirs "../thirdparty/lib"

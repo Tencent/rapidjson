@@ -1,9 +1,0 @@
-* add a test for 0x1F bug
-* numeric overflow in integers and double
-* line and char offsets in the lexer and in error messages
-* testing:
-  a. the permuter
-  b. some performance comparison against json_checker.
-* investigate pull instead of push parsing
-* Handle memory allocation failures gracefully
-* cygwin/msys support on win32
