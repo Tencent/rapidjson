@@ -1875,7 +1875,11 @@ private:
     }
 
     void Destroy() {
-        delete ownAllocator_;
+        // Normally "delete 0" is ok, but in this case we might be using
+        // custom allocation that doesn't like new/delete being called,
+        // so only call delete if we called new above.
+        if (ownAllocator_ != 0)
+            delete ownAllocator_;
     }
 
     static const size_t kDefaultStackCapacity = 1024;
