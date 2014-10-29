@@ -135,7 +135,12 @@ public:
     */
     ~MemoryPoolAllocator() {
         Clear();
-        delete ownBaseAllocator_;
+
+        // Normally "delete 0" is ok, but in this case we might be using
+        // custom allocation that doesn't like new/delete being called,
+        // so only call delete if we called new above.
+        if (ownBaseAllocator_ != 0)
+            delete ownBaseAllocator_;
     }
 
     //! Deallocates all memory chunks, excluding the user-supplied buffer.

@@ -162,7 +162,12 @@ private:
 
     void Destroy() {
         Allocator::Free(stack_);
-        delete ownAllocator; // Only delete if it is owned by the stack
+
+        // Normally "delete 0" is ok, but in this case we might be using
+        // custom allocation that doesn't like new/delete being called,
+        // so only call delete if we called new above.
+        if (ownAllocator != 0)
+            delete ownAllocator; // Only delete if it is owned by the stack
     }
 
     // Prohibit copy constructor & assignment operator.
