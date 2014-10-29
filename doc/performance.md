@@ -2,9 +2,15 @@
 
 The old performance article for RapidJSON 0.1 is provided [here](https://code.google.com/p/rapidjson/wiki/Performance).
 
-This file will be updated with new version and better procedures.
+The (third-party) performance tests have been removed from this repository
+and are now part of a dedicated [native JSON benchmark collection] [1].
 
-In the meantime, you may also refer to the following third-party benchmarks.
+This file will be updated with a summary of benchmarking results based on
+the above benchmark collection in the future.
+
+[1]: https://github.com/miloyip/nativejson-benchmark
+
+Additionally, you may refer to the following third-party benchmarks.
 
 ## Third-party benchmarks
 
