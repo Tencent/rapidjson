@@ -120,7 +120,7 @@ $(document).ready(function(){initNavTree('stack_8h_source.html','');});
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    Stack(Allocator* allocator, <span class="keywordtype">size_t</span> stackCapacity) : allocator_(allocator), ownAllocator(0), stack_(0), stackTop_(0), stackEnd_(0), initialCapacity_(stackCapacity) {</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(stackCapacity &gt; 0);</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <span class="keywordflow">if</span> (!allocator_)</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;            ownAllocator = allocator_ = <span class="keyword">new</span> Allocator();</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;            ownAllocator = allocator_ = <a class="code" href="rapidjson_8h.html#ab9e102fa2f1a0ae4914d4dac21f690a2">RAPIDJSON_NEW</a>(Allocator());</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    }</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#if RAPIDJSON_HAS_CXX11_RVALUE_REFS</span></div>
@@ -244,7 +244,7 @@ $(document).ready(function(){initNavTree('stack_8h_source.html','');});
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;</div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordtype">void</span> Destroy() {</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        Allocator::Free(stack_);</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        <span class="keyword">delete</span> ownAllocator; <span class="comment">// Only delete if it is owned by the stack</span></div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        <a class="code" href="rapidjson_8h.html#a52c941c3fdd646527cdcd42aa846a28a">RAPIDJSON_DELETE</a>(ownAllocator); <span class="comment">// Only delete if it is owned by the stack</span></div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    }</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="comment">// Prohibit copy constructor &amp; assignment operator.</span></div>
@@ -263,6 +263,8 @@ $(document).ready(function(){initNavTree('stack_8h_source.html','');});
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;} <span class="comment">// namespace rapidjson</span></div>
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_STACK_H_</span></div>
+<div class="ttc" id="rapidjson_8h_html_ab9e102fa2f1a0ae4914d4dac21f690a2"><div class="ttname"><a href="rapidjson_8h.html#ab9e102fa2f1a0ae4914d4dac21f690a2">RAPIDJSON_NEW</a></div><div class="ttdeci">#define RAPIDJSON_NEW(x)</div><div class="ttdoc">! customization point for global new </div><div class="ttdef"><b>Definition:</b> rapidjson.h:408</div></div>
+<div class="ttc" id="rapidjson_8h_html_a52c941c3fdd646527cdcd42aa846a28a"><div class="ttname"><a href="rapidjson_8h.html#a52c941c3fdd646527cdcd42aa846a28a">RAPIDJSON_DELETE</a></div><div class="ttdeci">#define RAPIDJSON_DELETE(x)</div><div class="ttdoc">! customization point for global delete </div><div class="ttdef"><b>Definition:</b> rapidjson.h:412</div></div>
 <div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:269</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
