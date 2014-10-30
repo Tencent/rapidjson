@@ -38,7 +38,7 @@ public:
     Stack(Allocator* allocator, size_t stackCapacity) : allocator_(allocator), ownAllocator(0), stack_(0), stackTop_(0), stackEnd_(0), initialCapacity_(stackCapacity) {
         RAPIDJSON_ASSERT(stackCapacity > 0);
         if (!allocator_)
-            ownAllocator = allocator_ = new Allocator();
+            ownAllocator = allocator_ = RAPIDJSON_NEW(Allocator());
     }
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
@@ -162,7 +162,7 @@ private:
 
     void Destroy() {
         Allocator::Free(stack_);
-        delete ownAllocator; // Only delete if it is owned by the stack
+        RAPIDJSON_DELETE(ownAllocator); // Only delete if it is owned by the stack
     }
 
     // Prohibit copy constructor & assignment operator.

@@ -401,6 +401,18 @@ template<int x> struct StaticAssertTest {};
 //!@endcond
 
 ///////////////////////////////////////////////////////////////////////////////
+// new/delete
+
+#ifndef RAPIDJSON_NEW
+///! customization point for global \c new
+#define RAPIDJSON_NEW(x) new x
+#endif
+#ifndef RAPIDJSON_DELETE
+///! customization point for global \c delete
+#define RAPIDJSON_DELETE(x) delete x
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // Allocators and Encodings
 
 #include "allocators.h"

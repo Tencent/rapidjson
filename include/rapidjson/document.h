@@ -1634,7 +1634,7 @@ public:
         allocator_(allocator), ownAllocator_(0), stack_(stackAllocator, stackCapacity), parseResult_()
     {
         if (!allocator_)
-            ownAllocator_ = allocator_ = new Allocator();
+            ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
     }
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
@@ -1875,7 +1875,7 @@ private:
     }
 
     void Destroy() {
-        delete ownAllocator_;
+        RAPIDJSON_DELETE(ownAllocator_);
     }
 
     static const size_t kDefaultStackCapacity = 1024;

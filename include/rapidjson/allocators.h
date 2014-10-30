@@ -105,7 +105,7 @@ public:
         chunkHead_(0), chunk_capacity_(chunkSize), userBuffer_(0), baseAllocator_(baseAllocator), ownBaseAllocator_(0)
     {
         if (!baseAllocator_)
-            ownBaseAllocator_ = baseAllocator_ = new BaseAllocator();
+            ownBaseAllocator_ = baseAllocator_ = RAPIDJSON_NEW(BaseAllocator());
         AddChunk(chunk_capacity_);
     }
 
@@ -135,7 +135,7 @@ public:
     */
     ~MemoryPoolAllocator() {
         Clear();
-        delete ownBaseAllocator_;
+        RAPIDJSON_DELETE(ownBaseAllocator_);
     }
 
     //! Deallocates all memory chunks, excluding the user-supplied buffer.
