@@ -37,8 +37,6 @@ public:
     // Do it lazily when first Push() -> Expand() -> Resize().
     Stack(Allocator* allocator, size_t stackCapacity) : allocator_(allocator), ownAllocator_(0), stack_(0), stackTop_(0), stackEnd_(0), initialCapacity_(stackCapacity) {
         RAPIDJSON_ASSERT(stackCapacity > 0);
-        if (!allocator_)
-            ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
     }
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
@@ -140,9 +138,11 @@ private:
     void Expand(size_t count) {
         // Only expand the capacity if the current stack exists. Otherwise just create a stack with initial capacity.
         size_t newCapacity;
-        if (stack_ == 0)
+        if (stack_ == 0) {
+            if (!allocator_)
+                ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
             newCapacity = initialCapacity_;
-        else {
+        } else {
             newCapacity = GetCapacity();
             newCapacity += (newCapacity + 1) / 2;
         }
