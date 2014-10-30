@@ -313,7 +313,7 @@ TYPED_TEST(DocumentMove, MoveConstructorStack) {
     GenericStringStream<Encoding> is("[\"one\", \"two\", \"three\"]");
     reader.template Parse<kParseDefaultFlags>(is, a);
     size_t capacity = a.GetStackCapacity();
-    EXPECT_GT(capacity, 0);
+    EXPECT_GT(capacity, 0u);
 
     Document b(std::move(a));
     EXPECT_EQ(a.GetStackCapacity(), defaultCapacity);
@@ -405,7 +405,7 @@ TYPED_TEST(DocumentMove, MoveAssignmentStack) {
     GenericStringStream<Encoding> is("[\"one\", \"two\", \"three\"]");
     reader.template Parse<kParseDefaultFlags>(is, a);
     size_t capacity = a.GetStackCapacity();
-    EXPECT_GT(capacity, 0);
+    EXPECT_GT(capacity, 0u);
 
     Document b;
     b = std::move(a);
