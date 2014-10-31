@@ -70,6 +70,32 @@ TEST(StringBuffer, Pop) {
 }
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
+#include <type_traits>
+
+TEST(StringBuffer, Traits) {
+  static_assert( std::is_constructible<StringBuffer>::value, "");
+  static_assert( std::is_default_constructible<StringBuffer>::value, "");
+  static_assert(!std::is_copy_constructible<StringBuffer>::value, "");
+  static_assert( std::is_move_constructible<StringBuffer>::value, "");
+
+  static_assert(!std::is_nothrow_constructible<StringBuffer>::value, "");
+  static_assert(!std::is_nothrow_default_constructible<StringBuffer>::value, "");
+  static_assert(!std::is_nothrow_copy_constructible<StringBuffer>::value, "");
+  static_assert(!std::is_nothrow_move_constructible<StringBuffer>::value, "");
+
+  static_assert( std::is_assignable<StringBuffer,StringBuffer>::value, "");
+  static_assert(!std::is_copy_assignable<StringBuffer>::value, "");
+  static_assert( std::is_move_assignable<StringBuffer>::value, "");
+
+  static_assert(!std::is_nothrow_assignable<StringBuffer,StringBuffer>::value, "");
+  static_assert(!std::is_nothrow_copy_assignable<StringBuffer>::value, "");
+  static_assert(!std::is_nothrow_move_assignable<StringBuffer>::value, "");
+
+  static_assert( std::is_destructible<StringBuffer>::value, "");
+  static_assert( std::is_nothrow_destructible<StringBuffer>::value, "");
+}
+
 TEST(StringBuffer, MoveConstructor) {
   StringBuffer x;
   x.Put('A');
@@ -80,13 +106,13 @@ TEST(StringBuffer, MoveConstructor) {
   EXPECT_EQ(4u, x.GetSize());
   EXPECT_STREQ("ABCD", x.GetString());
 
-  // StringBuffer y(x); // should not compile
+  // StringBuffer y(x); // does not compile (!is_copy_constructible)
   StringBuffer y(std::move(x));
   EXPECT_EQ(0u, x.GetSize());
   EXPECT_EQ(4u, y.GetSize());
   EXPECT_STREQ("ABCD", y.GetString());
 
-  // StringBuffer z = y; // should not compile
+  // StringBuffer z = y; // does not compile (!is_copy_assignable)
   StringBuffer z = std::move(y);
   EXPECT_EQ(0u, y.GetSize());
   EXPECT_EQ(4u, z.GetSize());
@@ -104,10 +130,11 @@ TEST(StringBuffer, MoveAssignment) {
   EXPECT_STREQ("ABCD", x.GetString());
 
   StringBuffer y;
-  // y = x; // should not compile
+  // y = x; // does not compile (!is_copy_assignable)
   y = std::move(x);
   EXPECT_EQ(0u, x.GetSize());
   EXPECT_EQ(4u, y.GetSize());
   EXPECT_STREQ("ABCD", y.GetString());
 }
+
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
