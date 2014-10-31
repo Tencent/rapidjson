@@ -50,3 +50,5 @@ set_target_properties(perftests PROPERTIES COMPILE_FLAGS "-march=native -Wall -W
 
 target_link_libraries(unittests pthread gtest)
 target_link_libraries(perftests pthread gtest)
+
+add_custom_target(runtests ALL ./unittests DEPENDS unittests)
