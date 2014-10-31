@@ -8,6 +8,8 @@ if (BUILD_CXX11)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 endif(BUILD_CXX11)
 
+add_subdirectory(thirdparty/gtest)
+
 set(HEADERS
     include/rapidjson/error/en.h
     include/rapidjson/error/error.h
@@ -36,7 +38,6 @@ set(HEADERS
 
 set(PERF_TEST_SOURCE_FILES
     ${HEADERS}
-    thirdparty/gtest/src/gtest-all.cc
     test/perftest/misctest.cpp
     test/perftest/perftest.cpp
     test/perftest/perftest.h
@@ -45,7 +46,6 @@ set(PERF_TEST_SOURCE_FILES
 
 set(UNIT_TEST_SOURCE_FILES
     ${HEADERS}
-    thirdparty/gtest/src/gtest-all.cc
     test/unittest/documenttest.cpp
     test/unittest/encodedstreamtest.cpp
     test/unittest/encodingstest.cpp
@@ -69,11 +69,10 @@ add_executable(example_simpledom     ${HEADERS} example/simpledom/simpledom.cpp)
 add_executable(example_simplereader  ${HEADERS} example/simplereader/simplereader.cpp)
 add_executable(example_simplewriter  ${HEADERS} example/simplewriter/simplewriter.cpp)
 
-include_directories(SYSTEM thirdparty/gtest/include)
-include_directories(thirdparty/gtest)
+include_directories(SYSTEM ${gtest_SOURCE_DIR}/include)
 
 add_executable(unittests ${UNIT_TEST_SOURCE_FILES})
 add_executable(perftests ${PERF_TEST_SOURCE_FILES})
 
-target_link_libraries(unittests pthread)
-target_link_libraries(perftests pthread)
+target_link_libraries(unittests pthread gtest)
+target_link_libraries(perftests pthread gtest)
