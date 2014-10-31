@@ -74,5 +74,8 @@ include_directories(SYSTEM ${gtest_SOURCE_DIR}/include)
 add_executable(unittests ${UNIT_TEST_SOURCE_FILES})
 add_executable(perftests ${PERF_TEST_SOURCE_FILES})
 
+set_target_properties(unittests PROPERTIES COMPILE_FLAGS "-march=native -Wall -Wextra -Werror -Weffc++ -Wswitch-default")
+set_target_properties(perftests PROPERTIES COMPILE_FLAGS "-march=native -Wall -Wextra -Werror -Weffc++ -Wswitch-default")
+
 target_link_libraries(unittests pthread gtest)
 target_link_libraries(perftests pthread gtest)
