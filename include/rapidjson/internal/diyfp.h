@@ -45,7 +45,7 @@ struct DiyFp {
 
     DiyFp(uint64_t f, int e) : f(f), e(e) {}
 
-    DiyFp(double d) {
+    explicit DiyFp(double d) {
         union {
             double d;
             uint64_t u64;
@@ -102,17 +102,21 @@ struct DiyFp {
         unsigned long index;
         _BitScanReverse64(&index, f);
         return DiyFp(f << (63 - index), e - (63 - index));
-#elif defined(__GNUC__)
+#elif 0//defined(__GNUC__)
         int s = __builtin_clzll(f) + 1;
         return DiyFp(f << s, e - s);
 #else
         DiyFp res = *this;
-        while (!(res.f & kDpHiddenBit)) {
+        while (!(res.f & (static_cast<uint64_t>(1) << 63))) {
             res.f <<= 1;
             res.e--;
         }
-        res.f <<= (kDiySignificandSize - kDpSignificandSize - 1);
-        res.e = res.e - (kDiySignificandSize - kDpSignificandSize - 1);
+        // while (!(res.f & kDpHiddenBit)) {
+        //     res.f <<= 1;
+        //     res.e--;
+        // }
+        // res.f <<= (kDiySignificandSize - kDpSignificandSize - 1);
+        // res.e = res.e - (kDiySignificandSize - kDpSignificandSize - 1);
         return res;
 #endif
     }
@@ -143,10 +147,39 @@ struct DiyFp {
         *minus = mi;
     }
 
+    double ToDouble() const {
+        union {
+            double d;
+            uint64_t u64;
+        }u;
+        uint64_t significand = f;
+        int exponent = e;
+        while (significand > kDpHiddenBit + kDpSignificandMask) {
+            significand >>= 1;
+            exponent++;
+        }
+        while (exponent > kDpDenormalExponent && (significand & kDpHiddenBit) == 0) {
+            significand <<= 1;
+            exponent--;
+        }
+        if (exponent >= kDpMaxExponent) {
+            u.u64 = kDpExponentMask;    // Infinity
+            return u.d;
+        }
+        else if (exponent < kDpDenormalExponent)
+            return 0.0;
+        const uint64_t be = (exponent == kDpDenormalExponent && (significand & kDpHiddenBit) == 0) ? 0 : 
+            static_cast<uint64_t>(exponent + kDpExponentBias);
+        u.u64 = (significand & kDpSignificandMask) | (be << kDpSignificandSize);
+        return u.d;
+    }
+
     static const int kDiySignificandSize = 64;
     static const int kDpSignificandSize = 52;
     static const int kDpExponentBias = 0x3FF + kDpSignificandSize;
+    static const int kDpMaxExponent = 0x7FF - kDpExponentBias;
     static const int kDpMinExponent = -kDpExponentBias;
+    static const int kDpDenormalExponent = -kDpExponentBias - 1;
     static const uint64_t kDpExponentMask = RAPIDJSON_UINT64_C2(0x7FF00000, 0x00000000);
     static const uint64_t kDpSignificandMask = RAPIDJSON_UINT64_C2(0x000FFFFF, 0xFFFFFFFF);
     static const uint64_t kDpHiddenBit = RAPIDJSON_UINT64_C2(0x00100000, 0x00000000);
@@ -155,7 +188,7 @@ struct DiyFp {
     int e;
 };
 
-inline uint64_t GetCachedPowerF(size_t index) {
+inline DiyFp GetCachedPowerByIndex(size_t index) {
     // 10^-348, 10^-340, ..., 10^340
     static const uint64_t kCachedPowers_F[] = {
         RAPIDJSON_UINT64_C2(0xfa8fd5a0, 0x081c0288), RAPIDJSON_UINT64_C2(0xbaaee17f, 0xa23ebf76),
@@ -203,21 +236,21 @@ inline uint64_t GetCachedPowerF(size_t index) {
         RAPIDJSON_UINT64_C2(0x9e19db92, 0xb4e31ba9), RAPIDJSON_UINT64_C2(0xeb96bf6e, 0xbadf77d9),
         RAPIDJSON_UINT64_C2(0xaf87023b, 0x9bf0ee6b)
     };
-    return kCachedPowers_F[index];
-}
-
-inline DiyFp GetCachedPower(int e, int* K) {
     static const int16_t kCachedPowers_E[] = {
         -1220, -1193, -1166, -1140, -1113, -1087, -1060, -1034, -1007,  -980,
-         -954,  -927,  -901,  -874,  -847,  -821,  -794,  -768,  -741,  -715,
-         -688,  -661,  -635,  -608,  -582,  -555,  -529,  -502,  -475,  -449,
-         -422,  -396,  -369,  -343,  -316,  -289,  -263,  -236,  -210,  -183,
-         -157,  -130,  -103,   -77,   -50,   -24,     3,    30,    56,    83,
-          109,   136,   162,   189,   216,   242,   269,   295,   322,   348,
-          375,   402,   428,   455,   481,   508,   534,   561,   588,   614,
-          641,   667,   694,   720,   747,   774,   800,   827,   853,   880,
-          907,   933,   960,   986,  1013,  1039,  1066
+        -954,  -927,  -901,  -874,  -847,  -821,  -794,  -768,  -741,  -715,
+        -688,  -661,  -635,  -608,  -582,  -555,  -529,  -502,  -475,  -449,
+        -422,  -396,  -369,  -343,  -316,  -289,  -263,  -236,  -210,  -183,
+        -157,  -130,  -103,   -77,   -50,   -24,     3,    30,    56,    83,
+        109,   136,   162,   189,   216,   242,   269,   295,   322,   348,
+        375,   402,   428,   455,   481,   508,   534,   561,   588,   614,
+        641,   667,   694,   720,   747,   774,   800,   827,   853,   880,
+        907,   933,   960,   986,  1013,  1039,  1066
     };
+    return DiyFp(kCachedPowers_F[index], kCachedPowers_E[index]);
+}
+    
+inline DiyFp GetCachedPower(int e, int* K) {
 
     //int k = static_cast<int>(ceil((-61 - e) * 0.30102999566398114)) + 374;
     double dk = (-61 - e) * 0.30102999566398114 + 347;  // dk must be positive, so can do ceiling in positive
@@ -228,24 +261,13 @@ inline DiyFp GetCachedPower(int e, int* K) {
     unsigned index = static_cast<unsigned>((k >> 3) + 1);
     *K = -(-348 + static_cast<int>(index << 3));    // decimal exponent no need lookup table
 
-    return DiyFp(GetCachedPowerF(index), kCachedPowers_E[index]);
+    return GetCachedPowerByIndex(index);
 }
 
 inline DiyFp GetCachedPower10(int exp, int *outExp) {
-    // static const int16_t kCachedPowers_E10[] = {
-    //     -348, -340, -332, -324, -316, -308, -300, -292, -284, -276,
-    //     -268, -260, -252, -244, -236, -228, -220, -212, -204, -196,
-    //     -188, -180, -172, -164, -156, -148, -140, -132, -124, -116,
-    //     -108, -100,  -92,  -84,  -76,  -68,  -60,  -52,  -44,  -36,
-    //      -28,  -20,  -12,   -4,    4,   12,   20,   28,   36,   44,
-    //       52,   60,   68,   76,   84,   92,  100,  108,  116,  124,
-    //      132,  140,  148,  156,  164,  172,  180,  188,  196,  204,
-    //      212,  220,  228,  236,  244,  252,  260,  268,  276,  284,
-    //      292,  300,  308,  316,  324,  332,  340
-    //  };
      unsigned index = (exp + 348) / 8;
      *outExp = -348 + index * 8;
-     return GetCachedPowerF(index);
+     return GetCachedPowerByIndex(index);
  }
 
 #ifdef __GNUC__

@@ -221,7 +221,7 @@ private:
         if (IsZero())
             *this = u;
         else {
-            unsigned exp = end - begin;
+            unsigned exp = static_cast<unsigned>(end - begin);
             (MultiplyPow5(exp) <<= exp) += u;   // *this = *this * 10^exp + u
         }
     }

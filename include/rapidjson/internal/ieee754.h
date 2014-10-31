@@ -60,6 +60,15 @@ public:
     int IntegerExponent() const { return (IsNormal() ? Exponent() : kDenormalExponent) - kSignificandSize; }
     uint64_t ToBias() const { return (u & kSignMask) ? ~u + 1 : u | kSignMask; }
 
+    static unsigned EffectiveSignificandSize(int order) {
+        if (order >= kDenormalExponent + kSignificandSize)
+            return kSignificandSize;
+        else if (order <= kDenormalExponent)
+            return 0;
+        else
+            return order - kDenormalExponent;
+    }
+
 private:
     static const int kSignificandSize = 52;
     static const int kExponentBias = 0x3FF;

@@ -145,8 +145,8 @@ inline bool StrtodFast(double d, int p, double* result) {
 // Compute an approximation and see if it is within 1/2 ULP
 inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosition, int exp, double* result) {
     uint64_t significand = 0;
-    size_t i = 0;   // 2^64 - 1 = 18446744073709551615, 1844674407370955161 = 0x199999990x99999999    
-    for (; i < length && (significand <= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) || decimals[i] <= '4'); i++)
+    size_t i = 0;   // 2^64 - 1 = 18446744073709551615, 1844674407370955161 = 0x1999999999999999    
+    for (; i < length && (significand < RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) || decimals[i] <= '4'); i++)
         significand = significand * 10 + (decimals[i] - '0');
     
     if (i < length && decimals[i] >= '5') // Rounding
@@ -154,8 +154,7 @@ inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosit
 
     DiyFp v(significand, 0);
     size_t remaining = length - i;
-    const int dExp = (int)decimalPosition - i + exp;
-    exp += (int)remaining;
+    const int dExp = (int)decimalPosition - (int)i + exp + (int)remaining;
 
     const unsigned kUlpShift = 3;
     const unsigned kUlp = 1 << kUlpShift;
@@ -165,8 +164,10 @@ inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosit
     error <<= - v.e;
 
     int actualExp;
-    v = v * GetCachedPower10(exp, &actualExp);
-    if (actualExp != exp) {
+    double temp1 = v.ToDouble();
+    v = v * GetCachedPower10(dExp, &actualExp);
+    double temp2 = v.ToDouble();
+    if (actualExp != dExp) {
         static const DiyFp kPow10[] = {
             DiyFp(RAPIDJSON_UINT64_C2(0xa0000000, 00000000), -60),  // 10^1
             DiyFp(RAPIDJSON_UINT64_C2(0xc8000000, 00000000), -57),  // 10^2
@@ -176,16 +177,35 @@ inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosit
             DiyFp(RAPIDJSON_UINT64_C2(0xf4240000, 00000000), -44),  // 10^6
             DiyFp(RAPIDJSON_UINT64_C2(0x98968000, 00000000), -40)   // 10^7
         };
-        v = v * kPow10[actualExp - exp - 1];
+        v = v * kPow10[dExp - actualExp - 1];
     }
+    double temp3 = v.ToDouble();
 
     error += kUlp + (error == 0 ? 0 : 1);
 
-    int oldExp = v.e;
+    const int oldExp = v.e;
     v = v.Normalize();
     error <<= oldExp - v.e;
 
-    return true;
+    const unsigned effectiveSignificandSize = Double::EffectiveSignificandSize(64 + v.e);
+    unsigned precisionSize = 64 - effectiveSignificandSize;
+    if (precisionSize + kUlpShift >= 64) {
+        unsigned scaleExp = (precisionSize + kUlpShift) - 63;
+        v.f >>= scaleExp;
+        v.e += scaleExp; 
+        error = (error >> scaleExp) + 1 + kUlp;
+        precisionSize -= scaleExp;
+    }
+
+    const uint64_t precisionBits = (v.f & ((uint64_t(1) << precisionSize) - 1)) * kUlp;
+    const uint64_t halfWay = (uint64_t(1) << (precisionSize - 1)) * kUlp;
+    DiyFp rounded(v.f >> precisionSize, v.e + precisionSize);
+    if (precisionBits >= halfWay + error)
+        rounded.f++;
+
+    *result = rounded.ToDouble();
+
+    return halfWay - error >= precisionBits || precisionBits >= halfWay + error;
 }
 
 inline double StrtodBigInteger(double approx, const char* decimals, size_t length, size_t decimalPosition, int exp) {
