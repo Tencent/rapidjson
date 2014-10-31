@@ -35,23 +35,21 @@ class Stack {
 public:
     // Optimization note: Do not allocate memory for stack_ in constructor.
     // Do it lazily when first Push() -> Expand() -> Resize().
-    Stack(Allocator* allocator, size_t stackCapacity) : allocator_(allocator), ownAllocator(0), stack_(0), stackTop_(0), stackEnd_(0), initialCapacity_(stackCapacity) {
+    Stack(Allocator* allocator, size_t stackCapacity) : allocator_(allocator), ownAllocator_(0), stack_(0), stackTop_(0), stackEnd_(0), initialCapacity_(stackCapacity) {
         RAPIDJSON_ASSERT(stackCapacity > 0);
-        if (!allocator_)
-            ownAllocator = allocator_ = RAPIDJSON_NEW(Allocator());
     }
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     Stack(Stack&& rhs)
         : allocator_(rhs.allocator_),
-          ownAllocator(rhs.ownAllocator),
+          ownAllocator_(rhs.ownAllocator_),
           stack_(rhs.stack_),
           stackTop_(rhs.stackTop_),
           stackEnd_(rhs.stackEnd_),
           initialCapacity_(rhs.initialCapacity_)
     {
         rhs.allocator_ = 0;
-        rhs.ownAllocator = 0;
+        rhs.ownAllocator_ = 0;
         rhs.stack_ = 0;
         rhs.stackTop_ = 0;
         rhs.stackEnd_ = 0;
@@ -70,14 +68,14 @@ public:
             Destroy();
 
             allocator_ = rhs.allocator_;
-            ownAllocator = rhs.ownAllocator;
+            ownAllocator_ = rhs.ownAllocator_;
             stack_ = rhs.stack_;
             stackTop_ = rhs.stackTop_;
             stackEnd_ = rhs.stackEnd_;
             initialCapacity_ = rhs.initialCapacity_;
 
             rhs.allocator_ = 0;
-            rhs.ownAllocator = 0;
+            rhs.ownAllocator_ = 0;
             rhs.stack_ = 0;
             rhs.stackTop_ = 0;
             rhs.stackEnd_ = 0;
@@ -140,9 +138,11 @@ private:
     void Expand(size_t count) {
         // Only expand the capacity if the current stack exists. Otherwise just create a stack with initial capacity.
         size_t newCapacity;
-        if (stack_ == 0)
+        if (stack_ == 0) {
+            if (!allocator_)
+                ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
             newCapacity = initialCapacity_;
-        else {
+        } else {
             newCapacity = GetCapacity();
             newCapacity += (newCapacity + 1) / 2;
         }
@@ -162,7 +162,7 @@ private:
 
     void Destroy() {
         Allocator::Free(stack_);
-        RAPIDJSON_DELETE(ownAllocator); // Only delete if it is owned by the stack
+        RAPIDJSON_DELETE(ownAllocator_); // Only delete if it is owned by the stack
     }
 
     // Prohibit copy constructor & assignment operator.
@@ -170,7 +170,7 @@ private:
     Stack& operator=(const Stack&);
 
     Allocator* allocator_;
-    Allocator* ownAllocator;
+    Allocator* ownAllocator_;
     char *stack_;
     char *stackTop_;
     char *stackEnd_;
