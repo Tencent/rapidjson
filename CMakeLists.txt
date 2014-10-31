@@ -10,42 +10,14 @@ endif(BUILD_CXX11)
 
 add_subdirectory(thirdparty/gtest)
 
-set(HEADERS
-    include/rapidjson/error/en.h
-    include/rapidjson/error/error.h
-    include/rapidjson/internal/dtoa.h
-    include/rapidjson/internal/itoa.h
-    include/rapidjson/internal/meta.h
-    include/rapidjson/internal/pow10.h
-    include/rapidjson/internal/stack.h
-    include/rapidjson/internal/strfunc.h
-    include/rapidjson/msinttypes/inttypes.h
-    include/rapidjson/msinttypes/stdint.h
-    include/rapidjson/allocators.h
-    include/rapidjson/document.h
-    include/rapidjson/encodedstream.h
-    include/rapidjson/encodings.h
-    include/rapidjson/filereadstream.h
-    include/rapidjson/filestream.h
-    include/rapidjson/filewritestream.h
-    include/rapidjson/memorybuffer.h
-    include/rapidjson/memorystream.h
-    include/rapidjson/prettywriter.h
-    include/rapidjson/rapidjson.h
-    include/rapidjson/reader.h
-    include/rapidjson/stringbuffer.h
-    include/rapidjson/writer.h)
 
 set(PERF_TEST_SOURCE_FILES
-    ${HEADERS}
     test/perftest/misctest.cpp
     test/perftest/perftest.cpp
-    test/perftest/perftest.h
     test/perftest/platformtest.cpp
     test/perftest/rapidjsontest.cpp)
 
 set(UNIT_TEST_SOURCE_FILES
-    ${HEADERS}
     test/unittest/documenttest.cpp
     test/unittest/encodedstreamtest.cpp
     test/unittest/encodingstest.cpp
@@ -53,7 +25,6 @@ set(UNIT_TEST_SOURCE_FILES
     test/unittest/jsoncheckertest.cpp
     test/unittest/readertest.cpp
     test/unittest/unittest.cpp
-    test/unittest/unittest.h
     test/unittest/valuetest.cpp
     test/unittest/writertest.cpp)
 
