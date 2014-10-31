@@ -23,6 +23,7 @@ set(UNIT_TEST_SOURCE_FILES
     test/unittest/filestreamtest.cpp
     test/unittest/jsoncheckertest.cpp
     test/unittest/readertest.cpp
+    test/unittest/stringbuffertest.cpp
     test/unittest/unittest.cpp
     test/unittest/valuetest.cpp
     test/unittest/writertest.cpp)
