@@ -39,6 +39,33 @@ TEST(Value, DefaultConstructor) {
 //}
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
+#include <type_traits>
+
+TEST(Value, Traits) {
+  typedef GenericValue<UTF8<>, CrtAllocator> Value;
+  static_assert( std::is_constructible<Value>::value, "");
+  static_assert( std::is_default_constructible<Value>::value, "");
+  static_assert(!std::is_copy_constructible<Value>::value, "");
+  static_assert( std::is_move_constructible<Value>::value, "");
+
+  static_assert( std::is_nothrow_constructible<Value>::value, "");
+  static_assert( std::is_nothrow_default_constructible<Value>::value, "");
+  static_assert(!std::is_nothrow_copy_constructible<Value>::value, "");
+  static_assert( std::is_nothrow_move_constructible<Value>::value, "");
+
+  static_assert( std::is_assignable<Value,Value>::value, "");
+  static_assert(!std::is_copy_assignable<Value>::value, "");
+  static_assert( std::is_move_assignable<Value>::value, "");
+
+  static_assert( std::is_nothrow_assignable<Value,Value>::value, "");
+  static_assert(!std::is_nothrow_copy_assignable<Value>::value, "");
+  static_assert( std::is_nothrow_move_assignable<Value>::value, "");
+
+  static_assert( std::is_destructible<Value>::value, "");
+  static_assert( std::is_nothrow_destructible<Value>::value, "");
+}
+
 TEST(Value, MoveConstructor) {
     typedef GenericValue<UTF8<>, CrtAllocator> Value;
     Value::AllocatorType allocator;
@@ -49,18 +76,19 @@ TEST(Value, MoveConstructor) {
     EXPECT_TRUE(x.IsArray());
     EXPECT_EQ(4u, x.Size());
 
-    // Value y(x); // should not compile
+    // Value y(x); // does not compile (!is_copy_constructible)
     Value y(std::move(x));
     EXPECT_TRUE(x.IsNull());
     EXPECT_TRUE(y.IsArray());
     EXPECT_EQ(4u, y.Size());
 
-    // Value z = y; // should not compile
+    // Value z = y; // does not compile (!is_copy_assignable)
     Value z = std::move(y);
     EXPECT_TRUE(y.IsNull());
     EXPECT_TRUE(z.IsArray());
     EXPECT_EQ(4u, z.Size());
 }
+
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
 TEST(Value, AssignmentOperator) {

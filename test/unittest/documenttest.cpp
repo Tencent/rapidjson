@@ -229,6 +229,31 @@ TEST(Document, UTF16_Document) {
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
+#include <type_traits>
+
+TEST(Document, Traits) {
+  static_assert( std::is_constructible<Document>::value, "");
+  static_assert( std::is_default_constructible<Document>::value, "");
+  static_assert(!std::is_copy_constructible<Document>::value, "");
+  static_assert( std::is_move_constructible<Document>::value, "");
+
+  static_assert(!std::is_nothrow_constructible<Document>::value, "");
+  static_assert(!std::is_nothrow_default_constructible<Document>::value, "");
+  static_assert(!std::is_nothrow_copy_constructible<Document>::value, "");
+  static_assert( std::is_nothrow_move_constructible<Document>::value, "");
+
+  static_assert( std::is_assignable<Document,Document>::value, "");
+  static_assert(!std::is_copy_assignable<Document>::value, "");
+  static_assert( std::is_move_assignable<Document>::value, "");
+
+  static_assert( std::is_nothrow_assignable<Document,Document>::value, "");
+  static_assert(!std::is_nothrow_copy_assignable<Document>::value, "");
+  static_assert( std::is_nothrow_move_assignable<Document>::value, "");
+
+  static_assert( std::is_destructible<Document>::value, "");
+  static_assert( std::is_nothrow_destructible<Document>::value, "");
+}
+
 template <typename Allocator>
 struct DocumentMove: public ::testing::Test {
 };
@@ -248,7 +273,7 @@ TYPED_TEST(DocumentMove, MoveConstructor) {
     EXPECT_EQ(3u, a.Size());
     EXPECT_EQ(&a.GetAllocator(), &allocator);
 
-    // Document b(a); // should not compile
+    // Document b(a); // does not compile (!is_copy_constructible)
     Document b(std::move(a));
     EXPECT_TRUE(a.IsNull());
     EXPECT_TRUE(b.IsArray());
@@ -261,7 +286,7 @@ TYPED_TEST(DocumentMove, MoveConstructor) {
     EXPECT_TRUE(b.IsObject());
     EXPECT_EQ(2u, b.MemberCount());
 
-    // Document c = a; // should not compile
+    // Document c = a; // does not compile (!is_copy_constructible)
     Document c = std::move(b);
     EXPECT_TRUE(b.IsNull());
     EXPECT_TRUE(c.IsObject());
@@ -336,7 +361,7 @@ TYPED_TEST(DocumentMove, MoveAssignment) {
     EXPECT_EQ(3u, a.Size());
     EXPECT_EQ(&a.GetAllocator(), &allocator);
 
-    // Document b; b = a; // should not compile
+    // Document b; b = a; // does not compile (!is_copy_assignable)
     Document b;
     b = std::move(a);
     EXPECT_TRUE(a.IsNull());
@@ -350,7 +375,7 @@ TYPED_TEST(DocumentMove, MoveAssignment) {
     EXPECT_TRUE(b.IsObject());
     EXPECT_EQ(2u, b.MemberCount());
 
-    // Document c; c = a; // should not compile
+    // Document c; c = a; // does not compile (see static_assert)
     Document c;
     c = std::move(b);
     EXPECT_TRUE(b.IsNull());
