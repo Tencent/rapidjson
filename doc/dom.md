@@ -31,7 +31,7 @@ User can customize these template parameters.
 
 ## Encoding {#Encoding}
 
-The `Encoding` parameter specifies the encoding of JSON String value in memory. Possible options are `UTF8`, `UTF16`, `UTF32`. Note that, these 3 types are also template class. `UTF8<>` is `UTF8<char>`, which means using char to store the characters. You may refer to [Encoding](encoding.md) for details.
+The `Encoding` parameter specifies the encoding of JSON String value in memory. Possible options are `UTF8`, `UTF16`, `UTF32`. Note that, these 3 types are also template class. `UTF8<>` is `UTF8<char>`, which means using char to store the characters. You may refer to [Encoding](doc/encoding.md) for details.
 
 Suppose a Windows application would query localization strings stored in JSON files. Unicode-enabled functions in Windows use UTF-16 (wide character) encoding. No matter what encoding was used in JSON files, we can store the strings in UTF-16 in memory.
 
@@ -106,7 +106,7 @@ GenericDocument& GenericDocument::Parse(const Ch* str);
 GenericDocument& GenericDocument::Parse(const Ch* str);
 ~~~~~~~~~~
 
-The examples of [tutorial](tutorial.md) uses (9) for normal parsing of string. The examples of [stream](stream.md) uses the first three. *In situ* parsing will be described soon.
+The examples of [tutorial](doc/tutorial.md) uses (9) for normal parsing of string. The examples of [stream](doc/stream.md) uses the first three. *In situ* parsing will be described soon.
 
 The `parseFlags` are combination of the following bit-flags:
 

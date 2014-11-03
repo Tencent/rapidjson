@@ -4,7 +4,7 @@
 
 1. What is RapidJSON?
 
-   RapidJSON is a C++ library for parsing and generating JSON. You may check all [features](features.md) of it.
+   RapidJSON is a C++ library for parsing and generating JSON. You may check all [features](doc/features.md) of it.
 
 2. Why is it named so?
 
