@@ -116,7 +116,7 @@ RAPIDJSON_DIAG_OFF(4702)  // unreachable code
 
 #include "error/error.h" // ParseErrorCode, ParseResult
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
 // ParseFlag
@@ -1360,7 +1360,7 @@ private:
 //! Reader with UTF8 encoding and default allocator.
 typedef GenericReader<UTF8<>, UTF8<> > Reader;
 
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #ifdef _MSC_VER
 RAPIDJSON_DIAG_POP

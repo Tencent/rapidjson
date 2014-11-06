@@ -21,7 +21,7 @@
 #ifndef RAPIDJSON_ITOA_
 #define RAPIDJSON_ITOA_
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
 inline const char* GetDigitsLut() {
@@ -301,6 +301,6 @@ inline char* i64toa(int64_t value, char* buffer) {
 }
 
 } // namespace internal
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #endif // RAPIDJSON_ITOA_
