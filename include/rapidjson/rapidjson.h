@@ -49,6 +49,52 @@
 #include <cstring>  // memset(), memcpy(), memmove(), memcmp()
 
 ///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_NAMESPACE_(BEGIN|END)
+/*! \def RAPIDJSON_NAMESPACE
+    \ingroup RAPIDJSON_CONFIG
+    \brief   provide custom rapidjson namespace
+
+    In order to avoid symbol clashes and/or "One Definition Rule" errors
+    between multiple inclusions of (different versions of) RapidJSON in
+    a single binary, users can customize the name of the main RapidJSON
+    namespace.
+
+    In case of a single nesting level, defining \c RAPIDJSON_NAMESPACE
+    to a custom name (e.g. \c MyRapidJSON) is sufficient.  If multiple
+    levels are needed, both \ref RAPIDJSON_NAMESPACE_BEGIN and \ref
+    RAPIDJSON_NAMESPACE_END need to be defined as well:
+
+    \code
+    // in some .cpp file
+    #define RAPIDJSON_NAMESPACE my::rapidjson
+    #define RAPIDJSON_NAMESPACE_BEGIN namespace my { namespace rapidjson {
+    #define RAPIDJSON_NAMESPACE_END   } }
+    #include "rapidjson/..."
+    \endcode
+
+    \see rapidjson
+ */
+/*! \def RAPIDJSON_NAMESPACE_BEGIN
+    \ingroup RAPIDJSON_CONFIG
+    \brief   provide custom rapidjson namespace (opening expression)
+    \see RAPIDJSON_NAMESPACE
+*/
+/*! \def RAPIDJSON_NAMESPACE_END
+    \ingroup RAPIDJSON_CONFIG
+    \brief   provide custom rapidjson namespace (closing expression)
+    \see RAPIDJSON_NAMESPACE
+*/
+#ifndef RAPIDJSON_NAMESPACE
+#define RAPIDJSON_NAMESPACE rapidjson
+#endif
+#ifndef RAPIDJSON_NAMESPACE_BEGIN
+#define RAPIDJSON_NAMESPACE_BEGIN namespace RAPIDJSON_NAMESPACE {
+#endif
+#ifndef RAPIDJSON_NAMESPACE_END
+#define RAPIDJSON_NAMESPACE_END }
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NO_INT64DEFINE
 
 /*! \def RAPIDJSON_NO_INT64DEFINE
