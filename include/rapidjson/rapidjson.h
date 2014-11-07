@@ -49,6 +49,52 @@
 #include <cstring>  // memset(), memcpy(), memmove(), memcmp()
 
 ///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_NAMESPACE_(BEGIN|END)
+/*! \def RAPIDJSON_NAMESPACE
+    \ingroup RAPIDJSON_CONFIG
+    \brief   provide custom rapidjson namespace
+
+    In order to avoid symbol clashes and/or "One Definition Rule" errors
+    between multiple inclusions of (different versions of) RapidJSON in
+    a single binary, users can customize the name of the main RapidJSON
+    namespace.
+
+    In case of a single nesting level, defining \c RAPIDJSON_NAMESPACE
+    to a custom name (e.g. \c MyRapidJSON) is sufficient.  If multiple
+    levels are needed, both \ref RAPIDJSON_NAMESPACE_BEGIN and \ref
+    RAPIDJSON_NAMESPACE_END need to be defined as well:
+
+    \code
+    // in some .cpp file
+    #define RAPIDJSON_NAMESPACE my::rapidjson
+    #define RAPIDJSON_NAMESPACE_BEGIN namespace my { namespace rapidjson {
+    #define RAPIDJSON_NAMESPACE_END   } }
+    #include "rapidjson/..."
+    \endcode
+
+    \see rapidjson
+ */
+/*! \def RAPIDJSON_NAMESPACE_BEGIN
+    \ingroup RAPIDJSON_CONFIG
+    \brief   provide custom rapidjson namespace (opening expression)
+    \see RAPIDJSON_NAMESPACE
+*/
+/*! \def RAPIDJSON_NAMESPACE_END
+    \ingroup RAPIDJSON_CONFIG
+    \brief   provide custom rapidjson namespace (closing expression)
+    \see RAPIDJSON_NAMESPACE
+*/
+#ifndef RAPIDJSON_NAMESPACE
+#define RAPIDJSON_NAMESPACE rapidjson
+#endif
+#ifndef RAPIDJSON_NAMESPACE_BEGIN
+#define RAPIDJSON_NAMESPACE_BEGIN namespace RAPIDJSON_NAMESPACE {
+#endif
+#ifndef RAPIDJSON_NAMESPACE_END
+#define RAPIDJSON_NAMESPACE_END }
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NO_INT64DEFINE
 
 /*! \def RAPIDJSON_NO_INT64DEFINE
@@ -238,20 +284,20 @@
 #ifdef RAPIDJSON_DOXYGEN_RUNNING
 #define RAPIDJSON_NO_SIZETYPEDEFINE
 #endif
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 //! Size type (for string lengths, array sizes, etc.)
 /*! RapidJSON uses 32-bit array/string indices even on 64-bit platforms,
     instead of using \c size_t. Users may override the SizeType by defining
     \ref RAPIDJSON_NO_SIZETYPEDEFINE.
 */
 typedef unsigned SizeType;
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 #endif
 
 // always import std::size_t to rapidjson namespace
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 using std::size_t;
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_ASSERT
@@ -275,12 +321,11 @@ using std::size_t;
 // Adopt from boost
 #ifndef RAPIDJSON_STATIC_ASSERT
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
-namespace rapidjson {
-
+RAPIDJSON_NAMESPACE_BEGIN
 template <bool x> struct STATIC_ASSERTION_FAILURE;
 template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
 template<int x> struct StaticAssertTest {};
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #define RAPIDJSON_JOIN(X, Y) RAPIDJSON_DO_JOIN(X, Y)
 #define RAPIDJSON_DO_JOIN(X, Y) RAPIDJSON_DO_JOIN2(X, Y)
@@ -298,8 +343,9 @@ template<int x> struct StaticAssertTest {};
     \param x compile-time condition
     \hideinitializer
  */
-#define RAPIDJSON_STATIC_ASSERT(x) typedef ::rapidjson::StaticAssertTest<\
-    sizeof(::rapidjson::STATIC_ASSERTION_FAILURE<bool(x) >)>\
+#define RAPIDJSON_STATIC_ASSERT(x) \
+    typedef ::RAPIDJSON_NAMESPACE::StaticAssertTest< \
+      sizeof(::RAPIDJSON_NAMESPACE::STATIC_ASSERTION_FAILURE<bool(x) >)> \
     RAPIDJSON_JOIN(StaticAssertTypedef, __LINE__) RAPIDJSON_STATIC_ASSERT_UNUSED_ATTRIBUTE
 #endif
 
@@ -418,8 +464,11 @@ template<int x> struct StaticAssertTest {};
 #include "allocators.h"
 #include "encodings.h"
 
-//! main RapidJSON namespace
-namespace rapidjson {
+/*! \namespace rapidjson
+    \brief main RapidJSON namespace
+    \see RAPIDJSON_NAMESPACE
+*/
+RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Stream
@@ -574,6 +623,6 @@ enum Type {
     kNumberType = 6     //!< number
 };
 
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #endif // RAPIDJSON_RAPIDJSON_H_

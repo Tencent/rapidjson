@@ -28,7 +28,7 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 
 //! Input byte stream wrapper with a statically bound encoding.
 /*!
@@ -281,7 +281,7 @@ private:
 
 #undef RAPIDJSON_ENCODINGS_FUNC
 
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #ifdef __GNUC__
 RAPIDJSON_DIAG_POP

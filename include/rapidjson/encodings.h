@@ -32,7 +32,7 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
 // Encoding
@@ -621,7 +621,7 @@ struct Transcoder<Encoding, Encoding> {
     }
 };
 
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #if defined(__GNUC__) || defined(_MSV_VER)
 RAPIDJSON_DIAG_POP

@@ -23,7 +23,7 @@
 
 #include "rapidjson.h"
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
 // Allocator
@@ -240,6 +240,6 @@ private:
     BaseAllocator* ownBaseAllocator_;   //!< base allocator created by this object.
 };
 
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #endif // RAPIDJSON_ENCODINGS_H_

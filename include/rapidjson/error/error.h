@@ -51,7 +51,7 @@
 #define RAPIDJSON_ERROR_STRING(x) x
 #endif
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
 // ParseErrorCode
@@ -145,6 +145,6 @@ private:
 */
 typedef const RAPIDJSON_ERROR_CHARTYPE* (*GetParseErrorFunc)(ParseErrorCode);
 
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #endif // RAPIDJSON_ERROR_ERROR_H__

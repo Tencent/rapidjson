@@ -24,7 +24,7 @@
 #include "rapidjson.h"
 #include "internal/stack.h"
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 
 //! Represents an in-memory output stream.
 /*!
@@ -74,6 +74,6 @@ inline void PutN(GenericStringBuffer<UTF8<> >& stream, char c, size_t n) {
     std::memset(stream.stack_.Push<char>(n), c, n * sizeof(c));
 }
 
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #endif // RAPIDJSON_STRINGBUFFER_H_

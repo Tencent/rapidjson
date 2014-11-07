@@ -32,6 +32,7 @@ before_script:
 script:
   - make -C build/gmake -f test.make    config=${CONF}${BITS}
   - make -C build/gmake -f example.make config=${CONF}${BITS}
+  - if [ "$CONF" = "debug" ] && ( objdump -t -C intermediate/${CONF}/gmake/unittest/x${BITS}/namespacetest.o | grep rapidjson ) ; then echo "Symbol check failed!" ; false; fi
   - pushd bin
   -  ./unittest_${CONF}_x${BITS}_gmake
   - valgrind --leak-check=full --error-exitcode=1 ./unittest_${CONF}_x${BITS}_gmake

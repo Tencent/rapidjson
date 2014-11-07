@@ -34,7 +34,7 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 #endif
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 
 //! JSON writer
 /*! Writer implements the concept Handler.
@@ -380,7 +380,7 @@ inline bool Writer<StringBuffer>::WriteDouble(double d) {
     return true;
 }
 
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #ifdef _MSC_VER
 RAPIDJSON_DIAG_POP

@@ -21,7 +21,7 @@
 #ifndef RAPIDJSON_POW10_
 #define RAPIDJSON_POW10_
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
 //! Computes integer powers of 10 in double (10.0^n).
@@ -54,6 +54,6 @@ inline double Pow10(int n) {
 }
 
 } // namespace internal
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #endif // RAPIDJSON_POW10_

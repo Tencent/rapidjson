@@ -24,7 +24,7 @@
 #include "rapidjson.h"
 #include <cstdio>
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 
 //! (Deprecated) Wrapper of C file stream for input or output.
 /*!
@@ -68,6 +68,6 @@ private:
     size_t count_;
 };
 
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #endif // RAPIDJSON_FILESTREAM_H_
