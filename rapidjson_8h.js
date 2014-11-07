@@ -12,6 +12,7 @@ var rapidjson_8h =
     [ "RAPIDJSON_DELETE", "rapidjson_8h.html#a52c941c3fdd646527cdcd42aa846a28a", null ],
     [ "RAPIDJSON_ENDIAN", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaba2445f582142cf918e74c2d22d1aa07", null ],
     [ "RAPIDJSON_LITTLEENDIAN", "rapidjson_8h.html#addcc0c3607c5790f35cc4c15885ff97c", null ],
+    [ "RAPIDJSON_NAMESPACE", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga743a79d3af927391fe3eb5c979136899", null ],
     [ "RAPIDJSON_NEW", "rapidjson_8h.html#ab9e102fa2f1a0ae4914d4dac21f690a2", null ],
     [ "RAPIDJSON_NO_INT64DEFINE", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga7f4e50c35dae3b015390daa6d48ce23c", null ],
     [ "RAPIDJSON_NO_SIZETYPEDEFINE", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga250603aa9e2a12429b25ba0c8108ad4f", null ],

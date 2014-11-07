@@ -88,6 +88,9 @@ $(document).ready(function(){initNavTree('group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:ga743a79d3af927391fe3eb5c979136899"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga743a79d3af927391fe3eb5c979136899">RAPIDJSON_NAMESPACE</a>&#160;&#160;&#160;rapidjson</td></tr>
+<tr class="memdesc:ga743a79d3af927391fe3eb5c979136899"><td class="mdescLeft">&#160;</td><td class="mdescRight">provide custom rapidjson namespace  <a href="#ga743a79d3af927391fe3eb5c979136899">More...</a><br /></td></tr>
+<tr class="separator:ga743a79d3af927391fe3eb5c979136899"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga7f4e50c35dae3b015390daa6d48ce23c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga7f4e50c35dae3b015390daa6d48ce23c">RAPIDJSON_NO_INT64DEFINE</a></td></tr>
 <tr class="memdesc:ga7f4e50c35dae3b015390daa6d48ce23c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use external 64-bit integer types.  <a href="#ga7f4e50c35dae3b015390daa6d48ce23c">More...</a><br /></td></tr>
 <tr class="separator:ga7f4e50c35dae3b015390daa6d48ce23c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -192,6 +195,28 @@ Macros</h2></td></tr>
 
 <p>Enable RapidJSON support for <code>std::string</code>. </p>
 <p>By defining this preprocessor symbol to <code>1</code>, several convenience functions for using <a class="el" href="classrapidjson_1_1_generic_value.html">rapidjson::GenericValue</a> with <code>std::string</code> are enabled, especially for construction and comparison. </p>
+
+</div>
+</div>
+<a class="anchor" id="ga743a79d3af927391fe3eb5c979136899"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RAPIDJSON_NAMESPACE&#160;&#160;&#160;rapidjson</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>provide custom rapidjson namespace </p>
+<p>In order to avoid symbol clashes and/or "One Definition Rule" errors between multiple inclusions of (different versions of) RapidJSON in a single binary, users can customize the name of the main RapidJSON namespace.</p>
+<p>In case of a single nesting level, defining <code>RAPIDJSON_NAMESPACE</code> to a custom name (e.g. <code>MyRapidJSON</code>) is sufficient. If multiple levels are needed, both RAPIDJSON_NAMESPACE_BEGIN and RAPIDJSON_NAMESPACE_END need to be defined as well:</p>
+<div class="fragment"><div class="line"><span class="comment">// in some .cpp file</span></div>
+<div class="line"><span class="preprocessor">#define RAPIDJSON_NAMESPACE my::rapidjson</span></div>
+<div class="line"><span class="preprocessor">#define RAPIDJSON_NAMESPACE_BEGIN namespace my { namespace rapidjson {</span></div>
+<div class="line"><span class="preprocessor">#define RAPIDJSON_NAMESPACE_END   } }</span></div>
+<div class="line"><span class="preprocessor">#include &quot;rapidjson/...&quot;</span></div>
+</div><!-- fragment --><dl class="section see"><dt>See also</dt><dd><a class="el" href="namespacerapidjson.html" title="main RapidJSON namespace ">rapidjson</a> </dd></dl>
 
 </div>
 </div>

@@ -14,6 +14,7 @@ var searchData=
   ['rapidjson_20error_20handling',['RapidJSON error handling',['../group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html',1,'']]],
   ['rapidjson_5fhas_5fstdstring',['RAPIDJSON_HAS_STDSTRING',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga2f2eef0ee4477f3fe5874703a66e997f',1,'document.h']]],
   ['rapidjson_5flittleendian',['RAPIDJSON_LITTLEENDIAN',['../rapidjson_8h.html#addcc0c3607c5790f35cc4c15885ff97c',1,'rapidjson.h']]],
+  ['rapidjson_5fnamespace',['RAPIDJSON_NAMESPACE',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga743a79d3af927391fe3eb5c979136899',1,'rapidjson.h']]],
   ['rapidjson_5fnew',['RAPIDJSON_NEW',['../rapidjson_8h.html#ab9e102fa2f1a0ae4914d4dac21f690a2',1,'rapidjson.h']]],
   ['rapidjson_5fno_5fint64define',['RAPIDJSON_NO_INT64DEFINE',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga7f4e50c35dae3b015390daa6d48ce23c',1,'rapidjson.h']]],
   ['rapidjson_5fno_5fsizetypedefine',['RAPIDJSON_NO_SIZETYPEDEFINE',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga250603aa9e2a12429b25ba0c8108ad4f',1,'rapidjson.h']]],

@@ -114,7 +114,7 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;RAPIDJSON_DIAG_OFF(effc++)</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">namespace </span>rapidjson {</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;RAPIDJSON_NAMESPACE_BEGIN</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment"></span><span class="comment">// Encoding</span></div>
@@ -327,13 +327,13 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">wchar_t</span>&gt;</div>
 <div class="line"><a name="l00246"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_u_t_f16.html">  246</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_u_t_f16.html">UTF16</a> {</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="keyword">typedef</span> CharType Ch;</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(Ch) &gt;= 2);</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(Ch) &gt;= 2);</div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keyword">enum</span> { supportUnicode = 1 };</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OutputStream&gt;</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> Encode(OutputStream&amp; os, <span class="keywordtype">unsigned</span> codepoint) {</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputStream::Ch) &gt;= 2);</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputStream::Ch) &gt;= 2);</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        <span class="keywordflow">if</span> (codepoint &lt;= 0xFFFF) {</div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;            <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(codepoint &lt; 0xD800 || codepoint &gt; 0xDFFF); <span class="comment">// Code point itself cannot be surrogate pair </span></div>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;            os.Put(static_cast&lt;typename OutputStream::Ch&gt;(codepoint));</div>
@@ -348,7 +348,7 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;</div>
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputStream&gt;</div>
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">bool</span> Decode(InputStream&amp; is, <span class="keywordtype">unsigned</span>* codepoint) {</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputStream::Ch) &gt;= 2);</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputStream::Ch) &gt;= 2);</div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        Ch c = is.Take();</div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        <span class="keywordflow">if</span> (c &lt; 0xD800 || c &gt; 0xDFFF) {</div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;            *codepoint = c;</div>
@@ -366,8 +366,8 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;</div>
 <div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> OutputStream&gt;</div>
 <div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">bool</span> Validate(InputStream&amp; is, OutputStream&amp; os) {</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputStream::Ch) &gt;= 2);</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputStream::Ch) &gt;= 2);</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputStream::Ch) &gt;= 2);</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputStream::Ch) &gt;= 2);</div>
 <div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;        Ch c;</div>
 <div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        os.Put(c = is.Take());</div>
 <div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        <span class="keywordflow">if</span> (c &lt; 0xD800 || c &gt; 0xDFFF)</div>
@@ -385,14 +385,14 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00303"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_u_t_f16_l_e.html">  303</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_u_t_f16_l_e.html">UTF16LE</a> : <a class="code" href="structrapidjson_1_1_u_t_f16.html">UTF16</a>&lt;CharType&gt; {</div>
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputByteStream&gt;</div>
 <div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    <span class="keyword">static</span> CharType TakeBOM(InputByteStream&amp; is) {</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;        CharType c = Take(is);</div>
 <div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;        <span class="keywordflow">return</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span>)c == 0xFEFFu ? Take(is) : c;</div>
 <div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    }</div>
 <div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;</div>
 <div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputByteStream&gt;</div>
 <div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <span class="keyword">static</span> CharType Take(InputByteStream&amp; is) {</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;        CharType c = (<span class="keywordtype">unsigned</span> char)is.Take();</div>
 <div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;        c |= (<span class="keywordtype">unsigned</span> char)is.Take() &lt;&lt; 8;</div>
 <div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;        <span class="keywordflow">return</span> c;</div>
@@ -400,13 +400,13 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;</div>
 <div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutputByteStream&gt;</div>
 <div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> PutBOM(OutputByteStream&amp; os) {</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;        os.Put(0xFFu); os.Put(0xFEu);</div>
 <div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    }</div>
 <div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;</div>
 <div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutputByteStream&gt;</div>
 <div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> Put(OutputByteStream&amp; os, CharType c) {</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;        os.Put(c &amp; 0xFFu);</div>
 <div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;        os.Put((c &gt;&gt; 8) &amp; 0xFFu);</div>
 <div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    }</div>
@@ -417,14 +417,14 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00335"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_u_t_f16_b_e.html">  335</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_u_t_f16_b_e.html">UTF16BE</a> : <a class="code" href="structrapidjson_1_1_u_t_f16.html">UTF16</a>&lt;CharType&gt; {</div>
 <div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputByteStream&gt;</div>
 <div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    <span class="keyword">static</span> CharType TakeBOM(InputByteStream&amp; is) {</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;        CharType c = Take(is);</div>
 <div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;        <span class="keywordflow">return</span> (<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span>)c == 0xFEFFu ? Take(is) : c;</div>
 <div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    }</div>
 <div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;</div>
 <div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputByteStream&gt;</div>
 <div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    <span class="keyword">static</span> CharType Take(InputByteStream&amp; is) {</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;        CharType c = (<span class="keywordtype">unsigned</span> char)is.Take() &lt;&lt; 8;</div>
 <div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;        c |= (<span class="keywordtype">unsigned</span> char)is.Take();</div>
 <div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;        <span class="keywordflow">return</span> c;</div>
@@ -432,13 +432,13 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;</div>
 <div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutputByteStream&gt;</div>
 <div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> PutBOM(OutputByteStream&amp; os) {</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;        os.Put(0xFEu); os.Put(0xFFu);</div>
 <div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;    }</div>
 <div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;</div>
 <div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutputByteStream&gt;</div>
 <div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> Put(OutputByteStream&amp; os, CharType c) {</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;        os.Put((c &gt;&gt; 8) &amp; 0xFFu);</div>
 <div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;        os.Put(c &amp; 0xFFu);</div>
 <div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    }</div>
@@ -458,20 +458,20 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">unsigned</span>&gt;</div>
 <div class="line"><a name="l00377"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_u_t_f32.html">  377</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_u_t_f32.html">UTF32</a> {</div>
 <div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    <span class="keyword">typedef</span> CharType Ch;</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(Ch) &gt;= 4);</div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;    <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(Ch) &gt;= 4);</div>
 <div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;</div>
 <div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    <span class="keyword">enum</span> { supportUnicode = 1 };</div>
 <div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;</div>
 <div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OutputStream&gt;</div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> Encode(OutputStream&amp; os, <span class="keywordtype">unsigned</span> codepoint) {</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputStream::Ch) &gt;= 4);</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputStream::Ch) &gt;= 4);</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(codepoint &lt;= 0x10FFFF);</div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;        os.Put(codepoint);</div>
 <div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    }</div>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputStream&gt;</div>
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">bool</span> Decode(InputStream&amp; is, <span class="keywordtype">unsigned</span>* codepoint) {</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputStream::Ch) &gt;= 4);</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputStream::Ch) &gt;= 4);</div>
 <div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;        Ch c = is.Take();</div>
 <div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;        *codepoint = c;</div>
 <div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;        <span class="keywordflow">return</span> c &lt;= 0x10FFFF;</div>
@@ -479,7 +479,7 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;</div>
 <div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> OutputStream&gt;</div>
 <div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">bool</span> Validate(InputStream&amp; is, OutputStream&amp; os) {</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputStream::Ch) &gt;= 4);</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputStream::Ch) &gt;= 4);</div>
 <div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;        Ch c;</div>
 <div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;        os.Put(c = is.Take());</div>
 <div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;        <span class="keywordflow">return</span> c &lt;= 0x10FFFF;</div>
@@ -491,14 +491,14 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00409"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_u_t_f32_l_e.html">  409</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_u_t_f32_l_e.html">UTF32LE</a> : <a class="code" href="structrapidjson_1_1_u_t_f32.html">UTF32</a>&lt;CharType&gt; {</div>
 <div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputByteStream&gt;</div>
 <div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;    <span class="keyword">static</span> CharType TakeBOM(InputByteStream&amp; is) {</div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;        CharType c = Take(is);</div>
 <div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;        <span class="keywordflow">return</span> (<span class="keywordtype">unsigned</span>)c == 0x0000FEFFu ? Take(is) : c;</div>
 <div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;    }</div>
 <div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;</div>
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputByteStream&gt;</div>
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;    <span class="keyword">static</span> CharType Take(InputByteStream&amp; is) {</div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;        CharType c = (<span class="keywordtype">unsigned</span> char)is.Take();</div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;        c |= (<span class="keywordtype">unsigned</span> char)is.Take() &lt;&lt; 8;</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;        c |= (<span class="keywordtype">unsigned</span> char)is.Take() &lt;&lt; 16;</div>
@@ -508,13 +508,13 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;</div>
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutputByteStream&gt;</div>
 <div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> PutBOM(OutputByteStream&amp; os) {</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;        os.Put(0xFFu); os.Put(0xFEu); os.Put(0x00u); os.Put(0x00u);</div>
 <div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    }</div>
 <div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;</div>
 <div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutputByteStream&gt;</div>
 <div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> Put(OutputByteStream&amp; os, CharType c) {</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;        os.Put(c &amp; 0xFFu);</div>
 <div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;        os.Put((c &gt;&gt; 8) &amp; 0xFFu);</div>
 <div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;        os.Put((c &gt;&gt; 16) &amp; 0xFFu);</div>
@@ -527,14 +527,14 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00445"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_u_t_f32_b_e.html">  445</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_u_t_f32_b_e.html">UTF32BE</a> : <a class="code" href="structrapidjson_1_1_u_t_f32.html">UTF32</a>&lt;CharType&gt; {</div>
 <div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputByteStream&gt;</div>
 <div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    <span class="keyword">static</span> CharType TakeBOM(InputByteStream&amp; is) {</div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;        CharType c = Take(is);</div>
 <div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;        <span class="keywordflow">return</span> (<span class="keywordtype">unsigned</span>)c == 0x0000FEFFu ? Take(is) : c; </div>
 <div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    }</div>
 <div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;</div>
 <div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputByteStream&gt;</div>
 <div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;    <span class="keyword">static</span> CharType Take(InputByteStream&amp; is) {</div>
-<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> InputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;        CharType c = (<span class="keywordtype">unsigned</span> char)is.Take() &lt;&lt; 24;</div>
 <div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;        c |= (<span class="keywordtype">unsigned</span> char)is.Take() &lt;&lt; 16;</div>
 <div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;        c |= (<span class="keywordtype">unsigned</span> char)is.Take() &lt;&lt; 8;</div>
@@ -544,13 +544,13 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00462"></a><span class="lineno">  462</span>&#160;</div>
 <div class="line"><a name="l00463"></a><span class="lineno">  463</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutputByteStream&gt;</div>
 <div class="line"><a name="l00464"></a><span class="lineno">  464</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> PutBOM(OutputByteStream&amp; os) {</div>
-<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00465"></a><span class="lineno">  465</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00466"></a><span class="lineno">  466</span>&#160;        os.Put(0x00u); os.Put(0x00u); os.Put(0xFEu); os.Put(0xFFu);</div>
 <div class="line"><a name="l00467"></a><span class="lineno">  467</span>&#160;    }</div>
 <div class="line"><a name="l00468"></a><span class="lineno">  468</span>&#160;</div>
 <div class="line"><a name="l00469"></a><span class="lineno">  469</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutputByteStream&gt;</div>
 <div class="line"><a name="l00470"></a><span class="lineno">  470</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> Put(OutputByteStream&amp; os, CharType c) {</div>
-<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;        RAPIDJSON_STATIC_ASSERT(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
+<div class="line"><a name="l00471"></a><span class="lineno">  471</span>&#160;        <a class="code" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(<span class="keyword">sizeof</span>(<span class="keyword">typename</span> OutputByteStream::Ch) == 1);</div>
 <div class="line"><a name="l00472"></a><span class="lineno">  472</span>&#160;        os.Put((c &gt;&gt; 24) &amp; 0xFFu);</div>
 <div class="line"><a name="l00473"></a><span class="lineno">  473</span>&#160;        os.Put((c &gt;&gt; 16) &amp; 0xFFu);</div>
 <div class="line"><a name="l00474"></a><span class="lineno">  474</span>&#160;        os.Put((c &gt;&gt; 8) &amp; 0xFFu);</div>
@@ -684,7 +684,7 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;<span class="comment">    //! Validate one Unicode codepoint from an encoded stream.</span></div>
 <div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;<span class="comment"></span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> OutputStream&gt;</div>
 <div class="line"><a name="l00604"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_transcoder.html#ae9178e512e99394a38785e73927140da">  604</a></span>&#160;    RAPIDJSON_FORCEINLINE <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="structrapidjson_1_1_transcoder.html#ae9178e512e99394a38785e73927140da">Validate</a>(InputStream&amp; is, OutputStream&amp; os) {</div>
-<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="structrapidjson_1_1_transcoder.html#a3a1de7069d3cf7f1d4f4e2f96ceb7664">Transcode</a>(is, os);   <span class="comment">// Since source/target encoding is different, must transcode.</span></div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;        <span class="keywordflow">return</span> Transcode(is, os);   <span class="comment">// Since source/target encoding is different, must transcode.</span></div>
 <div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;    }</div>
 <div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;};</div>
 <div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;<span class="comment"></span></div>
@@ -692,18 +692,18 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;<span class="comment"></span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Encoding&gt;</div>
 <div class="line"><a name="l00611"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_transcoder_3_01_encoding_00_01_encoding_01_4.html">  611</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_transcoder.html">Transcoder</a>&lt;<a class="code" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="code" href="classrapidjson_1_1_encoding.html">Encoding</a>&gt; {</div>
 <div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;    RAPIDJSON_FORCEINLINE <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="structrapidjson_1_1_transcoder.html#a3a1de7069d3cf7f1d4f4e2f96ceb7664">Transcode</a>(InputStream&amp; is, OutputStream&amp; os) {</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;    RAPIDJSON_FORCEINLINE <span class="keyword">static</span> <span class="keywordtype">bool</span> Transcode(InputStream&amp; is, OutputStream&amp; os) {</div>
 <div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;        os.Put(is.Take());  <span class="comment">// Just copy one code unit. This semantic is different from primary template class.</span></div>
 <div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;    }</div>
 <div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    </div>
 <div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;    RAPIDJSON_FORCEINLINE <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="structrapidjson_1_1_transcoder.html#ae9178e512e99394a38785e73927140da">Validate</a>(InputStream&amp; is, OutputStream&amp; os) {</div>
+<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;    RAPIDJSON_FORCEINLINE <span class="keyword">static</span> <span class="keywordtype">bool</span> Validate(InputStream&amp; is, OutputStream&amp; os) {</div>
 <div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;        <span class="keywordflow">return</span> Encoding::Validate(is, os);  <span class="comment">// source/target encoding are the same</span></div>
 <div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;    }</div>
 <div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;};</div>
 <div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;</div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;} <span class="comment">// namespace rapidjson</span></div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;RAPIDJSON_NAMESPACE_END</div>
 <div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;</div>
 <div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;<span class="preprocessor">#if defined(__GNUC__) || defined(_MSV_VER)</span></div>
 <div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;RAPIDJSON_DIAG_POP</div>
@@ -715,7 +715,7 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="ttc" id="namespacerapidjson_html_a4aacabc0f8cea1cd628f466d890773ebaa7ffda68d3584eb92155daf3cd1d6481"><div class="ttname"><a href="namespacerapidjson.html#a4aacabc0f8cea1cd628f466d890773ebaa7ffda68d3584eb92155daf3cd1d6481">rapidjson::kUTF16LE</a></div><div class="ttdoc">UTF-16 little endian. </div><div class="ttdef"><b>Definition:</b> encodings.h:545</div></div>
 <div class="ttc" id="structrapidjson_1_1_u_t_f16_b_e_html"><div class="ttname"><a href="structrapidjson_1_1_u_t_f16_b_e.html">rapidjson::UTF16BE</a></div><div class="ttdoc">UTF-16 big endian encoding. </div><div class="ttdef"><b>Definition:</b> encodings.h:335</div></div>
 <div class="ttc" id="namespacerapidjson_html_a4aacabc0f8cea1cd628f466d890773eba2ec8c855b2edacca40fa73ad307a66b4"><div class="ttname"><a href="namespacerapidjson.html#a4aacabc0f8cea1cd628f466d890773eba2ec8c855b2edacca40fa73ad307a66b4">rapidjson::kUTF32LE</a></div><div class="ttdoc">UTF-32 little endian. </div><div class="ttdef"><b>Definition:</b> encodings.h:547</div></div>
-<div class="ttc" id="rapidjson_8h_html_af95188da1d8eb6d4b148fe9ce71cd7c4"><div class="ttname"><a href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_STATIC_ASSERT(x)</div><div class="ttdoc">(Internal) macro to check for conditions at compile-time </div><div class="ttdef"><b>Definition:</b> rapidjson.h:301</div></div>
+<div class="ttc" id="rapidjson_8h_html_af95188da1d8eb6d4b148fe9ce71cd7c4"><div class="ttname"><a href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_STATIC_ASSERT(x)</div><div class="ttdoc">(Internal) macro to check for conditions at compile-time </div><div class="ttdef"><b>Definition:</b> rapidjson.h:346</div></div>
 <div class="ttc" id="structrapidjson_1_1_a_s_c_i_i_html"><div class="ttname"><a href="structrapidjson_1_1_a_s_c_i_i.html">rapidjson::ASCII</a></div><div class="ttdoc">ASCII encoding. </div><div class="ttdef"><b>Definition:</b> encodings.h:488</div></div>
 <div class="ttc" id="structrapidjson_1_1_transcoder_html_ae9178e512e99394a38785e73927140da"><div class="ttname"><a href="structrapidjson_1_1_transcoder.html#ae9178e512e99394a38785e73927140da">rapidjson::Transcoder::Validate</a></div><div class="ttdeci">static RAPIDJSON_FORCEINLINE bool Validate(InputStream &amp;is, OutputStream &amp;os)</div><div class="ttdoc">Validate one Unicode codepoint from an encoded stream. </div><div class="ttdef"><b>Definition:</b> encodings.h:604</div></div>
 <div class="ttc" id="classrapidjson_1_1_encoding_html"><div class="ttname"><a href="classrapidjson_1_1_encoding.html">rapidjson::Encoding</a></div><div class="ttdoc">Concept for encoding of Unicode characters. </div></div>
@@ -728,7 +728,7 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="ttc" id="namespacerapidjson_html_a4aacabc0f8cea1cd628f466d890773ebad6db204b848081468878ed58bc20ce8f"><div class="ttname"><a href="namespacerapidjson.html#a4aacabc0f8cea1cd628f466d890773ebad6db204b848081468878ed58bc20ce8f">rapidjson::kUTF32BE</a></div><div class="ttdoc">UTF-32 big endian. </div><div class="ttdef"><b>Definition:</b> encodings.h:548</div></div>
 <div class="ttc" id="structrapidjson_1_1_u_t_f32_l_e_html"><div class="ttname"><a href="structrapidjson_1_1_u_t_f32_l_e.html">rapidjson::UTF32LE</a></div><div class="ttdoc">UTF-32 little endian enocoding. </div><div class="ttdef"><b>Definition:</b> encodings.h:409</div></div>
 <div class="ttc" id="structrapidjson_1_1_transcoder_html_a3a1de7069d3cf7f1d4f4e2f96ceb7664"><div class="ttname"><a href="structrapidjson_1_1_transcoder.html#a3a1de7069d3cf7f1d4f4e2f96ceb7664">rapidjson::Transcoder::Transcode</a></div><div class="ttdeci">static RAPIDJSON_FORCEINLINE bool Transcode(InputStream &amp;is, OutputStream &amp;os)</div><div class="ttdoc">Take one Unicode codepoint from source encoding, convert it to target encoding and put it to the outp...</div><div class="ttdef"><b>Definition:</b> encodings.h:594</div></div>
-<div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:269</div></div>
+<div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:315</div></div>
 <div class="ttc" id="namespacerapidjson_html_a4aacabc0f8cea1cd628f466d890773eb"><div class="ttname"><a href="namespacerapidjson.html#a4aacabc0f8cea1cd628f466d890773eb">rapidjson::UTFType</a></div><div class="ttdeci">UTFType</div><div class="ttdoc">Runtime-specified UTF encoding type of a stream. </div><div class="ttdef"><b>Definition:</b> encodings.h:543</div></div>
 <div class="ttc" id="structrapidjson_1_1_u_t_f16_html"><div class="ttname"><a href="structrapidjson_1_1_u_t_f16.html">rapidjson::UTF16</a></div><div class="ttdoc">UTF-16 encoding. </div><div class="ttdef"><b>Definition:</b> encodings.h:246</div></div>
 <div class="ttc" id="structrapidjson_1_1_u_t_f32_b_e_html"><div class="ttname"><a href="structrapidjson_1_1_u_t_f32_b_e.html">rapidjson::UTF32BE</a></div><div class="ttdoc">UTF-32 big endian encoding. </div><div class="ttdef"><b>Definition:</b> encodings.h:445</div></div>
