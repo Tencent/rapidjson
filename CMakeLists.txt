@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8.11)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMakeModules)
 
 PROJECT(RapidJSON CXX)
@@ -17,6 +17,12 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 option(RAPIDJSON_BUILD_DOC "Build rapidjson documentation." ON)
 option(RAPIDJSON_BUILD_EXAMPLES "Build rapidjson examples." ON)
 option(RAPIDJSON_BUILD_TESTS "Build rapidjson perftests and unittests." ON)
+
+option(RAPIDJSON_HAS_STDSTRING "" OFF)
+if(RAPIDJSON_HAS_STDSTRING)
+    add_definitions(-DRAPIDJSON_HAS_STDSTRING)
+endif()
+
 
 #add extra search paths for libraries and includes
 SET(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The directory the headers are installed in")
@@ -37,6 +43,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${RAPIDJSON_CXX_FLAGS}")
 if(RAPIDJSON_BUILD_DOC)
     add_subdirectory(doc)
 endif()
+
+add_custom_target(travis_doc)
+add_custom_command(TARGET travis_doc
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/travis-doxygen.sh)
 
 if(RAPIDJSON_BUILD_EXAMPLES)
     add_subdirectory(example)

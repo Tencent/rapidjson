@@ -48,8 +48,8 @@ RapidJSON uses following software as its dependencies:
 
 To generate user documentation and run tests please proceed with the steps below:
 1. Execute `git submodule update --init` to get the files of thirdparty submodules (google test).
-2. Create directory called `build` nearby rapidjson source directory.
-3. Change to `build` directory and run `cmake ../rapidjson` command to configure your build. Windows users can do the same with cmake-gui application.
+2. Create directory called `build` in rapidjson source directory.
+3. Change to `build` directory and run `cmake ..` command to configure your build. Windows users can do the same with cmake-gui application.
 4. On Windows, build the solution found in the build directory. On Linux, run `make` from the build directory.
 
 On successfull build you will find compiled test and example binaries in `bin`
