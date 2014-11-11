@@ -6,6 +6,9 @@ set(PERFTEST_SOURCES
 
 add_executable(perftest ${PERFTEST_SOURCES})
 target_link_libraries(perftest ${TEST_LIBRARIES})
+
+add_dependencies(tests perftest)
+
 add_test(NAME perftest
     COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/perftest
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)

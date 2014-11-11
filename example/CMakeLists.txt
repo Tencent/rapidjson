@@ -17,3 +17,5 @@ set(EXAMPLES
 foreach (example ${EXAMPLES})
     add_executable(${example} ${example}/${example}.cpp)
 endforeach()
+
+add_custom_target(examples ALL DEPENDS ${EXAMPLES})

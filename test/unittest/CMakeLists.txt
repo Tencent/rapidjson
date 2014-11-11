@@ -12,6 +12,9 @@ set(UNITTEST_SOURCES
 
 add_executable(unittest ${UNITTEST_SOURCES})
 target_link_libraries(unittest ${TEST_LIBRARIES})
+
+add_dependencies(tests unittest)
+
 add_test(NAME unittest
     COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)

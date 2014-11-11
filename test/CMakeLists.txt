@@ -12,6 +12,8 @@ IF(GTESTSRC_FOUND)
 
     set(TEST_LIBRARIES gtest gtest_main)
 
+    add_custom_target(tests ALL)
     add_subdirectory(perftest)
     add_subdirectory(unittest)
+
 ENDIF(GTESTSRC_FOUND)
