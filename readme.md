@@ -41,21 +41,28 @@ Users can build and run the unit tests on their platform/compiler.
 
 RapidJSON is a header-only C++ library. Just copy the `include/rapidjson` folder to system or project's include path.
 
-To build the tests and examples:
+RapidJSON uses following software as its dependencies:
+* [CMake](http://www.cmake.org) as a general build tool
+* (optional)[Doxygen](http://www.goxygen.org) to build documentation
+* (optional)[googletest](https://code.google.com/p/googletest/) for unit and performance testing
 
+To generate user documentation and run tests please proceed with the steps below:
 1. Execute `git submodule update --init` to get the files of thirdparty submodules (google test).
-2. Obtain [premake4](http://industriousone.com/premake/download).
-3. Copy premake4 executable to `rapidjson/build` (or system path).
-4. Change directory to `rapidjson/build/`, run `premake.bat` on Windows, `premake.sh` on Linux or other platforms.
-5. On Windows, build the solution at `rapidjson/build/vs2008/` or `/vs2010/`.
-6. On other platforms, run GNU `make` at `rapidjson/build/gmake/` (e.g., `make -f test.make config=release32`; `make -f example.make config=debug32`).
-7. On success, the executables are generated at `rapidjson/bin`.
+2. Create directory called `build` nearby rapidjson source directory.
+3. Change to `build` directory and run `cmake ../rapidjson` command to configure your build. Windows users can do the same with cmake-gui application.
+4. On Windows, build the solution found in the build directory. On Linux, run `make` from the build directory.
 
-To build the [Doxygen](http://doxygen.org) documentation:
+On successfull build you will find compiled test and example binaries in `bin`
+directory. The generated documentation will be available in `doc/html`
+directory of the build tree. To run tests after finished build please run `make
+test` or `ctest` from your build tree. You can get detailed output using `ctest
+-V` command.
 
-1. Obtain and install [Doxygen](http://doxygen.org/download.html).
-2. In the top-level directory, run `doxygen build/Doxyfile`.
-3. Browse the generated documentation in `doc/html`.
+It is possible to install library system-wide by running `make install` command
+from the build tree with administrative privileges. This will install all files
+according to system preferences.  Once RapidJSON is installed, it is possible
+to use it from other CMake projects by adding `find_package(RapidJSON)` line to
+your CMakeLists.txt.
 
 ## Usage at a glance
 
