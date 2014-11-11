@@ -15,5 +15,5 @@ set(EXAMPLES
     tutorial)
 
 foreach (example ${EXAMPLES})
-    add_executable(${example}_ ${example}/${example}.cpp)
+    add_executable(${example} ${example}/${example}.cpp)
 endforeach()
