@@ -195,7 +195,6 @@ static void TestParseDouble() {
             EXPECT_DOUBLE_EQ(x, h.actual_); \
     }
     
-#if 0
     TEST_DOUBLE(fullPrecision, "0.0", 0.0);
     TEST_DOUBLE(fullPrecision, "1.0", 1.0);
     TEST_DOUBLE(fullPrecision, "-1.0", -1.0);
@@ -216,7 +215,6 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "2.22507e-308", 2.22507e-308);
     TEST_DOUBLE(fullPrecision, "-1.79769e+308", -1.79769e+308);
     TEST_DOUBLE(fullPrecision, "-2.22507e-308", -2.22507e-308);
-#endif
     TEST_DOUBLE(fullPrecision, "4.9406564584124654e-324", 4.9406564584124654e-324); // minimum denormal
     TEST_DOUBLE(fullPrecision, "2.2250738585072009e-308", 2.2250738585072009e-308); // Max subnormal double
     TEST_DOUBLE(fullPrecision, "2.2250738585072014e-308", 2.2250738585072014e-308); // Min normal positive double
@@ -259,7 +257,7 @@ static void TestParseDouble() {
         TEST_DOUBLE(fullPrecision, n1e308, 1E308);
     }
 
-#if 0
+#if 1
     static const unsigned count = 10000000;
     // Random test for double
     {

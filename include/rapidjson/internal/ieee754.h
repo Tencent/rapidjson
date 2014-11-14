@@ -61,12 +61,12 @@ public:
     uint64_t ToBias() const { return (u & kSignMask) ? ~u + 1 : u | kSignMask; }
 
     static unsigned EffectiveSignificandSize(int order) {
-        if (order >= kDenormalExponent + kSignificandSize)
-            return kSignificandSize;
-        else if (order <= kDenormalExponent)
+        if (order >= -1021)
+            return 53;
+        else if (order <= -1074)
             return 0;
         else
-            return order - kDenormalExponent;
+            return order + 1074;
     }
 
 private:

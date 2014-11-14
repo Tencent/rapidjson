@@ -179,7 +179,7 @@ struct DiyFp {
     static const int kDpExponentBias = 0x3FF + kDpSignificandSize;
     static const int kDpMaxExponent = 0x7FF - kDpExponentBias;
     static const int kDpMinExponent = -kDpExponentBias;
-    static const int kDpDenormalExponent = -kDpExponentBias - 1;
+    static const int kDpDenormalExponent = -kDpExponentBias + 1;
     static const uint64_t kDpExponentMask = RAPIDJSON_UINT64_C2(0x7FF00000, 0x00000000);
     static const uint64_t kDpSignificandMask = RAPIDJSON_UINT64_C2(0x000FFFFF, 0xFFFFFFFF);
     static const uint64_t kDpHiddenBit = RAPIDJSON_UINT64_C2(0x00100000, 0x00000000);
