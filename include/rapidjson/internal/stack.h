@@ -21,7 +21,7 @@
 #ifndef RAPIDJSON_INTERNAL_STACK_H_
 #define RAPIDJSON_INTERNAL_STACK_H_
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -35,16 +35,55 @@ class Stack {
 public:
     // Optimization note: Do not allocate memory for stack_ in constructor.
     // Do it lazily when first Push() -> Expand() -> Resize().
-    Stack(Allocator* allocator, size_t stackCapacity) : allocator_(allocator), ownAllocator(0), stack_(0), stackTop_(0), stackEnd_(0), initialCapacity_(stackCapacity) {
+    Stack(Allocator* allocator, size_t stackCapacity) : allocator_(allocator), ownAllocator_(0), stack_(0), stackTop_(0), stackEnd_(0), initialCapacity_(stackCapacity) {
         RAPIDJSON_ASSERT(stackCapacity > 0);
-        if (!allocator_)
-            ownAllocator = allocator_ = new Allocator();
     }
 
-    ~Stack() {
-        Allocator::Free(stack_);
-        delete ownAllocator; // Only delete if it is owned by the stack
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    Stack(Stack&& rhs)
+        : allocator_(rhs.allocator_),
+          ownAllocator_(rhs.ownAllocator_),
+          stack_(rhs.stack_),
+          stackTop_(rhs.stackTop_),
+          stackEnd_(rhs.stackEnd_),
+          initialCapacity_(rhs.initialCapacity_)
+    {
+        rhs.allocator_ = 0;
+        rhs.ownAllocator_ = 0;
+        rhs.stack_ = 0;
+        rhs.stackTop_ = 0;
+        rhs.stackEnd_ = 0;
+        rhs.initialCapacity_ = 0;
     }
+#endif
+
+    ~Stack() {
+        Destroy();
+    }
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    Stack& operator=(Stack&& rhs) {
+        if (&rhs != this)
+        {
+            Destroy();
+
+            allocator_ = rhs.allocator_;
+            ownAllocator_ = rhs.ownAllocator_;
+            stack_ = rhs.stack_;
+            stackTop_ = rhs.stackTop_;
+            stackEnd_ = rhs.stackEnd_;
+            initialCapacity_ = rhs.initialCapacity_;
+
+            rhs.allocator_ = 0;
+            rhs.ownAllocator_ = 0;
+            rhs.stack_ = 0;
+            rhs.stackTop_ = 0;
+            rhs.stackEnd_ = 0;
+            rhs.initialCapacity_ = 0;
+        }
+        return *this;
+    }
+#endif
 
     void Clear() { stackTop_ = stack_; }
 
@@ -98,7 +137,15 @@ private:
     template<typename T>
     void Expand(size_t count) {
         // Only expand the capacity if the current stack exists. Otherwise just create a stack with initial capacity.
-        size_t newCapacity = (stack_ == 0) ? initialCapacity_ : GetCapacity() * 2;
+        size_t newCapacity;
+        if (stack_ == 0) {
+            if (!allocator_)
+                ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
+            newCapacity = initialCapacity_;
+        } else {
+            newCapacity = GetCapacity();
+            newCapacity += (newCapacity + 1) / 2;
+        }
         size_t newSize = GetSize() + sizeof(T) * count;
         if (newCapacity < newSize)
             newCapacity = newSize;
@@ -113,12 +160,17 @@ private:
         stackEnd_ = stack_ + newCapacity;
     }
 
+    void Destroy() {
+        Allocator::Free(stack_);
+        RAPIDJSON_DELETE(ownAllocator_); // Only delete if it is owned by the stack
+    }
+
     // Prohibit copy constructor & assignment operator.
     Stack(const Stack&);
     Stack& operator=(const Stack&);
 
     Allocator* allocator_;
-    Allocator* ownAllocator;
+    Allocator* ownAllocator_;
     char *stack_;
     char *stackTop_;
     char *stackEnd_;
@@ -126,6 +178,6 @@ private:
 };
 
 } // namespace internal
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #endif // RAPIDJSON_STACK_H_

@@ -121,9 +121,7 @@ In the following, details about querying individual types are discussed.
 
 By default, `SizeType` is typedef of `unsigned`. In most systems, array is limited to store up to 2^32-1 elements.
 
-You may access the elements in array by integer literal, for example, `a[1]`, `a[2]`. However, `a[0]` will generate a compiler error. It is because two overloaded operators `operator[](SizeType)` and `operator[](const char*)` is available, and C++ can treat `0` as a null pointer. Workarounds:
-* `a[SizeType(0)]`
-* `a[0u]`
+You may access the elements in array by integer literal, for example, `a[0]`, `a[1]`, `a[2]`.
 
 Array is similar to `std::vector`, instead of using indices, you may also use iterator to access all the elements.
 ~~~~~~~~~~cpp
@@ -334,9 +332,10 @@ Sometimes, it is convenient to construct a Value in place, before passing it to 
 
 ~~~~~~~~~~cpp
 Value a(kArrayType);
-// a.PushBack(Value(42));       // will not compile
-a.PushBack(Value().SetInt(42)); // fluent API
-a.PushBack(Value(42).Move());   // same as above
+Document::AllocatorType& allocator = document.GetAllocator();
+// a.PushBack(Value(42), allocator);       // will not compile
+a.PushBack(Value().SetInt(42), allocator); // fluent API
+a.PushBack(Value(42).Move(), allocator);   // same as above
 ~~~~~~~~~~
 
 ## Create String {#CreateString}

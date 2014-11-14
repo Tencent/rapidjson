@@ -218,7 +218,7 @@ TEST(Document, UTF16_Document) {
     json.Parse<kParseValidateEncodingFlag>(L"[{\"created_at\":\"Wed Oct 30 17:13:20 +0000 2012\"}]");
 
     ASSERT_TRUE(json.IsArray());
-    GenericValue< UTF16<> >& v = json[0u];
+    GenericValue< UTF16<> >& v = json[0];
     ASSERT_TRUE(v.IsObject());
 
     GenericValue< UTF16<> >& s = v[L"created_at"];
@@ -226,6 +226,224 @@ TEST(Document, UTF16_Document) {
 
     EXPECT_EQ(0, wcscmp(L"Wed Oct 30 17:13:20 +0000 2012", s.GetString()));
 }
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
+#include <type_traits>
+
+TEST(Document, Traits) {
+  static_assert( std::is_constructible<Document>::value, "");
+  static_assert( std::is_default_constructible<Document>::value, "");
+  static_assert(!std::is_copy_constructible<Document>::value, "");
+  static_assert( std::is_move_constructible<Document>::value, "");
+
+  static_assert(!std::is_nothrow_constructible<Document>::value, "");
+  static_assert(!std::is_nothrow_default_constructible<Document>::value, "");
+  static_assert(!std::is_nothrow_copy_constructible<Document>::value, "");
+  static_assert( std::is_nothrow_move_constructible<Document>::value, "");
+
+  static_assert( std::is_assignable<Document,Document>::value, "");
+  static_assert(!std::is_copy_assignable<Document>::value, "");
+  static_assert( std::is_move_assignable<Document>::value, "");
+
+  static_assert( std::is_nothrow_assignable<Document,Document>::value, "");
+  static_assert(!std::is_nothrow_copy_assignable<Document>::value, "");
+  static_assert( std::is_nothrow_move_assignable<Document>::value, "");
+
+  static_assert( std::is_destructible<Document>::value, "");
+  static_assert( std::is_nothrow_destructible<Document>::value, "");
+}
+
+template <typename Allocator>
+struct DocumentMove: public ::testing::Test {
+};
+
+typedef ::testing::Types< CrtAllocator, MemoryPoolAllocator<> > MoveAllocatorTypes;
+TYPED_TEST_CASE(DocumentMove, MoveAllocatorTypes);
+
+TYPED_TEST(DocumentMove, MoveConstructor) {
+    typedef TypeParam Allocator;
+    typedef GenericDocument<UTF8<>, Allocator> Document;
+    Allocator allocator;
+
+    Document a(&allocator);
+    a.Parse("[\"one\", \"two\", \"three\"]");
+    EXPECT_FALSE(a.HasParseError());
+    EXPECT_TRUE(a.IsArray());
+    EXPECT_EQ(3u, a.Size());
+    EXPECT_EQ(&a.GetAllocator(), &allocator);
+
+    // Document b(a); // does not compile (!is_copy_constructible)
+    Document b(std::move(a));
+    EXPECT_TRUE(a.IsNull());
+    EXPECT_TRUE(b.IsArray());
+    EXPECT_EQ(3u, b.Size());
+    EXPECT_EQ(&a.GetAllocator(), (void*)0);
+    EXPECT_EQ(&b.GetAllocator(), &allocator);
+
+    b.Parse("{\"Foo\": \"Bar\", \"Baz\": 42}");
+    EXPECT_FALSE(b.HasParseError());
+    EXPECT_TRUE(b.IsObject());
+    EXPECT_EQ(2u, b.MemberCount());
+
+    // Document c = a; // does not compile (!is_copy_constructible)
+    Document c = std::move(b);
+    EXPECT_TRUE(b.IsNull());
+    EXPECT_TRUE(c.IsObject());
+    EXPECT_EQ(2u, c.MemberCount());
+    EXPECT_EQ(&b.GetAllocator(), (void*)0);
+    EXPECT_EQ(&c.GetAllocator(), &allocator);
+}
+
+TYPED_TEST(DocumentMove, MoveConstructorParseError) {
+    typedef TypeParam Allocator;
+    typedef GenericDocument<UTF8<>, Allocator> Document;
+
+    ParseResult noError;
+    Document a;
+    a.Parse("{ 4 = 4]");
+    ParseResult error(a.GetParseError(), a.GetErrorOffset());
+    EXPECT_TRUE(a.HasParseError());
+    EXPECT_NE(error.Code(), noError.Code());
+    EXPECT_NE(error.Offset(), noError.Offset());
+
+    Document b(std::move(a));
+    EXPECT_FALSE(a.HasParseError());
+    EXPECT_TRUE(b.HasParseError());
+    EXPECT_EQ(a.GetParseError(), noError.Code());
+    EXPECT_EQ(b.GetParseError(), error.Code());
+    EXPECT_EQ(a.GetErrorOffset(), noError.Offset());
+    EXPECT_EQ(b.GetErrorOffset(), error.Offset());
+
+    Document c(std::move(b));
+    EXPECT_FALSE(b.HasParseError());
+    EXPECT_TRUE(c.HasParseError());
+    EXPECT_EQ(b.GetParseError(), noError.Code());
+    EXPECT_EQ(c.GetParseError(), error.Code());
+    EXPECT_EQ(b.GetErrorOffset(), noError.Offset());
+    EXPECT_EQ(c.GetErrorOffset(), error.Offset());
+}
+
+TYPED_TEST(DocumentMove, MoveConstructorStack) {
+    typedef TypeParam Allocator;
+    typedef UTF8<> Encoding;
+    typedef GenericDocument<Encoding, Allocator> Document;
+
+    Document a;
+    size_t defaultCapacity = a.GetStackCapacity();
+
+    // Trick Document into getting GetStackCapacity() to return non-zero
+    typedef GenericReader<Encoding, Encoding, Allocator> Reader;
+    Reader reader(&a.GetAllocator());
+    GenericStringStream<Encoding> is("[\"one\", \"two\", \"three\"]");
+    reader.template Parse<kParseDefaultFlags>(is, a);
+    size_t capacity = a.GetStackCapacity();
+    EXPECT_GT(capacity, 0u);
+
+    Document b(std::move(a));
+    EXPECT_EQ(a.GetStackCapacity(), defaultCapacity);
+    EXPECT_EQ(b.GetStackCapacity(), capacity);
+
+    Document c = std::move(b);
+    EXPECT_EQ(b.GetStackCapacity(), defaultCapacity);
+    EXPECT_EQ(c.GetStackCapacity(), capacity);
+}
+
+TYPED_TEST(DocumentMove, MoveAssignment) {
+    typedef TypeParam Allocator;
+    typedef GenericDocument<UTF8<>, Allocator> Document;
+    Allocator allocator;
+
+    Document a(&allocator);
+    a.Parse("[\"one\", \"two\", \"three\"]");
+    EXPECT_FALSE(a.HasParseError());
+    EXPECT_TRUE(a.IsArray());
+    EXPECT_EQ(3u, a.Size());
+    EXPECT_EQ(&a.GetAllocator(), &allocator);
+
+    // Document b; b = a; // does not compile (!is_copy_assignable)
+    Document b;
+    b = std::move(a);
+    EXPECT_TRUE(a.IsNull());
+    EXPECT_TRUE(b.IsArray());
+    EXPECT_EQ(3u, b.Size());
+    EXPECT_EQ(&a.GetAllocator(), (void*)0);
+    EXPECT_EQ(&b.GetAllocator(), &allocator);
+
+    b.Parse("{\"Foo\": \"Bar\", \"Baz\": 42}");
+    EXPECT_FALSE(b.HasParseError());
+    EXPECT_TRUE(b.IsObject());
+    EXPECT_EQ(2u, b.MemberCount());
+
+    // Document c; c = a; // does not compile (see static_assert)
+    Document c;
+    c = std::move(b);
+    EXPECT_TRUE(b.IsNull());
+    EXPECT_TRUE(c.IsObject());
+    EXPECT_EQ(2u, c.MemberCount());
+    EXPECT_EQ(&b.GetAllocator(), (void*)0);
+    EXPECT_EQ(&c.GetAllocator(), &allocator);
+}
+
+TYPED_TEST(DocumentMove, MoveAssignmentParseError) {
+    typedef TypeParam Allocator;
+    typedef GenericDocument<UTF8<>, Allocator> Document;
+
+    ParseResult noError;
+    Document a;
+    a.Parse("{ 4 = 4]");
+    ParseResult error(a.GetParseError(), a.GetErrorOffset());
+    EXPECT_TRUE(a.HasParseError());
+    EXPECT_NE(error.Code(), noError.Code());
+    EXPECT_NE(error.Offset(), noError.Offset());
+
+    Document b;
+    b = std::move(a);
+    EXPECT_FALSE(a.HasParseError());
+    EXPECT_TRUE(b.HasParseError());
+    EXPECT_EQ(a.GetParseError(), noError.Code());
+    EXPECT_EQ(b.GetParseError(), error.Code());
+    EXPECT_EQ(a.GetErrorOffset(), noError.Offset());
+    EXPECT_EQ(b.GetErrorOffset(), error.Offset());
+
+    Document c;
+    c = std::move(b);
+    EXPECT_FALSE(b.HasParseError());
+    EXPECT_TRUE(c.HasParseError());
+    EXPECT_EQ(b.GetParseError(), noError.Code());
+    EXPECT_EQ(c.GetParseError(), error.Code());
+    EXPECT_EQ(b.GetErrorOffset(), noError.Offset());
+    EXPECT_EQ(c.GetErrorOffset(), error.Offset());
+}
+
+TYPED_TEST(DocumentMove, MoveAssignmentStack) {
+    typedef TypeParam Allocator;
+    typedef UTF8<> Encoding;
+    typedef GenericDocument<Encoding, Allocator> Document;
+
+    Document a;
+    size_t defaultCapacity = a.GetStackCapacity();
+
+    // Trick Document into getting GetStackCapacity() to return non-zero
+    typedef GenericReader<Encoding, Encoding, Allocator> Reader;
+    Reader reader(&a.GetAllocator());
+    GenericStringStream<Encoding> is("[\"one\", \"two\", \"three\"]");
+    reader.template Parse<kParseDefaultFlags>(is, a);
+    size_t capacity = a.GetStackCapacity();
+    EXPECT_GT(capacity, 0u);
+
+    Document b;
+    b = std::move(a);
+    EXPECT_EQ(a.GetStackCapacity(), defaultCapacity);
+    EXPECT_EQ(b.GetStackCapacity(), capacity);
+
+    Document c;
+    c = std::move(b);
+    EXPECT_EQ(b.GetStackCapacity(), defaultCapacity);
+    EXPECT_EQ(c.GetStackCapacity(), capacity);
+}
+
+#endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
 // Issue 22: Memory corruption via operator=
 // Fixed by making unimplemented assignment operator private.

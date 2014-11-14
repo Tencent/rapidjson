@@ -28,6 +28,8 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/filestream.h"
 #include "rapidjson/filereadstream.h"
+#include "rapidjson/encodedstream.h"
+#include "rapidjson/memorystream.h"
 
 #ifdef RAPIDJSON_SSE2
 #define SIMD_SUFFIX(name) name##_SSE2
@@ -176,6 +178,26 @@ TEST_F(RapidJson, SIMD_SUFFIX(DocumentParse_CrtAllocator)) {
     }
 }
 
+TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseEncodedInputStream_MemoryStream)) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        MemoryStream ms(json_, length_);
+        EncodedInputStream<UTF8<>, MemoryStream> is(ms);
+        Document doc;
+        doc.ParseStream<0, UTF8<> >(is);
+        ASSERT_TRUE(doc.IsObject());
+    }
+}
+
+TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseAutoUTFInputStream_MemoryStream)) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        MemoryStream ms(json_, length_);
+        AutoUTFInputStream<unsigned, MemoryStream> is(ms);
+        Document doc;
+        doc.ParseStream<0, AutoUTF<unsigned> >(is);
+        ASSERT_TRUE(doc.IsObject());
+    }
+}
+
 template<typename T>
 size_t Traverse(const T& value) {
     size_t count = 1;
@@ -302,7 +324,7 @@ TEST_F(RapidJson, UTF8_Validate) {
     }
 }
 
-// Depreciated.
+// Deprecated.
 //TEST_F(RapidJson, FileStream_Read) {
 //  for (size_t i = 0; i < kTrialCount; i++) {
 //      FILE *fp = fopen(filename_, "rb");

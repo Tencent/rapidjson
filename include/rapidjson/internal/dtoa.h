@@ -28,7 +28,7 @@
 #include "itoa.h" // GetDigitsLut()
 #include "diyfp.h"
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
 #ifdef __GNUC__
@@ -91,7 +91,7 @@ inline void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buff
 #endif
         }
         if (d || *len)
-            buffer[(*len)++] = '0' + static_cast<char>(d);
+            buffer[(*len)++] = static_cast<char>('0' + static_cast<char>(d));
         kappa--;
         uint64_t tmp = (static_cast<uint64_t>(p1) << -one.e) + p2;
         if (tmp <= delta) {
@@ -107,7 +107,7 @@ inline void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buff
         delta *= 10;
         char d = static_cast<char>(p2 >> -one.e);
         if (d || *len)
-            buffer[(*len)++] = '0' + d;
+            buffer[(*len)++] = static_cast<char>('0' + d);
         p2 &= one.f - 1;
         kappa--;
         if (p2 < delta) {
@@ -139,7 +139,7 @@ inline char* WriteExponent(int K, char* buffer) {
     }
 
     if (K >= 100) {
-        *buffer++ = '0' + static_cast<char>(K / 100);
+        *buffer++ = static_cast<char>('0' + static_cast<char>(K / 100));
         K %= 100;
         const char* d = GetDigitsLut() + K * 2;
         *buffer++ = d[0];
@@ -151,7 +151,7 @@ inline char* WriteExponent(int K, char* buffer) {
         *buffer++ = d[1];
     }
     else
-        *buffer++ = '0' + static_cast<char>(K);
+        *buffer++ = static_cast<char>('0' + static_cast<char>(K));
 
     return buffer;
 }
@@ -169,14 +169,14 @@ inline char* Prettify(char* buffer, int length, int k) {
     }
     else if (0 < kk && kk <= 21) {
         // 1234e-2 -> 12.34
-        memmove(&buffer[kk + 1], &buffer[kk], length - kk);
+        std::memmove(&buffer[kk + 1], &buffer[kk], length - kk);
         buffer[kk] = '.';
         return &buffer[length + 1];
     }
     else if (-6 < kk && kk <= 0) {
         // 1234e-6 -> 0.001234
         const int offset = 2 - kk;
-        memmove(&buffer[offset], &buffer[0], length);
+        std::memmove(&buffer[offset], &buffer[0], length);
         buffer[0] = '0';
         buffer[1] = '.';
         for (int i = 2; i < offset; i++)
@@ -190,7 +190,7 @@ inline char* Prettify(char* buffer, int length, int k) {
     }
     else {
         // 1234e30 -> 1.234e33
-        memmove(&buffer[2], &buffer[1], length - 1);
+        std::memmove(&buffer[2], &buffer[1], length - 1);
         buffer[1] = '.';
         buffer[length + 1] = 'e';
         return WriteExponent(kk - 1, &buffer[0 + length + 2]);
@@ -220,6 +220,6 @@ RAPIDJSON_DIAG_POP
 #endif
 
 } // namespace internal
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #endif // RAPIDJSON_DTOA_

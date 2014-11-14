@@ -39,6 +39,33 @@ TEST(Value, DefaultConstructor) {
 //}
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
+#include <type_traits>
+
+TEST(Value, Traits) {
+  typedef GenericValue<UTF8<>, CrtAllocator> Value;
+  static_assert( std::is_constructible<Value>::value, "");
+  static_assert( std::is_default_constructible<Value>::value, "");
+  static_assert(!std::is_copy_constructible<Value>::value, "");
+  static_assert( std::is_move_constructible<Value>::value, "");
+
+  static_assert( std::is_nothrow_constructible<Value>::value, "");
+  static_assert( std::is_nothrow_default_constructible<Value>::value, "");
+  static_assert(!std::is_nothrow_copy_constructible<Value>::value, "");
+  static_assert( std::is_nothrow_move_constructible<Value>::value, "");
+
+  static_assert( std::is_assignable<Value,Value>::value, "");
+  static_assert(!std::is_copy_assignable<Value>::value, "");
+  static_assert( std::is_move_assignable<Value>::value, "");
+
+  static_assert( std::is_nothrow_assignable<Value,Value>::value, "");
+  static_assert(!std::is_nothrow_copy_assignable<Value>::value, "");
+  static_assert( std::is_nothrow_move_assignable<Value>::value, "");
+
+  static_assert( std::is_destructible<Value>::value, "");
+  static_assert( std::is_nothrow_destructible<Value>::value, "");
+}
+
 TEST(Value, MoveConstructor) {
     typedef GenericValue<UTF8<>, CrtAllocator> Value;
     Value::AllocatorType allocator;
@@ -49,18 +76,19 @@ TEST(Value, MoveConstructor) {
     EXPECT_TRUE(x.IsArray());
     EXPECT_EQ(4u, x.Size());
 
-    // Value y(x); // should not compile
+    // Value y(x); // does not compile (!is_copy_constructible)
     Value y(std::move(x));
     EXPECT_TRUE(x.IsNull());
     EXPECT_TRUE(y.IsArray());
     EXPECT_EQ(4u, y.Size());
 
-    // Value z = y; // should not compile
+    // Value z = y; // does not compile (!is_copy_assignable)
     Value z = std::move(y);
     EXPECT_TRUE(y.IsNull());
     EXPECT_TRUE(z.IsArray());
     EXPECT_EQ(4u, z.Size());
 }
+
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
 TEST(Value, AssignmentOperator) {
@@ -672,17 +700,17 @@ TEST(Value, Array) {
     EXPECT_FALSE(y.Empty());
     EXPECT_EQ(5u, y.Size());
     EXPECT_TRUE(x[SizeType(0)].IsNull());
-    EXPECT_TRUE(x[1u].IsTrue());
-    EXPECT_TRUE(x[2u].IsFalse());
-    EXPECT_TRUE(x[3u].IsInt());
-    EXPECT_EQ(123, x[3u].GetInt());
+    EXPECT_TRUE(x[1].IsTrue());
+    EXPECT_TRUE(x[2].IsFalse());
+    EXPECT_TRUE(x[3].IsInt());
+    EXPECT_EQ(123, x[3].GetInt());
     EXPECT_TRUE(y[SizeType(0)].IsNull());
-    EXPECT_TRUE(y[1u].IsTrue());
-    EXPECT_TRUE(y[2u].IsFalse());
-    EXPECT_TRUE(y[3u].IsInt());
-    EXPECT_EQ(123, y[3u].GetInt());
-    EXPECT_TRUE(y[4u].IsString());
-    EXPECT_STREQ("foo", y[4u].GetString());
+    EXPECT_TRUE(y[1].IsTrue());
+    EXPECT_TRUE(y[2].IsFalse());
+    EXPECT_TRUE(y[3].IsInt());
+    EXPECT_EQ(123, y[3].GetInt());
+    EXPECT_TRUE(y[4].IsString());
+    EXPECT_STREQ("foo", y[4].GetString());
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     // PushBack(GenericValue&&, Allocator&);
@@ -691,11 +719,11 @@ TEST(Value, Array) {
         y.PushBack(Value(true), allocator);
         y.PushBack(std::move(Value(kArrayType).PushBack(Value(1), allocator).PushBack("foo", allocator)), allocator);
         EXPECT_EQ(2u, y.Size());
-        EXPECT_TRUE(y[0u].IsTrue());
-        EXPECT_TRUE(y[1u].IsArray());
-        EXPECT_EQ(2u, y[1u].Size());
-        EXPECT_TRUE(y[1u][0u].IsInt());
-        EXPECT_TRUE(y[1u][1u].IsString());
+        EXPECT_TRUE(y[0].IsTrue());
+        EXPECT_TRUE(y[1].IsArray());
+        EXPECT_EQ(2u, y[1].Size());
+        EXPECT_TRUE(y[1][0].IsInt());
+        EXPECT_TRUE(y[1][1].IsString());
     }
 #endif
 
@@ -741,9 +769,9 @@ TEST(Value, Array) {
     x.PopBack();
     EXPECT_EQ(4u, x.Size());
     EXPECT_TRUE(y[SizeType(0)].IsNull());
-    EXPECT_TRUE(y[1u].IsTrue());
-    EXPECT_TRUE(y[2u].IsFalse());
-    EXPECT_TRUE(y[3u].IsInt());
+    EXPECT_TRUE(y[1].IsTrue());
+    EXPECT_TRUE(y[2].IsFalse());
+    EXPECT_TRUE(y[3].IsInt());
 
     // Clear()
     x.Clear();
@@ -764,23 +792,23 @@ TEST(Value, Array) {
     EXPECT_EQ(x.Begin(), itr);
     EXPECT_EQ(9u, x.Size());
     for (int i = 0; i < 9; i++)
-        EXPECT_EQ(i + 1, x[i][0u].GetInt());
+        EXPECT_EQ(i + 1, x[i][0].GetInt());
 
     // Ease the last
     itr = x.Erase(x.End() - 1);
     EXPECT_EQ(x.End(), itr);
     EXPECT_EQ(8u, x.Size());
     for (int i = 0; i < 8; i++)
-        EXPECT_EQ(i + 1, x[i][0u].GetInt());
+        EXPECT_EQ(i + 1, x[i][0].GetInt());
 
     // Erase the middle
     itr = x.Erase(x.Begin() + 4);
     EXPECT_EQ(x.Begin() + 4, itr);
     EXPECT_EQ(7u, x.Size());
     for (int i = 0; i < 4; i++)
-        EXPECT_EQ(i + 1, x[i][0u].GetInt());
+        EXPECT_EQ(i + 1, x[i][0].GetInt());
     for (int i = 4; i < 7; i++)
-        EXPECT_EQ(i + 2, x[i][0u].GetInt());
+        EXPECT_EQ(i + 2, x[i][0].GetInt());
 
     // Erase(ValueIterator, ValueIterator)
     // Exhaustive test with all 0 <= first < n, first <= last <= n cases
@@ -800,9 +828,9 @@ TEST(Value, Array) {
             size_t removeCount = last - first;
             EXPECT_EQ(n - removeCount, x.Size());
             for (unsigned i = 0; i < first; i++)
-                EXPECT_EQ(i, x[i][0u].GetUint());
+                EXPECT_EQ(i, x[i][0].GetUint());
             for (unsigned i = first; i < n - removeCount; i++)
-                EXPECT_EQ(i + removeCount, x[i][0u].GetUint());
+                EXPECT_EQ(i + removeCount, x[i][0].GetUint());
         }
     }
 
@@ -1012,7 +1040,7 @@ TEST(Value, Object) {
     for (; itr != x.MemberEnd(); ++itr) {
         int i = (itr - x.MemberBegin()) + 1;
         EXPECT_STREQ(itr->name.GetString(), keys[i]);
-        EXPECT_EQ(i, itr->value[0u].GetInt());
+        EXPECT_EQ(i, itr->value[0].GetInt());
     }
 
     // Erase the last
@@ -1023,7 +1051,7 @@ TEST(Value, Object) {
     for (; itr != x.MemberEnd(); ++itr) {
         int i = (itr - x.MemberBegin()) + 1;
         EXPECT_STREQ(itr->name.GetString(), keys[i]);
-        EXPECT_EQ(i, itr->value[0u].GetInt());
+        EXPECT_EQ(i, itr->value[0].GetInt());
     }
 
     // Erase the middle
@@ -1035,7 +1063,7 @@ TEST(Value, Object) {
         int i = (itr - x.MemberBegin());
         i += (i<4) ? 1 : 2;
         EXPECT_STREQ(itr->name.GetString(), keys[i]);
-        EXPECT_EQ(i, itr->value[0u].GetInt());
+        EXPECT_EQ(i, itr->value[0].GetInt());
     }
 
     // EraseMember(ConstMemberIterator, ConstMemberIterator)
@@ -1056,9 +1084,9 @@ TEST(Value, Object) {
             size_t removeCount = last - first;
             EXPECT_EQ(n - removeCount, x.MemberCount());
             for (unsigned i = 0; i < first; i++)
-                EXPECT_EQ(i, x[keys[i]][0u].GetUint());
+                EXPECT_EQ(i, x[keys[i]][0].GetUint());
             for (unsigned i = first; i < n - removeCount; i++)
-                EXPECT_EQ(i + removeCount, x[keys[i+removeCount]][0u].GetUint());
+                EXPECT_EQ(i + removeCount, x[keys[i+removeCount]][0].GetUint());
         }
     }
 

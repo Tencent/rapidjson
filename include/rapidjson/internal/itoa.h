@@ -21,7 +21,7 @@
 #ifndef RAPIDJSON_ITOA_
 #define RAPIDJSON_ITOA_
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
 inline const char* GetDigitsLut() {
@@ -91,7 +91,7 @@ inline char* u32toa(uint32_t value, char* buffer) {
             *buffer++ = cDigitsLut[i + 1];
         }
         else
-            *buffer++ = '0' + static_cast<char>(a);
+            *buffer++ = static_cast<char>('0' + static_cast<char>(a));
 
         const uint32_t b = value / 10000; // 0 to 9999
         const uint32_t c = value % 10000; // 0 to 9999
@@ -227,14 +227,14 @@ inline char* u64toa(uint64_t value, char* buffer) {
         value %= kTen16;
         
         if (a < 10)
-            *buffer++ = '0' + static_cast<char>(a);
+            *buffer++ = static_cast<char>('0' + static_cast<char>(a));
         else if (a < 100) {
             const uint32_t i = a << 1;
             *buffer++ = cDigitsLut[i];
             *buffer++ = cDigitsLut[i + 1];
         }
         else if (a < 1000) {
-            *buffer++ = '0' + static_cast<char>(a / 100);
+            *buffer++ = static_cast<char>('0' + static_cast<char>(a / 100));
             
             const uint32_t i = (a % 100) << 1;
             *buffer++ = cDigitsLut[i];
@@ -301,6 +301,6 @@ inline char* i64toa(int64_t value, char* buffer) {
 }
 
 } // namespace internal
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #endif // RAPIDJSON_ITOA_

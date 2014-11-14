@@ -22,25 +22,18 @@
 #define PERFTEST_H_
 
 #define TEST_RAPIDJSON  1
-#define TEST_JSONCPP    0
-#define TEST_YAJL       0
-#define TEST_ULTRAJSON  0
 #define TEST_PLATFORM   0
 #define TEST_MISC       0
 
 #define TEST_VERSION_CODE(x,y,z) \
   (((x)*100000) + ((y)*100) + (z))
 
-// Only gcc >4.3 supports SSE4.2
-#if TEST_RAPIDJSON && !(defined(__GNUC__) && TEST_VERSION_CODE(__GNUC__,__GNUC_MINOR__,__GNUC_PATCHLEVEL__) < TEST_VERSION_CODE(4,3,0))
-//#define RAPIDJSON_SSE2
-#define RAPIDJSON_SSE42
-#endif
-
-#if TEST_YAJL
-#include "yajl/yajl_common.h"
-#undef YAJL_MAX_DEPTH
-#define YAJL_MAX_DEPTH 1024
+// __SSE2__ and __SSE4_2__ are recognized by gcc, clang, and the Intel compiler.
+// We use -march=native with gmake to enable -msse2 and -msse4.2, if supported.
+#if defined(__SSE4_2__)
+#  define RAPIDJSON_SSE42
+#elif defined(__SSE2__)
+#  define RAPIDJSON_SSE2
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////

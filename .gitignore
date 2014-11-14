@@ -6,5 +6,6 @@
 /build/gmake
 /build/vs*/
 /doc/html
+/doc/doxygen_*.db
 /thirdparty/lib
 /intermediate

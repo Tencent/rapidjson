@@ -23,7 +23,7 @@
 
 #include "rapidjson.h"
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 
 //! Represents an in-memory input byte stream.
 /*!
@@ -42,7 +42,7 @@ struct MemoryStream {
 
     MemoryStream(const Ch *src, size_t size) : src_(src), begin_(src), end_(src + size), size_(size) {}
 
-    Ch Peek() const { return *src_; }
+    Ch Peek() const { return (src_ == end_) ? '\0' : *src_; }
     Ch Take() { return (src_ == end_) ? '\0' : *src_++; }
     size_t Tell() const { return static_cast<size_t>(src_ - begin_); }
 
@@ -62,6 +62,6 @@ struct MemoryStream {
     size_t size_;       //!< Size of the stream.
 };
 
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #endif // RAPIDJSON_MEMORYBUFFER_H_
