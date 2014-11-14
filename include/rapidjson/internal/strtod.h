@@ -147,8 +147,8 @@ inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosit
     uint64_t significand = 0;
     size_t i = 0;   // 2^64 - 1 = 18446744073709551615, 1844674407370955161 = 0x1999999999999999    
     for (; i < length; i++) {
-        if (significand >  RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) ||
-            significand == RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) && decimals[i] > '5')
+        if (significand  >  RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) ||
+            (significand == RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) && decimals[i] > '5'))
             break;
         significand = significand * 10 + (decimals[i] - '0');
     }
@@ -262,7 +262,7 @@ inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t 
 
     // Trim right-most digits
     const int kMaxDecimalDigit = 780;
-    if (length > kMaxDecimalDigit) {
+    if ((int)length > kMaxDecimalDigit) {
         exp += (int(length) - kMaxDecimalDigit);
         length = kMaxDecimalDigit;
     }
