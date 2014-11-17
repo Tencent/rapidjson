@@ -315,7 +315,7 @@ template&lt;typename OutputStream, typename SourceEncoding = UTF8&lt;&gt;, typen
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -324,7 +324,7 @@ template&lt;typename OutputStream, typename SourceEncoding = UTF8&lt;&gt;, typen
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">os</td><td>Output stream. </td></tr>
-    <tr><td class="paramname">allocator</td><td>User supplied allocator. If it is null, it will create a private one. </td></tr>
+    <tr><td class="paramname">stackAllocator</td><td>User supplied allocator. If it is null, it will create a private one. </td></tr>
     <tr><td class="paramname">levelDepth</td><td>Initial capacity of stack. </td></tr>
   </table>
   </dd>
