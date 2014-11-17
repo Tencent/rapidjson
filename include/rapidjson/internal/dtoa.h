@@ -45,7 +45,7 @@ RAPIDJSON_DIAG_OFF(effc++)
 struct DiyFp {
     DiyFp() {}
 
-    DiyFp(uint64_t f, int e) : f(f), e(e) {}
+    DiyFp(uint64_t fp, int exp) : f(fp), e(exp) {}
 
     DiyFp(double d) {
         union {
