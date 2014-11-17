@@ -59,7 +59,7 @@ public:
 
     //! Constructor
     /*! \param os Output stream.
-        \param allocator User supplied allocator. If it is null, it will create a private one.
+        \param stackAllocator User supplied allocator. If it is null, it will create a private one.
         \param levelDepth Initial capacity of stack.
     */
     Writer(OutputStream& os, StackAllocator* stackAllocator = 0, size_t levelDepth = kDefaultLevelDepth) : 
