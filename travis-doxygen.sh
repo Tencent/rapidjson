@@ -4,7 +4,6 @@
 
 set -e
 
-SUDO=sudo
 DOXYGEN_VER=doxygen-1.8.7
 DOXYGEN_TAR=${DOXYGEN_VER}.linux.bin.tar.gz
 DOXYGEN_URL="http://ftp.stack.nl/pub/users/dimitri/${DOXYGEN_TAR}"
@@ -51,14 +50,13 @@ doxygen_install()
 {
 	wget -O - "${DOXYGEN_URL}" | \
 		tar xz -C ${TMPDIR-/tmp} ${DOXYGEN_VER}/bin/doxygen
-	$SUDO install -m 755 ${TMPDIR-/tmp}/${DOXYGEN_VER}/bin/doxygen \
-		${DOXYGEN_BIN};
+    export PATH="${TMPDIR-/tmp}/${DOXYGEN_VER}/bin:$PATH"
 }
 
 doxygen_run()
 {
-	cd "${TRAVIS_BUILD_DIR}/build/doc";
-	doxygen Doxyfile;
+	cd "${TRAVIS_BUILD_DIR}";
+	doxygen ${TRAVIS_BUILD_DIR}/build/doc/Doxyfile;
 }
 
 gh_pages_prepare()
