@@ -1862,6 +1862,8 @@ private:
     }
 
 private:
+    //! Prohibit copying
+    GenericDocument(const GenericDocument&);
     //! Prohibit assignment
     GenericDocument& operator=(const GenericDocument&);
 
