@@ -1944,50 +1944,52 @@ $(document).ready(function(){initNavTree('document_8h_source.html','');});
 <div class="line"><a name="l01862"></a><span class="lineno"> 1862</span>&#160;    }</div>
 <div class="line"><a name="l01863"></a><span class="lineno"> 1863</span>&#160;</div>
 <div class="line"><a name="l01864"></a><span class="lineno"> 1864</span>&#160;<span class="keyword">private</span>:<span class="comment"></span></div>
-<div class="line"><a name="l01865"></a><span class="lineno"> 1865</span>&#160;<span class="comment">    //! Prohibit assignment</span></div>
-<div class="line"><a name="l01866"></a><span class="lineno"> 1866</span>&#160;<span class="comment"></span>    GenericDocument&amp; operator=(<span class="keyword">const</span> GenericDocument&amp;);</div>
-<div class="line"><a name="l01867"></a><span class="lineno"> 1867</span>&#160;</div>
-<div class="line"><a name="l01868"></a><span class="lineno"> 1868</span>&#160;    <span class="keywordtype">void</span> ClearStack() {</div>
-<div class="line"><a name="l01869"></a><span class="lineno"> 1869</span>&#160;        <span class="keywordflow">if</span> (Allocator::kNeedFree)</div>
-<div class="line"><a name="l01870"></a><span class="lineno"> 1870</span>&#160;            <span class="keywordflow">while</span> (stack_.GetSize() &gt; 0)    <span class="comment">// Here assumes all elements in stack array are GenericValue (Member is actually 2 GenericValue objects)</span></div>
-<div class="line"><a name="l01871"></a><span class="lineno"> 1871</span>&#160;                (stack_.template Pop&lt;ValueType&gt;(1))-&gt;~ValueType();</div>
-<div class="line"><a name="l01872"></a><span class="lineno"> 1872</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01873"></a><span class="lineno"> 1873</span>&#160;            stack_.Clear();</div>
-<div class="line"><a name="l01874"></a><span class="lineno"> 1874</span>&#160;        stack_.ShrinkToFit();</div>
-<div class="line"><a name="l01875"></a><span class="lineno"> 1875</span>&#160;    }</div>
-<div class="line"><a name="l01876"></a><span class="lineno"> 1876</span>&#160;</div>
-<div class="line"><a name="l01877"></a><span class="lineno"> 1877</span>&#160;    <span class="keywordtype">void</span> Destroy() {</div>
-<div class="line"><a name="l01878"></a><span class="lineno"> 1878</span>&#160;        <a class="code" href="rapidjson_8h.html#a52c941c3fdd646527cdcd42aa846a28a">RAPIDJSON_DELETE</a>(ownAllocator_);</div>
-<div class="line"><a name="l01879"></a><span class="lineno"> 1879</span>&#160;    }</div>
-<div class="line"><a name="l01880"></a><span class="lineno"> 1880</span>&#160;</div>
-<div class="line"><a name="l01881"></a><span class="lineno"> 1881</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">size_t</span> kDefaultStackCapacity = 1024;</div>
-<div class="line"><a name="l01882"></a><span class="lineno"> 1882</span>&#160;    Allocator* allocator_;</div>
-<div class="line"><a name="l01883"></a><span class="lineno"> 1883</span>&#160;    Allocator* ownAllocator_;</div>
-<div class="line"><a name="l01884"></a><span class="lineno"> 1884</span>&#160;    internal::Stack&lt;StackAllocator&gt; stack_;</div>
-<div class="line"><a name="l01885"></a><span class="lineno"> 1885</span>&#160;    ParseResult parseResult_;</div>
-<div class="line"><a name="l01886"></a><span class="lineno"> 1886</span>&#160;};</div>
-<div class="line"><a name="l01887"></a><span class="lineno"> 1887</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l01888"></a><span class="lineno"> 1888</span>&#160;<span class="comment">//! GenericDocument with UTF8 encoding</span></div>
-<div class="line"><a name="l01889"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659"> 1889</a></span>&#160;<span class="comment"></span><span class="keyword">typedef</span> <a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument&lt;UTF8&lt;&gt;</a> &gt; <a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a>;</div>
-<div class="line"><a name="l01890"></a><span class="lineno"> 1890</span>&#160;</div>
-<div class="line"><a name="l01891"></a><span class="lineno"> 1891</span>&#160;<span class="comment">// defined here due to the dependency on GenericDocument</span></div>
-<div class="line"><a name="l01892"></a><span class="lineno"> 1892</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Encoding, <span class="keyword">typename</span> Allocator&gt;</div>
-<div class="line"><a name="l01893"></a><span class="lineno"> 1893</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> SourceAllocator&gt;</div>
-<div class="line"><a name="l01894"></a><span class="lineno"> 1894</span>&#160;<span class="keyword">inline</span></div>
-<div class="line"><a name="l01895"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_generic_value.html#a62a9fac23db014e88c508c2020573679"> 1895</a></span>&#160;<a class="code" href="classrapidjson_1_1_generic_value.html">GenericValue&lt;Encoding,Allocator&gt;::GenericValue</a>(<span class="keyword">const</span> <a class="code" href="classrapidjson_1_1_generic_value.html">GenericValue&lt;Encoding,SourceAllocator&gt;</a>&amp; rhs, <a class="code" href="classrapidjson_1_1_allocator.html">Allocator</a>&amp; allocator)</div>
-<div class="line"><a name="l01896"></a><span class="lineno"> 1896</span>&#160;{</div>
-<div class="line"><a name="l01897"></a><span class="lineno"> 1897</span>&#160;    <a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument&lt;Encoding,Allocator&gt;</a> d(&amp;allocator);</div>
-<div class="line"><a name="l01898"></a><span class="lineno"> 1898</span>&#160;    rhs.Accept(d);</div>
-<div class="line"><a name="l01899"></a><span class="lineno"> 1899</span>&#160;    RawAssign(*d.stack_.template Pop&lt;GenericValue&gt;(1));</div>
-<div class="line"><a name="l01900"></a><span class="lineno"> 1900</span>&#160;}</div>
-<div class="line"><a name="l01901"></a><span class="lineno"> 1901</span>&#160;</div>
-<div class="line"><a name="l01902"></a><span class="lineno"> 1902</span>&#160;RAPIDJSON_NAMESPACE_END</div>
+<div class="line"><a name="l01865"></a><span class="lineno"> 1865</span>&#160;<span class="comment">    //! Prohibit copying</span></div>
+<div class="line"><a name="l01866"></a><span class="lineno"> 1866</span>&#160;<span class="comment"></span>    GenericDocument(<span class="keyword">const</span> GenericDocument&amp;);<span class="comment"></span></div>
+<div class="line"><a name="l01867"></a><span class="lineno"> 1867</span>&#160;<span class="comment">    //! Prohibit assignment</span></div>
+<div class="line"><a name="l01868"></a><span class="lineno"> 1868</span>&#160;<span class="comment"></span>    GenericDocument&amp; operator=(<span class="keyword">const</span> GenericDocument&amp;);</div>
+<div class="line"><a name="l01869"></a><span class="lineno"> 1869</span>&#160;</div>
+<div class="line"><a name="l01870"></a><span class="lineno"> 1870</span>&#160;    <span class="keywordtype">void</span> ClearStack() {</div>
+<div class="line"><a name="l01871"></a><span class="lineno"> 1871</span>&#160;        <span class="keywordflow">if</span> (Allocator::kNeedFree)</div>
+<div class="line"><a name="l01872"></a><span class="lineno"> 1872</span>&#160;            <span class="keywordflow">while</span> (stack_.GetSize() &gt; 0)    <span class="comment">// Here assumes all elements in stack array are GenericValue (Member is actually 2 GenericValue objects)</span></div>
+<div class="line"><a name="l01873"></a><span class="lineno"> 1873</span>&#160;                (stack_.template Pop&lt;ValueType&gt;(1))-&gt;~ValueType();</div>
+<div class="line"><a name="l01874"></a><span class="lineno"> 1874</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01875"></a><span class="lineno"> 1875</span>&#160;            stack_.Clear();</div>
+<div class="line"><a name="l01876"></a><span class="lineno"> 1876</span>&#160;        stack_.ShrinkToFit();</div>
+<div class="line"><a name="l01877"></a><span class="lineno"> 1877</span>&#160;    }</div>
+<div class="line"><a name="l01878"></a><span class="lineno"> 1878</span>&#160;</div>
+<div class="line"><a name="l01879"></a><span class="lineno"> 1879</span>&#160;    <span class="keywordtype">void</span> Destroy() {</div>
+<div class="line"><a name="l01880"></a><span class="lineno"> 1880</span>&#160;        <a class="code" href="rapidjson_8h.html#a52c941c3fdd646527cdcd42aa846a28a">RAPIDJSON_DELETE</a>(ownAllocator_);</div>
+<div class="line"><a name="l01881"></a><span class="lineno"> 1881</span>&#160;    }</div>
+<div class="line"><a name="l01882"></a><span class="lineno"> 1882</span>&#160;</div>
+<div class="line"><a name="l01883"></a><span class="lineno"> 1883</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">size_t</span> kDefaultStackCapacity = 1024;</div>
+<div class="line"><a name="l01884"></a><span class="lineno"> 1884</span>&#160;    Allocator* allocator_;</div>
+<div class="line"><a name="l01885"></a><span class="lineno"> 1885</span>&#160;    Allocator* ownAllocator_;</div>
+<div class="line"><a name="l01886"></a><span class="lineno"> 1886</span>&#160;    internal::Stack&lt;StackAllocator&gt; stack_;</div>
+<div class="line"><a name="l01887"></a><span class="lineno"> 1887</span>&#160;    ParseResult parseResult_;</div>
+<div class="line"><a name="l01888"></a><span class="lineno"> 1888</span>&#160;};</div>
+<div class="line"><a name="l01889"></a><span class="lineno"> 1889</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l01890"></a><span class="lineno"> 1890</span>&#160;<span class="comment">//! GenericDocument with UTF8 encoding</span></div>
+<div class="line"><a name="l01891"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659"> 1891</a></span>&#160;<span class="comment"></span><span class="keyword">typedef</span> <a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument&lt;UTF8&lt;&gt;</a> &gt; <a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a>;</div>
+<div class="line"><a name="l01892"></a><span class="lineno"> 1892</span>&#160;</div>
+<div class="line"><a name="l01893"></a><span class="lineno"> 1893</span>&#160;<span class="comment">// defined here due to the dependency on GenericDocument</span></div>
+<div class="line"><a name="l01894"></a><span class="lineno"> 1894</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> Encoding, <span class="keyword">typename</span> Allocator&gt;</div>
+<div class="line"><a name="l01895"></a><span class="lineno"> 1895</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> SourceAllocator&gt;</div>
+<div class="line"><a name="l01896"></a><span class="lineno"> 1896</span>&#160;<span class="keyword">inline</span></div>
+<div class="line"><a name="l01897"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_generic_value.html#a62a9fac23db014e88c508c2020573679"> 1897</a></span>&#160;<a class="code" href="classrapidjson_1_1_generic_value.html">GenericValue&lt;Encoding,Allocator&gt;::GenericValue</a>(<span class="keyword">const</span> <a class="code" href="classrapidjson_1_1_generic_value.html">GenericValue&lt;Encoding,SourceAllocator&gt;</a>&amp; rhs, <a class="code" href="classrapidjson_1_1_allocator.html">Allocator</a>&amp; allocator)</div>
+<div class="line"><a name="l01898"></a><span class="lineno"> 1898</span>&#160;{</div>
+<div class="line"><a name="l01899"></a><span class="lineno"> 1899</span>&#160;    <a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument&lt;Encoding,Allocator&gt;</a> d(&amp;allocator);</div>
+<div class="line"><a name="l01900"></a><span class="lineno"> 1900</span>&#160;    rhs.Accept(d);</div>
+<div class="line"><a name="l01901"></a><span class="lineno"> 1901</span>&#160;    RawAssign(*d.stack_.template Pop&lt;GenericValue&gt;(1));</div>
+<div class="line"><a name="l01902"></a><span class="lineno"> 1902</span>&#160;}</div>
 <div class="line"><a name="l01903"></a><span class="lineno"> 1903</span>&#160;</div>
-<div class="line"><a name="l01904"></a><span class="lineno"> 1904</span>&#160;<span class="preprocessor">#if defined(_MSC_VER) || defined(__GNUC__)</span></div>
-<div class="line"><a name="l01905"></a><span class="lineno"> 1905</span>&#160;RAPIDJSON_DIAG_POP</div>
-<div class="line"><a name="l01906"></a><span class="lineno"> 1906</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l01907"></a><span class="lineno"> 1907</span>&#160;</div>
-<div class="line"><a name="l01908"></a><span class="lineno"> 1908</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_DOCUMENT_H_</span></div>
+<div class="line"><a name="l01904"></a><span class="lineno"> 1904</span>&#160;RAPIDJSON_NAMESPACE_END</div>
+<div class="line"><a name="l01905"></a><span class="lineno"> 1905</span>&#160;</div>
+<div class="line"><a name="l01906"></a><span class="lineno"> 1906</span>&#160;<span class="preprocessor">#if defined(_MSC_VER) || defined(__GNUC__)</span></div>
+<div class="line"><a name="l01907"></a><span class="lineno"> 1907</span>&#160;RAPIDJSON_DIAG_POP</div>
+<div class="line"><a name="l01908"></a><span class="lineno"> 1908</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l01909"></a><span class="lineno"> 1909</span>&#160;</div>
+<div class="line"><a name="l01910"></a><span class="lineno"> 1910</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_DOCUMENT_H_</span></div>
 <div class="ttc" id="classrapidjson_1_1_generic_member_iterator_html_a41b953d6523fdc09f4f21c7b345e5833"><div class="ttname"><a href="classrapidjson_1_1_generic_member_iterator.html#a41b953d6523fdc09f4f21c7b345e5833">rapidjson::GenericMemberIterator::DifferenceType</a></div><div class="ttdeci">BaseType::difference_type DifferenceType</div><div class="ttdoc">Signed integer type (e.g. ptrdiff_t) </div><div class="ttdef"><b>Definition:</b> document.h:136</div></div>
 <div class="ttc" id="classrapidjson_1_1_generic_document_html_a41bbec044c421e870a9d355075d741bc"><div class="ttname"><a href="classrapidjson_1_1_generic_document.html#a41bbec044c421e870a9d355075d741bc">rapidjson::GenericDocument::ValueType</a></div><div class="ttdeci">GenericValue&lt; Encoding, Allocator &gt; ValueType</div><div class="ttdoc">Value type of the document. </div><div class="ttdef"><b>Definition:</b> document.h:1625</div></div>
 <div class="ttc" id="classrapidjson_1_1_generic_value_html_a4a8060a42b7953a2981ad892180ca5a6"><div class="ttname"><a href="classrapidjson_1_1_generic_value.html#a4a8060a42b7953a2981ad892180ca5a6">rapidjson::GenericValue::GenericValue</a></div><div class="ttdeci">GenericValue(unsigned u) RAPIDJSON_NOEXCEPT</div><div class="ttdoc">Constructor for unsigned value. </div><div class="ttdef"><b>Definition:</b> document.h:502</div></div>
@@ -2128,7 +2130,7 @@ $(document).ready(function(){initNavTree('document_8h_source.html','');});
 <div class="ttc" id="classrapidjson_1_1_generic_document_html_a2ab17089bd6249bf2a7959d56d35cb68"><div class="ttname"><a href="classrapidjson_1_1_generic_document.html#a2ab17089bd6249bf2a7959d56d35cb68">rapidjson::GenericDocument::HasParseError</a></div><div class="ttdeci">bool HasParseError() const </div><div class="ttdoc">Whether a parse error has occured in the last parsing. </div><div class="ttdef"><b>Definition:</b> document.h:1798</div></div>
 <div class="ttc" id="classrapidjson_1_1_generic_value_html_a85dc131bdad8077ce970d580d333d15a"><div class="ttname"><a href="classrapidjson_1_1_generic_value.html#a85dc131bdad8077ce970d580d333d15a">rapidjson::GenericValue::AddMember</a></div><div class="ttdeci">GenericValue &amp; AddMember(StringRefType name, GenericValue &amp;value, Allocator &amp;allocator)</div><div class="ttdoc">Add a member (name-value pair) to the object. </div><div class="ttdef"><b>Definition:</b> document.h:980</div></div>
 <div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:315</div></div>
-<div class="ttc" id="namespacerapidjson_html_a660c934c2959121babf799b6cb206659"><div class="ttname"><a href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">rapidjson::Document</a></div><div class="ttdeci">GenericDocument&lt; UTF8&lt;&gt; &gt; Document</div><div class="ttdoc">GenericDocument with UTF8 encoding. </div><div class="ttdef"><b>Definition:</b> document.h:1889</div></div>
+<div class="ttc" id="namespacerapidjson_html_a660c934c2959121babf799b6cb206659"><div class="ttname"><a href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">rapidjson::Document</a></div><div class="ttdeci">GenericDocument&lt; UTF8&lt;&gt; &gt; Document</div><div class="ttdoc">GenericDocument with UTF8 encoding. </div><div class="ttdef"><b>Definition:</b> document.h:1891</div></div>
 <div class="ttc" id="classrapidjson_1_1_generic_value_html_a1f125e735577aae64c0306345de45563"><div class="ttname"><a href="classrapidjson_1_1_generic_value.html#a1f125e735577aae64c0306345de45563">rapidjson::GenericValue::GenericValue</a></div><div class="ttdeci">GenericValue(uint64_t u64) RAPIDJSON_NOEXCEPT</div><div class="ttdoc">Constructor for uint64_t value. </div><div class="ttdef"><b>Definition:</b> document.h:523</div></div>
 <div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a">rapidjson::kNumberType</a></div><div class="ttdoc">number </div><div class="ttdef"><b>Definition:</b> rapidjson.h:623</div></div>
 <div class="ttc" id="classrapidjson_1_1_generic_document_html_a7ba626bf84eb45a9bca0b7723bf47f3f"><div class="ttname"><a href="classrapidjson_1_1_generic_document.html#a7ba626bf84eb45a9bca0b7723bf47f3f">rapidjson::GenericDocument::ParseInsitu</a></div><div class="ttdeci">GenericDocument &amp; ParseInsitu(Ch *str)</div><div class="ttdoc">Parse JSON text from a mutable string. </div><div class="ttdef"><b>Definition:</b> document.h:1749</div></div>
