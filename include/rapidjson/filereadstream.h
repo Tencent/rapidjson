@@ -40,7 +40,7 @@ public:
         \param buffer user-supplied buffer.
         \param bufferSize size of buffer in bytes. Must >=4 bytes.
     */
-    FileReadStream(FILE* fp, char* buffer, size_t bufferSize) : fp_(fp), buffer_(buffer), bufferSize_(bufferSize), bufferLast_(0), current_(buffer_), readCount_(0), count_(0), eof_(false) { 
+    FileReadStream(std::FILE* fp, char* buffer, size_t bufferSize) : fp_(fp), buffer_(buffer), bufferSize_(bufferSize), bufferLast_(0), current_(buffer_), readCount_(0), count_(0), eof_(false) { 
         RAPIDJSON_ASSERT(fp_ != 0);
         RAPIDJSON_ASSERT(bufferSize >= 4);
         Read();
@@ -79,7 +79,7 @@ private:
         }
     }
 
-    FILE* fp_;
+    std::FILE* fp_;
     Ch *buffer_;
     size_t bufferSize_;
     Ch *bufferLast_;
