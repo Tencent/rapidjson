@@ -179,7 +179,8 @@ inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosit
             DiyFp(RAPIDJSON_UINT64_C2(0xf4240000, 00000000), -44),  // 10^6
             DiyFp(RAPIDJSON_UINT64_C2(0x98968000, 00000000), -40)   // 10^7
         };
-        int adjustment = dExp - actualExp - 1;        
+        int adjustment = dExp - actualExp - 1;
+        RAPIDJSON_ASSERT(adjustment >= 0 && adjustment < 7);
         v = v * kPow10[adjustment];
         if (length + adjustment > 19) // has more digits than decimal digits in 64-bit
             error += kUlp / 2;

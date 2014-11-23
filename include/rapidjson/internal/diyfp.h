@@ -102,8 +102,8 @@ struct DiyFp {
         unsigned long index;
         _BitScanReverse64(&index, f);
         return DiyFp(f << (63 - index), e - (63 - index));
-#elif 0//defined(__GNUC__)
-        int s = __builtin_clzll(f) + 1;
+#elif defined(__GNUC__) && __GNUC__ >= 4
+        int s = __builtin_clzll(f);
         return DiyFp(f << s, e - s);
 #else
         DiyFp res = *this;
@@ -111,22 +111,11 @@ struct DiyFp {
             res.f <<= 1;
             res.e--;
         }
-        // while (!(res.f & kDpHiddenBit)) {
-        //     res.f <<= 1;
-        //     res.e--;
-        // }
-        // res.f <<= (kDiySignificandSize - kDpSignificandSize - 1);
-        // res.e = res.e - (kDiySignificandSize - kDpSignificandSize - 1);
         return res;
 #endif
     }
 
     DiyFp NormalizeBoundary() const {
-#if defined(_MSC_VER) && defined(_M_AMD64)
-        unsigned long index;
-        _BitScanReverse64(&index, f);
-        return DiyFp (f << (63 - index), e - (63 - index));
-#else
         DiyFp res = *this;
         while (!(res.f & (kDpHiddenBit << 1))) {
             res.f <<= 1;
@@ -135,7 +124,6 @@ struct DiyFp {
         res.f <<= (kDiySignificandSize - kDpSignificandSize - 2);
         res.e = res.e - (kDiySignificandSize - kDpSignificandSize - 2);
         return res;
-#endif
     }
 
     void NormalizedBoundaries(DiyFp* minus, DiyFp* plus) const {
