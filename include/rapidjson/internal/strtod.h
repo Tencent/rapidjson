@@ -27,7 +27,7 @@
 #include "diyfp.h"
 #include "pow10.h"
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
 inline double FastPath(double significand, int exp) {
@@ -280,6 +280,6 @@ inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t 
 }
 
 } // namespace internal
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #endif // RAPIDJSON_STRTOD_

@@ -23,7 +23,7 @@
 
 #include "../rapidjson.h"
 
-namespace rapidjson {
+RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
 class BigInteger {
@@ -285,6 +285,6 @@ private:
 };
 
 } // namespace internal
-} // namespace rapidjson
+RAPIDJSON_NAMESPACE_END
 
 #endif // RAPIDJSON_BIGINTEGER_H_
