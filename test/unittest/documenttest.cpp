@@ -232,26 +232,38 @@ TEST(Document, UTF16_Document) {
 #include <type_traits>
 
 TEST(Document, Traits) {
-  static_assert( std::is_constructible<Document>::value, "");
-  static_assert( std::is_default_constructible<Document>::value, "");
-  static_assert(!std::is_copy_constructible<Document>::value, "");
-  static_assert( std::is_move_constructible<Document>::value, "");
+    static_assert(std::is_constructible<Document>::value, "");
+    static_assert(std::is_default_constructible<Document>::value, "");
+#ifndef _MSC_VER
+    static_assert(!std::is_copy_constructible<Document>::value, "");
+#endif
+    static_assert(std::is_move_constructible<Document>::value, "");
 
-  static_assert(!std::is_nothrow_constructible<Document>::value, "");
-  static_assert(!std::is_nothrow_default_constructible<Document>::value, "");
-  static_assert(!std::is_nothrow_copy_constructible<Document>::value, "");
-  static_assert( std::is_nothrow_move_constructible<Document>::value, "");
+    static_assert(!std::is_nothrow_constructible<Document>::value, "");
+    static_assert(!std::is_nothrow_default_constructible<Document>::value, "");
+    static_assert(!std::is_nothrow_copy_constructible<Document>::value, "");
+#ifndef _MSC_VER
+    static_assert(std::is_nothrow_move_constructible<Document>::value, "");
+#endif
 
-  static_assert( std::is_assignable<Document,Document>::value, "");
+    static_assert(std::is_assignable<Document,Document>::value, "");
+#ifndef _MSC_VER
   static_assert(!std::is_copy_assignable<Document>::value, "");
-  static_assert( std::is_move_assignable<Document>::value, "");
+#endif
+    static_assert(std::is_move_assignable<Document>::value, "");
 
-  static_assert( std::is_nothrow_assignable<Document,Document>::value, "");
-  static_assert(!std::is_nothrow_copy_assignable<Document>::value, "");
-  static_assert( std::is_nothrow_move_assignable<Document>::value, "");
+#ifndef _MSC_VER
+    static_assert(std::is_nothrow_assignable<Document, Document>::value, "");
+#endif
+    static_assert(!std::is_nothrow_copy_assignable<Document>::value, "");
+#ifndef _MSC_VER
+    static_assert(std::is_nothrow_move_assignable<Document>::value, "");
+#endif
 
-  static_assert( std::is_destructible<Document>::value, "");
-  static_assert( std::is_nothrow_destructible<Document>::value, "");
+    static_assert( std::is_destructible<Document>::value, "");
+#ifndef _MSC_VER
+    static_assert(std::is_nothrow_destructible<Document>::value, "");
+#endif
 }
 
 template <typename Allocator>
