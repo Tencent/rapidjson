@@ -43,27 +43,41 @@ TEST(Value, DefaultConstructor) {
 #include <type_traits>
 
 TEST(Value, Traits) {
-  typedef GenericValue<UTF8<>, CrtAllocator> Value;
-  static_assert( std::is_constructible<Value>::value, "");
-  static_assert( std::is_default_constructible<Value>::value, "");
-  static_assert(!std::is_copy_constructible<Value>::value, "");
-  static_assert( std::is_move_constructible<Value>::value, "");
+    typedef GenericValue<UTF8<>, CrtAllocator> Value;
+    static_assert(std::is_constructible<Value>::value, "");
+    static_assert(std::is_default_constructible<Value>::value, "");
+#ifndef _MSC_VER
+    static_assert(!std::is_copy_constructible<Value>::value, "");
+#endif
+    static_assert(std::is_move_constructible<Value>::value, "");
 
-  static_assert( std::is_nothrow_constructible<Value>::value, "");
-  static_assert( std::is_nothrow_default_constructible<Value>::value, "");
-  static_assert(!std::is_nothrow_copy_constructible<Value>::value, "");
-  static_assert( std::is_nothrow_move_constructible<Value>::value, "");
+#ifndef _MSC_VER
+    static_assert(std::is_nothrow_constructible<Value>::value, "");
+    static_assert(std::is_nothrow_default_constructible<Value>::value, "");
+#endif
+    static_assert(!std::is_nothrow_copy_constructible<Value>::value, "");
+#ifndef _MSC_VER
+    static_assert(std::is_nothrow_move_constructible<Value>::value, "");
+#endif
 
-  static_assert( std::is_assignable<Value,Value>::value, "");
-  static_assert(!std::is_copy_assignable<Value>::value, "");
-  static_assert( std::is_move_assignable<Value>::value, "");
+    static_assert(std::is_assignable<Value,Value>::value, "");
+#ifndef _MSC_VER
+    static_assert(!std::is_copy_assignable<Value>::value, "");
+#endif
+    static_assert(std::is_move_assignable<Value>::value, "");
 
-  static_assert( std::is_nothrow_assignable<Value,Value>::value, "");
-  static_assert(!std::is_nothrow_copy_assignable<Value>::value, "");
-  static_assert( std::is_nothrow_move_assignable<Value>::value, "");
+#ifndef _MSC_VER
+    static_assert(std::is_nothrow_assignable<Value, Value>::value, "");
+#endif
+    static_assert(!std::is_nothrow_copy_assignable<Value>::value, "");
+#ifndef _MSC_VER
+    static_assert(std::is_nothrow_move_assignable<Value>::value, "");
+#endif
 
-  static_assert( std::is_destructible<Value>::value, "");
-  static_assert( std::is_nothrow_destructible<Value>::value, "");
+    static_assert(std::is_destructible<Value>::value, "");
+#ifndef _MSC_VER
+    static_assert(std::is_nothrow_destructible<Value>::value, "");
+#endif
 }
 
 TEST(Value, MoveConstructor) {
