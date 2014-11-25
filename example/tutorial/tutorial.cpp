@@ -7,6 +7,7 @@
 #include <cstdio>
 
 using namespace rapidjson;
+using namespace std;
 
 int main(int, char*[]) {
     ////////////////////////////////////////////////////////////////////////////
