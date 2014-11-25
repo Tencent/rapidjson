@@ -1,7 +1,7 @@
 var classrapidjson_1_1_file_write_stream =
 [
     [ "Ch", "classrapidjson_1_1_file_write_stream.html#afc606cc81f6c3709d81bf99b30566330", null ],
-    [ "FileWriteStream", "classrapidjson_1_1_file_write_stream.html#acf86731c17157a6ceceec5506c6eabe8", null ],
+    [ "FileWriteStream", "classrapidjson_1_1_file_write_stream.html#a9abf2078f78a30c7ad868f480e4221be", null ],
     [ "Flush", "classrapidjson_1_1_file_write_stream.html#ad21fb3d1318a91a1d32ce971378981e1", null ],
     [ "Peek", "classrapidjson_1_1_file_write_stream.html#aa29c9e8cf63110d93ff7efd3c9878ff5", null ],
     [ "Put", "classrapidjson_1_1_file_write_stream.html#a5a3b2b270c90f4672400d36a4f056fbc", null ],

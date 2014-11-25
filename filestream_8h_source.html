@@ -118,7 +118,7 @@ $(document).ready(function(){initNavTree('filestream_8h_source.html','');});
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_file_stream.html#a7268db443b6fce9563ced1c3fc7a99aa">   37</a></span>&#160;    <span class="keyword">typedef</span> <span class="keywordtype">char</span> <a class="code" href="classrapidjson_1_1_file_stream.html#a7268db443b6fce9563ced1c3fc7a99aa">Ch</a>;    <span class="comment">//!&lt; Character type. Only support char.</span></div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="code" href="classrapidjson_1_1_file_stream.html">FileStream</a>(FILE* fp) : fp_(fp), current_(<span class="stringliteral">&#39;\0&#39;</span>), count_(0) { Read(); }</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <a class="code" href="classrapidjson_1_1_file_stream.html">FileStream</a>(std::FILE* fp) : fp_(fp), current_(<span class="stringliteral">&#39;\0&#39;</span>), count_(0) { Read(); }</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordtype">char</span> Peek()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> current_; }</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">char</span> Take() { <span class="keywordtype">char</span> c = current_; Read(); <span class="keywordflow">return</span> c; }</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">size_t</span> Tell()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> count_; }</div>
@@ -145,7 +145,7 @@ $(document).ready(function(){initNavTree('filestream_8h_source.html','');});
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;            current_ = <span class="charliteral">&#39;\0&#39;</span>;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    }</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    FILE* fp_;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    std::FILE* fp_;</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordtype">char</span> current_;</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keywordtype">size_t</span> count_;</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;};</div>

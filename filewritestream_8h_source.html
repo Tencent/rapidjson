@@ -116,7 +116,7 @@ $(document).ready(function(){initNavTree('filewritestream_8h_source.html','');})
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_file_write_stream.html#afc606cc81f6c3709d81bf99b30566330">   35</a></span>&#160;    <span class="keyword">typedef</span> <span class="keywordtype">char</span> <a class="code" href="classrapidjson_1_1_file_write_stream.html#afc606cc81f6c3709d81bf99b30566330">Ch</a>;    <span class="comment">//!&lt; Character type. Only support char.</span></div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <a class="code" href="classrapidjson_1_1_file_write_stream.html">FileWriteStream</a>(FILE* fp, <span class="keywordtype">char</span>* buffer, <span class="keywordtype">size_t</span> bufferSize) : fp_(fp), buffer_(buffer), bufferEnd_(buffer + bufferSize), current_(buffer_) { </div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <a class="code" href="classrapidjson_1_1_file_write_stream.html">FileWriteStream</a>(std::FILE* fp, <span class="keywordtype">char</span>* buffer, <span class="keywordtype">size_t</span> bufferSize) : fp_(fp), buffer_(buffer), bufferEnd_(buffer + bufferSize), current_(buffer_) { </div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(fp_ != 0);</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    }</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
@@ -162,7 +162,7 @@ $(document).ready(function(){initNavTree('filewritestream_8h_source.html','');})
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    FileWriteStream(<span class="keyword">const</span> FileWriteStream&amp;);</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    FileWriteStream&amp; operator=(<span class="keyword">const</span> FileWriteStream&amp;);</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    FILE* fp_;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    std::FILE* fp_;</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordtype">char</span> *buffer_;</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keywordtype">char</span> *bufferEnd_;</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordtype">char</span> *current_;</div>

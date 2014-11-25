@@ -1,7 +1,7 @@
 var classrapidjson_1_1_file_read_stream =
 [
     [ "Ch", "classrapidjson_1_1_file_read_stream.html#a4a5f34875b40d22def206c9a09ecd929", null ],
-    [ "FileReadStream", "classrapidjson_1_1_file_read_stream.html#a4db80567cfb2133bc368227e0d891281", null ],
+    [ "FileReadStream", "classrapidjson_1_1_file_read_stream.html#a72b610ada5d86e8977a2bc1f2f4c0808", null ],
     [ "Flush", "classrapidjson_1_1_file_read_stream.html#a1b3ae0fe7ad88d8c9c1fac7854d1d7ec", null ],
     [ "Peek", "classrapidjson_1_1_file_read_stream.html#acd66b37d543e380c1a0b439210762b7b", null ],
     [ "Peek4", "classrapidjson_1_1_file_read_stream.html#ae40bad01efd692ce99ef08031a9a1b4b", null ],
