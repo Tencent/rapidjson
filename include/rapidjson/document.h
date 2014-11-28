@@ -1896,9 +1896,26 @@ template <typename SourceAllocator>
 inline
 GenericValue<Encoding,Allocator>::GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator)
 {
-    GenericDocument<Encoding,Allocator> d(&allocator);
-    rhs.Accept(d);
-    RawAssign(*d.stack_.template Pop<GenericValue>(1));
+    switch (rhs.GetType()) {
+    case kObjectType:
+    case kArrayType: { // perform deep copy via SAX Handler
+            GenericDocument<Encoding,Allocator> d(&allocator);
+            rhs.Accept(d);
+            RawAssign(*d.stack_.template Pop<GenericValue>(1));
+        }
+        break;
+    case kStringType:
+        if (rhs.flags_ == kConstStringFlag) {
+            flags_ = rhs.flags_;
+            data_  = *reinterpret_cast<const Data*>(&rhs.data_);
+        } else {
+            SetStringRaw(StringRef(rhs.GetString(), rhs.GetStringLength()), allocator);
+        }
+        break;
+    default: // kNumberType, kTrueType, kFalseType, kNullType
+        flags_ = rhs.flags_;
+        data_  = *reinterpret_cast<const Data*>(&rhs.data_);
+    }
 }
 
 RAPIDJSON_NAMESPACE_END
