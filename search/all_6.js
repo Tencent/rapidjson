@@ -9,7 +9,7 @@ var searchData=
   ['genericmemorybuffer',['GenericMemoryBuffer',['../structrapidjson_1_1_generic_memory_buffer.html',1,'rapidjson']]],
   ['genericreader',['GenericReader',['../classrapidjson_1_1_generic_reader.html',1,'rapidjson']]],
   ['genericreader',['GenericReader',['../classrapidjson_1_1_generic_reader.html#a56ab1065ea75167aeacb4802425bf57f',1,'rapidjson::GenericReader']]],
-  ['genericstringbuffer',['GenericStringBuffer',['../structrapidjson_1_1_generic_string_buffer.html',1,'rapidjson']]],
+  ['genericstringbuffer',['GenericStringBuffer',['../classrapidjson_1_1_generic_string_buffer.html',1,'rapidjson']]],
   ['genericstringref',['GenericStringRef',['../structrapidjson_1_1_generic_string_ref.html',1,'rapidjson']]],
   ['genericstringref',['GenericStringRef',['../structrapidjson_1_1_generic_string_ref.html#acd4d5ebac2b610ce647356aa52998002',1,'rapidjson::GenericStringRef::GenericStringRef(const CharType(&amp;str)[N]) RAPIDJSON_NOEXCEPT'],['../structrapidjson_1_1_generic_string_ref.html#a29cf407c6aa2313f13dff78d6ce02687',1,'rapidjson::GenericStringRef::GenericStringRef(const CharType *str)'],['../structrapidjson_1_1_generic_string_ref.html#ad9eb120a58cee500ff3bd5706779c4e4',1,'rapidjson::GenericStringRef::GenericStringRef(const CharType *str, SizeType len)']]],
   ['genericstringstream',['GenericStringStream',['../structrapidjson_1_1_generic_string_stream.html',1,'rapidjson']]],

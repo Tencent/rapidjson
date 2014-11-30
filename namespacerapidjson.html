@@ -148,8 +148,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html">GenericReader</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">SAX-style JSON parser. Use <a class="el" href="md_doc_sax.html#Reader">Reader</a> for <a class="el" href="structrapidjson_1_1_u_t_f8.html" title="UTF-8 encoding. ">UTF8</a> encoding and default allocator.  <a href="classrapidjson_1_1_generic_reader.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrapidjson_1_1_generic_string_buffer.html">GenericStringBuffer</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents an in-memory output stream.  <a href="structrapidjson_1_1_generic_string_buffer.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_string_buffer.html">GenericStringBuffer</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents an in-memory output stream.  <a href="classrapidjson_1_1_generic_string_buffer.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrapidjson_1_1_generic_string_ref.html">GenericStringRef</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference to a constant string (not taking a copy)  <a href="structrapidjson_1_1_generic_string_ref.html#details">More...</a><br /></td></tr>
@@ -253,7 +253,7 @@ typedef <a class="el" href="classrapidjson_1_1_generic_reader.html">GenericReade
 <tr class="memdesc:a4eaef42a208413d1f2c8d4655ecec52d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reader with <a class="el" href="structrapidjson_1_1_u_t_f8.html" title="UTF-8 encoding. ">UTF8</a> encoding and default allocator. <br /></td></tr>
 <tr class="separator:a4eaef42a208413d1f2c8d4655ecec52d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51a6c35028b76e354bbb9e25d7125641"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a51a6c35028b76e354bbb9e25d7125641"></a>
-typedef <a class="el" href="structrapidjson_1_1_generic_string_buffer.html">GenericStringBuffer</a><br class="typebreak" />
+typedef <a class="el" href="classrapidjson_1_1_generic_string_buffer.html">GenericStringBuffer</a><br class="typebreak" />
 &lt; <a class="el" href="structrapidjson_1_1_u_t_f8.html">UTF8</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a51a6c35028b76e354bbb9e25d7125641">StringBuffer</a></td></tr>
 <tr class="memdesc:a51a6c35028b76e354bbb9e25d7125641"><td class="mdescLeft">&#160;</td><td class="mdescRight">String buffer with <a class="el" href="structrapidjson_1_1_u_t_f8.html" title="UTF-8 encoding. ">UTF8</a> encoding. <br /></td></tr>
 <tr class="separator:a51a6c35028b76e354bbb9e25d7125641"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -371,7 +371,7 @@ template&lt;&gt; </td></tr>
 <tr class="separator:a791735c27e073a70d720c2775ddf9568"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d43be9c033dc49738b713fe6fbafecf"><td class="memTemplParams" colspan="2"><a class="anchor" id="a9d43be9c033dc49738b713fe6fbafecf"></a>
 template&lt;&gt; </td></tr>
-<tr class="memitem:a9d43be9c033dc49738b713fe6fbafecf"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a9d43be9c033dc49738b713fe6fbafecf">PutN</a> (<a class="el" href="structrapidjson_1_1_generic_string_buffer.html">GenericStringBuffer</a>&lt; <a class="el" href="structrapidjson_1_1_u_t_f8.html">UTF8</a>&lt;&gt; &gt; &amp;stream, char c, size_t n)</td></tr>
+<tr class="memitem:a9d43be9c033dc49738b713fe6fbafecf"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a9d43be9c033dc49738b713fe6fbafecf">PutN</a> (<a class="el" href="classrapidjson_1_1_generic_string_buffer.html">GenericStringBuffer</a>&lt; <a class="el" href="structrapidjson_1_1_u_t_f8.html">UTF8</a>&lt;&gt; &gt; &amp;stream, char c, size_t n)</td></tr>
 <tr class="memdesc:a9d43be9c033dc49738b713fe6fbafecf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implement specialized version of <a class="el" href="namespacerapidjson.html#a1d49d2cab617858b53a1db23b1759f43" title="Put N copies of a character to a stream. ">PutN()</a> with memset() for better performance. <br /></td></tr>
 <tr class="separator:a9d43be9c033dc49738b713fe6fbafecf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
