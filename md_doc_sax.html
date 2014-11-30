@@ -296,7 +296,7 @@ PrettyWriter</h2>
 <p>The usage of <code>PrettyWriter</code> is exactly the same as <code>Writer</code>, expect that <code>PrettyWriter</code> provides a <code>SetIndent(Ch indentChar, unsigned indentCharCount)</code> function. The default is 4 spaces.</p>
 <h2><a class="anchor" id="CompletenessReset"></a>
 Completeness and Reset</h2>
-<p>A <code>Writer</code> can only output a single JSON, which can be either an object or array at the root. Once the last matching <code>EndObject()</code> or <code>EndArray()</code> event is handled, the output JSON is well-formed and complete. User can detect this state by calling <code>Writer::IsComplete()</code>.</p>
+<p>A <code>Writer</code> can only output a single JSON, which can be any JSON type at the root. Once the singular event for root (e.g. <code>String()</code>), or the last matching <code>EndObject()</code> or <code>EndArray()</code> event, is handled, the output JSON is well-formed and complete. User can detect this state by calling <code>Writer::IsComplete()</code>.</p>
 <p>When a JSON is complete, the <code>Writer</code> cannot accept any new events. Otherwise the output will be invalid (i.e. having more than one root). To reuse the <code>Writer</code> object, user can call <code>Writer::Reset(OutputStream&amp; os)</code> to reset all internal states of the <code>Writer</code> with a new output stream.</p>
 <h1><a class="anchor" id="Techniques"></a>
 Techniques</h1>

@@ -187,7 +187,9 @@ Parsing</h1>
 <tr>
 <th>Parse flags </th><th>Meaning  </th></tr>
 <tr>
-<td><code>kParseDefaultFlags = 0</code> </td><td>Default parse flags. </td></tr>
+<td><code>kParseNoFlags</code> </td><td>No flag is set. </td></tr>
+<tr>
+<td><code>kParseDefaultFlags</code> </td><td>Default parse flags. It is equal to macro <code>RAPIDJSON_PARSE_DEFAULT_FLAGS</code>, which is defined as <code>kParseNoFlags</code>. </td></tr>
 <tr>
 <td><code>kParseInsituFlag</code> </td><td>In-situ(destructive) parsing. </td></tr>
 <tr>
@@ -212,8 +214,6 @@ Parse Error</h2>
 <td><code>kParseErrorNone</code> </td><td>No error. </td></tr>
 <tr>
 <td><code>kParseErrorDocumentEmpty</code> </td><td>The document is empty. </td></tr>
-<tr>
-<td><code>kParseErrorDocumentRootNotObjectOrArray</code> </td><td>The document root must be either object or array. </td></tr>
 <tr>
 <td><code>kParseErrorDocumentRootNotSingular</code> </td><td>The document root must not follow by other values. </td></tr>
 <tr>
