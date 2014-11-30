@@ -192,6 +192,12 @@ Parsing</h1>
 <td><code>kParseInsituFlag</code> </td><td>In-situ(destructive) parsing. </td></tr>
 <tr>
 <td><code>kParseValidateEncodingFlag</code> </td><td>Validate encoding of JSON strings. </td></tr>
+<tr>
+<td><code>kParseIterativeFlag</code> </td><td>Iterative(constant complexity in terms of function call stack size) parsing. </td></tr>
+<tr>
+<td><code>kParseStopWhenDoneFlag</code> </td><td>After parsing a complete JSON root from stream, stop further processing the rest of stream. When this flag is used, parser will not generate <code>kParseErrorDocumentRootNotSingular</code> error. Using this flag for parsing multiple JSONs in the same stream. </td></tr>
+<tr>
+<td><code>kParseFullPrecisionFlag</code> </td><td>Parse number in full precision (slower). If this flag is not set, the normal precision (faster) is used. Normal precision has maximum 3 <a href="http://en.wikipedia.org/wiki/Unit_in_the_last_place">ULP</a> error. </td></tr>
 </table>
 <p>By using a non-type template parameter, instead of a function parameter, C++ compiler can generate code which is optimized for specified combinations, improving speed, and reducing code size (if only using a single specialization). The downside is the flags needed to be determined in compile-time.</p>
 <p>The <code>SourceEncoding</code> parameter defines what encoding is in the stream. This can be differed to the <code>Encoding</code> of the <code>Document</code>. See <a href="#TranscodingAndValidation">Transcoding and Validation</a> section for details.</p>

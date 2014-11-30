@@ -312,12 +312,14 @@ Enumerations</h2></td></tr>
 <tr class="memdesc:ga7d3acf640886b1f2552dc8c4cd6dea60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error code of parsing.  <a href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">More...</a><br /></td></tr>
 <tr class="separator:ga7d3acf640886b1f2552dc8c4cd6dea60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81379eb4e94a0386d71d15fda882ebc9"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9">ParseFlag</a> { <br />
-&#160;&#160;<a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835">kParseDefaultFlags</a> = 0, 
+&#160;&#160;<a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9af2c7fa21e9e7656e467bd71079ac8fb0">kParseNoFlags</a> = 0, 
 <a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a02748971d6ea0c5e22c69b8aa7f344ea">kParseInsituFlag</a> = 1, 
 <a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a3df81f75479da8e052393f92cbec394b">kParseValidateEncodingFlag</a> = 2, 
 <a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a7923686c8bdb7614699f1fb1bb615bb2">kParseIterativeFlag</a> = 4, 
 <br />
-&#160;&#160;<a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9af84c60868704433b80aa51a62e042bb1">kParseStopWhenDoneFlag</a> = 8
+&#160;&#160;<a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9af84c60868704433b80aa51a62e042bb1">kParseStopWhenDoneFlag</a> = 8, 
+<a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9adf80892cdfa076b2d1a7dd9530e15cb0">kParseFullPrecisionFlag</a> = 16, 
+<a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835">kParseDefaultFlags</a> = RAPIDJSON_PARSE_DEFAULT_FLAGS
 <br />
  }</td></tr>
 <tr class="memdesc:a81379eb4e94a0386d71d15fda882ebc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Combination of parseFlags.  <a href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9">More...</a><br /></td></tr>
@@ -408,8 +410,8 @@ template&lt;&gt; </td></tr>
 <p>Combination of parseFlags. </p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b" title="Parse JSON text. ">Reader::Parse</a>, <a class="el" href="classrapidjson_1_1_generic_document.html#a5bb026ab42705b2c2cfbbf904108b3f5" title="Parse JSON text from a read-only string (with Encoding conversion) ">Document::Parse</a>, <a class="el" href="classrapidjson_1_1_generic_document.html#a8ece26197fb1fef28e6626e6d73df976" title="Parse JSON text from a mutable string (with Encoding conversion) ">Document::ParseInsitu</a>, <a class="el" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85" title="Parse JSON text from an input stream (with Encoding conversion) ">Document::ParseStream</a> </dd></dl>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835"></a>kParseDefaultFlags&#160;</td><td class="fielddoc">
-<p>Default parse flags. Non-destructive parsing. Text strings are decoded into allocated buffer. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a81379eb4e94a0386d71d15fda882ebc9af2c7fa21e9e7656e467bd71079ac8fb0"></a>kParseNoFlags&#160;</td><td class="fielddoc">
+<p>No flags are set. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a81379eb4e94a0386d71d15fda882ebc9a02748971d6ea0c5e22c69b8aa7f344ea"></a>kParseInsituFlag&#160;</td><td class="fielddoc">
 <p>In-situ(destructive) parsing. </p>
@@ -422,6 +424,12 @@ template&lt;&gt; </td></tr>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a81379eb4e94a0386d71d15fda882ebc9af84c60868704433b80aa51a62e042bb1"></a>kParseStopWhenDoneFlag&#160;</td><td class="fielddoc">
 <p>After parsing a complete JSON root from stream, stop further processing the rest of stream. When this flag is used, parser will not generate kParseErrorDocumentRootNotSingular error. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a81379eb4e94a0386d71d15fda882ebc9adf80892cdfa076b2d1a7dd9530e15cb0"></a>kParseFullPrecisionFlag&#160;</td><td class="fielddoc">
+<p>Parse number in full precision (but slower). </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835"></a>kParseDefaultFlags&#160;</td><td class="fielddoc">
+<p>Default parse flags. Can be customized by defining RAPIDJSON_PARSE_DEFAULT_FLAGS. </p>
 </td></tr>
 </table>
 

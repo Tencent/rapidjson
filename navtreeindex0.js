@@ -2,6 +2,7 @@ var NAVTREEINDEX0 =
 {
 "allocators_8h_source.html":[12,0,0,0,2],
 "annotated.html":[11,0],
+"biginteger_8h_source.html":[12,0,0,0,1,0],
 "classrapidjson_1_1_allocator.html":[11,0,0,0],
 "classrapidjson_1_1_auto_u_t_f_input_stream.html":[11,0,0,3],
 "classrapidjson_1_1_auto_u_t_f_input_stream.html#a1e513c05b0be76071bfd31d528e8f3ed":[11,0,0,3,10],
@@ -248,6 +249,5 @@ var NAVTREEINDEX0 =
 "classrapidjson_1_1_generic_value.html#ab933ad7ff8c9d08f73cebaecb700dbe9":[11,0,0,22,12],
 "classrapidjson_1_1_generic_value.html#abba0c9ccfd90726f916c36013a2e9e19":[11,0,0,22,13],
 "classrapidjson_1_1_generic_value.html#abc8945d3411c6ce583d322753ce028e1":[11,0,0,22,30],
-"classrapidjson_1_1_generic_value.html#aca0cff58ccd1d50ddce2eb2182e322c2":[11,0,0,22,104],
-"classrapidjson_1_1_generic_value.html#aca5596987335016c1a7c2a9467baf80b":[11,0,0,22,6]
+"classrapidjson_1_1_generic_value.html#aca0cff58ccd1d50ddce2eb2182e322c2":[11,0,0,22,104]
 };
