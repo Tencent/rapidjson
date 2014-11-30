@@ -112,7 +112,8 @@ The `parseFlags` are combination of the following bit-flags:
 
 Parse flags                   | Meaning
 ------------------------------|-----------------------------------
-`kParseDefaultFlags = 0`      | Default parse flags. 
+`kParseNoFlags`               | No flag is set.
+`kParseDefaultFlags`          | Default parse flags. It is equal to macro `RAPIDJSON_PARSE_DEFAULT_FLAGS`, which is defined as `kParseNoFlags`.
 `kParseInsituFlag`            | In-situ(destructive) parsing.
 `kParseValidateEncodingFlag`  | Validate encoding of JSON strings.
 `kParseIterativeFlag`         | Iterative(constant complexity in terms of function call stack size) parsing.
