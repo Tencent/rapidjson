@@ -85,38 +85,81 @@ $(document).ready(function(){initNavTree('md_doc_faq.html','');});
 <li><p class="startli">What is RapidJSON?</p>
 <p class="startli">RapidJSON is a C++ library for parsing and generating JSON. You may check all features of it.</p>
 </li>
-<li><p class="startli">Why is it named so?</p>
-<p class="startli">It is inspired by <a href="http://rapidxml.sourceforge.net/">RapidXML</a>, which is a fast XML DOM parser. RapidJSON borrowed some designs of RapidXML, including <em>in situ</em> parsing, header-only library, and more.</p>
+<li><p class="startli">Why is RapidJSON named so?</p>
+<p class="startli">It is inspired by <a href="http://rapidxml.sourceforge.net/">RapidXML</a>, which is a fast XML DOM parser.</p>
 </li>
-<li>Is it similar to RapidXML?</li>
-<li>Is it free?</li>
-<li>Is it small? What are its dependencies?</li>
-<li>How to install RapidJSON?</li>
-<li>Can it run on my platform?</li>
-<li>Does it support C++03? C++11?</li>
-<li>Does it really work in real applications?</li>
-<li>How it is tested?</li>
-<li>Is it well documented?</li>
-<li>Are there alternatives?</li>
+<li><p class="startli">Is RapidJSON similar to RapidXML?</p>
+<p class="startli">RapidJSON borrowed some designs of RapidXML, including <em>in situ</em> parsing, header-only library. But the two APIs are completely different. Also RapidJSON provide many features that are not in RapidXML.</p>
+</li>
+<li><p class="startli">Is RapidJSON free?</p>
+<p class="startli">Yes, it is free under MIT license. It can be used in commercial applications. Please check the details in <a href="https://github.com/miloyip/rapidjson/blob/master/license.txt">license.txt</a>.</p>
+</li>
+<li><p class="startli">Is RapidJSON small? What are its dependencies?</p>
+<p class="startli">Yes. A simple executable which parses a JSON and prints its statistics is less than 30KB on Windows.</p>
+<p class="startli">RapidJSON depends on C++ standard library only.</p>
+</li>
+<li><p class="startli">How to install RapidJSON?</p>
+<p class="startli">Check <a href="http://miloyip.github.io/rapidjson/">Installation section</a>.</p>
+</li>
+<li><p class="startli">Can RapidJSON run on my platform?</p>
+<p class="startli">RapidJSON has been tested in many combinations of operating systems, compilers and CPU architecture by the community. But we cannot ensure that it can be run on your particular platform. Building and running the unit test suite will give you the answer.</p>
+</li>
+<li><p class="startli">Does RapidJSON support C++03? C++11?</p>
+<p class="startli">RapidJSON was firstly implemented for C++03. Later it added optional support of some C++11 features (e.g., move constructor, <code>noexcept</code>). RapidJSON shall be compatible with C++03 or C++11 compliant compilers.</p>
+</li>
+<li><p class="startli">Does RapidJSON really work in real applications?</p>
+<p class="startli">Yes. It is deployed in both client and server real applications. A community member reported that RapidJSON in their system parses 50 million JSONs daily.</p>
+</li>
+<li><p class="startli">How RapidJSON is tested?</p>
+<p class="startli">RapidJSON contains a unit test suite for automatic testing. <a href="https://travis-ci.org/miloyip/rapidjson/">Travis</a> will compile and run the unit test suite for all modifications. The test process also uses Valgrind to detect memory leaks.</p>
+</li>
+<li><p class="startli">Is RapidJSON well documented?</p>
+<p class="startli">RapidJSON provides <a href="http://miloyip.github.io/rapidjson/index.html">user guide and API documentationn</a>.</p>
+</li>
+<li><p class="startli">Are there alternatives?</p>
+<p class="startli">Yes, there are a lot alternatives. For example, <a href="https://github.com/miloyip/nativejson-benchmark">nativejson-benchmark</a> has a listing of open-source C/C++ JSON libraries. <a href="http://www.json.org/">json.org</a> also has a list.</p>
+</li>
 </ol>
 <h2>JSON</h2>
 <ol type="1">
-<li>What is JSON?</li>
-<li>What is application of JSON?</li>
+<li><p class="startli">What is JSON?</p>
+<p class="startli">JSON (JavaScript Object Notation) is a lightweight data-interchange format. It uses human readable text format. More details of JSON can be referred to <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a> and <a href="http://www.ecma-international.org/publications/standards/Ecma-404.htm">ECMA-404</a>.</p>
+</li>
+<li><p class="startli">What are applications of JSON?</p>
+<p class="startli">JSON are commonly used in web applications for transferring structured data. It is also used as a file format for data persistence.</p>
+</li>
 </ol>
 <ol type="1">
-<li>Does RapidJSON conform to the JSON standard?</li>
-<li>Does RapidJSON support relaxed syntax?</li>
+<li><p class="startli">Does RapidJSON conform to the JSON standard?</p>
+<p class="startli">Yes. RapidJSON is fully compliance with <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a> and <a href="http://www.ecma-international.org/publications/standards/Ecma-404.htm">ECMA-404</a>. It can handle corner cases, such as supporting null character and surrogate pairs in JSON strings.</p>
+</li>
+<li><p class="startli">Does RapidJSON support relaxed syntax?</p>
+<p class="startli">Currently no. RapidJSON only support the strict standardized format. Support on related syntax is under discussion in this <a href="https://github.com/miloyip/rapidjson/issues/36">issue</a>.</p>
+</li>
 </ol>
 <h2>DOM and SAX</h2>
 <ol type="1">
-<li>What is DOM style API?</li>
-<li>What is SAX style API?</li>
-<li>Should I choose DOM or SAX?</li>
-<li>What is <em>in situ</em> parsing?</li>
-<li>When will parsing generates an error?</li>
-<li>What error information is provided?</li>
-<li>Why not just using <code>double</code> to represent JSON number?</li>
+<li><p class="startli">What is DOM style API?</p>
+<p class="startli">Document Object Model (DOM) is an in-memory representation of JSON for query and manipulation.</p>
+</li>
+<li><p class="startli">What is SAX style API?</p>
+<p class="startli">SAX is an event-driven API for parsing and generation.</p>
+</li>
+<li><p class="startli">Should I choose DOM or SAX?</p>
+<p class="startli">DOM is easy for query and manipulation. SAX is very fast and memory-saving but often more difficult to be applied.</p>
+</li>
+<li><p class="startli">What is <em>in situ</em> parsing?</p>
+<p class="startli"><em>in situ</em> parsing decodes the JSON strings directly into the input JSON. This is an optimization which can reduce memory consumption and improve performance, but the input JSON will be modified. Check <a href="http://miloyip.github.io/rapidjson/md_doc_dom.html#InSituParsing">in-situ parsing</a> for details.</p>
+</li>
+<li><p class="startli">When does parsing generate an error?</p>
+<p class="startli">The parser generates an error when the input JSON contains invalid syntax, or a value can not be represented (a number is too big), or the handler of parsers terminate the parsing. Check <a href="http://miloyip.github.io/rapidjson/md_doc_dom.html#ParseError">parse error</a> for details.</p>
+</li>
+<li><p class="startli">What error information is provided?</p>
+<p class="startli">The error is stored in <code>ParseResult</code>, which includes the error code and offset (number of characters from the beginning of JSON). The error code can be translated into human-readable error message.</p>
+</li>
+<li><p class="startli">Why not just using <code>double</code> to represent JSON number?</p>
+<p class="startli">Some applications use 64-bit unsigned/signed integers. And these integers cannot be converted into <code>double</code> without loss of precision. So the parsers detects whether a JSON number is convertible to different types of integers and/or <code>double</code>.</p>
+</li>
 </ol>
 <h2>Document/Value (DOM)</h2>
 <ol type="1">
