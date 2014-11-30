@@ -126,16 +126,27 @@ RAPIDJSON_NAMESPACE_BEGIN
 ///////////////////////////////////////////////////////////////////////////////
 // ParseFlag
 
+/*! \def RAPIDJSON_PARSE_DEFAULT_FLAGS 
+    \ingroup RAPIDJSON_CONFIG
+    \brief User-defined kParseDefaultFlags definition.
+
+    User can define this as any \c ParseFlag combinations.
+*/
+#ifndef RAPIDJSON_PARSE_DEFAULT_FLAGS
+#define RAPIDJSON_PARSE_DEFAULT_FLAGS kParseNoFlags
+#endif
+
 //! Combination of parseFlags
 /*! \see Reader::Parse, Document::Parse, Document::ParseInsitu, Document::ParseStream
  */
 enum ParseFlag {
-    kParseDefaultFlags = 0,         //!< Default parse flags. Non-destructive parsing. Text strings are decoded into allocated buffer.
+    kParseNoFlags = 0,              //!< No flags are set.
     kParseInsituFlag = 1,           //!< In-situ(destructive) parsing.
     kParseValidateEncodingFlag = 2, //!< Validate encoding of JSON strings.
     kParseIterativeFlag = 4,        //!< Iterative(constant complexity in terms of function call stack size) parsing.
     kParseStopWhenDoneFlag = 8,     //!< After parsing a complete JSON root from stream, stop further processing the rest of stream. When this flag is used, parser will not generate kParseErrorDocumentRootNotSingular error.
-    kParseFullPrecisionFlag = 16    //!< Parse number in full precision (but slower).
+    kParseFullPrecisionFlag = 16,   //!< Parse number in full precision (but slower).
+    kParseDefaultFlags = RAPIDJSON_PARSE_DEFAULT_FLAGS  //!< Default parse flags. Can be customized by defining RAPIDJSON_PARSE_DEFAULT_FLAGS
 };
 
 ///////////////////////////////////////////////////////////////////////////////
