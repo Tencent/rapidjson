@@ -33,10 +33,20 @@ RAPIDJSON_NAMESPACE_BEGIN
     \note implements Stream concept
 */
 template <typename Encoding, typename Allocator = CrtAllocator>
-struct GenericStringBuffer {
+class GenericStringBuffer {
+public:
     typedef typename Encoding::Ch Ch;
 
     GenericStringBuffer(Allocator* allocator = 0, size_t capacity = kDefaultCapacity) : stack_(allocator, capacity) {}
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    GenericStringBuffer(GenericStringBuffer&& rhs) : stack_(std::move(rhs.stack_)) {}
+    GenericStringBuffer& operator=(GenericStringBuffer&& rhs) {
+        if (&rhs != this)
+            stack_ = std::move(rhs.stack_);
+        return *this;
+    }
+#endif
 
     void Put(Ch c) { *stack_.template Push<Ch>() = c; }
     void Flush() {}
@@ -63,6 +73,11 @@ struct GenericStringBuffer {
 
     static const size_t kDefaultCapacity = 256;
     mutable internal::Stack<Allocator> stack_;
+
+private:
+    // Prohibit copy constructor & assignment operator.
+    GenericStringBuffer(const GenericStringBuffer&);
+    GenericStringBuffer& operator=(const GenericStringBuffer&);
 };
 
 //! String buffer with UTF8 encoding
