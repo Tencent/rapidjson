@@ -26,8 +26,8 @@
 #include "rapidjson.h"
 #include "encodings.h"
 #include "internal/meta.h"
-#include "internal/pow10.h"
 #include "internal/stack.h"
+#include "internal/strtod.h"
 
 #if defined(RAPIDJSON_SIMD) && defined(_MSC_VER)
 #include <intrin.h>
@@ -43,6 +43,11 @@
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
 RAPIDJSON_DIAG_OFF(4702)  // unreachable code
+#endif
+
+#ifdef __GNUC__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
@@ -121,15 +126,27 @@ RAPIDJSON_NAMESPACE_BEGIN
 ///////////////////////////////////////////////////////////////////////////////
 // ParseFlag
 
+/*! \def RAPIDJSON_PARSE_DEFAULT_FLAGS 
+    \ingroup RAPIDJSON_CONFIG
+    \brief User-defined kParseDefaultFlags definition.
+
+    User can define this as any \c ParseFlag combinations.
+*/
+#ifndef RAPIDJSON_PARSE_DEFAULT_FLAGS
+#define RAPIDJSON_PARSE_DEFAULT_FLAGS kParseNoFlags
+#endif
+
 //! Combination of parseFlags
 /*! \see Reader::Parse, Document::Parse, Document::ParseInsitu, Document::ParseStream
  */
 enum ParseFlag {
-    kParseDefaultFlags = 0,         //!< Default parse flags. Non-destructive parsing. Text strings are decoded into allocated buffer.
+    kParseNoFlags = 0,              //!< No flags are set.
     kParseInsituFlag = 1,           //!< In-situ(destructive) parsing.
     kParseValidateEncodingFlag = 2, //!< Validate encoding of JSON strings.
     kParseIterativeFlag = 4,        //!< Iterative(constant complexity in terms of function call stack size) parsing.
-    kParseStopWhenDoneFlag = 8      //!< After parsing a complete JSON root from stream, stop further processing the rest of stream. When this flag is used, parser will not generate kParseErrorDocumentRootNotSingular error.
+    kParseStopWhenDoneFlag = 8,     //!< After parsing a complete JSON root from stream, stop further processing the rest of stream. When this flag is used, parser will not generate kParseErrorDocumentRootNotSingular error.
+    kParseFullPrecisionFlag = 16,   //!< Parse number in full precision (but slower).
+    kParseDefaultFlags = RAPIDJSON_PARSE_DEFAULT_FLAGS  //!< Default parse flags. Can be customized by defining RAPIDJSON_PARSE_DEFAULT_FLAGS
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -600,21 +617,27 @@ private:
         return codepoint;
     }
 
+    template <typename CharType>
     class StackStream {
     public:
-        typedef typename TargetEncoding::Ch Ch;
+        typedef CharType Ch;
 
         StackStream(internal::Stack<StackAllocator>& stack) : stack_(stack), length_(0) {}
         RAPIDJSON_FORCEINLINE void Put(Ch c) {
             *stack_.template Push<Ch>() = c;
             ++length_;
         }
-        internal::Stack<StackAllocator>& stack_;
-        SizeType length_;
+        size_t Length() const { return length_; }
+        Ch* Pop() {
+            return stack_.template Pop<Ch>(length_);
+        }
 
     private:
         StackStream(const StackStream&);
         StackStream& operator=(const StackStream&);
+
+        internal::Stack<StackAllocator>& stack_;
+        SizeType length_;
     };
 
     // Parse string and generate String event. Different code paths for kParseInsituFlag.
@@ -634,11 +657,12 @@ private:
             success = (isKey ? handler.Key(str, SizeType(length), false) : handler.String(str, SizeType(length), false));
         }
         else {
-            StackStream stackStream(stack_);
+            StackStream<typename TargetEncoding::Ch> stackStream(stack_);
             ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
-            const typename TargetEncoding::Ch* const str = stack_.template Pop<typename TargetEncoding::Ch>(stackStream.length_);
-            success = (isKey ? handler.Key(str, stackStream.length_ - 1, true) : handler.String(str, stackStream.length_ - 1, true));
+            SizeType length = static_cast<SizeType>(stackStream.Length()) - 1;
+            const typename TargetEncoding::Ch* const str = stackStream.Pop();
+            success = (isKey ? handler.Key(str, length, true) : handler.String(str, length, true));
         }
         if (!success)
             RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
@@ -705,22 +729,55 @@ private:
         }
     }
 
-    inline double StrtodFastPath(double significand, int exp) {
-        // Fast path only works on limited range of values.
-        // But for simplicity and performance, currently only implement this.
-        // see http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/
-        if (exp < -308)
-            return 0.0;
-        else if (exp >= 0)
-            return significand * internal::Pow10(exp);
-        else
-            return significand / internal::Pow10(-exp);
-    }
+    template<typename InputStream, bool backup>
+    class NumberStream {};
+
+    template<typename InputStream>
+    class NumberStream<InputStream, false> {
+    public:
+        NumberStream(GenericReader& reader, InputStream& is) : is(is) { (void)reader;  }
+        ~NumberStream() {}
+
+        RAPIDJSON_FORCEINLINE Ch Peek() const { return is.Peek(); }
+        RAPIDJSON_FORCEINLINE Ch TakePush() { return is.Take(); }
+        RAPIDJSON_FORCEINLINE Ch Take() { return is.Take(); }
+        size_t Tell() { return is.Tell(); }
+        size_t Length() { return 0; }
+        const char* Pop() { return 0; }
+
+    protected:
+        NumberStream& operator=(const NumberStream&);
+
+        InputStream& is;
+    };
+
+    template<typename InputStream>
+    class NumberStream<InputStream, true> : public NumberStream<InputStream, false> {
+        typedef NumberStream<InputStream, false> Base;
+    public:
+        NumberStream(GenericReader& reader, InputStream& is) : NumberStream<InputStream, false>(reader, is), stackStream(reader.stack_) {}
+        ~NumberStream() {}
+
+        RAPIDJSON_FORCEINLINE Ch TakePush() {
+            stackStream.Put((char)Base::is.Peek());
+            return Base::is.Take();
+        }
+
+        size_t Length() { return stackStream.Length(); }
+
+        const char* Pop() {
+            stackStream.Put('\0');
+            return stackStream.Pop();
+        }
+
+    private:
+        StackStream<char> stackStream;
+    };
 
     template<unsigned parseFlags, typename InputStream, typename Handler>
     void ParseNumber(InputStream& is, Handler& handler) {
         internal::StreamLocalCopy<InputStream> copy(is);
-        InputStream& s(copy.s);
+        NumberStream<InputStream, (parseFlags & kParseFullPrecisionFlag) != 0> s(*this, copy.s);
 
         // Parse minus
         bool minus = false;
@@ -733,12 +790,13 @@ private:
         unsigned i = 0;
         uint64_t i64 = 0;
         bool use64bit = false;
+        int significandDigit = 0;
         if (s.Peek() == '0') {
             i = 0;
-            s.Take();
+            s.TakePush();
         }
         else if (s.Peek() >= '1' && s.Peek() <= '9') {
-            i = static_cast<unsigned>(s.Take() - '0');
+            i = static_cast<unsigned>(s.TakePush() - '0');
 
             if (minus)
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
@@ -749,7 +807,8 @@ private:
                             break;
                         }
                     }
-                    i = i * 10 + static_cast<unsigned>(s.Take() - '0');
+                    i = i * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                    significandDigit++;
                 }
             else
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
@@ -760,35 +819,38 @@ private:
                             break;
                         }
                     }
-                    i = i * 10 + static_cast<unsigned>(s.Take() - '0');
+                    i = i * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                    significandDigit++;
                 }
         }
         else
             RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
 
         // Parse 64bit int
-        double d = 0.0;
         bool useDouble = false;
+        double d = 0.0;
         if (use64bit) {
             if (minus) 
                 while (s.Peek() >= '0' && s.Peek() <= '9') {                    
                      if (i64 >= RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC)) // 2^63 = 9223372036854775808
                         if (i64 != RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC) || s.Peek() > '8') {
-                            d = (double)i64;
+                            d = i64;
                             useDouble = true;
                             break;
                         }
-                    i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
+                    i64 = i64 * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                    significandDigit++;
                 }
             else
                 while (s.Peek() >= '0' && s.Peek() <= '9') {                    
                     if (i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999)) // 2^64 - 1 = 18446744073709551615
                         if (i64 != RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) || s.Peek() > '5') {
-                            d = (double)i64;
+                            d = i64;
                             useDouble = true;
                             break;
                         }
-                    i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
+                    i64 = i64 * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                    significandDigit++;
                 }
         }
 
@@ -797,53 +859,64 @@ private:
             while (s.Peek() >= '0' && s.Peek() <= '9') {
                 if (d >= 1.7976931348623157e307) // DBL_MAX / 10.0
                     RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
-                d = d * 10 + (s.Take() - '0');
+                d = d * 10 + (s.TakePush() - '0');
             }
         }
 
         // Parse frac = decimal-point 1*DIGIT
         int expFrac = 0;
+        size_t decimalPosition;
         if (s.Peek() == '.') {
             s.Take();
+            decimalPosition = s.Length();
 
-#if RAPIDJSON_64BIT
-            // Use i64 to store significand in 64-bit architecture
+            if (!(s.Peek() >= '0' && s.Peek() <= '9'))
+                RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, s.Tell());
+
             if (!useDouble) {
+#if RAPIDJSON_64BIT
+                // Use i64 to store significand in 64-bit architecture
                 if (!use64bit)
                     i64 = i;
         
                 while (s.Peek() >= '0' && s.Peek() <= '9') {
-                    if (i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999))
+                    if (i64 > RAPIDJSON_UINT64_C2(0x1FFFFF, 0xFFFFFFFF)) // 2^53 - 1 for fast path
                         break;
                     else {
-                        i64 = i64 * 10 + static_cast<unsigned>(s.Take() - '0');
+                        i64 = i64 * 10 + static_cast<unsigned>(s.TakePush() - '0');
                         --expFrac;
+                        if (i64 != 0)
+                            significandDigit++;
                     }
                 }
 
                 d = (double)i64;
-            }
 #else
-            // Use double to store significand in 32-bit architecture
-            if (!useDouble)
+                // Use double to store significand in 32-bit architecture
                 d = use64bit ? (double)i64 : (double)i;
 #endif
-            useDouble = true;
-
-            while (s.Peek() >= '0' && s.Peek() <= '9') {
-                d = d * 10 + (s.Take() - '0');
-                --expFrac;
+                useDouble = true;
             }
 
-            if (expFrac == 0)
-                RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, s.Tell());
+            while (s.Peek() >= '0' && s.Peek() <= '9') {
+                if (significandDigit < 17) {
+                    d = d * 10.0 + (s.TakePush() - '0');
+                    --expFrac;
+                    if (d != 0.0)
+                        significandDigit++;
+                }
+                else
+                    s.TakePush();
+            }
         }
+        else
+            decimalPosition = s.Length(); // decimal position at the end of integer.
 
         // Parse exp = e [ minus / plus ] 1*DIGIT
         int exp = 0;
         if (s.Peek() == 'e' || s.Peek() == 'E') {
             if (!useDouble) {
-                d = use64bit ? (double)i64 : (double)i;
+                d = use64bit ? i64 : i;
                 useDouble = true;
             }
             s.Take();
@@ -873,15 +946,15 @@ private:
 
         // Finish parsing, call event according to the type of number.
         bool cont = true;
+        size_t length = s.Length();
+        const char* decimal = s.Pop();  // Pop stack no matter if it will be used or not.
+
         if (useDouble) {
-            int expSum = exp + expFrac;
-            if (expSum < -308) {
-                // Prevent expSum < -308, making Pow10(expSum) = 0
-                d = StrtodFastPath(d, exp);
-                d = StrtodFastPath(d, expFrac);
-            }
+            int p = exp + expFrac;
+            if (parseFlags & kParseFullPrecisionFlag)
+                d = internal::StrtodFullPrecision(d, p, decimal, length, decimalPosition, exp);
             else
-                d = StrtodFastPath(d, expSum);
+                d = internal::StrtodNormalPrecision(d, p);
 
             cont = handler.Double(minus ? -d : d);
         }
@@ -1361,6 +1434,10 @@ private:
 typedef GenericReader<UTF8<>, UTF8<> > Reader;
 
 RAPIDJSON_NAMESPACE_END
+
+#ifdef __GNUC__
+RAPIDJSON_DIAG_POP
+#endif
 
 #ifdef _MSC_VER
 RAPIDJSON_DIAG_POP

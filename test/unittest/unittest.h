@@ -96,4 +96,17 @@ public:
 
 #define RAPIDJSON_ASSERT(x) if (!(x)) throw AssertException(RAPIDJSON_STRINGIFY(x))
 
+class Random {
+public:
+    Random(unsigned seed = 0) : mSeed(seed) {}
+
+    unsigned operator()() {
+        mSeed = 214013 * mSeed + 2531011;
+        return mSeed;
+    }
+
+private:
+    unsigned mSeed;
+};
+
 #endif // UNITTEST_H_

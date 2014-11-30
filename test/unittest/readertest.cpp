@@ -21,6 +21,8 @@
 #include "unittest.h"
 
 #include "rapidjson/reader.h"
+#include "rapidjson/internal/dtoa.h"
+#include "rapidjson/internal/itoa.h"
 #include "rapidjson/memorystream.h"
 
 using namespace rapidjson;
@@ -102,65 +104,150 @@ struct ParseDoubleHandler : BaseReaderHandler<UTF8<>, ParseDoubleHandler> {
     double actual_;
 };
 
-TEST(Reader, ParseNumberHandler) {
-#define TEST_NUMBER(Handler, str, x) \
+TEST(Reader, ParseNumber_Integer) {
+#define TEST_INTEGER(Handler, str, x) \
     { \
         StringStream s(str); \
         Handler h; \
         Reader reader; \
         reader.Parse(s, h); \
         EXPECT_EQ(1u, h.step_); \
-        EXPECT_EQ(double(x), h.actual_); \
+        EXPECT_EQ(x, h.actual_); \
     }
 
-#define TEST_DOUBLE(str, x) \
+    TEST_INTEGER(ParseUintHandler, "0", 0u);
+    TEST_INTEGER(ParseUintHandler, "123", 123u);
+    TEST_INTEGER(ParseUintHandler, "2147483648", 2147483648u);       // 2^31 - 1 (cannot be stored in int)
+    TEST_INTEGER(ParseUintHandler, "4294967295", 4294967295u);
+
+    TEST_INTEGER(ParseIntHandler, "-123", -123);
+    TEST_INTEGER(ParseIntHandler, "-2147483648", static_cast<int32_t>(0x80000000));     // -2^31 (min of int)
+
+    TEST_INTEGER(ParseUint64Handler, "4294967296", RAPIDJSON_UINT64_C2(1, 0));   // 2^32 (max of unsigned + 1, force to use uint64_t)
+    TEST_INTEGER(ParseUint64Handler, "18446744073709551615", RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0xFFFFFFFF));   // 2^64 - 1 (max of uint64_t)
+
+    TEST_INTEGER(ParseInt64Handler, "-2147483649", static_cast<int64_t>(RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0x7FFFFFFF)));   // -2^31 -1 (min of int - 1, force to use int64_t)
+    TEST_INTEGER(ParseInt64Handler, "-9223372036854775808", static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x80000000, 0x00000000)));       // -2^63 (min of int64_t)
+
+    // Random test for uint32_t/int32_t
+    {
+        union {
+            uint32_t u;
+            int32_t i;
+        }u;
+        Random r;
+
+        for (unsigned i = 0; i < 100000; i++) {
+            u.u = r();
+
+            char buffer[32];
+            *internal::u32toa(u.u, buffer) = '\0';
+            TEST_INTEGER(ParseUintHandler, buffer, u.u);
+
+            if (u.i < 0) {
+                *internal::i32toa(u.i, buffer) = '\0';
+                TEST_INTEGER(ParseIntHandler, buffer, u.i);
+            }
+        }
+    }
+
+    // Random test for uint64_t/int64_t
+    {
+        union {
+            uint64_t u;
+            int64_t i;
+        }u;
+        Random r;
+
+        for (unsigned i = 0; i < 100000; i++) {
+            u.u = uint64_t(r()) << 32;
+            u.u |= r();
+
+            char buffer[32];
+            if (u.u >= 4294967296ULL) {
+                *internal::u64toa(u.u, buffer) = '\0';
+                TEST_INTEGER(ParseUint64Handler, buffer, u.u);
+            }
+
+            if (u.i <= -2147483649LL) {
+                *internal::i64toa(u.i, buffer) = '\0';
+                TEST_INTEGER(ParseInt64Handler, buffer, u.i);
+            }
+        }
+    }
+#undef TEST_INTEGER
+}
+
+template<bool fullPrecision>
+static void TestParseDouble() {
+#define TEST_DOUBLE(fullPrecision, str, x) \
     { \
         StringStream s(str); \
         ParseDoubleHandler h; \
         Reader reader; \
-        reader.Parse(s, h); \
+        ASSERT_EQ(kParseErrorNone, reader.Parse<fullPrecision ? kParseFullPrecisionFlag : 0>(s, h).Code()); \
         EXPECT_EQ(1u, h.step_); \
-        EXPECT_DOUBLE_EQ(x, h.actual_); \
+        if (fullPrecision) { \
+            EXPECT_EQ(x, h.actual_); \
+            if (x != h.actual_) \
+            printf("  String: %s\n  Actual: %.17g\nExpected: %.17g\n", str, h.actual_, x); \
+        } \
+        else \
+            EXPECT_DOUBLE_EQ(x, h.actual_); \
     }
+    
+    TEST_DOUBLE(fullPrecision, "0.0", 0.0);
+    TEST_DOUBLE(fullPrecision, "1.0", 1.0);
+    TEST_DOUBLE(fullPrecision, "-1.0", -1.0);
+    TEST_DOUBLE(fullPrecision, "1.5", 1.5);
+    TEST_DOUBLE(fullPrecision, "-1.5", -1.5);
+    TEST_DOUBLE(fullPrecision, "3.1416", 3.1416);
+    TEST_DOUBLE(fullPrecision, "1E10", 1E10);
+    TEST_DOUBLE(fullPrecision, "1e10", 1e10);
+    TEST_DOUBLE(fullPrecision, "1E+10", 1E+10);
+    TEST_DOUBLE(fullPrecision, "1E-10", 1E-10);
+    TEST_DOUBLE(fullPrecision, "-1E10", -1E10);
+    TEST_DOUBLE(fullPrecision, "-1e10", -1e10);
+    TEST_DOUBLE(fullPrecision, "-1E+10", -1E+10);
+    TEST_DOUBLE(fullPrecision, "-1E-10", -1E-10);
+    TEST_DOUBLE(fullPrecision, "1.234E+10", 1.234E+10);
+    TEST_DOUBLE(fullPrecision, "1.234E-10", 1.234E-10);
+    TEST_DOUBLE(fullPrecision, "1.79769e+308", 1.79769e+308);
+    TEST_DOUBLE(fullPrecision, "2.22507e-308", 2.22507e-308);
+    TEST_DOUBLE(fullPrecision, "-1.79769e+308", -1.79769e+308);
+    TEST_DOUBLE(fullPrecision, "-2.22507e-308", -2.22507e-308);
+    TEST_DOUBLE(fullPrecision, "4.9406564584124654e-324", 4.9406564584124654e-324); // minimum denormal
+    TEST_DOUBLE(fullPrecision, "2.2250738585072009e-308", 2.2250738585072009e-308); // Max subnormal double
+    TEST_DOUBLE(fullPrecision, "2.2250738585072014e-308", 2.2250738585072014e-308); // Min normal positive double
+    TEST_DOUBLE(fullPrecision, "1.7976931348623157e+308", 1.7976931348623157e+308); // Max double
+    TEST_DOUBLE(fullPrecision, "1e-10000", 0.0);                                   // must underflow
+    TEST_DOUBLE(fullPrecision, "18446744073709551616", 18446744073709551616.0);    // 2^64 (max of uint64_t + 1, force to use double)
+    TEST_DOUBLE(fullPrecision, "-9223372036854775809", -9223372036854775809.0);    // -2^63 - 1(min of int64_t + 1, force to use double)
+    TEST_DOUBLE(fullPrecision, "0.9868011474609375", 0.9868011474609375);          // https://github.com/miloyip/rapidjson/issues/120
+    TEST_DOUBLE(fullPrecision, "123e34", 123e34);                                  // Fast Path Cases In Disguise
+    TEST_DOUBLE(fullPrecision, "45913141877270640000.0", 45913141877270640000.0);
+    TEST_DOUBLE(fullPrecision, "2.2250738585072011e-308", 2.2250738585072011e-308); // http://www.exploringbinary.com/php-hangs-on-numeric-value-2-2250738585072011e-308/
 
-    TEST_NUMBER(ParseUintHandler, "0", 0);
-    TEST_NUMBER(ParseUintHandler, "123", 123);
-    TEST_NUMBER(ParseUintHandler, "2147483648", 2147483648u);       // 2^31 - 1 (cannot be stored in int)
-    TEST_NUMBER(ParseUintHandler, "4294967295", 4294967295u);
+    // Since
+    // abs((2^-1022 - 2^-1074) - 2.2250738585072012e-308) = 3.109754131239141401123495768877590405345064751974375599... ¡Á 10^-324
+    // abs((2^-1022) - 2.2250738585072012e-308) = 1.830902327173324040642192159804623318305533274168872044... ¡Á 10 ^ -324
+    // So 2.2250738585072012e-308 should round to 2^-1022 = 2.2250738585072014e-308
+    TEST_DOUBLE(fullPrecision, "2.2250738585072012e-308", 2.2250738585072014e-308); // http://www.exploringbinary.com/java-hangs-when-converting-2-2250738585072012e-308/
 
-    TEST_NUMBER(ParseIntHandler, "-123", -123);
-    TEST_NUMBER(ParseIntHandler, "-2147483648", -2147483648LL);     // -2^31 (min of int)
+    // More closer to normal/subnormal boundary
+    // boundary = 2^-1022 - 2^-1075 = 2.225073858507201136057409796709131975934819546351645648... ¡Á 10^-308
+    TEST_DOUBLE(fullPrecision, "2.22507385850720113605740979670913197593481954635164564e-308", 2.2250738585072009e-308);
+    TEST_DOUBLE(fullPrecision, "2.22507385850720113605740979670913197593481954635164565e-308", 2.2250738585072014e-308);
 
-    TEST_NUMBER(ParseUint64Handler, "4294967296", 4294967296ULL);   // 2^32 (max of unsigned + 1, force to use uint64_t)
-    TEST_NUMBER(ParseUint64Handler, "18446744073709551615", 18446744073709551615ULL);   // 2^64 - 1 (max of uint64_t)
-
-    TEST_NUMBER(ParseInt64Handler, "-2147483649", -2147483649LL);   // -2^31 -1 (min of int - 1, force to use int64_t)
-    TEST_NUMBER(ParseInt64Handler, "-9223372036854775808", (-9223372036854775807LL - 1));       // -2^63 (min of int64_t)
-
-    TEST_DOUBLE("0.0", 0.0);
-    TEST_DOUBLE("1.0", 1.0);
-    TEST_DOUBLE("-1.0", -1.0);
-    TEST_DOUBLE("1.5", 1.5);
-    TEST_DOUBLE("-1.5", -1.5);
-    TEST_DOUBLE("3.1416", 3.1416);
-    TEST_DOUBLE("1E10", 1E10);
-    TEST_DOUBLE("1e10", 1e10);
-    TEST_DOUBLE("1E+10", 1E+10);
-    TEST_DOUBLE("1E-10", 1E-10);
-    TEST_DOUBLE("-1E10", -1E10);
-    TEST_DOUBLE("-1e10", -1e10);
-    TEST_DOUBLE("-1E+10", -1E+10);
-    TEST_DOUBLE("-1E-10", -1E-10);
-    TEST_DOUBLE("1.234E+10", 1.234E+10);
-    TEST_DOUBLE("1.234E-10", 1.234E-10);
-    TEST_DOUBLE("1.79769e+308", 1.79769e+308);
-    TEST_DOUBLE("2.22507e-308", 2.22507e-308);
-    TEST_DOUBLE("-1.79769e+308", -1.79769e+308);
-    TEST_DOUBLE("-2.22507e-308", -2.22507e-308);
-    TEST_DOUBLE("4.9406564584124654e-324", 4.9406564584124654e-324); // minimum denormal
-    TEST_DOUBLE("1e-10000", 0.0);                                   // must underflow
-    TEST_DOUBLE("18446744073709551616", 18446744073709551616.0);    // 2^64 (max of uint64_t + 1, force to use double)
-    TEST_DOUBLE("-9223372036854775809", -9223372036854775809.0);    // -2^63 - 1(min of int64_t + 1, force to use double)
+    // 1.0 is in (1.0 - 2^-54, 1.0 + 2^-53)
+    // 1.0 - 2^-54 = 0.999999999999999944488848768742172978818416595458984375
+    TEST_DOUBLE(fullPrecision, "0.999999999999999944488848768742172978818416595458984375", 1.0); // round to even
+    TEST_DOUBLE(fullPrecision, "0.999999999999999944488848768742172978818416595458984374", 0.99999999999999989); // previous double
+    TEST_DOUBLE(fullPrecision, "0.999999999999999944488848768742172978818416595458984376", 1.0); // next double
+    // 1.0 + 2^-53 = 1.00000000000000011102230246251565404236316680908203125
+    TEST_DOUBLE(fullPrecision, "1.00000000000000011102230246251565404236316680908203125", 1.0); // round to even
+    TEST_DOUBLE(fullPrecision, "1.00000000000000011102230246251565404236316680908203124", 1.0); // previous double
+    TEST_DOUBLE(fullPrecision, "1.00000000000000011102230246251565404236316680908203126", 1.00000000000000022); // next double
 
     {
         char n1e308[310];   // '1' followed by 308 '0'
@@ -168,10 +255,74 @@ TEST(Reader, ParseNumberHandler) {
         for (int i = 1; i < 309; i++)
             n1e308[i] = '0';
         n1e308[309] = '\0';
-        TEST_DOUBLE(n1e308, 1E308);
+        TEST_DOUBLE(fullPrecision, n1e308, 1E308);
     }
-#undef TEST_NUMBER
+
+#if 0 // Very slow
+    static const unsigned count = 10000000;
+    // Random test for double
+    {
+        Random r;
+
+        for (unsigned i = 0; i < count; i++) {
+            internal::Double d;
+            do {
+                // Need to call r() in two statements for cross-platform coherent sequence.
+                uint64_t u = uint64_t(r()) << 32;
+                u |= uint64_t(r());
+                d = internal::Double(u);
+            } while (d.IsNan() || d.IsInf()/* || !d.IsNormal()*/);  // Also work for subnormal now
+
+            char buffer[32];
+            *internal::dtoa(d.Value(), buffer) = '\0';
+            TEST_DOUBLE(fullPrecision, buffer, d.Value());
+        }
+    }
+#endif
+
 #undef TEST_DOUBLE
+}
+
+TEST(Reader, ParseNumber_NormalPrecisionDouble) {
+    TestParseDouble<false>();
+}
+
+TEST(Reader, ParseNumber_FullPrecisionDouble) {
+    TestParseDouble<true>();
+}
+
+TEST(Reader, ParseNumber_NormalPrecisionError) {
+    static unsigned count = 1000000;
+    Random r;
+
+    double ulpSum = 0.0;
+    double ulpMax = 0.0;
+    for (unsigned i = 0; i < count; i++) {
+        internal::Double e, a;
+        do {
+            // Need to call r() in two statements for cross-platform coherent sequence.
+            uint64_t u = uint64_t(r()) << 32;
+            u |= uint64_t(r());
+            e = u;
+        } while (e.IsNan() || e.IsInf() || !e.IsNormal());
+
+        char buffer[32];
+        *internal::dtoa(e.Value(), buffer) = '\0';
+
+        StringStream s(buffer);
+        ParseDoubleHandler h;
+        Reader reader;
+        ASSERT_EQ(kParseErrorNone, reader.Parse(s, h).Code());
+        EXPECT_EQ(1u, h.step_);
+
+        a = h.actual_;
+        uint64_t bias1 = e.ToBias();
+        uint64_t bias2 = a.ToBias();
+        double ulp = bias1 >= bias2 ? bias1 - bias2 : bias2 - bias1;
+        ulpMax = std::max(ulpMax, ulp);
+        ulpSum += ulp;
+    }
+    printf("ULP Average = %g, Max = %g \n", ulpSum / count, ulpMax);
 }
 
 TEST(Reader, ParseNumber_Error) {
