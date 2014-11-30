@@ -273,7 +273,7 @@ The usage of `PrettyWriter` is exactly the same as `Writer`, expect that `Pretty
 
 ## Completeness and Reset {#CompletenessReset}
 
-A `Writer` can only output a single JSON, which can be either an object or array at the root. Once the last matching `EndObject()` or `EndArray()` event is handled, the output JSON is well-formed and complete. User can detect this state by calling `Writer::IsComplete()`.
+A `Writer` can only output a single JSON, which can be any JSON type at the root. Once the singular event for root (e.g. `String()`), or the last matching `EndObject()` or `EndArray()` event, is handled, the output JSON is well-formed and complete. User can detect this state by calling `Writer::IsComplete()`.
 
 When a JSON is complete, the `Writer` cannot accept any new events. Otherwise the output will be invalid (i.e. having more than one root). To reuse the `Writer` object, user can call `Writer::Reset(OutputStream& os)` to reset all internal states of the `Writer` with a new output stream.
 

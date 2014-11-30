@@ -134,7 +134,6 @@ Parse Error Code                            | Description
 --------------------------------------------|---------------------------------------------------
 `kParseErrorNone`                           | No error.
 `kParseErrorDocumentEmpty`                  | The document is empty.
-`kParseErrorDocumentRootNotObjectOrArray`   | The document root must be either object or array.
 `kParseErrorDocumentRootNotSingular`        | The document root must not follow by other values.
 `kParseErrorValueInvalid`                   | Invalid value.
 `kParseErrorObjectMissName`                 | Missing a name for object member.
