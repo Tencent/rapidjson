@@ -21,11 +21,12 @@
 #ifndef RAPIDJSON_STRINGBUFFER_H_
 #define RAPIDJSON_STRINGBUFFER_H_
 
+#include "rapidjson.h"
+
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 #include <utility> // std::move
 #endif
 
-#include "rapidjson.h"
 #include "internal/stack.h"
 
 RAPIDJSON_NAMESPACE_BEGIN
