@@ -43,6 +43,11 @@
 
 #include "stdint.h"
 
+// miloyip: VC supports inttypes.h since VC2013
+#if _MSC_VER >= 1800
+#include <inttypes.h>
+#else
+
 // 7.8 Format conversion of integer types
 
 typedef struct {
@@ -302,5 +307,6 @@ imaxdiv_t __cdecl imaxdiv(intmax_t numer, intmax_t denom)
 #define wcstoimax _wcstoi64
 #define wcstoumax _wcstoui64
 
+#endif // _MSC_VER >= 1800
 
 #endif // _MSC_INTTYPES_H_ ]
