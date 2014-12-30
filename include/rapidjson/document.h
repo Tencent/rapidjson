@@ -286,6 +286,9 @@ struct GenericStringRef {
     GenericStringRef(const CharType (&str)[N]) RAPIDJSON_NOEXCEPT
         : s(str), length(N-1) {}
 
+    GenericStringRef(const GenericStringRef& rhs) RAPIDJSON_NOEXCEPT
+          : s(rhs.s), length(rhs.length) {}
+
     //! Explicitly create string reference from \c const character pointer
     /*!
         This constructor can be used to \b explicitly  create a reference to
