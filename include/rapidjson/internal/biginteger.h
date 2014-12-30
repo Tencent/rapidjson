@@ -55,7 +55,7 @@ public:
 
     BigInteger& operator=(const BigInteger& rhs) {
         count_ = rhs.count_;
-        std::memcpy(digits_, rhs.digits_, count_ * sizeof(Type));
+        std::memmove(digits_, rhs.digits_, count_ * sizeof(Type));
         return *this;
     }
 
