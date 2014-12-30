@@ -53,6 +53,12 @@ public:
             AppendDecimal64(decimals + i, decimals + i + length);
     }
 
+    BigInteger& operator=(const BigInteger& rhs) {
+        count_ = rhs.count_;
+        std::memcpy(digits_, rhs.digits_, count_ * sizeof(Type));
+        return *this;
+    }
+
     BigInteger& operator=(uint64_t u) {
         digits_[0] = u;            
         count_ = 1;

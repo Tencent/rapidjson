@@ -285,6 +285,9 @@ struct GenericStringRef {
     template<SizeType N>
     GenericStringRef(const CharType (&str)[N]) RAPIDJSON_NOEXCEPT
         : s(str), length(N-1) {}
+    
+    GenericStringRef(const GenericStringRef& rhs) RAPIDJSON_NOEXCEPT
+          : s(rhs.s), length(rhs.length) {}
 
     //! Explicitly create string reference from \c const character pointer
     /*!
