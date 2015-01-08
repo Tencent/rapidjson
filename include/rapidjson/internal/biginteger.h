@@ -23,6 +23,10 @@
 
 #include "../rapidjson.h"
 
+#if defined(_MSC_VER) && defined(_M_AMD64)
+#include <intrin.h> // for _umul128
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
