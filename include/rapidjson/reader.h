@@ -512,8 +512,7 @@ private:
                 case '}': 
                     if (!handler.EndObject(memberCount))
                         RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
-                    else
-                        return;
+                    return;
                 default:  RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell());
             }
         }
@@ -549,8 +548,7 @@ private:
                 case ']': 
                     if (!handler.EndArray(elementCount))
                         RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
-                    else
-                        return;
+                    return;
                 default:  RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell());
             }
         }
