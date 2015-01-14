@@ -600,7 +600,7 @@ TEST(Value, String) {
     // Constructor with type
     Value y(kStringType);
     EXPECT_TRUE(y.IsString());
-    EXPECT_EQ(0, y.GetString());
+    EXPECT_STREQ("", y.GetString());    // Empty string should be "" instead of 0 (issue 226)
     EXPECT_EQ(0u, y.GetStringLength());
 
     // SetConsttring()
@@ -675,6 +675,12 @@ TEST(Value, String) {
         TestEqual(vs0, vs1);
     }
 #endif // RAPIDJSON_HAS_STDSTRING
+}
+
+// Issue 226: Value of string type should not point to NULL
+TEST(Value, SetStringNullException) {
+    Value v;
+    EXPECT_THROW(v.SetString(0, 0), AssertException);
 }
 
 TEST(Value, Array) {

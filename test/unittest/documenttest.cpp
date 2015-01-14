@@ -212,6 +212,18 @@ TEST(Document, AcceptWriter) {
     EXPECT_EQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3,4]}", os.str());
 }
 
+// Issue 226: Value of string type should not point to NULL
+TEST(Document, AssertAcceptInvalidNameType) {
+    Document doc;
+    doc.SetObject();
+    doc.AddMember("a", 0, doc.GetAllocator());
+    doc.FindMember("a")->name.SetNull(); // Change name to non-string type.
+
+    OutputStringStream os;
+    Writer<OutputStringStream> writer(os);
+    ASSERT_THROW(doc.Accept(writer), AssertException);
+}
+
 // Issue 44:    SetStringRaw doesn't work with wchar_t
 TEST(Document, UTF16_Document) {
     GenericDocument< UTF16<> > json;
