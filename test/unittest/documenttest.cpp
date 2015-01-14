@@ -336,6 +336,10 @@ TYPED_TEST(DocumentMove, MoveConstructorParseError) {
     EXPECT_EQ(c.GetErrorOffset(), error.Offset());
 }
 
+// This test does not properly use parsing, just for testing.
+// It must call ClearStack() explicitly to prevent memory leak.
+// But here we cannot as ClearStack() is private.
+#if 0
 TYPED_TEST(DocumentMove, MoveConstructorStack) {
     typedef TypeParam Allocator;
     typedef UTF8<> Encoding;
@@ -360,6 +364,7 @@ TYPED_TEST(DocumentMove, MoveConstructorStack) {
     EXPECT_EQ(b.GetStackCapacity(), defaultCapacity);
     EXPECT_EQ(c.GetStackCapacity(), capacity);
 }
+#endif
 
 TYPED_TEST(DocumentMove, MoveAssignment) {
     typedef TypeParam Allocator;
@@ -428,6 +433,10 @@ TYPED_TEST(DocumentMove, MoveAssignmentParseError) {
     EXPECT_EQ(c.GetErrorOffset(), error.Offset());
 }
 
+// This test does not properly use parsing, just for testing.
+// It must call ClearStack() explicitly to prevent memory leak.
+// But here we cannot as ClearStack() is private.
+#if 0
 TYPED_TEST(DocumentMove, MoveAssignmentStack) {
     typedef TypeParam Allocator;
     typedef UTF8<> Encoding;
@@ -454,6 +463,7 @@ TYPED_TEST(DocumentMove, MoveAssignmentStack) {
     EXPECT_EQ(b.GetStackCapacity(), defaultCapacity);
     EXPECT_EQ(c.GetStackCapacity(), capacity);
 }
+#endif
 
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
 

@@ -21,10 +21,20 @@
 #include "unittest.h"
 
 int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+
 #if _MSC_VER
-    _CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+    _CrtMemState memoryState = { 0 };
+    _CrtMemCheckpoint(&memoryState);
+    //_CrtSetBreakAlloc(X);
     //void *testWhetherMemoryLeakDetectionWorks = malloc(1);
 #endif
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+
+    int ret = RUN_ALL_TESTS();
+
+#if _MSC_VER
+    // Current gtest constantly leak 2 blocks at exit
+    _CrtMemDumpAllObjectsSince(&memoryState);
+#endif
+    return ret;
 }
