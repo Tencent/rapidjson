@@ -29,6 +29,10 @@
 #include "stringbuffer.h"
 #include <new>      // placement new
 
+#if RAPIDJSON_HAS_STDSTRING
+#include <string>
+#endif
+
 #ifdef _MSC_VER
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
