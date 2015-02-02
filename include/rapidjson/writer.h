@@ -127,6 +127,12 @@ public:
         return WriteString(str, length);
     }
 
+#if RAPIDJSON_HAS_STDSTRING
+    bool String(const std::basic_string<Ch>& str) {
+      return String(str.data(), SizeType(str.size()));
+    }
+#endif
+
     bool StartObject() {
         Prefix(kObjectType);
         new (level_stack_.template Push<Level>()) Level(false);
