@@ -29,6 +29,10 @@
 #include "stringbuffer.h"
 #include <new>      // placement new
 
+#if RAPIDJSON_HAS_STDSTRING
+#include <string>
+#endif
+
 #ifdef _MSC_VER
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
@@ -126,6 +130,12 @@ public:
         Prefix(kStringType);
         return WriteString(str, length);
     }
+
+#if RAPIDJSON_HAS_STDSTRING
+    bool String(const std::basic_string<Ch>& str) {
+      return String(str.data(), SizeType(str.size()));
+    }
+#endif
 
     bool StartObject() {
         Prefix(kObjectType);
