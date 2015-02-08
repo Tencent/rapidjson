@@ -382,7 +382,7 @@ public:
     typedef typename SourceEncoding::Ch Ch; //!< SourceEncoding character type
 
     //! Constructor.
-    /*! \param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
+    /*! \param stackAllocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
         \param stackCapacity stack capacity in bytes for storing a single decoded string.  (Only use for non-destructive parsing)
     */
     GenericReader(StackAllocator* stackAllocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(stackAllocator, stackCapacity), parseResult_() {}
@@ -728,12 +728,12 @@ private:
     }
 
     template<typename InputStream, bool backup>
-    class NumberStream {};
+    class NumberStream;
 
     template<typename InputStream>
     class NumberStream<InputStream, false> {
     public:
-        NumberStream(GenericReader& reader, InputStream& is) : is(is) { (void)reader;  }
+        NumberStream(GenericReader& reader, InputStream& s) : is(s) { (void)reader;  }
         ~NumberStream() {}
 
         RAPIDJSON_FORCEINLINE Ch Peek() const { return is.Peek(); }
