@@ -14,6 +14,7 @@
 * Without C++ exception, RTTI
 * High performance
  * Use template and inline functions to reduce function call overheads.
+ * Internal optimized Grisu2 and floating point parsing implementations.
  * Optional SSE2/SSE4.1 support.
 
 ## Standard compliance
@@ -44,23 +45,33 @@
  * Similar to [DOM](http://en.wikipedia.org/wiki/Document_Object_Model) for HTML/XML, RapidJSON can parse JSON into a DOM representation (`rapidjson::GenericDocument`), for easy manipulation, and finally stringify back to JSON if needed.
  * The DOM style API (`rapidjson::GenericDocument`) is actually implemented with SAX style API (`rapidjson::GenericReader`). SAX is faster but sometimes DOM is easier. Users can pick their choices according to scenarios.
 
-## DOM (Document)
+## Parsing
 
+* Recursive (default) and iterative parser
+ * Recursive parser is faster but prone to stack overflow in extreme cases.
+ * Iterative parser use custom stack to keep parsing state.
 * Support *in situ* parsing.
  * Parse JSON string values in-place at the source JSON, and then the DOM points to addresses of those strings.
  * Faster than convention parsing: no allocation for strings, no copy (if string does not contain escapes), cache-friendly.
 * Support 32-bit/64-bit signed/unsigned integer and `double` for JSON number type.
- * RapidJSON checks range of numerical values for conversions.
+* Support parsing multiple JSONs in input stream (`kParseStopWhenDoneFlag`).
+* Error Handling
+ * Support comprehensive error code if parsing failed.
+ * Support error message localization.
 
-## SAX (Reader)
+## DOM (Document)
 
-* Support comprehensive error code if parsing failed.
-* Support error message localization.
+* RapidJSON checks range of numerical values for conversions.
+* Optimization for string literal
+ * Only store pointer instead of copying
+* Optimization for "short" strings
+ * Store short string in `Value` internally without additional allocation.
+ * For UTF-8 string: maximum 11 characters in 32-bit, 15 characters in 64-bit.
+* Optionally support `std::string` (define `RAPIDJSON_HAS_STDSTRING=1`)
 
-## SAX (Writer)
+## Generation
 
 * Support `rapidjson::PrettyWriter` for adding newlines and indentations.
-* Support custom precision for floating point values.
 
 ## Stream
 
@@ -77,3 +88,9 @@
  * User can provide a pre-allocated buffer. (Possible to parse a number of JSONs without any CRT allocation)
 * Support standard CRT(C-runtime) allocator.
 * Support custom allocators.
+
+## Miscellaneous
+
+* Some C++11 support (optional)
+ * Rvalue reference
+ * `noexcept` specifier

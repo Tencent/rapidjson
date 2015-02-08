@@ -8,7 +8,7 @@ As shown in [Usage at a glance](readme.md), a JSON can be parsed into DOM, and t
 
 # Value & Document {#ValueDocument}
 
-Each JSON value is stored in a type called `Value`. A `Document`, representing the DOM, contains the root of `Value`. All public types and functions of RapidJSON are defined in the `rapidjson` namespace.
+Each JSON value is stored in a type called `Value`. A `Document`, representing the DOM, contains the root `Value` of the DOM tree. All public types and functions of RapidJSON are defined in the `rapidjson` namespace.
 
 # Query Value {#QueryValue}
 
@@ -27,7 +27,7 @@ Assumes we have a JSON stored in a C string (`const char* json`):
 }
 ~~~~~~~~~~
 
-Parse it into a `Document`
+Parse it into a `Document`:
 ~~~~~~~~~~cpp
 #include "rapidjson/document.h"
 
@@ -42,12 +42,12 @@ The JSON is now parsed into `document` as a *DOM tree*:
 
 ![DOM in the tutorial](diagram/tutorial.png)
 
-Since the update to RFC7159, the root of a conforming JSON document can be any JSON value.  In RFC4627, only objects or arrays were allowed as root values. In this case, the root is an object.
+Since the update to RFC 7159, the root of a conforming JSON document can be any JSON value.  In earlier RFC 4627, only objects or arrays were allowed as root values. In this case, the root is an object.
 ~~~~~~~~~~cpp
 assert(document.IsObject());
 ~~~~~~~~~~
 
-Query whether a `"hello"` member exists in the root object. Since a `Value` can contain different types of value, we may need to verify its type and use suitable API to obtain the value. In this example, `"hello"` member associates with a JSON string.
+Let's query whether a `"hello"` member exists in the root object. Since a `Value` can contain different types of value, we may need to verify its type and use suitable API to obtain the value. In this example, `"hello"` member associates with a JSON string.
 ~~~~~~~~~~cpp
 assert(document.HasMember("hello"));
 assert(document["hello"].IsString());
@@ -135,7 +135,7 @@ And other familiar query functions:
 
 ## Query Object {#QueryObject}
 
-Similar to array, we can iterate object members by iterator:
+Similar to array, we can access all object members by iterator:
 
 ~~~~~~~~~~cpp
 static const char* kTypeNames[] = 
@@ -175,7 +175,7 @@ JSON provide a single numerical type called Number. Number can be integer or rea
 
 As C++ provides several integer and floating point number types, the DOM tries to handle these with widest possible range and good performance.
 
-When the DOM parses a Number, it stores it as either one of the following type:
+When a Number is parsed, it is stored in the DOM as either one of the following type:
 
 Type       | Description
 -----------|---------------------------------------
@@ -198,7 +198,7 @@ Checking          | Obtaining
 
 Note that, an integer value may be obtained in various ways without conversion. For example, A value `x` containing 123 will make `x.IsInt() == x.IsUint() == x.IsInt64() == x.IsUint64() == true`. But a value `y` containing -3000000000 will only makes `x.IsInt64() == true`.
 
-When obtaining the numeric values, `GetDouble()` will convert internal integer representation to a `double`. Note that, `int` and `uint` can be safely convert to `double`, but `int64_t` and `uint64_t` may lose precision (since mantissa of `double` is only 52-bits).
+When obtaining the numeric values, `GetDouble()` will convert internal integer representation to a `double`. Note that, `int` and `unsigned` can be safely convert to `double`, but `int64_t` and `uint64_t` may lose precision (since mantissa of `double` is only 52-bits).
 
 ## Query String {#QueryString}
 
@@ -208,7 +208,7 @@ According to RFC 4627, JSON strings can contain Unicode character `U+0000`, whic
 
 To conform RFC 4627, RapidJSON supports string containing `U+0000`. If you need to handle this, you can use `GetStringLength()` API to obtain the correct length of string.
 
-For example, after parsing a the following JSON string to `Document d`.
+For example, after parsing a the following JSON to `Document d`:
 
 ~~~~~~~~~~js
 { "s" :  "a\u0000b" }
@@ -236,7 +236,7 @@ if (document["i"] != 123) /*...*/;                  // Compare with integers
 if (document["pi"] != 3.14) /*...*/;                // Compare with double.
 ~~~~~~~~~~
 
-Array and object must be `Value`s in order to be compared. They are equal if and only if their whole subtrees are equal.
+Array/object compares their elements/members in order. They are equal if and only if their whole subtrees are equal.
 
 Note that, currently if an object contains duplicated named member, comparing equality with any object is always `false`.
 
@@ -346,7 +346,7 @@ RapidJSON provide two strategies for storing string.
 
 Copy-string is always safe because it owns a copy of the data. Const-string can be used for storing string literal, and in-situ parsing which we will mentioned in Document section.
 
-To make memory allocation customizable, RapidJSON requires user to pass an instance of allocator, whenever an operation may require allocation. This design is more flexible than STL's allocator type per class, as we can assign an allocator instance for each allocation.
+To make memory allocation customizable, RapidJSON requires user to pass an instance of allocator, whenever an operation may require allocation. This design is needed to prevent storing a allocator (or Document) pointer per Value.
 
 Therefore, when we assign a copy-string, we call this overloaded `SetString()` with allocator:
 
@@ -364,7 +364,7 @@ In this example, we get the allocator from a `Document` instance. This is a comm
 
 Besides, the above `SetString()` requires length. This can handle null characters within a string. There is another `SetString()` overloaded function without the length parameter. And it assumes the input is null-terminated and calls a `strlen()`-like function to obtain the length.
 
-Finally, for literal string or string with safe life-cycle can use const-string version of `SetString()`, which lacks allocator parameter.  For string literals (or constant character arrays), simply passing the literal as parameter is safe and efficient:
+Finally, for string literal or string with safe life-cycle can use const-string version of `SetString()`, which lacks allocator parameter.  For string literals (or constant character arrays), simply passing the literal as parameter is safe and efficient:
 
 ~~~~~~~~~~cpp
 Value s;
@@ -372,7 +372,7 @@ s.SetString("rapidjson");    // can contain null character, length derived at co
 s = "rapidjson";             // shortcut, same as above
 ~~~~~~~~~~
 
-For plain string pointers, the RapidJSON requires to mark a string as safe before using it without copying.  This can be achieved by using the `StringRef` function:
+For character pointer, the RapidJSON requires to mark it as safe before using it without copying. This can be achieved by using the `StringRef` function:
 
 ~~~~~~~~~cpp
 const char * cstr = getenv("USER");
@@ -427,7 +427,7 @@ contact.PushBack(val, document.GetAllocator());
 ~~~~~~~~~~
 
 ## Modify Object {#ModifyObject}
-Object is a collection of key-value pairs. Each key must be a string value. The way to manipulating object is to add members:
+Object is a collection of key-value pairs (members). Each key must be a string value. To modify an object, either add or remove members. THe following APIs are for adding members:
 
 * `Value& AddMember(Value&, Value&, Allocator& allocator)`
 * `Value& AddMember(StringRefType, Value&, Allocator&)`
@@ -441,7 +441,7 @@ contact.AddMember("name", "Milo", document.GetAllocator());
 contact.AddMember("married", true, document.GetAllocator());
 ~~~~~~~~~~
 
-The `StringRefType` used as name parameter assumes the same interface as the `SetString` function for string values.  These overloads are used to avoid the need for copying the `name` string, as constant key names are very common in JSON objects.
+The name parameter with `StringRefType` is similar to the interface of `SetString` function for string values. These overloads are used to avoid the need for copying the `name` string, as constant key names are very common in JSON objects.
 
 If you need to create a name from a non-constant string or a string without sufficient lifetime (see [Create String](#CreateString)), you need to create a string Value by using the copy-string API.  To avoid the need for an intermediate variable, you can use a [temporary value](#TemporaryValues) in place:
 
@@ -452,7 +452,7 @@ contact.AddMember(Value("copy", document.GetAllocator()).Move(), // copy string
                   document.GetAllocator());
 
 // explicit parameters
-Value key("key", document.GetAllocator()); // copy name string
+Value key("key", document.GetAllocator()); // copy string name
 Value val(42);                             // some value
 contact.AddMember(key, val, document.GetAllocator());
 ~~~~~~~~~~
@@ -465,7 +465,7 @@ For removing members, there are several choices:
 * `MemberIterator EraseMember(MemberIterator)`: similar to the above but it preserves order of members (linear time complexity).
 * `MemberIterator EraseMember(MemberIterator first, MemberIterator last)`: remove a range of members, preserves order (linear time complexity).
 
-`MemberIterator RemoveMember(MemberIterator)` uses a "move-last" trick to archive constant time complexity. Basically the member at iterator is destructed, and then the last element is moved to that position. So the order of the remaining members are changed.
+`MemberIterator RemoveMember(MemberIterator)` uses a "move-last" trick to achieve constant time complexity. Basically the member at iterator is destructed, and then the last element is moved to that position. So the order of the remaining members are changed.
 
 ## Deep Copy Value {#DeepCopyValue}
 If we really need to copy a DOM tree, we can use two APIs for deep copy: constructor with allocator, and `CopyFrom()`.
@@ -506,7 +506,7 @@ Swapping two DOM trees is fast (constant time), despite the complexity of the tr
 This tutorial shows the basics of DOM tree query and manipulation. There are several important concepts in RapidJSON:
 
 1. [Streams](doc/stream.md) are channels for reading/writing JSON, which can be a in-memory string, or file stream, etc. User can also create their streams.
-2. [Encoding](doc/encoding.md) defines which character set is used in streams and memory. RapidJSON also provide Unicode conversion/validation internally.
+2. [Encoding](doc/encoding.md) defines which character encoding is used in streams and memory. RapidJSON also provide Unicode conversion/validation internally.
 3. [DOM](doc/dom.md)'s basics are already covered in this tutorial. Uncover more advanced features such as *in situ* parsing, other parsing options and advanced usages.
 4. [SAX](doc/sax.md) is the foundation of parsing/generating facility in RapidJSON. Learn how to use `Reader`/`Writer` to implement even faster applications. Also try `PrettyWriter` to format the JSON.
 5. [Performance](doc/performance.md) shows some in-house and third-party benchmarks.
