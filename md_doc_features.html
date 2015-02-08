@@ -100,6 +100,7 @@ $(document).ready(function(){initNavTree('md_doc_features.html','');});
 <li>Without C++ exception, RTTI</li>
 <li>High performance<ul>
 <li>Use template and inline functions to reduce function call overheads.</li>
+<li>Internal optimized Grisu2 and floating point parsing implementations.</li>
 <li>Optional SSE2/SSE4.1 support.</li>
 </ul>
 </li>
@@ -146,27 +147,43 @@ $(document).ready(function(){initNavTree('md_doc_features.html','');});
 </ul>
 </li>
 </ul>
-<h2>DOM (Document)</h2>
+<h2>Parsing</h2>
 <ul>
+<li>Recursive (default) and iterative parser<ul>
+<li>Recursive parser is faster but prone to stack overflow in extreme cases.</li>
+<li>Iterative parser use custom stack to keep parsing state.</li>
+</ul>
+</li>
 <li>Support <em>in situ</em> parsing.<ul>
 <li>Parse JSON string values in-place at the source JSON, and then the DOM points to addresses of those strings.</li>
 <li>Faster than convention parsing: no allocation for strings, no copy (if string does not contain escapes), cache-friendly.</li>
 </ul>
 </li>
-<li>Support 32-bit/64-bit signed/unsigned integer and <code>double</code> for JSON number type.<ul>
-<li>RapidJSON checks range of numerical values for conversions.</li>
-</ul>
-</li>
-</ul>
-<h2>SAX (Reader)</h2>
-<ul>
+<li>Support 32-bit/64-bit signed/unsigned integer and <code>double</code> for JSON number type.</li>
+<li>Support parsing multiple JSONs in input stream (<code>kParseStopWhenDoneFlag</code>).</li>
+<li>Error Handling<ul>
 <li>Support comprehensive error code if parsing failed.</li>
 <li>Support error message localization.</li>
 </ul>
-<h2>SAX (Writer)</h2>
+</li>
+</ul>
+<h2>DOM (Document)</h2>
+<ul>
+<li>RapidJSON checks range of numerical values for conversions.</li>
+<li>Optimization for string literal<ul>
+<li>Only store pointer instead of copying</li>
+</ul>
+</li>
+<li>Optimization for "short" strings<ul>
+<li>Store short string in <code>Value</code> internally without additional allocation.</li>
+<li>For UTF-8 string: maximum 11 characters in 32-bit, 15 characters in 64-bit.</li>
+</ul>
+</li>
+<li>Optionally support <code>std::string</code> (define <code>RAPIDJSON_HAS_STDSTRING=1</code>)</li>
+</ul>
+<h2>Generation</h2>
 <ul>
 <li>Support <code><a class="el" href="classrapidjson_1_1_pretty_writer.html" title="Writer with indentation and spacing. ">rapidjson::PrettyWriter</a></code> for adding newlines and indentations.</li>
-<li>Support custom precision for floating point values.</li>
 </ul>
 <h2>Stream</h2>
 <ul>
@@ -186,7 +203,15 @@ $(document).ready(function(){initNavTree('md_doc_features.html','');});
 </ul>
 </li>
 <li>Support standard CRT(C-runtime) allocator.</li>
-<li>Support custom allocators. </li>
+<li>Support custom allocators.</li>
+</ul>
+<h2>Miscellaneous</h2>
+<ul>
+<li>Some C++11 support (optional)<ul>
+<li>Rvalue reference</li>
+<li><code>noexcept</code> specifier </li>
+</ul>
+</li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
