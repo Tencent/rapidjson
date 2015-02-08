@@ -464,7 +464,7 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l00382"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_generic_reader.html#a0781d19e8c6bc044d9cc5f5d3dde287e">  382</a></span>&#160;    <span class="keyword">typedef</span> <span class="keyword">typename</span> SourceEncoding::Ch <a class="code" href="classrapidjson_1_1_generic_reader.html#a0781d19e8c6bc044d9cc5f5d3dde287e">Ch</a>; <span class="comment">//!&lt; SourceEncoding character type</span></div>
 <div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;<span class="comment"></span><span class="comment"></span></div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;<span class="comment">    //! Constructor.</span></div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;<span class="comment"></span><span class="comment">    /*! \param allocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)</span></div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;<span class="comment"></span><span class="comment">    /*! \param stackAllocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)</span></div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;<span class="comment">        \param stackCapacity stack capacity in bytes for storing a single decoded string.  (Only use for non-destructive parsing)</span></div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;<span class="comment">    */</span></div>
 <div class="line"><a name="l00388"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_generic_reader.html#a56ab1065ea75167aeacb4802425bf57f">  388</a></span>&#160;    <a class="code" href="classrapidjson_1_1_generic_reader.html#a56ab1065ea75167aeacb4802425bf57f">GenericReader</a>(StackAllocator* stackAllocator = 0, <span class="keywordtype">size_t</span> stackCapacity = kDefaultStackCapacity) : stack_(stackAllocator, stackCapacity), parseResult_() {}</div>
@@ -810,12 +810,12 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;    }</div>
 <div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;</div>
 <div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream, <span class="keywordtype">bool</span> backup&gt;</div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;    <span class="keyword">class </span>NumberStream {};</div>
+<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;    <span class="keyword">class </span>NumberStream;</div>
 <div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;</div>
 <div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream&gt;</div>
 <div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;    <span class="keyword">class </span>NumberStream&lt;InputStream, false&gt; {</div>
 <div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;        NumberStream(GenericReader&amp; reader, InputStream&amp; is) : is(is) { (void)reader;  }</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;        NumberStream(GenericReader&amp; reader, InputStream&amp; s) : is(s) { (void)reader;  }</div>
 <div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;        ~NumberStream() {}</div>
 <div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;</div>
 <div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;        RAPIDJSON_FORCEINLINE Ch Peek()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> is.Peek(); }</div>
