@@ -2,6 +2,7 @@ find_package(GTestSrc)
 
 IF(GTESTSRC_FOUND)
     enable_testing()
+    set(gtest_force_shared_crt ON)
 
     if (WIN32 AND (NOT CYGWIN) AND (NOT MINGW))
         set(gtest_disable_pthreads ON)
