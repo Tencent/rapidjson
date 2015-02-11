@@ -1,0 +1,4 @@
+Name: @PROJECT_NAME@
+Description: RapidJSON is a JSON parser and generator for C++ inspired by RapidXml.
+Version: @LIB_VERSION_STRING@
+Cflags: -I${includedir}

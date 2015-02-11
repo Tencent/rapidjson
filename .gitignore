@@ -9,3 +9,17 @@
 /doc/doxygen_*.db
 /thirdparty/lib
 /intermediate
+
+# Temporary files created during CMake build
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+RapidJSON*.cmake
+RapidJSON.pc
+Testing
+/googletest
+install_manifest.txt
+Doxyfile
+DartConfiguration.tcl
