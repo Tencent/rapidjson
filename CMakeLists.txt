@@ -23,6 +23,13 @@ if(RAPIDJSON_HAS_STDSTRING)
     add_definitions(-DRAPIDJSON_HAS_STDSTRING)
 endif()
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wall -Wextra")
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wall -Wextra")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    add_definitions(_CRT_SECURE_NO_WARNINGS)
+endif()
 
 #add extra search paths for libraries and includes
 SET(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The directory the headers are installed in")
@@ -36,9 +43,7 @@ ELSEIF(WIN32)
 ENDIF()
 SET(CMAKE_INSTALL_DIR "${_CMAKE_INSTALL_DIR}" CACHE PATH "The directory cmake fiels are installed in")
 
-
 include_directories(${CMAKE_SOURCE_DIR}/include)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${RAPIDJSON_CXX_FLAGS}")
 
 if(RAPIDJSON_BUILD_DOC)
     add_subdirectory(doc)

@@ -14,6 +14,14 @@ set(EXAMPLES
     simplewriter
     tutorial)
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default")
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    add_definitions(_CRT_SECURE_NO_WARNINGS)
+endif()
+
 foreach (example ${EXAMPLES})
     add_executable(${example} ${example}/${example}.cpp)
 endforeach()

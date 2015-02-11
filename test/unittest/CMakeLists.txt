@@ -13,6 +13,14 @@ set(UNITTEST_SOURCES
     valuetest.cpp
     writertest.cpp)
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Weffc++ -Wswitch-default")
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Weffc++ -Wswitch-default")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    add_definitions(_CRT_SECURE_NO_WARNINGS)
+endif()
+
 add_library(namespacetest STATIC namespacetest.cpp)
 
 add_executable(unittest ${UNITTEST_SOURCES})
