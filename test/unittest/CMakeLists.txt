@@ -1,12 +1,15 @@
 set(UNITTEST_SOURCES
+    bigintegertest.cpp
     documenttest.cpp
     encodedstreamtest.cpp
     encodingstest.cpp
     filestreamtest.cpp
     jsoncheckertest.cpp
+    namespacetest.cpp
     readertest.cpp
+    stringbuffertest.cpp
+    strtodtest.cpp
     unittest.cpp
-    unittest.h
     valuetest.cpp
     writertest.cpp)
 
