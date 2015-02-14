@@ -148,7 +148,7 @@ public:
     }
 
     bool operator==(const BigInteger& rhs) const {
-        return count_ == rhs.count_ && memcmp(digits_, rhs.digits_, count_ * sizeof(Type)) == 0;
+        return count_ == rhs.count_ && std::memcmp(digits_, rhs.digits_, count_ * sizeof(Type)) == 0;
     }
 
     bool operator==(const Type rhs) const {
