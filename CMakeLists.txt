@@ -53,6 +53,10 @@ if(RAPIDJSON_BUILD_EXAMPLES)
 endif()
 
 if(RAPIDJSON_BUILD_TESTS)
+    if(MSVC11)
+	    # required for VS2012 due to missing support for variadic templates
+	    add_definitions(-D_VARIADIC_MAX=10)
+	endif(MSVC11)
     add_subdirectory(test)
     include(CTest)
 endif()

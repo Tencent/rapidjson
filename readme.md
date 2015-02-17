@@ -6,6 +6,10 @@ Copyright (c) 2011-2014 Milo Yip (miloyip@gmail.com)
 
 [RapidJSON Documentation](http://miloyip.github.io/rapidjson/)
 
+## Build status
+* Tavis CI (Linux): [![Travis Build status](https://travis-ci.org/Kosta-Github/rapidjson)](https://travis-ci.org/Kosta-Github/rapidjson)
+* AppVeyor (Windows): [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/3xw2isxomp5r4do7/branch/master?svg=true)](https://ci.appveyor.com/project/Kosta-Github/rapidjson/branch/master)
+
 ## Introduction
 
 RapidJSON is a JSON parser and generator for C++. It was inspired by [RapidXml](http://rapidxml.sourceforge.net/).

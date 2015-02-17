@@ -1,0 +1,28 @@
+version: 0.12.{build}
+
+configuration:
+- Debug
+- Release
+
+platform:
+- x86
+- x64
+
+environment:
+  matrix:
+  - VS_VERSION: 11
+  - VS_VERSION: 12
+  - VS_VERSION: 14
+
+before_build:
+- git submodule update --init --recursive
+- if "%PLATFORM%" == "x86" set PLATFORM=win32
+- cmake -H. -BBuild/VS -G "Visual Studio %VS_VERSION%" -DCMAKE_GENERATOR_PLATFORM=%PLATFORM% -DBUILD_SHARED_LIBS=true -Wno-dev
+
+build:
+  project: Build\VS\RapidJSON.sln
+  parallel: true
+  verbosity: minimal
+
+test_script:
+- cd Build\VS && ctest --verbose --timeout 120 --build-config %CONFIGURATION%
