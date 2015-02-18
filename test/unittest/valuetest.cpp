@@ -54,9 +54,7 @@ TEST(Value, Traits) {
 #ifndef _MSC_VER
     static_assert(std::is_nothrow_constructible<Value>::value, "");
     static_assert(std::is_nothrow_default_constructible<Value>::value, "");
-#endif
     static_assert(!std::is_nothrow_copy_constructible<Value>::value, "");
-#ifndef _MSC_VER
     static_assert(std::is_nothrow_move_constructible<Value>::value, "");
 #endif
 
