@@ -8,7 +8,7 @@ Copyright (c) 2011-2014 Milo Yip (miloyip@gmail.com)
 
 ## Build status
 * Tavis CI (Linux): [![Travis Build status](https://travis-ci.org/miloyip/rapidjson.png)](https://travis-ci.org/miloyip/rapidjson)
-* AppVeyor (Windows): [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/3xw2isxomp5r4do7/branch/master?svg=true)](https://ci.appveyor.com/project/Kosta-Github/rapidjson/branch/master)
+* AppVeyor (Windows): [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/u658dcuwxo14a8m9/branch/master?svg=true)](https://ci.appveyor.com/project/miloyip/rapidjson/branch/master)
 
 ## Introduction
 
