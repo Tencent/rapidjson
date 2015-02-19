@@ -21,6 +21,7 @@ before_install:
 install: true
 
 before_script:
+    - sed -i 's/march=native/msse4.2/' CMakeLists.txt
     - mkdir build 
     - >
         (cd build && cmake 
