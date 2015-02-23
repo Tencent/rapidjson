@@ -1,14 +1,21 @@
 ![](doc/logo/rapidjson.png)
+## A fast JSON parser/generator for C++ with both SAX/DOM style API 
 
 Copyright (c) 2011-2014 Milo Yip (miloyip@gmail.com)
 
-[RapidJSON GitHub](https://github.com/miloyip/rapidjson/)
-
-[RapidJSON Documentation](http://miloyip.github.io/rapidjson/)
+* [RapidJSON GitHub](https://github.com/miloyip/rapidjson/)
+* [RapidJSON Documentation](http://miloyip.github.io/rapidjson/)
 
 ## Build status
-* Tavis CI (Linux): [![Travis Build status](https://travis-ci.org/miloyip/rapidjson.png)](https://travis-ci.org/miloyip/rapidjson)
-* AppVeyor (Windows): [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/u658dcuwxo14a8m9/branch/master?svg=true)](https://ci.appveyor.com/project/miloyip/rapidjson/branch/master)
+
+| [Linux][lin-link] | [Windows][win-link] |
+| :---------------: | :-----------------: |
+| ![lin-badge]      | ![win-badge]        |
+
+[lin-badge]: https://travis-ci.org/miloyip/rapidjson.png "Travis build status"
+[lin-link]:  https://travis-ci.org/miloyip/rapidjson "Travis build status"
+[win-badge]: https://ci.appveyor.com/api/projects/status/u658dcuwxo14a8m9/branch/master?svg=true "AppVeyor build status"
+[win-link]:  https://ci.appveyor.com/project/miloyip/rapidjson/branch/master "AppVeyor build status"
 
 ## Introduction
 
