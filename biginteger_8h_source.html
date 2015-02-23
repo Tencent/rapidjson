@@ -230,7 +230,7 @@ $(document).ready(function(){initNavTree('biginteger_8h_source.html','');});
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    }</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <span class="keywordtype">bool</span> operator==(<span class="keyword">const</span> BigInteger&amp; rhs)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        <span class="keywordflow">return</span> count_ == rhs.count_ &amp;&amp; memcmp(digits_, rhs.digits_, count_ * <span class="keyword">sizeof</span>(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>)) == 0;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        <span class="keywordflow">return</span> count_ == rhs.count_ &amp;&amp; std::memcmp(digits_, rhs.digits_, count_ * <span class="keyword">sizeof</span>(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>)) == 0;</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    }</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keywordtype">bool</span> operator==(<span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> rhs)<span class="keyword"> const </span>{</div>
@@ -254,7 +254,7 @@ $(document).ready(function(){initNavTree('biginteger_8h_source.html','');});
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        };</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        <span class="keywordflow">if</span> (exp == 0) <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        <span class="keywordflow">for</span> (; exp &gt;= 27; exp -= 27) *<span class="keyword">this</span> *= <a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0X6765C793, 0XFA10079D); <span class="comment">// 5^27</span></div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        <span class="keywordflow">for</span> (; exp &gt;= 13; exp -= 13) *<span class="keyword">this</span> *= 1220703125u; <span class="comment">// 5^13</span></div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        <span class="keywordflow">for</span> (; exp &gt;= 13; exp -= 13) *<span class="keyword">this</span> *= static_cast&lt;uint32_t&gt;(1220703125u); <span class="comment">// 5^13</span></div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        <span class="keywordflow">if</span> (exp &gt; 0)                 *<span class="keyword">this</span> *= kPow5[exp - 1];</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    }</div>
