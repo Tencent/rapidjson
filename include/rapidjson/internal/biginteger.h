@@ -148,7 +148,7 @@ public:
     }
 
     bool operator==(const BigInteger& rhs) const {
-        return count_ == rhs.count_ && memcmp(digits_, rhs.digits_, count_ * sizeof(Type)) == 0;
+        return count_ == rhs.count_ && std::memcmp(digits_, rhs.digits_, count_ * sizeof(Type)) == 0;
     }
 
     bool operator==(const Type rhs) const {
@@ -172,7 +172,7 @@ public:
         };
         if (exp == 0) return *this;
         for (; exp >= 27; exp -= 27) *this *= RAPIDJSON_UINT64_C2(0X6765C793, 0XFA10079D); // 5^27
-        for (; exp >= 13; exp -= 13) *this *= 1220703125u; // 5^13
+        for (; exp >= 13; exp -= 13) *this *= static_cast<uint32_t>(1220703125u); // 5^13
         if (exp > 0)                 *this *= kPow5[exp - 1];
         return *this;
     }
