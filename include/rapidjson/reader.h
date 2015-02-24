@@ -559,7 +559,7 @@ private:
         RAPIDJSON_ASSERT(is.Peek() == 'n');
         is.Take();
 
-        if (is.Take() == 'u' && is.Take() == 'l' && is.Take() == 'l') {
+        if (is.Take() == 'u' && is.Take() == 'l') {
             if (!handler.Null())
                 RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
         }
