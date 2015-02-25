@@ -212,6 +212,19 @@ TEST(Document, AcceptWriter) {
     EXPECT_EQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3,4]}", os.str());
 }
 
+TEST(Document, UserBuffer) {
+    typedef GenericDocument<UTF8<>, MemoryPoolAllocator<>, MemoryPoolAllocator<>> DocumentType;
+    char valueBuffer[4096];
+    char parseBuffer[1024];
+    MemoryPoolAllocator<> valueAllocator(valueBuffer, sizeof(valueBuffer));
+    MemoryPoolAllocator<> parseAllocator(parseBuffer, sizeof(parseBuffer));
+    DocumentType doc(&valueAllocator, sizeof(parseBuffer), &parseAllocator);
+    doc.Parse(" { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3, 4] } ");
+    EXPECT_FALSE(doc.HasParseError());
+    EXPECT_LE(valueAllocator.Size(), sizeof(valueBuffer));
+    EXPECT_LE(parseAllocator.Size(), sizeof(parseBuffer));
+}
+
 // Issue 226: Value of string type should not point to NULL
 TEST(Document, AssertAcceptInvalidNameType) {
     Document doc;
