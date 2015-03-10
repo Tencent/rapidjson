@@ -1,14 +1,25 @@
 set(UNITTEST_SOURCES
+    bigintegertest.cpp
     documenttest.cpp
     encodedstreamtest.cpp
     encodingstest.cpp
     filestreamtest.cpp
     jsoncheckertest.cpp
+    namespacetest.cpp
     readertest.cpp
+    stringbuffertest.cpp
+    strtodtest.cpp
     unittest.cpp
-    unittest.h
     valuetest.cpp
     writertest.cpp)
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Weffc++ -Wswitch-default")
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Weffc++ -Wswitch-default")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
+endif()
 
 add_library(namespacetest STATIC namespacetest.cpp)
 
