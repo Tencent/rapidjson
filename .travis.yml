@@ -17,6 +17,7 @@ env:
     - secure: "HrsaCb+N66EG1HR+LWH1u51SjaJyRwJEDzqJGYMB7LJ/bfqb9mWKF1fLvZGk46W5t7TVaXRDD5KHFx9DPWvKn4gRUVkwTHEy262ah5ORh8M6n/6VVVajeV/AYt2C0sswdkDBDO4Xq+xy5gdw3G8s1A4Inbm73pUh+6vx+7ltBbk="
 
 before_install:
+  - sudo apt-get update -qq
   - sudo apt-get install -qq cmake doxygen valgrind
   - if [ "$ARCH" = "x86" ]; then sudo apt-get install -qq g++-multilib libc6-dbg:i386; fi
 
