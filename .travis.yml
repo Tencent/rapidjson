@@ -39,5 +39,5 @@ script:
   - cd build
   - make tests
   - make examples
-  - ctest -V
+  - ctest -V `[ "$CONF" = "release" ] || echo "-E perftest"`
   - make travis_doc
