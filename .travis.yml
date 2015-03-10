@@ -34,7 +34,7 @@ before_script:
         -DRAPIDJSON_HAS_STDSTRING=ON
         -DCMAKE_VERBOSE_MAKEFILE=ON 
         -DCMAKE_BUILD_TYPE=$CONF 
-        -DCMAKE_C_FLAGS="$ARCH_FLAGS" ..)
+        -DCMAKE_CXX_FLAGS="$ARCH_FLAGS" ..)
 
 script:
   - cd build
