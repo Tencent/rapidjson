@@ -25,4 +25,4 @@ build:
   verbosity: minimal
 
 test_script:
-- cd Build\VS && ctest --verbose --build-config %CONFIGURATION%
+- cd Build\VS && if %CONFIGURATION%==Debug (ctest --verbose -E perftest --build-config %CONFIGURATION%) else (ctest --verbose --build-config %CONFIGURATION%)
