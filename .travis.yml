@@ -23,6 +23,8 @@ before_install:
 install: true
 
 before_script:
+#   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
+#   exposed by merging PR#163 (using -march=native)
     - sed -i 's/march=native/msse4.2/' CMakeLists.txt
     - mkdir build 
     - >
@@ -32,9 +34,6 @@ before_script:
         -DCMAKE_VERBOSE_MAKEFILE=ON 
         -DCMAKE_BUILD_TYPE=$CONF 
         -DCMAKE_C_FLAGS="$ARCH_FLAGS" ..)
-#   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
-#   exposed by merging PR#163 (using -march=native)
-#  - (cd build/gmake && sed -i 's/march=native/msse4.2/' *.make)
 
 script:
   - cd build
