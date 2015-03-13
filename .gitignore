@@ -2,10 +2,10 @@
 !/bin/data
 !/bin/encodings
 !/bin/jsonchecker
+/build
 /doc/html
 /doc/doxygen_*.db
-/thirdparty/lib
-/intermediate
+*.a
 
 # Temporary files created during CMake build
 CMakeCache.txt
@@ -20,4 +20,3 @@ Testing
 install_manifest.txt
 Doxyfile
 DartConfiguration.tcl
-/build/*
