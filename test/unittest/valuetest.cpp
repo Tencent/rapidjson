@@ -919,6 +919,19 @@ TEST(Value, Object) {
         EXPECT_EQ(8u, o.MemberCount());
     }
 
+    // AddMember<T>(Value&, T, Allocator)
+    {
+        Value o(kObjectType);
+
+        Value n("s");
+        o.AddMember(n, "string", allocator);
+        EXPECT_EQ(1u, o.MemberCount());
+
+        Value count("#");
+        o.AddMember(count, o.MemberCount(), allocator);
+        EXPECT_EQ(2u, o.MemberCount());
+    }
+
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     // AddMember(GenericValue&&, ...) variants
     {
