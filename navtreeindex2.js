@@ -1,5 +1,7 @@
 var NAVTREEINDEX2 =
 {
+"md_doc_internals.html#ParsingOptimization":[7,1],
+"md_doc_internals.html#Pow10":[7,1,1],
 "md_doc_internals.html#SkipwhitespaceWithSIMD":[7,1,0],
 "md_doc_internals.html#Value":[7,0],
 "md_doc_performance.html":[6],

@@ -26,6 +26,8 @@ var classrapidjson_1_1_generic_value =
     [ "~GenericValue", "classrapidjson_1_1_generic_value.html#a433a64b466c80cadf7d1acaa6f065437", null ],
     [ "Accept", "classrapidjson_1_1_generic_value.html#aeef0506cd1f8d703db4833c503f0657e", null ],
     [ "AddMember", "classrapidjson_1_1_generic_value.html#ab018d734d189532b27943bc45776ba68", null ],
+    [ "AddMember", "classrapidjson_1_1_generic_value.html#ad290f179591025e871bedbbac89ac276", null ],
+    [ "AddMember", "classrapidjson_1_1_generic_value.html#ab705cb56bfb380005704cda2d0edf168", null ],
     [ "AddMember", "classrapidjson_1_1_generic_value.html#a85dc131bdad8077ce970d580d333d15a", null ],
     [ "AddMember", "classrapidjson_1_1_generic_value.html#a2ccb4736d0f2ec07f06f630d8fe54f8d", null ],
     [ "AddMember", "classrapidjson_1_1_generic_value.html#aa70ada250f3a0c5aeee0ce138d136b06", null ],
