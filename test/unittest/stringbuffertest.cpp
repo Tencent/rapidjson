@@ -83,8 +83,11 @@ TEST(StringBuffer, Traits) {
 
     static_assert(!std::is_nothrow_constructible<StringBuffer>::value, "");
     static_assert(!std::is_nothrow_default_constructible<StringBuffer>::value, "");
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1800
     static_assert(!std::is_nothrow_copy_constructible<StringBuffer>::value, "");
     static_assert(!std::is_nothrow_move_constructible<StringBuffer>::value, "");
+#endif
 
     static_assert( std::is_assignable<StringBuffer,StringBuffer>::value, "");
 #ifndef _MSC_VER
@@ -92,7 +95,10 @@ TEST(StringBuffer, Traits) {
 #endif
     static_assert( std::is_move_assignable<StringBuffer>::value, "");
 
-    static_assert(!std::is_nothrow_assignable<StringBuffer,StringBuffer>::value, "");
+#if !defined(_MSC_VER) || _MSC_VER >= 1800
+    static_assert(!std::is_nothrow_assignable<StringBuffer, StringBuffer>::value, "");
+#endif
+
     static_assert(!std::is_nothrow_copy_assignable<StringBuffer>::value, "");
     static_assert(!std::is_nothrow_move_assignable<StringBuffer>::value, "");
 
