@@ -86,7 +86,12 @@ install(DIRECTORY include/rapidjson
 
 install(DIRECTORY example/
     DESTINATION "${DOC_INSTALL_DIR}/examples"
-    COMPONENT examples)
+    COMPONENT examples
+    # Following patterns are for excluding the intermediate/object files
+    # from an install of in-source CMake build.
+    PATTERN "CMakeFiles" EXCLUDE
+    PATTERN "Makefile" EXCLUDE
+    PATTERN "cmake_install.cmake" EXCLUDE)
 
 # Provide config and version files to be used by other applications
 # ===============================
