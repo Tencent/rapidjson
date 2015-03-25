@@ -11,8 +11,8 @@ env:
     - CONF=debug   ARCH=x86
     - CONF=release ARCH=x86
   global:
-    - ARCH_FLAGS_x86='-m32'
-    - ARCH_FLAGS_x86_64=''
+    - ARCH_FLAGS_x86='-m32'        # #266: don't use SSE on 32-bit
+    - ARCH_FLAGS_x86_64='-msse4.2' #       use SSE4.2 on 64-bit
     - GITHUB_REPO='miloyip/rapidjson'
     - secure: "HrsaCb+N66EG1HR+LWH1u51SjaJyRwJEDzqJGYMB7LJ/bfqb9mWKF1fLvZGk46W5t7TVaXRDD5KHFx9DPWvKn4gRUVkwTHEy262ah5ORh8M6n/6VVVajeV/AYt2C0sswdkDBDO4Xq+xy5gdw3G8s1A4Inbm73pUh+6vx+7ltBbk="
 
@@ -26,7 +26,7 @@ install: true
 before_script:
 #   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
 #   exposed by merging PR#163 (using -march=native)
-    - sed -i 's/march=native/msse4.2/' CMakeLists.txt
+    - sed -i "s/-march=native//" CMakeLists.txt
     - mkdir build 
     - >
         eval "ARCH_FLAGS=\${ARCH_FLAGS_${ARCH}}" ;
