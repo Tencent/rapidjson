@@ -106,7 +106,7 @@
 
    Instead of copy semantics, move semantics is used in `Value`. That means, when assigning a source value to a target value, the ownership of source value is moved to the target value.
 
-   Since moving is faster than copying, this design decision force user to aware of the copying overhead.
+   Since moving is faster than copying, this design decision forces user to aware of the copying overhead.
 
 2. How to copy a value?
 
@@ -114,17 +114,17 @@
 
 3. Why do I need to provide the length of string?
 
-   Since C string is null-terminated, the length of string needed to be computed via `strlen()`, with linear runtime complexity. This incurs an unncessary overhead of many operations, if the user alread know the length of string.
+   Since C string is null-terminated, the length of string needs to be computed via `strlen()`, with linear runtime complexity. This incurs an unncessary overhead of many operations, if the user already knows the length of string.
 
    Also, RapidJSON can handle `\u0000` (null character) within a string. If a string contains null characters, `strlen()` cannot return the true length of it. In such case user must provide the length of string explicitly.
 
-4. Why do I need to provide allocator in many DOM manipulation API?
+4. Why do I need to provide allocator parameter in many DOM manipulation API?
 
    Since the APIs are member functions of `Value`, we do not want to save an allocator pointer in every `Value`.
 
 5. Does it convert between numerical types?
 
-   When using `GetInt()`, `GetUint()`, ... conversion may occur. For integer-to-integer conversion, it only convert when it is safe (otherwise it will assert). However, when converting a 64-bit siggned/unsigned integer to double, it will convert but be aware that it may lose precision. A number with fraction, or an integer larger than 64-bit, can only be obtained by `GetDouble()`.
+   When using `GetInt()`, `GetUint()`, ... conversion may occur. For integer-to-integer conversion, it only convert when it is safe (otherwise it will assert). However, when converting a 64-bit signed/unsigned integer to double, it will convert but be aware that it may lose precision. A number with fraction, or an integer larger than 64-bit, can only be obtained by `GetDouble()`.
 
 ## Reader/Writer (SAX)
 
@@ -152,11 +152,11 @@
 
    RapidJSON fully support parsing/generating UTF-16 surrogates. 
 
-4. Can it handle '\u0000' (null character) in JSON string?
+4. Can it handle `\u0000` (null character) in JSON string?
 
-   Yes. RapidJSON fully support null character in JSON string. However, user need to be awared of it and using `GetStringLength()` and related APIs to obtain the true length of string.
+   Yes. RapidJSON fully support null character in JSON string. However, user need to be aware of it and using `GetStringLength()` and related APIs to obtain the true length of string.
 
-5. Can I output '\uxxxx' for all non-ASCII character?
+5. Can I output `\uxxxx` for all non-ASCII character?
 
    Yes, use `ASCII<>` as output encoding template parameter in `Writer` can enforce escaping those characters.
 
@@ -170,13 +170,13 @@
 
    Yes. User can implement a custom stream for this. Please refer to the implementation of `FileReadStream`.
 
-3. I don't know what format will the JSON be. How to handle them?
+3. I don't know what encoding will the JSON be. How to handle them?
 
    You may use `AutoUTFInputStream` which detects the encoding of input stream automatically. However, it will incur some performance overhead.
 
 4. What is BOM? How RapidJSON handle it?
 
-   [Byte order mark (BOM)](http://en.wikipedia.org/wiki/Byte_order_mark) are sometimes reside at the beginning of file/stream to indiciate the UTF encoding type of it.
+   [Byte order mark (BOM)](http://en.wikipedia.org/wiki/Byte_order_mark) sometimes reside at the beginning of file/stream to indiciate the UTF encoding type of it.
 
    RapidJSON's `EncodedInputStream` can detect/consume BOM. `EncodedOutputStream` can optionally write a BOM. See [Encoded Streams](doc/stream.md) for example.
 
@@ -192,7 +192,7 @@
 
 2. Why is it fast?
 
-   Many design decisions of RapidJSON is aimed at time/space performance. This somehow reduces user-friendliness of APIs. Besides, it also employs low-level optimizations (intrinsics, SIMD) and custom algorithms (custom double-to-string, string-to-double conversions).
+   Many design decisions of RapidJSON is aimed at time/space performance. These may reduce user-friendliness of APIs. Besides, it also employs low-level optimizations (intrinsics, SIMD) and special algorithms (custom double-to-string, string-to-double conversions).
 
 3. What is SIMD? How it is applied in RapidJSON?
 
