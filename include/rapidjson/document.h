@@ -55,6 +55,9 @@ RAPIDJSON_DIAG_OFF(effc++)
 
     \hideinitializer
 */
+#endif // !defined(RAPIDJSON_HAS_STDSTRING)
+
+#if RAPIDJSON_HAS_STDSTRING
 #include <string>
 #endif // RAPIDJSON_HAS_STDSTRING
 
