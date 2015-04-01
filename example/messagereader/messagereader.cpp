@@ -54,7 +54,7 @@ struct MessageHandler
     enum State {
         kExpectObjectStart,
         kExpectNameOrObjectEnd,
-        kExpectValue,
+        kExpectValue
     }state_;
     std::string name_;
 };
