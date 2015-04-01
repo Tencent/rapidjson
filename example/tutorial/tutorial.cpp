@@ -24,12 +24,10 @@ int main(int, char*[]) {
         return 1;
 #else
     // In-situ parsing, decode strings directly in the source string. Source must be string.
-    {
-        char buffer[sizeof(json)];
-        memcpy(buffer, json, sizeof(json));
-        if (document.ParseInsitu(buffer).HasParseError())
-            return 1;
-    }
+    char buffer[sizeof(json)];
+    memcpy(buffer, json, sizeof(json));
+    if (document.ParseInsitu(buffer).HasParseError())
+        return 1;
 #endif
 
     printf("\nParsing to document succeeded.\n");
