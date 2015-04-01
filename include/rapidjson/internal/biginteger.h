@@ -252,7 +252,8 @@ private:
             (*outHigh)++;
         return low;
 #elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) && defined(__x86_64__)
-        unsigned __int128 p = static_cast<unsigned __int128>(a) * static_cast<unsigned __int128>(b);
+        __extension__ typedef unsigned __int128 uint128;
+        uint128 p = static_cast<uint128>(a) * static_cast<uint128>(b);
         p += k;
         *outHigh = p >> 64;
         return static_cast<uint64_t>(p);
