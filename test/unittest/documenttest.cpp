@@ -253,8 +253,8 @@ TEST(Document, Traits) {
 
     static_assert(!std::is_nothrow_constructible<Document>::value, "");
     static_assert(!std::is_nothrow_default_constructible<Document>::value, "");
-    static_assert(!std::is_nothrow_copy_constructible<Document>::value, "");
 #ifndef _MSC_VER
+    static_assert(!std::is_nothrow_copy_constructible<Document>::value, "");
     static_assert(std::is_nothrow_move_constructible<Document>::value, "");
 #endif
 

@@ -1,0 +1,28 @@
+version: 0.12.{build}
+
+configuration:
+- Debug
+- Release
+
+environment:
+  matrix:
+  - VS_VERSION: 11
+    VS_PLATFORM: win32
+  - VS_VERSION: 11
+    VS_PLATFORM: x64
+  - VS_VERSION: 12
+    VS_PLATFORM: win32
+  - VS_VERSION: 12
+    VS_PLATFORM: x64
+
+before_build:
+- git submodule update --init --recursive
+- cmake -H. -BBuild/VS -G "Visual Studio %VS_VERSION%" -DCMAKE_GENERATOR_PLATFORM=%VS_PLATFORM% -DBUILD_SHARED_LIBS=true -Wno-dev
+
+build:
+  project: Build\VS\RapidJSON.sln
+  parallel: true
+  verbosity: minimal
+
+test_script:
+- cd Build\VS && if %CONFIGURATION%==Debug (ctest --verbose -E perftest --build-config %CONFIGURATION%) else (ctest --verbose --build-config %CONFIGURATION%)
