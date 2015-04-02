@@ -30,6 +30,7 @@ RAPIDJSON_DIAG_OFF(4702)  // unreachable code
 #elif defined(__GNUC__)
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
+RAPIDJSON_DIAG_OFF(overflow)
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
