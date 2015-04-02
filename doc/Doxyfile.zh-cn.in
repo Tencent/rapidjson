@@ -764,9 +764,9 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ./include/rapidjson/rapidjson.h \
+INPUT                  = ./readme.zh-cn.md \
+                         ./include/rapidjson/rapidjson.h \
                          ./include/ \
-                         ./readme.zh-cn.md \
                          ./doc/features.zh-cn.md \
                          ./doc/tutorial.zh-cn.md \
                          ./doc/stream.zh-cn.md \
@@ -920,7 +920,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE = ./readme.zh-cn.md
+USE_MDFILE_AS_MAINPAGE = readme.zh-cn.md
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing

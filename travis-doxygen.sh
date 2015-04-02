@@ -57,6 +57,7 @@ doxygen_run()
 {
 	cd "${TRAVIS_BUILD_DIR}";
 	doxygen ${TRAVIS_BUILD_DIR}/build/doc/Doxyfile;
+	doxygen ${TRAVIS_BUILD_DIR}/build/doc/Doxyfile.zh-cn;
 }
 
 gh_pages_prepare()
