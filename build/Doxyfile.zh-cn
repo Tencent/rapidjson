@@ -44,7 +44,7 @@ PROJECT_NUMBER         =
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "A fast JSON parser/generator for C++ with both SAX/DOM style API"
+PROJECT_BRIEF          = "一个C++快速JSON解析器及生成器，包含SAX/DOM风格API"
 
 # With the PROJECT_LOGO tag one can specify an logo or icon that is included in
 # the documentation. The maximum height of the logo should not exceed 55 pixels
@@ -769,13 +769,13 @@ INPUT                  = ./include/rapidjson/rapidjson.h \
                          ./readme.zh-cn.md \
                          ./doc/features.zh-cn.md \
                          ./doc/tutorial.zh-cn.md \
-                         ./doc/stream.md \
-                         ./doc/encoding.md \
-                         ./doc/dom.md \
-                         ./doc/sax.md \
-                         ./doc/performance.md \
+                         ./doc/stream.zh-cn.md \
+                         ./doc/encoding.zh-cn.md \
+                         ./doc/dom.zh-cn.md \
+                         ./doc/sax.zh-cn.md \
+                         ./doc/performance.zh-cn.md \
                          ./doc/internals.md \
-                         ./doc/faq.md
+                         ./doc/faq.zh-cn.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
