@@ -1,14 +1,14 @@
-# Performance
+# 性能
 
-There is a [native JSON benchmark collection] [1] which evaluates speed, memory usage and code size of various operations among 20 JSON libaries.
+有一个[native JSON benchmark collection][1]项目，能评估20个JSON库在不同操作下的速度、內存用量及代码大小。
 
 [1]: https://github.com/miloyip/nativejson-benchmark
 
-The old performance article for RapidJSON 0.1 is provided [here](https://code.google.com/p/rapidjson/wiki/Performance).
+RapidJSON 0.1版本的性能测试文章位于[这里](https://code.google.com/p/rapidjson/wiki/Performance).
 
-Additionally, you may refer to the following third-party benchmarks.
+此外，你也可以参考以下这些第三方的评测。
 
-## Third-party benchmarks
+## 第三方评测
 
 * [Basic benchmarks for miscellaneous C++ JSON parsers and generators](https://github.com/mloskot/json_benchmark) by Mateusz Loskot (Jun 2013)
  * [casablanca](https://casablanca.codeplex.com/)
