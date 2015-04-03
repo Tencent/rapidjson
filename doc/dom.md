@@ -60,7 +60,7 @@ MessageBoxW(hWnd, d[locale].GetString(), L"Test", MB_OK);
 
 The `Allocator` defines which allocator class is used when allocating/deallocating memory for `Document`/`Value`. `Document` owns, or references to an `Allocator` instance. On the other hand, `Value` does not do so, in order to reduce memory consumption.
 
-The default allocator used in `GenericDocument` is `MemoryPoolAllocator`. This allocator actually allocate memory sequentially, and cannot deallocate one by one. This is very suitable when parsing a JSON to generate a DOM tree.
+The default allocator used in `GenericDocument` is `MemoryPoolAllocator`. This allocator actually allocate memory sequentially, and cannot deallocate one by one. This is very suitable when parsing a JSON into a DOM tree.
 
 Another allocator is `CrtAllocator`, of which CRT is short for C RunTime library. This allocator simply calls the standard `malloc()`/`realloc()`/`free()`. When there is a lot of add and remove operations, this allocator may be preferred. But this allocator is far less efficient than `MemoryPoolAllocator`.
 
@@ -87,7 +87,7 @@ GenericDocument& GenericDocument::ParseStream(InputStream& is);
 template <unsigned parseFlags, typename SourceEncoding>
 GenericDocument& GenericDocument::ParseInsitu(Ch* str);
 
-// (5) In situ parsing, using same Encoding for stream
+// (5) In situ parsing, using same Encoding of Document
 template <unsigned parseFlags>
 GenericDocument& GenericDocument::ParseInsitu(Ch* str);
 
@@ -98,7 +98,7 @@ GenericDocument& GenericDocument::ParseInsitu(Ch* str);
 template <unsigned parseFlags, typename SourceEncoding>
 GenericDocument& GenericDocument::Parse(const Ch* str);
 
-// (8) Normal parsing of a string, using same Encoding for stream
+// (8) Normal parsing of a string, using same Encoding of Document
 template <unsigned parseFlags>
 GenericDocument& GenericDocument::Parse(const Ch* str);
 
@@ -177,13 +177,13 @@ From [Wikipedia](http://en.wikipedia.org/wiki/In_situ):
 > ...
 > (In computer science) An algorithm is said to be an in situ algorithm, or in-place algorithm, if the extra amount of memory required to execute the algorithm is O(1), that is, does not exceed a constant no matter how large the input. For example, heapsort is an in situ sorting algorithm.
 
-In normal parsing process, a large overhead is to decode JSON strings and copy them to other buffers. *In situ* parsing decodes those JSON string at the place where it is stored. It is possible in JSON because the decoded string is always shorter than the one in JSON. In this context, decoding a JSON string means to process the escapes, such as `"\n"`, `"\u1234"`, etc., and add a null terminator (`'\0'`)at the end of string.
+In normal parsing process, a large overhead is to decode JSON strings and copy them to other buffers. *In situ* parsing decodes those JSON string at the place where it is stored. It is possible in JSON because the length of decoded string is always shorter than or equal to the one in JSON. In this context, decoding a JSON string means to process the escapes, such as `"\n"`, `"\u1234"`, etc., and add a null terminator (`'\0'`)at the end of string.
 
 The following diagrams compare normal and *in situ* parsing. The JSON string values contain pointers to the decoded string.
 
 ![normal parsing](diagram/normalparsing.png)
 
-In normal parsing, the decoded string are copied to freshly allocated buffers. `"\\n"` (2 characters) is decoded as `"\n"` (1 character). `"\\u0073"` (6 characters) is decoded as "s" (1 character).
+In normal parsing, the decoded string are copied to freshly allocated buffers. `"\\n"` (2 characters) is decoded as `"\n"` (1 character). `"\\u0073"` (6 characters) is decoded as `"s"` (1 character).
 
 ![instiu parsing](diagram/insituparsing.png)
 
@@ -212,7 +212,7 @@ free(buffer);
 // Note: At this point, d may have dangling pointers pointed to the deallocated buffer.
 ~~~~~~~~~~
 
-The JSON strings are marked as constant-string. But they may not be really "constant". The life cycle of it depends on the JSON buffer.
+The JSON strings are marked as const-string. But they may not be really "constant". The life cycle of it depends on the JSON buffer.
 
 In situ parsing minimizes allocation overheads and memory copying. Generally this improves cache coherence, which is an important factor of performance in modern computer.
 
@@ -229,7 +229,7 @@ There are some limitations of *in situ* parsing:
 
 RapidJSON supports conversion between Unicode formats (officially termed UCS Transformation Format) internally. During DOM parsing, the source encoding of the stream can be different from the encoding of the DOM. For example, the source stream contains a UTF-8 JSON, while the DOM is using UTF-16 encoding. There is an example code in [EncodedInputStream](doc/stream.md#EncodedInputStream).
 
-When writing a JSON from DOM to output stream, transcoding can also be used. An example is in [EncodedOutputStream](stream.md##EncodedOutputStream).
+When writing a JSON from DOM to output stream, transcoding can also be used. An example is in [EncodedOutputStream](stream.md#EncodedOutputStream).
 
 During transcoding, the source string is decoded to into Unicode code points, and then the code points are encoded in the target format. During decoding, it will validate the byte sequence in the source string. If it is not a valid sequence, the parser will be stopped with `kParseErrorStringInvalidEncoding` error.
 
@@ -263,16 +263,18 @@ Some applications may try to avoid memory allocations whenever possible.
 
 `MemoryPoolAllocator` will use the user buffer to satisfy allocations. When the user buffer is used up, it will allocate a chunk of memory from the base allocator (by default the `CrtAllocator`).
 
-Here is an example of using stack memory.
+Here is an example of using stack memory. The first allocator is for storing values, while the second allocator is for storing temporary data during parsing.
 
 ~~~~~~~~~~cpp
-char buffer[1024];
-MemoryPoolAllocator allocator(buffer, sizeof(buffer));
-
-Document d(&allocator);
+typedef GenericDocument<UTF8<>, MemoryPoolAllocator<>, MemoryPoolAllocator<>> DocumentType;
+char valueBuffer[4096];
+char parseBuffer[1024];
+MemoryPoolAllocator<> valueAllocator(valueBuffer, sizeof(valueBuffer));
+MemoryPoolAllocator<> parseAllocator(parseBuffer, sizeof(parseBuffer));
+DocumentType d(&valueAllocator, sizeof(parseBuffer), &parseAllocator);
 d.Parse(json);
 ~~~~~~~~~~
 
-If the total size of allocation is less than 1024 during parsing, this code does not invoke any heap allocation (via `new` or `malloc()`) at all.
+If the total size of allocation is less than 4096+1024 bytes during parsing, this code does not invoke any heap allocation (via `new` or `malloc()`) at all.
 
 User can query the current memory consumption in bytes via `MemoryPoolAllocator::Size()`. And then user can determine a suitable size of user buffer.
