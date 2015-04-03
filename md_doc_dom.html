@@ -246,7 +246,17 @@ Parse Error</h2>
 <p>The offset of error is defined as the character number from beginning of stream. Currently RapidJSON does not keep track of line number.</p>
 <p>To get an error message, RapidJSON provided a English messages in <code><a class="el" href="en_8h_source.html">rapidjson/error/en.h</a></code>. User can customize it for other locales, or use a custom localization system.</p>
 <p>Here shows an example of parse error handling.</p>
-<div class="fragment"><div class="line"><span class="comment">// TODO: example</span></div>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="document_8h.html">rapidjson/document.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;rapidjson/error/en.h&quot;</span></div>
+<div class="line"></div>
+<div class="line"><span class="comment">// ...</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="line"><span class="keywordflow">if</span> (d.Parse(json).HasParseError()) {</div>
+<div class="line">    fprintf(stderr, <span class="stringliteral">&quot;\nError(offset %u): %s\n&quot;</span>, </div>
+<div class="line">        (<span class="keywordtype">unsigned</span>)reader.GetErrorOffset(),</div>
+<div class="line">        <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(reader.GetParseErrorCode()));</div>
+<div class="line">    <span class="comment">// ...</span></div>
+<div class="line">}</div>
 </div><!-- fragment --><h2><a class="anchor" id="InSituParsing"></a>
 In Situ Parsing</h2>
 <p>From <a href="http://en.wikipedia.org/wiki/In_situ">Wikipedia</a>:</p>
@@ -309,9 +319,8 @@ Techniques</h1>
 <div class="line">Writer&lt;StringBuffer&gt; writer(buffer);</div>
 <div class="line">d.Accept(writer);</div>
 </div><!-- fragment --><p>Actually, <code>Value::Accept()</code> is responsible for publishing SAX events about the value to the handler. With this design, <code>Value</code> and <code>Writer</code> are decoupled. <code>Value</code> can generate SAX events, and <code>Writer</code> can handle those events.</p>
-<p>User may create customer handlers for transforming the DOM into other formats. For example, a handler which converts the DOM into XML.</p>
-<div class="fragment"><div class="line"><span class="comment">// TODO: example</span></div>
-</div><!-- fragment --><p>For more about SAX events and handler, please refer to <a class="el" href="md_doc_sax.html">SAX</a>.</p>
+<p>User may create custom handlers for transforming the DOM into other formats. For example, a handler which converts the DOM into XML.</p>
+<p>For more about SAX events and handler, please refer to <a class="el" href="md_doc_sax.html">SAX</a>.</p>
 <h2><a class="anchor" id="UserBuffer"></a>
 User Buffer</h2>
 <p>Some applications may try to avoid memory allocations whenever possible.</p>
