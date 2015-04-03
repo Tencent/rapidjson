@@ -1,4 +1,4 @@
-// JSON condenser exmaple
+// JSON condenser example
 
 // This example parses JSON text from stdin with validation, 
 // and re-output the JSON content to stdout without whitespace.
