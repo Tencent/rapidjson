@@ -95,7 +95,7 @@ var NAVTREE =
         [ "Local Stream Copy", "md_doc_internals.html#LocalStreamCopy", null ],
         [ "Parsing to Double", "md_doc_internals.html#ParsingDouble", null ]
       ] ],
-      [ "Generation Optimizatoin", "md_doc_internals.html#GenerationOptimization", [
+      [ "Generation Optimization", "md_doc_internals.html#GenerationOptimization", [
         [ "Integer-to-String conversion", "md_doc_internals.html#itoa", null ],
         [ "Double-to-String conversion", "md_doc_internals.html#dtoa", null ]
       ] ],
