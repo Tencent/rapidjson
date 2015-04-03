@@ -4,8 +4,8 @@ Copyright (c) 2011-2015 Milo Yip (miloyip@gmail.com)
 
 * [RapidJSON GitHub](https://github.com/miloyip/rapidjson/)
 * [RapidJSON 文档](http://miloyip.github.io/rapidjson/zh-cn/)
-  * [中国](http://miloyip.github.io/rapidjson/zh-cn/)
-  * [英语](http://miloyip.github.io/rapidjson/)
+  * [英文](http://miloyip.github.io/rapidjson/)
+  * [简体中文](http://miloyip.github.io/rapidjson/zh-cn/)
 
 ## 简介
 

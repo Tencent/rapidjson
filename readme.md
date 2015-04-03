@@ -6,7 +6,7 @@ Copyright (c) 2011-2015 Milo Yip (miloyip@gmail.com)
 * [RapidJSON GitHub](https://github.com/miloyip/rapidjson/)
 * [RapidJSON Documentation](http://miloyip.github.io/rapidjson/)
   * [English](http://miloyip.github.io/rapidjson/)
-  * [Chinese](http://miloyip.github.io/rapidjson/zh-cn/)
+  * [Simplified Chinese](http://miloyip.github.io/rapidjson/zh-cn/)
 
 ## Build status
 
