@@ -141,7 +141,7 @@ Encoding</h2>
 </div><!-- fragment --><h2><a class="anchor" id="Allocator"></a>
 Allocator</h2>
 <p>The <code>Allocator</code> defines which allocator class is used when allocating/deallocating memory for <code>Document</code>/<code>Value</code>. <code>Document</code> owns, or references to an <code>Allocator</code> instance. On the other hand, <code>Value</code> does not do so, in order to reduce memory consumption.</p>
-<p>The default allocator used in <code>GenericDocument</code> is <code>MemoryPoolAllocator</code>. This allocator actually allocate memory sequentially, and cannot deallocate one by one. This is very suitable when parsing a JSON to generate a DOM tree.</p>
+<p>The default allocator used in <code>GenericDocument</code> is <code>MemoryPoolAllocator</code>. This allocator actually allocate memory sequentially, and cannot deallocate one by one. This is very suitable when parsing a JSON into a DOM tree.</p>
 <p>Another allocator is <code>CrtAllocator</code>, of which CRT is short for C RunTime library. This allocator simply calls the standard <code>malloc()</code>/<code>realloc()</code>/<code>free()</code>. When there is a lot of add and remove operations, this allocator may be preferred. But this allocator is far less efficient than <code>MemoryPoolAllocator</code>.</p>
 <h1><a class="anchor" id="Parsing"></a>
 Parsing</h1>
@@ -164,7 +164,7 @@ Parsing</h1>
 <div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> SourceEncoding&gt;</div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a8ece26197fb1fef28e6626e6d73df976">GenericDocument::ParseInsitu</a>(Ch* str);</div>
 <div class="line"></div>
-<div class="line"><span class="comment">// (5) In situ parsing, using same Encoding for stream</span></div>
+<div class="line"><span class="comment">// (5) In situ parsing, using same Encoding of Document</span></div>
 <div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags&gt;</div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a8ece26197fb1fef28e6626e6d73df976">GenericDocument::ParseInsitu</a>(Ch* str);</div>
 <div class="line"></div>
@@ -175,7 +175,7 @@ Parsing</h1>
 <div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> SourceEncoding&gt;</div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a5bb026ab42705b2c2cfbbf904108b3f5">GenericDocument::Parse</a>(<span class="keyword">const</span> Ch* str);</div>
 <div class="line"></div>
-<div class="line"><span class="comment">// (8) Normal parsing of a string, using same Encoding for stream</span></div>
+<div class="line"><span class="comment">// (8) Normal parsing of a string, using same Encoding of Document</span></div>
 <div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags&gt;</div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a5bb026ab42705b2c2cfbbf904108b3f5">GenericDocument::Parse</a>(<span class="keyword">const</span> Ch* str);</div>
 <div class="line"></div>
@@ -263,13 +263,13 @@ In Situ Parsing</h2>
 <blockquote class="doxtable">
 <p><em>In situ</em> ... is a Latin phrase that translates literally to "on site" or "in position". It means "locally", "on site", "on the premises" or "in place" to describe an event where it takes place, and is used in many different contexts. ... (In computer science) An algorithm is said to be an in situ algorithm, or in-place algorithm, if the extra amount of memory required to execute the algorithm is O(1), that is, does not exceed a constant no matter how large the input. For example, heapsort is an in situ sorting algorithm. </p>
 </blockquote>
-<p>In normal parsing process, a large overhead is to decode JSON strings and copy them to other buffers. <em>In situ</em> parsing decodes those JSON string at the place where it is stored. It is possible in JSON because the decoded string is always shorter than the one in JSON. In this context, decoding a JSON string means to process the escapes, such as <code>"\\n"</code>, <code>"\\u1234"</code>, etc., and add a null terminator (`'\0'`)at the end of string.</p>
+<p>In normal parsing process, a large overhead is to decode JSON strings and copy them to other buffers. <em>In situ</em> parsing decodes those JSON string at the place where it is stored. It is possible in JSON because the length of decoded string is always shorter than or equal to the one in JSON. In this context, decoding a JSON string means to process the escapes, such as <code>"\\n"</code>, <code>"\\u1234"</code>, etc., and add a null terminator (`'\0'`)at the end of string.</p>
 <p>The following diagrams compare normal and <em>in situ</em> parsing. The JSON string values contain pointers to the decoded string.</p>
 <div class="image">
 <img src="normalparsing.png" alt="normalparsing.png"/>
 <div class="caption">
 normal parsing</div></div>
-<p> In normal parsing, the decoded string are copied to freshly allocated buffers. <code>"\\\\n"</code> (2 characters) is decoded as <code>"\\n"</code> (1 character). <code>"\\\\u0073"</code> (6 characters) is decoded as "s" (1 character).</p>
+<p> In normal parsing, the decoded string are copied to freshly allocated buffers. <code>"\\\\n"</code> (2 characters) is decoded as <code>"\\n"</code> (1 character). <code>"\\\\u0073"</code> (6 characters) is decoded as <code>"s"</code> (1 character).</p>
 <div class="image">
 <img src="insituparsing.png" alt="insituparsing.png"/>
 <div class="caption">
@@ -294,7 +294,7 @@ instiu parsing</div></div>
 <div class="line"></div>
 <div class="line">free(buffer);</div>
 <div class="line"><span class="comment">// Note: At this point, d may have dangling pointers pointed to the deallocated buffer.</span></div>
-</div><!-- fragment --><p>The JSON strings are marked as constant-string. But they may not be really "constant". The life cycle of it depends on the JSON buffer.</p>
+</div><!-- fragment --><p>The JSON strings are marked as const-string. But they may not be really "constant". The life cycle of it depends on the JSON buffer.</p>
 <p>In situ parsing minimizes allocation overheads and memory copying. Generally this improves cache coherence, which is an important factor of performance in modern computer.</p>
 <p>There are some limitations of <em>in situ</em> parsing:</p>
 <ol type="1">
@@ -307,7 +307,7 @@ instiu parsing</div></div>
 <h2><a class="anchor" id="TranscodingAndValidation"></a>
 Transcoding and Validation</h2>
 <p>RapidJSON supports conversion between Unicode formats (officially termed UCS Transformation Format) internally. During DOM parsing, the source encoding of the stream can be different from the encoding of the DOM. For example, the source stream contains a UTF-8 JSON, while the DOM is using UTF-16 encoding. There is an example code in <a href="doc/stream.md#EncodedInputStream">EncodedInputStream</a>.</p>
-<p>When writing a JSON from DOM to output stream, transcoding can also be used. An example is in <a href="stream.md##EncodedOutputStream">EncodedOutputStream</a>.</p>
+<p>When writing a JSON from DOM to output stream, transcoding can also be used. An example is in <a href="stream.md#EncodedOutputStream">EncodedOutputStream</a>.</p>
 <p>During transcoding, the source string is decoded to into Unicode code points, and then the code points are encoded in the target format. During decoding, it will validate the byte sequence in the source string. If it is not a valid sequence, the parser will be stopped with <code>kParseErrorStringInvalidEncoding</code> error.</p>
 <p>When the source encoding of stream is the same as encoding of DOM, by default, the parser will <em>not</em> validate the sequence. User may use <code>kParseValidateEncodingFlag</code> to force validation.</p>
 <h1><a class="anchor" id="Techniques"></a>
@@ -326,13 +326,15 @@ User Buffer</h2>
 <p>Some applications may try to avoid memory allocations whenever possible.</p>
 <p><code>MemoryPoolAllocator</code> can support this by letting user to provide a buffer. The buffer can be on the program stack, or a "scratch buffer" which is statically allocated (a static/global array) for storing temporary data.</p>
 <p><code>MemoryPoolAllocator</code> will use the user buffer to satisfy allocations. When the user buffer is used up, it will allocate a chunk of memory from the base allocator (by default the <code>CrtAllocator</code>).</p>
-<p>Here is an example of using stack memory.</p>
-<div class="fragment"><div class="line"><span class="keywordtype">char</span> buffer[1024];</div>
-<div class="line">MemoryPoolAllocator allocator(buffer, <span class="keyword">sizeof</span>(buffer));</div>
-<div class="line"></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d(&amp;allocator);</div>
+<p>Here is an example of using stack memory. The first allocator is for storing values, while the second allocator is for storing temporary data during parsing.</p>
+<div class="fragment"><div class="line"><span class="keyword">typedef</span> GenericDocument&lt;UTF8&lt;&gt;, MemoryPoolAllocator&lt;&gt;, MemoryPoolAllocator&lt;&gt;&gt; DocumentType;</div>
+<div class="line"><span class="keywordtype">char</span> valueBuffer[4096];</div>
+<div class="line"><span class="keywordtype">char</span> parseBuffer[1024];</div>
+<div class="line">MemoryPoolAllocator&lt;&gt; valueAllocator(valueBuffer, <span class="keyword">sizeof</span>(valueBuffer));</div>
+<div class="line">MemoryPoolAllocator&lt;&gt; parseAllocator(parseBuffer, <span class="keyword">sizeof</span>(parseBuffer));</div>
+<div class="line">DocumentType d(&amp;valueAllocator, <span class="keyword">sizeof</span>(parseBuffer), &amp;parseAllocator);</div>
 <div class="line">d.Parse(json);</div>
-</div><!-- fragment --><p>If the total size of allocation is less than 1024 during parsing, this code does not invoke any heap allocation (via <code>new</code> or <code>malloc()</code>) at all.</p>
+</div><!-- fragment --><p>If the total size of allocation is less than 4096+1024 bytes during parsing, this code does not invoke any heap allocation (via <code>new</code> or <code>malloc()</code>) at all.</p>
 <p>User can query the current memory consumption in bytes via <code>MemoryPoolAllocator::Size()</code>. And then user can determine a suitable size of user buffer. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
