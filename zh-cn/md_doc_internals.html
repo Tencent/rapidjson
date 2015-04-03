@@ -266,8 +266,9 @@ Short-String Optimization</h2>
 <td><code>Ch str[MaxChars]</code> </td><td>String buffer </td><td align="center">11 </td><td align="center">15 </td></tr>
 <tr>
 <td><code>Ch invLength</code> </td><td>MaxChars - Length </td><td align="center">1 </td><td align="center">1 </td></tr>
+<tr>
+<td><code>unsigned flags_</code> </td><td><code>kStringType kStringFlag ...</code> </td><td align="center">4 </td><td align="center">4 </td></tr>
 </table>
-<p>| <code>unsigned flags_</code> | <code>kStringType | kStringFlag | ...</code> |4 |4 |</p>
 <p>A special technique is applied. Instead of storing the length of string directly, it stores (MaxChars - length). This make it possible to store 11 characters with trailing <code>\0</code>.</p>
 <p>This optimization can reduce memory usage for copy-string. It can also improve cache-coherence thus improve runtime performance.</p>
 <h1><a class="anchor" id="Allocator"></a>
