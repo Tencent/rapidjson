@@ -1,9 +1,14 @@
 var NAVTREEINDEX2 =
 {
-"md_doc_internals.html#ParsingOptimization":[7,1],
-"md_doc_internals.html#Pow10":[7,1,1],
-"md_doc_internals.html#SkipwhitespaceWithSIMD":[7,1,0],
-"md_doc_internals.html#Value":[7,0],
+"md_doc_internals.html#MemoryPoolAllocator":[7,1,3],
+"md_doc_internals.html#Parser":[7,4],
+"md_doc_internals.html#ParsingDouble":[7,2,2],
+"md_doc_internals.html#ParsingOptimization":[7,2],
+"md_doc_internals.html#ShortString":[7,1,2],
+"md_doc_internals.html#SkipwhitespaceWithSIMD":[7,2,0],
+"md_doc_internals.html#Value":[7,1],
+"md_doc_internals.html#dtoa":[7,3,1],
+"md_doc_internals.html#itoa":[7,3,0],
 "md_doc_performance.html":[6],
 "md_doc_sax.html":[5],
 "md_doc_sax.html#CompletenessReset":[5,1,1],

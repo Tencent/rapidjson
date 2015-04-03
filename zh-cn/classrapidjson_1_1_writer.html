@@ -1,0 +1,454 @@
+<!-- HTML header for doxygen 1.8.7-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.7"/>
+<title>RapidJSON: rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator &gt; 模板类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+  $(document).ready(initResizable);
+  $(window).load(resizeHeight);
+</script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="topbanner"><a href="https://github.com/miloyip/rapidjson" title="RapidJSON GitHub"><i class="githublogo"></i></a></div>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.7 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){initNavTree('classrapidjson_1_1_writer.html','');});
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(12)"><span class="SelectionMark">&#160;</span>页</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#pub-types">Public 类型</a> &#124;
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pro-methods">Protected 成员函数</a> &#124;
+<a href="#pro-attribs">Protected 属性</a> &#124;
+<a href="#pro-static-attribs">静态 Protected 属性</a> &#124;
+<a href="classrapidjson_1_1_writer-members.html">所有成员列表</a>  </div>
+  <div class="headertitle">
+<div class="title">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator &gt; 模板类 参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p>JSON writer.  
+ <a href="classrapidjson_1_1_writer.html#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="writer_8h_source.html">writer.h</a>&gt;</code></p>
+<div class="dynheader">
+类 rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator &gt; 继承关系图:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classrapidjson_1_1_writer.png" usemap="#rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator &gt;_map" alt=""/>
+  <map id="rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator &gt;_map" name="rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator &gt;_map">
+<area href="classrapidjson_1_1_pretty_writer.html" title="Writer with indentation and spacing. " alt="rapidjson::PrettyWriter&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator &gt;" shape="rect" coords="0,56,529,80"/>
+</map>
+ </div></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrapidjson_1_1_writer_1_1_level.html">Level</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Information for each nested level.  <a href="structrapidjson_1_1_writer_1_1_level.html#details">更多...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a9a48728ed60ffc881f92cb5e729dce43"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9a48728ed60ffc881f92cb5e729dce43"></a>
+typedef SourceEncoding::Ch&#160;</td><td class="memItemRight" valign="bottom"><b>Ch</b></td></tr>
+<tr class="separator:a9a48728ed60ffc881f92cb5e729dce43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:ac592904fad01d9d0f29bb0585fb02aa7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#ac592904fad01d9d0f29bb0585fb02aa7">Writer</a> (OutputStream &amp;os, StackAllocator *stackAllocator=0, size_t levelDepth=kDefaultLevelDepth)</td></tr>
+<tr class="memdesc:ac592904fad01d9d0f29bb0585fb02aa7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#ac592904fad01d9d0f29bb0585fb02aa7">更多...</a><br /></td></tr>
+<tr class="separator:ac592904fad01d9d0f29bb0585fb02aa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab7be272477cf986d15ef55d8e0923cc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aab7be272477cf986d15ef55d8e0923cc"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Writer</b> (StackAllocator *allocator=0, size_t levelDepth=kDefaultLevelDepth)</td></tr>
+<tr class="separator:aab7be272477cf986d15ef55d8e0923cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4411235dd75ae34274e7eb74d435147"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#af4411235dd75ae34274e7eb74d435147">Reset</a> (OutputStream &amp;os)</td></tr>
+<tr class="memdesc:af4411235dd75ae34274e7eb74d435147"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the writer with a new stream.  <a href="#af4411235dd75ae34274e7eb74d435147">更多...</a><br /></td></tr>
+<tr class="separator:af4411235dd75ae34274e7eb74d435147"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad70218827efbda426bbc8620a9339c3e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#ad70218827efbda426bbc8620a9339c3e">IsComplete</a> () const </td></tr>
+<tr class="memdesc:ad70218827efbda426bbc8620a9339c3e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the output is a complete JSON.  <a href="#ad70218827efbda426bbc8620a9339c3e">更多...</a><br /></td></tr>
+<tr class="separator:ad70218827efbda426bbc8620a9339c3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Implementation of Handler</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><dl class="section see"><dt>参见</dt><dd><a class="el" href="classrapidjson_1_1_handler.html" title="Concept for receiving events from GenericReader upon parsing. The functions return true if no error o...">Handler</a> </dd></dl>
+</div></td></tr>
+<tr class="memitem:a00fdf35590c8325be281373b75c9663b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a00fdf35590c8325be281373b75c9663b"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>Null</b> ()</td></tr>
+<tr class="separator:a00fdf35590c8325be281373b75c9663b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e7fe7625b61f5d2f8c79e345b87dcec"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5e7fe7625b61f5d2f8c79e345b87dcec"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>Bool</b> (bool b)</td></tr>
+<tr class="separator:a5e7fe7625b61f5d2f8c79e345b87dcec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9340eb570fb46d1937bdc0df816ea0d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af9340eb570fb46d1937bdc0df816ea0d"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>Int</b> (int i)</td></tr>
+<tr class="separator:af9340eb570fb46d1937bdc0df816ea0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20063f3ba0a6a9eb9a817d2f38064240"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a20063f3ba0a6a9eb9a817d2f38064240"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>Uint</b> (unsigned u)</td></tr>
+<tr class="separator:a20063f3ba0a6a9eb9a817d2f38064240"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb9bc84304f8b45f192a0bcc19d39681"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adb9bc84304f8b45f192a0bcc19d39681"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>Int64</b> (int64_t i64)</td></tr>
+<tr class="separator:adb9bc84304f8b45f192a0bcc19d39681"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5272254699604c79d08b16365550c9d7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5272254699604c79d08b16365550c9d7"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>Uint64</b> (uint64_t u64)</td></tr>
+<tr class="separator:a5272254699604c79d08b16365550c9d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5f042d9c1a8ce5be2d52e18255b4390"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#ad5f042d9c1a8ce5be2d52e18255b4390">Double</a> (double d)</td></tr>
+<tr class="memdesc:ad5f042d9c1a8ce5be2d52e18255b4390"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes the given <code>double</code> value to the stream.  <a href="#ad5f042d9c1a8ce5be2d52e18255b4390">更多...</a><br /></td></tr>
+<tr class="separator:ad5f042d9c1a8ce5be2d52e18255b4390"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ed3229a44d9aeac14fb9cb347ac0c5d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1ed3229a44d9aeac14fb9cb347ac0c5d"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>String</b> (const Ch *str, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, bool copy=false)</td></tr>
+<tr class="separator:a1ed3229a44d9aeac14fb9cb347ac0c5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a9c136d5a1806bea935c05d342f0523"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8a9c136d5a1806bea935c05d342f0523"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>StartObject</b> ()</td></tr>
+<tr class="separator:a8a9c136d5a1806bea935c05d342f0523"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa15723b3ee548ca9499c8e146b69ddce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa15723b3ee548ca9499c8e146b69ddce"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>Key</b> (const Ch *str, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, bool copy=false)</td></tr>
+<tr class="separator:aa15723b3ee548ca9499c8e146b69ddce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03c6d660c41721946ba2589f7b3aeb7a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a03c6d660c41721946ba2589f7b3aeb7a"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>EndObject</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> memberCount=0)</td></tr>
+<tr class="separator:a03c6d660c41721946ba2589f7b3aeb7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeff814774909144ab40eba83514a9b78"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeff814774909144ab40eba83514a9b78"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>StartArray</b> ()</td></tr>
+<tr class="separator:aeff814774909144ab40eba83514a9b78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1583447ea81f56d4e483e4a93f7e6940"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1583447ea81f56d4e483e4a93f7e6940"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>EndArray</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> elementCount=0)</td></tr>
+<tr class="separator:a1583447ea81f56d4e483e4a93f7e6940"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Convenience extensions</div></td></tr>
+<tr class="memitem:a2efd8a54a3cb86f8adedfd6bb692d0d9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2efd8a54a3cb86f8adedfd6bb692d0d9"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#a2efd8a54a3cb86f8adedfd6bb692d0d9">String</a> (const Ch *str)</td></tr>
+<tr class="memdesc:a2efd8a54a3cb86f8adedfd6bb692d0d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Simpler but slower overload. <br /></td></tr>
+<tr class="separator:a2efd8a54a3cb86f8adedfd6bb692d0d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fd39e3bf6e2f8759ecc1ec289191214"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1fd39e3bf6e2f8759ecc1ec289191214"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>Key</b> (const Ch *str)</td></tr>
+<tr class="separator:a1fd39e3bf6e2f8759ecc1ec289191214"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected 成员函数</h2></td></tr>
+<tr class="memitem:accb98eb6ea69447ac96ac8c9d9ed1646"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="accb98eb6ea69447ac96ac8c9d9ed1646"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteNull</b> ()</td></tr>
+<tr class="separator:accb98eb6ea69447ac96ac8c9d9ed1646"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13ab7c9e250448ec3405c6341eb0df9c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a13ab7c9e250448ec3405c6341eb0df9c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteBool</b> (bool b)</td></tr>
+<tr class="separator:a13ab7c9e250448ec3405c6341eb0df9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1b99adec59ff6c025dcf670e5877add"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae1b99adec59ff6c025dcf670e5877add"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteInt</b> (int i)</td></tr>
+<tr class="separator:ae1b99adec59ff6c025dcf670e5877add"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac10739643decdbe4f1dae6702c8bc579"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac10739643decdbe4f1dae6702c8bc579"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteUint</b> (unsigned u)</td></tr>
+<tr class="separator:ac10739643decdbe4f1dae6702c8bc579"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a114e37ad21c8273e65fdaac3f44d95d8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a114e37ad21c8273e65fdaac3f44d95d8"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteInt64</b> (int64_t i64)</td></tr>
+<tr class="separator:a114e37ad21c8273e65fdaac3f44d95d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a165e94f5bc8097a8145808e1ee3ab05e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a165e94f5bc8097a8145808e1ee3ab05e"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteUint64</b> (uint64_t u64)</td></tr>
+<tr class="separator:a165e94f5bc8097a8145808e1ee3ab05e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac30667a135e9ef11ada903fa18d39940"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac30667a135e9ef11ada903fa18d39940"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteDouble</b> (double d)</td></tr>
+<tr class="separator:ac30667a135e9ef11ada903fa18d39940"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0fbb77741df512ab83c526bc299ed56e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0fbb77741df512ab83c526bc299ed56e"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteString</b> (const Ch *str, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length)</td></tr>
+<tr class="separator:a0fbb77741df512ab83c526bc299ed56e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4aa72985c14d5db516975b0f88ad2384"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4aa72985c14d5db516975b0f88ad2384"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteStartObject</b> ()</td></tr>
+<tr class="separator:a4aa72985c14d5db516975b0f88ad2384"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9401bc8eadc11ab6910259a8b0bdac19"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9401bc8eadc11ab6910259a8b0bdac19"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteEndObject</b> ()</td></tr>
+<tr class="separator:a9401bc8eadc11ab6910259a8b0bdac19"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0308d67d1e18427d21ea262da591399c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0308d67d1e18427d21ea262da591399c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteStartArray</b> ()</td></tr>
+<tr class="separator:a0308d67d1e18427d21ea262da591399c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a023148bb1cb6f24abc20af52e64d2247"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a023148bb1cb6f24abc20af52e64d2247"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteEndArray</b> ()</td></tr>
+<tr class="separator:a023148bb1cb6f24abc20af52e64d2247"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7a45f586a7143980cd4c0a144fb1699"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad7a45f586a7143980cd4c0a144fb1699"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>Prefix</b> (<a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> type)</td></tr>
+<tr class="separator:ad7a45f586a7143980cd4c0a144fb1699"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2ccb801bfd355ecc03a3a3ba5eb7392"><td class="memTemplParams" colspan="2"><a class="anchor" id="ab2ccb801bfd355ecc03a3a3ba5eb7392"></a>
+template&lt;&gt; </td></tr>
+<tr class="memitem:ab2ccb801bfd355ecc03a3a3ba5eb7392"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>WriteInt</b> (int i)</td></tr>
+<tr class="separator:ab2ccb801bfd355ecc03a3a3ba5eb7392"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7c08a743fff55d9f09dc58f0a75e67f"><td class="memTemplParams" colspan="2"><a class="anchor" id="ab7c08a743fff55d9f09dc58f0a75e67f"></a>
+template&lt;&gt; </td></tr>
+<tr class="memitem:ab7c08a743fff55d9f09dc58f0a75e67f"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>WriteUint</b> (unsigned u)</td></tr>
+<tr class="separator:ab7c08a743fff55d9f09dc58f0a75e67f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91d238a4532d08363f97f37d3626632b"><td class="memTemplParams" colspan="2"><a class="anchor" id="a91d238a4532d08363f97f37d3626632b"></a>
+template&lt;&gt; </td></tr>
+<tr class="memitem:a91d238a4532d08363f97f37d3626632b"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>WriteInt64</b> (int64_t i64)</td></tr>
+<tr class="separator:a91d238a4532d08363f97f37d3626632b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a474abb8f7b704f1ef7c00bbe2a2e01b6"><td class="memTemplParams" colspan="2"><a class="anchor" id="a474abb8f7b704f1ef7c00bbe2a2e01b6"></a>
+template&lt;&gt; </td></tr>
+<tr class="memitem:a474abb8f7b704f1ef7c00bbe2a2e01b6"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>WriteUint64</b> (uint64_t u)</td></tr>
+<tr class="separator:a474abb8f7b704f1ef7c00bbe2a2e01b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d18f380070f825f48a494c8213adf9c"><td class="memTemplParams" colspan="2"><a class="anchor" id="a7d18f380070f825f48a494c8213adf9c"></a>
+template&lt;&gt; </td></tr>
+<tr class="memitem:a7d18f380070f825f48a494c8213adf9c"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>WriteDouble</b> (double d)</td></tr>
+<tr class="separator:a7d18f380070f825f48a494c8213adf9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected 属性</h2></td></tr>
+<tr class="memitem:a57ff477ea77c0d29bf126e380b8dd3a1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a57ff477ea77c0d29bf126e380b8dd3a1"></a>
+OutputStream *&#160;</td><td class="memItemRight" valign="bottom"><b>os_</b></td></tr>
+<tr class="separator:a57ff477ea77c0d29bf126e380b8dd3a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4441ab2911fe0247a164f333c03a279"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af4441ab2911fe0247a164f333c03a279"></a>
+internal::Stack&lt; StackAllocator &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>level_stack_</b></td></tr>
+<tr class="separator:af4441ab2911fe0247a164f333c03a279"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafc5c664d831e7ed87c495e7bf71a14c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aafc5c664d831e7ed87c495e7bf71a14c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>hasRoot_</b></td></tr>
+<tr class="separator:aafc5c664d831e7ed87c495e7bf71a14c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-attribs"></a>
+静态 Protected 属性</h2></td></tr>
+<tr class="memitem:a0fafbb3341c0f5d14856a72ec2dcc970"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0fafbb3341c0f5d14856a72ec2dcc970"></a>
+static const size_t&#160;</td><td class="memItemRight" valign="bottom"><b>kDefaultLevelDepth</b> = 32</td></tr>
+<tr class="separator:a0fafbb3341c0f5d14856a72ec2dcc970"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<div class="textblock"><h3>template&lt;typename OutputStream, typename SourceEncoding = UTF8&lt;&gt;, typename TargetEncoding = UTF8&lt;&gt;, typename StackAllocator = CrtAllocator&gt;<br />
+class rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator &gt;</h3>
+
+<p>JSON writer. </p>
+<p><a class="el" href="classrapidjson_1_1_writer.html" title="JSON writer. ">Writer</a> implements the concept <a class="el" href="classrapidjson_1_1_handler.html" title="Concept for receiving events from GenericReader upon parsing. The functions return true if no error o...">Handler</a>. It generates JSON text by events to an output os.</p>
+<p>User may programmatically calls the functions of a writer to generate JSON text.</p>
+<p>On the other side, a writer can also be passed to objects that generates events,</p>
+<p>for example <a class="el" href="classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b" title="Parse JSON text. ">Reader::Parse()</a> and <a class="el" href="classrapidjson_1_1_generic_value.html#aeef0506cd1f8d703db4833c503f0657e" title="Generate events of this value to a Handler. ">Document::Accept()</a>.</p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">OutputStream</td><td>Type of output stream. </td></tr>
+    <tr><td class="paramname">SourceEncoding</td><td><a class="el" href="classrapidjson_1_1_encoding.html" title="Concept for encoding of Unicode characters. ">Encoding</a> of source string. </td></tr>
+    <tr><td class="paramname">TargetEncoding</td><td><a class="el" href="classrapidjson_1_1_encoding.html" title="Concept for encoding of Unicode characters. ">Encoding</a> of output stream. </td></tr>
+    <tr><td class="paramname">StackAllocator</td><td>Type of allocator for allocating memory of stack. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>implements <a class="el" href="classrapidjson_1_1_handler.html" title="Concept for receiving events from GenericReader upon parsing. The functions return true if no error o...">Handler</a> concept </dd></dl>
+</div><h2 class="groupheader">构造及析构函数说明</h2>
+<a class="anchor" id="ac592904fad01d9d0f29bb0585fb02aa7"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename OutputStream, typename SourceEncoding = UTF8&lt;&gt;, typename TargetEncoding  = UTF8&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer</a>&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator &gt;::<a class="el" href="classrapidjson_1_1_writer.html">Writer</a> </td>
+          <td>(</td>
+          <td class="paramtype">OutputStream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">StackAllocator *&#160;</td>
+          <td class="paramname"><em>stackAllocator</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>levelDepth</em> = <code>kDefaultLevelDepth</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">os</td><td>Output stream. </td></tr>
+    <tr><td class="paramname">stackAllocator</td><td>User supplied allocator. If it is null, it will create a private one. </td></tr>
+    <tr><td class="paramname">levelDepth</td><td>Initial capacity of stack. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">成员函数说明</h2>
+<a class="anchor" id="ad5f042d9c1a8ce5be2d52e18255b4390"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename OutputStream, typename SourceEncoding = UTF8&lt;&gt;, typename TargetEncoding  = UTF8&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer</a>&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator &gt;::Double </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>d</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Writes the given <code>double</code> value to the stream. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">d</td><td>The value to be written. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>Whether it is succeed. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ad70218827efbda426bbc8620a9339c3e"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename OutputStream, typename SourceEncoding = UTF8&lt;&gt;, typename TargetEncoding  = UTF8&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer</a>&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator &gt;::IsComplete </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks whether the output is a complete JSON. </p>
+<p>A complete JSON has a complete root object or array. </p>
+
+</div>
+</div>
+<a class="anchor" id="af4411235dd75ae34274e7eb74d435147"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename OutputStream, typename SourceEncoding = UTF8&lt;&gt;, typename TargetEncoding  = UTF8&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer</a>&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator &gt;::Reset </td>
+          <td>(</td>
+          <td class="paramtype">OutputStream &amp;&#160;</td>
+          <td class="paramname"><em>os</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reset the writer with a new stream. </p>
+<p>This function reset the writer with a new stream and default settings, in order to make a <a class="el" href="classrapidjson_1_1_writer.html" title="JSON writer. ">Writer</a> object reusable for output multiple JSONs.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">os</td><td>New output stream. <div class="fragment"><div class="line">Writer&lt;OutputStream&gt; writer(os1);</div>
+<div class="line">writer.StartObject();</div>
+<div class="line"><span class="comment">// ...</span></div>
+<div class="line">writer.EndObject();</div>
+<div class="line"></div>
+<div class="line">writer.Reset(os2);</div>
+<div class="line">writer.StartObject();</div>
+<div class="line"><span class="comment">// ...</span></div>
+<div class="line">writer.EndObject();</div>
+</div><!-- fragment --> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>include/rapidjson/<a class="el" href="writer_8h_source.html">writer.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.8.7-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespacerapidjson.html">rapidjson</a></li><li class="navelem"><a class="el" href="classrapidjson_1_1_writer.html">Writer</a></li>
+  </ul>
+</div>

@@ -1,0 +1,480 @@
+<!-- HTML header for doxygen 1.8.7-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.7"/>
+<title>RapidJSON: RapidJSON error handling</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+  $(document).ready(initResizable);
+  $(window).load(resizeHeight);
+</script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="topbanner"><a href="https://github.com/miloyip/rapidjson" title="RapidJSON GitHub"><i class="githublogo"></i></a></div>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.7 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){initNavTree('group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html','');});
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(12)"><span class="SelectionMark">&#160;</span>页</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#define-members">宏定义</a> &#124;
+<a href="#typedef-members">类型定义</a> &#124;
+<a href="#enum-members">枚举</a> &#124;
+<a href="#func-members">函数</a>  </div>
+  <div class="headertitle">
+<div class="title">RapidJSON error handling</div>  </div>
+</div><!--header-->
+<div class="contents">
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:structrapidjson_1_1_parse_result"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result">rapidjson::ParseResult</a></td></tr>
+<tr class="memdesc:structrapidjson_1_1_parse_result"><td class="mdescLeft">&#160;</td><td class="mdescRight">Result of parsing (wraps ParseErrorCode)  <a href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result">更多...</a><br /></td></tr>
+<tr class="separator:structrapidjson_1_1_parse_result"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+宏定义</h2></td></tr>
+<tr class="memitem:ga7e4636fd48d0148f102b8a13f0539d8c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7e4636fd48d0148f102b8a13f0539d8c">RAPIDJSON_ERROR_CHARTYPE</a>&#160;&#160;&#160;char</td></tr>
+<tr class="memdesc:ga7e4636fd48d0148f102b8a13f0539d8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Character type of error messages.  <a href="#ga7e4636fd48d0148f102b8a13f0539d8c">更多...</a><br /></td></tr>
+<tr class="separator:ga7e4636fd48d0148f102b8a13f0539d8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabe2e1bd1349e5a7d6c1af78c05a98f0d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabe2e1bd1349e5a7d6c1af78c05a98f0d">RAPIDJSON_ERROR_STRING</a>(x)&#160;&#160;&#160;x</td></tr>
+<tr class="memdesc:gabe2e1bd1349e5a7d6c1af78c05a98f0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Macro for converting string literial to <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7e4636fd48d0148f102b8a13f0539d8c">RAPIDJSON_ERROR_CHARTYPE</a>[].  <a href="#gabe2e1bd1349e5a7d6c1af78c05a98f0d">更多...</a><br /></td></tr>
+<tr class="separator:gabe2e1bd1349e5a7d6c1af78c05a98f0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7f8c4265b2edda78568ae3338aaf1461"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7f8c4265b2edda78568ae3338aaf1461">RAPIDJSON_PARSE_ERROR_NORETURN</a>(parseErrorCode, offset)</td></tr>
+<tr class="memdesc:ga7f8c4265b2edda78568ae3338aaf1461"><td class="mdescLeft">&#160;</td><td class="mdescRight">Macro to indicate a parse error.  <a href="#ga7f8c4265b2edda78568ae3338aaf1461">更多...</a><br /></td></tr>
+<tr class="separator:ga7f8c4265b2edda78568ae3338aaf1461"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae3689840fa6e89a241313f33b602f865"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gae3689840fa6e89a241313f33b602f865">RAPIDJSON_PARSE_ERROR</a>(parseErrorCode, offset)</td></tr>
+<tr class="memdesc:gae3689840fa6e89a241313f33b602f865"><td class="mdescLeft">&#160;</td><td class="mdescRight">(Internal) macro to indicate and handle a parse error.  <a href="#gae3689840fa6e89a241313f33b602f865">更多...</a><br /></td></tr>
+<tr class="separator:gae3689840fa6e89a241313f33b602f865"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+类型定义</h2></td></tr>
+<tr class="memitem:ga4e77e464ec8abe1111ee581fc2cb00de"><td class="memItemLeft" align="right" valign="top">typedef const <br class="typebreak" />
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7e4636fd48d0148f102b8a13f0539d8c">RAPIDJSON_ERROR_CHARTYPE</a> *(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga4e77e464ec8abe1111ee581fc2cb00de">rapidjson::GetParseErrorFunc</a> )(ParseErrorCode)</td></tr>
+<tr class="memdesc:ga4e77e464ec8abe1111ee581fc2cb00de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function pointer type of GetParseError().  <a href="#ga4e77e464ec8abe1111ee581fc2cb00de">更多...</a><br /></td></tr>
+<tr class="separator:ga4e77e464ec8abe1111ee581fc2cb00de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+枚举</h2></td></tr>
+<tr class="memitem:ga7d3acf640886b1f2552dc8c4cd6dea60"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">rapidjson::ParseErrorCode</a> { <br />
+&#160;&#160;<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a86a60b723dca32df5debab2c3db4235f">rapidjson::kParseErrorNone</a> = 0, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a06183076357ebd9eca228666f614c286">rapidjson::kParseErrorDocumentEmpty</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a2022599bcd4f64d58885a026f95751d5">rapidjson::kParseErrorDocumentRootNotSingular</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60ab7fa69bce0c393cf3a2b6065111f2f57">rapidjson::kParseErrorValueInvalid</a>, 
+<br />
+&#160;&#160;<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60ab707b848425668e765def25554735242">rapidjson::kParseErrorObjectMissName</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a58e952084a0dfdbc5630f624252aef5c">rapidjson::kParseErrorObjectMissColon</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a2a81a684f39fc882ec99f07e86343f73">rapidjson::kParseErrorObjectMissCommaOrCurlyBracket</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a1a4ac97731f997e9591b40f98ecd9f93">rapidjson::kParseErrorArrayMissCommaOrSquareBracket</a>, 
+<br />
+&#160;&#160;<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a23c38bf88b8448555c0eb41e1735bd92">rapidjson::kParseErrorStringUnicodeEscapeInvalidHex</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a636209a2e516fbdb4db5ad0a83a6b386">rapidjson::kParseErrorStringUnicodeSurrogateInvalid</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a8dd0af5e6103a6503c61c38cb2b0bab9">rapidjson::kParseErrorStringEscapeInvalid</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60af7daa91caa53abb881ea231a874a4f40">rapidjson::kParseErrorStringMissQuotationMark</a>, 
+<br />
+&#160;&#160;<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a62ce0f5c74e4ab34ac325d2adda8fa8f">rapidjson::kParseErrorStringInvalidEncoding</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a240cebadea89f7282ab263b5a22c9805">rapidjson::kParseErrorNumberTooBig</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60ac840ece3ba6874fe6f16c01ebb71031f">rapidjson::kParseErrorNumberMissFraction</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a28a1c720ae63560780ccd992dc999ab7">rapidjson::kParseErrorNumberMissExponent</a>, 
+<br />
+&#160;&#160;<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60ab250f87c3d8454c579364b5a0f697a50">rapidjson::kParseErrorTermination</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a7abf1a337294d984a3f4d18b5843fb24">rapidjson::kParseErrorUnspecificSyntaxError</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:ga7d3acf640886b1f2552dc8c4cd6dea60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error code of parsing.  <a href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">更多...</a><br /></td></tr>
+<tr class="separator:ga7d3acf640886b1f2552dc8c4cd6dea60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
+函数</h2></td></tr>
+<tr class="memitem:gabdaf1a7a4db30fb0e3d927fdf0fabe79"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7e4636fd48d0148f102b8a13f0539d8c">RAPIDJSON_ERROR_CHARTYPE</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">rapidjson::GetParseError_En</a> (ParseErrorCode parseErrorCode)</td></tr>
+<tr class="memdesc:gabdaf1a7a4db30fb0e3d927fdf0fabe79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps error code of parsing into error message.  <a href="#gabdaf1a7a4db30fb0e3d927fdf0fabe79">更多...</a><br /></td></tr>
+<tr class="separator:gabdaf1a7a4db30fb0e3d927fdf0fabe79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<hr/><h2 class="groupheader">类说明</h2>
+<a name="structrapidjson_1_1_parse_result" id="structrapidjson_1_1_parse_result"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct rapidjson::ParseResult</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>Result of parsing (wraps ParseErrorCode) </p>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> doc;</div>
+<div class="line"><a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a0f03679d5fa2736d9e351541e767fac1">ParseResult</a> ok = doc.Parse(<span class="stringliteral">&quot;[42]&quot;</span>);</div>
+<div class="line"><span class="keywordflow">if</span> (!ok) {</div>
+<div class="line">    fprintf(stderr, <span class="stringliteral">&quot;JSON parse error: %s (%u)&quot;</span>,</div>
+<div class="line">            <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(ok.Code()), ok.Offset());</div>
+<div class="line">    exit(EXIT_FAILURE);</div>
+<div class="line">}</div>
+</div><!-- fragment --> <dl class="section see"><dt>参见</dt><dd><a class="el" href="classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b" title="Parse JSON text. ">GenericReader::Parse</a>, <a class="el" href="classrapidjson_1_1_generic_document.html#a5bb026ab42705b2c2cfbbf904108b3f5" title="Parse JSON text from a read-only string (with Encoding conversion) ">GenericDocument::Parse</a> </dd></dl>
+</div><table class="memberdecls">
+<tr><td colspan="2"><h3>Public 成员函数</h3></td></tr>
+<tr class="memitem:a0f03679d5fa2736d9e351541e767fac1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f03679d5fa2736d9e351541e767fac1"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a0f03679d5fa2736d9e351541e767fac1">ParseResult</a> ()</td></tr>
+<tr class="memdesc:a0f03679d5fa2736d9e351541e767fac1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor, no error. <br /></td></tr>
+<tr class="separator:a0f03679d5fa2736d9e351541e767fac1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad15710045513f13ba526753c4a2cb59b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad15710045513f13ba526753c4a2cb59b"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ad15710045513f13ba526753c4a2cb59b">ParseResult</a> (<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> code, size_t offset)</td></tr>
+<tr class="memdesc:ad15710045513f13ba526753c4a2cb59b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor to set an error. <br /></td></tr>
+<tr class="separator:ad15710045513f13ba526753c4a2cb59b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51cfd45c07e28aa4fdd78b55d86f0591"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a51cfd45c07e28aa4fdd78b55d86f0591"></a>
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a51cfd45c07e28aa4fdd78b55d86f0591">Code</a> () const </td></tr>
+<tr class="memdesc:a51cfd45c07e28aa4fdd78b55d86f0591"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the error code. <br /></td></tr>
+<tr class="separator:a51cfd45c07e28aa4fdd78b55d86f0591"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a056e5792c1554fbc05b5f1cc168d82ae"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a056e5792c1554fbc05b5f1cc168d82ae"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a056e5792c1554fbc05b5f1cc168d82ae">Offset</a> () const </td></tr>
+<tr class="memdesc:a056e5792c1554fbc05b5f1cc168d82ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the error offset, if <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a5ab5548c7a7776f4da20eac09fe57c1b">IsError()</a>, 0 otherwise. <br /></td></tr>
+<tr class="separator:a056e5792c1554fbc05b5f1cc168d82ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8865f9231951740a99d3f3ab10f9a4e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac8865f9231951740a99d3f3ab10f9a4e"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ac8865f9231951740a99d3f3ab10f9a4e">operator bool</a> () const </td></tr>
+<tr class="memdesc:ac8865f9231951740a99d3f3ab10f9a4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion to <code>bool</code>, returns <code>true</code>, iff !<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a5ab5548c7a7776f4da20eac09fe57c1b">IsError()</a>. <br /></td></tr>
+<tr class="separator:ac8865f9231951740a99d3f3ab10f9a4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ab5548c7a7776f4da20eac09fe57c1b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5ab5548c7a7776f4da20eac09fe57c1b"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a5ab5548c7a7776f4da20eac09fe57c1b">IsError</a> () const </td></tr>
+<tr class="memdesc:a5ab5548c7a7776f4da20eac09fe57c1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the result is an error. <br /></td></tr>
+<tr class="separator:a5ab5548c7a7776f4da20eac09fe57c1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d6e37872d7da5f4a4c41e724c8c5c5f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3d6e37872d7da5f4a4c41e724c8c5c5f"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result">ParseResult</a> &amp;that) const </td></tr>
+<tr class="separator:a3d6e37872d7da5f4a4c41e724c8c5c5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11595b2d573f0299422678c5e3695479"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a11595b2d573f0299422678c5e3695479"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> code) const </td></tr>
+<tr class="separator:a11595b2d573f0299422678c5e3695479"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17c9f7f81675283393222658d613000f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a17c9f7f81675283393222658d613000f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a17c9f7f81675283393222658d613000f">Clear</a> ()</td></tr>
+<tr class="memdesc:a17c9f7f81675283393222658d613000f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset error code. <br /></td></tr>
+<tr class="separator:a17c9f7f81675283393222658d613000f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40c0bd4d6c535c57acbb5c2e656bea38"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a40c0bd4d6c535c57acbb5c2e656bea38"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a40c0bd4d6c535c57acbb5c2e656bea38">Set</a> (<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> code, size_t offset=0)</td></tr>
+<tr class="memdesc:a40c0bd4d6c535c57acbb5c2e656bea38"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update error code and offset. <br /></td></tr>
+<tr class="separator:a40c0bd4d6c535c57acbb5c2e656bea38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><h3>友元</h3></td></tr>
+<tr class="memitem:a58c9982e833d1c74686506ac7449200c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a58c9982e833d1c74686506ac7449200c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> code, const <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result">ParseResult</a> &amp;err)</td></tr>
+<tr class="separator:a58c9982e833d1c74686506ac7449200c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">宏定义说明</h2>
+<a class="anchor" id="ga7e4636fd48d0148f102b8a13f0539d8c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RAPIDJSON_ERROR_CHARTYPE&#160;&#160;&#160;char</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Character type of error messages. </p>
+<p>The default character type is <code>char</code>. On Windows, user can define this macro as <code>TCHAR</code> for supporting both unicode/non-unicode settings. </p>
+
+</div>
+</div>
+<a class="anchor" id="gabe2e1bd1349e5a7d6c1af78c05a98f0d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RAPIDJSON_ERROR_STRING</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x</td><td>)</td>
+          <td>&#160;&#160;&#160;x</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Macro for converting string literial to <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7e4636fd48d0148f102b8a13f0539d8c">RAPIDJSON_ERROR_CHARTYPE</a>[]. </p>
+<p>By default this conversion macro does nothing. On Windows, user can define this macro as <code>_T(x)</code> for supporting both unicode/non-unicode settings. </p>
+
+</div>
+</div>
+<a class="anchor" id="gae3689840fa6e89a241313f33b602f865"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RAPIDJSON_PARSE_ERROR</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">parseErrorCode, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">offset&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>(Internal) macro to indicate and handle a parse error. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parseErrorCode</td><td><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">rapidjson::ParseErrorCode</a> of the error </td></tr>
+    <tr><td class="paramname">offset</td><td>position of the error in JSON input (<code>size_t</code>)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Invokes RAPIDJSON_PARSE_ERROR_NORETURN and stops the parsing.</p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7f8c4265b2edda78568ae3338aaf1461" title="Macro to indicate a parse error. ">RAPIDJSON_PARSE_ERROR_NORETURN</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ga7f8c4265b2edda78568ae3338aaf1461"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RAPIDJSON_PARSE_ERROR_NORETURN</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">parseErrorCode, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">offset&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>值:</b><div class="fragment"><div class="line"><a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_MULTILINEMACRO_BEGIN \</a></div>
+<div class="line"><a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">    RAPIDJSON_ASSERT</a>(!HasParseError()); <span class="comment">/* Error can only be assigned once */</span> \</div>
+<div class="line">    SetParseError(parseErrorCode, offset); \</div>
+<div class="line">    RAPIDJSON_MULTILINEMACRO_END</div>
+<div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:315</div></div>
+</div><!-- fragment -->
+<p>Macro to indicate a parse error. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parseErrorCode</td><td><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">rapidjson::ParseErrorCode</a> of the error </td></tr>
+    <tr><td class="paramname">offset</td><td>position of the error in JSON input (<code>size_t</code>)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>This macros can be used as a customization point for the internal error handling mechanism of RapidJSON.</p>
+<p>A common usage model is to throw an exception instead of requiring the caller to explicitly check the <a class="el" href="classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b">rapidjson::GenericReader::Parse</a>'s return value:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define RAPIDJSON_PARSE_ERROR_NORETURN(parseErrorCode,offset) \</span></div>
+<div class="line"><span class="preprocessor">   throw ParseException(parseErrorCode, #parseErrorCode, offset)</span></div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor">#include &lt;stdexcept&gt;</span>               <span class="comment">// std::runtime_error</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="error_8h.html">rapidjson/error/error.h</a>&quot;</span> <span class="comment">// rapidjson::ParseResult</span></div>
+<div class="line"></div>
+<div class="line"><span class="keyword">struct </span>ParseException : std::runtime_error, <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result">rapidjson::ParseResult</a> {</div>
+<div class="line">  ParseException(<a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">rapidjson::ParseErrorCode</a> code, <span class="keyword">const</span> <span class="keywordtype">char</span>* msg, <span class="keywordtype">size_t</span> offset)</div>
+<div class="line">    : std::runtime_error(msg), ParseResult(code, offset) {}</div>
+<div class="line">};</div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="reader_8h.html">rapidjson/reader.h</a>&quot;</span></div>
+</div><!-- fragment --><dl class="section see"><dt>参见</dt><dd><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gae3689840fa6e89a241313f33b602f865" title="(Internal) macro to indicate and handle a parse error. ">RAPIDJSON_PARSE_ERROR</a>, <a class="el" href="classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b" title="Parse JSON text. ">rapidjson::GenericReader::Parse</a> </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">类型定义说明</h2>
+<a class="anchor" id="ga4e77e464ec8abe1111ee581fc2cb00de"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef const <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7e4636fd48d0148f102b8a13f0539d8c">RAPIDJSON_ERROR_CHARTYPE</a>*(* rapidjson::GetParseErrorFunc)(ParseErrorCode)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Function pointer type of GetParseError(). </p>
+<p>This is the prototype for <code>GetParseError_X()</code>, where <code>X</code> is a locale. User can dynamically change locale in runtime, e.g.: </p><div class="fragment"><div class="line"><a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga4e77e464ec8abe1111ee581fc2cb00de">GetParseErrorFunc</a> GetParseError = <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>; <span class="comment">// or whatever</span></div>
+<div class="line"><span class="keyword">const</span> <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7e4636fd48d0148f102b8a13f0539d8c">RAPIDJSON_ERROR_CHARTYPE</a>* s = GetParseError(document.GetParseErrorCode());</div>
+</div><!-- fragment --> 
+</div>
+</div>
+<h2 class="groupheader">枚举类型说明</h2>
+<a class="anchor" id="ga7d3acf640886b1f2552dc8c4cd6dea60"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">rapidjson::ParseErrorCode</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Error code of parsing. </p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b" title="Parse JSON text. ">GenericReader::Parse</a>, <a class="el" href="classrapidjson_1_1_generic_reader.html#a40fd326bad7d7033f096b549cbf159db" title="Get the ParseErrorCode of last parsing. ">GenericReader::GetParseErrorCode</a> </dd></dl>
+<table class="fieldtable">
+<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60a86a60b723dca32df5debab2c3db4235f"></a>kParseErrorNone&#160;</td><td class="fielddoc">
+<p>No error. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60a06183076357ebd9eca228666f614c286"></a>kParseErrorDocumentEmpty&#160;</td><td class="fielddoc">
+<p>The document is empty. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60a2022599bcd4f64d58885a026f95751d5"></a>kParseErrorDocumentRootNotSingular&#160;</td><td class="fielddoc">
+<p>The document root must not follow by other values. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60ab7fa69bce0c393cf3a2b6065111f2f57"></a>kParseErrorValueInvalid&#160;</td><td class="fielddoc">
+<p>Invalid value. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60ab707b848425668e765def25554735242"></a>kParseErrorObjectMissName&#160;</td><td class="fielddoc">
+<p>Missing a name for object member. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60a58e952084a0dfdbc5630f624252aef5c"></a>kParseErrorObjectMissColon&#160;</td><td class="fielddoc">
+<p>Missing a colon after a name of object member. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60a2a81a684f39fc882ec99f07e86343f73"></a>kParseErrorObjectMissCommaOrCurlyBracket&#160;</td><td class="fielddoc">
+<p>Missing a comma or '}' after an object member. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60a1a4ac97731f997e9591b40f98ecd9f93"></a>kParseErrorArrayMissCommaOrSquareBracket&#160;</td><td class="fielddoc">
+<p>Missing a comma or ']' after an array element. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60a23c38bf88b8448555c0eb41e1735bd92"></a>kParseErrorStringUnicodeEscapeInvalidHex&#160;</td><td class="fielddoc">
+<p>Incorrect hex digit after \u escape in string. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60a636209a2e516fbdb4db5ad0a83a6b386"></a>kParseErrorStringUnicodeSurrogateInvalid&#160;</td><td class="fielddoc">
+<p>The surrogate pair in string is invalid. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60a8dd0af5e6103a6503c61c38cb2b0bab9"></a>kParseErrorStringEscapeInvalid&#160;</td><td class="fielddoc">
+<p>Invalid escape character in string. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60af7daa91caa53abb881ea231a874a4f40"></a>kParseErrorStringMissQuotationMark&#160;</td><td class="fielddoc">
+<p>Missing a closing quotation mark in string. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60a62ce0f5c74e4ab34ac325d2adda8fa8f"></a>kParseErrorStringInvalidEncoding&#160;</td><td class="fielddoc">
+<p>Invalid encoding in string. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60a240cebadea89f7282ab263b5a22c9805"></a>kParseErrorNumberTooBig&#160;</td><td class="fielddoc">
+<p>Number too big to be stored in double. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60ac840ece3ba6874fe6f16c01ebb71031f"></a>kParseErrorNumberMissFraction&#160;</td><td class="fielddoc">
+<p>Miss fraction part in number. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60a28a1c720ae63560780ccd992dc999ab7"></a>kParseErrorNumberMissExponent&#160;</td><td class="fielddoc">
+<p>Miss exponent in number. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60ab250f87c3d8454c579364b5a0f697a50"></a>kParseErrorTermination&#160;</td><td class="fielddoc">
+<p>Parsing was terminated. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60a7abf1a337294d984a3f4d18b5843fb24"></a>kParseErrorUnspecificSyntaxError&#160;</td><td class="fielddoc">
+<p>Unspecific syntax error. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">函数说明</h2>
+<a class="anchor" id="gabdaf1a7a4db30fb0e3d927fdf0fabe79"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7e4636fd48d0148f102b8a13f0539d8c">RAPIDJSON_ERROR_CHARTYPE</a>* rapidjson::GetParseError_En </td>
+          <td>(</td>
+          <td class="paramtype">ParseErrorCode&#160;</td>
+          <td class="paramname"><em>parseErrorCode</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Maps error code of parsing into error message. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parseErrorCode</td><td>Error code obtained in parsing. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>the error message. </dd></dl>
+<dl class="section note"><dt>注解</dt><dd>User can make a copy of this function for localization. Using switch-case is safer for future modification of error codes. </dd></dl>
+
+</div>
+</div>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.8.7-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+  </ul>
+</div>

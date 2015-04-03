@@ -83,15 +83,21 @@ var NAVTREE =
     ] ],
     [ "Performance", "md_doc_performance.html", null ],
     [ "Internals", "md_doc_internals.html", [
+      [ "Architecture", "md_doc_internals.html#Architecture", null ],
       [ "Value", "md_doc_internals.html#Value", [
         [ "Data Layout", "md_doc_internals.html#DataLayout", null ],
         [ "Flags", "md_doc_internals.html#Flags", null ],
+        [ "Short-String Optimization", "md_doc_internals.html#ShortString", null ],
         [ "MemoryPoolAllocator", "md_doc_internals.html#MemoryPoolAllocator", null ]
       ] ],
       [ "Parsing Optimization", "md_doc_internals.html#ParsingOptimization", [
-        [ "Skip Whitespace with SIMD", "md_doc_internals.html#SkipwhitespaceWithSIMD", null ],
-        [ "Pow10()", "md_doc_internals.html#Pow10", null ],
-        [ "Local Stream Copy", "md_doc_internals.html#LocalStreamCopy", null ]
+        [ "Skip Whitespaces with SIMD", "md_doc_internals.html#SkipwhitespaceWithSIMD", null ],
+        [ "Local Stream Copy", "md_doc_internals.html#LocalStreamCopy", null ],
+        [ "Parsing to Double", "md_doc_internals.html#ParsingDouble", null ]
+      ] ],
+      [ "Generation Optimizatoin", "md_doc_internals.html#GenerationOptimization", [
+        [ "Integer-to-String conversion", "md_doc_internals.html#itoa", null ],
+        [ "Double-to-String conversion", "md_doc_internals.html#dtoa", null ]
       ] ],
       [ "Parser", "md_doc_internals.html#Parser", [
         [ "Iterative Parser", "md_doc_internals.html#IterativeParser", [
@@ -135,7 +141,7 @@ var NAVTREEINDEX =
 [
 "allocators_8h_source.html",
 "classrapidjson_1_1_generic_value.html#aca0cff58ccd1d50ddce2eb2182e322c2",
-"md_doc_internals.html#ParsingOptimization"
+"md_doc_internals.html#MemoryPoolAllocator"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

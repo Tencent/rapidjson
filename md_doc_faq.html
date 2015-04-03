@@ -111,10 +111,10 @@ $(document).ready(function(){initNavTree('md_doc_faq.html','');});
 <p class="startli">Yes. It is deployed in both client and server real applications. A community member reported that RapidJSON in their system parses 50 million JSONs daily.</p>
 </li>
 <li><p class="startli">How RapidJSON is tested?</p>
-<p class="startli">RapidJSON contains a unit test suite for automatic testing. <a href="https://travis-ci.org/miloyip/rapidjson/">Travis</a> will compile and run the unit test suite for all modifications. The test process also uses Valgrind to detect memory leaks.</p>
+<p class="startli">RapidJSON contains a unit test suite for automatic testing. <a href="https://travis-ci.org/miloyip/rapidjson/">Travis</a>(for Linux) and <a href="https://ci.appveyor.com/project/miloyip/rapidjson/">AppVeyor</a>(for Windows) will compile and run the unit test suite for all modifications. The test process also uses Valgrind (in Linux) to detect memory leaks.</p>
 </li>
 <li><p class="startli">Is RapidJSON well documented?</p>
-<p class="startli">RapidJSON provides <a href="http://miloyip.github.io/rapidjson/index.html">user guide and API documentationn</a>.</p>
+<p class="startli">RapidJSON provides user guide and API documentationn.</p>
 </li>
 <li><p class="startli">Are there alternatives?</p>
 <p class="startli">Yes, there are a lot alternatives. For example, <a href="https://github.com/miloyip/nativejson-benchmark">nativejson-benchmark</a> has a listing of open-source C/C++ JSON libraries. <a href="http://www.json.org/">json.org</a> also has a list.</p>
@@ -149,10 +149,10 @@ $(document).ready(function(){initNavTree('md_doc_faq.html','');});
 <p class="startli">DOM is easy for query and manipulation. SAX is very fast and memory-saving but often more difficult to be applied.</p>
 </li>
 <li><p class="startli">What is <em>in situ</em> parsing?</p>
-<p class="startli"><em>in situ</em> parsing decodes the JSON strings directly into the input JSON. This is an optimization which can reduce memory consumption and improve performance, but the input JSON will be modified. Check <a href="http://miloyip.github.io/rapidjson/md_doc_dom.html#InSituParsing">in-situ parsing</a> for details.</p>
+<p class="startli"><em>in situ</em> parsing decodes the JSON strings directly into the input JSON. This is an optimization which can reduce memory consumption and improve performance, but the input JSON will be modified. Check <a class="el" href="md_doc_dom.html">in-situ parsing</a> for details.</p>
 </li>
 <li><p class="startli">When does parsing generate an error?</p>
-<p class="startli">The parser generates an error when the input JSON contains invalid syntax, or a value can not be represented (a number is too big), or the handler of parsers terminate the parsing. Check <a href="http://miloyip.github.io/rapidjson/md_doc_dom.html#ParseError">parse error</a> for details.</p>
+<p class="startli">The parser generates an error when the input JSON contains invalid syntax, or a value can not be represented (a number is too big), or the handler of parsers terminate the parsing. Check <a class="el" href="md_doc_dom.html">parse error</a> for details.</p>
 </li>
 <li><p class="startli">What error information is provided?</p>
 <p class="startli">The error is stored in <code>ParseResult</code>, which includes the error code and offset (number of characters from the beginning of JSON). The error code can be translated into human-readable error message.</p>
@@ -163,48 +163,105 @@ $(document).ready(function(){initNavTree('md_doc_faq.html','');});
 </ol>
 <h2>Document/Value (DOM)</h2>
 <ol type="1">
-<li>What is move semantics? Why?</li>
-<li>How to copy a value?</li>
-<li>Why do I need to provide the length of string?</li>
-<li>Why do I need to provide allocator in many DOM manipulation API?</li>
-<li>Does it convert between numerical types?</li>
+<li><p class="startli">What is move semantics? Why?</p>
+<p class="startli">Instead of copy semantics, move semantics is used in <code>Value</code>. That means, when assigning a source value to a target value, the ownership of source value is moved to the target value.</p>
+<p class="startli">Since moving is faster than copying, this design decision forces user to aware of the copying overhead.</p>
+</li>
+<li><p class="startli">How to copy a value?</p>
+<p class="startli">There are two APIs: constructor with allocator, and <code>CopyFrom()</code>. See <a class="el" href="md_doc_tutorial.html">Deep Copy Value</a> for an example.</p>
+</li>
+<li><p class="startli">Why do I need to provide the length of string?</p>
+<p class="startli">Since C string is null-terminated, the length of string needs to be computed via <code>strlen()</code>, with linear runtime complexity. This incurs an unncessary overhead of many operations, if the user already knows the length of string.</p>
+<p class="startli">Also, RapidJSON can handle <code>\u0000</code> (null character) within a string. If a string contains null characters, <code>strlen()</code> cannot return the true length of it. In such case user must provide the length of string explicitly.</p>
+</li>
+<li><p class="startli">Why do I need to provide allocator parameter in many DOM manipulation API?</p>
+<p class="startli">Since the APIs are member functions of <code>Value</code>, we do not want to save an allocator pointer in every <code>Value</code>.</p>
+</li>
+<li><p class="startli">Does it convert between numerical types?</p>
+<p class="startli">When using <code>GetInt()</code>, <code>GetUint()</code>, ... conversion may occur. For integer-to-integer conversion, it only convert when it is safe (otherwise it will assert). However, when converting a 64-bit signed/unsigned integer to double, it will convert but be aware that it may lose precision. A number with fraction, or an integer larger than 64-bit, can only be obtained by <code>GetDouble()</code>.</p>
+</li>
 </ol>
 <h2>Reader/Writer (SAX)</h2>
 <ol type="1">
-<li>Why not just <code>printf</code> a JSON? Why need a <code>Writer</code>?</li>
-<li>Why can't I parse a JSON which is just a number?</li>
-<li>Can I pause the parsing process and resume it later?</li>
+<li><p class="startli">Why don't we just <code>printf</code> a JSON? Why do we need a <code>Writer</code>?</p>
+<p class="startli">Most importantly, <code>Writer</code> will ensure the output JSON is well-formed. Calling SAX events incorrectly (e.g. <code>StartObject()</code> pairing with <code>EndArray()</code>) will assert. Besides, <code>Writer</code> will escapes strings (e.g., <code>\n</code>). Finally, the numeric output of <code>printf()</code> may not be a valid JSON number, especially in some locale with digit delimiters. And the number-to-string conversion in <code>Writer</code> is implemented with very fast algorithms, which outperforms than <code>printf()</code> or <code>iostream</code>.</p>
+</li>
+<li><p class="startli">Can I pause the parsing process and resume it later?</p>
+<p class="startli">This is not directly supported in the current version due to performance consideration. However, if the execution environment supports multi-threading, user can parse a JSON in a separate thread, and pause it by blocking in the input stream.</p>
+</li>
 </ol>
 <h2>Unicode</h2>
 <ol type="1">
-<li>Does it support UTF-8, UTF-16 and other format?</li>
-<li>Can it validate the encoding?</li>
-<li>What is surrogate pair? Does RapidJSON support it?</li>
-<li>Can it handle '' (null character) in JSON string?</li>
-<li>Can I output '' for all non-ASCII character?</li>
+<li><p class="startli">Does it support UTF-8, UTF-16 and other format?</p>
+<p class="startli">Yes. It fully support UTF-8, UTF-16 (LE/BE), UTF-32 (LE/BE) and ASCII.</p>
+</li>
+<li><p class="startli">Can it validate the encoding?</p>
+<p class="startli">Yes, just pass <code>kParseValidateEncodingFlag</code> to <code>Parse()</code>. If there is invalid encoding in the stream, it wil generate <code>kParseErrorStringInvalidEncoding</code> error.</p>
+</li>
+<li><p class="startli">What is surrogate pair? Does RapidJSON support it?</p>
+<p class="startli">JSON uses UTF-16 encoding when escaping unicode character, e.g. <code>\u5927</code> representing Chinese character "big". To handle characters other than those in basic multilingual plane (BMP), UTF-16 encodes those characters with two 16-bit values, which is called UTF-16 surrogate pair. For example, the Emoji character U+1F602 can be encoded as <code>\uD83D\uDE02</code> in JSON.</p>
+<p class="startli">RapidJSON fully support parsing/generating UTF-16 surrogates.</p>
+</li>
+<li><p class="startli">Can it handle <code>\u0000</code> (null character) in JSON string?</p>
+<p class="startli">Yes. RapidJSON fully support null character in JSON string. However, user need to be aware of it and using <code>GetStringLength()</code> and related APIs to obtain the true length of string.</p>
+</li>
+<li><p class="startli">Can I output <code>\uxxxx</code> for all non-ASCII character?</p>
+<p class="startli">Yes, use <code>ASCII&lt;&gt;</code> as output encoding template parameter in <code>Writer</code> can enforce escaping those characters.</p>
+</li>
 </ol>
 <h2>Stream</h2>
 <ol type="1">
-<li>I have a big JSON file. Should I load the whole file to memory?</li>
-<li>Can I parse JSON while it is streamed from network?</li>
-<li>I don't know what format will the JSON be. How to handle them?</li>
-<li>What is BOM? How RapidJSON handle it?</li>
-<li>Why little/big endian is related?</li>
+<li><p class="startli">I have a big JSON file. Should I load the whole file to memory?</p>
+<p class="startli">User can use <code>FileReadStream</code> to read the file chunk-by-chunk. But for <em>in situ</em> parsing, the whole file must be loaded.</p>
+</li>
+<li><p class="startli">Can I parse JSON while it is streamed from network?</p>
+<p class="startli">Yes. User can implement a custom stream for this. Please refer to the implementation of <code>FileReadStream</code>.</p>
+</li>
+<li><p class="startli">I don't know what encoding will the JSON be. How to handle them?</p>
+<p class="startli">You may use <code>AutoUTFInputStream</code> which detects the encoding of input stream automatically. However, it will incur some performance overhead.</p>
+</li>
+<li><p class="startli">What is BOM? How RapidJSON handle it?</p>
+<p class="startli"><a href="http://en.wikipedia.org/wiki/Byte_order_mark">Byte order mark (BOM)</a> sometimes reside at the beginning of file/stream to indiciate the UTF encoding type of it.</p>
+<p class="startli">RapidJSON's <code>EncodedInputStream</code> can detect/consume BOM. <code>EncodedOutputStream</code> can optionally write a BOM. See <a class="el" href="md_doc_stream.html">Encoded Streams</a> for example.</p>
+</li>
+<li><p class="startli">Why little/big endian is related?</p>
+<p class="startli">little/big endian of stream is an issue for UTF-16 and UTF-32 streams, but not UTF-8 stream.</p>
+</li>
 </ol>
 <h2>Performance</h2>
 <ol type="1">
-<li>Is RapidJSON really fast?</li>
-<li>Why is it fast?</li>
-<li>What is SIMD? How it is applied in RapidJSON?</li>
-<li>Does it consume a lot of memory?</li>
-<li>What is the purpose of being high performance?</li>
+<li><p class="startli">Is RapidJSON really fast?</p>
+<p class="startli">Yes. It may be the fastest open source JSON library. There is a <a href="https://github.com/miloyip/nativejson-benchmark">benchmark</a> for evaluating performance of C/C++ JSON libaries.</p>
+</li>
+<li><p class="startli">Why is it fast?</p>
+<p class="startli">Many design decisions of RapidJSON is aimed at time/space performance. These may reduce user-friendliness of APIs. Besides, it also employs low-level optimizations (intrinsics, SIMD) and special algorithms (custom double-to-string, string-to-double conversions).</p>
+</li>
+<li><p class="startli">What is SIMD? How it is applied in RapidJSON?</p>
+<p class="startli"><a href="http://en.wikipedia.org/wiki/SIMD">SIMD</a> instructions can perform parallel computation in modern CPUs. RapidJSON support Intel's SSE2/SSE4.1 to accelerate whitespace skipping. This improves performance of parsing indent formatted JSON.</p>
+</li>
+<li><p class="startli">Does it consume a lot of memory?</p>
+<p class="startli">The design of RapidJSON aims at reducing memory footprint.</p>
+<p class="startli">In the SAX API, <code>Reader</code> consumes memory portional to maximum depth of JSON tree, plus maximum length of JSON string.</p>
+<p class="startli">In the DOM API, each <code>Value</code> consumes exactly 16/24 bytes for 32/64-bit architecture respectively. RapidJSON also uses a special memory allocator to minimize overhead of allocations.</p>
+</li>
+<li><p class="startli">What is the purpose of being high performance?</p>
+<p class="startli">Some applications need to process very large JSON files. Some server-side applications need to process huge amount of JSONs. Being high performance can improve both latency and throuput. In a broad sense, it will also save energy.</p>
+</li>
 </ol>
 <h2>Gossip</h2>
 <ol type="1">
-<li>Who are the developers of RapidJSON?</li>
-<li>Why do you develop RapidJSON?</li>
-<li>Why there is a long empty period of development?</li>
-<li>Why did the repository move from Google Code to GitHub? </li>
+<li><p class="startli">Who are the developers of RapidJSON?</p>
+<p class="startli">Milo Yip () is the original author of RapidJSON. Many contributors from the world have improved RapidJSON. Philipp A. Hartmann () has implemented a lot of improvements, setting up automatic testing and also involves in a lot of discussions for the community. Don Ding () implemented the iterative parser. Andrii Senkovych () completed the CMake migration. Kosta (-Github) provided a very neat short-string optimization. Thank you for all other contributors and community members as well.</p>
+</li>
+<li><p class="startli">Why do you develop RapidJSON?</p>
+<p class="startli">It was just a hobby project initially in 2011. Milo Yip is a game programmer and he just knew about JSON at that time and would like to apply JSON in future projects. As JSON seems very simple he would like to write a header-only and fast library.</p>
+</li>
+<li><p class="startli">Why there is a long empty period of development?</p>
+<p class="startli">It is basically due to personal issues, such as getting new family members. Also, Milo Yip has spent a lot of spare time on translating "Game Engine Architecture" by Jason Gregory into Chinese.</p>
+</li>
+<li><p class="startli">Why did the repository move from Google Code to GitHub?</p>
+<p class="startli">This is the trend. And GitHub is much more powerful and convenient. </p>
+</li>
 </ol>
 </div></div><!-- contents -->
 </div><!-- doc-content -->

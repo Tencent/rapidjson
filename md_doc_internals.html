@@ -81,14 +81,20 @@ $(document).ready(function(){initNavTree('md_doc_internals.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#Value">Value</a><ul><li class="level2"><a href="#DataLayout">Data Layout</a></li>
+<ul><li class="level1"><a href="#Architecture">Architecture</a></li>
+<li class="level1"><a href="#Value">Value</a><ul><li class="level2"><a href="#DataLayout">Data Layout</a></li>
 <li class="level2"><a href="#Flags">Flags</a></li>
+<li class="level2"><a href="#ShortString">Short-String Optimization</a></li>
 <li class="level2"><a href="#MemoryPoolAllocator">MemoryPoolAllocator</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#ParsingOptimization">Parsing Optimization</a><ul><li class="level2"><a href="#SkipwhitespaceWithSIMD">Skip Whitespace with SIMD</a></li>
-<li class="level2"><a href="#Pow10">Pow10()</a></li>
+<li class="level1"><a href="#ParsingOptimization">Parsing Optimization</a><ul><li class="level2"><a href="#SkipwhitespaceWithSIMD">Skip Whitespaces with SIMD</a></li>
 <li class="level2"><a href="#LocalStreamCopy">Local Stream Copy</a></li>
+<li class="level2"><a href="#ParsingDouble">Parsing to Double</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#GenerationOptimization">Generation Optimizatoin</a><ul><li class="level2"><a href="#itoa">Integer-to-String conversion</a></li>
+<li class="level2"><a href="#dtoa">Double-to-String conversion</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#Parser">Parser</a><ul><li class="level2"><a href="#IterativeParser">Iterative Parser</a><ul><li class="level3"><a href="#IterativeParserGrammar">Grammar</a></li>
@@ -101,24 +107,237 @@ $(document).ready(function(){initNavTree('md_doc_internals.html','');});
 </ul>
 </div>
 <div class="textblock"><p>This section records some design and implementation details.</p>
-<h1><a class="anchor" id="Value"></a>
+<h1><a class="anchor" id="Architecture"></a>
+Architecture</h1>
+<h2>SAX and DOM</h2>
+<p>The basic relationships of SAX and DOM is shown in the following UML diagram.</p>
+<div class="image">
+<img src="architecture.png" alt="architecture.png"/>
+<div class="caption">
+Architecture UML class diagram</div></div>
+<p> The core of the relationship is the <code>Handler</code> concept. From the SAX side, <code>Reader</code> parses a JSON from a stream and publish events to a <code>Handler</code>. <code>Writer</code> implements the <code>Handler</code> concept to handle the same set of events. From the DOM side, <code>Document</code> implements the <code>Handler</code> concept to build a DOM according to the events. <code>Value</code> supports a <code>Value::Accept(Handler&amp;)</code> function, which traverses the DOM to publish events.</p>
+<p>With this design, SAX is not dependent on DOM. Even <code>Reader</code> and <code>Writer</code> have no dependencies between them. This provides flexibility to chain event publisher and handlers. Besides, <code>Value</code> does not depends on SAX as well. So, in addition to stringify a DOM to JSON, user may also stringify it to a XML writer, or do anything else.</p>
+<h2>Utility Classes</h2>
+<p>Both SAX and DOM APIs depends on 3 additional concepts: <code>Allocator</code>, <code>Encoding</code> and <code>Stream</code>. Their inheritance hierarchy is shown as below.</p>
+<div class="image">
+<img src="utilityclass.png" alt="utilityclass.png"/>
+<div class="caption">
+Utility classes UML class diagram</div></div>
+ <h1><a class="anchor" id="Value"></a>
 Value</h1>
+<p><code>Value</code> (actually a typedef of <code>GenericValue&lt;UTF8&lt;&gt;&gt;</code>) is the core of DOM API. This section describes the design of it.</p>
 <h2><a class="anchor" id="DataLayout"></a>
 Data Layout</h2>
+<p><code>Value</code> is a <a href="http://en.wikipedia.org/wiki/Variant_type">variant type</a>. In RapidJSON's context, an instance of <code>Value</code> can contain 1 of 6 JSON value types. This is possble by using <code>union</code>. Each <code>Value</code> contains two members: <code>union Data data_</code> and a<code>unsigned flags_</code>. The <code>flags_</code> indiciates the JSON type, and also additional information.</p>
+<p>The following tables show the data layout of each type. The 32-bit/64-bit columns indicates the size of the field in bytes.</p>
+<table class="doxtable">
+<tr>
+<th>Null </th><th></th><th align="center">32-bit</th><th align="center">64-bit  </th></tr>
+<tr>
+<td>(unused) </td><td></td><td align="center">4 </td><td align="center">8 </td></tr>
+<tr>
+<td>(unused) </td><td></td><td align="center">4 </td><td align="center">4 </td></tr>
+<tr>
+<td>(unused) </td><td></td><td align="center">4 </td><td align="center">4 </td></tr>
+</table>
+<p>| <code>unsigned flags_</code> | <code>kNullType | kNullFlag</code> |4 |4 |</p>
+<table class="doxtable">
+<tr>
+<th>Bool </th><th></th><th align="center">32-bit</th><th align="center">64-bit  </th></tr>
+<tr>
+<td>(unused) </td><td></td><td align="center">4 </td><td align="center">8 </td></tr>
+<tr>
+<td>(unused) </td><td></td><td align="center">4 </td><td align="center">4 </td></tr>
+<tr>
+<td>(unused) </td><td></td><td align="center">4 </td><td align="center">4 </td></tr>
+</table>
+<p>| <code>unsigned flags_</code> | <code>kBoolType |</code>(either <code>kTrueFlag</code> or <code>kFalseFlag</code>) |4 |4 |</p>
+<table class="doxtable">
+<tr>
+<th>String </th><th></th><th align="center">32-bit</th><th align="center">64-bit  </th></tr>
+<tr>
+<td><code>Ch* str</code> </td><td>Pointer to the string (may own) </td><td align="center">4 </td><td align="center">8 </td></tr>
+<tr>
+<td><code>SizeType length</code> </td><td>Length of string </td><td align="center">4 </td><td align="center">4 </td></tr>
+<tr>
+<td>(unused) </td><td></td><td align="center">4 </td><td align="center">4 </td></tr>
+</table>
+<p>| <code>unsigned flags_</code> | <code>kStringType | kStringFlag | ...</code> |4 |4 |</p>
+<table class="doxtable">
+<tr>
+<th>Object </th><th></th><th align="center">32-bit</th><th align="center">64-bit  </th></tr>
+<tr>
+<td><code>Member* members</code> </td><td>Pointer to array of members (owned) </td><td align="center">4 </td><td align="center">8 </td></tr>
+<tr>
+<td><code>SizeType size</code> </td><td>Number of members </td><td align="center">4 </td><td align="center">4 </td></tr>
+<tr>
+<td><code>SizeType capacity</code> </td><td>Capacity of members </td><td align="center">4 </td><td align="center">4 </td></tr>
+</table>
+<p>| <code>unsigned flags_</code> | <code>kObjectType | kObjectFlag</code> |4 |4 |</p>
+<table class="doxtable">
+<tr>
+<th>Array </th><th></th><th align="center">32-bit</th><th align="center">64-bit  </th></tr>
+<tr>
+<td><code>Value* values</code> </td><td>Pointer to array of values (owned) </td><td align="center">4 </td><td align="center">8 </td></tr>
+<tr>
+<td><code>SizeType size</code> </td><td>Number of values </td><td align="center">4 </td><td align="center">4 </td></tr>
+<tr>
+<td><code>SizeType capacity</code> </td><td>Capacity of values </td><td align="center">4 </td><td align="center">4 </td></tr>
+</table>
+<p>| <code>unsigned flags_</code> | <code>kArrayType | kArrayFlag</code> |4 |4 |</p>
+<table class="doxtable">
+<tr>
+<th>Number (Int) </th><th></th><th align="center">32-bit</th><th align="center">64-bit  </th></tr>
+<tr>
+<td><code>int i</code> </td><td>32-bit signed integer </td><td align="center">4 </td><td align="center">4 </td></tr>
+<tr>
+<td>(zero padding) </td><td>0 </td><td align="center">4 </td><td align="center">4 </td></tr>
+<tr>
+<td>(unused) </td><td></td><td align="center">4 </td><td align="center">8 </td></tr>
+</table>
+<p>| <code>unsigned flags_</code> | <code>kNumberType | kNumberFlag | kIntFlag | kInt64Flag | ...</code> |4 |4 |</p>
+<table class="doxtable">
+<tr>
+<th>Number (UInt) </th><th></th><th align="center">32-bit</th><th align="center">64-bit  </th></tr>
+<tr>
+<td><code>unsigned u</code> </td><td>32-bit unsigned integer </td><td align="center">4 </td><td align="center">4 </td></tr>
+<tr>
+<td>(zero padding) </td><td>0 </td><td align="center">4 </td><td align="center">4 </td></tr>
+<tr>
+<td>(unused) </td><td></td><td align="center">4 </td><td align="center">8 </td></tr>
+</table>
+<p>| <code>unsigned flags_</code> | <code>kNumberType | kNumberFlag | kUIntFlag | kUInt64Flag | ...</code> |4 |4 |</p>
+<table class="doxtable">
+<tr>
+<th>Number (Int64) </th><th></th><th align="center">32-bit</th><th align="center">64-bit  </th></tr>
+<tr>
+<td><code>int64_t i64</code> </td><td>64-bit signed integer </td><td align="center">8 </td><td align="center">8 </td></tr>
+<tr>
+<td>(unused) </td><td></td><td align="center">4 </td><td align="center">8 </td></tr>
+</table>
+<p>| <code>unsigned flags_</code> | <code>kNumberType | kNumberFlag | kInt64Flag | ...</code> |4 |4 |</p>
+<table class="doxtable">
+<tr>
+<th>Number (Uint64) </th><th></th><th align="center">32-bit</th><th align="center">64-bit  </th></tr>
+<tr>
+<td><code>uint64_t i64</code> </td><td>64-bit unsigned integer </td><td align="center">8 </td><td align="center">8 </td></tr>
+<tr>
+<td>(unused) </td><td></td><td align="center">4 </td><td align="center">8 </td></tr>
+</table>
+<p>| <code>unsigned flags_</code> | <code>kNumberType | kNumberFlag | kInt64Flag | ...</code> |4 |4 |</p>
+<table class="doxtable">
+<tr>
+<th>Number (Double) </th><th></th><th align="center">32-bit</th><th align="center">64-bit  </th></tr>
+<tr>
+<td><code>uint64_t i64</code> </td><td>Double precision floating-point </td><td align="center">8 </td><td align="center">8 </td></tr>
+<tr>
+<td>(unused) </td><td></td><td align="center">4 </td><td align="center">8 </td></tr>
+</table>
+<p>| <code>unsigned flags_</code> | <code>kNumberType | kNumberFlag | kDoubleFlag</code> |4 |4 |</p>
+<p>Here are some notes:</p><ul>
+<li>To reduce memory consumption for 64-bit architecture, <code>SizeType</code> is typedef as <code>unsigned</code> instead of <code>size_t</code>.</li>
+<li>Zero padding for 32-bit number may be placed after or before the actual type, according to the endianess. This makes possible for interpreting a 32-bit integer as a 64-bit integer, without any conversion.</li>
+<li>An <code>Int</code> is always an <code>Int64</code>, but the converse is not always true.</li>
+</ul>
 <h2><a class="anchor" id="Flags"></a>
 Flags</h2>
+<p>The 32-bit <code>flags_</code> contains both JSON type and other additional information. As shown in the above tables, each JSON type contains redundant <code>kXXXType</code> and <code>kXXXFlag</code>. This design is for optimizing the operation of testing bit-flags (<code>IsNumber()</code>) and obtaining a sequental number for each type (<code>GetType()</code>).</p>
+<p>String has two optional flags. <code>kCopyFlag</code> means that the string owns a copy of the string. <code>kInlineStrFlag</code> means using <a href="#ShortString">Short-String Optimizatoin</a>.</p>
+<p>Number is a bit more complicated. For normal integer values, it can contains <code>kIntFlag</code>, <code>kUintFlag</code>, <code>kInt64Flag</code> and/or <code>kUint64Flag</code>, according to the range of the integer. For numbers with fraction, and integers larger than 64-bit range, they will be stored as <code>double</code> with <code>kDoubleFlag</code>.</p>
+<h2><a class="anchor" id="ShortString"></a>
+Short-String Optimization</h2>
+<p>Kosta (-Github) provided a very neat short-string optimization. The optimization idea is given as follow. Excluding the <code>flags_</code>, a <code>Value</code> has 12 or 16 bytes (32-bit or 64-bit) for storing actual data. Instead of storing a pointer to a string, it is possible to store short strings in these space internally. For encoding with 1-byte character type (e.g. <code>char</code>), it can store maxium 11 or 15 characters string inside the <code>Value</code> type.</p>
+<table class="doxtable">
+<tr>
+<th>ShortString (Ch=char) </th><th></th><th align="center">32-bit</th><th align="center">64-bit  </th></tr>
+<tr>
+<td><code>Ch str[MaxChars]</code> </td><td>String buffer </td><td align="center">11 </td><td align="center">15 </td></tr>
+<tr>
+<td><code>Ch invLength</code> </td><td>MaxChars - Length </td><td align="center">1 </td><td align="center">1 </td></tr>
+</table>
+<p>| <code>unsigned flags_</code> | <code>kStringType | kStringFlag | ...</code> |4 |4 |</p>
+<p>A special technique is applied. Instead of storing the length of string directly, it stores (MaxChars - length). This make it possible to store 11 characters with trailing <code>\0</code>.</p>
+<p>This optimization can reduce memory usage for copy-string. It can also improve cache-coherence thus improve runtime performance.</p>
 <h1><a class="anchor" id="Allocator"></a>
 Allocator</h1>
+<p><code>Allocator</code> is a concept in RapidJSON: </p><div class="fragment"><div class="line">concept Allocator {</div>
+<div class="line">    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> kNeedFree;    <span class="comment">//!&lt; Whether this allocator needs to call Free().</span></div>
+<div class="line"><span class="comment"></span></div>
+<div class="line">    <span class="comment">// Allocate a memory block.</span></div>
+<div class="line">    <span class="comment">// \param size of the memory block in bytes.</span></div>
+<div class="line">    <span class="comment">// \returns pointer to the memory block.</span></div>
+<div class="line">    <span class="keywordtype">void</span>* Malloc(<span class="keywordtype">size_t</span> size);</div>
+<div class="line"></div>
+<div class="line">    <span class="comment">// Resize a memory block.</span></div>
+<div class="line">    <span class="comment">// \param originalPtr The pointer to current memory block. Null pointer is permitted.</span></div>
+<div class="line">    <span class="comment">// \param originalSize The current size in bytes. (Design issue: since some allocator may not book-keep this, explicitly pass to it can save memory.)</span></div>
+<div class="line">    <span class="comment">// \param newSize the new size in bytes.</span></div>
+<div class="line">    <span class="keywordtype">void</span>* Realloc(<span class="keywordtype">void</span>* originalPtr, <span class="keywordtype">size_t</span> originalSize, <span class="keywordtype">size_t</span> newSize);</div>
+<div class="line"></div>
+<div class="line">    <span class="comment">// Free a memory block.</span></div>
+<div class="line">    <span class="comment">// \param pointer to the memory block. Null pointer is permitted.</span></div>
+<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> Free(<span class="keywordtype">void</span> *ptr);</div>
+<div class="line">};</div>
+</div><!-- fragment --><p>Note that <code>Malloc()</code> and <code>Realloc()</code> are member functions but <code>Free()</code> is static member function.</p>
 <h2><a class="anchor" id="MemoryPoolAllocator"></a>
 MemoryPoolAllocator</h2>
+<p><code>MemoryPoolAllocator</code> is the default allocator for DOM. It allocate but do not free memory. This is suitable for building a DOM tree.</p>
+<p>Internally, it allocates chunks of memory from the base allocator (by default <code>CrtAllocator</code>) and stores the chunks as a singly linked list. When user requests an allocation, it allocates memory from the following order:</p>
+<ol type="1">
+<li>User supplied buffer if it is available. (See User Buffer section in DOM)</li>
+<li>If user supplied buffer is full, use the current memory chunk.</li>
+<li>If the current block is full, allocate a new block of memory.</li>
+</ol>
 <h1><a class="anchor" id="ParsingOptimization"></a>
 Parsing Optimization</h1>
 <h2><a class="anchor" id="SkipwhitespaceWithSIMD"></a>
-Skip Whitespace with SIMD</h2>
-<h2><a class="anchor" id="Pow10"></a>
-Pow10()</h2>
+Skip Whitespaces with SIMD</h2>
+<p>When parsing JSON from a stream, the parser need to skip 4 whitespace characters:</p>
+<ol type="1">
+<li>Space (<code>U+0020</code>)</li>
+<li>Character Tabulation (<code>U+000B</code>)</li>
+<li>Line Feed (<code>U+000A</code>)</li>
+<li>Carriage Return (<code>U+000D</code>)</li>
+</ol>
+<p>A simple implementation will be simply: </p><div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a">SkipWhitespace</a>(InputStream&amp; s) {</div>
+<div class="line">    <span class="keywordflow">while</span> (s.Peek() == <span class="charliteral">&#39; &#39;</span> || s.Peek() == <span class="charliteral">&#39;\n&#39;</span> || s.Peek() == <span class="charliteral">&#39;\r&#39;</span> || s.Peek() == <span class="charliteral">&#39;\t&#39;</span>)</div>
+<div class="line">        s.Take();</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>However, this requires 4 comparisons and a few branching for each character. This was found to be a hot spot.</p>
+<p>To accelerate this process, SIMD was applied to compare 16 characters with 4 white spaces for each iteration. Currently RapidJSON only supports SSE2 and SSE4.1 instructions for this. And it is only activated for UTF-8 memory streams, including string stream or <em>in situ</em> parsing.</p>
 <h2><a class="anchor" id="LocalStreamCopy"></a>
 Local Stream Copy</h2>
+<p>During optimization, it is found that some compilers cannot localize some member data access of streams into local variables or registers. Experimental results show that for some stream types, making a copy of the stream and used it in inner-loop can improve performance. For example, the actual (non-SIMD) implementation of <code><a class="el" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a" title="Skip the JSON white spaces in a stream. ">SkipWhitespace()</a></code> is implemented as:</p>
+<div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream&gt;</div>
+<div class="line"><span class="keywordtype">void</span> <a class="code" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a">SkipWhitespace</a>(InputStream&amp; is) {</div>
+<div class="line">    internal::StreamLocalCopy&lt;InputStream&gt; copy(is);</div>
+<div class="line">    InputStream&amp; s(copy.s);</div>
+<div class="line"></div>
+<div class="line">    <span class="keywordflow">while</span> (s.Peek() == <span class="charliteral">&#39; &#39;</span> || s.Peek() == <span class="charliteral">&#39;\n&#39;</span> || s.Peek() == <span class="charliteral">&#39;\r&#39;</span> || s.Peek() == <span class="charliteral">&#39;\t&#39;</span>)</div>
+<div class="line">        s.Take();</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>Depending on the traits of stream, <code>StreamLocalCopy</code> will make (or not make) a copy of the stream object, use it locally and copy the states of stream back to the original stream.</p>
+<h2><a class="anchor" id="ParsingDouble"></a>
+Parsing to Double</h2>
+<p>Parsing string into <code>double</code> is difficult. The standard library function <code>strtod()</code> can do the job but it is slow. By default, the parsers use normal precision setting. This has has maximum 3 <a href="http://en.wikipedia.org/wiki/Unit_in_the_last_place">ULP</a> error and implemented in <code>internal::StrtodNormalPrecision()</code>.</p>
+<p>When using <code>kParseFullPrecisionFlag</code>, the parsers calls <code>internal::StrtodFullPrecision()</code> instead, and this function actually implemented 3 versions of conversion methods.</p><ol type="1">
+<li><a href="http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/">Fast-Path</a>.</li>
+<li>Custom DIY-FP implementation as in <a href="https://github.com/floitsch/double-conversion">double-conversion</a>.</li>
+<li>Big Integer Method as in (Clinger, William D. How to read floating point numbers accurately. Vol. 25. No. 6. ACM, 1990).</li>
+</ol>
+<p>If the first conversion methods fail, it will try the second, and so on.</p>
+<h1><a class="anchor" id="GenerationOptimization"></a>
+Generation Optimizatoin</h1>
+<h2><a class="anchor" id="itoa"></a>
+Integer-to-String conversion</h2>
+<p>The naive algorithm for integer-to-string conversion involves division per each decimal digit. We have implemented various implementations and evaluated them in <a href="https://github.com/miloyip/itoa-benchmark">itoa-benchmark</a>.</p>
+<p>Although SSE2 version is the fastest but the difference is minor by comparing to the first running-up <code>branchlut</code>. And <code>branchlut</code> is pure C++ implementation so we adopt <code>branchlut</code> in RapidJSON.</p>
+<h2><a class="anchor" id="dtoa"></a>
+Double-to-String conversion</h2>
+<p>Originally RapidJSON uses <code>snprintf(..., ..., "%g")</code> to achieve double-to-string conversion. This is not accurate as the default precision is 6. Later we also find that this is slow and there is an alternative.</p>
+<p>Google's V8 <a href="https://github.com/floitsch/double-conversion">double-conversion</a> implemented a newer, fast algorithm called Grisu3 (Loitsch, Florian. "Printing floating-point numbers quickly and accurately with integers." ACM Sigplan Notices 45.6 (2010): 233-243.).</p>
+<p>However, since it is not header-only so that we implemented a header-only version of Grisu2. This algorithm guarantees that the result is always accurate. And in most of cases it produces the shortest (optimal) string representation.</p>
+<p>The header-only conversion function has been evaluated in <a href="https://github.com/miloyip/dtoa-benchmark">dtoa-benchmark</a>.</p>
 <h1><a class="anchor" id="Parser"></a>
 Parser</h1>
 <h2><a class="anchor" id="IterativeParser"></a>
