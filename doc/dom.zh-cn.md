@@ -156,7 +156,17 @@ GenericDocument& GenericDocument::Parse(const Ch* str);
 以下是一个处理错误的例子。
 
 ~~~~~~~~~~cpp
-// TODO: example
+#include "rapidjson/document.h"
+#include "rapidjson/error/en.h"
+
+// ...
+Document d;
+if (d.Parse(json).HasParseError()) {
+    fprintf(stderr, "\nError(offset %u): %s\n", 
+        (unsigned)reader.GetErrorOffset(),
+        GetParseError_En(reader.GetParseErrorCode()));
+    // ...
+}
 ~~~~~~~~~~
 
 ## 原位解析 {#InSituParsing}
@@ -246,10 +256,6 @@ d.Accept(writer);
 实际上，`Value::Accept()`是负责发布该值相关的SAX事件至处理器的。通过这个设计，`Value`及`Writer`解除了偶合。`Value`可生成SAX事件，而`Writer`则可以处理这些事件。
 
 使用者可以创建自定义的处理器，去把DOM转换成其它格式。例如，一个把DOM转换成XML的处理器。
-
-~~~~~~~~~~cpp
-// TODO: example
-~~~~~~~~~~
 
 要知道更多关于SAX事件与处理器，可参阅[SAX](doc/sax.md)。
 

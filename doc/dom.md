@@ -156,7 +156,17 @@ To get an error message, RapidJSON provided a English messages in `rapidjson/err
 Here shows an example of parse error handling.
 
 ~~~~~~~~~~cpp
-// TODO: example
+#include "rapidjson/document.h"
+#include "rapidjson/error/en.h"
+
+// ...
+Document d;
+if (d.Parse(json).HasParseError()) {
+    fprintf(stderr, "\nError(offset %u): %s\n", 
+        (unsigned)reader.GetErrorOffset(),
+        GetParseError_En(reader.GetParseErrorCode()));
+    // ...
+}
 ~~~~~~~~~~
 
 ## In Situ Parsing {#InSituParsing}
@@ -241,11 +251,7 @@ d.Accept(writer);
 
 Actually, `Value::Accept()` is responsible for publishing SAX events about the value to the handler. With this design, `Value` and `Writer` are decoupled. `Value` can generate SAX events, and `Writer` can handle those events.
 
-User may create customer handlers for transforming the DOM into other formats. For example, a handler which converts the DOM into XML.
-
-~~~~~~~~~~cpp
-// TODO: example
-~~~~~~~~~~
+User may create custom handlers for transforming the DOM into other formats. For example, a handler which converts the DOM into XML.
 
 For more about SAX events and handler, please refer to [SAX](doc/sax.md).
 
