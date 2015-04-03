@@ -28,7 +28,7 @@ Both SAX and DOM APIs depends on 3 additional concepts: `Allocator`, `Encoding` 
 
 ## Data Layout {#DataLayout}
 
-`Value` is a [variant type](http://en.wikipedia.org/wiki/Variant_type). In RapidJSON's context, an instance of `Value` can contain 1 of 6 JSON value types. This is possble by using `union`. Each `Value` contains two members: `union Data data_` and a`unsigned flags_`. The `flags_` indiciates the JSON type, and also additional information. 
+`Value` is a [variant type](http://en.wikipedia.org/wiki/Variant_type). In RapidJSON's context, an instance of `Value` can contain 1 of 6 JSON value types. This is possible by using `union`. Each `Value` contains two members: `union Data data_` and a`unsigned flags_`. The `flags_` indiciates the JSON type, and also additional information. 
 
 The following tables show the data layout of each type. The 32-bit/64-bit columns indicates the size of the field in bytes.
 
@@ -37,67 +37,67 @@ The following tables show the data layout of each type. The 32-bit/64-bit column
 | (unused)          |                                  |4     |8     | 
 | (unused)          |                                  |4     |4     |
 | (unused)          |                                  |4     |4     |
-| `unsigned flags_` | `kNullType | kNullFlag`          |4     |4     |
+| `unsigned flags_` | `kNullType kNullFlag`            |4     |4     |
 
 | Bool              |                                                    |32-bit|64-bit|
 |-------------------|----------------------------------------------------|:----:|:----:|
 | (unused)          |                                                    |4     |8     | 
 | (unused)          |                                                    |4     |4     |
 | (unused)          |                                                    |4     |4     |
-| `unsigned flags_` | `kBoolType | `(either `kTrueFlag` or `kFalseFlag`) |4     |4     |
+| `unsigned flags_` | `kBoolType` (either `kTrueFlag` or `kFalseFlag`) |4     |4     |
 
 | String              |                                     |32-bit|64-bit|
 |---------------------|-------------------------------------|:----:|:----:|
 | `Ch* str`           | Pointer to the string (may own)     |4     |8     | 
 | `SizeType length`   | Length of string                    |4     |4     |
 | (unused)            |                                     |4     |4     |
-| `unsigned flags_`   | `kStringType | kStringFlag | ...`   |4     |4     |
+| `unsigned flags_`   | `kStringType kStringFlag ...`       |4     |4     |
 
 | Object              |                                     |32-bit|64-bit|
 |---------------------|-------------------------------------|:----:|:----:|
 | `Member* members`   | Pointer to array of members (owned) |4     |8     | 
 | `SizeType size`     | Number of members                   |4     |4     |
 | `SizeType capacity` | Capacity of members                 |4     |4     |
-| `unsigned flags_`   | `kObjectType | kObjectFlag`         |4     |4     |
+| `unsigned flags_`   | `kObjectType kObjectFlag`           |4     |4     |
 
 | Array               |                                     |32-bit|64-bit|
 |---------------------|-------------------------------------|:----:|:----:|
 | `Value* values`     | Pointer to array of values (owned)  |4     |8     | 
 | `SizeType size`     | Number of values                    |4     |4     |
 | `SizeType capacity` | Capacity of values                  |4     |4     |
-| `unsigned flags_`   | `kArrayType | kArrayFlag`           |4     |4     |
+| `unsigned flags_`   | `kArrayType kArrayFlag`             |4     |4     |
 
 | Number (Int)        |                                     |32-bit|64-bit|
 |---------------------|-------------------------------------|:----:|:----:|
 | `int i`             | 32-bit signed integer               |4     |4     | 
 | (zero padding)      | 0                                   |4     |4     |
 | (unused)            |                                     |4     |8     |
-| `unsigned flags_`   | `kNumberType | kNumberFlag | kIntFlag | kInt64Flag | ...` |4     |4     |
+| `unsigned flags_`   | `kNumberType kNumberFlag kIntFlag kInt64Flag ...` |4     |4     |
 
 | Number (UInt)       |                                     |32-bit|64-bit|
 |---------------------|-------------------------------------|:----:|:----:|
 | `unsigned u`        | 32-bit unsigned integer             |4     |4     | 
 | (zero padding)      | 0                                   |4     |4     |
 | (unused)            |                                     |4     |8     |
-| `unsigned flags_`   | `kNumberType | kNumberFlag | kUIntFlag | kUInt64Flag | ...` |4     |4     |
+| `unsigned flags_`   | `kNumberType kNumberFlag kUIntFlag kUInt64Flag ...` |4     |4     |
 
 | Number (Int64)      |                                     |32-bit|64-bit|
 |---------------------|-------------------------------------|:----:|:----:|
 | `int64_t i64`       | 64-bit signed integer               |8     |8     | 
 | (unused)            |                                     |4     |8     |
-| `unsigned flags_`   | `kNumberType | kNumberFlag | kInt64Flag | ...`          |4     |4     |
+| `unsigned flags_`   | `kNumberType kNumberFlag kInt64Flag ...`          |4     |4     |
 
 | Number (Uint64)     |                                     |32-bit|64-bit|
 |---------------------|-------------------------------------|:----:|:----:|
 | `uint64_t i64`      | 64-bit unsigned integer             |8     |8     | 
 | (unused)            |                                     |4     |8     |
-| `unsigned flags_`   | `kNumberType | kNumberFlag | kInt64Flag | ...`          |4     |4     |
+| `unsigned flags_`   | `kNumberType kNumberFlag kInt64Flag ...`          |4     |4     |
 
 | Number (Double)     |                                     |32-bit|64-bit|
 |---------------------|-------------------------------------|:----:|:----:|
 | `uint64_t i64`      | Double precision floating-point     |8     |8     | 
 | (unused)            |                                     |4     |8     |
-| `unsigned flags_`   | `kNumberType | kNumberFlag | kDoubleFlag`          |4     |4     |
+| `unsigned flags_`   | `kNumberType kNumberFlag kDoubleFlag` |4     |4     |
 
 Here are some notes:
 * To reduce memory consumption for 64-bit architecture, `SizeType` is typedef as `unsigned` instead of `size_t`.
@@ -106,15 +106,15 @@ Here are some notes:
 
 ## Flags {#Flags}
 
-The 32-bit `flags_` contains both JSON type and other additional information. As shown in the above tables, each JSON type contains redundant `kXXXType` and `kXXXFlag`. This design is for optimizing the operation of testing bit-flags (`IsNumber()`) and obtaining a sequental number for each type (`GetType()`).
+The 32-bit `flags_` contains both JSON type and other additional information. As shown in the above tables, each JSON type contains redundant `kXXXType` and `kXXXFlag`. This design is for optimizing the operation of testing bit-flags (`IsNumber()`) and obtaining a sequential number for each type (`GetType()`).
 
-String has two optional flags. `kCopyFlag` means that the string owns a copy of the string. `kInlineStrFlag` means using [Short-String Optimizatoin](#ShortString).
+String has two optional flags. `kCopyFlag` means that the string owns a copy of the string. `kInlineStrFlag` means using [Short-String Optimization](#ShortString).
 
 Number is a bit more complicated. For normal integer values, it can contains `kIntFlag`, `kUintFlag`,  `kInt64Flag` and/or `kUint64Flag`, according to the range of the integer. For numbers with fraction, and integers larger than 64-bit range, they will be stored as `double` with `kDoubleFlag`.
 
 ## Short-String Optimization {#ShortString}
 
- Kosta (@Kosta-Github) provided a very neat short-string optimization. The optimization idea is given as follow. Excluding the `flags_`, a `Value` has 12 or 16 bytes (32-bit or 64-bit) for storing actual data. Instead of storing a pointer to a string, it is possible to store short strings in these space internally. For encoding with 1-byte character type (e.g. `char`), it can store maxium 11 or 15 characters string inside the `Value` type.
+ Kosta (@Kosta-Github) provided a very neat short-string optimization. The optimization idea is given as follow. Excluding the `flags_`, a `Value` has 12 or 16 bytes (32-bit or 64-bit) for storing actual data. Instead of storing a pointer to a string, it is possible to store short strings in these space internally. For encoding with 1-byte character type (e.g. `char`), it can store maximum 11 or 15 characters string inside the `Value` type.
 
 | ShortString (Ch=char) |                                    |32-bit|64-bit|
 |---------------------|-------------------------------------|:----:|:----:|
@@ -213,7 +213,7 @@ When using `kParseFullPrecisionFlag`, the parsers calls `internal::StrtodFullPre
 
 If the first conversion methods fail, it will try the second, and so on.
 
-# Generation Optimizatoin {#GenerationOptimization}
+# Generation Optimization {#GenerationOptimization}
 
 ## Integer-to-String conversion {#itoa}
 
