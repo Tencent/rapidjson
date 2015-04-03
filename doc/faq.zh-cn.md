@@ -1,5 +1,7 @@
 # 常见问题
 
+[TOC]
+
 ## 一般问题
 
 1. RapidJSON是什么？
@@ -214,7 +216,7 @@
 
 1. 谁是RapidJSON的开发者？
 
-   叶劲峰（Milo Yip，@miloyip）是RapidJSON的原作者。全世界许多贡献者一直在改善RapidJSON。Philipp A. Hartmann（@pah）实现了许多改进，也设置了自动化测试，而且还参与许多社区讨论。丁欧南（Don Ding，@thebusytypist）实现了迭代式解析器。Andrii Senkovych（@jollyroger）完成了向CMake的迁移。Kosta（@Kosta-Github）提供了一个非常灵巧的短字符串优化。也需要感谢其他献者及社区成员。
+   叶劲峰（Milo Yip，[@miloyip](https://github.com/miloyip)）是RapidJSON的原作者。全世界许多贡献者一直在改善RapidJSON。Philipp A. Hartmann（[@pah](https://github.com/pah)）实现了许多改进，也设置了自动化测试，而且还参与许多社区讨论。丁欧南（Don Ding，[@thebusytypist](https://github.com/thebusytypist)）实现了迭代式解析器。Andrii Senkovych（[@jollyroger](https://github.com/jollyroger)）完成了向CMake的迁移。Kosta（[@Kosta-Github](https://github.com/Kosta-Github)）提供了一个非常灵巧的短字符串优化。也需要感谢其他献者及社区成员。
 
 2. 为何你要开发RapidJSON？
 
