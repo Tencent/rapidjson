@@ -116,11 +116,11 @@ Number is a bit more complicated. For normal integer values, it can contains `kI
 
  Kosta (@Kosta-Github) provided a very neat short-string optimization. The optimization idea is given as follow. Excluding the `flags_`, a `Value` has 12 or 16 bytes (32-bit or 64-bit) for storing actual data. Instead of storing a pointer to a string, it is possible to store short strings in these space internally. For encoding with 1-byte character type (e.g. `char`), it can store maximum 11 or 15 characters string inside the `Value` type.
 
-| ShortString (Ch=char) |                                    |32-bit|64-bit|
+| ShortString (Ch=char) |                                   |32-bit|64-bit|
 |---------------------|-------------------------------------|:----:|:----:|
 | `Ch str[MaxChars]`  | String buffer                       |11    |15    | 
 | `Ch invLength`      | MaxChars - Length                   |1     |1     |
-| `unsigned flags_`   | `kStringType | kStringFlag | ...`   |4     |4     |
+| `unsigned flags_`   | `kStringType kStringFlag ...`       |4     |4     |
 
 A special technique is applied. Instead of storing the length of string directly, it stores (MaxChars - length). This make it possible to store 11 characters with trailing `\0`.
 

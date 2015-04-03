@@ -216,7 +216,7 @@
 
 1. Who are the developers of RapidJSON?
 
-   Milo Yip ([@miloyip](https://github.com/miloyip)) is the original author of RapidJSON. Many contributors from the world have improved RapidJSON.  Philipp A. Hartmann ([@pah](https://github.com/pah)) has implemented a lot of improvements, setting up automatic testing and also involves in a lot of discussions for the community. Don Ding ([@thebusytypist](https://github.com/thebusytypist)) implemented the iterative parser. Andrii Senkovych ([@jollyroger](https://github.com/jollyroger)) completed the CMake migration. Kosta ([@Kosta-Github](https://github.com/Kosta-Github)) provided a very neat short-string optimization. Thank you for all other contributors and community members as well.
+   Milo Yip ([miloyip](https://github.com/miloyip)) is the original author of RapidJSON. Many contributors from the world have improved RapidJSON.  Philipp A. Hartmann ([pah](https://github.com/pah)) has implemented a lot of improvements, setting up automatic testing and also involves in a lot of discussions for the community. Don Ding ([thebusytypist](https://github.com/thebusytypist)) implemented the iterative parser. Andrii Senkovych ([jollyroger](https://github.com/jollyroger)) completed the CMake migration. Kosta ([Kosta-Github](https://github.com/Kosta-Github)) provided a very neat short-string optimization. Thank you for all other contributors and community members as well.
 
 2. Why do you develop RapidJSON?
 
