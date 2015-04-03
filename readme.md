@@ -1,10 +1,12 @@
 ![](doc/logo/rapidjson.png)
 ## A fast JSON parser/generator for C++ with both SAX/DOM style API 
 
-Copyright (c) 2011-2014 Milo Yip (miloyip@gmail.com)
+Copyright (c) 2011-2015 Milo Yip (miloyip@gmail.com)
 
 * [RapidJSON GitHub](https://github.com/miloyip/rapidjson/)
 * [RapidJSON Documentation](http://miloyip.github.io/rapidjson/)
+  * [English](http://miloyip.github.io/rapidjson/)
+  * [Chinese](http://miloyip.github.io/rapidjson/zh-cn/)
 
 ## Build status
 
