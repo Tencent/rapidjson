@@ -213,7 +213,7 @@ TEST(Document, AcceptWriter) {
 }
 
 TEST(Document, UserBuffer) {
-    typedef GenericDocument<UTF8<>, MemoryPoolAllocator<>, MemoryPoolAllocator<>> DocumentType;
+    typedef GenericDocument<UTF8<>, MemoryPoolAllocator<>, MemoryPoolAllocator<> > DocumentType;
     char valueBuffer[4096];
     char parseBuffer[1024];
     MemoryPoolAllocator<> valueAllocator(valueBuffer, sizeof(valueBuffer));
