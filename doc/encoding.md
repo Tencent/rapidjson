@@ -73,7 +73,7 @@ typedef GenericDocument<UTF16<> > WDocument;
 typedef GenericValue<UTF16<> > WValue;
 ~~~~~~~~~~
 
-For a detail example, please check the example in [DOM's Encoding](doc/stream.md#Encoding) section.
+For a detail example, please check the example in [DOM's Encoding](doc/stream.md) section.
 
 ## Character Type {#CharacterType}
 
