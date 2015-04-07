@@ -227,9 +227,9 @@ There are some limitations of *in situ* parsing:
 
 ## Transcoding and Validation {#TranscodingAndValidation}
 
-RapidJSON supports conversion between Unicode formats (officially termed UCS Transformation Format) internally. During DOM parsing, the source encoding of the stream can be different from the encoding of the DOM. For example, the source stream contains a UTF-8 JSON, while the DOM is using UTF-16 encoding. There is an example code in [EncodedInputStream](doc/stream.md#EncodedInputStream).
+RapidJSON supports conversion between Unicode formats (officially termed UCS Transformation Format) internally. During DOM parsing, the source encoding of the stream can be different from the encoding of the DOM. For example, the source stream contains a UTF-8 JSON, while the DOM is using UTF-16 encoding. There is an example code in [EncodedInputStream](doc/stream.md).
 
-When writing a JSON from DOM to output stream, transcoding can also be used. An example is in [EncodedOutputStream](stream.md#EncodedOutputStream).
+When writing a JSON from DOM to output stream, transcoding can also be used. An example is in [EncodedOutputStream](doc/stream.md).
 
 During transcoding, the source string is decoded to into Unicode code points, and then the code points are encoded in the target format. During decoding, it will validate the byte sequence in the source string. If it is not a valid sequence, the parser will be stopped with `kParseErrorStringInvalidEncoding` error.
 

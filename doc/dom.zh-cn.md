@@ -231,9 +231,9 @@ JSON string会被打上const-string的标志。但它们可能并非真正的「
 
 ## 转码与校验 {#TranscodingAndValidation}
 
-RapidJSON内部支持不同Unicode格式（正式的术语是UCS变换格式）间的转换。在DOM解析时，流的来源编码与DOM的编码可以不同。例如，来源流可能含有UTF-8的JSON，而DOM则使用UTF-16编码。在[EncodedInputStream](doc/stream.md#EncodedInputStream)一节里有一个例子。
+RapidJSON内部支持不同Unicode格式（正式的术语是UCS变换格式）间的转换。在DOM解析时，流的来源编码与DOM的编码可以不同。例如，来源流可能含有UTF-8的JSON，而DOM则使用UTF-16编码。在[EncodedInputStream](doc/stream.md)一节里有一个例子。
 
-当从DOM输出一个JSON至输出流之时，也可以使用转码功能。在[EncodedOutputStream](stream.md#EncodedOutputStream)一节里有一个例子。
+当从DOM输出一个JSON至输出流之时，也可以使用转码功能。在[EncodedOutputStream](doc/stream.md)一节里有一个例子。
 
 在转码过程中，会把来源string解码成Unicode码点，然后把码点编码成目标格式。在解码时，它会校验来源string的字节序列是否合法。若遇上非合法序列，解析器会停止并返回`kParseErrorStringInvalidEncoding`错误。
 
