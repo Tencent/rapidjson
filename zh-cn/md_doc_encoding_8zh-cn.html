@@ -150,7 +150,7 @@ Unicode转换格式</h2>
 <p>使用UTF-16的DOM声明例子：</p>
 <div class="fragment"><div class="line"><span class="keyword">typedef</span> GenericDocument&lt;UTF16&lt;&gt; &gt; WDocument;</div>
 <div class="line"><span class="keyword">typedef</span> GenericValue&lt;UTF16&lt;&gt; &gt; WValue;</div>
-</div><!-- fragment --><p>可以在<a href="doc/stream.md#Encoding">DOM's Encoding</a>一节看到更详细的使用例子。</p>
+</div><!-- fragment --><p>可以在DOM's Encoding一节看到更详细的使用例子。</p>
 <h2><a class="anchor" id="CharacterType"></a>
 字符类型</h2>
 <p>从之前的声明中可以看到，每个编码都有一个<code>CharType</code>模板参数。这可能比较容易混淆，实际上，每个<code>CharType</code>存储一个编码单元，而不是一个字符（码点）。如之前所谈及，在UTF-8中一个码点可能会编码成1至4个编码单元。</p>
