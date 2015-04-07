@@ -74,6 +74,18 @@ div.toc li {
 	margin-top: 0px;
 }
 
+.summary {
+	float: none !important;
+	width: auto !important;
+	padding-top: 10px;
+	padding-right: 10px !important;
+}
+
+.summary + .headertitle .title {
+	font-size: 1.5em;
+	line-height: 2.0em;
+}
+
 body h1 {
 	font-size: 2em;
 	line-height: 1.7;
