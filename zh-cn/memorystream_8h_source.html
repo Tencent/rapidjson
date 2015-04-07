@@ -80,80 +80,74 @@ $(document).ready(function(){initNavTree('memorystream_8h_source.html','');});
 <div class="title">memorystream.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (C) 2011 Milo Yip</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// Permission is hereby granted, free of charge, to any person obtaining a copy</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">// of this software and associated documentation files (the &quot;Software&quot;), to deal</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">// in the Software without restriction, including without limitation the rights</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment">// copies of the Software, and to permit persons to whom the Software is</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment">// furnished to do so, subject to the following conditions:</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Tencent is pleased to support the open source community by making RapidJSON available.</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">// </span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">// Licensed under the MIT License (the &quot;License&quot;); you may not use this file except</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">// in compliance with the License. You may obtain a copy of the License at</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment">// http://opensource.org/licenses/MIT</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment">// The above copyright notice and this permission notice shall be included in</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">// all copies or substantial portions of the Software.</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment">// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment">// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment">// THE SOFTWARE.</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#ifndef RAPIDJSON_MEMORYSTREAM_H_</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#define RAPIDJSON_MEMORYSTREAM_H_</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="rapidjson_8h.html">rapidjson.h</a>&quot;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;RAPIDJSON_NAMESPACE_BEGIN</div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment">// Unless required by applicable law or agreed to in writing, software distributed </span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">// under the License is distributed on an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR </span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">// CONDITIONS OF ANY KIND, either express or implied. See the License for the </span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">// specific language governing permissions and limitations under the License.</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifndef RAPIDJSON_MEMORYSTREAM_H_</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define RAPIDJSON_MEMORYSTREAM_H_</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="rapidjson_8h.html">rapidjson.h</a>&quot;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;RAPIDJSON_NAMESPACE_BEGIN</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="comment">//! Represents an in-memory input byte stream.</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="comment"></span><span class="comment">/*!</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="comment">    This class is mainly for being wrapped by EncodedInputStream or AutoUTFInputStream.</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="comment">    It is similar to FileReadBuffer but the source is an in-memory buffer instead of a file.</span></div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment">//! Represents an in-memory input byte stream.</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="comment"></span><span class="comment">/*!</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="comment">    This class is mainly for being wrapped by EncodedInputStream or AutoUTFInputStream.</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment">    It is similar to FileReadBuffer but the source is an in-memory buffer instead of a file.</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment">    Differences between MemoryStream and StringStream:</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="comment">    1. StringStream has encoding but MemoryStream is a byte stream.</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="comment">    2. MemoryStream needs size of the source buffer and the buffer don&#39;t need to be null terminated. StringStream assume null-terminated string as source.</span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="comment">    3. MemoryStream supports Peek4() for encoding detection. StringStream is specified with an encoding so it should not have Peek4().</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment">    \note implements Stream concept</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_memory_stream.html">   40</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_memory_stream.html">MemoryStream</a> {</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">typedef</span> <span class="keywordtype">char</span> Ch; <span class="comment">// byte</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment">    Differences between MemoryStream and StringStream:</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="comment">    1. StringStream has encoding but MemoryStream is a byte stream.</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="comment">    2. MemoryStream needs size of the source buffer and the buffer don&#39;t need to be null terminated. StringStream assume null-terminated string as source.</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">    3. MemoryStream supports Peek4() for encoding detection. StringStream is specified with an encoding so it should not have Peek4().</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment">    \note implements Stream concept</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="comment">*/</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_memory_stream.html">   34</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_memory_stream.html">MemoryStream</a> {</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">typedef</span> <span class="keywordtype">char</span> Ch; <span class="comment">// byte</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <a class="code" href="structrapidjson_1_1_memory_stream.html">MemoryStream</a>(<span class="keyword">const</span> Ch *src, <span class="keywordtype">size_t</span> size) : src_(src), begin_(src), end_(src + size), size_(size) {}</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    Ch Peek()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (src_ == end_) ? <span class="charliteral">&#39;\0&#39;</span> : *src_; }</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    Ch Take() { <span class="keywordflow">return</span> (src_ == end_) ? <span class="charliteral">&#39;\0&#39;</span> : *src_++; }</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">size_t</span> Tell()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(src_ - begin_); }</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <a class="code" href="structrapidjson_1_1_memory_stream.html">MemoryStream</a>(<span class="keyword">const</span> Ch *src, <span class="keywordtype">size_t</span> size) : src_(src), begin_(src), end_(src + size), size_(size) {}</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    Ch Peek()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (src_ == end_) ? <span class="charliteral">&#39;\0&#39;</span> : *src_; }</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    Ch Take() { <span class="keywordflow">return</span> (src_ == end_) ? <span class="charliteral">&#39;\0&#39;</span> : *src_++; }</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordtype">size_t</span> Tell()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(src_ - begin_); }</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    Ch* PutBegin() { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); <span class="keywordflow">return</span> 0; }</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">void</span> Put(Ch) { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); }</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">void</span> Flush() { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); }</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordtype">size_t</span> PutEnd(Ch*) { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); <span class="keywordflow">return</span> 0; }</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="comment">// For encoding detection only.</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">const</span> Ch* Peek4()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordflow">return</span> Tell() + 4 &lt;= size_ ? src_ : 0;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    Ch* PutBegin() { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); <span class="keywordflow">return</span> 0; }</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">void</span> Put(Ch) { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); }</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">void</span> Flush() { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); }</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordtype">size_t</span> PutEnd(Ch*) { <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>); <span class="keywordflow">return</span> 0; }</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="comment">// For encoding detection only.</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">const</span> Ch* Peek4()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        <span class="keywordflow">return</span> Tell() + 4 &lt;= size_ ? src_ : 0;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    }</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
+<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_memory_stream.html#ac0b4da6016e5ba6241604fd4258fb722">   53</a></span>&#160;    <span class="keyword">const</span> Ch* <a class="code" href="structrapidjson_1_1_memory_stream.html#ac0b4da6016e5ba6241604fd4258fb722">src_</a>;     <span class="comment">//!&lt; Current read position.</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_memory_stream.html#a1cc586e50fbfc0bd5994977b42243b93">   54</a></span>&#160;<span class="comment"></span>    <span class="keyword">const</span> Ch* <a class="code" href="structrapidjson_1_1_memory_stream.html#a1cc586e50fbfc0bd5994977b42243b93">begin_</a>;   <span class="comment">//!&lt; Original head of the string.</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_memory_stream.html#a47f45298891e8156121b4017954fabe8">   55</a></span>&#160;<span class="comment"></span>    <span class="keyword">const</span> Ch* <a class="code" href="structrapidjson_1_1_memory_stream.html#a47f45298891e8156121b4017954fabe8">end_</a>;     <span class="comment">//!&lt; End of stream.</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_memory_stream.html#a8c8437d59c32168a74226312d9e96ace">   56</a></span>&#160;<span class="comment"></span>    <span class="keywordtype">size_t</span> <a class="code" href="structrapidjson_1_1_memory_stream.html#a8c8437d59c32168a74226312d9e96ace">size_</a>;       <span class="comment">//!&lt; Size of the stream.</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment"></span>};</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_memory_stream.html#ac0b4da6016e5ba6241604fd4258fb722">   59</a></span>&#160;    <span class="keyword">const</span> Ch* <a class="code" href="structrapidjson_1_1_memory_stream.html#ac0b4da6016e5ba6241604fd4258fb722">src_</a>;     <span class="comment">//!&lt; Current read position.</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_memory_stream.html#a1cc586e50fbfc0bd5994977b42243b93">   60</a></span>&#160;<span class="comment"></span>    <span class="keyword">const</span> Ch* <a class="code" href="structrapidjson_1_1_memory_stream.html#a1cc586e50fbfc0bd5994977b42243b93">begin_</a>;   <span class="comment">//!&lt; Original head of the string.</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_memory_stream.html#a47f45298891e8156121b4017954fabe8">   61</a></span>&#160;<span class="comment"></span>    <span class="keyword">const</span> Ch* <a class="code" href="structrapidjson_1_1_memory_stream.html#a47f45298891e8156121b4017954fabe8">end_</a>;     <span class="comment">//!&lt; End of stream.</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_memory_stream.html#a8c8437d59c32168a74226312d9e96ace">   62</a></span>&#160;<span class="comment"></span>    <span class="keywordtype">size_t</span> <a class="code" href="structrapidjson_1_1_memory_stream.html#a8c8437d59c32168a74226312d9e96ace">size_</a>;       <span class="comment">//!&lt; Size of the stream.</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment"></span>};</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;RAPIDJSON_NAMESPACE_END</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_MEMORYBUFFER_H_</span></div>
-<div class="ttc" id="structrapidjson_1_1_memory_stream_html"><div class="ttname"><a href="structrapidjson_1_1_memory_stream.html">rapidjson::MemoryStream</a></div><div class="ttdoc">Represents an in-memory input byte stream. </div><div class="ttdef"><b>Definition:</b> memorystream.h:40</div></div>
-<div class="ttc" id="structrapidjson_1_1_memory_stream_html_a8c8437d59c32168a74226312d9e96ace"><div class="ttname"><a href="structrapidjson_1_1_memory_stream.html#a8c8437d59c32168a74226312d9e96ace">rapidjson::MemoryStream::size_</a></div><div class="ttdeci">size_t size_</div><div class="ttdoc">Size of the stream. </div><div class="ttdef"><b>Definition:</b> memorystream.h:62</div></div>
-<div class="ttc" id="structrapidjson_1_1_memory_stream_html_a47f45298891e8156121b4017954fabe8"><div class="ttname"><a href="structrapidjson_1_1_memory_stream.html#a47f45298891e8156121b4017954fabe8">rapidjson::MemoryStream::end_</a></div><div class="ttdeci">const Ch * end_</div><div class="ttdoc">End of stream. </div><div class="ttdef"><b>Definition:</b> memorystream.h:61</div></div>
-<div class="ttc" id="structrapidjson_1_1_memory_stream_html_a1cc586e50fbfc0bd5994977b42243b93"><div class="ttname"><a href="structrapidjson_1_1_memory_stream.html#a1cc586e50fbfc0bd5994977b42243b93">rapidjson::MemoryStream::begin_</a></div><div class="ttdeci">const Ch * begin_</div><div class="ttdoc">Original head of the string. </div><div class="ttdef"><b>Definition:</b> memorystream.h:60</div></div>
-<div class="ttc" id="structrapidjson_1_1_memory_stream_html_ac0b4da6016e5ba6241604fd4258fb722"><div class="ttname"><a href="structrapidjson_1_1_memory_stream.html#ac0b4da6016e5ba6241604fd4258fb722">rapidjson::MemoryStream::src_</a></div><div class="ttdeci">const Ch * src_</div><div class="ttdoc">Current read position. </div><div class="ttdef"><b>Definition:</b> memorystream.h:59</div></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;RAPIDJSON_NAMESPACE_END</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_MEMORYBUFFER_H_</span></div>
+<div class="ttc" id="structrapidjson_1_1_memory_stream_html"><div class="ttname"><a href="structrapidjson_1_1_memory_stream.html">rapidjson::MemoryStream</a></div><div class="ttdoc">Represents an in-memory input byte stream. </div><div class="ttdef"><b>Definition:</b> memorystream.h:34</div></div>
+<div class="ttc" id="structrapidjson_1_1_memory_stream_html_a8c8437d59c32168a74226312d9e96ace"><div class="ttname"><a href="structrapidjson_1_1_memory_stream.html#a8c8437d59c32168a74226312d9e96ace">rapidjson::MemoryStream::size_</a></div><div class="ttdeci">size_t size_</div><div class="ttdoc">Size of the stream. </div><div class="ttdef"><b>Definition:</b> memorystream.h:56</div></div>
+<div class="ttc" id="structrapidjson_1_1_memory_stream_html_a47f45298891e8156121b4017954fabe8"><div class="ttname"><a href="structrapidjson_1_1_memory_stream.html#a47f45298891e8156121b4017954fabe8">rapidjson::MemoryStream::end_</a></div><div class="ttdeci">const Ch * end_</div><div class="ttdoc">End of stream. </div><div class="ttdef"><b>Definition:</b> memorystream.h:55</div></div>
+<div class="ttc" id="structrapidjson_1_1_memory_stream_html_a1cc586e50fbfc0bd5994977b42243b93"><div class="ttname"><a href="structrapidjson_1_1_memory_stream.html#a1cc586e50fbfc0bd5994977b42243b93">rapidjson::MemoryStream::begin_</a></div><div class="ttdeci">const Ch * begin_</div><div class="ttdoc">Original head of the string. </div><div class="ttdef"><b>Definition:</b> memorystream.h:54</div></div>
+<div class="ttc" id="structrapidjson_1_1_memory_stream_html_ac0b4da6016e5ba6241604fd4258fb722"><div class="ttname"><a href="structrapidjson_1_1_memory_stream.html#ac0b4da6016e5ba6241604fd4258fb722">rapidjson::MemoryStream::src_</a></div><div class="ttdeci">const Ch * src_</div><div class="ttdoc">Current read position. </div><div class="ttdef"><b>Definition:</b> memorystream.h:53</div></div>
 <div class="ttc" id="rapidjson_8h_html"><div class="ttname"><a href="rapidjson_8h.html">rapidjson.h</a></div><div class="ttdoc">common definitions and configuration </div></div>
-<div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:315</div></div>
+<div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:309</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->

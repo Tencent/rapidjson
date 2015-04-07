@@ -80,267 +80,261 @@ $(document).ready(function(){initNavTree('allocators_8h_source.html','');});
 <div class="title">allocators.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Copyright (C) 2011 Milo Yip</span></div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// Permission is hereby granted, free of charge, to any person obtaining a copy</span></div>
-<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">// of this software and associated documentation files (the &quot;Software&quot;), to deal</span></div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">// in the Software without restriction, including without limitation the rights</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment">// copies of the Software, and to permit persons to whom the Software is</span></div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment">// furnished to do so, subject to the following conditions:</span></div>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Tencent is pleased to support the open source community by making RapidJSON available.</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">// </span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">// Licensed under the MIT License (the &quot;License&quot;); you may not use this file except</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">// in compliance with the License. You may obtain a copy of the License at</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment">// http://opensource.org/licenses/MIT</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment">// The above copyright notice and this permission notice shall be included in</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">// all copies or substantial portions of the Software.</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="comment">// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span></div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment">// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment">// THE SOFTWARE.</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#ifndef RAPIDJSON_ALLOCATORS_H_</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#define RAPIDJSON_ALLOCATORS_H_</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="rapidjson_8h.html">rapidjson.h</a>&quot;</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;RAPIDJSON_NAMESPACE_BEGIN</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="comment"></span><span class="comment">// Allocator</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">/*! \class rapidjson::Allocator</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment">    \brief Concept for allocating, resizing and freeing memory block.</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="comment">    </span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment">    Note that Malloc() and Realloc() are non-static but Free() is static.</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="comment">    </span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="comment">    So if an allocator need to support Free(), it needs to put its pointer in </span></div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="comment">    the header of memory block.</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">\code</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">concept Allocator {</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">    static const bool kNeedFree;    //!&lt; Whether this allocator needs to call Free().</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">    // Allocate a memory block.</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">    // \param size of the memory block in bytes.</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment">    // \returns pointer to the memory block.</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment">    void* Malloc(size_t size);</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment">// Unless required by applicable law or agreed to in writing, software distributed </span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">// under the License is distributed on an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR </span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">// CONDITIONS OF ANY KIND, either express or implied. See the License for the </span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">// specific language governing permissions and limitations under the License.</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifndef RAPIDJSON_ALLOCATORS_H_</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define RAPIDJSON_ALLOCATORS_H_</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="rapidjson_8h.html">rapidjson.h</a>&quot;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;RAPIDJSON_NAMESPACE_BEGIN</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="comment"></span><span class="comment">// Allocator</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="comment">/*! \class rapidjson::Allocator</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="comment">    \brief Concept for allocating, resizing and freeing memory block.</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment">    </span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment">    Note that Malloc() and Realloc() are non-static but Free() is static.</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="comment">    </span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="comment">    So if an allocator need to support Free(), it needs to put its pointer in </span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">    the header of memory block.</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="comment">\code</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment">concept Allocator {</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="comment">    static const bool kNeedFree;    //!&lt; Whether this allocator needs to call Free().</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="comment">    // Allocate a memory block.</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment">    // \param size of the memory block in bytes.</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">    // \returns pointer to the memory block.</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">    void* Malloc(size_t size);</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">    // Resize a memory block.</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">    // \param originalPtr The pointer to current memory block. Null pointer is permitted.</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">    // \param originalSize The current size in bytes. (Design issue: since some allocator may not book-keep this, explicitly pass to it can save memory.)</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="comment">    // \param newSize the new size in bytes.</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="comment">    void* Realloc(void* originalPtr, size_t originalSize, size_t newSize);</span></div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">    // Resize a memory block.</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="comment">    // \param originalPtr The pointer to current memory block. Null pointer is permitted.</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="comment">    // \param originalSize The current size in bytes. (Design issue: since some allocator may not book-keep this, explicitly pass to it can save memory.)</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">    // \param newSize the new size in bytes.</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment">    void* Realloc(void* originalPtr, size_t originalSize, size_t newSize);</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment">    // Free a memory block.</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">    // \param pointer to the memory block. Null pointer is permitted.</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="comment">    static void Free(void *ptr);</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">};</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">\endcode</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="comment"></span><span class="comment">// CrtAllocator</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">//! C-runtime library allocator.</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="comment"></span><span class="comment">/*! This class is just wrapper for standard C library memory routines.</span></div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="comment">    \note implements Allocator concept</span></div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l00068"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_crt_allocator.html">   68</a></span>&#160;<span class="keyword">class </span><a class="code" href="classrapidjson_1_1_crt_allocator.html">CrtAllocator</a> {</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> kNeedFree = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordtype">void</span>* Malloc(<span class="keywordtype">size_t</span> size) { <span class="keywordflow">return</span> std::malloc(size); }</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordtype">void</span>* Realloc(<span class="keywordtype">void</span>* originalPtr, <span class="keywordtype">size_t</span> originalSize, <span class="keywordtype">size_t</span> newSize) { (void)originalSize; <span class="keywordflow">return</span> std::realloc(originalPtr, newSize); }</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> Free(<span class="keywordtype">void</span> *ptr) { std::free(ptr); }</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;};</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="comment">    // Free a memory block.</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="comment">    // \param pointer to the memory block. Null pointer is permitted.</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="comment">    static void Free(void *ptr);</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">};</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment">\endcode</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment">*/</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="comment"></span><span class="comment">// CrtAllocator</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">//! C-runtime library allocator.</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment"></span><span class="comment">/*! This class is just wrapper for standard C library memory routines.</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment">    \note implements Allocator concept</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="comment">*/</span></div>
+<div class="line"><a name="l00062"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_crt_allocator.html">   62</a></span>&#160;<span class="keyword">class </span><a class="code" href="classrapidjson_1_1_crt_allocator.html">CrtAllocator</a> {</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> kNeedFree = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordtype">void</span>* Malloc(<span class="keywordtype">size_t</span> size) { <span class="keywordflow">return</span> std::malloc(size); }</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keywordtype">void</span>* Realloc(<span class="keywordtype">void</span>* originalPtr, <span class="keywordtype">size_t</span> originalSize, <span class="keywordtype">size_t</span> newSize) { (void)originalSize; <span class="keywordflow">return</span> std::realloc(originalPtr, newSize); }</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> Free(<span class="keywordtype">void</span> *ptr) { std::free(ptr); }</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;};</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="comment"></span><span class="comment">// MemoryPoolAllocator</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;<span class="comment">//! Default memory allocator used by the parser and DOM.</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment"></span><span class="comment">/*! This allocator allocate memory blocks from pre-allocated memory chunks. </span></div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment">///////////////////////////////////////////////////////////////////////////////</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="comment"></span><span class="comment">// MemoryPoolAllocator</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment">//! Default memory allocator used by the parser and DOM.</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment"></span><span class="comment">/*! This allocator allocate memory blocks from pre-allocated memory chunks. </span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="comment">    It does not free memory blocks. And Realloc() only allocate new memory.</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="comment">    The memory chunks are allocated by BaseAllocator, which is CrtAllocator by default.</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment">    User may also supply a buffer as the first chunk.</span></div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">    It does not free memory blocks. And Realloc() only allocate new memory.</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">    If the user-buffer is full then additional chunks are allocated by BaseAllocator.</span></div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">    The memory chunks are allocated by BaseAllocator, which is CrtAllocator by default.</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">    The user-buffer is not deallocated by this allocator.</span></div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment">    User may also supply a buffer as the first chunk.</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment">    If the user-buffer is full then additional chunks are allocated by BaseAllocator.</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment">    The user-buffer is not deallocated by this allocator.</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment">    \tparam BaseAllocator the allocator type for allocating memory chunks. Default is CrtAllocator.</span></div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="comment">    \note implements Allocator concept</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> BaseAllocator = CrtAllocator&gt;</div>
-<div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html">   96</a></span>&#160;<span class="keyword">class </span><a class="code" href="classrapidjson_1_1_memory_pool_allocator.html">MemoryPoolAllocator</a> {</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00098"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#a2606d96e19bcfc9d4bf58aefe55c1b29">   98</a></span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> kNeedFree = <span class="keyword">false</span>;    <span class="comment">//!&lt; Tell users that no need to call Free() with this allocator. (concept Allocator)</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="comment"></span><span class="comment"></span></div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="comment">    //! Constructor with chunkSize.</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="comment"></span><span class="comment">    /*! \param chunkSize The size of memory chunk. The default is kDefaultChunkSize.</span></div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="comment">        \param baseAllocator The allocator for allocating memory chunks.</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l00104"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#a59d783f4feba17dcd35d9f25fcbc09f4">  104</a></span>&#160;    <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#a59d783f4feba17dcd35d9f25fcbc09f4">MemoryPoolAllocator</a>(<span class="keywordtype">size_t</span> chunkSize = kDefaultChunkCapacity, BaseAllocator* baseAllocator = 0) : </div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        chunkHead_(0), chunk_capacity_(chunkSize), userBuffer_(0), baseAllocator_(baseAllocator), ownBaseAllocator_(0)</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    {</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    }</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="comment">    //! Constructor with user-supplied buffer.</span></div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="comment"></span><span class="comment">    /*! The user buffer will be used firstly. When it is full, memory pool allocates new chunk with chunk size.</span></div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment">        The user buffer will not be deallocated when this allocator is destructed.</span></div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment">        \param buffer User supplied buffer.</span></div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="comment">        \param size Size of the buffer in bytes. It must at least larger than sizeof(ChunkHeader).</span></div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="comment">        \param chunkSize The size of memory chunk. The default is kDefaultChunkSize.</span></div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="comment">        \param baseAllocator The allocator for allocating memory chunks.</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#abcc572bdb6902c9d69711540db5098a7">  119</a></span>&#160;    <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#abcc572bdb6902c9d69711540db5098a7">MemoryPoolAllocator</a>(<span class="keywordtype">void</span> *buffer, <span class="keywordtype">size_t</span> size, <span class="keywordtype">size_t</span> chunkSize = kDefaultChunkCapacity, BaseAllocator* baseAllocator = 0) :</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        chunkHead_(0), chunk_capacity_(chunkSize), userBuffer_(buffer), baseAllocator_(baseAllocator), ownBaseAllocator_(0)</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    {</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(buffer != 0);</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(size &gt; <span class="keyword">sizeof</span>(ChunkHeader));</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        chunkHead_ = <span class="keyword">reinterpret_cast&lt;</span>ChunkHeader*<span class="keyword">&gt;</span>(buffer);</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        chunkHead_-&gt;capacity = size - <span class="keyword">sizeof</span>(ChunkHeader);</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        chunkHead_-&gt;size = 0;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        chunkHead_-&gt;next = 0;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    }</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="comment">    //! Destructor.</span></div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="comment"></span><span class="comment">    /*! This deallocates all memory chunks, excluding the user-supplied buffer.</span></div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l00133"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#aa1d5b36c67611937e8ad6b2be53a483e">  133</a></span>&#160;    <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#aa1d5b36c67611937e8ad6b2be53a483e">~MemoryPoolAllocator</a>() {</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        Clear();</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <a class="code" href="rapidjson_8h.html#a52c941c3fdd646527cdcd42aa846a28a">RAPIDJSON_DELETE</a>(ownBaseAllocator_);</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    }</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="comment">    //! Deallocates all memory chunks, excluding the user-supplied buffer.</span></div>
-<div class="line"><a name="l00139"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#aa050d52c62503ca6d6f66289ce83a18e">  139</a></span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#aa050d52c62503ca6d6f66289ce83a18e">Clear</a>() {</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        <span class="keywordflow">while</span>(chunkHead_ != 0 &amp;&amp; chunkHead_ != userBuffer_) {</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;            ChunkHeader* next = chunkHead_-&gt;next;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;            baseAllocator_-&gt;Free(chunkHead_);</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;            chunkHead_ = next;</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        }</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    }</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;<span class="comment">    //! Computes the total capacity of allocated memory chunks.</span></div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;<span class="comment"></span><span class="comment">    /*! \return total capacity in bytes.</span></div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l00150"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#a7433671a5129289939c3a4f24d173b6e">  150</a></span>&#160;    <span class="keywordtype">size_t</span> <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#a7433671a5129289939c3a4f24d173b6e">Capacity</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        <span class="keywordtype">size_t</span> capacity = 0;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        <span class="keywordflow">for</span> (ChunkHeader* c = chunkHead_; c != 0; c = c-&gt;next)</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;            capacity += c-&gt;capacity;</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        <span class="keywordflow">return</span> capacity;</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    }</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="comment">    //! Computes the memory blocks allocated.</span></div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;<span class="comment"></span><span class="comment">    /*! \return total used bytes.</span></div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l00160"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#aad83829efa77ad26a23f74d6cab3d781">  160</a></span>&#160;    <span class="keywordtype">size_t</span> <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#aad83829efa77ad26a23f74d6cab3d781">Size</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        <span class="keywordtype">size_t</span> size = 0;</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;        <span class="keywordflow">for</span> (ChunkHeader* c = chunkHead_; c != 0; c = c-&gt;next)</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;            size += c-&gt;size;</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        <span class="keywordflow">return</span> size;</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    }</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;<span class="comment">    //! Allocates a memory block. (concept Allocator)</span></div>
-<div class="line"><a name="l00168"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#a208c29e04b1d748bfe068444b7044344">  168</a></span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span>* <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#a208c29e04b1d748bfe068444b7044344">Malloc</a>(<span class="keywordtype">size_t</span> size) {</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        size = <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a>(size);</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        <span class="keywordflow">if</span> (chunkHead_ == 0 || chunkHead_-&gt;size + size &gt; chunkHead_-&gt;capacity)</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;            AddChunk(chunk_capacity_ &gt; size ? chunk_capacity_ : size);</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        <span class="keywordtype">void</span> *buffer = <span class="keyword">reinterpret_cast&lt;</span><span class="keywordtype">char</span> *<span class="keyword">&gt;</span>(chunkHead_ + 1) + chunkHead_-&gt;size;</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        chunkHead_-&gt;size += size;</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        <span class="keywordflow">return</span> buffer;</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    }</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;<span class="comment">    //! Resizes a memory block (concept Allocator)</span></div>
-<div class="line"><a name="l00179"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#a880524b17bbecb5d2691b8075050d55d">  179</a></span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span>* <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#a880524b17bbecb5d2691b8075050d55d">Realloc</a>(<span class="keywordtype">void</span>* originalPtr, <span class="keywordtype">size_t</span> originalSize, <span class="keywordtype">size_t</span> newSize) {</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;        <span class="keywordflow">if</span> (originalPtr == 0)</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;            <span class="keywordflow">return</span> Malloc(newSize);</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        <span class="comment">// Do not shrink if new size is smaller than original</span></div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        <span class="keywordflow">if</span> (originalSize &gt;= newSize)</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;            <span class="keywordflow">return</span> originalPtr;</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        <span class="comment">// Simply expand it if it is the last allocation and there is sufficient space</span></div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;        <span class="keywordflow">if</span> (originalPtr == (<span class="keywordtype">char</span> *)(chunkHead_ + 1) + chunkHead_-&gt;size - originalSize) {</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;            <span class="keywordtype">size_t</span> increment = <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(newSize - originalSize);</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;            increment = <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a>(increment);</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;            <span class="keywordflow">if</span> (chunkHead_-&gt;size + increment &lt;= chunkHead_-&gt;capacity) {</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;                chunkHead_-&gt;size += increment;</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;                <span class="keywordflow">return</span> originalPtr;</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;            }</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        }</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        <span class="comment">// Realloc process: allocate and copy memory, do not free original buffer.</span></div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        <span class="keywordtype">void</span>* newBuffer = Malloc(newSize);</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(newBuffer != 0);   <span class="comment">// Do not handle out-of-memory explicitly.</span></div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        <span class="keywordflow">return</span> std::memcpy(newBuffer, originalPtr, originalSize);</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    }</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="comment">    //! Frees a memory block (concept Allocator)</span></div>
-<div class="line"><a name="l00204"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#a9470dfeaeef3b3775249df2223129a2b">  204</a></span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#a9470dfeaeef3b3775249df2223129a2b">Free</a>(<span class="keywordtype">void</span> *ptr) { (void)ptr; } <span class="comment">// Do nothing</span></div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;<span class="keyword">private</span>:<span class="comment"></span></div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="comment">    //! Copy constructor is not permitted.</span></div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;<span class="comment"></span>    <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html">MemoryPoolAllocator</a>(<span class="keyword">const</span> <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html">MemoryPoolAllocator</a>&amp; rhs) <span class="comment">/* = delete */</span>;<span class="comment"></span></div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;<span class="comment">    //! Copy assignment operator is not permitted.</span></div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;<span class="comment"></span>    <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html">MemoryPoolAllocator</a>&amp; operator=(<span class="keyword">const</span> <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html">MemoryPoolAllocator</a>&amp; rhs) <span class="comment">/* = delete */</span>;</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;<span class="comment">    //! Creates a new chunk.</span></div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="comment"></span><span class="comment">    /*! \param capacity Capacity of the chunk in bytes.</span></div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordtype">void</span> AddChunk(<span class="keywordtype">size_t</span> capacity) {</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        <span class="keywordflow">if</span> (!baseAllocator_)</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;            ownBaseAllocator_ = baseAllocator_ = <a class="code" href="rapidjson_8h.html#ab9e102fa2f1a0ae4914d4dac21f690a2">RAPIDJSON_NEW</a>(BaseAllocator());</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        ChunkHeader* chunk = <span class="keyword">reinterpret_cast&lt;</span>ChunkHeader*<span class="keyword">&gt;</span>(baseAllocator_-&gt;Malloc(<span class="keyword">sizeof</span>(ChunkHeader) + capacity));</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        chunk-&gt;capacity = capacity;</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        chunk-&gt;size = 0;</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;        chunk-&gt;next = chunkHead_;</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;        chunkHead_ =  chunk;</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    }</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> kDefaultChunkCapacity = 64 * 1024; <span class="comment">//!&lt; Default chunk capacity.</span></div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;<span class="comment"></span><span class="comment"></span></div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;<span class="comment">    //! Chunk header for perpending to each chunk.</span></div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;<span class="comment"></span><span class="comment">    /*! Chunks are stored as a singly linked list.</span></div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="keyword">struct </span>ChunkHeader {</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;        <span class="keywordtype">size_t</span> capacity;    <span class="comment">//!&lt; Capacity of the chunk in bytes (excluding the header itself).</span></div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;<span class="comment"></span>        <span class="keywordtype">size_t</span> size;        <span class="comment">//!&lt; Current size of allocated memory in bytes.</span></div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;<span class="comment"></span>        ChunkHeader *next;  <span class="comment">//!&lt; Next chunk in the linked list.</span></div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;<span class="comment"></span>    };</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    ChunkHeader *chunkHead_;    <span class="comment">//!&lt; Head of the chunk linked-list. Only the head chunk serves allocation.</span></div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;<span class="comment"></span>    <span class="keywordtype">size_t</span> chunk_capacity_;     <span class="comment">//!&lt; The minimum capacity of chunk when they are allocated.</span></div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> *userBuffer_;          <span class="comment">//!&lt; User supplied buffer.</span></div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;<span class="comment"></span>    BaseAllocator* baseAllocator_;  <span class="comment">//!&lt; base allocator for allocating memory chunks.</span></div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;<span class="comment"></span>    BaseAllocator* ownBaseAllocator_;   <span class="comment">//!&lt; base allocator created by this object.</span></div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;<span class="comment"></span>};</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;RAPIDJSON_NAMESPACE_END</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_ENCODINGS_H_</span></div>
-<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_aa1d5b36c67611937e8ad6b2be53a483e"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#aa1d5b36c67611937e8ad6b2be53a483e">rapidjson::MemoryPoolAllocator::~MemoryPoolAllocator</a></div><div class="ttdeci">~MemoryPoolAllocator()</div><div class="ttdoc">Destructor. </div><div class="ttdef"><b>Definition:</b> allocators.h:133</div></div>
-<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_a880524b17bbecb5d2691b8075050d55d"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#a880524b17bbecb5d2691b8075050d55d">rapidjson::MemoryPoolAllocator::Realloc</a></div><div class="ttdeci">void * Realloc(void *originalPtr, size_t originalSize, size_t newSize)</div><div class="ttdoc">Resizes a memory block (concept Allocator) </div><div class="ttdef"><b>Definition:</b> allocators.h:179</div></div>
-<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_abcc572bdb6902c9d69711540db5098a7"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#abcc572bdb6902c9d69711540db5098a7">rapidjson::MemoryPoolAllocator::MemoryPoolAllocator</a></div><div class="ttdeci">MemoryPoolAllocator(void *buffer, size_t size, size_t chunkSize=kDefaultChunkCapacity, BaseAllocator *baseAllocator=0)</div><div class="ttdoc">Constructor with user-supplied buffer. </div><div class="ttdef"><b>Definition:</b> allocators.h:119</div></div>
-<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_a7433671a5129289939c3a4f24d173b6e"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#a7433671a5129289939c3a4f24d173b6e">rapidjson::MemoryPoolAllocator::Capacity</a></div><div class="ttdeci">size_t Capacity() const </div><div class="ttdoc">Computes the total capacity of allocated memory chunks. </div><div class="ttdef"><b>Definition:</b> allocators.h:150</div></div>
-<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_aad83829efa77ad26a23f74d6cab3d781"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#aad83829efa77ad26a23f74d6cab3d781">rapidjson::MemoryPoolAllocator::Size</a></div><div class="ttdeci">size_t Size() const </div><div class="ttdoc">Computes the memory blocks allocated. </div><div class="ttdef"><b>Definition:</b> allocators.h:160</div></div>
-<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_aa050d52c62503ca6d6f66289ce83a18e"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#aa050d52c62503ca6d6f66289ce83a18e">rapidjson::MemoryPoolAllocator::Clear</a></div><div class="ttdeci">void Clear()</div><div class="ttdoc">Deallocates all memory chunks, excluding the user-supplied buffer. </div><div class="ttdef"><b>Definition:</b> allocators.h:139</div></div>
-<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_a59d783f4feba17dcd35d9f25fcbc09f4"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#a59d783f4feba17dcd35d9f25fcbc09f4">rapidjson::MemoryPoolAllocator::MemoryPoolAllocator</a></div><div class="ttdeci">MemoryPoolAllocator(size_t chunkSize=kDefaultChunkCapacity, BaseAllocator *baseAllocator=0)</div><div class="ttdoc">Constructor with chunkSize. </div><div class="ttdef"><b>Definition:</b> allocators.h:104</div></div>
-<div class="ttc" id="classrapidjson_1_1_crt_allocator_html"><div class="ttname"><a href="classrapidjson_1_1_crt_allocator.html">rapidjson::CrtAllocator</a></div><div class="ttdoc">C-runtime library allocator. </div><div class="ttdef"><b>Definition:</b> allocators.h:68</div></div>
-<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_a208c29e04b1d748bfe068444b7044344"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#a208c29e04b1d748bfe068444b7044344">rapidjson::MemoryPoolAllocator::Malloc</a></div><div class="ttdeci">void * Malloc(size_t size)</div><div class="ttdoc">Allocates a memory block. (concept Allocator) </div><div class="ttdef"><b>Definition:</b> allocators.h:168</div></div>
-<div class="ttc" id="rapidjson_8h_html_ab9e102fa2f1a0ae4914d4dac21f690a2"><div class="ttname"><a href="rapidjson_8h.html#ab9e102fa2f1a0ae4914d4dac21f690a2">RAPIDJSON_NEW</a></div><div class="ttdeci">#define RAPIDJSON_NEW(x)</div><div class="ttdoc">! customization point for global new </div><div class="ttdef"><b>Definition:</b> rapidjson.h:455</div></div>
-<div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_ga583915242504c7fdb36e826f02f76242"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a></div><div class="ttdeci">#define RAPIDJSON_ALIGN(x)</div><div class="ttdoc">Data alignment of the machine. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:219</div></div>
-<div class="ttc" id="rapidjson_8h_html_a52c941c3fdd646527cdcd42aa846a28a"><div class="ttname"><a href="rapidjson_8h.html#a52c941c3fdd646527cdcd42aa846a28a">RAPIDJSON_DELETE</a></div><div class="ttdeci">#define RAPIDJSON_DELETE(x)</div><div class="ttdoc">! customization point for global delete </div><div class="ttdef"><b>Definition:</b> rapidjson.h:459</div></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment">    \tparam BaseAllocator the allocator type for allocating memory chunks. Default is CrtAllocator.</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="comment">    \note implements Allocator concept</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment">*/</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> BaseAllocator = CrtAllocator&gt;</div>
+<div class="line"><a name="l00090"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html">   90</a></span>&#160;<span class="keyword">class </span><a class="code" href="classrapidjson_1_1_memory_pool_allocator.html">MemoryPoolAllocator</a> {</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00092"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#a2606d96e19bcfc9d4bf58aefe55c1b29">   92</a></span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> kNeedFree = <span class="keyword">false</span>;    <span class="comment">//!&lt; Tell users that no need to call Free() with this allocator. (concept Allocator)</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="comment"></span><span class="comment"></span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment">    //! Constructor with chunkSize.</span></div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment"></span><span class="comment">    /*! \param chunkSize The size of memory chunk. The default is kDefaultChunkSize.</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="comment">        \param baseAllocator The allocator for allocating memory chunks.</span></div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#a59d783f4feba17dcd35d9f25fcbc09f4">   98</a></span>&#160;    <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#a59d783f4feba17dcd35d9f25fcbc09f4">MemoryPoolAllocator</a>(<span class="keywordtype">size_t</span> chunkSize = kDefaultChunkCapacity, BaseAllocator* baseAllocator = 0) : </div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        chunkHead_(0), chunk_capacity_(chunkSize), userBuffer_(0), baseAllocator_(baseAllocator), ownBaseAllocator_(0)</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    {</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    }</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="comment">    //! Constructor with user-supplied buffer.</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="comment"></span><span class="comment">    /*! The user buffer will be used firstly. When it is full, memory pool allocates new chunk with chunk size.</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="comment">        The user buffer will not be deallocated when this allocator is destructed.</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="comment">        \param buffer User supplied buffer.</span></div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="comment">        \param size Size of the buffer in bytes. It must at least larger than sizeof(ChunkHeader).</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="comment">        \param chunkSize The size of memory chunk. The default is kDefaultChunkSize.</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="comment">        \param baseAllocator The allocator for allocating memory chunks.</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l00113"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#abcc572bdb6902c9d69711540db5098a7">  113</a></span>&#160;    <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#abcc572bdb6902c9d69711540db5098a7">MemoryPoolAllocator</a>(<span class="keywordtype">void</span> *buffer, <span class="keywordtype">size_t</span> size, <span class="keywordtype">size_t</span> chunkSize = kDefaultChunkCapacity, BaseAllocator* baseAllocator = 0) :</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        chunkHead_(0), chunk_capacity_(chunkSize), userBuffer_(buffer), baseAllocator_(baseAllocator), ownBaseAllocator_(0)</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    {</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(buffer != 0);</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(size &gt; <span class="keyword">sizeof</span>(ChunkHeader));</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        chunkHead_ = <span class="keyword">reinterpret_cast&lt;</span>ChunkHeader*<span class="keyword">&gt;</span>(buffer);</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        chunkHead_-&gt;capacity = size - <span class="keyword">sizeof</span>(ChunkHeader);</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        chunkHead_-&gt;size = 0;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        chunkHead_-&gt;next = 0;</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    }</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="comment">    //! Destructor.</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="comment"></span><span class="comment">    /*! This deallocates all memory chunks, excluding the user-supplied buffer.</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#aa1d5b36c67611937e8ad6b2be53a483e">  127</a></span>&#160;    <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#aa1d5b36c67611937e8ad6b2be53a483e">~MemoryPoolAllocator</a>() {</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        Clear();</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        <a class="code" href="rapidjson_8h.html#a52c941c3fdd646527cdcd42aa846a28a">RAPIDJSON_DELETE</a>(ownBaseAllocator_);</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    }</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="comment">    //! Deallocates all memory chunks, excluding the user-supplied buffer.</span></div>
+<div class="line"><a name="l00133"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#aa050d52c62503ca6d6f66289ce83a18e">  133</a></span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#aa050d52c62503ca6d6f66289ce83a18e">Clear</a>() {</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        <span class="keywordflow">while</span>(chunkHead_ != 0 &amp;&amp; chunkHead_ != userBuffer_) {</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;            ChunkHeader* next = chunkHead_-&gt;next;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;            baseAllocator_-&gt;Free(chunkHead_);</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;            chunkHead_ = next;</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        }</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    }</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;<span class="comment">    //! Computes the total capacity of allocated memory chunks.</span></div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;<span class="comment"></span><span class="comment">    /*! \return total capacity in bytes.</span></div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l00144"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#a7433671a5129289939c3a4f24d173b6e">  144</a></span>&#160;    <span class="keywordtype">size_t</span> <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#a7433671a5129289939c3a4f24d173b6e">Capacity</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        <span class="keywordtype">size_t</span> capacity = 0;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        <span class="keywordflow">for</span> (ChunkHeader* c = chunkHead_; c != 0; c = c-&gt;next)</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;            capacity += c-&gt;capacity;</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        <span class="keywordflow">return</span> capacity;</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    }</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="comment">    //! Computes the memory blocks allocated.</span></div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="comment"></span><span class="comment">    /*! \return total used bytes.</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#aad83829efa77ad26a23f74d6cab3d781">  154</a></span>&#160;    <span class="keywordtype">size_t</span> <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#aad83829efa77ad26a23f74d6cab3d781">Size</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        <span class="keywordtype">size_t</span> size = 0;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        <span class="keywordflow">for</span> (ChunkHeader* c = chunkHead_; c != 0; c = c-&gt;next)</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;            size += c-&gt;size;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        <span class="keywordflow">return</span> size;</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    }</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="comment">    //! Allocates a memory block. (concept Allocator)</span></div>
+<div class="line"><a name="l00162"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#a208c29e04b1d748bfe068444b7044344">  162</a></span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span>* <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#a208c29e04b1d748bfe068444b7044344">Malloc</a>(<span class="keywordtype">size_t</span> size) {</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        size = <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a>(size);</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        <span class="keywordflow">if</span> (chunkHead_ == 0 || chunkHead_-&gt;size + size &gt; chunkHead_-&gt;capacity)</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;            AddChunk(chunk_capacity_ &gt; size ? chunk_capacity_ : size);</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        <span class="keywordtype">void</span> *buffer = <span class="keyword">reinterpret_cast&lt;</span><span class="keywordtype">char</span> *<span class="keyword">&gt;</span>(chunkHead_ + 1) + chunkHead_-&gt;size;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        chunkHead_-&gt;size += size;</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        <span class="keywordflow">return</span> buffer;</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    }</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;<span class="comment">    //! Resizes a memory block (concept Allocator)</span></div>
+<div class="line"><a name="l00173"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#a880524b17bbecb5d2691b8075050d55d">  173</a></span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span>* <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#a880524b17bbecb5d2691b8075050d55d">Realloc</a>(<span class="keywordtype">void</span>* originalPtr, <span class="keywordtype">size_t</span> originalSize, <span class="keywordtype">size_t</span> newSize) {</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        <span class="keywordflow">if</span> (originalPtr == 0)</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;            <span class="keywordflow">return</span> Malloc(newSize);</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        <span class="comment">// Do not shrink if new size is smaller than original</span></div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        <span class="keywordflow">if</span> (originalSize &gt;= newSize)</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;            <span class="keywordflow">return</span> originalPtr;</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        <span class="comment">// Simply expand it if it is the last allocation and there is sufficient space</span></div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;        <span class="keywordflow">if</span> (originalPtr == (<span class="keywordtype">char</span> *)(chunkHead_ + 1) + chunkHead_-&gt;size - originalSize) {</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;            <span class="keywordtype">size_t</span> increment = <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(newSize - originalSize);</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;            increment = <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a>(increment);</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;            <span class="keywordflow">if</span> (chunkHead_-&gt;size + increment &lt;= chunkHead_-&gt;capacity) {</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;                chunkHead_-&gt;size += increment;</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;                <span class="keywordflow">return</span> originalPtr;</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;            }</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;        }</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;        <span class="comment">// Realloc process: allocate and copy memory, do not free original buffer.</span></div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;        <span class="keywordtype">void</span>* newBuffer = Malloc(newSize);</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(newBuffer != 0);   <span class="comment">// Do not handle out-of-memory explicitly.</span></div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <span class="keywordflow">return</span> std::memcpy(newBuffer, originalPtr, originalSize);</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    }</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;<span class="comment">    //! Frees a memory block (concept Allocator)</span></div>
+<div class="line"><a name="l00198"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_memory_pool_allocator.html#a9470dfeaeef3b3775249df2223129a2b">  198</a></span>&#160;<span class="comment"></span>    <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html#a9470dfeaeef3b3775249df2223129a2b">Free</a>(<span class="keywordtype">void</span> *ptr) { (void)ptr; } <span class="comment">// Do nothing</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;<span class="keyword">private</span>:<span class="comment"></span></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<span class="comment">    //! Copy constructor is not permitted.</span></div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;<span class="comment"></span>    <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html">MemoryPoolAllocator</a>(<span class="keyword">const</span> <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html">MemoryPoolAllocator</a>&amp; rhs) <span class="comment">/* = delete */</span>;<span class="comment"></span></div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="comment">    //! Copy assignment operator is not permitted.</span></div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;<span class="comment"></span>    <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html">MemoryPoolAllocator</a>&amp; operator=(<span class="keyword">const</span> <a class="code" href="classrapidjson_1_1_memory_pool_allocator.html">MemoryPoolAllocator</a>&amp; rhs) <span class="comment">/* = delete */</span>;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;<span class="comment">    //! Creates a new chunk.</span></div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="comment"></span><span class="comment">    /*! \param capacity Capacity of the chunk in bytes.</span></div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keywordtype">void</span> AddChunk(<span class="keywordtype">size_t</span> capacity) {</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        <span class="keywordflow">if</span> (!baseAllocator_)</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;            ownBaseAllocator_ = baseAllocator_ = <a class="code" href="rapidjson_8h.html#ab9e102fa2f1a0ae4914d4dac21f690a2">RAPIDJSON_NEW</a>(BaseAllocator());</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        ChunkHeader* chunk = <span class="keyword">reinterpret_cast&lt;</span>ChunkHeader*<span class="keyword">&gt;</span>(baseAllocator_-&gt;Malloc(<span class="keyword">sizeof</span>(ChunkHeader) + capacity));</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;        chunk-&gt;capacity = capacity;</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        chunk-&gt;size = 0;</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;        chunk-&gt;next = chunkHead_;</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        chunkHead_ =  chunk;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    }</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> kDefaultChunkCapacity = 64 * 1024; <span class="comment">//!&lt; Default chunk capacity.</span></div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;<span class="comment"></span><span class="comment"></span></div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;<span class="comment">    //! Chunk header for perpending to each chunk.</span></div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;<span class="comment"></span><span class="comment">    /*! Chunks are stored as a singly linked list.</span></div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="keyword">struct </span>ChunkHeader {</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        <span class="keywordtype">size_t</span> capacity;    <span class="comment">//!&lt; Capacity of the chunk in bytes (excluding the header itself).</span></div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;<span class="comment"></span>        <span class="keywordtype">size_t</span> size;        <span class="comment">//!&lt; Current size of allocated memory in bytes.</span></div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;<span class="comment"></span>        ChunkHeader *next;  <span class="comment">//!&lt; Next chunk in the linked list.</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;<span class="comment"></span>    };</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    ChunkHeader *chunkHead_;    <span class="comment">//!&lt; Head of the chunk linked-list. Only the head chunk serves allocation.</span></div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;<span class="comment"></span>    <span class="keywordtype">size_t</span> chunk_capacity_;     <span class="comment">//!&lt; The minimum capacity of chunk when they are allocated.</span></div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;<span class="comment"></span>    <span class="keywordtype">void</span> *userBuffer_;          <span class="comment">//!&lt; User supplied buffer.</span></div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;<span class="comment"></span>    BaseAllocator* baseAllocator_;  <span class="comment">//!&lt; base allocator for allocating memory chunks.</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;<span class="comment"></span>    BaseAllocator* ownBaseAllocator_;   <span class="comment">//!&lt; base allocator created by this object.</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;<span class="comment"></span>};</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;RAPIDJSON_NAMESPACE_END</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_ENCODINGS_H_</span></div>
+<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_aa1d5b36c67611937e8ad6b2be53a483e"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#aa1d5b36c67611937e8ad6b2be53a483e">rapidjson::MemoryPoolAllocator::~MemoryPoolAllocator</a></div><div class="ttdeci">~MemoryPoolAllocator()</div><div class="ttdoc">Destructor. </div><div class="ttdef"><b>Definition:</b> allocators.h:127</div></div>
+<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_a880524b17bbecb5d2691b8075050d55d"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#a880524b17bbecb5d2691b8075050d55d">rapidjson::MemoryPoolAllocator::Realloc</a></div><div class="ttdeci">void * Realloc(void *originalPtr, size_t originalSize, size_t newSize)</div><div class="ttdoc">Resizes a memory block (concept Allocator) </div><div class="ttdef"><b>Definition:</b> allocators.h:173</div></div>
+<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_abcc572bdb6902c9d69711540db5098a7"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#abcc572bdb6902c9d69711540db5098a7">rapidjson::MemoryPoolAllocator::MemoryPoolAllocator</a></div><div class="ttdeci">MemoryPoolAllocator(void *buffer, size_t size, size_t chunkSize=kDefaultChunkCapacity, BaseAllocator *baseAllocator=0)</div><div class="ttdoc">Constructor with user-supplied buffer. </div><div class="ttdef"><b>Definition:</b> allocators.h:113</div></div>
+<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_a7433671a5129289939c3a4f24d173b6e"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#a7433671a5129289939c3a4f24d173b6e">rapidjson::MemoryPoolAllocator::Capacity</a></div><div class="ttdeci">size_t Capacity() const </div><div class="ttdoc">Computes the total capacity of allocated memory chunks. </div><div class="ttdef"><b>Definition:</b> allocators.h:144</div></div>
+<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_aad83829efa77ad26a23f74d6cab3d781"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#aad83829efa77ad26a23f74d6cab3d781">rapidjson::MemoryPoolAllocator::Size</a></div><div class="ttdeci">size_t Size() const </div><div class="ttdoc">Computes the memory blocks allocated. </div><div class="ttdef"><b>Definition:</b> allocators.h:154</div></div>
+<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_aa050d52c62503ca6d6f66289ce83a18e"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#aa050d52c62503ca6d6f66289ce83a18e">rapidjson::MemoryPoolAllocator::Clear</a></div><div class="ttdeci">void Clear()</div><div class="ttdoc">Deallocates all memory chunks, excluding the user-supplied buffer. </div><div class="ttdef"><b>Definition:</b> allocators.h:133</div></div>
+<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_a59d783f4feba17dcd35d9f25fcbc09f4"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#a59d783f4feba17dcd35d9f25fcbc09f4">rapidjson::MemoryPoolAllocator::MemoryPoolAllocator</a></div><div class="ttdeci">MemoryPoolAllocator(size_t chunkSize=kDefaultChunkCapacity, BaseAllocator *baseAllocator=0)</div><div class="ttdoc">Constructor with chunkSize. </div><div class="ttdef"><b>Definition:</b> allocators.h:98</div></div>
+<div class="ttc" id="classrapidjson_1_1_crt_allocator_html"><div class="ttname"><a href="classrapidjson_1_1_crt_allocator.html">rapidjson::CrtAllocator</a></div><div class="ttdoc">C-runtime library allocator. </div><div class="ttdef"><b>Definition:</b> allocators.h:62</div></div>
+<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_a208c29e04b1d748bfe068444b7044344"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#a208c29e04b1d748bfe068444b7044344">rapidjson::MemoryPoolAllocator::Malloc</a></div><div class="ttdeci">void * Malloc(size_t size)</div><div class="ttdoc">Allocates a memory block. (concept Allocator) </div><div class="ttdef"><b>Definition:</b> allocators.h:162</div></div>
+<div class="ttc" id="rapidjson_8h_html_ab9e102fa2f1a0ae4914d4dac21f690a2"><div class="ttname"><a href="rapidjson_8h.html#ab9e102fa2f1a0ae4914d4dac21f690a2">RAPIDJSON_NEW</a></div><div class="ttdeci">#define RAPIDJSON_NEW(x)</div><div class="ttdoc">! customization point for global new </div><div class="ttdef"><b>Definition:</b> rapidjson.h:449</div></div>
+<div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_ga583915242504c7fdb36e826f02f76242"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a></div><div class="ttdeci">#define RAPIDJSON_ALIGN(x)</div><div class="ttdoc">Data alignment of the machine. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:213</div></div>
+<div class="ttc" id="rapidjson_8h_html_a52c941c3fdd646527cdcd42aa846a28a"><div class="ttname"><a href="rapidjson_8h.html#a52c941c3fdd646527cdcd42aa846a28a">RAPIDJSON_DELETE</a></div><div class="ttdeci">#define RAPIDJSON_DELETE(x)</div><div class="ttdoc">! customization point for global delete </div><div class="ttdef"><b>Definition:</b> rapidjson.h:453</div></div>
 <div class="ttc" id="rapidjson_8h_html"><div class="ttname"><a href="rapidjson_8h.html">rapidjson.h</a></div><div class="ttdoc">common definitions and configuration </div></div>
-<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html">rapidjson::MemoryPoolAllocator</a></div><div class="ttdoc">Default memory allocator used by the parser and DOM. </div><div class="ttdef"><b>Definition:</b> allocators.h:96</div></div>
-<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_a9470dfeaeef3b3775249df2223129a2b"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#a9470dfeaeef3b3775249df2223129a2b">rapidjson::MemoryPoolAllocator::Free</a></div><div class="ttdeci">static void Free(void *ptr)</div><div class="ttdoc">Frees a memory block (concept Allocator) </div><div class="ttdef"><b>Definition:</b> allocators.h:204</div></div>
-<div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:315</div></div>
+<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html">rapidjson::MemoryPoolAllocator</a></div><div class="ttdoc">Default memory allocator used by the parser and DOM. </div><div class="ttdef"><b>Definition:</b> allocators.h:90</div></div>
+<div class="ttc" id="classrapidjson_1_1_memory_pool_allocator_html_a9470dfeaeef3b3775249df2223129a2b"><div class="ttname"><a href="classrapidjson_1_1_memory_pool_allocator.html#a9470dfeaeef3b3775249df2223129a2b">rapidjson::MemoryPoolAllocator::Free</a></div><div class="ttdeci">static void Free(void *ptr)</div><div class="ttdoc">Frees a memory block (concept Allocator) </div><div class="ttdef"><b>Definition:</b> allocators.h:198</div></div>
+<div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:309</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->
