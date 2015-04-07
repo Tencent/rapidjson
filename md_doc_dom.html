@@ -306,8 +306,8 @@ instiu parsing</div></div>
 <p><em>In situ</em> parsing is mostly suitable for short-term JSON that only need to be processed once, and then be released from memory. In practice, these situation is very common, for example, deserializing JSON to C++ objects, processing web requests represented in JSON, etc.</p>
 <h2><a class="anchor" id="TranscodingAndValidation"></a>
 Transcoding and Validation</h2>
-<p>RapidJSON supports conversion between Unicode formats (officially termed UCS Transformation Format) internally. During DOM parsing, the source encoding of the stream can be different from the encoding of the DOM. For example, the source stream contains a UTF-8 JSON, while the DOM is using UTF-16 encoding. There is an example code in <a href="doc/stream.md#EncodedInputStream">EncodedInputStream</a>.</p>
-<p>When writing a JSON from DOM to output stream, transcoding can also be used. An example is in <a href="stream.md#EncodedOutputStream">EncodedOutputStream</a>.</p>
+<p>RapidJSON supports conversion between Unicode formats (officially termed UCS Transformation Format) internally. During DOM parsing, the source encoding of the stream can be different from the encoding of the DOM. For example, the source stream contains a UTF-8 JSON, while the DOM is using UTF-16 encoding. There is an example code in <a class="el" href="md_doc_stream.html">EncodedInputStream</a>.</p>
+<p>When writing a JSON from DOM to output stream, transcoding can also be used. An example is in <a class="el" href="md_doc_stream.html">EncodedOutputStream</a>.</p>
 <p>During transcoding, the source string is decoded to into Unicode code points, and then the code points are encoded in the target format. During decoding, it will validate the byte sequence in the source string. If it is not a valid sequence, the parser will be stopped with <code>kParseErrorStringInvalidEncoding</code> error.</p>
 <p>When the source encoding of stream is the same as encoding of DOM, by default, the parser will <em>not</em> validate the sequence. User may use <code>kParseValidateEncodingFlag</code> to force validation.</p>
 <h1><a class="anchor" id="Techniques"></a>

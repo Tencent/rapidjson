@@ -307,8 +307,8 @@ Allocator</h2>
 <p>原位解析最适合用于短期的、用完即弃的JSON。实际应用中，这些场合是非常普遍的，例如反序列化JSON至C++对象、处理以JSON表示的web请求等。</p>
 <h2><a class="anchor" id="TranscodingAndValidation"></a>
 转码与校验</h2>
-<p>RapidJSON内部支持不同Unicode格式（正式的术语是UCS变换格式）间的转换。在DOM解析时，流的来源编码与DOM的编码可以不同。例如，来源流可能含有UTF-8的JSON，而DOM则使用UTF-16编码。在<a href="doc/stream.md#EncodedInputStream">EncodedInputStream</a>一节里有一个例子。</p>
-<p>当从DOM输出一个JSON至输出流之时，也可以使用转码功能。在<a href="stream.md#EncodedOutputStream">EncodedOutputStream</a>一节里有一个例子。</p>
+<p>RapidJSON内部支持不同Unicode格式（正式的术语是UCS变换格式）间的转换。在DOM解析时，流的来源编码与DOM的编码可以不同。例如，来源流可能含有UTF-8的JSON，而DOM则使用UTF-16编码。在EncodedInputStream一节里有一个例子。</p>
+<p>当从DOM输出一个JSON至输出流之时，也可以使用转码功能。在EncodedOutputStream一节里有一个例子。</p>
 <p>在转码过程中，会把来源string解码成Unicode码点，然后把码点编码成目标格式。在解码时，它会校验来源string的字节序列是否合法。若遇上非合法序列，解析器会停止并返回<code>kParseErrorStringInvalidEncoding</code>错误。</p>
 <p>当来源编码与DOM的编码相同，解析器缺省地*不会*校验序列。使用者可开启<code>kParseValidateEncodingFlag</code>去强制校验。</p>
 <h1><a class="anchor" id="Techniques"></a>
