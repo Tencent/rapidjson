@@ -5,9 +5,10 @@ Tencent is pleased to support the open source community by making RapidJSON avai
 Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 
 * [RapidJSON GitHub](https://github.com/miloyip/rapidjson/)
-* [RapidJSON 文档](http://miloyip.github.io/rapidjson/zh-cn/)
-  * [英文](http://miloyip.github.io/rapidjson/)
+* RapidJSON 文档
+  * [English](http://miloyip.github.io/rapidjson/)
   * [简体中文](http://miloyip.github.io/rapidjson/zh-cn/)
+  * [GitBook](https://www.gitbook.com/book/miloyip/rapidjson/)含可载的PDF/EPUB/MOBI，但不含API参考手册。
 
 ## 简介
 
