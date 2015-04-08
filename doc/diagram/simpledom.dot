@@ -11,8 +11,8 @@ digraph {
 
 	{
 		node [shape=record, fontsize="8", margin="0.04", height=0.2, color=gray]
-		srcjson [label="\{|p|r|o|j|e|c|t|\"|:|\"|r|a|p|i|d|j|s|o|n|\"|,|\"|s|t|a|r|s|\"|:|1|0|\}"]
-		dstjson [label="\{|p|r|o|j|e|c|t|\"|:|\"|r|a|p|i|d|j|s|o|n|\"|,|\"|s|t|a|r|s|\"|:|1|1|\}"]
+		srcjson [label="\{|\"|p|r|o|j|e|c|t|\"|:|\"|r|a|p|i|d|j|s|o|n|\"|,|\"|s|t|a|r|s|\"|:|1|0|\}"]
+		dstjson [label="\{|\"|p|r|o|j|e|c|t|\"|:|\"|r|a|p|i|d|j|s|o|n|\"|,|\"|s|t|a|r|s|\"|:|1|1|\}"]
 	}
 
 	{
