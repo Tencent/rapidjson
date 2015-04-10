@@ -17,6 +17,7 @@ FIND_PATH(GTEST_INCLUDE_DIR
     PATH_SUFFIXES include
     PATHS ${GTEST_SEARCH_PATH})
 
+INCLUDE(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(GTestSrc DEFAULT_MSG
     GTEST_SOURCE_DIR
     GTEST_INCLUDE_DIR)
