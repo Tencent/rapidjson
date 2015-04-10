@@ -663,7 +663,7 @@ struct ParseObjectHandler : BaseReaderHandler<UTF8<>, ParseObjectHandler> {
         }
     }
     bool Uint(unsigned i) { return Int(i); }
-    bool Double(double d) { EXPECT_EQ(12u, step_); EXPECT_EQ(3.1416, d); step_++; return true; }
+    bool Double(double d) { EXPECT_EQ(12u, step_); EXPECT_DOUBLE_EQ(3.1416, d); step_++; return true; }
     bool String(const char* str, size_t, bool) { 
         switch(step_) {
             case 1: EXPECT_STREQ("hello", str); step_++; return true;
