@@ -30,6 +30,7 @@ using namespace rapidjson;
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
+RAPIDJSON_DIAG_OFF(float-equal)
 #endif
 
 template<bool expect>
