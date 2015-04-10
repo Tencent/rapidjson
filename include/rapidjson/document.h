@@ -1662,6 +1662,7 @@ template <typename Encoding, typename Allocator = MemoryPoolAllocator<>, typenam
 class GenericDocument : public GenericValue<Encoding, Allocator> {
 public:
     typedef typename Encoding::Ch Ch;                       //!< Character type derived from Encoding.
+    typedef GenericValue<Encoding, Allocator> ValueType;    //!< Value type of the document.
     typedef Allocator AllocatorType;                        //!< Allocator type from template parameter.
 
     //! Constructor
