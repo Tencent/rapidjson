@@ -119,7 +119,7 @@ TEST(Pointer, Parse) {
         EXPECT_TRUE(p.IsValid());
         EXPECT_EQ(1u, p.GetTokenCount());
         EXPECT_STREQ("123", p.GetTokens()[0].name);
-        EXPECT_EQ(123, p.GetTokens()[0].index);
+        EXPECT_EQ(123u, p.GetTokens()[0].index);
     }
 
     {
