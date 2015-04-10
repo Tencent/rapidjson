@@ -187,6 +187,8 @@ static void TestParseDouble() {
         Reader reader; \
         ASSERT_EQ(kParseErrorNone, reader.Parse<fullPrecision ? kParseFullPrecisionFlag : 0>(s, h).Code()); \
         EXPECT_EQ(1u, h.step_); \
+        internal::Double e(x), a(h.actual_); \
+        EXPECT_EQ(e.Sign(), a.Sign()); \
         if (fullPrecision) { \
             EXPECT_EQ(x, h.actual_); \
             if (x != h.actual_) \
@@ -197,6 +199,7 @@ static void TestParseDouble() {
     }
     
     TEST_DOUBLE(fullPrecision, "0.0", 0.0);
+    TEST_DOUBLE(fullPrecision, "-0.0", -0.0); // For checking issue #289
     TEST_DOUBLE(fullPrecision, "1.0", 1.0);
     TEST_DOUBLE(fullPrecision, "-1.0", -1.0);
     TEST_DOUBLE(fullPrecision, "1.5", 1.5);
