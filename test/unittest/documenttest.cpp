@@ -63,7 +63,7 @@ void ParseTest() {
     EXPECT_TRUE(doc.HasMember("pi"));
     const ValueType& pi = doc["pi"];
     EXPECT_TRUE(pi.IsNumber());
-    EXPECT_EQ(3.1416, pi.GetDouble());
+    EXPECT_DOUBLE_EQ(3.1416, pi.GetDouble());
 
     EXPECT_TRUE(doc.HasMember("a"));
     const ValueType& a = doc["a"];
