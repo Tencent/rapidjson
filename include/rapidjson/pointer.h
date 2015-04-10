@@ -26,7 +26,7 @@ public:
     typedef typename EncodingType::Ch Ch;
 
     struct Token {
-        const typename Ch* name;
+        const Ch* name;
         SizeType length;
         SizeType index;             //!< A valid index if not equal to kInvalidIndex.
     };
@@ -149,11 +149,12 @@ public:
         ValueType* v = &root;
         bool exist = true;
         for (Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
-            if (v->GetType() != kObjectType && v->GetType() != kArrayType)
+            if (v->GetType() != kObjectType && v->GetType() != kArrayType) {
                 if (t->index == kInvalidIndex)
                     v->SetObject();
                 else
                     v->SetArray();
+            }
 
             switch (v->GetType()) {
             case kObjectType:
@@ -220,8 +221,10 @@ public:
     ValueType& GetWithDefault(ValueType& root, const ValueType& defaultValue, typename ValueType::AllocatorType& allocator) const {
         bool alreadyExist;
         Value& v = Create(root, allocator, &alreadyExist);
-        if (!alreadyExist)
-            v = Value(defaultValue, allocator);
+        if (!alreadyExist) {
+            Value clone(defaultValue, allocator);
+            v = clone;
+        }
         return v;
     }
 
@@ -332,7 +335,7 @@ typename T::ValueType& CreateValueByPointer(T& root, const GenericPointer<typena
 
 template <typename T, typename CharType, size_t N>
 typename T::ValueType& CreateValueByPointer(T& root, const CharType(&source)[N], typename T::AllocatorType& a) {
-    const Pointer pointer(source, N - 1);
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
     return pointer.Create(root, a);
 }
 
@@ -348,13 +351,13 @@ const typename T::ValueType* GetValueByPointer(const T& root, const GenericPoint
 
 template <typename T, typename CharType, size_t N>
 typename T::ValueType* GetValueByPointer(T& root, const CharType (&source)[N]) {
-    const Pointer pointer(source, N - 1);
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
     return pointer.Get(root);
 }
 
 template <typename T, typename CharType, size_t N>
 const typename T::ValueType* GetValueByPointer(const T& root, const CharType(&source)[N]) {
-    const Pointer pointer(source, N - 1);
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
     return pointer.Get(root);
 }
 
@@ -365,7 +368,7 @@ typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointe
 
 template <typename T, typename CharType, size_t N>
 typename T::ValueType& GetValueByPointerWithDefault(T& root, const CharType(&source)[N], const typename T::ValueType& defaultValue, typename T::AllocatorType& a) {
-    const Pointer pointer(source, N - 1);
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
     return pointer.GetWithDefault(root, defaultValue, a);
 }
 
@@ -376,7 +379,7 @@ typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename 
 
 template <typename T, typename CharType, size_t N>
 typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], typename T::ValueType& value, typename T::AllocatorType& a) {
-    const Pointer pointer(source, N - 1);
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
     return pointer.Set(root, value , a);
 }
 
@@ -387,7 +390,7 @@ typename T::ValueType& SwapValueByPointer(T& root, const GenericPointer<typename
 
 template <typename T, typename CharType, size_t N>
 typename T::ValueType& SwapValueByPointer(T& root, const CharType(&source)[N], typename T::ValueType& value, typename T::AllocatorType& a) {
-    const Pointer pointer(source, N - 1);
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
     return pointer.Swap(root, value, a);
 }
 
