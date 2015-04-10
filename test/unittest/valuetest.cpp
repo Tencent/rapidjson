@@ -533,10 +533,10 @@ TEST(Value, Double) {
     // SetDouble()
     Value z;
     z.SetDouble(12.34);
-    EXPECT_EQ(12.34, z.GetDouble());
+    EXPECT_NEAR(12.34, z.GetDouble(), 0.0);
 
     z = 56.78;
-    EXPECT_EQ(56.78, z.GetDouble());
+    EXPECT_NEAR(56.78, z.GetDouble(), 0.0);
 }
 
 TEST(Value, String) {
