@@ -517,7 +517,7 @@ TEST(Value, Double) {
     // Constructor with double
     Value x(12.34);
     EXPECT_EQ(kNumberType, x.GetType());
-    EXPECT_EQ(12.34, x.GetDouble());
+    EXPECT_NEAR(12.34, x.GetDouble(), 0.0);
     EXPECT_TRUE(x.IsNumber());
     EXPECT_TRUE(x.IsDouble());
 
