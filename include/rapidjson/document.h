@@ -700,8 +700,10 @@ public:
             return StringEqual(rhs);
 
         case kNumberType:
-            if (IsDouble() || rhs.IsDouble())
-                return GetDouble() == rhs.GetDouble(); // May convert one operand from integer to double.
+            if (IsDouble() || rhs.IsDouble()) {
+                float delta = GetDouble() - rhs.GetDouble();    // May convert one operand from integer to double.
+                return delta >= 0.0 && delta <= 0.0;            // Prevent -Wfloat-equal
+            }
             else
                 return data_.n.u64 == rhs.data_.n.u64;
 

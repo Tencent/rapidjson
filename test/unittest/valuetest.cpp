@@ -339,7 +339,7 @@ TEST(Value, Int) {
     EXPECT_EQ(1234u, x.GetUint());
     EXPECT_EQ(1234, x.GetInt64());
     EXPECT_EQ(1234u, x.GetUint64());
-    EXPECT_EQ(1234, x.GetDouble());
+    EXPECT_NEAR(1234.0, x.GetDouble(), 0.0);
     //EXPECT_EQ(1234, (int)x);
     //EXPECT_EQ(1234, (unsigned)x);
     //EXPECT_EQ(1234, (int64_t)x);
@@ -397,7 +397,7 @@ TEST(Value, Uint) {
     EXPECT_TRUE(x.IsUint());
     EXPECT_TRUE(x.IsInt64());
     EXPECT_TRUE(x.IsUint64());
-    EXPECT_EQ(1234.0, x.GetDouble());   // Number can always be cast as double but !IsDouble().
+    EXPECT_NEAR(1234.0, x.GetDouble(), 0.0);   // Number can always be cast as double but !IsDouble().
 
     EXPECT_FALSE(x.IsDouble());
     EXPECT_FALSE(x.IsNull());
