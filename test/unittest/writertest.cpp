@@ -93,7 +93,7 @@ TEST(Writer, String) {
 
 TEST(Writer, Double) {
     TEST_ROUNDTRIP("[1.2345,1.2345678,0.123456789012,1234567.8]");
-
+    TEST_ROUNDTRIP("[-0.0]"); // Issue #289
 }
 
 TEST(Writer, Transcode) {
