@@ -166,6 +166,82 @@ TEST(Pointer, Stringify) {
     }
 }
 
+// Construct a Pointer with static tokens, no dynamic allocation involved.
+#define NAME(s) { s, sizeof(s) / sizeof(s[0]) - 1, Pointer::kInvalidIndex }
+#define INDEX(i) { #i, sizeof(#i) - 1, i }
+
+static const Pointer::Token kTokens[] = { NAME("foo"), INDEX(0) }; // equivalent to "/foo/0"
+
+#undef NAME
+#undef INDEX
+
+TEST(Pointer, ConstructorWithToken) {
+    Pointer p(kTokens, sizeof(kTokens) / sizeof(kTokens[0]));
+    EXPECT_TRUE(p.IsValid());
+    EXPECT_EQ(2, p.GetTokenCount());
+    EXPECT_EQ(3, p.GetTokens()[0].length);
+    EXPECT_STREQ("foo", p.GetTokens()[0].name);
+    EXPECT_EQ(1, p.GetTokens()[1].length);
+    EXPECT_STREQ("0", p.GetTokens()[1].name);
+    EXPECT_EQ(0, p.GetTokens()[1].index);
+}
+
+TEST(Pointer, CopyConstructor) {
+    {
+        Pointer p("/foo/0");
+        Pointer q(p);
+        EXPECT_TRUE(q.IsValid());
+        EXPECT_EQ(2, q.GetTokenCount());
+        EXPECT_EQ(3, q.GetTokens()[0].length);
+        EXPECT_STREQ("foo", q.GetTokens()[0].name);
+        EXPECT_EQ(1, q.GetTokens()[1].length);
+        EXPECT_STREQ("0", q.GetTokens()[1].name);
+        EXPECT_EQ(0, q.GetTokens()[1].index);
+    }
+
+    // Static tokens
+    {
+        Pointer p(kTokens, sizeof(kTokens) / sizeof(kTokens[0]));
+        Pointer q(p);
+        EXPECT_TRUE(q.IsValid());
+        EXPECT_EQ(2, q.GetTokenCount());
+        EXPECT_EQ(3, q.GetTokens()[0].length);
+        EXPECT_STREQ("foo", q.GetTokens()[0].name);
+        EXPECT_EQ(1, q.GetTokens()[1].length);
+        EXPECT_STREQ("0", q.GetTokens()[1].name);
+        EXPECT_EQ(0, q.GetTokens()[1].index);
+    }
+}
+
+TEST(Pointer, Assignment) {
+    {
+        Pointer p("/foo/0");
+        Pointer q;
+        q = p;
+        EXPECT_TRUE(q.IsValid());
+        EXPECT_EQ(2, q.GetTokenCount());
+        EXPECT_EQ(3, q.GetTokens()[0].length);
+        EXPECT_STREQ("foo", q.GetTokens()[0].name);
+        EXPECT_EQ(1, q.GetTokens()[1].length);
+        EXPECT_STREQ("0", q.GetTokens()[1].name);
+        EXPECT_EQ(0, q.GetTokens()[1].index);
+    }
+
+    // Static tokens
+    {
+        Pointer p(kTokens, sizeof(kTokens) / sizeof(kTokens[0]));
+        Pointer q;
+        q = p;
+        EXPECT_TRUE(q.IsValid());
+        EXPECT_EQ(2, q.GetTokenCount());
+        EXPECT_EQ(3, q.GetTokens()[0].length);
+        EXPECT_STREQ("foo", q.GetTokens()[0].name);
+        EXPECT_EQ(1, q.GetTokens()[1].length);
+        EXPECT_STREQ("0", q.GetTokens()[1].name);
+        EXPECT_EQ(0, q.GetTokens()[1].index);
+    }
+}
+
 TEST(Pointer, Create) {
     Document d;
     EXPECT_EQ(&d, &Pointer("").Create(d, d.GetAllocator()));

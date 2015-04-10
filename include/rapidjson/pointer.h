@@ -33,6 +33,16 @@ public:
 
     static const SizeType kInvalidIndex = ~SizeType(0);
 
+    GenericPointer()
+        : allocator_(),
+        ownAllocator_(),
+        nameBuffer_(),
+        tokens_(),
+        tokenCount_(),
+        valid_(true)
+    {
+    }
+
     GenericPointer(const Ch* source, Allocator* allocator = 0) 
         : allocator_(allocator),
           ownAllocator_(),
@@ -55,14 +65,25 @@ public:
         Parse(source, length);
     }
 
-    GenericPointer(const Token* tokens, size_t tokenCount) : 
+    GenericPointer(const Token* tokens, size_t tokenCount)
         : allocator_(),
           ownAllocator_(),
           nameBuffer_(),
-          tokens_(tokens),
+          tokens_(const_cast<Token*>(tokens)),
           tokenCount_(tokenCount),
           valid_(true)
     {
+    }
+
+    GenericPointer(const GenericPointer& rhs)
+        : allocator_(),
+          ownAllocator_(),
+          nameBuffer_(),
+          tokens_(),
+          tokenCount_(),
+          valid_()
+    {
+        *this = rhs;
     }
 
     ~GenericPointer() {
@@ -71,6 +92,36 @@ public:
             Allocator::Free(tokens_);
         }
         RAPIDJSON_DELETE(ownAllocator_);
+    }
+
+    GenericPointer& operator=(const GenericPointer& rhs) {
+        this->~GenericPointer();
+
+        tokenCount_ = rhs.tokenCount_;
+        valid_ = rhs.valid_;
+
+        if (rhs.nameBuffer_) {
+            if (!allocator_)
+                ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
+
+            size_t nameBufferSize = tokenCount_; // null terminators
+            for (Token *t = rhs.tokens_; t != rhs.tokens_ + tokenCount_; ++t)
+                nameBufferSize += t->length;
+            nameBuffer_ = (Ch*)allocator_->Malloc(nameBufferSize * sizeof(Ch));
+            std::memcpy(nameBuffer_, rhs.nameBuffer_, nameBufferSize);
+
+            tokens_ = (Token*)allocator_->Malloc(tokenCount_ * sizeof(Token));
+            std::memcpy(tokens_, rhs.tokens_, tokenCount_ * sizeof(Token));
+
+            // Adjust pointers to name buffer
+            std::ptrdiff_t diff = nameBuffer_ - rhs.nameBuffer_;
+            for (Token *t = rhs.tokens_; t != rhs.tokens_ + tokenCount_; ++t)
+                t->name += diff;
+        }
+        else
+            tokens_ = rhs.tokens_;
+
+        return *this;
     }
 
     bool IsValid() const { return valid_; }
@@ -192,7 +243,7 @@ private:
 
         // Create a buffer as same size of source
         RAPIDJSON_ASSERT(nameBuffer_ == 0);
-        nameBuffer_ = (Ch*)allocator_->Malloc(length);
+        nameBuffer_ = (Ch*)allocator_->Malloc(length * sizeof(Ch));
 
         RAPIDJSON_ASSERT(tokens_ == 0);
         tokens_ = (Token*)allocator_->Malloc(length * sizeof(Token)); // Maximum possible tokens in the source
@@ -265,9 +316,6 @@ private:
         valid_ = false;
         return;
     }
-
-    GenericPointer(const GenericPointer& rhs);
-    GenericPointer& operator=(const GenericPointer& rhs);
 
     Allocator* allocator_;
     Allocator* ownAllocator_;
