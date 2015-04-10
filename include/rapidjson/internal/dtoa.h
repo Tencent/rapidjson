@@ -193,8 +193,8 @@ inline char* Prettify(char* buffer, int length, int k) {
 }
 
 inline char* dtoa(double value, char* buffer) {
-    if (value == 0) {
-        Double d(value);
+    Double d(value);
+    if (d.IsZero()) {
         if (d.Sign())
             *buffer++ = '-';     // -0.0, Issue #289
         buffer[0] = '0';

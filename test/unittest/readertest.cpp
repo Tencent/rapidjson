@@ -30,6 +30,7 @@ using namespace rapidjson;
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
+RAPIDJSON_DIAG_OFF(float-equal)
 #endif
 
 template<bool expect>
@@ -190,7 +191,7 @@ static void TestParseDouble() {
         internal::Double e(x), a(h.actual_); \
         EXPECT_EQ(e.Sign(), a.Sign()); \
         if (fullPrecision) { \
-            EXPECT_EQ(x, h.actual_); \
+            EXPECT_NEAR(x, h.actual_, 0.0); \
             if (x != h.actual_) \
             printf("  String: %s\n  Actual: %.17g\nExpected: %.17g\n", str, h.actual_, x); \
         } \
@@ -662,7 +663,7 @@ struct ParseObjectHandler : BaseReaderHandler<UTF8<>, ParseObjectHandler> {
         }
     }
     bool Uint(unsigned i) { return Int(i); }
-    bool Double(double d) { EXPECT_EQ(12u, step_); EXPECT_EQ(3.1416, d); step_++; return true; }
+    bool Double(double d) { EXPECT_EQ(12u, step_); EXPECT_DOUBLE_EQ(3.1416, d); step_++; return true; }
     bool String(const char* str, size_t, bool) { 
         switch(step_) {
             case 1: EXPECT_STREQ("hello", str); step_++; return true;
