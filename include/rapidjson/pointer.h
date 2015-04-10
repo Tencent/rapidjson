@@ -31,7 +31,7 @@ public:
         SizeType index;             //!< A valid index if not equal to kInvalidIndex.
     };
 
-    static const SizeType kInvalidIndex = ~SizeType(0);
+    enum { kInvalidIndex = ~SizeType(0) };
 
     GenericPointer()
         : allocator_(),
