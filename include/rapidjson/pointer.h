@@ -173,7 +173,7 @@ public:
                 if (t->index == kInvalidIndex) 
                     v->SetArray(); // Change to Array
                 if (t->index >= v->Size()) {
-                    v->Reserve(t->index - 1, allocator);
+                    v->Reserve(t->index + 1, allocator);
                     while (t->index >= v->Size())
                         v->PushBack(Value().Move(), allocator);
                     exist = false;
