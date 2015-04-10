@@ -180,6 +180,10 @@ public:
                 }
                 v = &((*v)[t->index]);
                 break;
+            default:
+                // Impossible.
+                RAPIDJSON_ASSERT(false);
+                break;
             }
         }
 

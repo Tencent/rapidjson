@@ -42,34 +42,34 @@ TEST(Pointer, Parse) {
     {
         Pointer p("");
         EXPECT_TRUE(p.IsValid());
-        EXPECT_EQ(0, p.GetTokenCount());
+        EXPECT_EQ(0u, p.GetTokenCount());
     }
 
     {
         Pointer p("/foo");
         EXPECT_TRUE(p.IsValid());
-        EXPECT_EQ(1, p.GetTokenCount());
-        EXPECT_EQ(3, p.GetTokens()[0].length);
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_EQ(3u, p.GetTokens()[0].length);
         EXPECT_STREQ("foo", p.GetTokens()[0].name);
     }
 
     {
         Pointer p("/foo/0");
         EXPECT_TRUE(p.IsValid());
-        EXPECT_EQ(2, p.GetTokenCount());
-        EXPECT_EQ(3, p.GetTokens()[0].length);
+        EXPECT_EQ(2u, p.GetTokenCount());
+        EXPECT_EQ(3u, p.GetTokens()[0].length);
         EXPECT_STREQ("foo", p.GetTokens()[0].name);
-        EXPECT_EQ(1, p.GetTokens()[1].length);
+        EXPECT_EQ(1u, p.GetTokens()[1].length);
         EXPECT_STREQ("0", p.GetTokens()[1].name);
-        EXPECT_EQ(0, p.GetTokens()[1].index);
+        EXPECT_EQ(0u, p.GetTokens()[1].index);
     }
 
     {
         // Unescape ~1
         Pointer p("/a~1b");
         EXPECT_TRUE(p.IsValid());
-        EXPECT_EQ(1, p.GetTokenCount());
-        EXPECT_EQ(3, p.GetTokens()[0].length);
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_EQ(3u, p.GetTokens()[0].length);
         EXPECT_STREQ("a/b", p.GetTokens()[0].name);
     }
 
@@ -77,8 +77,8 @@ TEST(Pointer, Parse) {
         // Unescape ~0
         Pointer p("/m~0n");
         EXPECT_TRUE(p.IsValid());
-        EXPECT_EQ(1, p.GetTokenCount());
-        EXPECT_EQ(3, p.GetTokens()[0].length);
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_EQ(3u, p.GetTokens()[0].length);
         EXPECT_STREQ("m~n", p.GetTokens()[0].name);
     }
 
@@ -86,8 +86,8 @@ TEST(Pointer, Parse) {
         // empty name
         Pointer p("/");
         EXPECT_TRUE(p.IsValid());
-        EXPECT_EQ(1, p.GetTokenCount());
-        EXPECT_EQ(0, p.GetTokens()[0].length);
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_EQ(0u, p.GetTokens()[0].length);
         EXPECT_STREQ("", p.GetTokens()[0].name);
     }
 
@@ -95,10 +95,10 @@ TEST(Pointer, Parse) {
         // empty and non-empty name
         Pointer p("//a");
         EXPECT_TRUE(p.IsValid());
-        EXPECT_EQ(2, p.GetTokenCount());
-        EXPECT_EQ(0, p.GetTokens()[0].length);
+        EXPECT_EQ(2u, p.GetTokenCount());
+        EXPECT_EQ(0u, p.GetTokens()[0].length);
         EXPECT_STREQ("", p.GetTokens()[0].name);
-        EXPECT_EQ(1, p.GetTokens()[1].length);
+        EXPECT_EQ(1u, p.GetTokens()[1].length);
         EXPECT_STREQ("a", p.GetTokens()[1].name);
     }
 
@@ -106,8 +106,8 @@ TEST(Pointer, Parse) {
         // Null characters
         Pointer p("/\0\0", 3);
         EXPECT_TRUE(p.IsValid());
-        EXPECT_EQ(1, p.GetTokenCount());
-        EXPECT_EQ(2, p.GetTokens()[0].length);
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_EQ(2u, p.GetTokens()[0].length);
         EXPECT_EQ('\0', p.GetTokens()[0].name[0]);
         EXPECT_EQ('\0', p.GetTokens()[0].name[1]);
         EXPECT_EQ('\0', p.GetTokens()[0].name[2]);
@@ -117,7 +117,7 @@ TEST(Pointer, Parse) {
         // Valid index
         Pointer p("/123");
         EXPECT_TRUE(p.IsValid());
-        EXPECT_EQ(1, p.GetTokenCount());
+        EXPECT_EQ(1u, p.GetTokenCount());
         EXPECT_STREQ("123", p.GetTokens()[0].name);
         EXPECT_EQ(123, p.GetTokens()[0].index);
     }
@@ -126,7 +126,7 @@ TEST(Pointer, Parse) {
         // Invalid index (with leading zero)
         Pointer p("/01");
         EXPECT_TRUE(p.IsValid());
-        EXPECT_EQ(1, p.GetTokenCount());
+        EXPECT_EQ(1u, p.GetTokenCount());
         EXPECT_STREQ("01", p.GetTokens()[0].name);
         EXPECT_EQ(Pointer::kInvalidIndex, p.GetTokens()[0].index);
     }
@@ -135,7 +135,7 @@ TEST(Pointer, Parse) {
         // Invalid index (overflow)
         Pointer p("/4294967296");
         EXPECT_TRUE(p.IsValid());
-        EXPECT_EQ(1, p.GetTokenCount());
+        EXPECT_EQ(1u, p.GetTokenCount());
         EXPECT_STREQ("4294967296", p.GetTokens()[0].name);
         EXPECT_EQ(Pointer::kInvalidIndex, p.GetTokens()[0].index);
     }
@@ -178,12 +178,12 @@ static const Pointer::Token kTokens[] = { NAME("foo"), INDEX(0) }; // equivalent
 TEST(Pointer, ConstructorWithToken) {
     Pointer p(kTokens, sizeof(kTokens) / sizeof(kTokens[0]));
     EXPECT_TRUE(p.IsValid());
-    EXPECT_EQ(2, p.GetTokenCount());
-    EXPECT_EQ(3, p.GetTokens()[0].length);
+    EXPECT_EQ(2u, p.GetTokenCount());
+    EXPECT_EQ(3u, p.GetTokens()[0].length);
     EXPECT_STREQ("foo", p.GetTokens()[0].name);
-    EXPECT_EQ(1, p.GetTokens()[1].length);
+    EXPECT_EQ(1u, p.GetTokens()[1].length);
     EXPECT_STREQ("0", p.GetTokens()[1].name);
-    EXPECT_EQ(0, p.GetTokens()[1].index);
+    EXPECT_EQ(0u, p.GetTokens()[1].index);
 }
 
 TEST(Pointer, CopyConstructor) {
@@ -191,12 +191,12 @@ TEST(Pointer, CopyConstructor) {
         Pointer p("/foo/0");
         Pointer q(p);
         EXPECT_TRUE(q.IsValid());
-        EXPECT_EQ(2, q.GetTokenCount());
-        EXPECT_EQ(3, q.GetTokens()[0].length);
+        EXPECT_EQ(2u, q.GetTokenCount());
+        EXPECT_EQ(3u, q.GetTokens()[0].length);
         EXPECT_STREQ("foo", q.GetTokens()[0].name);
-        EXPECT_EQ(1, q.GetTokens()[1].length);
+        EXPECT_EQ(1u, q.GetTokens()[1].length);
         EXPECT_STREQ("0", q.GetTokens()[1].name);
-        EXPECT_EQ(0, q.GetTokens()[1].index);
+        EXPECT_EQ(0u, q.GetTokens()[1].index);
     }
 
     // Static tokens
@@ -204,12 +204,12 @@ TEST(Pointer, CopyConstructor) {
         Pointer p(kTokens, sizeof(kTokens) / sizeof(kTokens[0]));
         Pointer q(p);
         EXPECT_TRUE(q.IsValid());
-        EXPECT_EQ(2, q.GetTokenCount());
-        EXPECT_EQ(3, q.GetTokens()[0].length);
+        EXPECT_EQ(2u, q.GetTokenCount());
+        EXPECT_EQ(3u, q.GetTokens()[0].length);
         EXPECT_STREQ("foo", q.GetTokens()[0].name);
-        EXPECT_EQ(1, q.GetTokens()[1].length);
+        EXPECT_EQ(1u, q.GetTokens()[1].length);
         EXPECT_STREQ("0", q.GetTokens()[1].name);
-        EXPECT_EQ(0, q.GetTokens()[1].index);
+        EXPECT_EQ(0u, q.GetTokens()[1].index);
     }
 }
 
@@ -219,12 +219,12 @@ TEST(Pointer, Assignment) {
         Pointer q;
         q = p;
         EXPECT_TRUE(q.IsValid());
-        EXPECT_EQ(2, q.GetTokenCount());
-        EXPECT_EQ(3, q.GetTokens()[0].length);
+        EXPECT_EQ(2u, q.GetTokenCount());
+        EXPECT_EQ(3u, q.GetTokens()[0].length);
         EXPECT_STREQ("foo", q.GetTokens()[0].name);
-        EXPECT_EQ(1, q.GetTokens()[1].length);
+        EXPECT_EQ(1u, q.GetTokens()[1].length);
         EXPECT_STREQ("0", q.GetTokens()[1].name);
-        EXPECT_EQ(0, q.GetTokens()[1].index);
+        EXPECT_EQ(0u, q.GetTokens()[1].index);
     }
 
     // Static tokens
@@ -233,12 +233,12 @@ TEST(Pointer, Assignment) {
         Pointer q;
         q = p;
         EXPECT_TRUE(q.IsValid());
-        EXPECT_EQ(2, q.GetTokenCount());
-        EXPECT_EQ(3, q.GetTokens()[0].length);
+        EXPECT_EQ(2u, q.GetTokenCount());
+        EXPECT_EQ(3u, q.GetTokens()[0].length);
         EXPECT_STREQ("foo", q.GetTokens()[0].name);
-        EXPECT_EQ(1, q.GetTokens()[1].length);
+        EXPECT_EQ(1u, q.GetTokens()[1].length);
         EXPECT_STREQ("0", q.GetTokens()[1].name);
-        EXPECT_EQ(0, q.GetTokens()[1].index);
+        EXPECT_EQ(0u, q.GetTokens()[1].index);
     }
 }
 
