@@ -31,6 +31,8 @@ public:
         SizeType index;             //!< A valid index if not equal to kInvalidIndex.
     };
 
+    static const SizeType kInvalidIndex = ~SizeType(0);
+
     GenericPointer(const Ch* source, Allocator* allocator = 0) 
         : allocator_(allocator),
           ownAllocator_(),
@@ -91,22 +93,96 @@ public:
         }
     }
 
-    ValueType* Get(ValueType& root) const;
+    ValueType& Create(ValueType& root, typename ValueType::AllocatorType& allocator, bool* alreadyExist = 0) const {
+        RAPIDJSON_ASSERT(IsValid());
+        ValueType* v = &root;
+        bool exist = true;
+        for (Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
+            if (v->GetType() != kObjectType && v->GetType() != kArrayType)
+                if (t->index == kInvalidIndex)
+                    v->SetObject();
+                else
+                    v->SetArray();
+
+            switch (v->GetType()) {
+            case kObjectType:
+                {
+                    typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
+                    if (m == v->MemberEnd()) {
+                        v->AddMember(Value(t->name, t->length, allocator).Move(), Value().Move(), allocator);
+                        v = &(--v->MemberEnd())->value; // Assumes AddMember() appends at the end
+                        exist = false;
+                    }
+                    else
+                        v = &m->value;
+                }
+                break;
+            case kArrayType:
+                if (t->index == kInvalidIndex) 
+                    v->SetArray(); // Change to Array
+                if (t->index >= v->Size()) {
+                    v->Reserve(t->index - 1, allocator);
+                    while (t->index >= v->Size())
+                        v->PushBack(Value().Move(), allocator);
+                    exist = false;
+                }
+                v = &((*v)[t->index]);
+                break;
+            }
+        }
+
+        if (alreadyExist)
+            *alreadyExist = exist;
+
+        return *v;
+    }
+
+    ValueType* Get(ValueType& root) const {
+        RAPIDJSON_ASSERT(IsValid());
+        ValueType* v = &root;
+        for (Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
+            switch (v->GetType()) {
+            case kObjectType:
+                {
+                    typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
+                    if (m == v->MemberEnd())
+                        return 0;
+                    v = &m->value;
+                }
+                break;
+            case kArrayType:
+                if (t->index == kInvalidIndex || t->index >= v->Size())
+                    return 0;
+                v = &((*v)[t->index]);
+                break;
+            default:
+                return 0;
+            }
+        }
+        return v;
+    }
+
     const ValueType* Get(const ValueType& root) const {
         return Get(const_cast<ValueType&>(root));
     }
 
-    ValueType* Get(ValueType& root, const ValueType& defaultValue) const;
-    const ValueType* Get(const ValueType& root, const ValueType& defaultValue) const;
+    ValueType& GetWithDefault(ValueType& root, const ValueType& defaultValue, typename ValueType::AllocatorType& allocator) const {
+        bool alreadyExist;
+        Value& v = Create(root, allocator, &alreadyExist);
+        if (!alreadyExist)
+            v = Value(defaultValue, allocator);
+        return v;
+    }
 
     // Move semantics, create parents if non-exist
-    void Set(ValueType& root, ValueType& value) const;
+    ValueType& Set(ValueType& root, ValueType& value, typename ValueType::AllocatorType& allocator) const {
+        return Create(root, allocator) = value;
+    }
 
     // Create parents if non-exist
-    void Swap(ValueType& root, ValueType& value) const;
-
-    static const size_t kDefaultTokenCapacity = 4;
-    static const SizeType kInvalidIndex = ~SizeType(0);
+    ValueType& Swap(ValueType& root, ValueType& value, typename ValueType::AllocatorType& allocator) const {
+        return Create(root, allocator).Swap(value);
+    }
 
 private:
     void Parse(const Ch* source, size_t length) {

@@ -25,7 +25,7 @@
 
 using namespace rapidjson;
 
-static const char cJson[] = "{\n"
+static const char kJson[] = "{\n"
 "    \"foo\":[\"bar\", \"baz\"],\n"
 "    \"\" : 0,\n"
 "    \"a/b\" : 1,\n"
@@ -131,7 +131,7 @@ TEST(Pointer, Parse) {
         EXPECT_EQ(Pointer::kInvalidIndex, p.GetTokens()[0].index);
     }
 
-    {
+    if (sizeof(SizeType) == 4) {
         // Invalid index (overflow)
         Pointer p("/4294967296");
         EXPECT_TRUE(p.IsValid());
@@ -164,4 +164,61 @@ TEST(Pointer, Stringify) {
         p.Stringify(s);
         EXPECT_STREQ(sources[i], s.GetString());
     }
+}
+
+TEST(Pointer, Create) {
+    Document d;
+    EXPECT_EQ(&d, &Pointer("").Create(d, d.GetAllocator()));
+    EXPECT_EQ(&d["foo"], &Pointer("/foo").Create(d, d.GetAllocator()));
+    EXPECT_EQ(&d["foo"][0], &Pointer("/foo/0").Create(d, d.GetAllocator()));
+}
+
+TEST(Pointer, Get) {
+    Document d;
+    d.Parse(kJson);
+
+    EXPECT_EQ(&d, Pointer("").Get(d));
+    EXPECT_EQ(&d["foo"], Pointer("/foo").Get(d));
+    EXPECT_EQ(&d["foo"][0], Pointer("/foo/0").Get(d));
+    EXPECT_EQ(&d[""], Pointer("/").Get(d));
+    EXPECT_EQ(&d["a/b"], Pointer("/a~1b").Get(d));
+    EXPECT_EQ(&d["c%d"], Pointer("/c%d").Get(d));
+    EXPECT_EQ(&d["e^f"], Pointer("/e^f").Get(d));
+    EXPECT_EQ(&d["g|h"], Pointer("/g|h").Get(d));
+    EXPECT_EQ(&d["i\\j"], Pointer("/i\\j").Get(d));
+    EXPECT_EQ(&d["k\"l"], Pointer("/k\"l").Get(d));
+    EXPECT_EQ(&d[" "], Pointer("/ ").Get(d));
+    EXPECT_EQ(&d["m~n"], Pointer("/m~0n").Get(d));
+}
+
+TEST(Pointer, GetWithDefault) {
+    Document d;
+    d.Parse(kJson);
+
+    Document::AllocatorType& a = d.GetAllocator();
+    const Value v("qux");
+    EXPECT_TRUE(Value("bar") == Pointer("/foo/0").GetWithDefault(d, v, a));
+    EXPECT_TRUE(Value("baz") == Pointer("/foo/1").GetWithDefault(d, v, a));
+    EXPECT_TRUE(Value("qux") == Pointer("/foo/2").GetWithDefault(d, v, a));
+}
+
+TEST(Pointer, Set) {
+    Document d;
+    d.Parse(kJson);
+    Document::AllocatorType& a = d.GetAllocator();
+    
+    Pointer("/foo/0").Set(d, Value(123).Move(), a);
+    EXPECT_EQ(123, d["foo"][0].GetInt());
+
+    Pointer("/foo/2").Set(d, Value(456).Move(), a);
+    EXPECT_EQ(456, d["foo"][2].GetInt());
+}
+
+TEST(Pointer, Swap) {
+    Document d;
+    d.Parse(kJson);
+    Document::AllocatorType& a = d.GetAllocator();
+    Pointer("/foo/0").Swap(d, *Pointer("/foo/1").Get(d), a);
+    EXPECT_STREQ("baz", d["foo"][0].GetString());
+    EXPECT_STREQ("bar", d["foo"][1].GetString());
 }
