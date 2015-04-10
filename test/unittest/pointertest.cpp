@@ -244,9 +244,18 @@ TEST(Pointer, Assignment) {
 
 TEST(Pointer, Create) {
     Document d;
-    EXPECT_EQ(&d, &Pointer("").Create(d, d.GetAllocator()));
-    EXPECT_EQ(&d["foo"], &Pointer("/foo").Create(d, d.GetAllocator()));
-    EXPECT_EQ(&d["foo"][0], &Pointer("/foo/0").Create(d, d.GetAllocator()));
+    {
+        Value* v = &Pointer("").Create(d, d.GetAllocator());
+        EXPECT_EQ(&d, v);
+    }
+    {
+        Value* v = &Pointer("/foo").Create(d, d.GetAllocator());
+        EXPECT_EQ(&d["foo"], v);
+    }
+    {
+        Value* v = &Pointer("/foo/0").Create(d, d.GetAllocator());
+        EXPECT_EQ(&d["foo"][0], v);
+    }
 }
 
 TEST(Pointer, Get) {
@@ -265,6 +274,7 @@ TEST(Pointer, Get) {
     EXPECT_EQ(&d["k\"l"], Pointer("/k\"l").Get(d));
     EXPECT_EQ(&d[" "], Pointer("/ ").Get(d));
     EXPECT_EQ(&d["m~n"], Pointer("/m~0n").Get(d));
+    EXPECT_TRUE(Pointer("/abc").Get(d) == 0);
 }
 
 TEST(Pointer, GetWithDefault) {
@@ -297,4 +307,66 @@ TEST(Pointer, Swap) {
     Pointer("/foo/0").Swap(d, *Pointer("/foo/1").Get(d), a);
     EXPECT_STREQ("baz", d["foo"][0].GetString());
     EXPECT_STREQ("bar", d["foo"][1].GetString());
+}
+
+TEST(Pointer, CreateValueByPointer) {
+    Document d;
+    Document::AllocatorType& a = d.GetAllocator();
+
+    {
+        Value& v = CreateValueByPointer(d, Pointer("/foo/0"), a);
+        EXPECT_EQ(&d["foo"][0], &v);
+    }
+    {
+        Value& v = CreateValueByPointer(d, "/foo/1", a);
+        EXPECT_EQ(&d["foo"][1], &v);
+    }
+}
+
+TEST(Pointer, GetValueByPointer) {
+    Document d;
+    d.Parse(kJson);
+
+    EXPECT_EQ(&d["foo"][0], GetValueByPointer(d, Pointer("/foo/0")));
+    EXPECT_EQ(&d["foo"][0], GetValueByPointer(d, "/foo/0"));
+
+    // const version
+    const Value& v = d;
+    EXPECT_EQ(&d["foo"][0], GetValueByPointer(v, Pointer("/foo/0")));
+    EXPECT_EQ(&d["foo"][0], GetValueByPointer(v, "/foo/0"));
+}
+
+TEST(Pointer, GetValueByPointerWithDefault) {
+    Document d;
+    d.Parse(kJson);
+
+    Document::AllocatorType& a = d.GetAllocator();
+    const Value v("qux");
+    EXPECT_TRUE(Value("bar") == GetValueByPointerWithDefault(d, Pointer("/foo/0"), v, a));
+    EXPECT_TRUE(Value("baz") == GetValueByPointerWithDefault(d, "/foo/1", v, a));
+}
+
+TEST(Pointer, SetValueByPointer) {
+    Document d;
+    d.Parse(kJson);
+    Document::AllocatorType& a = d.GetAllocator();
+
+    SetValueByPointer(d, Pointer("/foo/0"), Value(123).Move(), a);
+    EXPECT_EQ(123, d["foo"][0].GetInt());
+
+    SetValueByPointer(d, "/foo/2", Value(456).Move(), a);
+    EXPECT_EQ(456, d["foo"][2].GetInt());
+}
+
+TEST(Pointer, SwapValueByPointer) {
+    Document d;
+    d.Parse(kJson);
+    Document::AllocatorType& a = d.GetAllocator();
+    SwapValueByPointer(d, Pointer("/foo/0"), *GetValueByPointer(d, "/foo/1"), a);
+    EXPECT_STREQ("baz", d["foo"][0].GetString());
+    EXPECT_STREQ("bar", d["foo"][1].GetString());
+
+    SwapValueByPointer(d, "/foo/0", *GetValueByPointer(d, "/foo/1"), a);
+    EXPECT_STREQ("bar", d["foo"][0].GetString());
+    EXPECT_STREQ("baz", d["foo"][1].GetString());
 }

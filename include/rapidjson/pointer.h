@@ -325,6 +325,72 @@ private:
     bool valid_;
 };
 
+template <typename T>
+typename T::ValueType& CreateValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, typename T::AllocatorType& a) {
+    return pointer.Create(root, a);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& CreateValueByPointer(T& root, const CharType(&source)[N], typename T::AllocatorType& a) {
+    const Pointer pointer(source, N - 1);
+    return pointer.Create(root, a);
+}
+
+template <typename T>
+typename T::ValueType* GetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer) {
+    return pointer.Get(root);
+}
+
+template <typename T>
+const typename T::ValueType* GetValueByPointer(const T& root, const GenericPointer<typename T::ValueType>& pointer) {
+    return pointer.Get(root);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType* GetValueByPointer(T& root, const CharType (&source)[N]) {
+    const Pointer pointer(source, N - 1);
+    return pointer.Get(root);
+}
+
+template <typename T, typename CharType, size_t N>
+const typename T::ValueType* GetValueByPointer(const T& root, const CharType(&source)[N]) {
+    const Pointer pointer(source, N - 1);
+    return pointer.Get(root);
+}
+
+template <typename T>
+typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::ValueType& defaultValue, typename T::AllocatorType& a) {
+    return pointer.GetWithDefault(root, defaultValue, a);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& GetValueByPointerWithDefault(T& root, const CharType(&source)[N], const typename T::ValueType& defaultValue, typename T::AllocatorType& a) {
+    const Pointer pointer(source, N - 1);
+    return pointer.GetWithDefault(root, defaultValue, a);
+}
+
+template <typename T>
+typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, typename T::ValueType& value, typename T::AllocatorType& a) {
+    return pointer.Set(root, value, a);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], typename T::ValueType& value, typename T::AllocatorType& a) {
+    const Pointer pointer(source, N - 1);
+    return pointer.Set(root, value , a);
+}
+
+template <typename T>
+typename T::ValueType& SwapValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, typename T::ValueType& value, typename T::AllocatorType& a) {
+    return pointer.Swap(root, value, a);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& SwapValueByPointer(T& root, const CharType(&source)[N], typename T::ValueType& value, typename T::AllocatorType& a) {
+    const Pointer pointer(source, N - 1);
+    return pointer.Swap(root, value, a);
+}
+
 typedef GenericPointer<Value> Pointer;
 
 RAPIDJSON_NAMESPACE_END
