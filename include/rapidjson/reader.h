@@ -896,7 +896,7 @@ private:
                 if (significandDigit < 17) {
                     d = d * 10.0 + (s.TakePush() - '0');
                     --expFrac;
-                    if (d != 0.0)
+                    if (d > 0.0)
                         significandDigit++;
                 }
                 else

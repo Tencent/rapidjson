@@ -36,7 +36,7 @@ public:
 
     double PreviousPositiveDouble() const {
         RAPIDJSON_ASSERT(!Sign());
-        if (d == 0.0)
+        if (IsZero())
             return 0.0;
         else
             return Double(u - 1).Value();
