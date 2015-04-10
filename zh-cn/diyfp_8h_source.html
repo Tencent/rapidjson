@@ -320,7 +320,7 @@ $(document).ready(function(){initNavTree('diyfp_8h_source.html','');});
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="comment">//int k = static_cast&lt;int&gt;(ceil((-61 - e) * 0.30102999566398114)) + 374;</span></div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="keywordtype">double</span> dk = (-61 - e) * 0.30102999566398114 + 347;  <span class="comment">// dk must be positive, so can do ceiling in positive</span></div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keywordtype">int</span> k = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(dk);</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="keywordflow">if</span> (k != dk)</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="keywordflow">if</span> (dk - k &gt; 0.0)</div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;        k++;</div>
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;</div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="keywordtype">unsigned</span> index = <span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span><span class="keyword">&gt;</span>((k &gt;&gt; 3) + 1);</div>

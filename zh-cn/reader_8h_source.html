@@ -978,7 +978,7 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160;                <span class="keywordflow">if</span> (significandDigit &lt; 17) {</div>
 <div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160;                    d = d * 10.0 + (s.TakePush() - <span class="charliteral">&#39;0&#39;</span>);</div>
 <div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;                    --expFrac;</div>
-<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;                    <span class="keywordflow">if</span> (d != 0.0)</div>
+<div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;                    <span class="keywordflow">if</span> (d &gt; 0.0)</div>
 <div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;                        significandDigit++;</div>
 <div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160;                }</div>
 <div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;                <span class="keywordflow">else</span></div>

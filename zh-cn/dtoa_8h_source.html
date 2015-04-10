@@ -275,8 +275,8 @@ $(document).ready(function(){initNavTree('dtoa_8h_source.html','');});
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;}</div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">char</span>* dtoa(<span class="keywordtype">double</span> value, <span class="keywordtype">char</span>* buffer) {</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keywordflow">if</span> (value == 0) {</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        Double d(value);</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    Double d(value);</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordflow">if</span> (d.IsZero()) {</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        <span class="keywordflow">if</span> (d.Sign())</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;            *buffer++ = <span class="charliteral">&#39;-&#39;</span>;     <span class="comment">// -0.0, Issue #289</span></div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        buffer[0] = <span class="charliteral">&#39;0&#39;</span>;</div>
