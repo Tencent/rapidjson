@@ -1,0 +1,167 @@
+// Copyright (C) 2011 Milo Yip
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
+#include "unittest.h"
+#include "rapidjson/pointer.h"
+#include "rapidjson/stringbuffer.h"
+#include <sstream>
+
+using namespace rapidjson;
+
+static const char cJson[] = "{\n"
+"    \"foo\":[\"bar\", \"baz\"],\n"
+"    \"\" : 0,\n"
+"    \"a/b\" : 1,\n"
+"    \"c%d\" : 2,\n"
+"    \"e^f\" : 3,\n"
+"    \"g|h\" : 4,\n"
+"    \"i\\\\j\" : 5,\n"
+"    \"k\\\"l\" : 6,\n"
+"    \" \" : 7,\n"
+"    \"m~n\" : 8\n"
+"}";
+
+TEST(Pointer, Parse) {
+    {
+        Pointer p("");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(0, p.GetTokenCount());
+    }
+
+    {
+        Pointer p("/foo");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1, p.GetTokenCount());
+        EXPECT_EQ(3, p.GetTokens()[0].length);
+        EXPECT_STREQ("foo", p.GetTokens()[0].name);
+    }
+
+    {
+        Pointer p("/foo/0");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(2, p.GetTokenCount());
+        EXPECT_EQ(3, p.GetTokens()[0].length);
+        EXPECT_STREQ("foo", p.GetTokens()[0].name);
+        EXPECT_EQ(1, p.GetTokens()[1].length);
+        EXPECT_STREQ("0", p.GetTokens()[1].name);
+        EXPECT_EQ(0, p.GetTokens()[1].index);
+    }
+
+    {
+        // Unescape ~1
+        Pointer p("/a~1b");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1, p.GetTokenCount());
+        EXPECT_EQ(3, p.GetTokens()[0].length);
+        EXPECT_STREQ("a/b", p.GetTokens()[0].name);
+    }
+
+    {
+        // Unescape ~0
+        Pointer p("/m~0n");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1, p.GetTokenCount());
+        EXPECT_EQ(3, p.GetTokens()[0].length);
+        EXPECT_STREQ("m~n", p.GetTokens()[0].name);
+    }
+
+    {
+        // empty name
+        Pointer p("/");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1, p.GetTokenCount());
+        EXPECT_EQ(0, p.GetTokens()[0].length);
+        EXPECT_STREQ("", p.GetTokens()[0].name);
+    }
+
+    {
+        // empty and non-empty name
+        Pointer p("//a");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(2, p.GetTokenCount());
+        EXPECT_EQ(0, p.GetTokens()[0].length);
+        EXPECT_STREQ("", p.GetTokens()[0].name);
+        EXPECT_EQ(1, p.GetTokens()[1].length);
+        EXPECT_STREQ("a", p.GetTokens()[1].name);
+    }
+
+    {
+        // Null characters
+        Pointer p("/\0\0", 3);
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1, p.GetTokenCount());
+        EXPECT_EQ(2, p.GetTokens()[0].length);
+        EXPECT_EQ('\0', p.GetTokens()[0].name[0]);
+        EXPECT_EQ('\0', p.GetTokens()[0].name[1]);
+        EXPECT_EQ('\0', p.GetTokens()[0].name[2]);
+    }
+
+    {
+        // Valid index
+        Pointer p("/123");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1, p.GetTokenCount());
+        EXPECT_STREQ("123", p.GetTokens()[0].name);
+        EXPECT_EQ(123, p.GetTokens()[0].index);
+    }
+
+    {
+        // Invalid index (with leading zero)
+        Pointer p("/01");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1, p.GetTokenCount());
+        EXPECT_STREQ("01", p.GetTokens()[0].name);
+        EXPECT_EQ(Pointer::kInvalidIndex, p.GetTokens()[0].index);
+    }
+
+    {
+        // Invalid index (overflow)
+        Pointer p("/4294967296");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1, p.GetTokenCount());
+        EXPECT_STREQ("4294967296", p.GetTokens()[0].name);
+        EXPECT_EQ(Pointer::kInvalidIndex, p.GetTokens()[0].index);
+    }
+}
+
+TEST(Pointer, Stringify) {
+    // Test by roundtrip
+    const char* sources[] = {
+        "",
+        "/foo",
+        "/foo/0",
+        "/",
+        "/a~1b",
+        "/c%d",
+        "/e^f",
+        "/g|h",
+        "/i\\j",
+        "/k\"l",
+        "/ ",
+        "/m~0n"
+    };
+
+    for (size_t i = 0; i < sizeof(sources) / sizeof(sources[0]); i++) {
+        Pointer p(sources[i]);
+        StringBuffer s;
+        p.Stringify(s);
+        EXPECT_STREQ(sources[i], s.GetString());
+    }
+}
