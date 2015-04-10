@@ -191,7 +191,7 @@ static void TestParseDouble() {
         internal::Double e(x), a(h.actual_); \
         EXPECT_EQ(e.Sign(), a.Sign()); \
         if (fullPrecision) { \
-            EXPECT_EQ(x, h.actual_); \
+            EXPECT_NEAR(x, h.actual_, 0.0); \
             if (x != h.actual_) \
             printf("  String: %s\n  Actual: %.17g\nExpected: %.17g\n", str, h.actual_, x); \
         } \
