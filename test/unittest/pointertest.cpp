@@ -128,7 +128,7 @@ TEST(Pointer, Parse) {
         EXPECT_TRUE(p.IsValid());
         EXPECT_EQ(1u, p.GetTokenCount());
         EXPECT_STREQ("01", p.GetTokens()[0].name);
-        EXPECT_EQ(Pointer::kInvalidIndex, p.GetTokens()[0].index);
+        EXPECT_EQ(kPointerInvalidIndex, p.GetTokens()[0].index);
     }
 
     if (sizeof(SizeType) == 4) {
@@ -137,7 +137,7 @@ TEST(Pointer, Parse) {
         EXPECT_TRUE(p.IsValid());
         EXPECT_EQ(1u, p.GetTokenCount());
         EXPECT_STREQ("4294967296", p.GetTokens()[0].name);
-        EXPECT_EQ(Pointer::kInvalidIndex, p.GetTokens()[0].index);
+        EXPECT_EQ(kPointerInvalidIndex, p.GetTokens()[0].index);
     }
 }
 
@@ -167,7 +167,7 @@ TEST(Pointer, Stringify) {
 }
 
 // Construct a Pointer with static tokens, no dynamic allocation involved.
-#define NAME(s) { s, sizeof(s) / sizeof(s[0]) - 1, Pointer::kInvalidIndex }
+#define NAME(s) { s, sizeof(s) / sizeof(s[0]) - 1, kPointerInvalidIndex }
 #define INDEX(i) { #i, sizeof(#i) - 1, i }
 
 static const Pointer::Token kTokens[] = { NAME("foo"), INDEX(0) }; // equivalent to "/foo/0"

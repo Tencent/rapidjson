@@ -19,6 +19,8 @@
 
 RAPIDJSON_NAMESPACE_BEGIN
 
+static const SizeType kPointerInvalidIndex = ~SizeType(0);
+
 template <typename ValueType, typename Allocator = CrtAllocator>
 class GenericPointer {
 public:
@@ -28,10 +30,8 @@ public:
     struct Token {
         const Ch* name;
         SizeType length;
-        SizeType index;             //!< A valid index if not equal to kInvalidIndex.
+        SizeType index;             //!< A valid index if not equal to kPointerInvalidIndex.
     };
-
-    static const SizeType kInvalidIndex = -1;
 
     GenericPointer()
         : allocator_(),
@@ -150,7 +150,7 @@ public:
         bool exist = true;
         for (Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
             if (v->GetType() != kObjectType && v->GetType() != kArrayType) {
-                if (t->index == kInvalidIndex)
+                if (t->index == kPointerInvalidIndex)
                     v->SetObject();
                 else
                     v->SetArray();
@@ -170,7 +170,7 @@ public:
                 }
                 break;
             case kArrayType:
-                if (t->index == kInvalidIndex) 
+                if (t->index == kPointerInvalidIndex) 
                     v->SetArray(); // Change to Array
                 if (t->index >= v->Size()) {
                     v->Reserve(t->index + 1, allocator);
@@ -207,7 +207,7 @@ public:
                 }
                 break;
             case kArrayType:
-                if (t->index == kInvalidIndex || t->index >= v->Size())
+                if (t->index == kPointerInvalidIndex || t->index >= v->Size())
                     return 0;
                 v = &((*v)[t->index]);
                 break;
@@ -307,7 +307,7 @@ private:
                 }
             }
 
-            token.index = isNumber ? n : kInvalidIndex;
+            token.index = isNumber ? n : kPointerInvalidIndex;
         }
 
         RAPIDJSON_ASSERT(name <= nameBuffer_ + length); // Should not overflow buffer
