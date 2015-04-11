@@ -701,8 +701,9 @@ public:
 
         case kNumberType:
             if (IsDouble() || rhs.IsDouble()) {
-                float delta = GetDouble() - rhs.GetDouble();    // May convert one operand from integer to double.
-                return delta >= 0.0 && delta <= 0.0;            // Prevent -Wfloat-equal
+                double a = GetDouble();     // May convert from integer to double.
+                double b = rhs.GetDouble(); // Ditto
+                return a >= b && a <= b;    // Prevent -Wfloat-equal
             }
             else
                 return data_.n.u64 == rhs.data_.n.u64;
