@@ -189,14 +189,15 @@ static void TestParseDouble() {
         ASSERT_EQ(kParseErrorNone, reader.Parse<fullPrecision ? kParseFullPrecisionFlag : 0>(s, h).Code()); \
         EXPECT_EQ(1u, h.step_); \
         internal::Double e(x), a(h.actual_); \
-        EXPECT_EQ(e.Sign(), a.Sign()); \
         if (fullPrecision) { \
-            EXPECT_NEAR(x, h.actual_, 0.0); \
-            if (x != h.actual_) \
-            printf("  String: %s\n  Actual: %.17g\nExpected: %.17g\n", str, h.actual_, x); \
+            EXPECT_EQ(e.Uint64Value(), a.Uint64Value()); \
+            if (e.Uint64Value() != a.Uint64Value()) \
+                printf("  String: %s\n  Actual: %.17g\nExpected: %.17g\n", str, h.actual_, x); \
         } \
-        else \
+        else { \
+            EXPECT_EQ(e.Sign(), a.Sign()); /* for 0.0 != -0.0 */ \
             EXPECT_DOUBLE_EQ(x, h.actual_); \
+        } \
     }
     
     TEST_DOUBLE(fullPrecision, "0.0", 0.0);
