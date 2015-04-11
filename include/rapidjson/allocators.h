@@ -210,6 +210,7 @@ private:
         if (!baseAllocator_)
             ownBaseAllocator_ = baseAllocator_ = RAPIDJSON_NEW(BaseAllocator());
         ChunkHeader* chunk = reinterpret_cast<ChunkHeader*>(baseAllocator_->Malloc(sizeof(ChunkHeader) + capacity));
+        RAPIDJSON_ASSERT(chunk != 0);   // Do not handle out-of-memory explicitly.
         chunk->capacity = capacity;
         chunk->size = 0;
         chunk->next = chunkHead_;
