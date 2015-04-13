@@ -245,6 +245,13 @@ void TestCopyFrom() {
     EXPECT_STREQ(v1.GetString(), v2.GetString());
     EXPECT_EQ(v1.GetString(), v2.GetString()); // string NOT copied
 
+    v1.SetString("bar", a); // copy string
+    v2.CopyFrom(v1, a);
+    EXPECT_TRUE(v1.GetType() == v2.GetType());
+    EXPECT_STREQ(v1.GetString(), v2.GetString());
+    EXPECT_NE(v1.GetString(), v2.GetString()); // string copied
+
+
     v1.SetArray().PushBack(1234, a);
     v2.CopyFrom(v1, a);
     EXPECT_TRUE(v2.IsArray());
