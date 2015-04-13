@@ -1860,7 +1860,7 @@ $(document).ready(function(){initNavTree('document_8h_source.html','');});
 <div class="line"><a name="l01778"></a><span class="lineno"> 1778</span>&#160;    <span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags&gt;</div>
 <div class="line"><a name="l01779"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_generic_document.html#a7ba626bf84eb45a9bca0b7723bf47f3f"> 1779</a></span>&#160;    <a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a7ba626bf84eb45a9bca0b7723bf47f3f">ParseInsitu</a>(<a class="code" href="classrapidjson_1_1_generic_value.html#adcdbc7fa85a9a41b78966d7e0dcc2ac4">Ch</a>* str) {</div>
 <div class="line"><a name="l01780"></a><span class="lineno"> 1780</span>&#160;        <a class="code" href="structrapidjson_1_1_generic_insitu_string_stream.html">GenericInsituStringStream&lt;Encoding&gt;</a> s(str);</div>
-<div class="line"><a name="l01781"></a><span class="lineno"> 1781</span>&#160;        <span class="keywordflow">return</span> ParseStream&lt;parseFlags | kParseInsituFlag, SourceEncoding&gt;(s);</div>
+<div class="line"><a name="l01781"></a><span class="lineno"> 1781</span>&#160;        <span class="keywordflow">return</span> ParseStream&lt;parseFlags | kParseInsituFlag&gt;(s);</div>
 <div class="line"><a name="l01782"></a><span class="lineno"> 1782</span>&#160;    }</div>
 <div class="line"><a name="l01783"></a><span class="lineno"> 1783</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l01784"></a><span class="lineno"> 1784</span>&#160;<span class="comment">    //! Parse JSON text from a mutable string (with \ref kParseDefaultFlags)</span></div>
