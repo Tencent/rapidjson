@@ -32,6 +32,8 @@ template <typename DocumentType>
 void ParseCheck(DocumentType& doc) {
     typedef typename DocumentType::ValueType ValueType;
 
+    EXPECT_FALSE(doc.HasParseError());
+
     EXPECT_TRUE(doc.IsObject());
 
     EXPECT_TRUE(doc.HasMember("hello"));
@@ -76,17 +78,17 @@ void ParseTest() {
 
     const char* json = " { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3, 4] } ";
 
-    EXPECT_FALSE(doc.Parse(json).HasParseError());
+    doc.Parse(json);
     ParseCheck(doc);
 
     doc.SetNull();
     StringStream s(json);
-    EXPECT_FALSE(doc.ParseStream<0>( s).HasParseError());
+    doc.template ParseStream<0>(s);
     ParseCheck(doc);
 
     doc.SetNull();
     char *buffer = strdup(json);
-    EXPECT_FALSE(doc.ParseInsitu(buffer).HasParseError());
+    doc.ParseInsitu(buffer);
     ParseCheck(doc);
     free(buffer);
 }
