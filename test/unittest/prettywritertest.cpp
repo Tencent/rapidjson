@@ -31,7 +31,8 @@ TEST(PrettyWriter, Basic) {
     StringBuffer buffer;
     PrettyWriter<StringBuffer> writer(buffer);
     Reader reader;
-    reader.Parse(StringStream(kJson), writer);
+    StringStream s(kJson);
+    reader.Parse(s, writer);
     EXPECT_STREQ(
         "{\n"
         "    \"hello\": \"world\",\n"
@@ -54,7 +55,8 @@ TEST(PrettyWriter, SetIndent) {
     PrettyWriter<StringBuffer> writer(buffer);
     writer.SetIndent('\t', 1);
     Reader reader;
-    reader.Parse(StringStream(kJson), writer);
+    StringStream s(kJson);
+    reader.Parse(s, writer);
     EXPECT_STREQ(
         "{\n"
         "\t\"hello\": \"world\",\n"
