@@ -507,24 +507,31 @@ TEST(Reader, ParseString_NonDestructive) {
     EXPECT_EQ(11u, h.length_);
 }
 
-ParseErrorCode TestString(const char* str) {
-    StringStream s(str);
-    BaseReaderHandler<> h;
-    Reader reader;
-    reader.Parse<kParseValidateEncodingFlag>(s, h);
+template <typename Encoding>
+ParseErrorCode TestString(const typename Encoding::Ch* str) {
+    GenericStringStream<Encoding> s(str);
+    BaseReaderHandler<Encoding> h;
+    GenericReader<Encoding, Encoding> reader;
+    reader.template Parse<kParseValidateEncodingFlag>(s, h);
     return reader.GetParseErrorCode();
 }
 
 TEST(Reader, ParseString_Error) {
 #define TEST_STRING_ERROR(errorCode, str)\
-        EXPECT_EQ(errorCode, TestString(str))
+        EXPECT_EQ(errorCode, TestString<UTF8<> >(str))
 
 #define ARRAY(...) { __VA_ARGS__ }
-#define TEST_STRINGENCODING_ERROR(Encoding, utype, array) \
+#define TEST_STRINGENCODING_ERROR(Encoding, TargetEncoding, utype, array) \
     { \
         static const utype ue[] = array; \
         static const Encoding::Ch* e = reinterpret_cast<const Encoding::Ch *>(&ue[0]); \
-        EXPECT_EQ(kParseErrorStringInvalidEncoding, TestString(e));\
+        EXPECT_EQ(kParseErrorStringInvalidEncoding, TestString<Encoding>(e));\
+        /* decode error */\
+        GenericStringStream<Encoding> s(e);\
+        BaseReaderHandler<TargetEncoding> h;\
+        GenericReader<Encoding, TargetEncoding> reader;\
+        reader.Parse(s, h);\
+        EXPECT_EQ(kParseErrorStringInvalidEncoding, reader.GetParseErrorCode());\
     }
 
     // Invalid escape character in string.
@@ -553,7 +560,7 @@ TEST(Reader, ParseString_Error) {
          char e[] = { '[', '\"', 0, '\"', ']', '\0' };
          for (unsigned char c = 0x80u; c <= 0xBFu; c++) {
             e[2] = c;
-            ParseErrorCode error = TestString(e);
+            ParseErrorCode error = TestString<UTF8<> >(e);
             EXPECT_EQ(kParseErrorStringInvalidEncoding, error);
             if (error != kParseErrorStringInvalidEncoding)
                 std::cout << (unsigned)(unsigned char)c << std::endl;
@@ -572,30 +579,40 @@ TEST(Reader, ParseString_Error) {
     // 4  Overlong sequences 
 
     // 4.1  Examples of an overlong ASCII character
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xC0u, 0xAFu, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x80u, 0xAFu, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0xAFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xC0u, 0xAFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x80u, 0xAFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0xAFu, '\"', ']', '\0'));
 
     // 4.2  Maximum overlong sequences 
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xC1u, 0xBFu, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x9Fu, 0xBFu, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x8Fu, 0xBFu, 0xBFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xC1u, 0xBFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x9Fu, 0xBFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x8Fu, 0xBFu, 0xBFu, '\"', ']', '\0'));
 
     // 4.3  Overlong representation of the NUL character 
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xC0u, 0x80u, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x80u, 0x80u, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0x80u, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xC0u, 0x80u, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x80u, 0x80u, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0x80u, '\"', ']', '\0'));
 
     // 5  Illegal code positions
 
     // 5.1 Single UTF-16 surrogates
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xA0u, 0x80u, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xADu, 0xBFu, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xAEu, 0x80u, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xAFu, 0xBFu, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xB0u, 0x80u, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xBEu, 0x80u, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xBFu, 0xBFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xA0u, 0x80u, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xADu, 0xBFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xAEu, 0x80u, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xAFu, 0xBFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xB0u, 0x80u, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xBEu, 0x80u, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xBFu, 0xBFu, '\"', ']', '\0'));
+
+    // Malform UTF-16 sequences
+    TEST_STRINGENCODING_ERROR(UTF16<>, UTF8<>, wchar_t, ARRAY('[', '\"', 0xDC00, 0xDC00, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF16<>, UTF8<>, wchar_t, ARRAY('[', '\"', 0xD800, 0xD800, '\"', ']', '\0'));
+
+    // Malform UTF-32 sequence
+    TEST_STRINGENCODING_ERROR(UTF32<>, UTF8<>, unsigned, ARRAY('[', '\"', 0x110000, '\"', ']', '\0'));
+
+    // Malform ASCII sequence
+    TEST_STRINGENCODING_ERROR(ASCII<>, UTF8<>, char, ARRAY('[', '\"', 0x80, '\"', ']', '\0'));
 
 #undef ARRAY
 #undef TEST_STRINGARRAY_ERROR
