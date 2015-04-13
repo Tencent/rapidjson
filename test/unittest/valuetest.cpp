@@ -489,7 +489,7 @@ TEST(Value, Int64) {
     EXPECT_FALSE(z.IsInt());
     EXPECT_NEAR(-2147483649.0, z.GetDouble(), 0.0);
 
-    z.SetInt64(-9223372036854775808LL);
+    z.SetInt64(static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x80000000, 00000000)));
     EXPECT_DOUBLE_EQ(-9223372036854775808.0, z.GetDouble());
 }
 
