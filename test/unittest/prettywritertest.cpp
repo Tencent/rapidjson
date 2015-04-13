@@ -25,7 +25,7 @@
 
 using namespace rapidjson;
 
-static const char kJson[] = "{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3]}";
+static const char kJson[] = "{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3],\"u64\":1234567890123456789,\"i64\":-1234567890123456789}";
 
 TEST(PrettyWriter, Basic) {
     StringBuffer buffer;
@@ -45,7 +45,9 @@ TEST(PrettyWriter, Basic) {
         "        1,\n"
         "        2,\n"
         "        3\n"
-        "    ]\n"
+        "    ],\n"
+        "    \"u64\": 1234567890123456789,\n"
+        "    \"i64\": -1234567890123456789\n"
         "}",
         buffer.GetString());
 }
@@ -69,7 +71,9 @@ TEST(PrettyWriter, SetIndent) {
         "\t\t1,\n"
         "\t\t2,\n"
         "\t\t3\n"
-        "\t]\n"
+        "\t],\n"
+        "\t\"u64\": 1234567890123456789,\n"
+        "\t\"i64\": -1234567890123456789\n"
         "}",
         buffer.GetString());
 }

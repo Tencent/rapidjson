@@ -152,7 +152,7 @@ private:
 };
 
 TEST(Writer, OStreamWrapper) {
-    StringStream s("{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] } ");
+    StringStream s("{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3], \"u64\": 1234567890123456789, \"i64\":-1234567890123456789 } ");
     
     std::stringstream ss;
     OStreamWrapper os(ss);
@@ -163,7 +163,7 @@ TEST(Writer, OStreamWrapper) {
     reader.Parse<0>(s, writer);
     
     std::string actual = ss.str();
-    EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3]}", actual.c_str());
+    EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3],\"u64\":1234567890123456789,\"i64\":-1234567890123456789}", actual.c_str());
 }
 
 TEST(Writer, AssertRootMayBeAnyValue) {
