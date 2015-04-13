@@ -6,6 +6,7 @@ set(UNITTEST_SOURCES
     filestreamtest.cpp
     jsoncheckertest.cpp
     namespacetest.cpp
+    prettywritertest.cpp
     readertest.cpp
     stringbuffertest.cpp
     strtodtest.cpp
