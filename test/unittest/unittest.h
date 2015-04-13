@@ -40,14 +40,6 @@
 #pragma GCC diagnostic ignored "-Weffc++"
 #endif
 
-// __SSE2__ and __SSE4_2__ are recognized by gcc, clang, and the Intel compiler.
-// We use -march=native with gmake to enable -msse2 and -msse4.2, if supported.
-#if defined(__SSE4_2__)
-#  define RAPIDJSON_SSE42
-#elif defined(__SSE2__)
-#  define RAPIDJSON_SSE2
-#endif
-
 #include "gtest/gtest.h"
 #include <stdexcept>
 
