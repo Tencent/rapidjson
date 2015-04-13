@@ -1778,7 +1778,7 @@ public:
     template <unsigned parseFlags>
     GenericDocument& ParseInsitu(Ch* str) {
         GenericInsituStringStream<Encoding> s(str);
-        return ParseStream<parseFlags | kParseInsituFlag, SourceEncoding>(s);
+        return ParseStream<parseFlags | kParseInsituFlag>(s);
     }
 
     //! Parse JSON text from a mutable string (with \ref kParseDefaultFlags)
