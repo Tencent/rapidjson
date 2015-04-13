@@ -303,7 +303,8 @@ protected:
                 }
             }
             else
-                Transcoder<SourceEncoding, TargetEncoding>::Transcode(is, *os_);
+                if (!Transcoder<SourceEncoding, TargetEncoding>::Transcode(is, *os_))
+                    return false;
         }
         os_->Put('\"');
         return true;

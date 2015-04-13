@@ -306,3 +306,32 @@ TEST(Writer, RootValueIsComplete) {
     T(writer.String(""));
 #undef T
 }
+
+TEST(Writer, InvalidEncoding) {
+    // Fail in decoding invalid UTF-8 sequence http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
+    {
+        GenericStringBuffer<UTF16<> > buffer;
+        Writer<GenericStringBuffer<UTF16<> >, UTF8<>, UTF16<> > writer(buffer);
+        writer.StartArray();
+        EXPECT_FALSE(writer.String("\xfe"));
+        EXPECT_FALSE(writer.String("\xff"));
+        EXPECT_FALSE(writer.String("\xfe\xfe\xff\xff"));
+        writer.EndArray();
+    }
+
+    // Fail in encoding
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer, UTF32<> > writer(buffer);
+        static const UTF32<>::Ch s[] = { 0x110000, 0 }; // Out of U+0000 to U+10FFFF
+        EXPECT_FALSE(writer.String(s));
+    }
+
+    // Fail in unicode escaping in ASCII output
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer, UTF32<>, ASCII<> > writer(buffer);
+        static const UTF32<>::Ch s[] = { 0x110000, 0 }; // Out of U+0000 to U+10FFFF
+        EXPECT_FALSE(writer.String(s));
+    }
+}
