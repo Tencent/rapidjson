@@ -1770,18 +1770,6 @@ public:
     //!@name Parse in-place from mutable string
     //!@{
 
-    //! Parse JSON text from a mutable string (with Encoding conversion)
-    /*! \tparam parseFlags Combination of \ref ParseFlag.
-        \tparam SourceEncoding Transcoding from input Encoding
-        \param str Mutable zero-terminated string to be parsed.
-        \return The document itself for fluent API.
-    */
-    template <unsigned parseFlags, typename SourceEncoding>
-    GenericDocument& ParseInsitu(Ch* str) {
-        GenericInsituStringStream<Encoding> s(str);
-        return ParseStream<parseFlags | kParseInsituFlag, SourceEncoding>(s);
-    }
-
     //! Parse JSON text from a mutable string
     /*! \tparam parseFlags Combination of \ref ParseFlag.
         \param str Mutable zero-terminated string to be parsed.
@@ -1789,7 +1777,8 @@ public:
     */
     template <unsigned parseFlags>
     GenericDocument& ParseInsitu(Ch* str) {
-        return ParseInsitu<parseFlags, Encoding>(str);
+        GenericInsituStringStream<Encoding> s(str);
+        return ParseStream<parseFlags | kParseInsituFlag, SourceEncoding>(s);
     }
 
     //! Parse JSON text from a mutable string (with \ref kParseDefaultFlags)
@@ -1797,7 +1786,7 @@ public:
         \return The document itself for fluent API.
     */
     GenericDocument& ParseInsitu(Ch* str) {
-        return ParseInsitu<kParseDefaultFlags, Encoding>(str);
+        return ParseInsitu<kParseDefaultFlags>(str);
     }
     //!@}
 
