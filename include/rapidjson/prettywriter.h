@@ -78,7 +78,7 @@ public:
 
 #if RAPIDJSON_HAS_STDSTRING
     bool String(const std::basic_string<Ch>& str) {
-      return String(str.data(), SizeType(str.size()));
+        return String(str.data(), SizeType(str.size()));
     }
 #endif
 

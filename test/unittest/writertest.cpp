@@ -89,6 +89,15 @@ TEST(Writer, String) {
     TEST_ROUNDTRIP("[\"Hello\"]");
     TEST_ROUNDTRIP("[\"Hello\\u0000World\"]");
     TEST_ROUNDTRIP("[\"\\\"\\\\/\\b\\f\\n\\r\\t\"]");
+
+#if RAPIDJSON_HAS_STDSTRING
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.String(std::string("Hello\n"));
+        EXPECT_STREQ("\"Hello\\n\"", buffer.GetString());
+    }
+#endif
 }
 
 TEST(Writer, Double) {
