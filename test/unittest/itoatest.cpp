@@ -21,6 +21,11 @@
 #include "unittest.h"
 #include "rapidjson/internal/itoa.h"
 
+#ifdef __GNUC__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(type-limits)
+#endif
+
 using namespace rapidjson::internal;
 
 template <typename T>
@@ -153,3 +158,7 @@ TEST(itoa, u64toa) {
 TEST(itoa, i64toa) {
     Verify(i64toa_naive, i64toa);
 }
+
+#ifdef __GNUC__
+RAPIDJSON_DIAG_POP
+#endif
