@@ -159,27 +159,23 @@ Allocator</h2>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">GenericDocument::ParseStream</a>(InputStream&amp; is);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// (4) 原位解析</span></div>
-<div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> SourceEncoding&gt;</div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a8ece26197fb1fef28e6626e6d73df976">GenericDocument::ParseInsitu</a>(Ch* str);</div>
-<div class="line"></div>
-<div class="line"><span class="comment">// (5) 原位解析，使用Document的编码</span></div>
 <div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags&gt;</div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a8ece26197fb1fef28e6626e6d73df976">GenericDocument::ParseInsitu</a>(Ch* str);</div>
+<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a7ba626bf84eb45a9bca0b7723bf47f3f">GenericDocument::ParseInsitu</a>(Ch* str);</div>
 <div class="line"></div>
-<div class="line"><span class="comment">// (6) 原位解析，使用缺省标志</span></div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a8ece26197fb1fef28e6626e6d73df976">GenericDocument::ParseInsitu</a>(Ch* str);</div>
+<div class="line"><span class="comment">// (5) 原位解析，使用缺省标志</span></div>
+<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a7ba626bf84eb45a9bca0b7723bf47f3f">GenericDocument::ParseInsitu</a>(Ch* str);</div>
 <div class="line"></div>
-<div class="line"><span class="comment">// (7) 正常解析一个字符串</span></div>
+<div class="line"><span class="comment">// (6) 正常解析一个字符串</span></div>
 <div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> SourceEncoding&gt;</div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a5bb026ab42705b2c2cfbbf904108b3f5">GenericDocument::Parse</a>(<span class="keyword">const</span> Ch* str);</div>
 <div class="line"></div>
-<div class="line"><span class="comment">// (8) 正常解析一个字符串，使用Document的编码</span></div>
+<div class="line"><span class="comment">// (7) 正常解析一个字符串，使用Document的编码</span></div>
 <div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags&gt;</div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a5bb026ab42705b2c2cfbbf904108b3f5">GenericDocument::Parse</a>(<span class="keyword">const</span> Ch* str);</div>
 <div class="line"></div>
-<div class="line"><span class="comment">// (9) 正常解析一个字符串，使用缺省标志</span></div>
+<div class="line"><span class="comment">// (8) 正常解析一个字符串，使用缺省标志</span></div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a5bb026ab42705b2c2cfbbf904108b3f5">GenericDocument::Parse</a>(<span class="keyword">const</span> Ch* str);</div>
-</div><!-- fragment --><p>教程中的例使用(9)去正常解析字符串。而流的例子使用前3个函数。我们将稍后介绍原位（*In situ*） 解析。</p>
+</div><!-- fragment --><p>教程中的例使用(8)去正常解析字符串。而流的例子使用前3个函数。我们将稍后介绍原位（*In situ*） 解析。</p>
 <p><code>parseFlags</code>是以下位标置的组合：</p>
 <table class="doxtable">
 <tr>

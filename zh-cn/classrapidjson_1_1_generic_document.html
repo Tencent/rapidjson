@@ -186,10 +186,6 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 <tr class="memdesc:acf96a3c7fd61486d049c701b1fe5d414"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse JSON text from an input stream (with <a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835">kParseDefaultFlags</a>)  <a href="#acf96a3c7fd61486d049c701b1fe5d414">更多...</a><br /></td></tr>
 <tr class="separator:acf96a3c7fd61486d049c701b1fe5d414"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Parse in-place from mutable string</div></td></tr>
-<tr class="memitem:a8ece26197fb1fef28e6626e6d73df976"><td class="memTemplParams" colspan="2">template&lt;unsigned parseFlags, typename SourceEncoding &gt; </td></tr>
-<tr class="memitem:a8ece26197fb1fef28e6626e6d73df976"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_document.html#a8ece26197fb1fef28e6626e6d73df976">ParseInsitu</a> (<a class="el" href="classrapidjson_1_1_generic_value.html#adcdbc7fa85a9a41b78966d7e0dcc2ac4">Ch</a> *str)</td></tr>
-<tr class="memdesc:a8ece26197fb1fef28e6626e6d73df976"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse JSON text from a mutable string (with <a class="el" href="classrapidjson_1_1_encoding.html" title="Concept for encoding of Unicode characters. ">Encoding</a> conversion)  <a href="#a8ece26197fb1fef28e6626e6d73df976">更多...</a><br /></td></tr>
-<tr class="separator:a8ece26197fb1fef28e6626e6d73df976"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ba626bf84eb45a9bca0b7723bf47f3f"><td class="memTemplParams" colspan="2">template&lt;unsigned parseFlags&gt; </td></tr>
 <tr class="memitem:a7ba626bf84eb45a9bca0b7723bf47f3f"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_document.html#a7ba626bf84eb45a9bca0b7723bf47f3f">ParseInsitu</a> (<a class="el" href="classrapidjson_1_1_generic_value.html#adcdbc7fa85a9a41b78966d7e0dcc2ac4">Ch</a> *str)</td></tr>
 <tr class="memdesc:a7ba626bf84eb45a9bca0b7723bf47f3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse JSON text from a mutable string.  <a href="#a7ba626bf84eb45a9bca0b7723bf47f3f">更多...</a><br /></td></tr>
@@ -786,50 +782,6 @@ template&lt;typename Encoding, typename Allocator = MemoryPoolAllocator&lt;&gt;,
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a class="anchor" id="a8ece26197fb1fef28e6626e6d73df976"></a>
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Encoding, typename Allocator = MemoryPoolAllocator&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
-<div class="memtemplate">
-template&lt;unsigned parseFlags, typename SourceEncoding &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="el" href="classrapidjson_1_1_generic_document.html">rapidjson::GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a>, StackAllocator &gt;::ParseInsitu </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classrapidjson_1_1_generic_value.html#adcdbc7fa85a9a41b78966d7e0dcc2ac4">Ch</a> *&#160;</td>
-          <td class="paramname"><em>str</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Parse JSON text from a mutable string (with <a class="el" href="classrapidjson_1_1_encoding.html" title="Concept for encoding of Unicode characters. ">Encoding</a> conversion) </p>
-<dl class="tparams"><dt>模板参数</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">parseFlags</td><td>Combination of <a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9">ParseFlag</a>. </td></tr>
-    <tr><td class="paramname">SourceEncoding</td><td>Transcoding from input <a class="el" href="classrapidjson_1_1_encoding.html" title="Concept for encoding of Unicode characters. ">Encoding</a> </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="params"><dt>参数</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">str</td><td>Mutable zero-terminated string to be parsed. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>返回</dt><dd>The document itself for fluent API. </dd></dl>
 
 </div>
 </div>

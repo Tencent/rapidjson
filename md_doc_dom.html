@@ -161,27 +161,23 @@ Parsing</h1>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">GenericDocument::ParseStream</a>(InputStream&amp; is);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// (4) In situ parsing</span></div>
-<div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> SourceEncoding&gt;</div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a8ece26197fb1fef28e6626e6d73df976">GenericDocument::ParseInsitu</a>(Ch* str);</div>
-<div class="line"></div>
-<div class="line"><span class="comment">// (5) In situ parsing, using same Encoding of Document</span></div>
 <div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags&gt;</div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a8ece26197fb1fef28e6626e6d73df976">GenericDocument::ParseInsitu</a>(Ch* str);</div>
+<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a7ba626bf84eb45a9bca0b7723bf47f3f">GenericDocument::ParseInsitu</a>(Ch* str);</div>
 <div class="line"></div>
-<div class="line"><span class="comment">// (6) In situ parsing, using default parse flags</span></div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a8ece26197fb1fef28e6626e6d73df976">GenericDocument::ParseInsitu</a>(Ch* str);</div>
+<div class="line"><span class="comment">// (5) In situ parsing, using default parse flags</span></div>
+<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a7ba626bf84eb45a9bca0b7723bf47f3f">GenericDocument::ParseInsitu</a>(Ch* str);</div>
 <div class="line"></div>
-<div class="line"><span class="comment">// (7) Normal parsing of a string</span></div>
+<div class="line"><span class="comment">// (6) Normal parsing of a string</span></div>
 <div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> SourceEncoding&gt;</div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a5bb026ab42705b2c2cfbbf904108b3f5">GenericDocument::Parse</a>(<span class="keyword">const</span> Ch* str);</div>
 <div class="line"></div>
-<div class="line"><span class="comment">// (8) Normal parsing of a string, using same Encoding of Document</span></div>
+<div class="line"><span class="comment">// (7) Normal parsing of a string, using same Encoding of Document</span></div>
 <div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags&gt;</div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a5bb026ab42705b2c2cfbbf904108b3f5">GenericDocument::Parse</a>(<span class="keyword">const</span> Ch* str);</div>
 <div class="line"></div>
-<div class="line"><span class="comment">// (9) Normal parsing of a string, using default parse flags</span></div>
+<div class="line"><span class="comment">// (8) Normal parsing of a string, using default parse flags</span></div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a5bb026ab42705b2c2cfbbf904108b3f5">GenericDocument::Parse</a>(<span class="keyword">const</span> Ch* str);</div>
-</div><!-- fragment --><p>The examples of <a class="el" href="md_doc_tutorial.html">tutorial</a> uses (9) for normal parsing of string. The examples of <a class="el" href="md_doc_stream.html">stream</a> uses the first three. <em>In situ</em> parsing will be described soon.</p>
+</div><!-- fragment --><p>The examples of <a class="el" href="md_doc_tutorial.html">tutorial</a> uses (8) for normal parsing of string. The examples of <a class="el" href="md_doc_stream.html">stream</a> uses the first three. <em>In situ</em> parsing will be described soon.</p>
 <p>The <code>parseFlags</code> are combination of the following bit-flags:</p>
 <table class="doxtable">
 <tr>

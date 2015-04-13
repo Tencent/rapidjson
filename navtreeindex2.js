@@ -1,6 +1,5 @@
 var NAVTREEINDEX2 =
 {
-"md_doc_internals.html#MemoryPoolAllocator":[7,1,3],
 "md_doc_internals.html#Parser":[7,4],
 "md_doc_internals.html#ParsingDouble":[7,2,2],
 "md_doc_internals.html#ParsingOptimization":[7,2],
