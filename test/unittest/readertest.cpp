@@ -1196,10 +1196,10 @@ struct TerminateHandler {
     bool Double(double) { return e != 6; }
     bool String(const char*, SizeType, bool) { return e != 7; }
     bool StartObject() { return e != 8; }
-    bool Key(const char* str, SizeType length, bool copy)  { return e != 9; }
-    bool EndObject(SizeType memberCount) { return e != 10; }
+    bool Key(const char*, SizeType, bool)  { return e != 9; }
+    bool EndObject(SizeType) { return e != 10; }
     bool StartArray() { return e != 11; }
-    bool EndArray(SizeType elementCount) { return e != 12; }
+    bool EndArray(SizeType) { return e != 12; }
 };
 
 #define TEST_TERMINATION(e, json)\
