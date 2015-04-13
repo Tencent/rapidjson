@@ -344,3 +344,32 @@ TEST(Writer, InvalidEncoding) {
         EXPECT_FALSE(writer.String(s));
     }
 }
+
+TEST(Writer, InvalidEventSequence) {
+    // {]
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.StartObject();
+        EXPECT_THROW(writer.EndArray(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+
+    // [}
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.StartArray();
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+
+    // { 1: 
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.StartObject();
+        EXPECT_THROW(writer.Int(1), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+}

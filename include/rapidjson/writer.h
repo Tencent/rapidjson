@@ -272,7 +272,8 @@ protected:
                     os_->Put(hexDigits[(codepoint >>  4) & 15]);
                     os_->Put(hexDigits[(codepoint      ) & 15]);
                 }
-                else if (codepoint >= 0x010000 && codepoint <= 0x10FFFF)    {
+                else {
+                    RAPIDJSON_ASSERT(codepoint >= 0x010000 && codepoint <= 0x10FFFF);
                     // Surrogate pair
                     unsigned s = codepoint - 0x010000;
                     unsigned lead = (s >> 10) + 0xD800;
@@ -288,8 +289,6 @@ protected:
                     os_->Put(hexDigits[(trail >>  4) & 15]);
                     os_->Put(hexDigits[(trail      ) & 15]);                    
                 }
-                else
-                    return false;   // invalid code point
             }
             else if ((sizeof(Ch) == 1 || (unsigned)c < 256) && escape[(unsigned char)c])  {
                 is.Take();

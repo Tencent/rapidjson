@@ -100,8 +100,9 @@ public:
             Base::os_->Put('\n');
             WriteIndent();
         }
-        if (!Base::WriteEndObject())
-            return false;
+        bool ret = Base::WriteEndObject();
+        (void)ret;
+        RAPIDJSON_ASSERT(ret == true);
         if (Base::level_stack_.Empty()) // end of json text
             Base::os_->Flush();
         return true;
@@ -123,8 +124,9 @@ public:
             Base::os_->Put('\n');
             WriteIndent();
         }
-        if (!Base::WriteEndArray())
-            return false;
+        bool ret = Base::WriteEndArray();
+        (void)ret;
+        RAPIDJSON_ASSERT(ret == true);
         if (Base::level_stack_.Empty()) // end of json text
             Base::os_->Flush();
         return true;

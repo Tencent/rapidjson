@@ -80,6 +80,15 @@ TEST(PrettyWriter, SetIndent) {
         buffer.GetString());
 }
 
+TEST(PrettyWriter, String) {
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    EXPECT_TRUE(writer.StartArray());
+    EXPECT_TRUE(writer.String("Hello\n"));
+    EXPECT_TRUE(writer.EndArray());
+    EXPECT_STREQ("[\n    \"Hello\\n\"\n]", buffer.GetString());
+}
+
 #if RAPIDJSON_HAS_STDSTRING
 TEST(PrettyWriter, String_STDSTRING) {
     StringBuffer buffer;
