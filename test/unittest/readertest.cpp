@@ -1177,6 +1177,56 @@ TEST(Reader, IterativeParsing_ShortCircuit) {
     }
 }
 
+// For covering BaseReaderHandler default functions
+TEST(Reader, BaseReaderHandler_Default) {
+    BaseReaderHandler<> h;
+    Reader reader;
+    StringStream is("[null, true, -1, 1, -1234567890123456789, 1234567890123456789, 3.14, \"s\", { \"a\" : 1 }]");
+    EXPECT_TRUE(reader.Parse(is, h));
+}
+
+template <int e>
+struct TerminateHandler {
+    bool Null() { return e != 0; }
+    bool Bool(bool) { return e != 1; }
+    bool Int(int) { return e != 2; }
+    bool Uint(unsigned) { return e != 3; }
+    bool Int64(int64_t) { return e != 4; }
+    bool Uint64(uint64_t) { return e != 5;  }
+    bool Double(double) { return e != 6; }
+    bool String(const char*, SizeType, bool) { return e != 7; }
+    bool StartObject() { return e != 8; }
+    bool Key(const char* str, SizeType length, bool copy)  { return e != 9; }
+    bool EndObject(SizeType memberCount) { return e != 10; }
+    bool StartArray() { return e != 11; }
+    bool EndArray(SizeType elementCount) { return e != 12; }
+};
+
+#define TEST_TERMINATION(e, json)\
+{\
+    Reader reader;\
+    TerminateHandler<e> h;\
+    StringStream is(json);\
+    EXPECT_FALSE(reader.Parse(is, h));\
+    EXPECT_EQ(kParseErrorTermination, reader.GetParseErrorCode());\
+}
+
+TEST(Reader, ParseTerminationByHandler) {
+    TEST_TERMINATION(0, "[null");
+    TEST_TERMINATION(1, "[true");
+    TEST_TERMINATION(2, "[-1");
+    TEST_TERMINATION(3, "[1");
+    TEST_TERMINATION(4, "[-1234567890123456789");
+    TEST_TERMINATION(5, "[1234567890123456789");
+    TEST_TERMINATION(6, "[0.5]");
+    TEST_TERMINATION(7, "[\"a\"");
+    TEST_TERMINATION(8, "[{");
+    TEST_TERMINATION(9, "[{\"a\"");
+    TEST_TERMINATION(10, "[{}");
+    TEST_TERMINATION(11, "{\"a\":[");
+    TEST_TERMINATION(12, "{\"a\":[]");
+}
+
 #ifdef __GNUC__
 RAPIDJSON_DIAG_POP
 #endif
