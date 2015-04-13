@@ -1214,6 +1214,7 @@ struct TerminateHandler {
 TEST(Reader, ParseTerminationByHandler) {
     TEST_TERMINATION(0, "[null");
     TEST_TERMINATION(1, "[true");
+    TEST_TERMINATION(1, "[false");
     TEST_TERMINATION(2, "[-1");
     TEST_TERMINATION(3, "[1");
     TEST_TERMINATION(4, "[-1234567890123456789");
@@ -1223,8 +1224,10 @@ TEST(Reader, ParseTerminationByHandler) {
     TEST_TERMINATION(8, "[{");
     TEST_TERMINATION(9, "[{\"a\"");
     TEST_TERMINATION(10, "[{}");
+    TEST_TERMINATION(10, "[{\"a\":1}"); // non-empty object
     TEST_TERMINATION(11, "{\"a\":[");
     TEST_TERMINATION(12, "{\"a\":[]");
+    TEST_TERMINATION(12, "{\"a\":[1]"); // non-empty array
 }
 
 #ifdef __GNUC__
