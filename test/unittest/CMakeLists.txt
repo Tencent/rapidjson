@@ -4,6 +4,7 @@ set(UNITTEST_SOURCES
     encodedstreamtest.cpp
     encodingstest.cpp
     filestreamtest.cpp
+    itoatest.cpp
     jsoncheckertest.cpp
     namespacetest.cpp
     prettywritertest.cpp
