@@ -99,3 +99,60 @@ TEST(PrettyWriter, String_STDSTRING) {
     EXPECT_STREQ("[\n    \"Hello\\n\"\n]", buffer.GetString());
 }
 #endif
+
+#include <sstream>
+
+class OStreamWrapper {
+public:
+    typedef char Ch;
+
+    OStreamWrapper(std::ostream& os) : os_(os) {}
+
+    Ch Peek() const { assert(false); return '\0'; }
+    Ch Take() { assert(false); return '\0'; }
+    size_t Tell() const { return 0; }
+
+    Ch* PutBegin() { assert(false); return 0; }
+    void Put(Ch c) { os_.put(c); }
+    void Flush() { os_.flush(); }
+    size_t PutEnd(Ch*) { assert(false); return 0; }
+
+private:
+    OStreamWrapper(const OStreamWrapper&);
+    OStreamWrapper& operator=(const OStreamWrapper&);
+
+    std::ostream& os_;
+};
+
+// For covering PutN() generic version
+TEST(PrettyWriter, OStreamWrapper) {
+    StringStream s(kJson);
+    
+    std::stringstream ss;
+    OStreamWrapper os(ss);
+    
+    PrettyWriter<OStreamWrapper> writer(os);
+
+    Reader reader;
+    reader.Parse(s, writer);
+    
+    std::string actual = ss.str();
+    EXPECT_STREQ(
+        "{\n"
+        "    \"hello\": \"world\",\n"
+        "    \"t\": true,\n"
+        "    \"f\": false,\n"
+        "    \"n\": null,\n"
+        "    \"i\": 123,\n"
+        "    \"pi\": 3.1416,\n"
+        "    \"a\": [\n"
+        "        1,\n"
+        "        2,\n"
+        "        3,\n"
+        "        -1\n"
+        "    ],\n"
+        "    \"u64\": 1234567890123456789,\n"
+        "    \"i64\": -1234567890123456789\n"
+        "}",
+        actual.c_str());
+}
