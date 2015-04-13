@@ -25,7 +25,7 @@
 
 using namespace rapidjson;
 
-static const char kJson[] = "{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3],\"u64\":1234567890123456789,\"i64\":-1234567890123456789}";
+static const char kJson[] = "{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3,-1],\"u64\":1234567890123456789,\"i64\":-1234567890123456789}";
 
 TEST(PrettyWriter, Basic) {
     StringBuffer buffer;
@@ -44,7 +44,8 @@ TEST(PrettyWriter, Basic) {
         "    \"a\": [\n"
         "        1,\n"
         "        2,\n"
-        "        3\n"
+        "        3,\n"
+        "        -1\n"
         "    ],\n"
         "    \"u64\": 1234567890123456789,\n"
         "    \"i64\": -1234567890123456789\n"
@@ -70,7 +71,8 @@ TEST(PrettyWriter, SetIndent) {
         "\t\"a\": [\n"
         "\t\t1,\n"
         "\t\t2,\n"
-        "\t\t3\n"
+        "\t\t3,\n"
+        "\t\t-1\n"
         "\t],\n"
         "\t\"u64\": 1234567890123456789,\n"
         "\t\"i64\": -1234567890123456789\n"
