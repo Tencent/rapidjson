@@ -487,6 +487,17 @@ TEST(Reader, ParseString_Transcoding) {
     EXPECT_EQ(StrLen(e), h.length_);
 }
 
+TEST(Reader, ParseString_TranscodingWithValidation) {
+    const char* x = "\"Hello\"";
+    const wchar_t* e = L"Hello";
+    GenericStringStream<UTF8<> > is(x);
+    GenericReader<UTF8<>, UTF16<> > reader;
+    ParseStringHandler<UTF16<> > h;
+    reader.Parse<kParseValidateEncodingFlag>(is, h);
+    EXPECT_EQ(0, StrCmp<UTF16<>::Ch>(e, h.str_));
+    EXPECT_EQ(StrLen(e), h.length_);
+}
+
 TEST(Reader, ParseString_NonDestructive) {
     StringStream s("\"Hello\\nWorld\"");
     ParseStringHandler<UTF8<> > h;
