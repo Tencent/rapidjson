@@ -263,7 +263,7 @@ static void TestParseDouble() {
         TEST_DOUBLE(fullPrecision, n1e308, 1E308);
     }
 
-#if 0 // Very slow
+#if 1 // Very slow
     static const unsigned count = 10000000;
     // Random test for double
     {
