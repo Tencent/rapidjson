@@ -323,17 +323,6 @@ TEST_F(RapidJson, UTF8_Validate) {
     }
 }
 
-// Deprecated.
-//TEST_F(RapidJson, FileStream_Read) {
-//  for (size_t i = 0; i < kTrialCount; i++) {
-//      FILE *fp = fopen(filename_, "rb");
-//      FileStream s(fp);
-//      while (s.Take() != '\0')
-//          ;
-//      fclose(fp);
-//  }
-//}
-
 TEST_F(RapidJson, FileReadStream) {
     for (size_t i = 0; i < kTrialCount; i++) {
         FILE *fp = fopen(filename_, "rb");
