@@ -26,7 +26,6 @@
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
-#include "rapidjson/filestream.h"
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/encodedstream.h"
 #include "rapidjson/memorystream.h"
