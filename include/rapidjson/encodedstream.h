@@ -109,6 +109,7 @@ public:
         \param type UTF encoding type if it is not detected from the stream.
     */
     AutoUTFInputStream(InputByteStream& is, UTFType type = kUTF8) : is_(&is), type_(type), hasBOM_(false) {
+        RAPIDJSON_ASSERT(type >= kUTF8 && type <= kUTF32BE);        
         DetectType();
         static const TakeFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Take) };
         takeFunc_ = f[type_];
@@ -189,8 +190,6 @@ private:
         case kUTF32BE:
             RAPIDJSON_ASSERT(sizeof(Ch) >= 4);
             break;
-        default:
-            RAPIDJSON_ASSERT(false);    // Invalid type
         }
     }
 
@@ -220,6 +219,8 @@ public:
         \param putBOM Whether to write BOM at the beginning of the stream.
     */
     AutoUTFOutputStream(OutputByteStream& os, UTFType type, bool putBOM) : os_(&os), type_(type) {
+        RAPIDJSON_ASSERT(type >= kUTF8 && type <= kUTF32BE);
+
         // RUntime check whether the size of character type is sufficient. It only perform checks with assertion.
         switch (type_) {
         case kUTF16LE:
@@ -233,8 +234,6 @@ public:
         case kUTF8:
             // Do nothing
             break;
-        default:
-            RAPIDJSON_ASSERT(false);    // Invalid UTFType
         }
 
         static const PutFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Put) };

@@ -119,10 +119,11 @@ protected:
             }
             EXPECT_EQ('\0', s.Peek());
             free(data);
+            EXPECT_EQ(size, eis.Tell());
         }
     }
 
-    void TestAutoUTFInputStream(const char *filename) {
+    void TestAutoUTFInputStream(const char *filename, bool expectHasBOM) {
         // Test FileReadStream
         {
             char buffer[16];
@@ -130,6 +131,7 @@ protected:
             ASSERT_TRUE(fp != 0);
             FileReadStream fs(fp, buffer, sizeof(buffer));
             AutoUTFInputStream<unsigned, FileReadStream> eis(fs);
+            EXPECT_EQ(expectHasBOM, eis.HasBOM());
             StringStream s(json_);
             while (eis.Peek() != '\0') {
                 unsigned expected, actual;
@@ -147,6 +149,7 @@ protected:
             char* data = ReadFile(filename, true, &size);
             MemoryStream ms(data, size);
             AutoUTFInputStream<unsigned, MemoryStream> eis(ms);
+            EXPECT_EQ(expectHasBOM, eis.HasBOM());
             StringStream s(json_);
 
             while (eis.Peek() != '\0') {
@@ -264,16 +267,25 @@ TEST_F(EncodedStreamTest, EncodedInputStream) {
 }
 
 TEST_F(EncodedStreamTest, AutoUTFInputStream) {
-    TestAutoUTFInputStream("utf8.json");
-    TestAutoUTFInputStream("utf8bom.json");
-    TestAutoUTFInputStream("utf16le.json");
-    TestAutoUTFInputStream("utf16lebom.json");
-    TestAutoUTFInputStream("utf16be.json");
-    TestAutoUTFInputStream("utf16bebom.json");
-    TestAutoUTFInputStream("utf32le.json");
-    TestAutoUTFInputStream("utf32lebom.json");
-    TestAutoUTFInputStream("utf32be.json");
-    TestAutoUTFInputStream("utf32bebom.json");
+    TestAutoUTFInputStream("utf8.json",      false);
+    TestAutoUTFInputStream("utf8bom.json",   true);
+    TestAutoUTFInputStream("utf16le.json",   false);
+    TestAutoUTFInputStream("utf16lebom.json",true);
+    TestAutoUTFInputStream("utf16be.json",   false);
+    TestAutoUTFInputStream("utf16bebom.json",true);
+    TestAutoUTFInputStream("utf32le.json",   false);
+    TestAutoUTFInputStream("utf32lebom.json",true);
+    TestAutoUTFInputStream("utf32be.json",   false);
+    TestAutoUTFInputStream("utf32bebom.json", true);
+
+    {
+        // Auto detection fail, use user defined UTF type
+        const char json[] = "{}";
+        MemoryStream ms(json, sizeof(json));
+        AutoUTFInputStream<unsigned, MemoryStream> eis(ms, kUTF8);
+        EXPECT_FALSE(eis.HasBOM());
+        EXPECT_EQ(kUTF8, eis.GetType());
+    }
 }
 
 TEST_F(EncodedStreamTest, EncodedOutputStream) {
