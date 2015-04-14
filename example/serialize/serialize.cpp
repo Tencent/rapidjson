@@ -2,7 +2,6 @@
 // This example shows writing JSON string with writer directly.
 
 #include "rapidjson/prettywriter.h" // for stringify JSON
-#include "rapidjson/filestream.h"   // wrapper of C stream for prettywriter as output
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -144,13 +143,15 @@ int main(int, char*[]) {
 
     employees.push_back(Employee("Percy TSE", 30, false));
 
-    FileStream s(stdout);
-    PrettyWriter<FileStream> writer(s);     // Can also use Writer for condensed formatting
+    StringBuffer sb;
+    PrettyWriter<StringBuffer> writer(sb);
 
     writer.StartArray();
     for (std::vector<Employee>::const_iterator employeeItr = employees.begin(); employeeItr != employees.end(); ++employeeItr)
         employeeItr->Serialize(writer);
     writer.EndArray();
+
+    puts(sb.GetString());
 
     return 0;
 }
