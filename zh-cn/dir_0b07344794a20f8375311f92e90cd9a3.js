@@ -7,7 +7,6 @@ var dir_0b07344794a20f8375311f92e90cd9a3 =
     [ "encodedstream.h", "encodedstream_8h_source.html", null ],
     [ "encodings.h", "encodings_8h_source.html", null ],
     [ "filereadstream.h", "filereadstream_8h_source.html", null ],
-    [ "filestream.h", "filestream_8h_source.html", null ],
     [ "filewritestream.h", "filewritestream_8h_source.html", null ],
     [ "memorybuffer.h", "memorybuffer_8h_source.html", null ],
     [ "memorystream.h", "memorystream_8h_source.html", null ],

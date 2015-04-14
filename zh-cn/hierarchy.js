@@ -11,7 +11,6 @@ var hierarchy =
     [ "rapidjson::EncodedOutputStream< Encoding, OutputByteStream >", "classrapidjson_1_1_encoded_output_stream.html", null ],
     [ "rapidjson::Encoding", "classrapidjson_1_1_encoding.html", null ],
     [ "rapidjson::FileReadStream", "classrapidjson_1_1_file_read_stream.html", null ],
-    [ "rapidjson::FileStream", "classrapidjson_1_1_file_stream.html", null ],
     [ "rapidjson::FileWriteStream", "classrapidjson_1_1_file_write_stream.html", null ],
     [ "rapidjson::GenericInsituStringStream< Encoding >", "structrapidjson_1_1_generic_insitu_string_stream.html", null ],
     [ "rapidjson::GenericMember< Encoding, Allocator >", "structrapidjson_1_1_generic_member.html", null ],

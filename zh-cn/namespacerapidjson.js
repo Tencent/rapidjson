@@ -11,7 +11,6 @@ var namespacerapidjson =
     [ "EncodedOutputStream", "classrapidjson_1_1_encoded_output_stream.html", "classrapidjson_1_1_encoded_output_stream" ],
     [ "Encoding", "classrapidjson_1_1_encoding.html", null ],
     [ "FileReadStream", "classrapidjson_1_1_file_read_stream.html", "classrapidjson_1_1_file_read_stream" ],
-    [ "FileStream", "classrapidjson_1_1_file_stream.html", "classrapidjson_1_1_file_stream" ],
     [ "FileWriteStream", "classrapidjson_1_1_file_write_stream.html", "classrapidjson_1_1_file_write_stream" ],
     [ "GenericDocument", "classrapidjson_1_1_generic_document.html", "classrapidjson_1_1_generic_document" ],
     [ "GenericInsituStringStream", "structrapidjson_1_1_generic_insitu_string_stream.html", "structrapidjson_1_1_generic_insitu_string_stream" ],
