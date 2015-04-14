@@ -46,7 +46,7 @@ TEST(Writer, Compact) {
         StringBuffer buffer; \
         Writer<StringBuffer> writer(buffer); \
         Reader reader; \
-        reader.Parse<0>(s, writer); \
+        reader.Parse<kParseFullPrecisionFlag>(s, writer); \
         EXPECT_STREQ(json, buffer.GetString()); \
         EXPECT_TRUE(writer.IsComplete()); \
     }
@@ -102,8 +102,15 @@ TEST(Writer, String) {
 
 TEST(Writer, Double) {
     TEST_ROUNDTRIP("[1.2345,1.2345678,0.123456789012,1234567.8]");
-    TEST_ROUNDTRIP("[-0.0]"); // Issue #289
+    TEST_ROUNDTRIP("0.0");
+    TEST_ROUNDTRIP("-0.0"); // Issue #289
     TEST_ROUNDTRIP("1e30");
+    TEST_ROUNDTRIP("1.0");
+    TEST_ROUNDTRIP("5e-324"); // Min subnormal positive double
+    TEST_ROUNDTRIP("2.225073858507201e-308"); // Max subnormal positive double
+    TEST_ROUNDTRIP("2.2250738585072014e-308"); // Min normal positive double
+    TEST_ROUNDTRIP("1.7976931348623157e308"); // Max double
+
 }
 
 TEST(Writer, Transcode) {
