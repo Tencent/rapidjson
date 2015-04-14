@@ -54,6 +54,9 @@ TEST(StringBuffer, Push) {
     buffer.Push(5);
 
     EXPECT_EQ(5u, buffer.GetSize());
+
+    buffer.Push(65536u);
+    EXPECT_EQ(5u + 65536u, buffer.GetSize());
 }
 
 TEST(StringBuffer, Pop) {
