@@ -160,6 +160,7 @@ protected:
             }
             EXPECT_EQ('\0', s.Peek());
             free(data);
+            EXPECT_EQ(size, eis.Tell());
         }
     }
 
@@ -280,7 +281,7 @@ TEST_F(EncodedStreamTest, AutoUTFInputStream) {
 
     {
         // Auto detection fail, use user defined UTF type
-        const char json[] = "{}";
+        const char json[] = "{ }";
         MemoryStream ms(json, sizeof(json));
         AutoUTFInputStream<unsigned, MemoryStream> eis(ms, kUTF8);
         EXPECT_FALSE(eis.HasBOM());
