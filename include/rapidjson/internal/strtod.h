@@ -258,7 +258,9 @@ inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t 
     // Trim right-most digits
     const int kMaxDecimalDigit = 780;
     if ((int)length > kMaxDecimalDigit) {
-        exp += (int(length) - kMaxDecimalDigit);
+        int delta = (int(length) - kMaxDecimalDigit);
+        exp += delta;
+        decimalPosition -= delta;
         length = kMaxDecimalDigit;
     }
 
