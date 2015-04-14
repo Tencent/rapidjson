@@ -1,4 +1,5 @@
 set(UNITTEST_SOURCES
+	allocatorstest.cpp
     bigintegertest.cpp
     documenttest.cpp
     encodedstreamtest.cpp
