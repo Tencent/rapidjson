@@ -244,7 +244,7 @@ TEST(Document, UserBuffer) {
     EXPECT_LE(valueAllocator.Size(), sizeof(valueBuffer));
     EXPECT_LE(parseAllocator.Size(), sizeof(parseBuffer));
 
-    // Cover MemoryPool::Capacity()
+    // Cover MemoryPoolAllocator::Capacity()
     EXPECT_LE(valueAllocator.Size(), valueAllocator.Capacity());
     EXPECT_LE(parseAllocator.Size(), parseAllocator.Capacity());
 }
