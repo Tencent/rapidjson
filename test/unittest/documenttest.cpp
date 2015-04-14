@@ -243,6 +243,10 @@ TEST(Document, UserBuffer) {
     EXPECT_FALSE(doc.HasParseError());
     EXPECT_LE(valueAllocator.Size(), sizeof(valueBuffer));
     EXPECT_LE(parseAllocator.Size(), sizeof(parseBuffer));
+
+    // Cover MemoryPool::Capacity()
+    EXPECT_LE(valueAllocator.Size(), valueAllocator.Capacity());
+    EXPECT_LE(parseAllocator.Size(), parseAllocator.Capacity());
 }
 
 // Issue 226: Value of string type should not point to NULL
