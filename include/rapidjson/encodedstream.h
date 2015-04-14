@@ -178,19 +178,10 @@ private:
         }
 
         // Runtime check whether the size of character type is sufficient. It only perform checks with assertion.
-        switch (type_) {
-        case kUTF8:
-            // Do nothing
-            break;
-        case kUTF16LE:
-        case kUTF16BE:
+        if (type_ == kUTF16LE || type_ == kUTF16BE)
             RAPIDJSON_ASSERT(sizeof(Ch) >= 2);
-            break;
-        case kUTF32LE:
-        case kUTF32BE:
+        else if (type_ == kUTF32LE || type_ == kUTF32BE)
             RAPIDJSON_ASSERT(sizeof(Ch) >= 4);
-            break;
-        }
     }
 
     typedef Ch (*TakeFunc)(InputByteStream& is);
@@ -221,20 +212,11 @@ public:
     AutoUTFOutputStream(OutputByteStream& os, UTFType type, bool putBOM) : os_(&os), type_(type) {
         RAPIDJSON_ASSERT(type >= kUTF8 && type <= kUTF32BE);
 
-        // RUntime check whether the size of character type is sufficient. It only perform checks with assertion.
-        switch (type_) {
-        case kUTF16LE:
-        case kUTF16BE:
+        // Runtime check whether the size of character type is sufficient. It only perform checks with assertion.
+        if (type_ == kUTF16LE || type_ == kUTF16BE)
             RAPIDJSON_ASSERT(sizeof(Ch) >= 2);
-            break;
-        case kUTF32LE:
-        case kUTF32BE:
+        else if (type_ == kUTF32LE || type_ == kUTF32BE)
             RAPIDJSON_ASSERT(sizeof(Ch) >= 4);
-            break;
-        case kUTF8:
-            // Do nothing
-            break;
-        }
 
         static const PutFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Put) };
         putFunc_ = f[type_];
