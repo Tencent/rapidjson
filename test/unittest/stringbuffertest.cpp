@@ -55,6 +55,7 @@ TEST(StringBuffer, Push) {
 
     EXPECT_EQ(5u, buffer.GetSize());
 
+    // Causes sudden expansion to make the stack's capacity equal to size
     buffer.Push(65536u);
     EXPECT_EQ(5u + 65536u, buffer.GetSize());
 }
