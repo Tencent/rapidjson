@@ -26,7 +26,6 @@
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
-#include "rapidjson/filestream.h"
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/encodedstream.h"
 #include "rapidjson/memorystream.h"
@@ -323,17 +322,6 @@ TEST_F(RapidJson, UTF8_Validate) {
         EXPECT_TRUE(result);
     }
 }
-
-// Deprecated.
-//TEST_F(RapidJson, FileStream_Read) {
-//  for (size_t i = 0; i < kTrialCount; i++) {
-//      FILE *fp = fopen(filename_, "rb");
-//      FileStream s(fp);
-//      while (s.Take() != '\0')
-//          ;
-//      fclose(fp);
-//  }
-//}
 
 TEST_F(RapidJson, FileReadStream) {
     for (size_t i = 0; i < kTrialCount; i++) {
