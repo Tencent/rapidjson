@@ -30,6 +30,7 @@ using namespace rapidjson;
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
+RAPIDJSON_DIAG_OFF(float-equal)
 #endif
 
 template<bool expect>
@@ -187,16 +188,20 @@ static void TestParseDouble() {
         Reader reader; \
         ASSERT_EQ(kParseErrorNone, reader.Parse<fullPrecision ? kParseFullPrecisionFlag : 0>(s, h).Code()); \
         EXPECT_EQ(1u, h.step_); \
+        internal::Double e(x), a(h.actual_); \
         if (fullPrecision) { \
-            EXPECT_EQ(x, h.actual_); \
-            if (x != h.actual_) \
-            printf("  String: %s\n  Actual: %.17g\nExpected: %.17g\n", str, h.actual_, x); \
+            EXPECT_EQ(e.Uint64Value(), a.Uint64Value()); \
+            if (e.Uint64Value() != a.Uint64Value()) \
+                printf("  String: %s\n  Actual: %.17g\nExpected: %.17g\n", str, h.actual_, x); \
         } \
-        else \
+        else { \
+            EXPECT_EQ(e.Sign(), a.Sign()); /* for 0.0 != -0.0 */ \
             EXPECT_DOUBLE_EQ(x, h.actual_); \
+        } \
     }
     
     TEST_DOUBLE(fullPrecision, "0.0", 0.0);
+    TEST_DOUBLE(fullPrecision, "-0.0", -0.0); // For checking issue #289
     TEST_DOUBLE(fullPrecision, "1.0", 1.0);
     TEST_DOUBLE(fullPrecision, "-1.0", -1.0);
     TEST_DOUBLE(fullPrecision, "1.5", 1.5);
@@ -517,6 +522,10 @@ TEST(Reader, ParseString_Error) {
     // Incorrect hex digit after \\u escape in string.
     TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uABCG\"]");
 
+    // Quotation in \\u escape in string (Issue #288)
+    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uaaa\"]");
+    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uD800\\uFFF\"]");
+
     // The surrogate pair in string is invalid.
     TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800X\"]");
     TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800\\uFFFF\"]");
@@ -655,7 +664,7 @@ struct ParseObjectHandler : BaseReaderHandler<UTF8<>, ParseObjectHandler> {
         }
     }
     bool Uint(unsigned i) { return Int(i); }
-    bool Double(double d) { EXPECT_EQ(12u, step_); EXPECT_EQ(3.1416, d); step_++; return true; }
+    bool Double(double d) { EXPECT_EQ(12u, step_); EXPECT_DOUBLE_EQ(3.1416, d); step_++; return true; }
     bool String(const char* str, size_t, bool) { 
         switch(step_) {
             case 1: EXPECT_STREQ("hello", str); step_++; return true;

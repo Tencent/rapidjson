@@ -21,6 +21,7 @@
 
 #include "itoa.h" // GetDigitsLut()
 #include "diyfp.h"
+#include "ieee754.h"
 
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
@@ -192,7 +193,10 @@ inline char* Prettify(char* buffer, int length, int k) {
 }
 
 inline char* dtoa(double value, char* buffer) {
-    if (value == 0) {
+    Double d(value);
+    if (d.IsZero()) {
+        if (d.Sign())
+            *buffer++ = '-';     // -0.0, Issue #289
         buffer[0] = '0';
         buffer[1] = '.';
         buffer[2] = '0';

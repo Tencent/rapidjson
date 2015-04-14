@@ -84,29 +84,25 @@ template <typename InputStream>
 GenericDocument& GenericDocument::ParseStream(InputStream& is);
 
 // (4) In situ parsing
-template <unsigned parseFlags, typename SourceEncoding>
-GenericDocument& GenericDocument::ParseInsitu(Ch* str);
-
-// (5) In situ parsing, using same Encoding of Document
 template <unsigned parseFlags>
 GenericDocument& GenericDocument::ParseInsitu(Ch* str);
 
-// (6) In situ parsing, using default parse flags
+// (5) In situ parsing, using default parse flags
 GenericDocument& GenericDocument::ParseInsitu(Ch* str);
 
-// (7) Normal parsing of a string
+// (6) Normal parsing of a string
 template <unsigned parseFlags, typename SourceEncoding>
 GenericDocument& GenericDocument::Parse(const Ch* str);
 
-// (8) Normal parsing of a string, using same Encoding of Document
+// (7) Normal parsing of a string, using same Encoding of Document
 template <unsigned parseFlags>
 GenericDocument& GenericDocument::Parse(const Ch* str);
 
-// (9) Normal parsing of a string, using default parse flags
+// (8) Normal parsing of a string, using default parse flags
 GenericDocument& GenericDocument::Parse(const Ch* str);
 ~~~~~~~~~~
 
-The examples of [tutorial](doc/tutorial.md) uses (9) for normal parsing of string. The examples of [stream](doc/stream.md) uses the first three. *In situ* parsing will be described soon.
+The examples of [tutorial](doc/tutorial.md) uses (8) for normal parsing of string. The examples of [stream](doc/stream.md) uses the first three. *In situ* parsing will be described soon.
 
 The `parseFlags` are combination of the following bit-flags:
 

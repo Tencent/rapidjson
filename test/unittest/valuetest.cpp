@@ -339,7 +339,7 @@ TEST(Value, Int) {
     EXPECT_EQ(1234u, x.GetUint());
     EXPECT_EQ(1234, x.GetInt64());
     EXPECT_EQ(1234u, x.GetUint64());
-    EXPECT_EQ(1234, x.GetDouble());
+    EXPECT_NEAR(1234.0, x.GetDouble(), 0.0);
     //EXPECT_EQ(1234, (int)x);
     //EXPECT_EQ(1234, (unsigned)x);
     //EXPECT_EQ(1234, (int64_t)x);
@@ -397,7 +397,7 @@ TEST(Value, Uint) {
     EXPECT_TRUE(x.IsUint());
     EXPECT_TRUE(x.IsInt64());
     EXPECT_TRUE(x.IsUint64());
-    EXPECT_EQ(1234.0, x.GetDouble());   // Number can always be cast as double but !IsDouble().
+    EXPECT_NEAR(1234.0, x.GetDouble(), 0.0);   // Number can always be cast as double but !IsDouble().
 
     EXPECT_FALSE(x.IsDouble());
     EXPECT_FALSE(x.IsNull());
@@ -517,7 +517,7 @@ TEST(Value, Double) {
     // Constructor with double
     Value x(12.34);
     EXPECT_EQ(kNumberType, x.GetType());
-    EXPECT_EQ(12.34, x.GetDouble());
+    EXPECT_NEAR(12.34, x.GetDouble(), 0.0);
     EXPECT_TRUE(x.IsNumber());
     EXPECT_TRUE(x.IsDouble());
 
@@ -533,10 +533,10 @@ TEST(Value, Double) {
     // SetDouble()
     Value z;
     z.SetDouble(12.34);
-    EXPECT_EQ(12.34, z.GetDouble());
+    EXPECT_NEAR(12.34, z.GetDouble(), 0.0);
 
     z = 56.78;
-    EXPECT_EQ(56.78, z.GetDouble());
+    EXPECT_NEAR(56.78, z.GetDouble(), 0.0);
 }
 
 TEST(Value, String) {

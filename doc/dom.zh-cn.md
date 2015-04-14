@@ -84,29 +84,25 @@ template <typename InputStream>
 GenericDocument& GenericDocument::ParseStream(InputStream& is);
 
 // (4) 原位解析
-template <unsigned parseFlags, typename SourceEncoding>
-GenericDocument& GenericDocument::ParseInsitu(Ch* str);
-
-// (5) 原位解析，使用Document的编码
 template <unsigned parseFlags>
 GenericDocument& GenericDocument::ParseInsitu(Ch* str);
 
-// (6) 原位解析，使用缺省标志
+// (5) 原位解析，使用缺省标志
 GenericDocument& GenericDocument::ParseInsitu(Ch* str);
 
-// (7) 正常解析一个字符串
+// (6) 正常解析一个字符串
 template <unsigned parseFlags, typename SourceEncoding>
 GenericDocument& GenericDocument::Parse(const Ch* str);
 
-// (8) 正常解析一个字符串，使用Document的编码
+// (7) 正常解析一个字符串，使用Document的编码
 template <unsigned parseFlags>
 GenericDocument& GenericDocument::Parse(const Ch* str);
 
-// (9) 正常解析一个字符串，使用缺省标志
+// (8) 正常解析一个字符串，使用缺省标志
 GenericDocument& GenericDocument::Parse(const Ch* str);
 ~~~~~~~~~~
 
-[教程](tutorial.md)中的例使用(9)去正常解析字符串。而[流](stream.md)的例子使用前3个函数。我们将稍后介绍原位（*In situ*） 解析。
+[教程](tutorial.md)中的例使用(8)去正常解析字符串。而[流](stream.md)的例子使用前3个函数。我们将稍后介绍原位（*In situ*） 解析。
 
 `parseFlags`是以下位标置的组合：
 
