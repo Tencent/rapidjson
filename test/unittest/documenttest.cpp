@@ -101,14 +101,21 @@ TEST(Document, Parse) {
 }
 
 static FILE* OpenEncodedFile(const char* filename) {
+    const char *paths[] = {
+        "encodings/%s",
+        "bin/encodings/%s",
+        "../bin/encodings/%s",
+        "../../bin/encodings/%s",
+        "../../../bin/encodings/%s"
+    };
     char buffer[1024];
-    sprintf(buffer, "encodings/%s", filename);
-    FILE *fp = fopen(buffer, "rb");
-    if (!fp) {
-        sprintf(buffer, "../../bin/encodings/%s", filename);
-        fp = fopen(buffer, "rb");
+    for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
+        sprintf(buffer, paths[i], filename);
+        FILE *fp = fopen(buffer, "rb");
+        if (fp)
+            return fp;
     }
-    return fp;
+    return 0;
 }
 
 TEST(Document, ParseStream_EncodedInputStream) {
