@@ -269,12 +269,6 @@ private:
 #endif
     }
 
-    static Type FullAdd(Type a, Type b, bool inCarry, bool* outCarry) {
-        Type c = a + b + (inCarry ? 1 : 0);
-        *outCarry = c < a;
-        return c;
-    }
-
     static const size_t kBitCount = 3328;  // 64bit * 54 > 10^1000
     static const size_t kCapacity = kBitCount / sizeof(Type);
     static const size_t kTypeBit = sizeof(Type) * 8;
