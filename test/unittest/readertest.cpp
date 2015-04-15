@@ -254,6 +254,32 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "1.00000000000000011102230246251565404236316680908203124", 1.0); // previous double
     TEST_DOUBLE(fullPrecision, "1.00000000000000011102230246251565404236316680908203126", 1.00000000000000022); // next double
 
+    // Numbers from https://github.com/floitsch/double-conversion/blob/master/test/cctest/test-strtod.cc
+
+    TEST_DOUBLE(fullPrecision, "72057594037927928.0", 72057594037927928.0);
+    TEST_DOUBLE(fullPrecision, "72057594037927936.0", 72057594037927936.0);
+    TEST_DOUBLE(fullPrecision, "72057594037927932.0", 72057594037927936.0);
+    TEST_DOUBLE(fullPrecision, "7205759403792793199999e-5", 72057594037927928.0);
+    TEST_DOUBLE(fullPrecision, "7205759403792793200001e-5", 72057594037927936.0);
+
+    TEST_DOUBLE(fullPrecision, "9223372036854774784.0", 9223372036854774784.0);
+    TEST_DOUBLE(fullPrecision, "9223372036854775808.0", 9223372036854775808.0);
+    TEST_DOUBLE(fullPrecision, "9223372036854775296.0", 9223372036854775808.0);
+    TEST_DOUBLE(fullPrecision, "922337203685477529599999e-5", 9223372036854774784.0);
+    TEST_DOUBLE(fullPrecision, "922337203685477529600001e-5", 9223372036854775808.0);
+
+    TEST_DOUBLE(fullPrecision, "10141204801825834086073718800384", 10141204801825834086073718800384.0);
+    TEST_DOUBLE(fullPrecision, "10141204801825835211973625643008", 10141204801825835211973625643008.0);
+    TEST_DOUBLE(fullPrecision, "10141204801825834649023672221696", 10141204801825835211973625643008.0);
+    TEST_DOUBLE(fullPrecision, "1014120480182583464902367222169599999e-5", 10141204801825834086073718800384.0);
+    TEST_DOUBLE(fullPrecision, "1014120480182583464902367222169600001e-5", 10141204801825835211973625643008.0);
+
+    TEST_DOUBLE(fullPrecision, "5708990770823838890407843763683279797179383808", 5708990770823838890407843763683279797179383808.0);
+    TEST_DOUBLE(fullPrecision, "5708990770823839524233143877797980545530986496", 5708990770823839524233143877797980545530986496.0);
+    TEST_DOUBLE(fullPrecision, "5708990770823839207320493820740630171355185152", 5708990770823839524233143877797980545530986496.0);
+    TEST_DOUBLE(fullPrecision, "5708990770823839207320493820740630171355185151999e-3", 5708990770823838890407843763683279797179383808.0);
+    TEST_DOUBLE(fullPrecision, "5708990770823839207320493820740630171355185152001e-3", 5708990770823839524233143877797980545530986496.0);
+
     {
         char n1e308[310];   // '1' followed by 308 '0'
         n1e308[0] = '1';
@@ -263,28 +289,53 @@ static void TestParseDouble() {
         TEST_DOUBLE(fullPrecision, n1e308, 1E308);
     }
 
-#if 0 // Very slow
-    static const unsigned count = 10000000;
-    // Random test for double
+    // Cover trimming
+    TEST_DOUBLE(fullPrecision, 
+"2.22507385850720113605740979670913197593481954635164564802342610972482222202107694551652952390813508"
+"7914149158913039621106870086438694594645527657207407820621743379988141063267329253552286881372149012"
+"9811224514518898490572223072852551331557550159143974763979834118019993239625482890171070818506906306"
+"6665599493827577257201576306269066333264756530000924588831643303777979186961204949739037782970490505"
+"1080609940730262937128958950003583799967207254304360284078895771796150945516748243471030702609144621"
+"5722898802581825451803257070188608721131280795122334262883686223215037756666225039825343359745688844"
+"2390026549819838548794829220689472168983109969836584681402285424333066033985088644580400103493397042"
+"7567186443383770486037861622771738545623065874679014086723327636718751234567890123456789012345678901"
+"e-308", 
+    2.2250738585072014e-308);
+
     {
+        static const unsigned count = 100; // Tested with 1000000 locally
         Random r;
+        Reader reader; // Reusing reader to prevent heap allocation
 
-        for (unsigned i = 0; i < count; i++) {
-            internal::Double d;
-            do {
+        // Exhaustively test different exponents with random significant
+        for (uint64_t exp = 0; exp < 2047; exp++) {
+            ;
+            for (unsigned i = 0; i < count; i++) {
                 // Need to call r() in two statements for cross-platform coherent sequence.
-                uint64_t u = uint64_t(r()) << 32;
+                uint64_t u = (exp << 52) | uint64_t(r() & 0x000FFFFF) << 32;
                 u |= uint64_t(r());
-                d = internal::Double(u);
-            } while (d.IsNan() || d.IsInf()/* || !d.IsNormal()*/);  // Also work for subnormal now
+                internal::Double d = internal::Double(u);
 
-            char buffer[32];
-            *internal::dtoa(d.Value(), buffer) = '\0';
-            TEST_DOUBLE(fullPrecision, buffer, d.Value());
+                char buffer[32];
+                *internal::dtoa(d.Value(), buffer) = '\0';
+
+                StringStream s(buffer);
+                ParseDoubleHandler h;
+                ASSERT_EQ(kParseErrorNone, reader.Parse<fullPrecision ? kParseFullPrecisionFlag : 0>(s, h).Code());
+                EXPECT_EQ(1u, h.step_);
+                internal::Double a(h.actual_);
+                if (fullPrecision) {
+                    EXPECT_EQ(d.Uint64Value(), a.Uint64Value());
+                    if (d.Uint64Value() != a.Uint64Value())
+                        printf("  String: %sn  Actual: %.17gnExpected: %.17gn", buffer, h.actual_, d.Value());
+                }
+                else {
+                    EXPECT_EQ(d.Sign(), a.Sign()); /* for 0.0 != -0.0 */
+                    EXPECT_DOUBLE_EQ(d.Value(), h.actual_);
+                }
+            }
         }
     }
-#endif
-
 #undef TEST_DOUBLE
 }
 
@@ -487,6 +538,17 @@ TEST(Reader, ParseString_Transcoding) {
     EXPECT_EQ(StrLen(e), h.length_);
 }
 
+TEST(Reader, ParseString_TranscodingWithValidation) {
+    const char* x = "\"Hello\"";
+    const wchar_t* e = L"Hello";
+    GenericStringStream<UTF8<> > is(x);
+    GenericReader<UTF8<>, UTF16<> > reader;
+    ParseStringHandler<UTF16<> > h;
+    reader.Parse<kParseValidateEncodingFlag>(is, h);
+    EXPECT_EQ(0, StrCmp<UTF16<>::Ch>(e, h.str_));
+    EXPECT_EQ(StrLen(e), h.length_);
+}
+
 TEST(Reader, ParseString_NonDestructive) {
     StringStream s("\"Hello\\nWorld\"");
     ParseStringHandler<UTF8<> > h;
@@ -496,24 +558,31 @@ TEST(Reader, ParseString_NonDestructive) {
     EXPECT_EQ(11u, h.length_);
 }
 
-ParseErrorCode TestString(const char* str) {
-    StringStream s(str);
-    BaseReaderHandler<> h;
-    Reader reader;
-    reader.Parse<kParseValidateEncodingFlag>(s, h);
+template <typename Encoding>
+ParseErrorCode TestString(const typename Encoding::Ch* str) {
+    GenericStringStream<Encoding> s(str);
+    BaseReaderHandler<Encoding> h;
+    GenericReader<Encoding, Encoding> reader;
+    reader.template Parse<kParseValidateEncodingFlag>(s, h);
     return reader.GetParseErrorCode();
 }
 
 TEST(Reader, ParseString_Error) {
 #define TEST_STRING_ERROR(errorCode, str)\
-        EXPECT_EQ(errorCode, TestString(str))
+        EXPECT_EQ(errorCode, TestString<UTF8<> >(str))
 
 #define ARRAY(...) { __VA_ARGS__ }
-#define TEST_STRINGENCODING_ERROR(Encoding, utype, array) \
+#define TEST_STRINGENCODING_ERROR(Encoding, TargetEncoding, utype, array) \
     { \
         static const utype ue[] = array; \
         static const Encoding::Ch* e = reinterpret_cast<const Encoding::Ch *>(&ue[0]); \
-        EXPECT_EQ(kParseErrorStringInvalidEncoding, TestString(e));\
+        EXPECT_EQ(kParseErrorStringInvalidEncoding, TestString<Encoding>(e));\
+        /* decode error */\
+        GenericStringStream<Encoding> s(e);\
+        BaseReaderHandler<TargetEncoding> h;\
+        GenericReader<Encoding, TargetEncoding> reader;\
+        reader.Parse(s, h);\
+        EXPECT_EQ(kParseErrorStringInvalidEncoding, reader.GetParseErrorCode());\
     }
 
     // Invalid escape character in string.
@@ -542,7 +611,7 @@ TEST(Reader, ParseString_Error) {
          char e[] = { '[', '\"', 0, '\"', ']', '\0' };
          for (unsigned char c = 0x80u; c <= 0xBFu; c++) {
             e[2] = c;
-            ParseErrorCode error = TestString(e);
+            ParseErrorCode error = TestString<UTF8<> >(e);
             EXPECT_EQ(kParseErrorStringInvalidEncoding, error);
             if (error != kParseErrorStringInvalidEncoding)
                 std::cout << (unsigned)(unsigned char)c << std::endl;
@@ -561,30 +630,40 @@ TEST(Reader, ParseString_Error) {
     // 4  Overlong sequences 
 
     // 4.1  Examples of an overlong ASCII character
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xC0u, 0xAFu, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x80u, 0xAFu, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0xAFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xC0u, 0xAFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x80u, 0xAFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0xAFu, '\"', ']', '\0'));
 
     // 4.2  Maximum overlong sequences 
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xC1u, 0xBFu, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x9Fu, 0xBFu, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x8Fu, 0xBFu, 0xBFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xC1u, 0xBFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x9Fu, 0xBFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x8Fu, 0xBFu, 0xBFu, '\"', ']', '\0'));
 
     // 4.3  Overlong representation of the NUL character 
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xC0u, 0x80u, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x80u, 0x80u, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0x80u, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xC0u, 0x80u, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xE0u, 0x80u, 0x80u, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xF0u, 0x80u, 0x80u, 0x80u, '\"', ']', '\0'));
 
     // 5  Illegal code positions
 
     // 5.1 Single UTF-16 surrogates
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xA0u, 0x80u, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xADu, 0xBFu, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xAEu, 0x80u, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xAFu, 0xBFu, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xB0u, 0x80u, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xBEu, 0x80u, '\"', ']', '\0'));
-    TEST_STRINGENCODING_ERROR(UTF8<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xBFu, 0xBFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xA0u, 0x80u, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xADu, 0xBFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xAEu, 0x80u, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xAFu, 0xBFu, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xB0u, 0x80u, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xBEu, 0x80u, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF8<>, UTF16<>, unsigned char, ARRAY('[', '\"', 0xEDu, 0xBFu, 0xBFu, '\"', ']', '\0'));
+
+    // Malform UTF-16 sequences
+    TEST_STRINGENCODING_ERROR(UTF16<>, UTF8<>, wchar_t, ARRAY('[', '\"', 0xDC00, 0xDC00, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(UTF16<>, UTF8<>, wchar_t, ARRAY('[', '\"', 0xD800, 0xD800, '\"', ']', '\0'));
+
+    // Malform UTF-32 sequence
+    TEST_STRINGENCODING_ERROR(UTF32<>, UTF8<>, unsigned, ARRAY('[', '\"', 0x110000, '\"', ']', '\0'));
+
+    // Malform ASCII sequence
+    TEST_STRINGENCODING_ERROR(ASCII<>, UTF8<>, char, ARRAY('[', '\"', char(0x80), '\"', ']', '\0'));
 
 #undef ARRAY
 #undef TEST_STRINGARRAY_ERROR
@@ -974,6 +1053,17 @@ TEST(Reader, IterativeParsing_ErrorHandling) {
     TESTERRORHANDLING("{\"a\"}", kParseErrorObjectMissColon, 4u);
     TESTERRORHANDLING("{\"a\": 1", kParseErrorObjectMissCommaOrCurlyBracket, 7u);
     TESTERRORHANDLING("[1 2 3]", kParseErrorArrayMissCommaOrSquareBracket, 3u);
+    TESTERRORHANDLING("{\"a: 1", kParseErrorStringMissQuotationMark, 5u);
+
+    // Any JSON value can be a valid root element in RFC7159.
+    TESTERRORHANDLING("\"ab", kParseErrorStringMissQuotationMark, 2u);
+    TESTERRORHANDLING("truE", kParseErrorValueInvalid, 3u);
+    TESTERRORHANDLING("False", kParseErrorValueInvalid, 0u);
+    TESTERRORHANDLING("true, false", kParseErrorDocumentRootNotSingular, 4u);
+    TESTERRORHANDLING("false, false", kParseErrorDocumentRootNotSingular, 5u);
+    TESTERRORHANDLING("nulL", kParseErrorValueInvalid, 3u);
+    TESTERRORHANDLING("null , null", kParseErrorDocumentRootNotSingular, 5u);
+    TESTERRORHANDLING("1a", kParseErrorDocumentRootNotSingular, 1u);
 }
 
 template<typename Encoding = UTF8<> >
@@ -1175,6 +1265,59 @@ TEST(Reader, IterativeParsing_ShortCircuit) {
         EXPECT_EQ(kParseErrorTermination, r.Code());
         EXPECT_EQ(7u, r.Offset());
     }
+}
+
+// For covering BaseReaderHandler default functions
+TEST(Reader, BaseReaderHandler_Default) {
+    BaseReaderHandler<> h;
+    Reader reader;
+    StringStream is("[null, true, -1, 1, -1234567890123456789, 1234567890123456789, 3.14, \"s\", { \"a\" : 1 }]");
+    EXPECT_TRUE(reader.Parse(is, h));
+}
+
+template <int e>
+struct TerminateHandler {
+    bool Null() { return e != 0; }
+    bool Bool(bool) { return e != 1; }
+    bool Int(int) { return e != 2; }
+    bool Uint(unsigned) { return e != 3; }
+    bool Int64(int64_t) { return e != 4; }
+    bool Uint64(uint64_t) { return e != 5;  }
+    bool Double(double) { return e != 6; }
+    bool String(const char*, SizeType, bool) { return e != 7; }
+    bool StartObject() { return e != 8; }
+    bool Key(const char*, SizeType, bool)  { return e != 9; }
+    bool EndObject(SizeType) { return e != 10; }
+    bool StartArray() { return e != 11; }
+    bool EndArray(SizeType) { return e != 12; }
+};
+
+#define TEST_TERMINATION(e, json)\
+{\
+    Reader reader;\
+    TerminateHandler<e> h;\
+    StringStream is(json);\
+    EXPECT_FALSE(reader.Parse(is, h));\
+    EXPECT_EQ(kParseErrorTermination, reader.GetParseErrorCode());\
+}
+
+TEST(Reader, ParseTerminationByHandler) {
+    TEST_TERMINATION(0, "[null");
+    TEST_TERMINATION(1, "[true");
+    TEST_TERMINATION(1, "[false");
+    TEST_TERMINATION(2, "[-1");
+    TEST_TERMINATION(3, "[1");
+    TEST_TERMINATION(4, "[-1234567890123456789");
+    TEST_TERMINATION(5, "[1234567890123456789");
+    TEST_TERMINATION(6, "[0.5]");
+    TEST_TERMINATION(7, "[\"a\"");
+    TEST_TERMINATION(8, "[{");
+    TEST_TERMINATION(9, "[{\"a\"");
+    TEST_TERMINATION(10, "[{}");
+    TEST_TERMINATION(10, "[{\"a\":1}"); // non-empty object
+    TEST_TERMINATION(11, "{\"a\":[");
+    TEST_TERMINATION(12, "{\"a\":[]");
+    TEST_TERMINATION(12, "{\"a\":[1]"); // non-empty array
 }
 
 #ifdef __GNUC__

@@ -28,13 +28,11 @@
 
 using namespace rapidjson;
 
-template <typename Allocator, typename StackAllocator>
-void ParseTest() {
-    typedef GenericDocument<UTF8<>, Allocator, StackAllocator> DocumentType;
+template <typename DocumentType>
+void ParseCheck(DocumentType& doc) {
     typedef typename DocumentType::ValueType ValueType;
-    DocumentType doc;
 
-    doc.Parse(" { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3, 4] } ");
+    EXPECT_FALSE(doc.HasParseError());
 
     EXPECT_TRUE(doc.IsObject());
 
@@ -73,6 +71,28 @@ void ParseTest() {
         EXPECT_EQ(i + 1, a[i].GetUint());
 }
 
+template <typename Allocator, typename StackAllocator>
+void ParseTest() {
+    typedef GenericDocument<UTF8<>, Allocator, StackAllocator> DocumentType;
+    DocumentType doc;
+
+    const char* json = " { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3, 4] } ";
+
+    doc.Parse(json);
+    ParseCheck(doc);
+
+    doc.SetNull();
+    StringStream s(json);
+    doc.template ParseStream<0>(s);
+    ParseCheck(doc);
+
+    doc.SetNull();
+    char *buffer = strdup(json);
+    doc.ParseInsitu(buffer);
+    ParseCheck(doc);
+    free(buffer);
+}
+
 TEST(Document, Parse) {
     ParseTest<MemoryPoolAllocator<>, CrtAllocator>();
     ParseTest<MemoryPoolAllocator<>, MemoryPoolAllocator<> >();
@@ -81,14 +101,21 @@ TEST(Document, Parse) {
 }
 
 static FILE* OpenEncodedFile(const char* filename) {
+    const char *paths[] = {
+        "encodings/%s",
+        "bin/encodings/%s",
+        "../bin/encodings/%s",
+        "../../bin/encodings/%s",
+        "../../../bin/encodings/%s"
+    };
     char buffer[1024];
-    sprintf(buffer, "encodings/%s", filename);
-    FILE *fp = fopen(buffer, "rb");
-    if (!fp) {
-        sprintf(buffer, "../../bin/encodings/%s", filename);
-        fp = fopen(buffer, "rb");
+    for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
+        sprintf(buffer, paths[i], filename);
+        FILE *fp = fopen(buffer, "rb");
+        if (fp)
+            return fp;
     }
-    return fp;
+    return 0;
 }
 
 TEST(Document, ParseStream_EncodedInputStream) {
@@ -223,6 +250,10 @@ TEST(Document, UserBuffer) {
     EXPECT_FALSE(doc.HasParseError());
     EXPECT_LE(valueAllocator.Size(), sizeof(valueBuffer));
     EXPECT_LE(parseAllocator.Size(), sizeof(parseBuffer));
+
+    // Cover MemoryPoolAllocator::Capacity()
+    EXPECT_LE(valueAllocator.Size(), valueAllocator.Capacity());
+    EXPECT_LE(parseAllocator.Size(), parseAllocator.Capacity());
 }
 
 // Issue 226: Value of string type should not point to NULL

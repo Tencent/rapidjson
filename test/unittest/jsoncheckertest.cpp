@@ -25,9 +25,22 @@
 using namespace rapidjson;
 
 static char* ReadFile(const char* filename, size_t& length) {
-    FILE *fp = fopen(filename, "rb");
-    if (!fp)
-        fp = fopen(filename, "rb");
+    const char *paths[] = {
+        "jsonchecker/%s",
+        "bin/jsonchecker/%s",
+        "../bin/jsonchecker/%s",
+        "../../bin/jsonchecker/%s",
+        "../../../bin/jsonchecker/%s"
+    };
+    char buffer[1024];
+    FILE *fp = 0;
+    for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
+        sprintf(buffer, paths[i], filename);
+        fp = fopen(buffer, "rb");
+        if (fp)
+            break;
+    }
+
     if (!fp)
         return 0;
 
@@ -51,17 +64,13 @@ TEST(JsonChecker, Reader) {
         if (i == 18)    // fail18.json is valid in rapidjson, which has no limitation on depth of nesting.
             continue;
 
-        sprintf(filename, "jsonchecker/fail%d.json", i);
+        sprintf(filename, "fail%d.json", i);
         size_t length;
         char* json = ReadFile(filename, length);
         if (!json) {
-            sprintf(filename, "../../bin/jsonchecker/fail%d.json", i);
-            json = ReadFile(filename, length);
-            if (!json) {
-                printf("jsonchecker file %s not found", filename);
-                ADD_FAILURE();
-                continue;
-            }
+            printf("jsonchecker file %s not found", filename);
+            ADD_FAILURE();
+            continue;
         }
 
         GenericDocument<UTF8<>, CrtAllocator> document; // Use Crt allocator to check exception-safety (no memory leak)
@@ -76,16 +85,12 @@ TEST(JsonChecker, Reader) {
 
     // passX.json
     for (int i = 1; i <= 3; i++) {
-        sprintf(filename, "jsonchecker/pass%d.json", i);
+        sprintf(filename, "pass%d.json", i);
         size_t length;
         char* json = ReadFile(filename, length);
         if (!json) {
-            sprintf(filename, "../../bin/jsonchecker/pass%d.json", i);
-            json = ReadFile(filename, length);
-            if (!json) {
-                printf("jsonchecker file %s not found", filename);
-                continue;
-            }
+            printf("jsonchecker file %s not found", filename);
+            continue;
         }
 
         GenericDocument<UTF8<>, CrtAllocator> document; // Use Crt allocator to check exception-safety (no memory leak)

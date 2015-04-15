@@ -203,11 +203,27 @@ TEST(Value, EqualtoOperator) {
     EXPECT_TRUE(z.RemoveMember("t"));
     TestUnequal(x, z);
     TestEqual(y, z);
-    y.AddMember("t", true, crtAllocator);
-    z.AddMember("t", true, z.GetAllocator());
+    y.AddMember("t", false, crtAllocator);
+    z.AddMember("t", false, z.GetAllocator());
+    TestUnequal(x, y);
+    TestUnequal(z, x);
+    y["t"] = true;
+    z["t"] = true;
     TestEqual(x, y);
     TestEqual(y, z);
     TestEqual(z, x);
+
+    // Swapping element order is not OK
+    x["a"][0].Swap(x["a"][1]);
+    TestUnequal(x, y);
+    x["a"][0].Swap(x["a"][1]);
+    TestEqual(x, y);
+
+    // Array of different size
+    x["a"].PushBack(4, allocator);
+    TestUnequal(x, y);
+    x["a"].PopBack();
+    TestEqual(x, y);
 
     // Issue #129: compare Uint64
     x.SetUint64(RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0xFFFFFFF0));
@@ -228,6 +244,13 @@ void TestCopyFrom() {
     EXPECT_TRUE(v1.GetType() == v2.GetType());
     EXPECT_STREQ(v1.GetString(), v2.GetString());
     EXPECT_EQ(v1.GetString(), v2.GetString()); // string NOT copied
+
+    v1.SetString("bar", a); // copy string
+    v2.CopyFrom(v1, a);
+    EXPECT_TRUE(v1.GetType() == v2.GetType());
+    EXPECT_STREQ(v1.GetString(), v2.GetString());
+    EXPECT_NE(v1.GetString(), v2.GetString()); // string copied
+
 
     v1.SetArray().PushBack(1234, a);
     v2.CopyFrom(v1, a);
@@ -462,10 +485,19 @@ TEST(Value, Int64) {
     z.SetInt64(2147483648LL);   // 2^31, cannot cast as int
     EXPECT_FALSE(z.IsInt());
     EXPECT_TRUE(z.IsUint());
+    EXPECT_NEAR(2147483648.0, z.GetDouble(), 0.0);
 
     z.SetInt64(4294967296LL);   // 2^32, cannot cast as uint
     EXPECT_FALSE(z.IsInt());
     EXPECT_FALSE(z.IsUint());
+    EXPECT_NEAR(4294967296.0, z.GetDouble(), 0.0);
+
+    z.SetInt64(-2147483649LL);   // -2^31-1, cannot cast as int
+    EXPECT_FALSE(z.IsInt());
+    EXPECT_NEAR(-2147483649.0, z.GetDouble(), 0.0);
+
+    z.SetInt64(static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x80000000, 00000000)));
+    EXPECT_DOUBLE_EQ(-9223372036854775808.0, z.GetDouble());
 }
 
 TEST(Value, Uint64) {
@@ -508,9 +540,8 @@ TEST(Value, Uint64) {
 
     z.SetUint64(9223372036854775808uLL);    // 2^63 cannot cast as int64
     EXPECT_FALSE(z.IsInt64());
-
-    // Issue 48
-    EXPECT_EQ(9223372036854775808uLL, z.GetUint64());
+    EXPECT_EQ(9223372036854775808uLL, z.GetUint64()); // Issue 48
+    EXPECT_DOUBLE_EQ(9223372036854775808.0, z.GetDouble());
 }
 
 TEST(Value, Double) {
@@ -977,6 +1008,7 @@ TEST(Value, Object) {
     EXPECT_STREQ("Banana", x["B"].GetString());
     EXPECT_STREQ("CherryD", x[C0D].GetString());
     EXPECT_STREQ("CherryD", x[othername].GetString());
+    EXPECT_THROW(x["nonexist"], AssertException);
 
     // const operator[]
     EXPECT_STREQ("Apple", y["A"].GetString());
@@ -1041,13 +1073,15 @@ TEST(Value, Object) {
     EXPECT_FALSE(citr >= itr);
 
     // RemoveMember()
-    x.RemoveMember("A");
+    EXPECT_TRUE(x.RemoveMember("A"));
     EXPECT_FALSE(x.HasMember("A"));
 
-    x.RemoveMember("B");
+    EXPECT_TRUE(x.RemoveMember("B"));
     EXPECT_FALSE(x.HasMember("B"));
 
-    x.RemoveMember(othername);
+    EXPECT_FALSE(x.RemoveMember("nonexist"));
+
+    EXPECT_TRUE(x.RemoveMember(othername));
     EXPECT_FALSE(x.HasMember(name));
 
     EXPECT_TRUE(x.MemberBegin() == x.MemberEnd());
@@ -1236,4 +1270,47 @@ TEST(Value, AllocateShortString) {
 	TestShortStringOptimization("123456789012");     // edge case: 12 chars in 32-bit mode (=> regular string)
 	TestShortStringOptimization("123456789012345");  // edge case: 15 chars in 64-bit mode (=> short string)
 	TestShortStringOptimization("1234567890123456"); // edge case: 16 chars in 64-bit mode (=> regular string)
+}
+
+template <int e>
+struct TerminateHandler {
+    bool Null() { return e != 0; }
+    bool Bool(bool) { return e != 1; }
+    bool Int(int) { return e != 2; }
+    bool Uint(unsigned) { return e != 3; }
+    bool Int64(int64_t) { return e != 4; }
+    bool Uint64(uint64_t) { return e != 5; }
+    bool Double(double) { return e != 6; }
+    bool String(const char*, SizeType, bool) { return e != 7; }
+    bool StartObject() { return e != 8; }
+    bool Key(const char*, SizeType, bool)  { return e != 9; }
+    bool EndObject(SizeType) { return e != 10; }
+    bool StartArray() { return e != 11; }
+    bool EndArray(SizeType) { return e != 12; }
+};
+
+#define TEST_TERMINATION(e, json)\
+{\
+    Document d; \
+    EXPECT_FALSE(d.Parse(json).HasParseError()); \
+    Reader reader; \
+    TerminateHandler<e> h;\
+    EXPECT_FALSE(d.Accept(h));\
+}
+
+TEST(Value, AcceptTerminationByHandler) {
+    TEST_TERMINATION(0, "[null]");
+    TEST_TERMINATION(1, "[true]");
+    TEST_TERMINATION(1, "[false]");
+    TEST_TERMINATION(2, "[-1]");
+    TEST_TERMINATION(3, "[2147483648]");
+    TEST_TERMINATION(4, "[-1234567890123456789]");
+    TEST_TERMINATION(5, "[9223372036854775808]");
+    TEST_TERMINATION(6, "[0.5]");
+    TEST_TERMINATION(7, "[\"a\"]");
+    TEST_TERMINATION(8, "[{}]");
+    TEST_TERMINATION(9, "[{\"a\":1}]");
+    TEST_TERMINATION(10, "[{}]");
+    TEST_TERMINATION(11, "{\"a\":[]}");
+    TEST_TERMINATION(12, "{\"a\":[]}");
 }
