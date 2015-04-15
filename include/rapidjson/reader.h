@@ -1273,12 +1273,9 @@ private:
                 return dst;
 
         case IterativeParsingKeyValueDelimiterState:
-            if (token == ColonToken) {
-                is.Take();
-                return dst;
-            }
-            else
-                return IterativeParsingErrorState;
+            RAPIDJSON_ASSERT(token == ColonToken);
+            is.Take();
+            return dst;
 
         case IterativeParsingMemberValueState:
             // Must be non-compound value. Or it would be ObjectInitial or ArrayInitial state.
