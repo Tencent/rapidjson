@@ -10,6 +10,19 @@ Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights 
   * [简体中文](http://miloyip.github.io/rapidjson/zh-cn/)
   * [GitBook](https://www.gitbook.com/book/miloyip/rapidjson/)可下载PDF/EPUB/MOBI，但不含API参考手册。
 
+## Build 状态
+
+| [Linux][lin-link] | [Windows][win-link] | [Coveralls][cov-link] |
+| :---------------: | :-----------------: | :-------------------: |
+| ![lin-badge]      | ![win-badge]        | ![cov-badge]          |
+
+[lin-badge]: https://travis-ci.org/miloyip/rapidjson.png?branch=master "Travis build status"
+[lin-link]:  https://travis-ci.org/miloyip/rapidjson "Travis build status"
+[win-badge]: https://ci.appveyor.com/api/projects/status/u658dcuwxo14a8m9/branch/master "AppVeyor build status"
+[win-link]:  https://ci.appveyor.com/project/miloyip/rapidjson/branch/master "AppVeyor build status"
+[cov-badge]: https://coveralls.io/repos/miloyip/rapidjson/badge.png?branch=master
+[cov-link]:  https://coveralls.io/r/miloyip/rapidjson?branch=master
+
 ## 简介
 
 RapidJSON是一个C++的JSON解析器及生成器。它的灵感来自[RapidXml](http://rapidxml.sourceforge.net/)。
