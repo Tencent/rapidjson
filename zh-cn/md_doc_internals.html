@@ -317,7 +317,16 @@ Skip Whitespaces with SIMD</h2>
 <div class="line">        s.Take();</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>However, this requires 4 comparisons and a few branching for each character. This was found to be a hot spot.</p>
-<p>To accelerate this process, SIMD was applied to compare 16 characters with 4 white spaces for each iteration. Currently RapidJSON only supports SSE2 and SSE4.1 instructions for this. And it is only activated for UTF-8 memory streams, including string stream or <em>in situ</em> parsing.</p>
+<p>To accelerate this process, SIMD was applied to compare 16 characters with 4 white spaces for each iteration. Currently RapidJSON only supports SSE2 and SSE4.2 instructions for this. And it is only activated for UTF-8 memory streams, including string stream or <em>in situ</em> parsing.</p>
+<p>To enable this optimization, need to define <code>RAPIDJSON_SSE2</code> or <code>RAPIDJSON_SSE42</code> before including <code><a class="el" href="rapidjson_8h.html" title="common definitions and configuration ">rapidjson.h</a></code>. Some compilers can detect the setting, as in <code>perftest.h</code>:</p>
+<div class="fragment"><div class="line"><span class="comment">// __SSE2__ and __SSE4_2__ are recognized by gcc, clang, and the Intel compiler.</span></div>
+<div class="line"><span class="comment">// We use -march=native with gmake to enable -msse2 and -msse4.2, if supported.</span></div>
+<div class="line"><span class="preprocessor">#if defined(__SSE4_2__)</span></div>
+<div class="line"><span class="preprocessor">#  define RAPIDJSON_SSE42</span></div>
+<div class="line"><span class="preprocessor">#elif defined(__SSE2__)</span></div>
+<div class="line"><span class="preprocessor">#  define RAPIDJSON_SSE2</span></div>
+<div class="line"><span class="preprocessor">#endif</span></div>
+</div><!-- fragment --><p>Note that, these are compile-time settings. Running the executable on a machine without such instruction set support will make it crash.</p>
 <h2><a class="anchor" id="LocalStreamCopy"></a>
 Local Stream Copy</h2>
 <p>During optimization, it is found that some compilers cannot localize some member data access of streams into local variables or registers. Experimental results show that for some stream types, making a copy of the stream and used it in inner-loop can improve performance. For example, the actual (non-SIMD) implementation of <code><a class="el" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a" title="Skip the JSON white spaces in a stream. ">SkipWhitespace()</a></code> is implemented as:</p>

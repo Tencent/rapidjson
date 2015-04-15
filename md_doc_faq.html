@@ -237,7 +237,7 @@ $(document).ready(function(){initNavTree('md_doc_faq.html','');});
 <p class="startli">Many design decisions of RapidJSON is aimed at time/space performance. These may reduce user-friendliness of APIs. Besides, it also employs low-level optimizations (intrinsics, SIMD) and special algorithms (custom double-to-string, string-to-double conversions).</p>
 </li>
 <li><p class="startli">What is SIMD? How it is applied in RapidJSON?</p>
-<p class="startli"><a href="http://en.wikipedia.org/wiki/SIMD">SIMD</a> instructions can perform parallel computation in modern CPUs. RapidJSON support Intel's SSE2/SSE4.1 to accelerate whitespace skipping. This improves performance of parsing indent formatted JSON.</p>
+<p class="startli"><a href="http://en.wikipedia.org/wiki/SIMD">SIMD</a> instructions can perform parallel computation in modern CPUs. RapidJSON support Intel's SSE2/SSE4.2 to accelerate whitespace skipping. This improves performance of parsing indent formatted JSON. Define <code>RAPIDJSON_SSE2</code> or <code>RAPIDJSON_SSE42</code> macro to enable this feature. However, running the executable on a machine without such instruction set support will make it crash.</p>
 </li>
 <li><p class="startli">Does it consume a lot of memory?</p>
 <p class="startli">The design of RapidJSON aims at reducing memory footprint.</p>

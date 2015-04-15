@@ -237,7 +237,7 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <p class="startli">RapidJSON的许多设计是针对时间／空间性能来设计的，这些决定可能会影响API的易用性。此外，它也使用了许多底层优化（内部函数／intrinsic、SIMD）及特别的算法（自定义的double至字符串转换、字符串至double的转换）。</p>
 </li>
 <li><p class="startli">什是是SIMD？它如何用于RapidJSON？</p>
-<p class="startli"><a href="http://en.wikipedia.org/wiki/SIMD">SIMD</a>指令可以在现代CPU中执行并行运算。RapidJSON支持了Intel的SSE2/SSE4.1去加速跳过空白字符。在解析含缩进的JSON时，这能提升性能。</p>
+<p class="startli"><a href="http://en.wikipedia.org/wiki/SIMD">SIMD</a>指令可以在现代CPU中执行并行运算。RapidJSON支持了Intel的SSE2/SSE4.2去加速跳过空白字符。在解析含缩进的JSON时，这能提升性能。只要定义名为<code>RAPIDJSON_SSE2</code>或<code>RAPIDJSON_SSE42</code>的宏，就能启动这个功能。然而，若在不支持这些指令集的机器上执行这些可执行文件，会导致崩溃。</p>
 </li>
 <li><p class="startli">它会消耗许多内存么？</p>
 <p class="startli">RapidJSON的设计目标是减低内存占用。</p>

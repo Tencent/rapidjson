@@ -112,7 +112,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p>RapidJSON is a JSON parser and generator for C++. It was inspired by <a href="http://rapidxml.sourceforge.net/">RapidXml</a>.</p>
 <ul>
 <li>RapidJSON is small but complete. It supports both SAX and DOM style API. The SAX parser is only a half thousand lines of code.</li>
-<li>RapidJSON is fast. Its performance can be comparable to <code>strlen()</code>. It also optionally supports SSE2/SSE4.1 for acceleration.</li>
+<li>RapidJSON is fast. Its performance can be comparable to <code>strlen()</code>. It also optionally supports SSE2/SSE4.2 for acceleration.</li>
 <li>RapidJSON is self-contained. It does not depend on external libraries such as BOOST. It even does not depend on STL.</li>
 <li>RapidJSON is memory friendly. Each JSON value occupies exactly 16/20 bytes for most 32/64-bit machines (excluding text string). By default it uses a fast memory allocator, and the parser allocates memory compactly during parsing.</li>
 <li>RapidJSON is Unicode friendly. It supports UTF-8, UTF-16, UTF-32 (LE &amp; BE), and their detection, validation and transcoding internally. For example, you can read a UTF-8 file and let RapidJSON transcode the JSON strings into UTF-16 in the DOM. It also supports surrogates and "\u0000" (null character).</li>
