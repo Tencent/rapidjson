@@ -29,11 +29,13 @@
 #  define RAPIDJSON_SSE2
 #endif
 
+#define RAPIDJSON_NAMESPACE rapidjson_simd
+
 #include "unittest.h"
 
 #include "rapidjson/reader.h"
 
-using namespace rapidjson;
+using namespace rapidjson_simd;
 
 #ifdef RAPIDJSON_SSE2
 #define SIMD_SUFFIX(name) name##_SSE2
