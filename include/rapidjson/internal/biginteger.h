@@ -172,13 +172,10 @@ public:
     }
 
     // Compute absolute difference of this and rhs.
-    // Return false if this < rhs
+    // Assume this != rhs
     bool Difference(const BigInteger& rhs, BigInteger* out) const {
         int cmp = Compare(rhs);
-        if (cmp == 0) {
-            *out = BigInteger(0);
-            return false;
-        }
+        RAPIDJSON_ASSERT(cmp != 0);
         const BigInteger *a, *b;  // Makes a > b
         bool ret;
         if (cmp < 0) { a = &rhs; b = this; ret = true; }

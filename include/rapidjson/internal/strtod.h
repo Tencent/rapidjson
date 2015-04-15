@@ -104,19 +104,9 @@ inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp) {
     hS.MultiplyPow5(hS_Exp5) <<= hS_Exp2;
 
     BigInteger delta(0);
-    bool adjustToNegative = dS.Difference(bS, &delta);
+    dS.Difference(bS, &delta);
 
-    int cmp = delta.Compare(hS);
-    // If delta is within 1/2 ULP, check for special case when significand is power of two.
-    // In this case, need to compare with 1/2h in the lower bound.
-    if (cmp < 0 && adjustToNegative && // within and dS < bS
-        db.IsNormal() && (bInt & (bInt - 1)) == 0 && // Power of 2
-        db.Uint64Value() != RAPIDJSON_UINT64_C2(0x00100000, 0x00000000)) // minimum normal number must not do this
-    {
-        delta <<= 1;
-        return delta.Compare(hS);
-    }
-    return cmp;
+    return delta.Compare(hS);
 }
 
 inline bool StrtodFast(double d, int p, double* result) {
