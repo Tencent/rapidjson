@@ -1227,6 +1227,8 @@ private:
     // May return a new state on state pop.
     template <unsigned parseFlags, typename InputStream, typename Handler>
     RAPIDJSON_FORCEINLINE IterativeParsingState Transit(IterativeParsingState src, Token token, IterativeParsingState dst, InputStream& is, Handler& handler) {
+        (void)token;
+
         switch (dst) {
         case IterativeParsingErrorState:
             return dst;
