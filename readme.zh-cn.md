@@ -16,7 +16,7 @@ RapidJSON是一个C++的JSON解析器及生成器。它的灵感来自[RapidXml]
 
 * RapidJSON小而全。它同时支持SAX和DOM风格的API。SAX解析器只有约500行代码。
 
-* RapidJSON快。它的性能可与`strlen()`相比。可支持SSE2/SSE4.1加速。
+* RapidJSON快。它的性能可与`strlen()`相比。可支持SSE2/SSE4.2加速。
 
 * RapidJSON独立。它不依赖于BOOST等外部库。它甚至不依赖于STL。
 
