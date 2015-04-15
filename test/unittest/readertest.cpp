@@ -1053,6 +1053,17 @@ TEST(Reader, IterativeParsing_ErrorHandling) {
     TESTERRORHANDLING("{\"a\"}", kParseErrorObjectMissColon, 4u);
     TESTERRORHANDLING("{\"a\": 1", kParseErrorObjectMissCommaOrCurlyBracket, 7u);
     TESTERRORHANDLING("[1 2 3]", kParseErrorArrayMissCommaOrSquareBracket, 3u);
+    TESTERRORHANDLING("{\"a: 1", kParseErrorStringMissQuotationMark, 5u);
+
+    // Any JSON value can be a valid root element in RFC7159.
+    TESTERRORHANDLING("\"ab", kParseErrorStringMissQuotationMark, 2u);
+    TESTERRORHANDLING("truE", kParseErrorValueInvalid, 3u);
+    TESTERRORHANDLING("False", kParseErrorValueInvalid, 0u);
+    TESTERRORHANDLING("true, false", kParseErrorDocumentRootNotSingular, 4u);
+    TESTERRORHANDLING("false, false", kParseErrorDocumentRootNotSingular, 5u);
+    TESTERRORHANDLING("nulL", kParseErrorValueInvalid, 3u);
+    TESTERRORHANDLING("null , null", kParseErrorDocumentRootNotSingular, 5u);
+    TESTERRORHANDLING("1a", kParseErrorDocumentRootNotSingular, 1u);
 }
 
 template<typename Encoding = UTF8<> >
