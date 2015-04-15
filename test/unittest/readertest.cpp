@@ -302,28 +302,40 @@ static void TestParseDouble() {
 "e-308", 
     2.2250738585072014e-308);
 
-#if 0 // Very slow
-    static const unsigned count = 10000000;
-    // Random test for double
     {
+        static const unsigned count = 1000; // Tested with 1000000 locally
         Random r;
+        Reader reader; // Reusing reader to prevent heap allocation
 
-        for (unsigned i = 0; i < count; i++) {
-            internal::Double d;
-            do {
+        // Exhaustively test different exponents with random significant
+        for (uint64_t exp = 0; exp < 2047; exp++) {
+            ;
+            for (unsigned i = 0; i < count; i++) {
                 // Need to call r() in two statements for cross-platform coherent sequence.
-                uint64_t u = uint64_t(r()) << 32;
+                uint64_t u = (exp << 52) | uint64_t(r() & 0x000FFFFF) << 32;
                 u |= uint64_t(r());
-                d = internal::Double(u);
-            } while (d.IsNan() || d.IsInf()/* || !d.IsNormal()*/);  // Also work for subnormal now
+                internal::Double d = internal::Double(u);
 
-            char buffer[32];
-            *internal::dtoa(d.Value(), buffer) = '\0';
-            TEST_DOUBLE(fullPrecision, buffer, d.Value());
+                char buffer[32];
+                *internal::dtoa(d.Value(), buffer) = '\0';
+
+                StringStream s(buffer);
+                ParseDoubleHandler h;
+                ASSERT_EQ(kParseErrorNone, reader.Parse<fullPrecision ? kParseFullPrecisionFlag : 0>(s, h).Code());
+                EXPECT_EQ(1u, h.step_);
+                internal::Double a(h.actual_);
+                if (fullPrecision) {
+                    EXPECT_EQ(d.Uint64Value(), a.Uint64Value());
+                    if (d.Uint64Value() != a.Uint64Value())
+                        printf("  String: %sn  Actual: %.17gnExpected: %.17gn", buffer, h.actual_, d.Value());
+                }
+                else {
+                    EXPECT_EQ(d.Sign(), a.Sign()); /* for 0.0 != -0.0 */
+                    EXPECT_DOUBLE_EQ(d.Value(), h.actual_);
+                }
+            }
         }
     }
-#endif
-
 #undef TEST_DOUBLE
 }
 
@@ -651,7 +663,7 @@ TEST(Reader, ParseString_Error) {
     TEST_STRINGENCODING_ERROR(UTF32<>, UTF8<>, unsigned, ARRAY('[', '\"', 0x110000, '\"', ']', '\0'));
 
     // Malform ASCII sequence
-    TEST_STRINGENCODING_ERROR(ASCII<>, UTF8<>, char, ARRAY('[', '\"', 0x80, '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(ASCII<>, UTF8<>, char, ARRAY('[', '\"', char(0x80), '\"', ']', '\0'));
 
 #undef ARRAY
 #undef TEST_STRINGARRAY_ERROR
