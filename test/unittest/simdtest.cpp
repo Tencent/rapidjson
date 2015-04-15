@@ -46,18 +46,23 @@ using namespace rapidjson_simd;
 #endif
 
 TEST(SIMD, SIMD_SUFFIX(SkipWhitespace)) {
-    char buffer[1025];
-    for (size_t i = 0; i < 1024; i++)
-        buffer[i] = " \t\r\n"[i % 4];
-    for (size_t i = 0; i < 1024; i += 31)
-        buffer[i] = 'X';
-    buffer[1024] = '\0';
+    for (int step = 1; step < 32; step++) {
+        char buffer[1025];
+        for (size_t i = 0; i < 1024; i++)
+            buffer[i] = " \t\r\n"[i % 4];
+        for (size_t i = 0; i < 1024; i += step)
+            buffer[i] = 'X';
+        buffer[1024] = '\0';
 
-    StringStream s(buffer);
-    for(;;) {
-        SkipWhitespace(s);
-        if (s.Peek() == '\0')
-            break;
-        EXPECT_EQ('X', s.Take());
+        StringStream s(buffer);
+        size_t i = 0;
+        for (;;) {
+            SkipWhitespace(s);
+            if (s.Peek() == '\0')
+                break;
+            EXPECT_EQ(i, s.Tell());
+            EXPECT_EQ('X', s.Take());
+            i += step;
+        }
     }
 }
