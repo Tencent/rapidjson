@@ -45,7 +45,8 @@ using namespace rapidjson_simd;
 #define SIMD_SUFFIX(name) name
 #endif
 
-TEST(SIMD, SIMD_SUFFIX(SkipWhitespace)) {
+template <typename StreamType>
+void TestSkipWhitespace() {
     for (int step = 1; step < 32; step++) {
         char buffer[1025];
         for (size_t i = 0; i < 1024; i++)
@@ -54,7 +55,7 @@ TEST(SIMD, SIMD_SUFFIX(SkipWhitespace)) {
             buffer[i] = 'X';
         buffer[1024] = '\0';
 
-        StringStream s(buffer);
+        StreamType s(buffer);
         size_t i = 0;
         for (;;) {
             SkipWhitespace(s);
@@ -65,4 +66,9 @@ TEST(SIMD, SIMD_SUFFIX(SkipWhitespace)) {
             i += step;
         }
     }
+}
+
+TEST(SIMD, SIMD_SUFFIX(SkipWhitespace)) {
+    TestSkipWhitespace<StringStream>();
+    TestSkipWhitespace<InsituStringStream>();
 }
