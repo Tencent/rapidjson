@@ -46,12 +46,12 @@ using namespace rapidjson_simd;
 #endif
 
 TEST(SIMD, SIMD_SUFFIX(SkipWhitespace)) {
-    char buffer[257];
-    for (size_t i = 0; i < 256; i++)
+    char buffer[1025];
+    for (size_t i = 0; i < 1024; i++)
         buffer[i] = " \t\r\n"[i % 4];
-    for (size_t i = 0; i < 256; i += 15)
+    for (size_t i = 0; i < 1024; i += 31)
         buffer[i] = 'X';
-    buffer[256] = '\0';
+    buffer[1024] = '\0';
 
     StringStream s(buffer);
     for(;;) {
