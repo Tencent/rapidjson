@@ -57,7 +57,7 @@ TEST(Allocator, MemoryPoolAllocator) {
     MemoryPoolAllocator<> a;
     TestAllocator(a);
 
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 1; i < 1000; i++) {
         EXPECT_TRUE(a.Malloc(i) != 0);
         EXPECT_LE(a.Size(), a.Capacity());
     }
