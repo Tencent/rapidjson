@@ -1459,17 +1459,14 @@ public:
         case kStringType:
             return handler.String(GetString(), GetStringLength(), (flags_ & kCopyFlag) != 0);
     
-        case kNumberType:
+        default:
+            RAPIDJSON_ASSERT(GetType() == kNumberType);
             if (IsInt())            return handler.Int(data_.n.i.i);
             else if (IsUint())      return handler.Uint(data_.n.u.u);
             else if (IsInt64())     return handler.Int64(data_.n.i64);
             else if (IsUint64())    return handler.Uint64(data_.n.u64);
             else                    return handler.Double(data_.n.d);
-    
-        default:
-            RAPIDJSON_ASSERT(false);
         }
-        return false;
     }
 
 private:
