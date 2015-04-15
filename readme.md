@@ -13,14 +13,16 @@ Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights 
 
 ## Build status
 
-| [Linux][lin-link] | [Windows][win-link] |
-| :---------------: | :-----------------: |
-| ![lin-badge]      | ![win-badge]        |
+| [Linux][lin-link] | [Windows][win-link] | [Coveralls][cov-link] |
+| :---------------: | :-----------------: | :-------------------: |
+| ![lin-badge]      | ![win-badge]        | ![cov-badge]          |
 
-[lin-badge]: https://travis-ci.org/miloyip/rapidjson.png "Travis build status"
+[lin-badge]: https://travis-ci.org/miloyip/rapidjson.png?branch=master "Travis build status"
 [lin-link]:  https://travis-ci.org/miloyip/rapidjson "Travis build status"
-[win-badge]: https://ci.appveyor.com/api/projects/status/u658dcuwxo14a8m9/branch/master?svg=true "AppVeyor build status"
+[win-badge]: https://ci.appveyor.com/api/projects/status/u658dcuwxo14a8m9/branch/master "AppVeyor build status"
 [win-link]:  https://ci.appveyor.com/project/miloyip/rapidjson/branch/master "AppVeyor build status"
+[cov-badge]: https://coveralls.io/repos/miloyip/rapidjson/badge.png?branch=master
+[cov-link]:  https://coveralls.io/r/miloyip/rapidjson?branch=master
 
 ## Introduction
 
