@@ -77,6 +77,7 @@ inline void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buff
             case  3: d = p1 /        100; p1 %=        100; break;
             case  2: d = p1 /         10; p1 %=         10; break;
             case  1: d = p1;              p1 =           0; break;
+            default:;
         }
         if (d || *len)
             buffer[(*len)++] = static_cast<char>('0' + static_cast<char>(d));
