@@ -303,7 +303,7 @@ static void TestParseDouble() {
     2.2250738585072014e-308);
 
     {
-        static const unsigned count = 1000; // Tested with 1000000 locally
+        static const unsigned count = 100; // Tested with 1000000 locally
         Random r;
         Reader reader; // Reusing reader to prevent heap allocation
 
