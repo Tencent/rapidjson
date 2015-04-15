@@ -52,7 +52,7 @@ inline T Min3(T a, T b, T c) {
     return m;
 }
 
-inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp, bool* adjustToNegative) {
+inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp) {
     const Double db(b);
     const uint64_t bInt = db.IntegerSignificand();
     const int bExp = db.IntegerExponent();
@@ -104,12 +104,12 @@ inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp, bool* adj
     hS.MultiplyPow5(hS_Exp5) <<= hS_Exp2;
 
     BigInteger delta(0);
-    *adjustToNegative = dS.Difference(bS, &delta);
+    bool adjustToNegative = dS.Difference(bS, &delta);
 
     int cmp = delta.Compare(hS);
     // If delta is within 1/2 ULP, check for special case when significand is power of two.
     // In this case, need to compare with 1/2h in the lower bound.
-    if (cmp < 0 && *adjustToNegative && // within and dS < bS
+    if (cmp < 0 && adjustToNegative && // within and dS < bS
         db.IsNormal() && (bInt & (bInt - 1)) == 0 && // Power of 2
         db.Uint64Value() != RAPIDJSON_UINT64_C2(0x00100000, 0x00000000)) // minimum normal number must not do this
     {
@@ -213,24 +213,18 @@ inline double StrtodBigInteger(double approx, const char* decimals, size_t lengt
     const BigInteger dInt(decimals, length);
     const int dExp = (int)decimalPosition - (int)length + exp;
     Double a(approx);
-    for (int i = 0; i < 10; i++) {
-        bool adjustToNegative;
-        int cmp = CheckWithinHalfULP(a.Value(), dInt, dExp, &adjustToNegative);
-        if (cmp < 0)
-            return a.Value();  // within half ULP
-        else if (cmp == 0) {
-            // Round towards even
-            if (a.Significand() & 1)
-                return adjustToNegative ? a.PreviousPositiveDouble() : a.NextPositiveDouble();
-            else
-                return a.Value();
-        }
-        else // adjustment
-            a = adjustToNegative ? a.PreviousPositiveDouble() : a.NextPositiveDouble();
+    int cmp = CheckWithinHalfULP(a.Value(), dInt, dExp);
+    if (cmp < 0)
+        return a.Value();  // within half ULP
+    else if (cmp == 0) {
+        // Round towards even
+        if (a.Significand() & 1)
+            return a.NextPositiveDouble();
+        else
+            return a.Value();
     }
-
-    // This should not happen, but in case there is really a bug, break the infinite-loop
-    return a.Value();
+    else // adjustment
+        return a.NextPositiveDouble();
 }
 
 inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t length, size_t decimalPosition, int exp) {

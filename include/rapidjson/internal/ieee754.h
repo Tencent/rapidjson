@@ -34,14 +34,6 @@ public:
         return Double(u + 1).Value();
     }
 
-    double PreviousPositiveDouble() const {
-        RAPIDJSON_ASSERT(!Sign());
-        if (IsZero())
-            return 0.0;
-        else
-            return Double(u - 1).Value();
-    }
-
     bool Sign() const { return (u & kSignMask) != 0; }
     uint64_t Significand() const { return u & kSignificandMask; }
     int Exponent() const { return ((u & kExponentMask) >> kSignificandSize) - kExponentBias; }

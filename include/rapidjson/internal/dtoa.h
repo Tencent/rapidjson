@@ -50,8 +50,10 @@ inline unsigned CountDecimalDigit32(uint32_t n) {
     if (n < 1000000) return 6;
     if (n < 10000000) return 7;
     if (n < 100000000) return 8;
-    if (n < 1000000000) return 9;
-    return 10;
+    // Will not reach 10 digits in DigitGen()
+    //if (n < 1000000000) return 9;
+    //return 10;
+    return 9;
 }
 
 inline void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buffer, int* len, int* K) {
@@ -60,13 +62,12 @@ inline void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buff
     const DiyFp wp_w = Mp - W;
     uint32_t p1 = static_cast<uint32_t>(Mp.f >> -one.e);
     uint64_t p2 = Mp.f & (one.f - 1);
-    int kappa = CountDecimalDigit32(p1);
+    int kappa = CountDecimalDigit32(p1); // kappa in [0, 9]
     *len = 0;
 
     while (kappa > 0) {
-        uint32_t d;
+        uint32_t d = 0;
         switch (kappa) {
-            case 10: d = p1 / 1000000000; p1 %= 1000000000; break;
             case  9: d = p1 /  100000000; p1 %=  100000000; break;
             case  8: d = p1 /   10000000; p1 %=   10000000; break;
             case  7: d = p1 /    1000000; p1 %=    1000000; break;
@@ -76,14 +77,6 @@ inline void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buff
             case  3: d = p1 /        100; p1 %=        100; break;
             case  2: d = p1 /         10; p1 %=         10; break;
             case  1: d = p1;              p1 =           0; break;
-            default: 
-#if defined(_MSC_VER)
-                __assume(0);
-#elif __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
-                __builtin_unreachable();
-#else
-                d = 0;
-#endif
         }
         if (d || *len)
             buffer[(*len)++] = static_cast<char>('0' + static_cast<char>(d));
