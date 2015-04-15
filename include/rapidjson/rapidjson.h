@@ -118,6 +118,23 @@
 #endif // RAPIDJSON_NO_INT64TYPEDEF
 
 ///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_FORCENOINLINE and RAPIDJSON_CODE_COVERAGE
+
+#ifndef RAPIDJSON_FORCENOINLINE
+#ifdef _MSC_VER
+#define RAPIDJSON_FORCENOINLINE __declspec(noinline)
+#elif defined(__GNUC__)
+#define RAPIDJSON_FORCENOINLINE __attribute__ ((noinline))
+#else
+#define RAPIDJSON_FORCENOINLINE 
+#endif
+#endif
+
+#ifdef RAPIDJSON_CODE_COVERAGE
+#define RAPIDJSON_FORCEINLINE RAPIDJSON_FORCENOINLINE
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_FORCEINLINE
 
 #ifndef RAPIDJSON_FORCEINLINE
