@@ -1309,60 +1309,60 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l01227"></a><span class="lineno"> 1227</span>&#160;    <span class="comment">// May return a new state on state pop.</span></div>
 <div class="line"><a name="l01228"></a><span class="lineno"> 1228</span>&#160;    <span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> Handler&gt;</div>
 <div class="line"><a name="l01229"></a><span class="lineno"> 1229</span>&#160;    RAPIDJSON_FORCEINLINE IterativeParsingState Transit(IterativeParsingState src, Token token, IterativeParsingState dst, InputStream&amp; is, Handler&amp; handler) {</div>
-<div class="line"><a name="l01230"></a><span class="lineno"> 1230</span>&#160;        <span class="keywordflow">switch</span> (dst) {</div>
-<div class="line"><a name="l01231"></a><span class="lineno"> 1231</span>&#160;        <span class="keywordflow">case</span> IterativeParsingStartState:</div>
-<div class="line"><a name="l01232"></a><span class="lineno"> 1232</span>&#160;            <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>);</div>
-<div class="line"><a name="l01233"></a><span class="lineno"> 1233</span>&#160;            <span class="keywordflow">return</span> IterativeParsingErrorState;</div>
-<div class="line"><a name="l01234"></a><span class="lineno"> 1234</span>&#160;</div>
-<div class="line"><a name="l01235"></a><span class="lineno"> 1235</span>&#160;        <span class="keywordflow">case</span> IterativeParsingFinishState:</div>
-<div class="line"><a name="l01236"></a><span class="lineno"> 1236</span>&#160;            <span class="keywordflow">return</span> dst;</div>
-<div class="line"><a name="l01237"></a><span class="lineno"> 1237</span>&#160;</div>
-<div class="line"><a name="l01238"></a><span class="lineno"> 1238</span>&#160;        <span class="keywordflow">case</span> IterativeParsingErrorState:</div>
-<div class="line"><a name="l01239"></a><span class="lineno"> 1239</span>&#160;            <span class="keywordflow">return</span> dst;</div>
-<div class="line"><a name="l01240"></a><span class="lineno"> 1240</span>&#160;</div>
-<div class="line"><a name="l01241"></a><span class="lineno"> 1241</span>&#160;        <span class="keywordflow">case</span> IterativeParsingObjectInitialState:</div>
-<div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160;        <span class="keywordflow">case</span> IterativeParsingArrayInitialState:</div>
-<div class="line"><a name="l01243"></a><span class="lineno"> 1243</span>&#160;        {</div>
-<div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;            <span class="comment">// Push the state(Element or MemeberValue) if we are nested in another array or value of member.</span></div>
-<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;            <span class="comment">// In this way we can get the correct state on ObjectFinish or ArrayFinish by frame pop.</span></div>
-<div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;            IterativeParsingState n = src;</div>
-<div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;            <span class="keywordflow">if</span> (src == IterativeParsingArrayInitialState || src == IterativeParsingElementDelimiterState)</div>
-<div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;                n = IterativeParsingElementState;</div>
-<div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (src == IterativeParsingKeyValueDelimiterState)</div>
-<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;                n = IterativeParsingMemberValueState;</div>
-<div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;            <span class="comment">// Push current state.</span></div>
-<div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;            *stack_.template Push&lt;SizeType&gt;(1) = n;</div>
-<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160;            <span class="comment">// Initialize and push the member/element count.</span></div>
-<div class="line"><a name="l01254"></a><span class="lineno"> 1254</span>&#160;            *stack_.template Push&lt;SizeType&gt;(1) = 0;</div>
-<div class="line"><a name="l01255"></a><span class="lineno"> 1255</span>&#160;            <span class="comment">// Call handler</span></div>
-<div class="line"><a name="l01256"></a><span class="lineno"> 1256</span>&#160;            <span class="keywordtype">bool</span> hr = (dst == IterativeParsingObjectInitialState) ? handler.StartObject() : handler.StartArray();</div>
-<div class="line"><a name="l01257"></a><span class="lineno"> 1257</span>&#160;            <span class="comment">// On handler short circuits the parsing.</span></div>
-<div class="line"><a name="l01258"></a><span class="lineno"> 1258</span>&#160;            <span class="keywordflow">if</span> (!hr) {</div>
-<div class="line"><a name="l01259"></a><span class="lineno"> 1259</span>&#160;                <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7f8c4265b2edda78568ae3338aaf1461">RAPIDJSON_PARSE_ERROR_NORETURN</a>(<a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60ab250f87c3d8454c579364b5a0f697a50">kParseErrorTermination</a>, is.Tell());</div>
-<div class="line"><a name="l01260"></a><span class="lineno"> 1260</span>&#160;                <span class="keywordflow">return</span> IterativeParsingErrorState;</div>
-<div class="line"><a name="l01261"></a><span class="lineno"> 1261</span>&#160;            }</div>
-<div class="line"><a name="l01262"></a><span class="lineno"> 1262</span>&#160;            <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l01263"></a><span class="lineno"> 1263</span>&#160;                is.Take();</div>
-<div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160;                <span class="keywordflow">return</span> dst;</div>
-<div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160;            }</div>
-<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;        }</div>
-<div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;</div>
-<div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160;        <span class="keywordflow">case</span> IterativeParsingMemberKeyState:</div>
-<div class="line"><a name="l01269"></a><span class="lineno"> 1269</span>&#160;            ParseString&lt;parseFlags&gt;(is, handler, <span class="keyword">true</span>);</div>
-<div class="line"><a name="l01270"></a><span class="lineno"> 1270</span>&#160;            <span class="keywordflow">if</span> (HasParseError())</div>
-<div class="line"><a name="l01271"></a><span class="lineno"> 1271</span>&#160;                <span class="keywordflow">return</span> IterativeParsingErrorState;</div>
-<div class="line"><a name="l01272"></a><span class="lineno"> 1272</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01273"></a><span class="lineno"> 1273</span>&#160;                <span class="keywordflow">return</span> dst;</div>
+<div class="line"><a name="l01230"></a><span class="lineno"> 1230</span>&#160;        (void)token;</div>
+<div class="line"><a name="l01231"></a><span class="lineno"> 1231</span>&#160;</div>
+<div class="line"><a name="l01232"></a><span class="lineno"> 1232</span>&#160;        <span class="keywordflow">switch</span> (dst) {</div>
+<div class="line"><a name="l01233"></a><span class="lineno"> 1233</span>&#160;        <span class="keywordflow">case</span> IterativeParsingErrorState:</div>
+<div class="line"><a name="l01234"></a><span class="lineno"> 1234</span>&#160;            <span class="keywordflow">return</span> dst;</div>
+<div class="line"><a name="l01235"></a><span class="lineno"> 1235</span>&#160;</div>
+<div class="line"><a name="l01236"></a><span class="lineno"> 1236</span>&#160;        <span class="keywordflow">case</span> IterativeParsingObjectInitialState:</div>
+<div class="line"><a name="l01237"></a><span class="lineno"> 1237</span>&#160;        <span class="keywordflow">case</span> IterativeParsingArrayInitialState:</div>
+<div class="line"><a name="l01238"></a><span class="lineno"> 1238</span>&#160;        {</div>
+<div class="line"><a name="l01239"></a><span class="lineno"> 1239</span>&#160;            <span class="comment">// Push the state(Element or MemeberValue) if we are nested in another array or value of member.</span></div>
+<div class="line"><a name="l01240"></a><span class="lineno"> 1240</span>&#160;            <span class="comment">// In this way we can get the correct state on ObjectFinish or ArrayFinish by frame pop.</span></div>
+<div class="line"><a name="l01241"></a><span class="lineno"> 1241</span>&#160;            IterativeParsingState n = src;</div>
+<div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160;            <span class="keywordflow">if</span> (src == IterativeParsingArrayInitialState || src == IterativeParsingElementDelimiterState)</div>
+<div class="line"><a name="l01243"></a><span class="lineno"> 1243</span>&#160;                n = IterativeParsingElementState;</div>
+<div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (src == IterativeParsingKeyValueDelimiterState)</div>
+<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;                n = IterativeParsingMemberValueState;</div>
+<div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;            <span class="comment">// Push current state.</span></div>
+<div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;            *stack_.template Push&lt;SizeType&gt;(1) = n;</div>
+<div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;            <span class="comment">// Initialize and push the member/element count.</span></div>
+<div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160;            *stack_.template Push&lt;SizeType&gt;(1) = 0;</div>
+<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;            <span class="comment">// Call handler</span></div>
+<div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;            <span class="keywordtype">bool</span> hr = (dst == IterativeParsingObjectInitialState) ? handler.StartObject() : handler.StartArray();</div>
+<div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;            <span class="comment">// On handler short circuits the parsing.</span></div>
+<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160;            <span class="keywordflow">if</span> (!hr) {</div>
+<div class="line"><a name="l01254"></a><span class="lineno"> 1254</span>&#160;                <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7f8c4265b2edda78568ae3338aaf1461">RAPIDJSON_PARSE_ERROR_NORETURN</a>(<a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60ab250f87c3d8454c579364b5a0f697a50">kParseErrorTermination</a>, is.Tell());</div>
+<div class="line"><a name="l01255"></a><span class="lineno"> 1255</span>&#160;                <span class="keywordflow">return</span> IterativeParsingErrorState;</div>
+<div class="line"><a name="l01256"></a><span class="lineno"> 1256</span>&#160;            }</div>
+<div class="line"><a name="l01257"></a><span class="lineno"> 1257</span>&#160;            <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l01258"></a><span class="lineno"> 1258</span>&#160;                is.Take();</div>
+<div class="line"><a name="l01259"></a><span class="lineno"> 1259</span>&#160;                <span class="keywordflow">return</span> dst;</div>
+<div class="line"><a name="l01260"></a><span class="lineno"> 1260</span>&#160;            }</div>
+<div class="line"><a name="l01261"></a><span class="lineno"> 1261</span>&#160;        }</div>
+<div class="line"><a name="l01262"></a><span class="lineno"> 1262</span>&#160;</div>
+<div class="line"><a name="l01263"></a><span class="lineno"> 1263</span>&#160;        <span class="keywordflow">case</span> IterativeParsingMemberKeyState:</div>
+<div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160;            ParseString&lt;parseFlags&gt;(is, handler, <span class="keyword">true</span>);</div>
+<div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160;            <span class="keywordflow">if</span> (HasParseError())</div>
+<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;                <span class="keywordflow">return</span> IterativeParsingErrorState;</div>
+<div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160;                <span class="keywordflow">return</span> dst;</div>
+<div class="line"><a name="l01269"></a><span class="lineno"> 1269</span>&#160;</div>
+<div class="line"><a name="l01270"></a><span class="lineno"> 1270</span>&#160;        <span class="keywordflow">case</span> IterativeParsingKeyValueDelimiterState:</div>
+<div class="line"><a name="l01271"></a><span class="lineno"> 1271</span>&#160;            <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(token == ColonToken);</div>
+<div class="line"><a name="l01272"></a><span class="lineno"> 1272</span>&#160;            is.Take();</div>
+<div class="line"><a name="l01273"></a><span class="lineno"> 1273</span>&#160;            <span class="keywordflow">return</span> dst;</div>
 <div class="line"><a name="l01274"></a><span class="lineno"> 1274</span>&#160;</div>
-<div class="line"><a name="l01275"></a><span class="lineno"> 1275</span>&#160;        <span class="keywordflow">case</span> IterativeParsingKeyValueDelimiterState:</div>
-<div class="line"><a name="l01276"></a><span class="lineno"> 1276</span>&#160;            <span class="keywordflow">if</span> (token == ColonToken) {</div>
-<div class="line"><a name="l01277"></a><span class="lineno"> 1277</span>&#160;                is.Take();</div>
-<div class="line"><a name="l01278"></a><span class="lineno"> 1278</span>&#160;                <span class="keywordflow">return</span> dst;</div>
-<div class="line"><a name="l01279"></a><span class="lineno"> 1279</span>&#160;            }</div>
-<div class="line"><a name="l01280"></a><span class="lineno"> 1280</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01281"></a><span class="lineno"> 1281</span>&#160;                <span class="keywordflow">return</span> IterativeParsingErrorState;</div>
+<div class="line"><a name="l01275"></a><span class="lineno"> 1275</span>&#160;        <span class="keywordflow">case</span> IterativeParsingMemberValueState:</div>
+<div class="line"><a name="l01276"></a><span class="lineno"> 1276</span>&#160;            <span class="comment">// Must be non-compound value. Or it would be ObjectInitial or ArrayInitial state.</span></div>
+<div class="line"><a name="l01277"></a><span class="lineno"> 1277</span>&#160;            ParseValue&lt;parseFlags&gt;(is, handler);</div>
+<div class="line"><a name="l01278"></a><span class="lineno"> 1278</span>&#160;            <span class="keywordflow">if</span> (HasParseError()) {</div>
+<div class="line"><a name="l01279"></a><span class="lineno"> 1279</span>&#160;                <span class="keywordflow">return</span> IterativeParsingErrorState;</div>
+<div class="line"><a name="l01280"></a><span class="lineno"> 1280</span>&#160;            }</div>
+<div class="line"><a name="l01281"></a><span class="lineno"> 1281</span>&#160;            <span class="keywordflow">return</span> dst;</div>
 <div class="line"><a name="l01282"></a><span class="lineno"> 1282</span>&#160;</div>
-<div class="line"><a name="l01283"></a><span class="lineno"> 1283</span>&#160;        <span class="keywordflow">case</span> IterativeParsingMemberValueState:</div>
+<div class="line"><a name="l01283"></a><span class="lineno"> 1283</span>&#160;        <span class="keywordflow">case</span> IterativeParsingElementState:</div>
 <div class="line"><a name="l01284"></a><span class="lineno"> 1284</span>&#160;            <span class="comment">// Must be non-compound value. Or it would be ObjectInitial or ArrayInitial state.</span></div>
 <div class="line"><a name="l01285"></a><span class="lineno"> 1285</span>&#160;            ParseValue&lt;parseFlags&gt;(is, handler);</div>
 <div class="line"><a name="l01286"></a><span class="lineno"> 1286</span>&#160;            <span class="keywordflow">if</span> (HasParseError()) {</div>
@@ -1370,82 +1370,82 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l01288"></a><span class="lineno"> 1288</span>&#160;            }</div>
 <div class="line"><a name="l01289"></a><span class="lineno"> 1289</span>&#160;            <span class="keywordflow">return</span> dst;</div>
 <div class="line"><a name="l01290"></a><span class="lineno"> 1290</span>&#160;</div>
-<div class="line"><a name="l01291"></a><span class="lineno"> 1291</span>&#160;        <span class="keywordflow">case</span> IterativeParsingElementState:</div>
-<div class="line"><a name="l01292"></a><span class="lineno"> 1292</span>&#160;            <span class="comment">// Must be non-compound value. Or it would be ObjectInitial or ArrayInitial state.</span></div>
-<div class="line"><a name="l01293"></a><span class="lineno"> 1293</span>&#160;            ParseValue&lt;parseFlags&gt;(is, handler);</div>
-<div class="line"><a name="l01294"></a><span class="lineno"> 1294</span>&#160;            <span class="keywordflow">if</span> (HasParseError()) {</div>
-<div class="line"><a name="l01295"></a><span class="lineno"> 1295</span>&#160;                <span class="keywordflow">return</span> IterativeParsingErrorState;</div>
-<div class="line"><a name="l01296"></a><span class="lineno"> 1296</span>&#160;            }</div>
-<div class="line"><a name="l01297"></a><span class="lineno"> 1297</span>&#160;            <span class="keywordflow">return</span> dst;</div>
-<div class="line"><a name="l01298"></a><span class="lineno"> 1298</span>&#160;</div>
-<div class="line"><a name="l01299"></a><span class="lineno"> 1299</span>&#160;        <span class="keywordflow">case</span> IterativeParsingMemberDelimiterState:</div>
-<div class="line"><a name="l01300"></a><span class="lineno"> 1300</span>&#160;        <span class="keywordflow">case</span> IterativeParsingElementDelimiterState:</div>
-<div class="line"><a name="l01301"></a><span class="lineno"> 1301</span>&#160;            is.Take();</div>
-<div class="line"><a name="l01302"></a><span class="lineno"> 1302</span>&#160;            <span class="comment">// Update member/element count.</span></div>
-<div class="line"><a name="l01303"></a><span class="lineno"> 1303</span>&#160;            *stack_.template Top&lt;SizeType&gt;() = *stack_.template Top&lt;SizeType&gt;() + 1;</div>
-<div class="line"><a name="l01304"></a><span class="lineno"> 1304</span>&#160;            <span class="keywordflow">return</span> dst;</div>
-<div class="line"><a name="l01305"></a><span class="lineno"> 1305</span>&#160;</div>
-<div class="line"><a name="l01306"></a><span class="lineno"> 1306</span>&#160;        <span class="keywordflow">case</span> IterativeParsingObjectFinishState:</div>
-<div class="line"><a name="l01307"></a><span class="lineno"> 1307</span>&#160;        {</div>
-<div class="line"><a name="l01308"></a><span class="lineno"> 1308</span>&#160;            <span class="comment">// Get member count.</span></div>
-<div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160;            <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> c = *stack_.template Pop&lt;SizeType&gt;(1);</div>
-<div class="line"><a name="l01310"></a><span class="lineno"> 1310</span>&#160;            <span class="comment">// If the object is not empty, count the last member.</span></div>
-<div class="line"><a name="l01311"></a><span class="lineno"> 1311</span>&#160;            <span class="keywordflow">if</span> (src == IterativeParsingMemberValueState)</div>
-<div class="line"><a name="l01312"></a><span class="lineno"> 1312</span>&#160;                ++c;</div>
-<div class="line"><a name="l01313"></a><span class="lineno"> 1313</span>&#160;            <span class="comment">// Restore the state.</span></div>
-<div class="line"><a name="l01314"></a><span class="lineno"> 1314</span>&#160;            IterativeParsingState n = <span class="keyword">static_cast&lt;</span>IterativeParsingState<span class="keyword">&gt;</span>(*stack_.template Pop&lt;SizeType&gt;(1));</div>
-<div class="line"><a name="l01315"></a><span class="lineno"> 1315</span>&#160;            <span class="comment">// Transit to Finish state if this is the topmost scope.</span></div>
-<div class="line"><a name="l01316"></a><span class="lineno"> 1316</span>&#160;            <span class="keywordflow">if</span> (n == IterativeParsingStartState)</div>
-<div class="line"><a name="l01317"></a><span class="lineno"> 1317</span>&#160;                n = IterativeParsingFinishState;</div>
-<div class="line"><a name="l01318"></a><span class="lineno"> 1318</span>&#160;            <span class="comment">// Call handler</span></div>
-<div class="line"><a name="l01319"></a><span class="lineno"> 1319</span>&#160;            <span class="keywordtype">bool</span> hr = handler.EndObject(c);</div>
-<div class="line"><a name="l01320"></a><span class="lineno"> 1320</span>&#160;            <span class="comment">// On handler short circuits the parsing.</span></div>
-<div class="line"><a name="l01321"></a><span class="lineno"> 1321</span>&#160;            <span class="keywordflow">if</span> (!hr) {</div>
-<div class="line"><a name="l01322"></a><span class="lineno"> 1322</span>&#160;                <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7f8c4265b2edda78568ae3338aaf1461">RAPIDJSON_PARSE_ERROR_NORETURN</a>(<a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60ab250f87c3d8454c579364b5a0f697a50">kParseErrorTermination</a>, is.Tell());</div>
-<div class="line"><a name="l01323"></a><span class="lineno"> 1323</span>&#160;                <span class="keywordflow">return</span> IterativeParsingErrorState;</div>
-<div class="line"><a name="l01324"></a><span class="lineno"> 1324</span>&#160;            }</div>
-<div class="line"><a name="l01325"></a><span class="lineno"> 1325</span>&#160;            <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l01326"></a><span class="lineno"> 1326</span>&#160;                is.Take();</div>
-<div class="line"><a name="l01327"></a><span class="lineno"> 1327</span>&#160;                <span class="keywordflow">return</span> n;</div>
-<div class="line"><a name="l01328"></a><span class="lineno"> 1328</span>&#160;            }</div>
-<div class="line"><a name="l01329"></a><span class="lineno"> 1329</span>&#160;        }</div>
-<div class="line"><a name="l01330"></a><span class="lineno"> 1330</span>&#160;</div>
-<div class="line"><a name="l01331"></a><span class="lineno"> 1331</span>&#160;        <span class="keywordflow">case</span> IterativeParsingArrayFinishState:</div>
-<div class="line"><a name="l01332"></a><span class="lineno"> 1332</span>&#160;        {</div>
-<div class="line"><a name="l01333"></a><span class="lineno"> 1333</span>&#160;            <span class="comment">// Get element count.</span></div>
-<div class="line"><a name="l01334"></a><span class="lineno"> 1334</span>&#160;            <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> c = *stack_.template Pop&lt;SizeType&gt;(1);</div>
-<div class="line"><a name="l01335"></a><span class="lineno"> 1335</span>&#160;            <span class="comment">// If the array is not empty, count the last element.</span></div>
-<div class="line"><a name="l01336"></a><span class="lineno"> 1336</span>&#160;            <span class="keywordflow">if</span> (src == IterativeParsingElementState)</div>
-<div class="line"><a name="l01337"></a><span class="lineno"> 1337</span>&#160;                ++c;</div>
-<div class="line"><a name="l01338"></a><span class="lineno"> 1338</span>&#160;            <span class="comment">// Restore the state.</span></div>
-<div class="line"><a name="l01339"></a><span class="lineno"> 1339</span>&#160;            IterativeParsingState n = <span class="keyword">static_cast&lt;</span>IterativeParsingState<span class="keyword">&gt;</span>(*stack_.template Pop&lt;SizeType&gt;(1));</div>
-<div class="line"><a name="l01340"></a><span class="lineno"> 1340</span>&#160;            <span class="comment">// Transit to Finish state if this is the topmost scope.</span></div>
-<div class="line"><a name="l01341"></a><span class="lineno"> 1341</span>&#160;            <span class="keywordflow">if</span> (n == IterativeParsingStartState)</div>
-<div class="line"><a name="l01342"></a><span class="lineno"> 1342</span>&#160;                n = IterativeParsingFinishState;</div>
-<div class="line"><a name="l01343"></a><span class="lineno"> 1343</span>&#160;            <span class="comment">// Call handler</span></div>
-<div class="line"><a name="l01344"></a><span class="lineno"> 1344</span>&#160;            <span class="keywordtype">bool</span> hr = handler.EndArray(c);</div>
-<div class="line"><a name="l01345"></a><span class="lineno"> 1345</span>&#160;            <span class="comment">// On handler short circuits the parsing.</span></div>
-<div class="line"><a name="l01346"></a><span class="lineno"> 1346</span>&#160;            <span class="keywordflow">if</span> (!hr) {</div>
-<div class="line"><a name="l01347"></a><span class="lineno"> 1347</span>&#160;                <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7f8c4265b2edda78568ae3338aaf1461">RAPIDJSON_PARSE_ERROR_NORETURN</a>(<a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60ab250f87c3d8454c579364b5a0f697a50">kParseErrorTermination</a>, is.Tell());</div>
-<div class="line"><a name="l01348"></a><span class="lineno"> 1348</span>&#160;                <span class="keywordflow">return</span> IterativeParsingErrorState;</div>
-<div class="line"><a name="l01349"></a><span class="lineno"> 1349</span>&#160;            }</div>
-<div class="line"><a name="l01350"></a><span class="lineno"> 1350</span>&#160;            <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l01351"></a><span class="lineno"> 1351</span>&#160;                is.Take();</div>
-<div class="line"><a name="l01352"></a><span class="lineno"> 1352</span>&#160;                <span class="keywordflow">return</span> n;</div>
-<div class="line"><a name="l01353"></a><span class="lineno"> 1353</span>&#160;            }</div>
-<div class="line"><a name="l01354"></a><span class="lineno"> 1354</span>&#160;        }</div>
+<div class="line"><a name="l01291"></a><span class="lineno"> 1291</span>&#160;        <span class="keywordflow">case</span> IterativeParsingMemberDelimiterState:</div>
+<div class="line"><a name="l01292"></a><span class="lineno"> 1292</span>&#160;        <span class="keywordflow">case</span> IterativeParsingElementDelimiterState:</div>
+<div class="line"><a name="l01293"></a><span class="lineno"> 1293</span>&#160;            is.Take();</div>
+<div class="line"><a name="l01294"></a><span class="lineno"> 1294</span>&#160;            <span class="comment">// Update member/element count.</span></div>
+<div class="line"><a name="l01295"></a><span class="lineno"> 1295</span>&#160;            *stack_.template Top&lt;SizeType&gt;() = *stack_.template Top&lt;SizeType&gt;() + 1;</div>
+<div class="line"><a name="l01296"></a><span class="lineno"> 1296</span>&#160;            <span class="keywordflow">return</span> dst;</div>
+<div class="line"><a name="l01297"></a><span class="lineno"> 1297</span>&#160;</div>
+<div class="line"><a name="l01298"></a><span class="lineno"> 1298</span>&#160;        <span class="keywordflow">case</span> IterativeParsingObjectFinishState:</div>
+<div class="line"><a name="l01299"></a><span class="lineno"> 1299</span>&#160;        {</div>
+<div class="line"><a name="l01300"></a><span class="lineno"> 1300</span>&#160;            <span class="comment">// Get member count.</span></div>
+<div class="line"><a name="l01301"></a><span class="lineno"> 1301</span>&#160;            <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> c = *stack_.template Pop&lt;SizeType&gt;(1);</div>
+<div class="line"><a name="l01302"></a><span class="lineno"> 1302</span>&#160;            <span class="comment">// If the object is not empty, count the last member.</span></div>
+<div class="line"><a name="l01303"></a><span class="lineno"> 1303</span>&#160;            <span class="keywordflow">if</span> (src == IterativeParsingMemberValueState)</div>
+<div class="line"><a name="l01304"></a><span class="lineno"> 1304</span>&#160;                ++c;</div>
+<div class="line"><a name="l01305"></a><span class="lineno"> 1305</span>&#160;            <span class="comment">// Restore the state.</span></div>
+<div class="line"><a name="l01306"></a><span class="lineno"> 1306</span>&#160;            IterativeParsingState n = <span class="keyword">static_cast&lt;</span>IterativeParsingState<span class="keyword">&gt;</span>(*stack_.template Pop&lt;SizeType&gt;(1));</div>
+<div class="line"><a name="l01307"></a><span class="lineno"> 1307</span>&#160;            <span class="comment">// Transit to Finish state if this is the topmost scope.</span></div>
+<div class="line"><a name="l01308"></a><span class="lineno"> 1308</span>&#160;            <span class="keywordflow">if</span> (n == IterativeParsingStartState)</div>
+<div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160;                n = IterativeParsingFinishState;</div>
+<div class="line"><a name="l01310"></a><span class="lineno"> 1310</span>&#160;            <span class="comment">// Call handler</span></div>
+<div class="line"><a name="l01311"></a><span class="lineno"> 1311</span>&#160;            <span class="keywordtype">bool</span> hr = handler.EndObject(c);</div>
+<div class="line"><a name="l01312"></a><span class="lineno"> 1312</span>&#160;            <span class="comment">// On handler short circuits the parsing.</span></div>
+<div class="line"><a name="l01313"></a><span class="lineno"> 1313</span>&#160;            <span class="keywordflow">if</span> (!hr) {</div>
+<div class="line"><a name="l01314"></a><span class="lineno"> 1314</span>&#160;                <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7f8c4265b2edda78568ae3338aaf1461">RAPIDJSON_PARSE_ERROR_NORETURN</a>(<a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60ab250f87c3d8454c579364b5a0f697a50">kParseErrorTermination</a>, is.Tell());</div>
+<div class="line"><a name="l01315"></a><span class="lineno"> 1315</span>&#160;                <span class="keywordflow">return</span> IterativeParsingErrorState;</div>
+<div class="line"><a name="l01316"></a><span class="lineno"> 1316</span>&#160;            }</div>
+<div class="line"><a name="l01317"></a><span class="lineno"> 1317</span>&#160;            <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l01318"></a><span class="lineno"> 1318</span>&#160;                is.Take();</div>
+<div class="line"><a name="l01319"></a><span class="lineno"> 1319</span>&#160;                <span class="keywordflow">return</span> n;</div>
+<div class="line"><a name="l01320"></a><span class="lineno"> 1320</span>&#160;            }</div>
+<div class="line"><a name="l01321"></a><span class="lineno"> 1321</span>&#160;        }</div>
+<div class="line"><a name="l01322"></a><span class="lineno"> 1322</span>&#160;</div>
+<div class="line"><a name="l01323"></a><span class="lineno"> 1323</span>&#160;        <span class="keywordflow">case</span> IterativeParsingArrayFinishState:</div>
+<div class="line"><a name="l01324"></a><span class="lineno"> 1324</span>&#160;        {</div>
+<div class="line"><a name="l01325"></a><span class="lineno"> 1325</span>&#160;            <span class="comment">// Get element count.</span></div>
+<div class="line"><a name="l01326"></a><span class="lineno"> 1326</span>&#160;            <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> c = *stack_.template Pop&lt;SizeType&gt;(1);</div>
+<div class="line"><a name="l01327"></a><span class="lineno"> 1327</span>&#160;            <span class="comment">// If the array is not empty, count the last element.</span></div>
+<div class="line"><a name="l01328"></a><span class="lineno"> 1328</span>&#160;            <span class="keywordflow">if</span> (src == IterativeParsingElementState)</div>
+<div class="line"><a name="l01329"></a><span class="lineno"> 1329</span>&#160;                ++c;</div>
+<div class="line"><a name="l01330"></a><span class="lineno"> 1330</span>&#160;            <span class="comment">// Restore the state.</span></div>
+<div class="line"><a name="l01331"></a><span class="lineno"> 1331</span>&#160;            IterativeParsingState n = <span class="keyword">static_cast&lt;</span>IterativeParsingState<span class="keyword">&gt;</span>(*stack_.template Pop&lt;SizeType&gt;(1));</div>
+<div class="line"><a name="l01332"></a><span class="lineno"> 1332</span>&#160;            <span class="comment">// Transit to Finish state if this is the topmost scope.</span></div>
+<div class="line"><a name="l01333"></a><span class="lineno"> 1333</span>&#160;            <span class="keywordflow">if</span> (n == IterativeParsingStartState)</div>
+<div class="line"><a name="l01334"></a><span class="lineno"> 1334</span>&#160;                n = IterativeParsingFinishState;</div>
+<div class="line"><a name="l01335"></a><span class="lineno"> 1335</span>&#160;            <span class="comment">// Call handler</span></div>
+<div class="line"><a name="l01336"></a><span class="lineno"> 1336</span>&#160;            <span class="keywordtype">bool</span> hr = handler.EndArray(c);</div>
+<div class="line"><a name="l01337"></a><span class="lineno"> 1337</span>&#160;            <span class="comment">// On handler short circuits the parsing.</span></div>
+<div class="line"><a name="l01338"></a><span class="lineno"> 1338</span>&#160;            <span class="keywordflow">if</span> (!hr) {</div>
+<div class="line"><a name="l01339"></a><span class="lineno"> 1339</span>&#160;                <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7f8c4265b2edda78568ae3338aaf1461">RAPIDJSON_PARSE_ERROR_NORETURN</a>(<a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60ab250f87c3d8454c579364b5a0f697a50">kParseErrorTermination</a>, is.Tell());</div>
+<div class="line"><a name="l01340"></a><span class="lineno"> 1340</span>&#160;                <span class="keywordflow">return</span> IterativeParsingErrorState;</div>
+<div class="line"><a name="l01341"></a><span class="lineno"> 1341</span>&#160;            }</div>
+<div class="line"><a name="l01342"></a><span class="lineno"> 1342</span>&#160;            <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l01343"></a><span class="lineno"> 1343</span>&#160;                is.Take();</div>
+<div class="line"><a name="l01344"></a><span class="lineno"> 1344</span>&#160;                <span class="keywordflow">return</span> n;</div>
+<div class="line"><a name="l01345"></a><span class="lineno"> 1345</span>&#160;            }</div>
+<div class="line"><a name="l01346"></a><span class="lineno"> 1346</span>&#160;        }</div>
+<div class="line"><a name="l01347"></a><span class="lineno"> 1347</span>&#160;</div>
+<div class="line"><a name="l01348"></a><span class="lineno"> 1348</span>&#160;        <span class="keywordflow">default</span>:</div>
+<div class="line"><a name="l01349"></a><span class="lineno"> 1349</span>&#160;            <span class="comment">// This branch is for IterativeParsingValueState actually.</span></div>
+<div class="line"><a name="l01350"></a><span class="lineno"> 1350</span>&#160;            <span class="comment">// Use `default:` rather than</span></div>
+<div class="line"><a name="l01351"></a><span class="lineno"> 1351</span>&#160;            <span class="comment">// `case IterativeParsingValueState:` is for code coverage.</span></div>
+<div class="line"><a name="l01352"></a><span class="lineno"> 1352</span>&#160;</div>
+<div class="line"><a name="l01353"></a><span class="lineno"> 1353</span>&#160;            <span class="comment">// The IterativeParsingStartState is not enumerated in this switch-case.</span></div>
+<div class="line"><a name="l01354"></a><span class="lineno"> 1354</span>&#160;            <span class="comment">// It is impossible for that case. And it can be caught by following assertion.</span></div>
 <div class="line"><a name="l01355"></a><span class="lineno"> 1355</span>&#160;</div>
-<div class="line"><a name="l01356"></a><span class="lineno"> 1356</span>&#160;        <span class="keywordflow">case</span> IterativeParsingValueState:</div>
-<div class="line"><a name="l01357"></a><span class="lineno"> 1357</span>&#160;            <span class="comment">// Must be non-compound value. Or it would be ObjectInitial or ArrayInitial state.</span></div>
-<div class="line"><a name="l01358"></a><span class="lineno"> 1358</span>&#160;            ParseValue&lt;parseFlags&gt;(is, handler);</div>
-<div class="line"><a name="l01359"></a><span class="lineno"> 1359</span>&#160;            <span class="keywordflow">if</span> (HasParseError()) {</div>
-<div class="line"><a name="l01360"></a><span class="lineno"> 1360</span>&#160;                <span class="keywordflow">return</span> IterativeParsingErrorState;</div>
-<div class="line"><a name="l01361"></a><span class="lineno"> 1361</span>&#160;            }</div>
-<div class="line"><a name="l01362"></a><span class="lineno"> 1362</span>&#160;            <span class="keywordflow">return</span> IterativeParsingFinishState;</div>
-<div class="line"><a name="l01363"></a><span class="lineno"> 1363</span>&#160;</div>
-<div class="line"><a name="l01364"></a><span class="lineno"> 1364</span>&#160;        <span class="keywordflow">default</span>:</div>
-<div class="line"><a name="l01365"></a><span class="lineno"> 1365</span>&#160;            <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(<span class="keyword">false</span>);</div>
-<div class="line"><a name="l01366"></a><span class="lineno"> 1366</span>&#160;            <span class="keywordflow">return</span> IterativeParsingErrorState;</div>
+<div class="line"><a name="l01356"></a><span class="lineno"> 1356</span>&#160;            <span class="comment">// The IterativeParsingFinishState is not enumerated in this switch-case either.</span></div>
+<div class="line"><a name="l01357"></a><span class="lineno"> 1357</span>&#160;            <span class="comment">// It is a &quot;derivative&quot; state which cannot triggered from Predict() directly.</span></div>
+<div class="line"><a name="l01358"></a><span class="lineno"> 1358</span>&#160;            <span class="comment">// Therefore it cannot happen here. And it can be caught by following assertion.</span></div>
+<div class="line"><a name="l01359"></a><span class="lineno"> 1359</span>&#160;            <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(dst == IterativeParsingValueState);</div>
+<div class="line"><a name="l01360"></a><span class="lineno"> 1360</span>&#160;</div>
+<div class="line"><a name="l01361"></a><span class="lineno"> 1361</span>&#160;            <span class="comment">// Must be non-compound value. Or it would be ObjectInitial or ArrayInitial state.</span></div>
+<div class="line"><a name="l01362"></a><span class="lineno"> 1362</span>&#160;            ParseValue&lt;parseFlags&gt;(is, handler);</div>
+<div class="line"><a name="l01363"></a><span class="lineno"> 1363</span>&#160;            <span class="keywordflow">if</span> (HasParseError()) {</div>
+<div class="line"><a name="l01364"></a><span class="lineno"> 1364</span>&#160;                <span class="keywordflow">return</span> IterativeParsingErrorState;</div>
+<div class="line"><a name="l01365"></a><span class="lineno"> 1365</span>&#160;            }</div>
+<div class="line"><a name="l01366"></a><span class="lineno"> 1366</span>&#160;            <span class="keywordflow">return</span> IterativeParsingFinishState;</div>
 <div class="line"><a name="l01367"></a><span class="lineno"> 1367</span>&#160;        }</div>
 <div class="line"><a name="l01368"></a><span class="lineno"> 1368</span>&#160;    }</div>
 <div class="line"><a name="l01369"></a><span class="lineno"> 1369</span>&#160;</div>

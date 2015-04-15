@@ -204,9 +204,9 @@ $(document).ready(function(){initNavTree('rapidjson_8h_source.html','');});
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="preprocessor">#ifndef RAPIDJSON_FORCEINLINE</span></div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="comment">//!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN</span></div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="comment"></span><span class="preprocessor">#ifdef _MSC_VER</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="comment"></span><span class="preprocessor">#if defined(_MSC_VER) &amp;&amp; !defined(NDEBUG)</span></div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="preprocessor">#define RAPIDJSON_FORCEINLINE __forceinline</span></div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="preprocessor">#elif defined(__GNUC__) &amp;&amp; __GNUC__ &gt;= 4</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="preprocessor">#elif defined(__GNUC__) &amp;&amp; __GNUC__ &gt;= 4 &amp;&amp; !defined(NDEBUG)</span></div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="preprocessor">#define RAPIDJSON_FORCEINLINE __attribute__((always_inline))</span></div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="preprocessor">#else</span></div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;<span class="preprocessor">#define RAPIDJSON_FORCEINLINE</span></div>
