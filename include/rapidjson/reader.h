@@ -1228,13 +1228,6 @@ private:
     template <unsigned parseFlags, typename InputStream, typename Handler>
     RAPIDJSON_FORCEINLINE IterativeParsingState Transit(IterativeParsingState src, Token token, IterativeParsingState dst, InputStream& is, Handler& handler) {
         switch (dst) {
-        case IterativeParsingStartState:
-            RAPIDJSON_ASSERT(false);
-            return IterativeParsingErrorState;
-
-        case IterativeParsingFinishState:
-            return dst;
-
         case IterativeParsingErrorState:
             return dst;
 
@@ -1350,17 +1343,25 @@ private:
             }
         }
 
-        case IterativeParsingValueState:
+        default:
+            // This branch is for IterativeParsingValueState actually.
+            // Use `default:` rather than
+            // `case IterativeParsingValueState:` is for code coverage.
+
+            // The IterativeParsingStartState is not enumerated in this switch-case.
+            // It is impossible for that case. And it can be caught by following assertion.
+
+            // The IterativeParsingFinishState is not enumerated in this switch-case either.
+            // It is a "derivative" state which cannot triggered from Predict() directly.
+            // Therefore it cannot happen here. And it can be caught by following assertion.
+            RAPIDJSON_ASSERT(dst == IterativeParsingValueState);
+
             // Must be non-compound value. Or it would be ObjectInitial or ArrayInitial state.
             ParseValue<parseFlags>(is, handler);
             if (HasParseError()) {
                 return IterativeParsingErrorState;
             }
             return IterativeParsingFinishState;
-
-        default:
-            RAPIDJSON_ASSERT(false);
-            return IterativeParsingErrorState;
         }
     }
 
