@@ -1051,6 +1051,7 @@ TEST(Reader, IterativeParsing_ErrorHandling) {
     TESTERRORHANDLING("false, false", kParseErrorDocumentRootNotSingular, 5u);
     TESTERRORHANDLING("nulL", kParseErrorValueInvalid, 3u);
     TESTERRORHANDLING("null , null", kParseErrorDocumentRootNotSingular, 5u);
+    TESTERRORHANDLING("1a", kParseErrorDocumentRootNotSingular, 1u);
 }
 
 template<typename Encoding = UTF8<> >
