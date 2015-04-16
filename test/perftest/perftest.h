@@ -71,9 +71,20 @@ public:
     PerfTest() : filename_(), json_(), length_(), whitespace_(), whitespace_length_() {}
 
     virtual void SetUp() {
-        FILE *fp = fopen(filename_ = "data/sample.json", "rb");
-        if (!fp) 
-            fp = fopen(filename_ = "../../bin/data/sample.json", "rb");
+
+        const char *paths[] = {
+            "data/sample.json",
+            "bin/data/sample.json",
+            "../bin/data/sample.json",
+            "../../bin/data/sample.json",
+            "../../../bin/data/sample.json"
+        };
+        FILE *fp = 0;
+        for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
+            fp = fopen(paths[i], "rb");
+            if (fp)
+                break;
+        }
         ASSERT_TRUE(fp != 0);
 
         fseek(fp, 0, SEEK_END);
