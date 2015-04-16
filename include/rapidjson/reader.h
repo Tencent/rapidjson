@@ -255,23 +255,23 @@ void SkipWhitespace(InputStream& is) {
 #ifdef RAPIDJSON_SSE42
 //! Skip whitespace with SSE 4.2 pcmpistrm instruction, testing 16 8-byte characters at once.
 inline const char *SkipWhitespace_SIMD(const char* p) {
-	// Fast return for single non-whitespace
-	if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
-		++p;
-	else
-		return p;
+    // Fast return for single non-whitespace
+    if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
+        ++p;
+    else
+        return p;
 
-	// 16-byte align to the next boundary
-	const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & ~15);
-	while (p != nextAligned)
-		if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
-			++p;
-		else
-			return p;
+    // 16-byte align to the next boundary
+    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & ~15);
+    while (p != nextAligned)
+        if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
+            ++p;
+        else
+            return p;
 
     // The rest of string using SIMD
-	static const char whitespace[16] = " \n\r\t";
-	const __m128i w = _mm_load_si128((const __m128i *)&whitespace[0]);
+    static const char whitespace[16] = " \n\r\t";
+    const __m128i w = _mm_load_si128((const __m128i *)&whitespace[0]);
 
     for (;; p += 16) {
         const __m128i s = _mm_load_si128((const __m128i *)p);
@@ -292,31 +292,31 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
 
 //! Skip whitespace with SSE2 instructions, testing 16 8-byte characters at once.
 inline const char *SkipWhitespace_SIMD(const char* p) {
-	// Fast return for single non-whitespace
-	if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
-		++p;
-	else
-		return p;
+    // Fast return for single non-whitespace
+    if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
+        ++p;
+    else
+        return p;
 
     // 16-byte align to the next boundary
-	const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & ~15);
-	while (p != nextAligned)
-		if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
-			++p;
-		else
-			return p;
+    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & ~15);
+    while (p != nextAligned)
+        if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
+            ++p;
+        else
+            return p;
 
     // The rest of string
-	static const char whitespaces[4][17] = {
-		"                ",
-		"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
-		"\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r",
-		"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"};
+    static const char whitespaces[4][17] = {
+        "                ",
+        "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+        "\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r",
+        "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"};
 
-		const __m128i w0 = _mm_loadu_si128((const __m128i *)&whitespaces[0][0]);
-		const __m128i w1 = _mm_loadu_si128((const __m128i *)&whitespaces[1][0]);
-		const __m128i w2 = _mm_loadu_si128((const __m128i *)&whitespaces[2][0]);
-		const __m128i w3 = _mm_loadu_si128((const __m128i *)&whitespaces[3][0]);
+        const __m128i w0 = _mm_loadu_si128((const __m128i *)&whitespaces[0][0]);
+        const __m128i w1 = _mm_loadu_si128((const __m128i *)&whitespaces[1][0]);
+        const __m128i w2 = _mm_loadu_si128((const __m128i *)&whitespaces[2][0]);
+        const __m128i w3 = _mm_loadu_si128((const __m128i *)&whitespaces[3][0]);
 
     for (;; p += 16) {
         const __m128i s = _mm_load_si128((const __m128i *)p);
