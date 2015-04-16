@@ -1582,16 +1582,24 @@ private:
     // Initialize this value as array with initial data, without calling destructor.
     void SetArrayRaw(GenericValue* values, SizeType count, Allocator& allocator) {
         flags_ = kArrayFlag;
-        data_.a.elements = (GenericValue*)allocator.Malloc(count * sizeof(GenericValue));
-        std::memcpy(data_.a.elements, values, count * sizeof(GenericValue));
+        if (count) {
+            data_.a.elements = (GenericValue*)allocator.Malloc(count * sizeof(GenericValue));
+            std::memcpy(data_.a.elements, values, count * sizeof(GenericValue));
+        }
+        else
+            data_.a.elements = NULL;
         data_.a.size = data_.a.capacity = count;
     }
 
     //! Initialize this value as object with initial data, without calling destructor.
     void SetObjectRaw(Member* members, SizeType count, Allocator& allocator) {
         flags_ = kObjectFlag;
-        data_.o.members = (Member*)allocator.Malloc(count * sizeof(Member));
-        std::memcpy(data_.o.members, members, count * sizeof(Member));
+        if (count) {
+            data_.o.members = (Member*)allocator.Malloc(count * sizeof(Member));
+            std::memcpy(data_.o.members, members, count * sizeof(Member));
+        }
+        else
+            data_.o.members = NULL;
         data_.o.size = data_.o.capacity = count;
     }
 
