@@ -81,7 +81,7 @@ public:
         };
         FILE *fp = 0;
         for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
-            fp = fopen(paths[i], "rb");
+            fp = fopen(filename_ = paths[i], "rb");
             if (fp)
                 break;
         }
