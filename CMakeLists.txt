@@ -132,7 +132,7 @@ if (UNIX)
     SET(CPACK_PACKAGE_VERSION_PATCH ${LIB_PATCH_VERSION})
 
     # Debian-aware information
-    execute_process(COMMAND "/bin/date %Y%d%m" OUTPUT_VARIABLE DATE)
+    execute_process(COMMAND "/bin/date +%Y%d%m" OUTPUT_VARIABLE DATE)
     SET(CPACK_DEBIAN_PACKAGE_VERSION 
         "${LIB_VERSION_STRING}~git${DATE}-1")
     SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Vitaly Isaev <vitalyisaev2@gmail.com>")
