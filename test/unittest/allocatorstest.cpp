@@ -26,6 +26,8 @@ using namespace rapidjson;
 
 template <typename Allocator>
 void TestAllocator(Allocator& a) {
+    EXPECT_TRUE(a.Malloc(0) == 0);
+
     uint8_t* p = (uint8_t*)a.Malloc(100);
     EXPECT_TRUE(p != 0);
     for (size_t i = 0; i < 100; i++)
