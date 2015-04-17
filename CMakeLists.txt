@@ -123,7 +123,7 @@ if (UNIX)
     SET(CPACK_DEBIAN_PACKAGE_NAME "rapidjson")
     SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY
         "RapidJSON is a JSON parser and generator for C++ inspired by RapidXml")
-    SET(CPACK_RESOURCE_FILE_LICENSE "license.txt")
+    SET(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/license.txt)
 
     # Versions
     SET(CPACK_PACKAGE_VERSION ${LIB_VERSION_STRING})
