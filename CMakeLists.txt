@@ -115,7 +115,7 @@ INSTALL(FILES
 if (UNIX)
 
     # Common information
-    SET(CPACK_COMPONENTS_ALL dev examples)
+    SET(CPACK_COMPONENTS_ALL dev doc examples)
     SET(CPACK_GENERATOR "TGZ;DEB")
     SET(CPACK_SOURCE_TGZ "ON")
     SET(CPACK_DEB_COMPONENT_INSTALL 1)
@@ -123,6 +123,7 @@ if (UNIX)
     SET(CPACK_DEBIAN_PACKAGE_NAME "rapidjson")
     SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY
         "RapidJSON is a JSON parser and generator for C++ inspired by RapidXml")
+    SET(CPACK_RESOURCE_FILE_LICENSE "license.txt")
 
     # Versions
     SET(CPACK_PACKAGE_VERSION ${LIB_VERSION_STRING})
@@ -131,7 +132,7 @@ if (UNIX)
     SET(CPACK_PACKAGE_VERSION_PATCH ${LIB_PATCH_VERSION})
 
     # Debian-aware information
-    string(TIMESTAMP DATE "%Y%d%m")
+    execute_process(COMMAND "/bin/date %Y%d%m" OUTPUT_VARIABLE DATE)
     SET(CPACK_DEBIAN_PACKAGE_VERSION 
         "${LIB_VERSION_STRING}~git${DATE}-1")
     SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Vitaly Isaev <vitalyisaev2@gmail.com>")
