@@ -114,15 +114,28 @@ INSTALL(FILES
 # ================ debian package ===============
 if (UNIX)
 
-    SET(CPACK_GENERATOR "DEB")
+    # Common information
+    SET(CPACK_COMPONENTS_ALL dev doc example)
+    SET(CPACK_GENERATOR "TGZ;DEB")
+    SET(CPACK_SOURCE_TGZ "ON")
+    SET(CPACK_DEB_COMPONENT_INSTALL 1)
+
     SET(CPACK_DEBIAN_PACKAGE_NAME "rapidjson")
+    SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY
+        "RapidJSON is a JSON parser and generator for C++ inspired by RapidXml")
+
+    # Versions
+    SET(CPACK_PACKAGE_VERSION ${LIB_VERSION_STRING})
+    SET(CPACK_PACKAGE_VERSION_MAJOR ${LIB_MAJOR_VERSION})
+    SET(CPACK_PACKAGE_VERSION_MINOR ${LIB_MINOR_VERSION})
+    SET(CPACK_PACKAGE_VERSION_PATCH ${LIB_PATCH_VERSION})
+
+    # Debian-aware information
     string(TIMESTAMP DATE "%Y%d%m")
     SET(CPACK_DEBIAN_PACKAGE_VERSION 
         "${LIB_VERSION_STRING}~git${DATE}-1")
     SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Vitaly Isaev <isaev@corp.sputnik.ru>")
     SET(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "all")
-    SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION 
-        "RapidJSON is a JSON parser and generator for C++ inspired by RapidXml")
     SET(CPACK_PACKAGE_FILE_NAME 
         "${CPACK_DEBIAN_PACKAGE_NAME}_${CPACK_DEBIAN_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}")
     SET(CPACK_DEBIAN_PACKAGE_HOMEPAGE "http://miloyip.github.io/rapidjson/")
