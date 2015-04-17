@@ -115,8 +115,7 @@ INSTALL(FILES
 if (UNIX)
 
     # Common information
-    cpack_add_component(docs DEPENDES doc examples)
-    SET(CPACK_COMPONENTS_ALL dev docs)
+    SET(CPACK_COMPONENTS_ALL dev examples)
     SET(CPACK_GENERATOR "TGZ;DEB")
     SET(CPACK_SOURCE_TGZ "ON")
     SET(CPACK_DEB_COMPONENT_INSTALL 1)
