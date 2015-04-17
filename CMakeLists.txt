@@ -132,7 +132,7 @@ if (UNIX)
     SET(CPACK_PACKAGE_VERSION_PATCH ${LIB_PATCH_VERSION})
 
     # Debian-aware information
-    EXEC_PROGRAM("/bin/date +%Y%d%m" OUTPUT_VARIABLE DATE)
+    EXEC_PROGRAM("/bin/date +%Y%m%d" OUTPUT_VARIABLE DATE)
     MESSAGE (STATUS "DATE:     " ${DATE}) 
     SET(CPACK_DEBIAN_PACKAGE_VERSION 
         "${LIB_VERSION_STRING}~git${DATE}-1")
