@@ -344,6 +344,35 @@ RAPIDJSON_NAMESPACE_END
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_LIKELY, RAPIDJSON_UNLIKELY
+
+//! Compiler branching hint for expression with high probability to be true.
+/*!
+    \ingroup RAPIDJSON_CONFIG
+    \param x Boolean expression likely to be true.
+*/
+#ifndef RAPIDJSON_LIKELY
+#if defined(__GNUC__) || defined(__clang__)
+#define RAPIDJSON_LIKELY(x) __builtin_expect(!!(x), 1)
+#else
+#define RAPIDJSON_LIKELY(x) x
+#endif
+#endif
+
+//! Compiler branching hint for expression with low probability to be true.
+/*!
+    \ingroup RAPIDJSON_CONFIG
+    \param x Boolean expression unlikely to be true.
+*/
+#ifndef RAPIDJSON_UNLIKELY
+#if defined(__GNUC__) || defined(__clang__)
+#define RAPIDJSON_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else
+#define RAPIDJSON_UNLIKELY(x) x
+#endif
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // Helpers
 
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN

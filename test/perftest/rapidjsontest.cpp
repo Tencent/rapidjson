@@ -346,4 +346,10 @@ TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_FileReadStream)) {
     }
 }
 
+TEST_F(RapidJson, StringBuffer) {
+    StringBuffer sb;
+    for (int i = 0; i < 32 * 1024 * 1024; i++)
+        sb.Put(i & 0x7f);
+}
+
 #endif // TEST_RAPIDJSON
