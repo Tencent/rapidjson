@@ -768,7 +768,7 @@ template <typename Writer>
 void itoa_Writer_StringBufferVerify() {
     rapidjson::StringBuffer sb;
     Writer writer(sb);
-    for (int j = 0; j < randvalCount; j++) {
+    for (size_t j = 0; j < randvalCount; j++) {
         char buffer[32];
         sprintf(buffer, "%d", randval[j]);
         writer.WriteInt(randval[j]);
@@ -780,7 +780,7 @@ void itoa_Writer_StringBufferVerify() {
 template <typename Writer>
 void itoa_Writer_InsituStringStreamVerify() {
     Writer writer;
-    for (int j = 0; j < randvalCount; j++) {
+    for (size_t j = 0; j < randvalCount; j++) {
         char buffer[32];
         sprintf(buffer, "%d", randval[j]);
         char buffer2[32];
