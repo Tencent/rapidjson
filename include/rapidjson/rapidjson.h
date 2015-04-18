@@ -15,9 +15,6 @@
 #ifndef RAPIDJSON_RAPIDJSON_H_
 #define RAPIDJSON_RAPIDJSON_H_
 
-// Copyright (c) 2011 Milo Yip (miloyip@gmail.com)
-// Version 0.1
-
 /*!\file rapidjson.h
     \brief common definitions and configuration
 
