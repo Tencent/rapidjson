@@ -17,6 +17,7 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 option(RAPIDJSON_BUILD_DOC "Build rapidjson documentation." ON)
 option(RAPIDJSON_BUILD_EXAMPLES "Build rapidjson examples." ON)
 option(RAPIDJSON_BUILD_TESTS "Build rapidjson perftests and unittests." ON)
+option(RAPIDJSON_BUILD_THIRDPARTY_GTEST "Build GTest from thirdparty/gtest." ON)
 
 option(RAPIDJSON_HAS_STDSTRING "" OFF)
 if(RAPIDJSON_HAS_STDSTRING)
