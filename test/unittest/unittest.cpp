@@ -13,9 +13,12 @@
 // specific language governing permissions and limitations under the License.
 
 #include "unittest.h"
+#include "rapidjson/rapidjson.h"
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
+
+    std::cout << "RapidJSON v" << RAPIDJSON_VERSION_STRING << std::endl;
 
 #if _MSC_VER
     _CrtMemState memoryState = { 0 };

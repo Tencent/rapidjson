@@ -1,5 +1,7 @@
 ![](doc/logo/rapidjson.png)
 
+![](https://img.shields.io/badge/release-v1.0.0-blue.png)
+
 Tencent is pleased to support the open source community by making RapidJSON available.
 
 Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.

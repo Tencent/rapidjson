@@ -17,7 +17,7 @@
 
 /*!\file rapidjson.h
     \brief common definitions and configuration
-
+    
     \see RAPIDJSON_CONFIG
  */
 
@@ -38,6 +38,40 @@
 
 #include <cstdlib>  // malloc(), realloc(), free(), size_t
 #include <cstring>  // memset(), memcpy(), memmove(), memcmp()
+
+///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_VERSION_STRING
+//
+// ALWAYS synchronize the following 3 macros with corresponding variables in /CMakeLists.txt.
+//
+
+//!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
+// token stringification
+#define RAPIDJSON_STRINGIFY(x) RAPIDJSON_DO_STRINGIFY(x)
+#define RAPIDJSON_DO_STRINGIFY(x) #x
+//!@endcond
+
+/*! \def RAPIDJSON_MAJOR_VERSION
+    \ingroup RAPIDJSON_CONFIG
+    \brief Major version of RapidJSON in integer.
+*/
+/*! \def RAPIDJSON_MINOR_VERSION
+    \ingroup RAPIDJSON_CONFIG
+    \brief Minor version of RapidJSON in integer.
+*/
+/*! \def RAPIDJSON_PATCH_VERSION
+    \ingroup RAPIDJSON_CONFIG
+    \brief Patch version of RapidJSON in integer.
+*/
+/*! \def RAPIDJSON_VERSION_STRING
+    \ingroup RAPIDJSON_CONFIG
+    \brief Version of RapidJSON in "<major>.<minor>.<patch>" string format.
+*/
+#define RAPIDJSON_MAJOR_VERSION 1
+#define RAPIDJSON_MINOR_VERSION 0
+#define RAPIDJSON_PATCH_VERSION 0
+#define RAPIDJSON_VERSION_STRING \
+    RAPIDJSON_STRINGIFY(RAPIDJSON_MAJOR_VERSION.RAPIDJSON_MINOR_VERSION.RAPIDJSON_PATCH_VERSION)
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NAMESPACE_(BEGIN|END)
@@ -352,10 +386,6 @@ RAPIDJSON_NAMESPACE_END
 // adopted from Boost
 #define RAPIDJSON_VERSION_CODE(x,y,z) \
   (((x)*100000) + ((y)*100) + (z))
-
-// token stringification
-#define RAPIDJSON_STRINGIFY(x) RAPIDJSON_DO_STRINGIFY(x)
-#define RAPIDJSON_DO_STRINGIFY(x) #x
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_DIAG_PUSH/POP, RAPIDJSON_DIAG_OFF
