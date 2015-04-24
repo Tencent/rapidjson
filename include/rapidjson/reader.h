@@ -928,7 +928,7 @@ private:
                 if (expMinus) {
                     while (s.Peek() >= '0' && s.Peek() <= '9') {
                         exp = exp * 10 + (s.Take() - '0');
-                        if (exp >= 429496729) {                     // Issue #313: prevent overflow exponent
+                        if (exp >= 214748364) {                         // Issue #313: prevent overflow exponent
                             while (s.Peek() >= '0' && s.Peek() <= '9')  // Consume the rest of exponent
                                 s.Take();
                         }
