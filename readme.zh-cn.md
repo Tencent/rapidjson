@@ -1,6 +1,6 @@
 ![](doc/logo/rapidjson.png)
 
-![](https://img.shields.io/badge/release-v1.0.0-blue.png)
+![](https://img.shields.io/badge/release-v1.0.1-blue.png)
 
 Tencent is pleased to support the open source community by making RapidJSON available.
 
