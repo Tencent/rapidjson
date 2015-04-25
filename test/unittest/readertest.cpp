@@ -219,13 +219,19 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "2.2250738585072009e-308", 2.2250738585072009e-308); // Max subnormal double
     TEST_DOUBLE(fullPrecision, "2.2250738585072014e-308", 2.2250738585072014e-308); // Min normal positive double
     TEST_DOUBLE(fullPrecision, "1.7976931348623157e+308", 1.7976931348623157e+308); // Max double
-    TEST_DOUBLE(fullPrecision, "1e-10000", 0.0);                                   // must underflow
-    TEST_DOUBLE(fullPrecision, "18446744073709551616", 18446744073709551616.0);    // 2^64 (max of uint64_t + 1, force to use double)
-    TEST_DOUBLE(fullPrecision, "-9223372036854775809", -9223372036854775809.0);    // -2^63 - 1(min of int64_t + 1, force to use double)
-    TEST_DOUBLE(fullPrecision, "0.9868011474609375", 0.9868011474609375);          // https://github.com/miloyip/rapidjson/issues/120
-    TEST_DOUBLE(fullPrecision, "123e34", 123e34);                                  // Fast Path Cases In Disguise
+    TEST_DOUBLE(fullPrecision, "1e-10000", 0.0);                                    // must underflow
+    TEST_DOUBLE(fullPrecision, "18446744073709551616", 18446744073709551616.0);     // 2^64 (max of uint64_t + 1, force to use double)
+    TEST_DOUBLE(fullPrecision, "-9223372036854775809", -9223372036854775809.0);     // -2^63 - 1(min of int64_t + 1, force to use double)
+    TEST_DOUBLE(fullPrecision, "0.9868011474609375", 0.9868011474609375);           // https://github.com/miloyip/rapidjson/issues/120
+    TEST_DOUBLE(fullPrecision, "123e34", 123e34);                                   // Fast Path Cases In Disguise
     TEST_DOUBLE(fullPrecision, "45913141877270640000.0", 45913141877270640000.0);
     TEST_DOUBLE(fullPrecision, "2.2250738585072011e-308", 2.2250738585072011e-308); // http://www.exploringbinary.com/php-hangs-on-numeric-value-2-2250738585072011e-308/
+    TEST_DOUBLE(fullPrecision, "1e-00011111111111", 0.0);                           // Issue #313
+    TEST_DOUBLE(fullPrecision, "-1e-00011111111111", -0.0);
+    TEST_DOUBLE(fullPrecision, "1e-214748363", 0.0);                                  // Maximum supported negative exponent
+    TEST_DOUBLE(fullPrecision, "1e-214748364", 0.0);
+    TEST_DOUBLE(fullPrecision, "1e-21474836311", 0.0);
+    TEST_DOUBLE(fullPrecision, "0.017976931348623157e+310", 1.7976931348623157e+308); // Max double in another form
 
     // Since
     // abs((2^-1022 - 2^-1074) - 2.2250738585072012e-308) = 3.109754131239141401123495768877590405345064751974375599... ¡Á 10^-324

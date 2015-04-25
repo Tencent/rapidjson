@@ -925,10 +925,22 @@ private:
 
             if (s.Peek() >= '0' && s.Peek() <= '9') {
                 exp = s.Take() - '0';
-                while (s.Peek() >= '0' && s.Peek() <= '9') {
-                    exp = exp * 10 + (s.Take() - '0');
-                    if (exp > 308 && !expMinus) // exp > 308 should be rare, so it should be checked first.
-                        RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
+                if (expMinus) {
+                    while (s.Peek() >= '0' && s.Peek() <= '9') {
+                        exp = exp * 10 + (s.Take() - '0');
+                        if (exp >= 214748364) {                         // Issue #313: prevent overflow exponent
+                            while (s.Peek() >= '0' && s.Peek() <= '9')  // Consume the rest of exponent
+                                s.Take();
+                        }
+                    }
+                }
+                else {  // positive exp
+                    int maxExp = 308 - expFrac;
+                    while (s.Peek() >= '0' && s.Peek() <= '9') {
+                        exp = exp * 10 + (s.Take() - '0');
+                        if (exp > maxExp)
+                            RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
+                    }
                 }
             }
             else
