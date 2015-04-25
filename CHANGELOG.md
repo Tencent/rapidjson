@@ -4,7 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [1.0.1] - 2015-04-25
+## [v1.0.1] - 2015-04-25
 
 ### Added
 * Changelog following [Keep a CHANGELOG](https://github.com/olivierlacan/keep-a-changelog) suggestions.
@@ -13,7 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Parsing of some numbers (e.g. "1e-00011111111111") causing assertion (#314).
 * Visual C++ 32-bit compilation error in `diyfp.h` (#317).
 
-## [1.0.0] - 2015-04-22
+## [v1.0.0] - 2015-04-22
 
 ### Added
 * 100% [Coverall](https://coveralls.io/r/miloyip/rapidjson?branch=master) coverage.
@@ -28,7 +28,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 * Remove an invalid `Document::ParseInsitu()` API (e7f1c6dd08b522cfcf9aed58a333bd9a0c0ccbeb).
 
-## [1.0 Beta] - 2015-04-8
+## [v1.0 Beta] - 2015-04-8
 
 ### Added
 * RFC 7159 (#101)
@@ -54,6 +54,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Removed
 * Remove other JSON libraries for performance comparison (#180)
 
-## [0.11] - 2012-11-16
+## 0.11 - 2012-11-16
 
-## [0.1] - 2011-11-18
+## 0.1 - 2011-11-18
