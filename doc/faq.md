@@ -28,7 +28,7 @@
 
 6. How to install RapidJSON?
 
-   Check [Installation section](http://miloyip.github.io/rapidjson/).
+   Check [Installation section](https://miloyip.github.io/rapidjson/).
 
 7. Can RapidJSON run on my platform?
 
