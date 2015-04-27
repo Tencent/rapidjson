@@ -1,4 +1,7 @@
 ![](doc/logo/rapidjson.png)
+
+![](https://img.shields.io/badge/release-v1.0.1-blue.png)
+
 ## A fast JSON parser/generator for C++ with both SAX/DOM style API 
 
 Tencent is pleased to support the open source community by making RapidJSON available.
@@ -13,14 +16,16 @@ Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights 
 
 ## Build status
 
-| [Linux][lin-link] | [Windows][win-link] |
-| :---------------: | :-----------------: |
-| ![lin-badge]      | ![win-badge]        |
+| [Linux][lin-link] | [Windows][win-link] | [Coveralls][cov-link] |
+| :---------------: | :-----------------: | :-------------------: |
+| ![lin-badge]      | ![win-badge]        | ![cov-badge]          |
 
-[lin-badge]: https://travis-ci.org/miloyip/rapidjson.png "Travis build status"
+[lin-badge]: https://travis-ci.org/miloyip/rapidjson.png?branch=master "Travis build status"
 [lin-link]:  https://travis-ci.org/miloyip/rapidjson "Travis build status"
-[win-badge]: https://ci.appveyor.com/api/projects/status/u658dcuwxo14a8m9/branch/master?svg=true "AppVeyor build status"
+[win-badge]: https://ci.appveyor.com/api/projects/status/u658dcuwxo14a8m9/branch/master "AppVeyor build status"
 [win-link]:  https://ci.appveyor.com/project/miloyip/rapidjson/branch/master "AppVeyor build status"
+[cov-badge]: https://coveralls.io/repos/miloyip/rapidjson/badge.png?branch=master
+[cov-link]:  https://coveralls.io/r/miloyip/rapidjson?branch=master
 
 ## Introduction
 
@@ -28,7 +33,7 @@ RapidJSON is a JSON parser and generator for C++. It was inspired by [RapidXml](
 
 * RapidJSON is small but complete. It supports both SAX and DOM style API. The SAX parser is only a half thousand lines of code.
 
-* RapidJSON is fast. Its performance can be comparable to `strlen()`. It also optionally supports SSE2/SSE4.1 for acceleration.
+* RapidJSON is fast. Its performance can be comparable to `strlen()`. It also optionally supports SSE2/SSE4.2 for acceleration.
 
 * RapidJSON is self-contained. It does not depend on external libraries such as BOOST. It even does not depend on STL.
 

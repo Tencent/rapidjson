@@ -1,12 +1,16 @@
 set(UNITTEST_SOURCES
+	allocatorstest.cpp
     bigintegertest.cpp
     documenttest.cpp
     encodedstreamtest.cpp
     encodingstest.cpp
     filestreamtest.cpp
+    itoatest.cpp
     jsoncheckertest.cpp
     namespacetest.cpp
+    prettywritertest.cpp
     readertest.cpp
+	simdtest.cpp
     stringbuffertest.cpp
     strtodtest.cpp
     unittest.cpp
@@ -33,8 +37,9 @@ add_test(NAME unittest
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 if(NOT MSVC)
+    # Not running SIMD.* unit test cases for Valgrind
     add_test(NAME valgrind_unittest
-        COMMAND valgrind --leak-check=full --error-exitcode=1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest
+        COMMAND valgrind --leak-check=full --error-exitcode=1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest --gtest_filter=-SIMD.*
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")

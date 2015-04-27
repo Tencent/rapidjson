@@ -172,13 +172,10 @@ public:
     }
 
     // Compute absolute difference of this and rhs.
-    // Return false if this < rhs
+    // Assume this != rhs
     bool Difference(const BigInteger& rhs, BigInteger* out) const {
         int cmp = Compare(rhs);
-        if (cmp == 0) {
-            *out = BigInteger(0);
-            return false;
-        }
+        RAPIDJSON_ASSERT(cmp != 0);
         const BigInteger *a, *b;  // Makes a > b
         bool ret;
         if (cmp < 0) { a = &rhs; b = this; ret = true; }
@@ -267,12 +264,6 @@ private:
         *outHigh = hi;
         return lo;
 #endif
-    }
-
-    static Type FullAdd(Type a, Type b, bool inCarry, bool* outCarry) {
-        Type c = a + b + (inCarry ? 1 : 0);
-        *outCarry = c < a;
-        return c;
     }
 
     static const size_t kBitCount = 3328;  // 64bit * 54 > 10^1000

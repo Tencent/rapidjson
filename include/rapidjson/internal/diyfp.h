@@ -19,11 +19,9 @@
 #ifndef RAPIDJSON_DIYFP_H_
 #define RAPIDJSON_DIYFP_H_
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && defined(_M_AMD64)
 #include <intrin.h>
-#if defined(_M_AMD64)
 #pragma intrinsic(_BitScanReverse64)
-#endif
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -135,25 +133,9 @@ struct DiyFp {
             double d;
             uint64_t u64;
         }u;
-        uint64_t significand = f;
-        int exponent = e;
-        while (significand > kDpHiddenBit + kDpSignificandMask) {
-            significand >>= 1;
-            exponent++;
-        }
-        while (exponent > kDpDenormalExponent && (significand & kDpHiddenBit) == 0) {
-            significand <<= 1;
-            exponent--;
-        }
-        if (exponent >= kDpMaxExponent) {
-            u.u64 = kDpExponentMask;    // Infinity
-            return u.d;
-        }
-        else if (exponent < kDpDenormalExponent)
-            return 0.0;
-        const uint64_t be = (exponent == kDpDenormalExponent && (significand & kDpHiddenBit) == 0) ? 0 : 
-            static_cast<uint64_t>(exponent + kDpExponentBias);
-        u.u64 = (significand & kDpSignificandMask) | (be << kDpSignificandSize);
+        const uint64_t be = (e == kDpDenormalExponent && (f & kDpHiddenBit) == 0) ? 0 : 
+            static_cast<uint64_t>(e + kDpExponentBias);
+        u.u64 = (f & kDpSignificandMask) | (be << kDpSignificandSize);
         return u.d;
     }
 

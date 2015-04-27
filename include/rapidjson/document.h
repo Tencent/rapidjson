@@ -1459,17 +1459,14 @@ public:
         case kStringType:
             return handler.String(GetString(), GetStringLength(), (flags_ & kCopyFlag) != 0);
     
-        case kNumberType:
+        default:
+            RAPIDJSON_ASSERT(GetType() == kNumberType);
             if (IsInt())            return handler.Int(data_.n.i.i);
             else if (IsUint())      return handler.Uint(data_.n.u.u);
             else if (IsInt64())     return handler.Int64(data_.n.i64);
             else if (IsUint64())    return handler.Uint64(data_.n.u64);
             else                    return handler.Double(data_.n.d);
-    
-        default:
-            RAPIDJSON_ASSERT(false);
         }
-        return false;
     }
 
 private:
@@ -1582,16 +1579,24 @@ private:
     // Initialize this value as array with initial data, without calling destructor.
     void SetArrayRaw(GenericValue* values, SizeType count, Allocator& allocator) {
         flags_ = kArrayFlag;
-        data_.a.elements = (GenericValue*)allocator.Malloc(count * sizeof(GenericValue));
-        std::memcpy(data_.a.elements, values, count * sizeof(GenericValue));
+        if (count) {
+            data_.a.elements = (GenericValue*)allocator.Malloc(count * sizeof(GenericValue));
+            std::memcpy(data_.a.elements, values, count * sizeof(GenericValue));
+        }
+        else
+            data_.a.elements = NULL;
         data_.a.size = data_.a.capacity = count;
     }
 
     //! Initialize this value as object with initial data, without calling destructor.
     void SetObjectRaw(Member* members, SizeType count, Allocator& allocator) {
         flags_ = kObjectFlag;
-        data_.o.members = (Member*)allocator.Malloc(count * sizeof(Member));
-        std::memcpy(data_.o.members, members, count * sizeof(Member));
+        if (count) {
+            data_.o.members = (Member*)allocator.Malloc(count * sizeof(Member));
+            std::memcpy(data_.o.members, members, count * sizeof(Member));
+        }
+        else
+            data_.o.members = NULL;
         data_.o.size = data_.o.capacity = count;
     }
 
@@ -1753,7 +1758,7 @@ public:
     */
     template <unsigned parseFlags, typename InputStream>
     GenericDocument& ParseStream(InputStream& is) {
-        return ParseStream<parseFlags,Encoding,InputStream>(is);
+        return ParseStream<parseFlags, Encoding, InputStream>(is);
     }
 
     //! Parse JSON text from an input stream (with \ref kParseDefaultFlags)
