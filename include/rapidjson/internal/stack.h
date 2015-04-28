@@ -15,6 +15,8 @@
 #ifndef RAPIDJSON_INTERNAL_STACK_H_
 #define RAPIDJSON_INTERNAL_STACK_H_
 
+#include "../rapidjson.h"
+
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 

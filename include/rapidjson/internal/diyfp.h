@@ -19,6 +19,8 @@
 #ifndef RAPIDJSON_DIYFP_H_
 #define RAPIDJSON_DIYFP_H_
 
+#include "../rapidjson.h"
+
 #if defined(_MSC_VER) && defined(_M_AMD64)
 #include <intrin.h>
 #pragma intrinsic(_BitScanReverse64)
