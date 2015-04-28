@@ -15,6 +15,8 @@
 #ifndef RAPIDJSON_POW10_
 #define RAPIDJSON_POW10_
 
+#include "../rapidjson.h"
+
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
