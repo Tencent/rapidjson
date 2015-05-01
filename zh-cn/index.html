@@ -86,6 +86,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <div class="image">
 <img src="https://img.shields.io/badge/release-v1.0.1-blue.png" />
 </div>
+<h2>高效的C++ JSON解析／生成器，提供SAX及DOM风格API</h2>
 <p>Tencent is pleased to support the open source community by making RapidJSON available.</p>
 <p>Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.</p>
 <ul>
@@ -138,22 +139,20 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p>用户也可以在他们的平台上生成及执行单元测试。</p>
 <h2>安装</h2>
 <p>RapidJSON是只有头文件的C++库。只需把<code>include/rapidjson</code>目录复制至系统或项目的include目录中。</p>
+<p>RapidJSON依赖于以下软件：</p><ul>
+<li><a href="http://www.cmake.org">CMake</a> 作为通用生成工具</li>
+<li>(optional)<a href="http://www.doxygen.org">Doxygen</a>用于生成文档</li>
+<li>(optional)<a href="https://code.google.com/p/googletest/">googletest</a>用于单元及性能测试</li>
+</ul>
 <p>生成测试及例子的步骤：</p>
 <ol type="1">
 <li>执行 <code>git submodule update --init</code> 去获取 thirdparty submodules (google test)。</li>
-<li>下载 <a href="http://industriousone.com/premake/download">premake4</a>。</li>
-<li>复制 premake4 可执行文件至 <code>rapidjson/build</code> （或系统路径）。</li>
-<li>进入<code>rapidjson/build/</code>目录，在Windows下执行<code>premake.bat</code>，在Linux或其他平台下执行<code>premake.sh</code>。</li>
-<li>在Windows上，生成位于<code>rapidjson/build/vs2008/</code>或<code>/vs2010/</code>内的项目方案.</li>
-<li>在其他平台上，在<code>rapidjson/build/gmake/</code>目录执行GNU <code>make</code>（如 <code>make -f test.make config=release32</code>、<code>make -f example.make config=debug32</code>）。</li>
-<li>若成功，可执行文件会生成在<code>rapidjson/bin</code>目录。</li>
+<li>在rapidjson目渌下，建立一个<code>build</code>目录。</li>
+<li>在<code>build</code>目录下执行<code>cmake ..</code>命令以设置生成。Windows用户可使用cmake-gui应用程序。</li>
+<li>在Windows下，编译生成在build目录中的solution。在Linux下，于build目录运行<code>make</code>。</li>
 </ol>
-<p>生成<a href="http://doxygen.org">Doxygen</a>文档的步骤：</p>
-<ol type="1">
-<li>下载及安装<a href="http://doxygen.org/download.html">Doxygen</a>。</li>
-<li>在顶层目录执行<code>doxygen build/Doxyfile</code>。</li>
-<li>在<code>doc/html</code>浏览文档。</li>
-</ol>
+<p>成功生成后，你会在<code>bin</code>的目录下找到编译后的测试及例子可执行文件。而生成的文档将位于build下的<code>doc/html</code>目录。要执行测试，请在build下执行<code>make test</code>或<code>ctest</code>。使用<code>ctest -V</code>命令可获取详细的输出。</p>
+<p>我们也可以把程序库安装至全系统中，只要在具管理權限下从build目录执行<code>make install</code>命令。这样会按系统的偏好设置安装所有文件。当安装RapidJSON后，其他的CMake项目需要使用它时，可以通过在<code>CMakeLists.txt</code>加入一句<code>find_package(RapidJSON)</code>。</p>
 <h2>用法一览</h2>
 <p>此简单例子解析一个JSON字符串至一个document (DOM)，对DOM作出简单修改，最终把DOM转换（stringify）至JSON字符串。</p>
 <div class="fragment"><div class="line"><span class="comment">// rapidjson/example/simpledom/simpledom.cpp`</span></div>
