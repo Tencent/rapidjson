@@ -383,7 +383,7 @@ public:
         delete itemsList_;
         for (SizeType i = 0; i < itemsTupleCount_; i++)
             delete itemsTuple_[i];
-        delete itemsTuple_;
+        delete [] itemsTuple_;
     }
 
     virtual void BeginValue(Context& context) const {
