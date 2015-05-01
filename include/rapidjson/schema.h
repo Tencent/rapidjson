@@ -18,6 +18,12 @@
 #include "document.h"
 #include <cmath> // HUGE_VAL, fmod
 
+#if defined(__GNUC__)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(effc++)
+RAPIDJSON_DIAG_OFF(float-equal)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 template <typename Encoding>
@@ -861,5 +867,9 @@ private:
 typedef GenericSchemaValidator<UTF8<> > SchemaValidator;
 
 RAPIDJSON_NAMESPACE_END
+
+#if defined(__GNUC__)
+RAPIDJSON_DIAG_POP
+#endif
 
 #endif // RAPIDJSON_SCHEMA_H_

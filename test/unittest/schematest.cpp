@@ -26,7 +26,10 @@ using namespace rapidjson;
     Document d;\
     d.Parse(json);\
     EXPECT_FALSE(d.HasParseError());\
-    EXPECT_EQ(expected, d.Accept(validator));\
+    if (expected)\
+        EXPECT_TRUE(d.Accept(validator));\
+    else\
+        EXPECT_FALSE(d.Accept(validator));\
 }
 
 TEST(SchemaValidator, Typeless) {
