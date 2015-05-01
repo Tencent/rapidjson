@@ -10,6 +10,7 @@ set(UNITTEST_SOURCES
     namespacetest.cpp
     prettywritertest.cpp
     readertest.cpp
+	schematest.cpp
 	simdtest.cpp
     stringbuffertest.cpp
     strtodtest.cpp
