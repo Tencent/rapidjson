@@ -192,7 +192,7 @@ Checking          | Obtaining
 `bool IsNumber()` | N/A
 `bool IsUint()`   | `unsigned GetUint()`
 `bool IsInt()`    | `int GetInt()`
-`bool IsUint64()` | `uint64_t GetUint()`
+`bool IsUint64()` | `uint64_t GetUint64()`
 `bool IsInt64()`  | `int64_t GetInt64()`
 `bool IsDouble()` | `double GetDouble()`
 

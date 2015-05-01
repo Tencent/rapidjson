@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+* Include rapidjson.h for all internal/error headers.
+
 ## [1.0.1] - 2015-04-25
 
 ### Added

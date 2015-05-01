@@ -2,6 +2,8 @@
 
 ![](https://img.shields.io/badge/release-v1.0.1-blue.png)
 
+## 高效的C++ JSON解析／生成器，提供SAX及DOM风格API
+
 Tencent is pleased to support the open source community by making RapidJSON available.
 
 Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
@@ -60,21 +62,21 @@ RapidJSON是跨平台的。以下是一些曾测试的平台／编译器组合�
 
 RapidJSON是只有头文件的C++库。只需把`include/rapidjson`目录复制至系统或项目的include目录中。
 
+RapidJSON依赖于以下软件：
+* [CMake](http://www.cmake.org) 作为通用生成工具
+* (optional)[Doxygen](http://www.doxygen.org)用于生成文档
+* (optional)[googletest](https://code.google.com/p/googletest/)用于单元及性能测试
+
 生成测试及例子的步骤：
 
 1. 执行 `git submodule update --init` 去获取 thirdparty submodules (google test)。
-2. 下载 [premake4](http://industriousone.com/premake/download)。
-3. 复制 premake4 可执行文件至 `rapidjson/build` （或系统路径）。
-4. 进入`rapidjson/build/`目录，在Windows下执行`premake.bat`，在Linux或其他平台下执行`premake.sh`。
-5. 在Windows上，生成位于`rapidjson/build/vs2008/`或`/vs2010/`内的项目方案.
-6. 在其他平台上，在`rapidjson/build/gmake/`目录执行GNU `make`（如 `make -f test.make config=release32`、`make -f example.make config=debug32`）。
-7. 若成功，可执行文件会生成在`rapidjson/bin`目录。
+2. 在rapidjson目渌下，建立一个`build`目录。
+3. 在`build`目录下执行`cmake ..`命令以设置生成。Windows用户可使用cmake-gui应用程序。
+4. 在Windows下，编译生成在build目录中的solution。在Linux下，于build目录运行`make`。
 
-生成[Doxygen](http://doxygen.org)文档的步骤：
+成功生成后，你会在`bin`的目录下找到编译后的测试及例子可执行文件。而生成的文档将位于build下的`doc/html`目录。要执行测试，请在build下执行`make test`或`ctest`。使用`ctest -V`命令可获取详细的输出。
 
-1. 下载及安装[Doxygen](http://doxygen.org/download.html)。
-2. 在顶层目录执行`doxygen build/Doxyfile`。
-3. 在`doc/html`浏览文档。
+我们也可以把程序库安装至全系统中，只要在具管理權限下从build目录执行`make install`命令。这样会按系统的偏好设置安装所有文件。当安装RapidJSON后，其他的CMake项目需要使用它时，可以通过在`CMakeLists.txt`加入一句`find_package(RapidJSON)`。
 
 ## 用法一览
 
