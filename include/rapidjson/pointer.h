@@ -248,6 +248,28 @@ public:
         return v;
     }
 
+    ValueType& GetWithDefault(ValueType& root, GenericStringRef<Ch> defaultValue, typename ValueType::AllocatorType& allocator) const {
+        ValueType v(defaultValue);
+        return GetWithDefault(root, v, allocator);
+    }
+
+    ValueType& GetWithDefault(ValueType& root, const Ch* defaultValue, typename ValueType::AllocatorType& allocator) const {
+        bool alreadyExist;
+        Value& v = Create(root, allocator, &alreadyExist);
+        if (!alreadyExist) {
+            Value clone(defaultValue, allocator); // This has overhead, so do it inside if.
+            v = clone;
+        }
+        return v;
+    }
+
+    template <typename T>
+    RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&))
+    GetWithDefault(ValueType& root, T defaultValue, typename ValueType::AllocatorType& allocator) const {
+        ValueType v(defaultValue);
+        return GetWithDefault(root, v, allocator);
+    }
+
     // Move semantics, create parents if non-exist
     ValueType& Set(ValueType& root, ValueType& value, typename ValueType::AllocatorType& allocator) const {
         return Create(root, allocator) = value;

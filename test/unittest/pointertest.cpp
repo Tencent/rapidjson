@@ -313,6 +313,7 @@ TEST(Pointer, GetWithDefault) {
     Document d;
     d.Parse(kJson);
 
+    // Value version
     Document::AllocatorType& a = d.GetAllocator();
     const Value v("qux");
     EXPECT_TRUE(Value("bar") == Pointer("/foo/0").GetWithDefault(d, v, a));
@@ -320,6 +321,41 @@ TEST(Pointer, GetWithDefault) {
     EXPECT_TRUE(Value("qux") == Pointer("/foo/2").GetWithDefault(d, v, a));
     EXPECT_TRUE(Value("last") == Pointer("/foo/-").GetWithDefault(d, Value("last").Move(), a));
     EXPECT_STREQ("last", d["foo"][3].GetString());
+
+    EXPECT_TRUE(Pointer("/foo/null").GetWithDefault(d, Value().Move(), a).IsNull());
+    EXPECT_TRUE(Pointer("/foo/null").GetWithDefault(d, "x", a).IsNull());
+
+    // Generic version
+    EXPECT_EQ(-1, Pointer("/foo/int").GetWithDefault(d, -1, a).GetInt());
+    EXPECT_EQ(-1, Pointer("/foo/int").GetWithDefault(d, -2, a).GetInt());
+    EXPECT_EQ(0x87654321, Pointer("/foo/uint").GetWithDefault(d, 0x87654321, a).GetUint());
+    EXPECT_EQ(0x87654321, Pointer("/foo/uint").GetWithDefault(d, 0x12345678, a).GetUint());
+
+    const int64_t i64 = static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x80000000, 0));
+    EXPECT_EQ(i64, Pointer("/foo/int64").GetWithDefault(d, i64, a).GetInt64());
+    EXPECT_EQ(i64, Pointer("/foo/int64").GetWithDefault(d, i64 + 1, a).GetInt64());
+
+    const uint64_t u64 = RAPIDJSON_UINT64_C2(0xFFFFFFFFF, 0xFFFFFFFFF);
+    EXPECT_EQ(u64, Pointer("/foo/uint64").GetWithDefault(d, u64, a).GetUint64());
+    EXPECT_EQ(u64, Pointer("/foo/uint64").GetWithDefault(d, u64 - 1, a).GetUint64());
+
+    EXPECT_TRUE(Pointer("/foo/true").GetWithDefault(d, true, a).IsTrue());
+    EXPECT_TRUE(Pointer("/foo/true").GetWithDefault(d, false, a).IsTrue());
+
+    EXPECT_TRUE(Pointer("/foo/false").GetWithDefault(d, false, a).IsFalse());
+    EXPECT_TRUE(Pointer("/foo/false").GetWithDefault(d, true, a).IsFalse());
+
+    // StringRef version
+    EXPECT_STREQ("Hello", Pointer("/foo/hello").GetWithDefault(d, "Hello", a).GetString());
+
+    // Copy string version
+    {
+        char buffer[256];
+        strcpy(buffer, "World");
+        EXPECT_STREQ("World", Pointer("/foo/world").GetWithDefault(d, buffer, a).GetString());
+        memset(buffer, 0, sizeof(buffer));
+    }
+    EXPECT_STREQ("World", GetValueByPointer(d, "/foo/world")->GetString());
 }
 
 TEST(Pointer, Set) {
