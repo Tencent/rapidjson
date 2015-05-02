@@ -21,9 +21,10 @@ using namespace rapidjson;
 
 #define VALIDATE(schema, json, expected) \
 {\
-    EXPECT_TRUE(schema.IsValid());\
+    ASSERT_TRUE(schema.IsValid());\
     SchemaValidator validator(schema);\
     Document d;\
+    /*printf("\n%s\n", json);*/\
     d.Parse(json);\
     EXPECT_FALSE(d.HasParseError());\
     if (expected)\
@@ -40,6 +41,16 @@ TEST(SchemaValidator, Typeless) {
     VALIDATE(s, "42", true);
     VALIDATE(s, "\"I'm a string\"", true);
     VALIDATE(s, "{ \"an\": [ \"arbitrarily\", \"nested\" ], \"data\": \"structure\" }", true);
+}
+
+TEST(SchemaValidator, MultiType) {
+    Document sd;
+    sd.Parse("{ \"type\": [\"number\", \"string\"] }");
+    Schema s(sd);
+
+    VALIDATE(s, "42", true);
+    VALIDATE(s, "\"Life, the universe, and everything\"", true);
+    VALIDATE(s, "[\"Life\", \"the universe\", \"and everything\"]", false);
 }
 
 TEST(SchemaValidator, Enum_Typed) {
@@ -426,6 +437,8 @@ TEST(SchemaValidator, Null) {
     VALIDATE(s, "\"\"", false);
 }
 
+// Additional tests
+
 TEST(SchemaValidator, ObjectInArray) {
     Document sd;
     sd.Parse("{\"type\":\"array\", \"items\": { \"type\":\"string\" }}");
@@ -435,3 +448,40 @@ TEST(SchemaValidator, ObjectInArray) {
     VALIDATE(s, "[1]", false);
     VALIDATE(s, "[{}]", false);
 }
+
+TEST(SchemaValidator, MultiTypeInObject) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "    \"type\":\"object\","
+        "    \"properties\": {"
+        "        \"tel\" : {"
+        "            \"type\":[\"integer\", \"string\"]"
+        "        }"
+        "    }"
+        "}");
+    Schema s(sd);
+
+    VALIDATE(s, "{ \"tel\": 999 }", true);
+    VALIDATE(s, "{ \"tel\": \"123-456\" }", true);
+    VALIDATE(s, "{ \"tel\": true }", false);
+}
+
+TEST(SchemaValidator, MultiTypeWithObject) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "    \"type\": [\"object\",\"string\"],"
+        "    \"properties\": {"
+        "        \"tel\" : {"
+        "            \"type\": \"integer\""
+        "        }"
+        "    }"
+        "}");
+    Schema s(sd);
+
+    VALIDATE(s, "\"Hello\"", true);
+    VALIDATE(s, "{ \"tel\": 999 }", true);
+    VALIDATE(s, "{ \"tel\": \"fail\" }", false);
+}
+

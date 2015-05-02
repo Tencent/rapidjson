@@ -26,17 +26,31 @@ RAPIDJSON_DIAG_OFF(float-equal)
 
 RAPIDJSON_NAMESPACE_BEGIN
 
+enum SchemaType {
+    kNullSchemaType,
+    kBooleanSchemaType,
+    kObjectSchemaType,
+    kArraySchemaType,
+    kStringSchemaType,
+    kNumberSchemaType,
+    kIntegerSchemaType,
+    kTotalBasicSchemaType,
+    kTypelessSchemaType = kTotalBasicSchemaType,
+    kMultiTypeSchemaType,
+};
+
 template <typename Encoding>
 class BaseSchema;
 
 template <typename Encoding>
 struct SchemaValidationContext {
-    SchemaValidationContext(const BaseSchema<Encoding>* s) : schema(s), valueSchema() {}
+    SchemaValidationContext(const BaseSchema<Encoding>* s) : schema(s), valueSchema(), multiTypeSchema() {}
 
     ~SchemaValidationContext() {}
 
     const BaseSchema<Encoding>* schema;
     const BaseSchema<Encoding>* valueSchema;
+    const BaseSchema<Encoding>* multiTypeSchema;
     SizeType objectRequiredCount;
     SizeType arrayElementIndex;
 };
@@ -50,8 +64,7 @@ public:
     BaseSchema() {}
 
     template <typename ValueType>
-    BaseSchema(const ValueType& value)
-    {
+    BaseSchema(const ValueType& value) {
         typename ValueType::ConstMemberIterator enumItr = value.FindMember("enum");
         if (enumItr != value.MemberEnd()) {
             if (enumItr->value.IsArray() && enumItr->value.Size() > 0)
@@ -64,6 +77,9 @@ public:
     
     virtual ~BaseSchema() {}
 
+    virtual SchemaType GetSchemaType() const = 0;
+
+    virtual bool HandleMultiType(Context&, SchemaType) const { return true; }
     virtual bool BeginValue(Context&) const { return true; }
 
     virtual bool Null() const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>().Move()); }
@@ -93,6 +109,9 @@ protected:
 };
 
 template <typename Encoding, typename ValueType>
+inline BaseSchema<Encoding>* CreateSchema(const ValueType& value, const ValueType& type);
+
+template <typename Encoding, typename ValueType>
 inline BaseSchema<Encoding>* CreateSchema(const ValueType& value);
 
 template <typename Encoding>
@@ -105,7 +124,59 @@ public:
     template <typename ValueType>
     TypelessSchema(const ValueType& value) : BaseSchema<Encoding>(value) {}
 
+    virtual SchemaType GetSchemaType() const { return kTypelessSchemaType; }
+
     virtual bool BeginValue(Context& context) const { context.valueSchema = this; return true; }
+};
+
+template <typename Encoding>
+class MultiTypeSchema : public BaseSchema<Encoding> {
+public:
+    typedef SchemaValidationContext<Encoding> Context;
+
+    template <typename ValueType>
+    MultiTypeSchema(const ValueType& value, const ValueType& type) : BaseSchema<Encoding>(), typedSchemas_() {
+        RAPIDJSON_ASSERT(type.IsArray());
+        for (typename ValueType::ConstValueIterator itr = type.Begin(); itr != type.End(); ++itr) {
+            if (itr->IsString()) {
+                BaseSchema<Encoding>* schema = CreateSchema<Encoding, ValueType>(value, *itr);
+                SchemaType schemaType = schema->GetSchemaType();
+                RAPIDJSON_ASSERT(schemaType < kTotalBasicSchemaType);
+                if (typedSchemas_[schemaType] == 0)
+                    typedSchemas_[schemaType] = schema;
+                else {
+                    // Erorr: not unique type
+                }
+            }
+            else {
+                // Error
+            }
+        }
+    }
+
+    ~MultiTypeSchema() {
+        for (size_t i = 0; i < kTotalBasicSchemaType; i++)
+            delete typedSchemas_[i];
+    }
+
+    virtual SchemaType GetSchemaType() const { return kMultiTypeSchemaType; };
+
+    virtual bool HandleMultiType(Context& context, SchemaType schemaType) const {
+        RAPIDJSON_ASSERT(schemaType < kTotalBasicSchemaType);
+        if (typedSchemas_[schemaType]) {
+            context.multiTypeSchema = typedSchemas_[schemaType];
+            return true;
+        }
+        else if (schemaType == kIntegerSchemaType && typedSchemas_[kNumberSchemaType]) {
+            context.multiTypeSchema = typedSchemas_[kNumberSchemaType];
+            return true;
+        }
+        else
+            return false;
+    }
+
+private:
+    BaseSchema<Encoding>* typedSchemas_[kTotalBasicSchemaType];
 };
 
 template <typename Encoding>
@@ -116,6 +187,8 @@ public:
 
     template <typename ValueType>
     NullSchema(const ValueType& value) : BaseSchema<Encoding>(value) {}
+
+    virtual SchemaType GetSchemaType() const { return kNullSchemaType; }
 
     virtual bool Null() const { return BaseSchema<Encoding>::Null(); }
     virtual bool Bool(bool) const { return false; }
@@ -140,6 +213,8 @@ public:
 
     template <typename ValueType>
     BooleanSchema(const ValueType& value) : BaseSchema<Encoding>(value) {}
+
+    virtual SchemaType GetSchemaType() const { return kBooleanSchemaType; }
 
     virtual bool Null() const { return false; }
     virtual bool Bool(bool b) const { return BaseSchema<Encoding>::Bool(b); }
@@ -240,6 +315,8 @@ public:
         delete [] properties_;
         delete additionalPropertySchema_;
     }
+
+    virtual SchemaType GetSchemaType() const { return kObjectSchemaType; }
 
     virtual bool Null() const { return false; }
     virtual bool Bool(bool) const { return false; }
@@ -402,6 +479,8 @@ public:
         delete [] itemsTuple_;
     }
 
+    virtual SchemaType GetSchemaType() const { return kArraySchemaType; }
+
     virtual bool BeginValue(Context& context) const {
         if (itemsList_)
             context.valueSchema = itemsList_;
@@ -481,6 +560,8 @@ public:
             }
         }
     }
+
+    virtual SchemaType GetSchemaType() const { return kStringSchemaType; }
 
     virtual bool Null() const { return false; }
     virtual bool Bool(bool) const { return false; }
@@ -567,6 +648,8 @@ public:
             }
         }
     }
+
+    virtual SchemaType GetSchemaType() const { return kIntegerSchemaType; }
 
     virtual bool Null() const { return false; }
     virtual bool Bool(bool) const { return false; }
@@ -713,6 +796,8 @@ public:
         }
     }
 
+    virtual SchemaType GetSchemaType() const { return kNumberSchemaType; }
+
     virtual bool Null() const { return false; }
     virtual bool Bool(bool) const { return false; }
 
@@ -746,21 +831,27 @@ private:
 };
 
 template <typename Encoding, typename ValueType>
+inline BaseSchema<Encoding>* CreateSchema(const ValueType& value, const ValueType& type) {
+    if      (type == Value("null"   ).Move()) return new NullSchema<Encoding>(value);
+    else if (type == Value("boolean").Move()) return new BooleanSchema<Encoding>(value);
+    else if (type == Value("object" ).Move()) return new ObjectSchema<Encoding>(value);
+    else if (type == Value("array"  ).Move()) return new ArraySchema<Encoding>(value);
+    else if (type == Value("string" ).Move()) return new StringSchema<Encoding>(value);
+    else if (type == Value("integer").Move()) return new IntegerSchema<Encoding>(value);
+    else if (type == Value("number" ).Move()) return new NumberSchema<Encoding>(value);
+    else                                      return 0;
+}
+
+template <typename Encoding, typename ValueType>
 inline BaseSchema<Encoding>* CreateSchema(const ValueType& value) {
     if (!value.IsObject())
         return 0;
 
     typename ValueType::ConstMemberIterator typeItr = value.FindMember("type");
 
-    if (typeItr == value.MemberEnd())                   return new TypelessSchema<Encoding>(value);
-    else if (typeItr->value == Value("null"   ).Move()) return new NullSchema<Encoding>(value);
-    else if (typeItr->value == Value("boolean").Move()) return new BooleanSchema<Encoding>(value);
-    else if (typeItr->value == Value("object" ).Move()) return new ObjectSchema<Encoding>(value);
-    else if (typeItr->value == Value("array"  ).Move()) return new ArraySchema<Encoding>(value);
-    else if (typeItr->value == Value("string" ).Move()) return new StringSchema<Encoding>(value);
-    else if (typeItr->value == Value("integer").Move()) return new IntegerSchema<Encoding>(value);
-    else if (typeItr->value == Value("number" ).Move()) return new NumberSchema<Encoding>(value);
-    else                                                return 0;
+    if (typeItr == value.MemberEnd())  return new TypelessSchema<Encoding>(value);
+    else if (typeItr->value.IsArray()) return new MultiTypeSchema<Encoding>(value, typeItr->value);
+    else                               return CreateSchema<Encoding, ValueType>(value, typeItr->value);
 }
 
 template <typename Encoding, typename Allocator = MemoryPoolAllocator<> >
@@ -790,10 +881,10 @@ template <typename Encoding, typename OutputHandler = BaseReaderHandler<Encoding
 class GenericSchemaValidator {
 public:
     typedef typename Encoding::Ch Ch;               //!< Character type derived from Encoding.
-    typedef GenericSchema<Encoding> SchemaType;
+    typedef GenericSchema<Encoding> SchemaT;
 
     GenericSchemaValidator(
-        const Schema& schema,
+        const SchemaT& schema,
         Allocator* allocator = 0, 
         size_t schemaStackCapacity = kDefaultSchemaStackCapacity,
         size_t documentStackCapacity = kDefaultDocumentStackCapacity)
@@ -807,7 +898,7 @@ public:
     }
 
     GenericSchemaValidator( 
-        const Schema& schema,
+        const SchemaT& schema,
         OutputHandler& outputHandler,
         Allocator* allocator = 0,
         size_t schemaStackCapacity = kDefaultSchemaStackCapacity,
@@ -826,43 +917,50 @@ public:
         documentStack_.Clear();
     };
 
-    bool Null()               { return BeginValue() && CurrentSchema().Null()      && EndValue() && outputHandler_.Null();      }
-    bool Bool(bool b)         { return BeginValue() && CurrentSchema().Bool(b)     && EndValue() && outputHandler_.Bool(b);     }
-    bool Int(int i)           { return BeginValue() && CurrentSchema().Int(i)      && EndValue() && outputHandler_.Int(i);      }
-    bool Uint(unsigned u)     { return BeginValue() && CurrentSchema().Uint(u)     && EndValue() && outputHandler_.Uint(u);     }
-    bool Int64(int64_t i64)   { return BeginValue() && CurrentSchema().Int64(i64)  && EndValue() && outputHandler_.Int64(i64);  }
-    bool Uint64(uint64_t u64) { return BeginValue() && CurrentSchema().Uint64(u64) && EndValue() && outputHandler_.Uint64(u64); }
-    bool Double(double d)     { return BeginValue() && CurrentSchema().Double(d)   && EndValue() && outputHandler_.Double(d);   }
-    bool String(const Ch* str, SizeType length, bool copy) { return BeginValue() && CurrentSchema().String(str, length, copy) && EndValue() && outputHandler_.String(str, length, copy); }
+    bool Null()               { return BeginValue(kNullSchemaType)    && CurrentSchema().Null()      && EndValue() && outputHandler_.Null();      }
+    bool Bool(bool b)         { return BeginValue(kBooleanSchemaType) && CurrentSchema().Bool(b)     && EndValue() && outputHandler_.Bool(b);     }
+    bool Int(int i)           { return BeginValue(kIntegerSchemaType) && CurrentSchema().Int(i)      && EndValue() && outputHandler_.Int(i);      }
+    bool Uint(unsigned u)     { return BeginValue(kIntegerSchemaType) && CurrentSchema().Uint(u)     && EndValue() && outputHandler_.Uint(u);     }
+    bool Int64(int64_t i64)   { return BeginValue(kIntegerSchemaType) && CurrentSchema().Int64(i64)  && EndValue() && outputHandler_.Int64(i64);  }
+    bool Uint64(uint64_t u64) { return BeginValue(kIntegerSchemaType) && CurrentSchema().Uint64(u64) && EndValue() && outputHandler_.Uint64(u64); }
+    bool Double(double d)     { return BeginValue(kNumberSchemaType)  && CurrentSchema().Double(d)   && EndValue() && outputHandler_.Double(d);   }
+    bool String(const Ch* str, SizeType length, bool copy) { return BeginValue(kStringSchemaType) && CurrentSchema().String(str, length, copy) && EndValue() && outputHandler_.String(str, length, copy); }
     
-    bool StartObject() { return BeginValue() && CurrentSchema().StartObject(CurrentContext()) && outputHandler_.StartObject(); }
+    bool StartObject() { return BeginValue(kObjectSchemaType) && CurrentSchema().StartObject(CurrentContext()) && outputHandler_.StartObject(); }
     bool Key(const Ch* str, SizeType len, bool copy) { return CurrentSchema().Key(CurrentContext(), str, len, copy) && outputHandler_.Key(str, len, copy); }
     bool EndObject(SizeType memberCount) { return CurrentSchema().EndObject(CurrentContext(), memberCount) && EndValue() && outputHandler_.EndObject(memberCount); }
     
-    bool StartArray() { return BeginValue() && CurrentSchema().StartArray(CurrentContext()) ? outputHandler_.StartArray() : false; }
+    bool StartArray() { return BeginValue(kArraySchemaType) && CurrentSchema().StartArray(CurrentContext()) ? outputHandler_.StartArray() : false; }
     bool EndArray(SizeType elementCount) { return CurrentSchema().EndArray(CurrentContext(), elementCount) && EndValue() && outputHandler_.EndArray(elementCount); }
 
 private:
     typedef BaseSchema<Encoding> BaseSchemaType;
     typedef typename BaseSchemaType::Context Context;
 
-    bool BeginValue() {
-        if (schemaStack_.Empty()) {
+    bool BeginValue(SchemaType schemaType) {
+        if (schemaStack_.Empty())
             PushSchema(*schema_.root_);
-            return true;
-        }
         else {
             if (!CurrentSchema().BeginValue(CurrentContext()))
                 return false;
 
             if (CurrentContext().valueSchema)
                 PushSchema(*CurrentContext().valueSchema);
-            return true;
         }
+
+        if (!CurrentSchema().HandleMultiType(CurrentContext(), schemaType))
+            return false;
+
+        if (CurrentContext().multiTypeSchema)
+            PushSchema(*CurrentContext().multiTypeSchema);
+
+        return true;
     }
 
     bool EndValue() {
         PopSchema();
+        if (!schemaStack_.Empty() && CurrentContext().multiTypeSchema)
+             PopSchema();
         return true;
     }
 
@@ -873,7 +971,7 @@ private:
 
     static const size_t kDefaultSchemaStackCapacity = 256;
     static const size_t kDefaultDocumentStackCapacity = 256;
-    const SchemaType& schema_;
+    const SchemaT& schema_;
     BaseReaderHandler<Encoding> nullOutputHandler_;
     OutputHandler& outputHandler_;
     internal::Stack<Allocator> schemaStack_;    //!< stack to store the current path of schema (BaseSchemaType *)
