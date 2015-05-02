@@ -209,6 +209,11 @@ public:
         return *v;
     }
 
+    template <typename stackAllocator>
+    ValueType& Create(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, bool* alreadyExist = 0) const {
+        return Create(root, root.GetAllocator(), alreadyExist);
+    }
+
     ValueType* Get(ValueType& root) const {
         RAPIDJSON_ASSERT(IsValid());
         ValueType* v = &root;
@@ -270,6 +275,27 @@ public:
         return GetWithDefault(root, v, allocator);
     }
 
+    template <typename stackAllocator>
+    ValueType& GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, const ValueType& defaultValue) const {
+        return GetWithDefault(root, defaultValue, root.GetAllocator());
+    }
+
+    template <typename stackAllocator>
+    ValueType& GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, GenericStringRef<Ch> defaultValue) const {
+        return GetWithDefault(root, defaultValue, root.GetAllocator());
+    }
+
+    template <typename stackAllocator>
+    ValueType& GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, const Ch* defaultValue) const {
+        return GetWithDefault(root, defaultValue, root.GetAllocator());
+    }
+    
+    template <typename T, typename stackAllocator>
+    RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&))
+    GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, T defaultValue) const {
+        return GetWithDefault(root, defaultValue, root.GetAllocator());
+    }
+
     // Move semantics, create parents if non-exist
     ValueType& Set(ValueType& root, ValueType& value, typename ValueType::AllocatorType& allocator) const {
         return Create(root, allocator) = value;
@@ -295,6 +321,35 @@ public:
     Set(ValueType& root, T value, typename ValueType::AllocatorType& allocator) const {
         ValueType v(value);
         return Create(root, allocator) = v;
+    }
+
+    template <typename stackAllocator>
+    ValueType& Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, ValueType& value) const {
+        return Create(root) = value;
+    }
+
+    template <typename stackAllocator>
+    ValueType& Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, const ValueType& value) const {
+        return Create(root).CopyFrom(value, root.GetAllocator());
+    }
+
+    template <typename stackAllocator>
+    ValueType& Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, GenericStringRef<Ch> value) const {
+        ValueType v(value);
+        return Create(root) = v;
+    }
+
+    template <typename stackAllocator>
+    ValueType& Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, const Ch* value) const {
+        ValueType v(value, root.GetAllocator());
+        return Create(root) = v;
+    }
+
+    template <typename T, typename stackAllocator>
+    RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&))
+    Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, T value) const {
+        ValueType v(value);
+        return Create(root) = v;
     }
 
     // Create parents if non-exist
@@ -407,6 +462,8 @@ private:
     PointerParseErrorCode parseErrorCode_;
 };
 
+//////////////////////////////////////////////////////////////////////////////
+
 template <typename T>
 typename T::ValueType& CreateValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, typename T::AllocatorType& a) {
     return pointer.Create(root, a);
@@ -417,6 +474,21 @@ typename T::ValueType& CreateValueByPointer(T& root, const CharType(&source)[N],
     const GenericPointer<typename T::ValueType> pointer(source, N - 1);
     return CreateValueByPointer(root, pointer, a);
 }
+
+// No allocator parameter
+
+template <typename T>
+typename T::ValueType& CreateValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer) {
+    return pointer.Create(root);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& CreateValueByPointer(T& root, const CharType(&source)[N]) {
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
+    return CreateValueByPointer(root, pointer);
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
 typename T::ValueType* GetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer) {
@@ -439,6 +511,8 @@ const typename T::ValueType* GetValueByPointer(const T& root, const CharType(&so
     const GenericPointer<typename T::ValueType> pointer(source, N - 1);
     return GetValueByPointer(root, pointer);
 }
+
+//////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
 typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::ValueType& defaultValue, typename T::AllocatorType& a) {
@@ -486,6 +560,56 @@ GetValueByPointerWithDefault(T& root, const CharType(&source)[N], T2 defaultValu
     return GetValueByPointerWithDefault(root, pointer, defaultValue, a);
 }
 
+// No allocator parameter
+
+template <typename T>
+typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::ValueType& defaultValue) {
+    return pointer.GetWithDefault(root, defaultValue);
+}
+
+template <typename T>
+typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType>& pointer, GenericStringRef<typename T::Ch> defaultValue) {
+    return pointer.GetWithDefault(root, defaultValue);
+}
+
+template <typename T>
+typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::Ch* defaultValue) {
+    return pointer.GetWithDefault(root, defaultValue);
+}
+
+template <typename T, typename T2>
+RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T2>, internal::IsGenericValue<T2> >), (typename T::ValueType&))
+GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType>& pointer, T2 defaultValue) {
+    return pointer.GetWithDefault(root, defaultValue);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& GetValueByPointerWithDefault(T& root, const CharType(&source)[N], const typename T::ValueType& defaultValue) {
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
+    return GetValueByPointerWithDefault(root, pointer, defaultValue);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& GetValueByPointerWithDefault(T& root, const CharType(&source)[N], GenericStringRef<typename T::Ch> defaultValue) {
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
+    return GetValueByPointerWithDefault(root, pointer, defaultValue);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& GetValueByPointerWithDefault(T& root, const CharType(&source)[N], const typename T::Ch* defaultValue) {
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
+    return GetValueByPointerWithDefault(root, pointer, defaultValue);
+}
+
+template <typename T, typename CharType, size_t N, typename T2>
+RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T2>, internal::IsGenericValue<T2> >), (typename T::ValueType&))
+GetValueByPointerWithDefault(T& root, const CharType(&source)[N], T2 defaultValue) {
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
+    return GetValueByPointerWithDefault(root, pointer, defaultValue);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
 template <typename T>
 typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, typename T::ValueType& value, typename T::AllocatorType& a) {
     return pointer.Set(root, value, a);
@@ -531,6 +655,56 @@ SetValueByPointer(T& root, const CharType(&source)[N], T2 value, typename T::All
     const GenericPointer<typename T::ValueType> pointer(source, N - 1);
     return SetValueByPointer(root, pointer, value, a);
 }
+
+// No allocator parameter
+
+template <typename T>
+typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, typename T::ValueType& value) {
+    return pointer.Set(root, value);
+}
+
+template <typename T>
+typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, GenericStringRef<typename T::Ch> value) {
+    return pointer.Set(root, value);
+}
+
+template <typename T>
+typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::Ch* value) {
+    return pointer.Set(root, value);
+}
+
+template <typename T, typename T2>
+RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T2>, internal::IsGenericValue<T2> >), (typename T::ValueType&))
+SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, T2 value) {
+    return pointer.Set(root, value);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], typename T::ValueType& value) {
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
+    return SetValueByPointer(root, pointer, value);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], GenericStringRef<typename T::Ch> value) {
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
+    return SetValueByPointer(root, pointer, value);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], const typename T::Ch* value) {
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
+    return SetValueByPointer(root, pointer, value);
+}
+
+template <typename T, typename CharType, size_t N, typename T2>
+RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T2>, internal::IsGenericValue<T2> >), (typename T::ValueType&))
+SetValueByPointer(T& root, const CharType(&source)[N], T2 value) {
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
+    return SetValueByPointer(root, pointer, value);
+}
+
+//////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
 typename T::ValueType& SwapValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, typename T::ValueType& value, typename T::AllocatorType& a) {
