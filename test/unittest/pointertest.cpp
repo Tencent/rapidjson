@@ -280,6 +280,14 @@ TEST(Pointer, Create) {
         Value* v = &Pointer("/foo/0").Create(d, d.GetAllocator());
         EXPECT_EQ(&d["foo"][0], v);
     }
+    {
+        Value* v = &Pointer("/foo/-").Create(d, d.GetAllocator());
+        EXPECT_EQ(&d["foo"][1], v);
+    }
+    {
+        Value* v = &Pointer("/foo/-/-").Create(d, d.GetAllocator());
+        EXPECT_EQ(&d["foo"][2][0], v);
+    }
 }
 
 TEST(Pointer, Get) {
@@ -310,6 +318,8 @@ TEST(Pointer, GetWithDefault) {
     EXPECT_TRUE(Value("bar") == Pointer("/foo/0").GetWithDefault(d, v, a));
     EXPECT_TRUE(Value("baz") == Pointer("/foo/1").GetWithDefault(d, v, a));
     EXPECT_TRUE(Value("qux") == Pointer("/foo/2").GetWithDefault(d, v, a));
+    EXPECT_TRUE(Value("last") == Pointer("/foo/-").GetWithDefault(d, Value("last").Move(), a));
+    EXPECT_STREQ("last", d["foo"][3].GetString());
 }
 
 TEST(Pointer, Set) {
@@ -320,6 +330,9 @@ TEST(Pointer, Set) {
     // Value version
     Pointer("/foo/0").Set(d, Value(123).Move(), a);
     EXPECT_EQ(123, d["foo"][0].GetInt());
+
+    Pointer("/foo/-").Set(d, Value(456).Move(), a);
+    EXPECT_EQ(456, d["foo"][2].GetInt());
 
     Pointer("/foo/null").Set(d, Value().Move(), a);
     EXPECT_TRUE(GetValueByPointer(d, "/foo/null")->IsNull());

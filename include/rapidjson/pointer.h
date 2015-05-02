@@ -166,27 +166,30 @@ public:
         ValueType* v = &root;
         bool exist = true;
         for (Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
-            if (v->GetType() != kObjectType && v->GetType() != kArrayType) {
-                if (t->index == kPointerInvalidIndex)
-                    v->SetObject();
-                else
-                    v->SetArray();
-            }
-
-            if (t->index == kPointerInvalidIndex) {
-                if (!v->IsObject())
-                    v->SetObject(); // Change to Object
-
-                typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
-                if (m == v->MemberEnd()) {
-                    v->AddMember(Value(t->name, t->length, allocator).Move(), Value().Move(), allocator);
-                    v = &(--v->MemberEnd())->value; // Assumes AddMember() appends at the end
+            if (t->index == kPointerInvalidIndex) { // object name
+                // Handling of '-' for last element of array
+                if (t->name[0] == '-' && t->length == 1) {
+                    if (!v->IsArray())
+                        v->SetArray(); // Change to Array
+                    v->PushBack(Value().Move(), allocator);
+                    v = &((*v)[v->Size() - 1]);
                     exist = false;
                 }
-                else
-                    v = &m->value;
+                else {
+                    if (!v->IsObject())
+                        v->SetObject(); // Change to Object
+
+                    typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
+                    if (m == v->MemberEnd()) {
+                        v->AddMember(Value(t->name, t->length, allocator).Move(), Value().Move(), allocator);
+                        v = &(--v->MemberEnd())->value; // Assumes AddMember() appends at the end
+                        exist = false;
+                    }
+                    else
+                        v = &m->value;
+                }
             }
-            else {
+            else { // array index
                 if (!v->IsArray())
                     v->SetArray(); // Change to Array
 
