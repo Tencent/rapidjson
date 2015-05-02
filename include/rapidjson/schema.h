@@ -388,7 +388,7 @@ public:
         typename ValueType::ConstMemberIterator additionalItemsItr = value.FindMember(Value("additionalItems").Move());
         if (additionalItemsItr != value.MemberEnd()) {
             if (additionalItemsItr->value.IsBool())
-                additionalItems_ = maxItemsItr->value.GetBool();
+                additionalItems_ = additionalItemsItr->value.GetBool();
             else {
                 // Error
             }
