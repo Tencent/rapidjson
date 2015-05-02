@@ -139,6 +139,30 @@ TEST(Pointer, Parse) {
         EXPECT_STREQ("4294967296", p.GetTokens()[0].name);
         EXPECT_EQ(kPointerInvalidIndex, p.GetTokens()[0].index);
     }
+
+    {
+        // kPointerParseErrorTokenMustBeginWithSolidus
+        Pointer p(" ");
+        EXPECT_FALSE(p.IsValid());
+        EXPECT_EQ(kPointerParseErrorTokenMustBeginWithSolidus, p.GetParseErrorCode());
+        EXPECT_EQ(0u, p.GetParseErrorOffset());
+    }
+
+    {
+        // kPointerParseErrorInvalidEscape
+        Pointer p("/~");
+        EXPECT_FALSE(p.IsValid());
+        EXPECT_EQ(kPointerParseErrorInvalidEscape, p.GetParseErrorCode());
+        EXPECT_EQ(2u, p.GetParseErrorOffset());
+    }
+
+    {
+        // kPointerParseErrorInvalidEscape
+        Pointer p("/~2");
+        EXPECT_FALSE(p.IsValid());
+        EXPECT_EQ(kPointerParseErrorInvalidEscape, p.GetParseErrorCode());
+        EXPECT_EQ(2u, p.GetParseErrorOffset());
+    }
 }
 
 TEST(Pointer, Stringify) {

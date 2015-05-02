@@ -21,6 +21,13 @@ RAPIDJSON_NAMESPACE_BEGIN
 
 static const SizeType kPointerInvalidIndex = ~SizeType(0);
 
+enum PointerParseErrorCode {
+    kPointerParseErrorNone = 0,
+
+    kPointerParseErrorTokenMustBeginWithSolidus,
+    kPointerParseErrorInvalidEscape
+};
+
 template <typename ValueType, typename Allocator = CrtAllocator>
 class GenericPointer {
 public:
@@ -33,55 +40,60 @@ public:
         SizeType index;             //!< A valid index if not equal to kPointerInvalidIndex.
     };
 
-    GenericPointer()
-        : allocator_(),
+    GenericPointer() :
+        allocator_(),
         ownAllocator_(),
         nameBuffer_(),
         tokens_(),
         tokenCount_(),
-        valid_(true)
+        parseErrorOffset_(),
+        parseErrorCode_(kPointerParseErrorNone)
     {
     }
 
-    explicit GenericPointer(const Ch* source, Allocator* allocator = 0) 
-        : allocator_(allocator),
-          ownAllocator_(),
-          nameBuffer_(),
-          tokens_(),
-          tokenCount_(),
-          valid_(true)
+    explicit GenericPointer(const Ch* source, Allocator* allocator = 0) :
+        allocator_(allocator),
+        ownAllocator_(),
+        nameBuffer_(),
+        tokens_(),
+        tokenCount_(),
+        parseErrorOffset_(),
+        parseErrorCode_(kPointerParseErrorNone)
     {
         Parse(source, internal::StrLen(source));
     }
 
-    GenericPointer(const Ch* source, size_t length, Allocator* allocator = 0)
-        : allocator_(allocator),
-          ownAllocator_(),
-          nameBuffer_(),
-          tokens_(),
-          tokenCount_(),
-          valid_(true)
+    GenericPointer(const Ch* source, size_t length, Allocator* allocator = 0) :
+        allocator_(allocator),
+        ownAllocator_(),
+        nameBuffer_(),
+        tokens_(),
+        tokenCount_(),
+        parseErrorOffset_(),
+        parseErrorCode_(kPointerParseErrorNone)
     {
         Parse(source, length);
     }
 
-    GenericPointer(const Token* tokens, size_t tokenCount)
-        : allocator_(),
-          ownAllocator_(),
-          nameBuffer_(),
-          tokens_(const_cast<Token*>(tokens)),
-          tokenCount_(tokenCount),
-          valid_(true)
+    GenericPointer(const Token* tokens, size_t tokenCount) :
+        allocator_(),
+        ownAllocator_(),
+        nameBuffer_(),
+        tokens_(const_cast<Token*>(tokens)),
+        tokenCount_(tokenCount),
+        parseErrorOffset_(),
+        parseErrorCode_(kPointerParseErrorNone)
     {
     }
 
-    GenericPointer(const GenericPointer& rhs)
-        : allocator_(),
-          ownAllocator_(),
-          nameBuffer_(),
-          tokens_(),
-          tokenCount_(),
-          valid_()
+    GenericPointer(const GenericPointer& rhs) : 
+        allocator_(),
+        ownAllocator_(),
+        nameBuffer_(),
+        tokens_(),
+        tokenCount_(),
+        parseErrorOffset_(),
+        parseErrorCode_(kPointerParseErrorNone)
     {
         *this = rhs;
     }
@@ -98,7 +110,8 @@ public:
         this->~GenericPointer();
 
         tokenCount_ = rhs.tokenCount_;
-        valid_ = rhs.valid_;
+        parseErrorOffset_ = rhs.parseErrorOffset_;
+        parseErrorCode_ = rhs.parseErrorCode_;
 
         if (rhs.nameBuffer_) {
             if (!allocator_)
@@ -124,7 +137,11 @@ public:
         return *this;
     }
 
-    bool IsValid() const { return valid_; }
+    bool IsValid() const { return parseErrorCode_ == kPointerParseErrorNone; }
+
+    size_t GetParseErrorOffset() const { return parseErrorOffset_; }
+
+    PointerParseErrorCode GetParseErrorCode() const { return parseErrorCode_; }
 
     const Token* GetTokens() const { return tokens_; }
 
@@ -276,9 +293,16 @@ private:
         tokenCount_ = 0;
         Ch* name = nameBuffer_;
 
-        for (size_t i = 0; i < length;) {
-            if (source[i++] != '/') // Consumes '/'
-                goto error;
+        size_t i = 0;
+
+        if (length != 0 && source[i] != '/') {
+            parseErrorCode_ = kPointerParseErrorTokenMustBeginWithSolidus;
+            goto error;
+        }
+
+        while (i < length) {
+            RAPIDJSON_ASSERT(source[i] == '/');
+            i++; // consumes '/'
 
             Token& token = tokens_[tokenCount_++];
             token.name = name;
@@ -290,13 +314,19 @@ private:
                 // Escaping "~0" -> '~', "~1" -> '/'
                 if (c == '~') {
                     if (i < length) {
-                        c = source[i++];
+                        c = source[i];
                         if (c == '0')       c = '~';
                         else if (c == '1')  c = '/';
-                        else                goto error;
+                        else {
+                            parseErrorCode_ = kPointerParseErrorInvalidEscape;
+                            goto error;
+                        }
+                        i++;
                     }
-                    else
+                    else {
+                        parseErrorCode_ = kPointerParseErrorInvalidEscape;
                         goto error;
+                    }
                 }
 
                 // First check for index: all of characters are digit
@@ -330,6 +360,7 @@ private:
 
         RAPIDJSON_ASSERT(name <= nameBuffer_ + length); // Should not overflow buffer
         tokens_ = (Token*)allocator_->Realloc(tokens_, length * sizeof(Token), tokenCount_ * sizeof(Token)); // Shrink tokens_
+        parseErrorCode_ = kPointerParseErrorNone;
         return;
 
     error:
@@ -338,7 +369,7 @@ private:
         nameBuffer_ = 0;
         tokens_ = 0;
         tokenCount_ = 0;
-        valid_ = false;
+        parseErrorOffset_ = i;
         return;
     }
 
@@ -347,7 +378,8 @@ private:
     Ch* nameBuffer_;
     Token* tokens_;
     size_t tokenCount_;
-    bool valid_;
+    size_t parseErrorOffset_;
+    PointerParseErrorCode parseErrorCode_;
 };
 
 template <typename T>
