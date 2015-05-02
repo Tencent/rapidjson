@@ -425,3 +425,13 @@ TEST(SchemaValidator, Null) {
     VALIDATE(s, "0", false);
     VALIDATE(s, "\"\"", false);
 }
+
+TEST(SchemaValidator, ObjectInArray) {
+    Document sd;
+    sd.Parse("{\"type\":\"array\", \"items\": { \"type\":\"string\" }}");
+    Schema s(sd);
+
+    VALIDATE(s, "[]", true);
+    VALIDATE(s, "[1]", false);
+    VALIDATE(s, "[{}]", false);
+}

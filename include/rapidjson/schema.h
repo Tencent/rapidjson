@@ -870,6 +870,7 @@ private:
 
             if (CurrentContext().valueSchema)
                 PushSchema(*CurrentContext().valueSchema);
+            return true;
         }
     }
 
