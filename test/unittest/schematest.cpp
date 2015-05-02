@@ -350,6 +350,36 @@ TEST(SchemaValidator, Array_ItemsTuple) {
     VALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\", \"NW\", \"Washington\"]", true);
 }
 
+TEST(SchemaValidator, Array_AdditionalItmes) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "  \"type\": \"array\","
+        "  \"items\": ["
+        "    {"
+        "      \"type\": \"number\""
+        "    },"
+        "    {"
+        "      \"type\": \"string\""
+        "    },"
+        "    {"
+        "      \"type\": \"string\","
+        "      \"enum\": [\"Street\", \"Avenue\", \"Boulevard\"]"
+        "    },"
+        "    {"
+        "      \"type\": \"string\","
+        "      \"enum\": [\"NW\", \"NE\", \"SW\", \"SE\"]"
+        "    }"
+        "  ],"
+        "  \"additionalItems\": false"
+        "}");
+    Schema s(sd);
+
+    VALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\", \"NW\"]", true);
+    VALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\"]", true);
+    VALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\", \"NW\", \"Washington\"]", false);
+}
+
 TEST(SchemaValidator, Array_ItemsRange) {
     Document sd;
     sd.Parse("{\"type\": \"array\",\"minItems\": 2,\"maxItems\" : 3}");

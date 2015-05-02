@@ -64,7 +64,7 @@ public:
     
     virtual ~BaseSchema() {}
 
-    virtual void BeginValue(Context&) const {}
+    virtual bool BeginValue(Context&) const { return true; }
 
     virtual bool Null() const { return enum_.IsArray() ? CheckEnum(GenericValue<Encoding>().Move()) : true; }
     virtual bool Bool(bool b) const { return enum_.IsArray() ? CheckEnum(GenericValue<Encoding>(b).Move()) : true; }
@@ -105,7 +105,7 @@ public:
     template <typename ValueType>
     TypelessSchema(const ValueType& value) : BaseSchema<Encoding>(value) {}
 
-    virtual void BeginValue(Context& context) const { context.valueSchema = this; }
+    virtual bool BeginValue(Context& context) const { context.valueSchema = this; return true; }
 };
 
 template <typename Encoding>
@@ -347,7 +347,8 @@ public:
         itemsTuple_(),
         itemsTupleCount_(),
         minItems_(),
-        maxItems_(SizeType(~0))
+        maxItems_(SizeType(~0)),
+        additionalItems_(true)
     {
         typename ValueType::ConstMemberIterator itemsItr = value.FindMember(Value("items").Move());
         if (itemsItr != value.MemberEnd()) {
@@ -383,6 +384,15 @@ public:
                 // Error
             }
         }
+
+        typename ValueType::ConstMemberIterator additionalItemsItr = value.FindMember(Value("additionalItems").Move());
+        if (additionalItemsItr != value.MemberEnd()) {
+            if (additionalItemsItr->value.IsBool())
+                additionalItems_ = maxItemsItr->value.GetBool();
+            else {
+                // Error
+            }
+        }
     }
 
     ~ArraySchema() {
@@ -392,15 +402,22 @@ public:
         delete [] itemsTuple_;
     }
 
-    virtual void BeginValue(Context& context) const {
+    virtual bool BeginValue(Context& context) const {
         if (itemsList_)
             context.valueSchema = itemsList_;
-        else if (itemsTuple_ && context.arrayElementIndex < itemsTupleCount_)
-            context.valueSchema = itemsTuple_[context.arrayElementIndex];
+        else if (itemsTuple_) {
+            if (context.arrayElementIndex < itemsTupleCount_)
+                context.valueSchema = itemsTuple_[context.arrayElementIndex];
+            else if (additionalItems_)
+                context.valueSchema = &typeless_;
+            else
+                return false;
+        }
         else
             context.valueSchema = &typeless_;
 
         context.arrayElementIndex++;
+        return true;
     }
 
     virtual bool Null() const { return false; }
@@ -431,6 +448,7 @@ private:
     SizeType itemsTupleCount_;
     SizeType minItems_;
     SizeType maxItems_;
+    bool additionalItems_;
 };
 
 template <typename Encoding>
@@ -804,15 +822,17 @@ public:
         documentStack_.Clear();
     };
 
-    bool Null()               { BeginValue(); return PopSchema().Null()      ? outputHandler_.Null()      : false; }
-    bool Bool(bool b)         { BeginValue(); return PopSchema().Bool(b)     ? outputHandler_.Bool(b)     : false; }
-    bool Int(int i)           { BeginValue(); return PopSchema().Int(i)      ? outputHandler_.Int(i)      : false; }
-    bool Uint(unsigned u)     { BeginValue(); return PopSchema().Uint(u)     ? outputHandler_.Uint(u)     : false; }
-    bool Int64(int64_t i64)   { BeginValue(); return PopSchema().Int64(i64)  ? outputHandler_.Int64(i64)  : false; }
-    bool Uint64(uint64_t u64) { BeginValue(); return PopSchema().Uint64(u64) ? outputHandler_.Uint64(u64) : false; }
-    bool Double(double d)     { BeginValue(); return PopSchema().Double(d)   ? outputHandler_.Double(d)   : false; }
-    bool String(const Ch* str, SizeType length, bool copy) {  BeginValue(); return PopSchema().String(str, length, copy) ? outputHandler_.String(str, length, copy) : false; }
-    bool StartObject() { BeginValue(); return CurrentSchema().StartObject(CurrentContext()) ? outputHandler_.StartObject() : false; }
+    bool Null()               { return BeginValue() && PopSchema().Null()      ? outputHandler_.Null()      : false; }
+    bool Bool(bool b)         { return BeginValue() && PopSchema().Bool(b)     ? outputHandler_.Bool(b)     : false; }
+    bool Int(int i)           { return BeginValue() && PopSchema().Int(i)      ? outputHandler_.Int(i)      : false; }
+    bool Uint(unsigned u)     { return BeginValue() && PopSchema().Uint(u)     ? outputHandler_.Uint(u)     : false; }
+    bool Int64(int64_t i64)   { return BeginValue() && PopSchema().Int64(i64)  ? outputHandler_.Int64(i64)  : false; }
+    bool Uint64(uint64_t u64) { return BeginValue() && PopSchema().Uint64(u64) ? outputHandler_.Uint64(u64) : false; }
+    bool Double(double d)     { return BeginValue() && PopSchema().Double(d)   ? outputHandler_.Double(d)   : false; }
+    bool String(const Ch* str, SizeType length, bool copy) { return BeginValue() && PopSchema().String(str, length, copy) ? outputHandler_.String(str, length, copy) : false; }
+    
+    bool StartObject() { return BeginValue() && CurrentSchema().StartObject(CurrentContext()) ? outputHandler_.StartObject() : false; }
+
     bool Key(const Ch* str, SizeType len, bool copy) { return CurrentSchema().Key(CurrentContext(), str, len, copy) ? outputHandler_.Key(str, len, copy) : false; }
 
     bool EndObject(SizeType memberCount) {
@@ -824,7 +844,7 @@ public:
             return false;
     }
 
-    bool StartArray() { BeginValue(); return CurrentSchema().StartArray(CurrentContext()) ? outputHandler_.StartArray(): false; }
+    bool StartArray() { return BeginValue() && CurrentSchema().StartArray(CurrentContext()) ? outputHandler_.StartArray() : false; }
 
     bool EndArray(SizeType elementCount) { 
         if (CurrentSchema().EndArray(CurrentContext(), elementCount)) {
@@ -839,12 +859,15 @@ private:
     typedef BaseSchema<Encoding> BaseSchemaType;
     typedef typename BaseSchemaType::Context Context;
 
-    void BeginValue() {
+    bool BeginValue() {
         if (schemaStack_.Empty()) {
             PushSchema(*schema_.root_);
+            return true;
         }
         else {
-            CurrentSchema().BeginValue(CurrentContext());
+            if (!CurrentSchema().BeginValue(CurrentContext()))
+                return false;
+
             if (CurrentContext().valueSchema)
                 PushSchema(*CurrentContext().valueSchema);
         }
