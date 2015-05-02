@@ -431,7 +431,7 @@ TEST(SchemaValidator, ObjectInArray) {
     sd.Parse("{\"type\":\"array\", \"items\": { \"type\":\"string\" }}");
     Schema s(sd);
 
-    VALIDATE(s, "[]", true);
+    VALIDATE(s, "[\"a\"]", true);
     VALIDATE(s, "[1]", false);
     VALIDATE(s, "[{}]", false);
 }

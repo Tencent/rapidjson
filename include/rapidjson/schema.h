@@ -66,14 +66,14 @@ public:
 
     virtual bool BeginValue(Context&) const { return true; }
 
-    virtual bool Null() const { return enum_.IsArray() ? CheckEnum(GenericValue<Encoding>().Move()) : true; }
-    virtual bool Bool(bool b) const { return enum_.IsArray() ? CheckEnum(GenericValue<Encoding>(b).Move()) : true; }
-    virtual bool Int(int i) const { return enum_.IsArray() ? CheckEnum(GenericValue<Encoding>(i).Move()) : true; }
-    virtual bool Uint(unsigned u) const { return enum_.IsArray() ? CheckEnum(GenericValue<Encoding>(u).Move()) : true; }
-    virtual bool Int64(int64_t i) const { return enum_.IsArray() ? CheckEnum(GenericValue<Encoding>(i).Move()) : true; }
-    virtual bool Uint64(uint64_t u) const { return enum_.IsArray() ? CheckEnum(GenericValue<Encoding>(u).Move()) : true; }
-    virtual bool Double(double d) const { return enum_.IsArray() ? CheckEnum(GenericValue<Encoding>(d).Move()) : true; }
-    virtual bool String(const Ch* s, SizeType length, bool) const { return enum_.IsArray() ? CheckEnum(GenericValue<Encoding>(s, length).Move()) : true; }
+    virtual bool Null() const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>().Move()); }
+    virtual bool Bool(bool b) const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(b).Move()); }
+    virtual bool Int(int i) const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(i).Move()); }
+    virtual bool Uint(unsigned u) const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(u).Move()); }
+    virtual bool Int64(int64_t i) const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(i).Move()); }
+    virtual bool Uint64(uint64_t u) const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(u).Move()); }
+    virtual bool Double(double d) const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(d).Move()); }
+    virtual bool String(const Ch* s, SizeType length, bool) const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(s, length).Move()); }
     virtual bool StartObject(Context&) const { return true; }
     virtual bool Key(Context&, const Ch*, SizeType, bool) const { return true; }
     virtual bool EndObject(Context&, SizeType) const { return true; }
@@ -494,6 +494,9 @@ public:
         return BaseSchema<Encoding>::String(str, length, copy) && length >= minLength_ && length <= maxLength_;
     }
 
+    virtual bool StartObject(Context&) const { return false; }
+    virtual bool Key(Context&, const Ch*, SizeType, bool) const { return false; }
+    virtual bool EndObject(Context&, SizeType) const { return false; }
     virtual bool StartArray(Context&) const { return true; }
     virtual bool EndArray(Context&, SizeType) const { return true; }
 
@@ -787,6 +790,7 @@ template <typename Encoding, typename OutputHandler = BaseReaderHandler<Encoding
 class GenericSchemaValidator {
 public:
     typedef typename Encoding::Ch Ch;               //!< Character type derived from Encoding.
+    typedef GenericSchema<Encoding> SchemaType;
 
     GenericSchemaValidator(
         const Schema& schema,
@@ -822,38 +826,21 @@ public:
         documentStack_.Clear();
     };
 
-    bool Null()               { return BeginValue() && PopSchema().Null()      ? outputHandler_.Null()      : false; }
-    bool Bool(bool b)         { return BeginValue() && PopSchema().Bool(b)     ? outputHandler_.Bool(b)     : false; }
-    bool Int(int i)           { return BeginValue() && PopSchema().Int(i)      ? outputHandler_.Int(i)      : false; }
-    bool Uint(unsigned u)     { return BeginValue() && PopSchema().Uint(u)     ? outputHandler_.Uint(u)     : false; }
-    bool Int64(int64_t i64)   { return BeginValue() && PopSchema().Int64(i64)  ? outputHandler_.Int64(i64)  : false; }
-    bool Uint64(uint64_t u64) { return BeginValue() && PopSchema().Uint64(u64) ? outputHandler_.Uint64(u64) : false; }
-    bool Double(double d)     { return BeginValue() && PopSchema().Double(d)   ? outputHandler_.Double(d)   : false; }
-    bool String(const Ch* str, SizeType length, bool copy) { return BeginValue() && PopSchema().String(str, length, copy) ? outputHandler_.String(str, length, copy) : false; }
+    bool Null()               { return BeginValue() && CurrentSchema().Null()      && EndValue() && outputHandler_.Null();      }
+    bool Bool(bool b)         { return BeginValue() && CurrentSchema().Bool(b)     && EndValue() && outputHandler_.Bool(b);     }
+    bool Int(int i)           { return BeginValue() && CurrentSchema().Int(i)      && EndValue() && outputHandler_.Int(i);      }
+    bool Uint(unsigned u)     { return BeginValue() && CurrentSchema().Uint(u)     && EndValue() && outputHandler_.Uint(u);     }
+    bool Int64(int64_t i64)   { return BeginValue() && CurrentSchema().Int64(i64)  && EndValue() && outputHandler_.Int64(i64);  }
+    bool Uint64(uint64_t u64) { return BeginValue() && CurrentSchema().Uint64(u64) && EndValue() && outputHandler_.Uint64(u64); }
+    bool Double(double d)     { return BeginValue() && CurrentSchema().Double(d)   && EndValue() && outputHandler_.Double(d);   }
+    bool String(const Ch* str, SizeType length, bool copy) { return BeginValue() && CurrentSchema().String(str, length, copy) && EndValue() && outputHandler_.String(str, length, copy); }
     
-    bool StartObject() { return BeginValue() && CurrentSchema().StartObject(CurrentContext()) ? outputHandler_.StartObject() : false; }
-
-    bool Key(const Ch* str, SizeType len, bool copy) { return CurrentSchema().Key(CurrentContext(), str, len, copy) ? outputHandler_.Key(str, len, copy) : false; }
-
-    bool EndObject(SizeType memberCount) {
-        if (CurrentSchema().EndObject(CurrentContext(), memberCount)) {
-            PopSchema();
-            return outputHandler_.EndObject(memberCount);
-        }
-        else
-            return false;
-    }
-
+    bool StartObject() { return BeginValue() && CurrentSchema().StartObject(CurrentContext()) && outputHandler_.StartObject(); }
+    bool Key(const Ch* str, SizeType len, bool copy) { return CurrentSchema().Key(CurrentContext(), str, len, copy) && outputHandler_.Key(str, len, copy); }
+    bool EndObject(SizeType memberCount) { return CurrentSchema().EndObject(CurrentContext(), memberCount) && EndValue() && outputHandler_.EndObject(memberCount); }
+    
     bool StartArray() { return BeginValue() && CurrentSchema().StartArray(CurrentContext()) ? outputHandler_.StartArray() : false; }
-
-    bool EndArray(SizeType elementCount) { 
-        if (CurrentSchema().EndArray(CurrentContext(), elementCount)) {
-            PopSchema();
-            return outputHandler_.EndArray(elementCount);
-        }
-        else
-            return false;
-    }
+    bool EndArray(SizeType elementCount) { return CurrentSchema().EndArray(CurrentContext(), elementCount) && EndValue() && outputHandler_.EndArray(elementCount); }
 
 private:
     typedef BaseSchema<Encoding> BaseSchemaType;
@@ -874,6 +861,11 @@ private:
         }
     }
 
+    bool EndValue() {
+        PopSchema();
+        return true;
+    }
+
     void PushSchema(const BaseSchemaType& schema) { *schemaStack_.template Push<Context>() = Context(&schema); }
     const BaseSchemaType& PopSchema() { return *schemaStack_.template Pop<Context>(1)->schema; }
     const BaseSchemaType& CurrentSchema() { return *schemaStack_.template Top<Context>()->schema; }
@@ -881,7 +873,7 @@ private:
 
     static const size_t kDefaultSchemaStackCapacity = 256;
     static const size_t kDefaultDocumentStackCapacity = 256;
-    const Schema& schema_;
+    const SchemaType& schema_;
     BaseReaderHandler<Encoding> nullOutputHandler_;
     OutputHandler& outputHandler_;
     internal::Stack<Allocator> schemaStack_;    //!< stack to store the current path of schema (BaseSchemaType *)
