@@ -357,6 +357,11 @@ public:
         return Create(root, allocator).Swap(value);
     }
 
+    template <typename stackAllocator>
+    ValueType& Swap(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, ValueType& value) const {
+        return Create(root).Swap(value);
+    }
+
 private:
     void Parse(const Ch* source, size_t length) {
         // Create own allocator if user did not supply.
@@ -461,6 +466,8 @@ private:
     size_t parseErrorOffset_;
     PointerParseErrorCode parseErrorCode_;
 };
+
+typedef GenericPointer<Value> Pointer;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -717,7 +724,16 @@ typename T::ValueType& SwapValueByPointer(T& root, const CharType(&source)[N], t
     return SwapValueByPointer(root, pointer, value, a);
 }
 
-typedef GenericPointer<Value> Pointer;
+template <typename T>
+typename T::ValueType& SwapValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, typename T::ValueType& value) {
+    return pointer.Swap(root, value);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& SwapValueByPointer(T& root, const CharType(&source)[N], typename T::ValueType& value) {
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
+    return SwapValueByPointer(root, pointer, value);
+}
 
 RAPIDJSON_NAMESPACE_END
 
