@@ -293,11 +293,46 @@ TEST(Pointer, Set) {
     d.Parse(kJson);
     Document::AllocatorType& a = d.GetAllocator();
     
+    // Value version
     Pointer("/foo/0").Set(d, Value(123).Move(), a);
     EXPECT_EQ(123, d["foo"][0].GetInt());
 
-    Pointer("/foo/2").Set(d, Value(456).Move(), a);
-    EXPECT_EQ(456, d["foo"][2].GetInt());
+    Pointer("/foo/null").Set(d, Value().Move(), a);
+    EXPECT_TRUE(GetValueByPointer(d, "/foo/null")->IsNull());
+
+    // Generic version
+    Pointer("/foo/int").Set(d, -1, a);
+    EXPECT_EQ(-1, GetValueByPointer(d, "/foo/int")->GetInt());
+
+    Pointer("/foo/uint").Set(d, 0x87654321, a);
+    EXPECT_EQ(0x87654321, GetValueByPointer(d, "/foo/uint")->GetUint());
+
+    const int64_t i64 = static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x80000000, 0));
+    Pointer("/foo/int64").Set(d, i64, a);
+    EXPECT_EQ(i64, GetValueByPointer(d, "/foo/int64")->GetInt64());
+
+    const uint64_t u64 = RAPIDJSON_UINT64_C2(0xFFFFFFFFF, 0xFFFFFFFFF);
+    Pointer("/foo/uint64").Set(d, u64, a);
+    EXPECT_EQ(u64, GetValueByPointer(d, "/foo/uint64")->GetUint64());
+
+    Pointer("/foo/true").Set(d, true, a);
+    EXPECT_TRUE(GetValueByPointer(d, "/foo/true")->IsTrue());
+
+    Pointer("/foo/false").Set(d, false, a);
+    EXPECT_TRUE(GetValueByPointer(d, "/foo/false")->IsFalse());
+
+    // StringRef version
+    Pointer("/foo/hello").Set(d, "Hello", a);
+    EXPECT_STREQ("Hello", GetValueByPointer(d, "/foo/hello")->GetString());
+
+    // Copy string version
+    {
+        char buffer[256];
+        strcpy(buffer, "World");
+        Pointer("/foo/world").Set(d, buffer, a);
+        memset(buffer, 0, sizeof(buffer));
+    }
+    EXPECT_STREQ("World", GetValueByPointer(d, "/foo/world")->GetString());
 }
 
 TEST(Pointer, Swap) {
@@ -346,16 +381,98 @@ TEST(Pointer, GetValueByPointerWithDefault) {
     EXPECT_TRUE(Value("baz") == GetValueByPointerWithDefault(d, "/foo/1", v, a));
 }
 
-TEST(Pointer, SetValueByPointer) {
+TEST(Pointer, SetValueByPointer_Pointer) {
     Document d;
     d.Parse(kJson);
     Document::AllocatorType& a = d.GetAllocator();
 
+    // Value version
     SetValueByPointer(d, Pointer("/foo/0"), Value(123).Move(), a);
     EXPECT_EQ(123, d["foo"][0].GetInt());
 
-    SetValueByPointer(d, "/foo/2", Value(456).Move(), a);
-    EXPECT_EQ(456, d["foo"][2].GetInt());
+    SetValueByPointer(d, Pointer("/foo/null"), Value().Move(), a);
+    EXPECT_TRUE(GetValueByPointer(d, "/foo/null")->IsNull());
+
+    // Generic version
+    SetValueByPointer(d, Pointer("/foo/int"), -1, a);
+    EXPECT_EQ(-1, GetValueByPointer(d, "/foo/int")->GetInt());
+
+    SetValueByPointer(d, Pointer("/foo/uint"), 0x87654321, a);
+    EXPECT_EQ(0x87654321, GetValueByPointer(d, "/foo/uint")->GetUint());
+
+    const int64_t i64 = static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x80000000, 0));
+    SetValueByPointer(d, Pointer("/foo/int64"), i64, a);
+    EXPECT_EQ(i64, GetValueByPointer(d, "/foo/int64")->GetInt64());
+
+    const uint64_t u64 = RAPIDJSON_UINT64_C2(0xFFFFFFFFF, 0xFFFFFFFFF);
+    SetValueByPointer(d, Pointer("/foo/uint64"), u64, a);
+    EXPECT_EQ(u64, GetValueByPointer(d, "/foo/uint64")->GetUint64());
+
+    SetValueByPointer(d, Pointer("/foo/true"), true, a);
+    EXPECT_TRUE(GetValueByPointer(d, "/foo/true")->IsTrue());
+
+    SetValueByPointer(d, Pointer("/foo/false"), false, a);
+    EXPECT_TRUE(GetValueByPointer(d, "/foo/false")->IsFalse());
+
+    // StringRef version
+    SetValueByPointer(d, Pointer("/foo/hello"), "Hello", a);
+    EXPECT_STREQ("Hello", GetValueByPointer(d, "/foo/hello")->GetString());
+
+    // Copy string version
+    {
+        char buffer[256];
+        strcpy(buffer, "World");
+        SetValueByPointer(d, Pointer("/foo/world"), buffer, a);
+        memset(buffer, 0, sizeof(buffer));
+    }
+    EXPECT_STREQ("World", GetValueByPointer(d, "/foo/world")->GetString());
+}
+
+TEST(Pointer, SetValueByPointer_String) {
+    Document d;
+    d.Parse(kJson);
+    Document::AllocatorType& a = d.GetAllocator();
+
+    // Value version
+    SetValueByPointer(d, "/foo/0", Value(123).Move(), a);
+    EXPECT_EQ(123, d["foo"][0].GetInt());
+
+    SetValueByPointer(d, "/foo/null", Value().Move(), a);
+    EXPECT_TRUE(GetValueByPointer(d, "/foo/null")->IsNull());
+
+    // Generic version
+    SetValueByPointer(d, "/foo/int", -1, a);
+    EXPECT_EQ(-1, GetValueByPointer(d, "/foo/int")->GetInt());
+
+    SetValueByPointer(d, "/foo/uint", 0x87654321, a);
+    EXPECT_EQ(0x87654321, GetValueByPointer(d, "/foo/uint")->GetUint());
+
+    const int64_t i64 = static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x80000000, 0));
+    SetValueByPointer(d, "/foo/int64", i64, a);
+    EXPECT_EQ(i64, GetValueByPointer(d, "/foo/int64")->GetInt64());
+
+    const uint64_t u64 = RAPIDJSON_UINT64_C2(0xFFFFFFFFF, 0xFFFFFFFFF);
+    SetValueByPointer(d, "/foo/uint64", u64, a);
+    EXPECT_EQ(u64, GetValueByPointer(d, "/foo/uint64")->GetUint64());
+
+    SetValueByPointer(d, "/foo/true", true, a);
+    EXPECT_TRUE(GetValueByPointer(d, "/foo/true")->IsTrue());
+
+    SetValueByPointer(d, "/foo/false", false, a);
+    EXPECT_TRUE(GetValueByPointer(d, "/foo/false")->IsFalse());
+
+    // StringRef version
+    SetValueByPointer(d, "/foo/hello", "Hello", a);
+    EXPECT_STREQ("Hello", GetValueByPointer(d, "/foo/hello")->GetString());
+
+    // Copy string version
+    {
+        char buffer[256];
+        strcpy(buffer, "World");
+        SetValueByPointer(d, "/foo/world", buffer, a);
+        memset(buffer, 0, sizeof(buffer));
+    }
+    EXPECT_STREQ("World", GetValueByPointer(d, "/foo/world")->GetString());
 }
 
 TEST(Pointer, SwapValueByPointer) {

@@ -43,7 +43,7 @@ public:
     {
     }
 
-    GenericPointer(const Ch* source, Allocator* allocator = 0) 
+    explicit GenericPointer(const Ch* source, Allocator* allocator = 0) 
         : allocator_(allocator),
           ownAllocator_(),
           nameBuffer_(),
@@ -156,22 +156,23 @@ public:
                     v->SetArray();
             }
 
-            switch (v->GetType()) {
-            case kObjectType:
-                {
-                    typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
-                    if (m == v->MemberEnd()) {
-                        v->AddMember(Value(t->name, t->length, allocator).Move(), Value().Move(), allocator);
-                        v = &(--v->MemberEnd())->value; // Assumes AddMember() appends at the end
-                        exist = false;
-                    }
-                    else
-                        v = &m->value;
+            if (t->index == kPointerInvalidIndex) {
+                if (!v->IsObject())
+                    v->SetObject(); // Change to Object
+
+                typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
+                if (m == v->MemberEnd()) {
+                    v->AddMember(Value(t->name, t->length, allocator).Move(), Value().Move(), allocator);
+                    v = &(--v->MemberEnd())->value; // Assumes AddMember() appends at the end
+                    exist = false;
                 }
-                break;
-            case kArrayType:
-                if (t->index == kPointerInvalidIndex) 
+                else
+                    v = &m->value;
+            }
+            else {
+                if (!v->IsArray())
                     v->SetArray(); // Change to Array
+
                 if (t->index >= v->Size()) {
                     v->Reserve(t->index + 1, allocator);
                     while (t->index >= v->Size())
@@ -179,11 +180,6 @@ public:
                     exist = false;
                 }
                 v = &((*v)[t->index]);
-                break;
-            default:
-                // Impossible.
-                RAPIDJSON_ASSERT(false);
-                break;
             }
         }
 
@@ -235,6 +231,28 @@ public:
     // Move semantics, create parents if non-exist
     ValueType& Set(ValueType& root, ValueType& value, typename ValueType::AllocatorType& allocator) const {
         return Create(root, allocator) = value;
+    }
+
+    // Copy semantics, create parents if non-exist
+    ValueType& Set(ValueType& root, const ValueType& value, typename ValueType::AllocatorType& allocator) const {
+        return Create(root, allocator).CopyFrom(value, allocator);
+    }
+
+    ValueType& Set(ValueType& root, GenericStringRef<Ch> value, typename ValueType::AllocatorType& allocator) const {
+        ValueType v(value);
+        return Create(root, allocator) = v;
+    }
+
+    ValueType& Set(ValueType& root, const Ch* value, typename ValueType::AllocatorType& allocator) const {
+        ValueType v(value, allocator);
+        return Create(root, allocator) = v;
+    }
+
+    template <typename T>
+    RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&))
+    Set(ValueType& root, T value, typename ValueType::AllocatorType& allocator) const {
+        ValueType v(value);
+        return Create(root, allocator) = v;
     }
 
     // Create parents if non-exist
@@ -340,7 +358,7 @@ typename T::ValueType& CreateValueByPointer(T& root, const GenericPointer<typena
 template <typename T, typename CharType, size_t N>
 typename T::ValueType& CreateValueByPointer(T& root, const CharType(&source)[N], typename T::AllocatorType& a) {
     const GenericPointer<typename T::ValueType> pointer(source, N - 1);
-    return pointer.Create(root, a);
+    return CreateValueByPointer(root, pointer, a);
 }
 
 template <typename T>
@@ -356,13 +374,13 @@ const typename T::ValueType* GetValueByPointer(const T& root, const GenericPoint
 template <typename T, typename CharType, size_t N>
 typename T::ValueType* GetValueByPointer(T& root, const CharType (&source)[N]) {
     const GenericPointer<typename T::ValueType> pointer(source, N - 1);
-    return pointer.Get(root);
+    return GetValueByPointer(root, pointer);
 }
 
 template <typename T, typename CharType, size_t N>
 const typename T::ValueType* GetValueByPointer(const T& root, const CharType(&source)[N]) {
     const GenericPointer<typename T::ValueType> pointer(source, N - 1);
-    return pointer.Get(root);
+    return GetValueByPointer(root, pointer);
 }
 
 template <typename T>
@@ -373,7 +391,7 @@ typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointe
 template <typename T, typename CharType, size_t N>
 typename T::ValueType& GetValueByPointerWithDefault(T& root, const CharType(&source)[N], const typename T::ValueType& defaultValue, typename T::AllocatorType& a) {
     const GenericPointer<typename T::ValueType> pointer(source, N - 1);
-    return pointer.GetWithDefault(root, defaultValue, a);
+    return GetValueByPointerWithDefault(root, pointer, defaultValue, a);
 }
 
 template <typename T>
@@ -381,10 +399,45 @@ typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename 
     return pointer.Set(root, value, a);
 }
 
+template <typename T>
+typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, GenericStringRef<typename T::Ch> value, typename T::AllocatorType& a) {
+    return pointer.Set(root, value, a);
+}
+
+template <typename T>
+typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::Ch* value, typename T::AllocatorType& a) {
+    return pointer.Set(root, value, a);
+}
+
+template <typename T, typename T2>
+RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T2>, internal::IsGenericValue<T2> >), (typename T::ValueType&))
+SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, T2 value, typename T::AllocatorType& a) {
+    return pointer.Set(root, value, a);
+}
+
 template <typename T, typename CharType, size_t N>
 typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], typename T::ValueType& value, typename T::AllocatorType& a) {
     const GenericPointer<typename T::ValueType> pointer(source, N - 1);
-    return pointer.Set(root, value , a);
+    return SetValueByPointer(root, pointer, value, a);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], GenericStringRef<typename T::Ch> value, typename T::AllocatorType& a) {
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
+    return SetValueByPointer(root, pointer, value, a);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], const typename T::Ch* value, typename T::AllocatorType& a) {
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
+    return SetValueByPointer(root, pointer, value, a);
+}
+
+template <typename T, typename CharType, size_t N, typename T2>
+RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T2>, internal::IsGenericValue<T2> >), (typename T::ValueType&))
+SetValueByPointer(T& root, const CharType(&source)[N], T2 value, typename T::AllocatorType& a) {
+    const GenericPointer<typename T::ValueType> pointer(source, N - 1);
+    return SetValueByPointer(root, pointer, value, a);
 }
 
 template <typename T>
@@ -395,7 +448,7 @@ typename T::ValueType& SwapValueByPointer(T& root, const GenericPointer<typename
 template <typename T, typename CharType, size_t N>
 typename T::ValueType& SwapValueByPointer(T& root, const CharType(&source)[N], typename T::ValueType& value, typename T::AllocatorType& a) {
     const GenericPointer<typename T::ValueType> pointer(source, N - 1);
-    return pointer.Swap(root, value, a);
+    return SwapValueByPointer(root, pointer, value, a);
 }
 
 typedef GenericPointer<Value> Pointer;
