@@ -340,7 +340,7 @@ TEST(Pointer, Parse_URIFragment) {
     }
 
     {
-        // kPointerParseErrorInvalidPercentEncoding
+        // kPointerParseErrorInvalidPercentEncoding (invalid hex)
         Pointer p("#/%g0");
         EXPECT_FALSE(p.IsValid());
         EXPECT_EQ(kPointerParseErrorInvalidPercentEncoding, p.GetParseErrorCode());
@@ -348,8 +348,16 @@ TEST(Pointer, Parse_URIFragment) {
     }
 
     {
-        // kPointerParseErrorInvalidPercentEncoding
+        // kPointerParseErrorInvalidPercentEncoding (invalid hex)
         Pointer p("#/%0g");
+        EXPECT_FALSE(p.IsValid());
+        EXPECT_EQ(kPointerParseErrorInvalidPercentEncoding, p.GetParseErrorCode());
+        EXPECT_EQ(2u, p.GetParseErrorOffset());
+    }
+
+    {
+        // kPointerParseErrorInvalidPercentEncoding (incomplete UTF-8 sequence)
+        Pointer p("#/%C2");
         EXPECT_FALSE(p.IsValid());
         EXPECT_EQ(kPointerParseErrorInvalidPercentEncoding, p.GetParseErrorCode());
         EXPECT_EQ(2u, p.GetParseErrorOffset());
@@ -395,15 +403,22 @@ TEST(Pointer, Stringify) {
     for (size_t i = 0; i < sizeof(sources) / sizeof(sources[0]); i++) {
         Pointer p(sources[i]);
         StringBuffer s;
-        p.Stringify(s);
+        EXPECT_TRUE(p.Stringify(s));
         EXPECT_STREQ(sources[i], s.GetString());
 
         // Stringify to URI fragment
         StringBuffer s2;
-        p.StringifyUriFragment(s2);
+        EXPECT_TRUE(p.StringifyUriFragment(s2));
         Pointer p2(s2.GetString(), s2.GetSize());
         EXPECT_TRUE(p2.IsValid());
         EXPECT_TRUE(p == p2);
+    }
+
+    {
+        // Strigify to URI fragment with an invalid UTF-8 sequence
+        Pointer p("/\xC2");
+        StringBuffer s;
+        EXPECT_FALSE(p.StringifyUriFragment(s));
     }
 }
 
@@ -552,6 +567,10 @@ TEST(Pointer, Get) {
     EXPECT_EQ(&d[" "], Pointer("/ ").Get(d));
     EXPECT_EQ(&d["m~n"], Pointer("/m~0n").Get(d));
     EXPECT_TRUE(Pointer("/abc").Get(d) == 0);
+    EXPECT_TRUE(Pointer("/foo/2").Get(d) == 0); // Out of boundary
+    EXPECT_TRUE(Pointer("/foo/a").Get(d) == 0); // "/foo" is an array, cannot query by "a"
+    EXPECT_TRUE(Pointer("/foo/0/0").Get(d) == 0); // "/foo/0" is an string, cannot further query
+    EXPECT_TRUE(Pointer("/foo/0/a").Get(d) == 0); // "/foo/0" is an string, cannot further query
 }
 
 TEST(Pointer, GetWithDefault) {
