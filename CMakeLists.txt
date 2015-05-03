@@ -3,9 +3,9 @@ SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/CMakeModules)
 
 PROJECT(RapidJSON CXX)
 
-set(LIB_MAJOR_VERSION "0")
-set(LIB_MINOR_VERSION "12")
-set(LIB_PATCH_VERSION "0")
+set(LIB_MAJOR_VERSION "1")
+set(LIB_MINOR_VERSION "0")
+set(LIB_PATCH_VERSION "1")
 set(LIB_VERSION_STRING "${LIB_MAJOR_VERSION}.${LIB_MINOR_VERSION}.${LIB_PATCH_VERSION}")
 
 # compile in release with debug info mode by default
@@ -17,6 +17,8 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 option(RAPIDJSON_BUILD_DOC "Build rapidjson documentation." ON)
 option(RAPIDJSON_BUILD_EXAMPLES "Build rapidjson examples." ON)
 option(RAPIDJSON_BUILD_TESTS "Build rapidjson perftests and unittests." ON)
+option(RAPIDJSON_BUILD_THIRDPARTY_GTEST 
+    "Use gtest installation in `thirdparty/gtest` by default if available" OFF)
 
 option(RAPIDJSON_HAS_STDSTRING "" OFF)
 if(RAPIDJSON_HAS_STDSTRING)

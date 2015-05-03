@@ -1,13 +1,20 @@
 set(UNITTEST_SOURCES
+	allocatorstest.cpp
     bigintegertest.cpp
     documenttest.cpp
     encodedstreamtest.cpp
     encodingstest.cpp
     filestreamtest.cpp
+    itoatest.cpp
     jsoncheckertest.cpp
     namespacetest.cpp
+<<<<<<< HEAD
     pointertest.cpp
+=======
+    prettywritertest.cpp
+>>>>>>> master
     readertest.cpp
+	simdtest.cpp
     stringbuffertest.cpp
     strtodtest.cpp
     unittest.cpp
@@ -15,9 +22,9 @@ set(UNITTEST_SOURCES
     writertest.cpp)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Weffc++ -Wswitch-default")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default -Wfloat-equal")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Weffc++ -Wswitch-default")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default -Wfloat-equal")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
 endif()
@@ -36,8 +43,9 @@ add_test(NAME unittest
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 if(NOT MSVC)
+    # Not running SIMD.* unit test cases for Valgrind
     add_test(NAME valgrind_unittest
-        COMMAND valgrind --leak-check=full --error-exitcode=1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest
+        COMMAND valgrind --leak-check=full --error-exitcode=1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest --gtest_filter=-SIMD.*
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")

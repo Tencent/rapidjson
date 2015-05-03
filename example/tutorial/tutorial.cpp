@@ -3,7 +3,6 @@
 
 #include "rapidjson/document.h"     // rapidjson's DOM-style API
 #include "rapidjson/prettywriter.h" // for stringify JSON
-#include "rapidjson/filestream.h"   // wrapper of C stream for prettywriter as output
 #include <cstdio>
 
 using namespace rapidjson;
@@ -143,9 +142,10 @@ int main(int, char*[]) {
     // 4. Stringify JSON
 
     printf("\nModified JSON with reformatting:\n");
-    FileStream f(stdout);
-    PrettyWriter<FileStream> writer(f);
+    StringBuffer sb;
+    PrettyWriter<StringBuffer> writer(sb);
     document.Accept(writer);    // Accept() traverses the DOM and generates Handler events.
+    puts(sb.GetString());
 
     return 0;
 }

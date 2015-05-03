@@ -15,6 +15,8 @@
 #ifndef RAPIDJSON_ERROR_ERROR_H__
 #define RAPIDJSON_ERROR_ERROR_H__
 
+#include "../rapidjson.h"
+
 /*! \file error.h */
 
 /*! \defgroup RAPIDJSON_ERRORS RapidJSON error handling */

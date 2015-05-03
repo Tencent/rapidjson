@@ -15,7 +15,7 @@
 * High performance
  * Use template and inline functions to reduce function call overheads.
  * Internal optimized Grisu2 and floating point parsing implementations.
- * Optional SSE2/SSE4.1 support.
+ * Optional SSE2/SSE4.2 support.
 
 ## Standard compliance
 

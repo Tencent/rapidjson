@@ -701,8 +701,11 @@ public:
             return StringEqual(rhs);
 
         case kNumberType:
-            if (IsDouble() || rhs.IsDouble())
-                return GetDouble() == rhs.GetDouble(); // May convert one operand from integer to double.
+            if (IsDouble() || rhs.IsDouble()) {
+                double a = GetDouble();     // May convert from integer to double.
+                double b = rhs.GetDouble(); // Ditto
+                return a >= b && a <= b;    // Prevent -Wfloat-equal
+            }
             else
                 return data_.n.u64 == rhs.data_.n.u64;
 
@@ -1457,17 +1460,14 @@ public:
         case kStringType:
             return handler.String(GetString(), GetStringLength(), (flags_ & kCopyFlag) != 0);
     
-        case kNumberType:
+        default:
+            RAPIDJSON_ASSERT(GetType() == kNumberType);
             if (IsInt())            return handler.Int(data_.n.i.i);
             else if (IsUint())      return handler.Uint(data_.n.u.u);
             else if (IsInt64())     return handler.Int64(data_.n.i64);
             else if (IsUint64())    return handler.Uint64(data_.n.u64);
             else                    return handler.Double(data_.n.d);
-    
-        default:
-            RAPIDJSON_ASSERT(false);
         }
-        return false;
     }
 
 private:
@@ -1580,16 +1580,24 @@ private:
     // Initialize this value as array with initial data, without calling destructor.
     void SetArrayRaw(GenericValue* values, SizeType count, Allocator& allocator) {
         flags_ = kArrayFlag;
-        data_.a.elements = (GenericValue*)allocator.Malloc(count * sizeof(GenericValue));
-        std::memcpy(data_.a.elements, values, count * sizeof(GenericValue));
+        if (count) {
+            data_.a.elements = (GenericValue*)allocator.Malloc(count * sizeof(GenericValue));
+            std::memcpy(data_.a.elements, values, count * sizeof(GenericValue));
+        }
+        else
+            data_.a.elements = NULL;
         data_.a.size = data_.a.capacity = count;
     }
 
     //! Initialize this value as object with initial data, without calling destructor.
     void SetObjectRaw(Member* members, SizeType count, Allocator& allocator) {
         flags_ = kObjectFlag;
-        data_.o.members = (Member*)allocator.Malloc(count * sizeof(Member));
-        std::memcpy(data_.o.members, members, count * sizeof(Member));
+        if (count) {
+            data_.o.members = (Member*)allocator.Malloc(count * sizeof(Member));
+            std::memcpy(data_.o.members, members, count * sizeof(Member));
+        }
+        else
+            data_.o.members = NULL;
         data_.o.size = data_.o.capacity = count;
     }
 
@@ -1751,7 +1759,7 @@ public:
     */
     template <unsigned parseFlags, typename InputStream>
     GenericDocument& ParseStream(InputStream& is) {
-        return ParseStream<parseFlags,Encoding,InputStream>(is);
+        return ParseStream<parseFlags, Encoding, InputStream>(is);
     }
 
     //! Parse JSON text from an input stream (with \ref kParseDefaultFlags)
@@ -1768,18 +1776,6 @@ public:
     //!@name Parse in-place from mutable string
     //!@{
 
-    //! Parse JSON text from a mutable string (with Encoding conversion)
-    /*! \tparam parseFlags Combination of \ref ParseFlag.
-        \tparam SourceEncoding Transcoding from input Encoding
-        \param str Mutable zero-terminated string to be parsed.
-        \return The document itself for fluent API.
-    */
-    template <unsigned parseFlags, typename SourceEncoding>
-    GenericDocument& ParseInsitu(Ch* str) {
-        GenericInsituStringStream<Encoding> s(str);
-        return ParseStream<parseFlags | kParseInsituFlag, SourceEncoding>(s);
-    }
-
     //! Parse JSON text from a mutable string
     /*! \tparam parseFlags Combination of \ref ParseFlag.
         \param str Mutable zero-terminated string to be parsed.
@@ -1787,7 +1783,8 @@ public:
     */
     template <unsigned parseFlags>
     GenericDocument& ParseInsitu(Ch* str) {
-        return ParseInsitu<parseFlags, Encoding>(str);
+        GenericInsituStringStream<Encoding> s(str);
+        return ParseStream<parseFlags | kParseInsituFlag>(s);
     }
 
     //! Parse JSON text from a mutable string (with \ref kParseDefaultFlags)
@@ -1795,7 +1792,7 @@ public:
         \return The document itself for fluent API.
     */
     GenericDocument& ParseInsitu(Ch* str) {
-        return ParseInsitu<kParseDefaultFlags, Encoding>(str);
+        return ParseInsitu<kParseDefaultFlags>(str);
     }
     //!@}
 

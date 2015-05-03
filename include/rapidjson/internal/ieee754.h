@@ -34,14 +34,6 @@ public:
         return Double(u + 1).Value();
     }
 
-    double PreviousPositiveDouble() const {
-        RAPIDJSON_ASSERT(!Sign());
-        if (d == 0.0)
-            return 0.0;
-        else
-            return Double(u - 1).Value();
-    }
-
     bool Sign() const { return (u & kSignMask) != 0; }
     uint64_t Significand() const { return u & kSignificandMask; }
     int Exponent() const { return ((u & kExponentMask) >> kSignificandSize) - kExponentBias; }
@@ -49,6 +41,7 @@ public:
     bool IsNan() const { return (u & kExponentMask) == kExponentMask && Significand() != 0; }
     bool IsInf() const { return (u & kExponentMask) == kExponentMask && Significand() == 0; }
     bool IsNormal() const { return (u & kExponentMask) != 0 || Significand() == 0; }
+    bool IsZero() const { return (u & (kExponentMask | kSignificandMask)) == 0; }
 
     uint64_t IntegerSignificand() const { return IsNormal() ? Significand() | kHiddenBit : Significand(); }
     int IntegerExponent() const { return (IsNormal() ? Exponent() : kDenormalExponent) - kSignificandSize; }

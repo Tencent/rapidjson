@@ -62,7 +62,12 @@ concept Allocator {
 class CrtAllocator {
 public:
     static const bool kNeedFree = true;
-    void* Malloc(size_t size) { return std::malloc(size); }
+    void* Malloc(size_t size) { 
+        if (size) //  behavior of malloc(0) is implementation defined.
+            return std::malloc(size);
+        else
+            return NULL; // standardize to returning NULL.
+    }
     void* Realloc(void* originalPtr, size_t originalSize, size_t newSize) { (void)originalSize; return std::realloc(originalPtr, newSize); }
     static void Free(void *ptr) { std::free(ptr); }
 };
@@ -160,6 +165,9 @@ public:
 
     //! Allocates a memory block. (concept Allocator)
     void* Malloc(size_t size) {
+        if (!size)
+            return NULL;
+
         size = RAPIDJSON_ALIGN(size);
         if (chunkHead_ == 0 || chunkHead_->size + size > chunkHead_->capacity)
             AddChunk(chunk_capacity_ > size ? chunk_capacity_ : size);
@@ -191,7 +199,9 @@ public:
         // Realloc process: allocate and copy memory, do not free original buffer.
         void* newBuffer = Malloc(newSize);
         RAPIDJSON_ASSERT(newBuffer != 0);   // Do not handle out-of-memory explicitly.
-        return std::memcpy(newBuffer, originalPtr, originalSize);
+        if (originalSize)
+            std::memcpy(newBuffer, originalPtr, originalSize);
+        return newBuffer;
     }
 
     //! Frees a memory block (concept Allocator)

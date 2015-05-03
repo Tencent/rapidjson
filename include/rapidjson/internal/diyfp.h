@@ -19,11 +19,11 @@
 #ifndef RAPIDJSON_DIYFP_H_
 #define RAPIDJSON_DIYFP_H_
 
-#if defined(_MSC_VER)
+#include "../rapidjson.h"
+
+#if defined(_MSC_VER) && defined(_M_AMD64)
 #include <intrin.h>
-#if defined(_M_AMD64)
 #pragma intrinsic(_BitScanReverse64)
-#endif
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -135,25 +135,9 @@ struct DiyFp {
             double d;
             uint64_t u64;
         }u;
-        uint64_t significand = f;
-        int exponent = e;
-        while (significand > kDpHiddenBit + kDpSignificandMask) {
-            significand >>= 1;
-            exponent++;
-        }
-        while (exponent > kDpDenormalExponent && (significand & kDpHiddenBit) == 0) {
-            significand <<= 1;
-            exponent--;
-        }
-        if (exponent >= kDpMaxExponent) {
-            u.u64 = kDpExponentMask;    // Infinity
-            return u.d;
-        }
-        else if (exponent < kDpDenormalExponent)
-            return 0.0;
-        const uint64_t be = (exponent == kDpDenormalExponent && (significand & kDpHiddenBit) == 0) ? 0 : 
-            static_cast<uint64_t>(exponent + kDpExponentBias);
-        u.u64 = (significand & kDpSignificandMask) | (be << kDpSignificandSize);
+        const uint64_t be = (e == kDpDenormalExponent && (f & kDpHiddenBit) == 0) ? 0 : 
+            static_cast<uint64_t>(e + kDpExponentBias);
+        u.u64 = (f & kDpSignificandMask) | (be << kDpSignificandSize);
         return u.d;
     }
 
@@ -238,7 +222,7 @@ inline DiyFp GetCachedPower(int e, int* K) {
     //int k = static_cast<int>(ceil((-61 - e) * 0.30102999566398114)) + 374;
     double dk = (-61 - e) * 0.30102999566398114 + 347;  // dk must be positive, so can do ceiling in positive
     int k = static_cast<int>(dk);
-    if (k != dk)
+    if (dk - k > 0.0)
         k++;
 
     unsigned index = static_cast<unsigned>((k >> 3) + 1);

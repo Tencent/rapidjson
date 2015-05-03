@@ -18,8 +18,10 @@ env:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq cmake doxygen valgrind
+  - sudo apt-get install -qq cmake valgrind
+  - sudo apt-get --no-install-recommends install doxygen # Don't install LaTeX stuffs
   - if [ "$ARCH" = "x86" ]; then sudo apt-get install -qq g++-multilib libc6-dbg:i386; fi
+  - if [ "$CC" = "gcc" ] && [ "$CONF" = "debug" ]; then sudo pip install cpp-coveralls; export GCOV_FLAGS='--coverage'; fi
 
 install: true
 
@@ -34,7 +36,9 @@ before_script:
         -DRAPIDJSON_HAS_STDSTRING=ON
         -DCMAKE_VERBOSE_MAKEFILE=ON 
         -DCMAKE_BUILD_TYPE=$CONF 
-        -DCMAKE_CXX_FLAGS="$ARCH_FLAGS" ..)
+        -DCMAKE_CXX_FLAGS="$ARCH_FLAGS $GCOV_FLAGS"
+        -DCMAKE_EXE_LINKER_FLAGS=$GCOV_FLAGS
+        ..)
 
 script:
   - cd build
@@ -42,3 +46,6 @@ script:
   - make examples
   - ctest -V `[ "$CONF" = "release" ] || echo "-E perftest"`
   - make travis_doc
+
+after_success:
+  - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
