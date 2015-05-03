@@ -248,7 +248,7 @@ public:
         maxProperties_(SizeType(~0)),
         additionalProperty_(true)
     {
-        typename ValueType::ConstMemberIterator propretiesItr = value.FindMember(Value("properties").Move());
+        typename ValueType::ConstMemberIterator propretiesItr = value.FindMember("properties");
         if (propretiesItr != value.MemberEnd()) {
             const ValueType& properties = propretiesItr->value;
             properties_ = new Property[properties.MemberCount()];
@@ -262,7 +262,7 @@ public:
         }
 
         // Establish required after properties
-        typename ValueType::ConstMemberIterator requiredItr = value.FindMember(Value("required").Move());
+        typename ValueType::ConstMemberIterator requiredItr = value.FindMember("required");
         if (requiredItr != value.MemberEnd()) {
             if (requiredItr->value.IsArray()) {
                 for (typename ValueType::ConstValueIterator itr = requiredItr->value.Begin(); itr != requiredItr->value.End(); ++itr) {
@@ -281,7 +281,7 @@ public:
             }
         }
 
-        typename ValueType::ConstMemberIterator additionalPropretiesItr = value.FindMember(Value("additionalProperties").Move());
+        typename ValueType::ConstMemberIterator additionalPropretiesItr = value.FindMember("additionalProperties");
         if (additionalPropretiesItr != value.MemberEnd()) {
             if (additionalPropretiesItr->value.IsBool())
                 additionalProperty_ = additionalPropretiesItr->value.GetBool();
@@ -292,7 +292,7 @@ public:
             }
         }
 
-        typename ValueType::ConstMemberIterator minPropertiesItr = value.FindMember(Value("minProperties").Move());
+        typename ValueType::ConstMemberIterator minPropertiesItr = value.FindMember("minProperties");
         if (minPropertiesItr != value.MemberEnd()) {
             if (minPropertiesItr->value.IsUint64() && minPropertiesItr->value.GetUint64() <= SizeType(~0))
                 minProperties_ = static_cast<SizeType>(minPropertiesItr->value.GetUint64());
@@ -301,7 +301,7 @@ public:
             }
         }
 
-        typename ValueType::ConstMemberIterator maxPropertiesItr = value.FindMember(Value("maxProperties").Move());
+        typename ValueType::ConstMemberIterator maxPropertiesItr = value.FindMember("maxProperties");
         if (maxPropertiesItr != value.MemberEnd()) {
             if (maxPropertiesItr->value.IsUint64() && maxPropertiesItr->value.GetUint64() <= SizeType(~0))
                 maxProperties_ = static_cast<SizeType>(maxPropertiesItr->value.GetUint64());
@@ -427,7 +427,7 @@ public:
         maxItems_(SizeType(~0)),
         additionalItems_(true)
     {
-        typename ValueType::ConstMemberIterator itemsItr = value.FindMember(Value("items").Move());
+        typename ValueType::ConstMemberIterator itemsItr = value.FindMember("items");
         if (itemsItr != value.MemberEnd()) {
             if (itemsItr->value.IsObject())
                 itemsList_ = CreateSchema<Encoding>(itemsItr->value); // List validation
@@ -444,7 +444,7 @@ public:
             }
         }
 
-        typename ValueType::ConstMemberIterator minItemsItr = value.FindMember(Value("minItems").Move());
+        typename ValueType::ConstMemberIterator minItemsItr = value.FindMember("minItems");
         if (minItemsItr != value.MemberEnd()) {
             if (minItemsItr->value.IsUint64() && minItemsItr->value.GetUint64() <= SizeType(~0))
                 minItems_ = static_cast<SizeType>(minItemsItr->value.GetUint64());
@@ -453,7 +453,7 @@ public:
             }
         }
 
-        typename ValueType::ConstMemberIterator maxItemsItr = value.FindMember(Value("maxItems").Move());
+        typename ValueType::ConstMemberIterator maxItemsItr = value.FindMember("maxItems");
         if (maxItemsItr != value.MemberEnd()) {
             if (maxItemsItr->value.IsUint64() && maxItemsItr->value.GetUint64() <= SizeType(~0))
                 maxItems_ = static_cast<SizeType>(maxItemsItr->value.GetUint64());
@@ -462,7 +462,7 @@ public:
             }
         }
 
-        typename ValueType::ConstMemberIterator additionalItemsItr = value.FindMember(Value("additionalItems").Move());
+        typename ValueType::ConstMemberIterator additionalItemsItr = value.FindMember("additionalItems");
         if (additionalItemsItr != value.MemberEnd()) {
             if (additionalItemsItr->value.IsBool())
                 additionalItems_ = additionalItemsItr->value.GetBool();
@@ -542,7 +542,7 @@ public:
         minLength_(0),
         maxLength_(~SizeType(0))
     {
-        typename ValueType::ConstMemberIterator minLengthItr = value.FindMember(Value("minLength").Move());
+        typename ValueType::ConstMemberIterator minLengthItr = value.FindMember("minLength");
         if (minLengthItr != value.MemberEnd()) {
             if (minLengthItr->value.IsUint64() && minLengthItr->value.GetUint64() <= ~SizeType(0))
                 minLength_ = static_cast<SizeType>(minLengthItr->value.GetUint64());
@@ -551,7 +551,7 @@ public:
             }
         }
 
-        typename ValueType::ConstMemberIterator maxLengthItr = value.FindMember(Value("maxLength").Move());
+        typename ValueType::ConstMemberIterator maxLengthItr = value.FindMember("maxLength");
         if (maxLengthItr != value.MemberEnd()) {
             if (maxLengthItr->value.IsUint64() && maxLengthItr->value.GetUint64() <= ~SizeType(0))
                 maxLength_ = static_cast<SizeType>(maxLengthItr->value.GetUint64());
@@ -599,7 +599,7 @@ public:
         exclusiveMinimum_(false),
         exclusiveMaximum_(false)
     {
-        typename ValueType::ConstMemberIterator minimumItr = value.FindMember(Value("minimum").Move());
+        typename ValueType::ConstMemberIterator minimumItr = value.FindMember("minimum");
         if (minimumItr != value.MemberEnd()) {
             if (minimumItr->value.IsInt64())
                 minimum_.SetInt64(minimumItr->value.GetInt64());
@@ -610,7 +610,7 @@ public:
             }
         }
 
-        typename ValueType::ConstMemberIterator maximumItr = value.FindMember(Value("maximum").Move());
+        typename ValueType::ConstMemberIterator maximumItr = value.FindMember("maximum");
         if (maximumItr != value.MemberEnd()) {
             if (maximumItr->value.IsInt64())
                 maximum_.SetInt64(maximumItr->value.GetInt64());
@@ -621,7 +621,7 @@ public:
             }
         }
 
-        typename ValueType::ConstMemberIterator exclusiveMinimumItr = value.FindMember(Value("exclusiveMinimum").Move());
+        typename ValueType::ConstMemberIterator exclusiveMinimumItr = value.FindMember("exclusiveMinimum");
         if (exclusiveMinimumItr != value.MemberEnd()) {
             if (exclusiveMinimumItr->value.IsBool())
                 exclusiveMinimum_ = exclusiveMinimumItr->value.GetBool();
@@ -630,7 +630,7 @@ public:
             }
         }
 
-        typename ValueType::ConstMemberIterator exclusiveMaximumItr = value.FindMember(Value("exclusiveMaximum").Move());
+        typename ValueType::ConstMemberIterator exclusiveMaximumItr = value.FindMember("exclusiveMaximum");
         if (exclusiveMaximumItr != value.MemberEnd()) {
             if (exclusiveMaximumItr->value.IsBool())
                 exclusiveMaximum_ = exclusiveMaximumItr->value.GetBool();
@@ -639,7 +639,7 @@ public:
             }
         }
 
-        typename ValueType::ConstMemberIterator multipleOfItr = value.FindMember(Value("multipleOf").Move());
+        typename ValueType::ConstMemberIterator multipleOfItr = value.FindMember("multipleOf");
         if (multipleOfItr != value.MemberEnd()) {
             if (multipleOfItr->value.IsUint64())
                 multipleOf_ = multipleOfItr->value.GetUint64();
@@ -748,7 +748,7 @@ public:
         exclusiveMinimum_(false),
         exclusiveMaximum_(false)
     {
-        typename ValueType::ConstMemberIterator minimumItr = value.FindMember(Value("minimum").Move());
+        typename ValueType::ConstMemberIterator minimumItr = value.FindMember("minimum");
         if (minimumItr != value.MemberEnd()) {
             if (minimumItr->value.IsNumber())
                 minimum_ = minimumItr->value.GetDouble();
@@ -757,7 +757,7 @@ public:
             }
         }
 
-        typename ValueType::ConstMemberIterator maximumItr = value.FindMember(Value("maximum").Move());
+        typename ValueType::ConstMemberIterator maximumItr = value.FindMember("maximum");
         if (maximumItr != value.MemberEnd()) {
             if (maximumItr->value.IsNumber())
                 maximum_ = maximumItr->value.GetDouble();
@@ -766,7 +766,7 @@ public:
             }
         }
 
-        typename ValueType::ConstMemberIterator exclusiveMinimumItr = value.FindMember(Value("exclusiveMinimum").Move());
+        typename ValueType::ConstMemberIterator exclusiveMinimumItr = value.FindMember("exclusiveMinimum");
         if (exclusiveMinimumItr != value.MemberEnd()) {
             if (exclusiveMinimumItr->value.IsBool())
                 exclusiveMinimum_ = exclusiveMinimumItr->value.GetBool();
@@ -775,7 +775,7 @@ public:
             }
         }
 
-        typename ValueType::ConstMemberIterator exclusiveMaximumItr = value.FindMember(Value("exclusiveMaximum").Move());
+        typename ValueType::ConstMemberIterator exclusiveMaximumItr = value.FindMember("exclusiveMaximum");
         if (exclusiveMaximumItr != value.MemberEnd()) {
             if (exclusiveMaximumItr->value.IsBool())
                 exclusiveMaximum_ = exclusiveMaximumItr->value.GetBool();
@@ -784,7 +784,7 @@ public:
             }
         }
 
-        typename ValueType::ConstMemberIterator multipleOfItr = value.FindMember(Value("multipleOf").Move());
+        typename ValueType::ConstMemberIterator multipleOfItr = value.FindMember("multipleOf");
         if (multipleOfItr != value.MemberEnd()) {
             if (multipleOfItr->value.IsNumber()) {
                 multipleOf_ = multipleOfItr->value.GetDouble();
