@@ -44,15 +44,18 @@ class BaseSchema;
 
 template <typename Encoding>
 struct SchemaValidationContext {
-    SchemaValidationContext(const BaseSchema<Encoding>* s) : schema(s), valueSchema(), multiTypeSchema() {}
+    SchemaValidationContext(const BaseSchema<Encoding>* s) : schema(s), valueSchema(), multiTypeSchema(), objectDependencies() {}
 
-    ~SchemaValidationContext() {}
+    ~SchemaValidationContext() {
+        delete[] objectDependencies;
+    }
 
     const BaseSchema<Encoding>* schema;
     const BaseSchema<Encoding>* valueSchema;
     const BaseSchema<Encoding>* multiTypeSchema;
     SizeType objectRequiredCount;
     SizeType arrayElementIndex;
+    bool* objectDependencies;
 };
 
 template <typename Encoding>
@@ -246,7 +249,8 @@ public:
         requiredCount_(),
         minProperties_(),
         maxProperties_(SizeType(~0)),
-        additionalProperty_(true)
+        additionalProperty_(true),
+        hasDependencies_()
     {
         typename ValueType::ConstMemberIterator propretiesItr = value.FindMember("properties");
         if (propretiesItr != value.MemberEnd()) {
@@ -272,12 +276,52 @@ public:
                             properties_[index].required = true;
                             requiredCount_++;
                         }
+                        else {
+                            // Error
+                        }
+                    }
+                    else {
+                        // Error
                     }
                 }
+            }
+            else {
+                // Error
+            }
+        }
 
-                if (requiredCount_ != requiredItr->value.Size()) {
-                    // Error
+        // Establish dependencies after properties
+        typename ValueType::ConstMemberIterator dependenciesItr = value.FindMember("dependencies");
+        if (dependenciesItr != value.MemberEnd()) {
+            if (dependenciesItr->value.IsObject()) {
+                hasDependencies_ = true;
+                for (typename ValueType::ConstMemberIterator itr = dependenciesItr->value.MemberBegin(); itr != dependenciesItr->value.MemberEnd(); ++itr) {
+                    SizeType sourceIndex;
+                    if (FindPropertyIndex(itr->name, &sourceIndex)) {
+                        properties_[sourceIndex].dependencies = new bool[propertyCount_];
+                        std::memset(properties_[sourceIndex].dependencies, 0, sizeof(bool) * propertyCount_);
+                        if (itr->value.IsArray()) {
+                            for (typename ValueType::ConstValueIterator targetItr = itr->value.Begin(); targetItr != itr->value.End(); ++targetItr) {
+                                SizeType targetIndex;
+                                if (FindPropertyIndex(*targetItr, &targetIndex)) {
+                                    properties_[sourceIndex].dependencies[targetIndex] = true;
+                                }
+                                else {
+                                    // Error
+                                }
+                            }
+                        }
+                        else {
+                            // Error
+                        }
+                    }
+                    else {
+                        // Error
+                    }
                 }
+            }
+            else {
+                // Error
             }
         }
 
@@ -329,6 +373,10 @@ public:
 
     virtual bool StartObject(Context& context) const { 
         context.objectRequiredCount = 0;
+        if (hasDependencies_) {
+            context.objectDependencies = new bool[propertyCount_];
+            std::memset(context.objectDependencies, 0, sizeof(bool) * propertyCount_);
+        }
         return true; 
     }
     
@@ -339,6 +387,9 @@ public:
 
             if (properties_[index].required)
                 context.objectRequiredCount++;
+
+            if (hasDependencies_)
+                context.objectDependencies[index] = true;
 
             return true;
         }
@@ -356,9 +407,18 @@ public:
     }
 
     virtual bool EndObject(Context& context, SizeType memberCount) const {
-        return context.objectRequiredCount == requiredCount_ &&
-            memberCount >= minProperties_ &&
-            memberCount <= maxProperties_;
+        if (context.objectRequiredCount != requiredCount_ || memberCount < minProperties_ || memberCount > maxProperties_)
+            return false;
+
+        if (hasDependencies_) {
+            for (SizeType sourceIndex = 0; sourceIndex < propertyCount_; sourceIndex++)
+                if (context.objectDependencies[sourceIndex] && properties_[sourceIndex].dependencies)
+                    for (SizeType targetIndex = 0; targetIndex < propertyCount_; targetIndex++)
+                        if (properties_[sourceIndex].dependencies[targetIndex] && !context.objectDependencies[targetIndex])
+                            return false;
+        }
+
+        return true;
     }
 
     virtual bool StartArray(Context&) const { return false; }
@@ -391,13 +451,15 @@ private:
     }
 
     struct Property {
-        Property() : schema(), required(false) {}
+        Property() : schema(), dependencies(), required(false) {}
         ~Property() { 
             delete schema;
+            delete[] dependencies;
         }
 
         GenericValue<Encoding> name;
         BaseSchema<Encoding>* schema;
+        bool* dependencies;
         bool required;
     };
 
@@ -409,6 +471,7 @@ private:
     SizeType minProperties_;
     SizeType maxProperties_;
     bool additionalProperty_;
+    bool hasDependencies_;
 };
 
 template <typename Encoding>
@@ -894,7 +957,6 @@ public:
         schemaStack_(allocator, schemaStackCapacity),
         documentStack_(allocator, documentStackCapacity)
     {
-        Reset();
     }
 
     GenericSchemaValidator( 
@@ -909,11 +971,15 @@ public:
         schemaStack_(allocator, schemaStackCapacity),
         documentStack_(allocator, documentStackCapacity)
     {
+    }
+
+    ~GenericSchemaValidator() {
         Reset();
     }
 
     void Reset() {
-        schemaStack_.Clear();
+        while (!schemaStack_.Empty())
+            PopSchema();
         documentStack_.Clear();
     };
 
@@ -965,7 +1031,7 @@ private:
     }
 
     void PushSchema(const BaseSchemaType& schema) { *schemaStack_.template Push<Context>() = Context(&schema); }
-    const BaseSchemaType& PopSchema() { return *schemaStack_.template Pop<Context>(1)->schema; }
+    void PopSchema() { schemaStack_.template Pop<Context>(1)->~Context(); }
     const BaseSchemaType& CurrentSchema() { return *schemaStack_.template Top<Context>()->schema; }
     Context& CurrentContext() { return *schemaStack_.template Top<Context>(); }
 

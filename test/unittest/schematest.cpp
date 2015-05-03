@@ -278,8 +278,6 @@ TEST(SchemaValidator, Object_PropertiesRange) {
     VALIDATE(s, "{\"a\":0,\"b\":1,\"c\":2,\"d\":3}", false);
 }
 
-#if 0
-// TODO
 TEST(SchemaValidator, Object_PropertyDependencies) {
     Document sd;
     sd.Parse(
@@ -302,7 +300,6 @@ TEST(SchemaValidator, Object_PropertyDependencies) {
     VALIDATE(s, "{ \"name\": \"John Doe\"}", true);
     VALIDATE(s, "{ \"name\": \"John Doe\", \"billing_address\": \"555 Debtor's Lane\" }", true);
 }
-#endif
 
 TEST(SchemaValidator, Array) {
     Document sd;
