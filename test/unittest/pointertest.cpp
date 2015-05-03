@@ -278,6 +278,46 @@ TEST(Pointer, Parse_URIFragment) {
     }
 
     {
+        // Decode UTF-8 perecent encoding to UTF-8
+        Pointer p("#/%C2%A2");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_STREQ("\xC2\xA2", p.GetTokens()[0].name);
+    }
+
+    {
+        // Decode UTF-8 perecent encoding to UTF-16
+        GenericPointer<GenericValue<UTF16<> > > p(L"#/%C2%A2");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_STREQ(L"\xA2", p.GetTokens()[0].name);
+    }
+
+    {
+        // Decode UTF-8 perecent encoding to UTF-16
+        GenericPointer<GenericValue<UTF16<> > > p(L"#/%C2%A2");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_STREQ(L"\xA2", p.GetTokens()[0].name);
+    }
+
+    {
+        // Decode UTF-8 perecent encoding to UTF-16
+        GenericPointer<GenericValue<UTF16<> > > p(L"#/%C2%A2");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_STREQ(L"\x00A2", p.GetTokens()[0].name);
+    }
+
+    {
+        // Decode UTF-8 perecent encoding to UTF-16
+        GenericPointer<GenericValue<UTF16<> > > p(L"#/%E2%82%AC");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_STREQ(L"\x20AC", p.GetTokens()[0].name);
+    }
+
+    {
         // kPointerParseErrorTokenMustBeginWithSolidus
         Pointer p("# ");
         EXPECT_FALSE(p.IsValid());
@@ -306,7 +346,7 @@ TEST(Pointer, Parse_URIFragment) {
         Pointer p("#/%");
         EXPECT_FALSE(p.IsValid());
         EXPECT_EQ(kPointerParseErrorInvalidPercentEncoding, p.GetParseErrorCode());
-        EXPECT_EQ(3u, p.GetParseErrorOffset());
+        EXPECT_EQ(2u, p.GetParseErrorOffset());
     }
 
     {
@@ -314,7 +354,7 @@ TEST(Pointer, Parse_URIFragment) {
         Pointer p("#/%g0");
         EXPECT_FALSE(p.IsValid());
         EXPECT_EQ(kPointerParseErrorInvalidPercentEncoding, p.GetParseErrorCode());
-        EXPECT_EQ(3u, p.GetParseErrorOffset());
+        EXPECT_EQ(2u, p.GetParseErrorOffset());
     }
 
     {
@@ -322,7 +362,7 @@ TEST(Pointer, Parse_URIFragment) {
         Pointer p("#/%0g");
         EXPECT_FALSE(p.IsValid());
         EXPECT_EQ(kPointerParseErrorInvalidPercentEncoding, p.GetParseErrorCode());
-        EXPECT_EQ(4u, p.GetParseErrorOffset());
+        EXPECT_EQ(2u, p.GetParseErrorOffset());
     }
 
     {
@@ -335,12 +375,11 @@ TEST(Pointer, Parse_URIFragment) {
 
     {
         // kPointerParseErrorCharacterMustPercentEncode
-        Pointer p("#/\\");
+        Pointer p("#/\n");
         EXPECT_FALSE(p.IsValid());
         EXPECT_EQ(kPointerParseErrorCharacterMustPercentEncode, p.GetParseErrorCode());
         EXPECT_EQ(2u, p.GetParseErrorOffset());
     }
-
 }
 
 TEST(Pointer, Stringify) {
@@ -357,7 +396,10 @@ TEST(Pointer, Stringify) {
         "/i\\j",
         "/k\"l",
         "/ ",
-        "/m~0n"
+        "/m~0n",
+        "/\xC2\xA2",
+        "/\xE2\x82\xAC",
+        "/\xF0\x9D\x84\x9E"
     };
 
     for (size_t i = 0; i < sizeof(sources) / sizeof(sources[0]); i++) {
@@ -365,6 +407,13 @@ TEST(Pointer, Stringify) {
         StringBuffer s;
         p.Stringify(s);
         EXPECT_STREQ(sources[i], s.GetString());
+
+        // Stringify to URI fragment
+        StringBuffer s2;
+        p.StringifyUriFragment(s2);
+        Pointer p2(s2.GetString(), s2.GetSize());
+        EXPECT_TRUE(p2.IsValid());
+        EXPECT_TRUE(p == p2);
     }
 }
 
@@ -442,6 +491,22 @@ TEST(Pointer, Assignment) {
         EXPECT_STREQ("0", q.GetTokens()[1].name);
         EXPECT_EQ(0u, q.GetTokens()[1].index);
     }
+}
+
+TEST(Pointer, Equality) {
+    EXPECT_TRUE(Pointer("/foo/0") == Pointer("/foo/0"));
+    EXPECT_FALSE(Pointer("/foo/0") == Pointer("/foo/1"));
+    EXPECT_FALSE(Pointer("/foo/0") == Pointer("/foo/0/1"));
+    EXPECT_FALSE(Pointer("/foo/0") == Pointer("a"));
+    EXPECT_FALSE(Pointer("a") == Pointer("a")); // Invalid always not equal
+}
+
+TEST(Pointer, Inequality) {
+    EXPECT_FALSE(Pointer("/foo/0") != Pointer("/foo/0"));
+    EXPECT_TRUE(Pointer("/foo/0") != Pointer("/foo/1"));
+    EXPECT_TRUE(Pointer("/foo/0") != Pointer("/foo/0/1"));
+    EXPECT_TRUE(Pointer("/foo/0") != Pointer("a"));
+    EXPECT_TRUE(Pointer("a") != Pointer("a")); // Invalid always not equal
 }
 
 TEST(Pointer, Create) {

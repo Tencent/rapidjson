@@ -123,7 +123,7 @@ public:
             for (Token *t = rhs.tokens_; t != rhs.tokens_ + tokenCount_; ++t)
                 nameBufferSize += t->length;
             nameBuffer_ = (Ch*)allocator_->Malloc(nameBufferSize * sizeof(Ch));
-            std::memcpy(nameBuffer_, rhs.nameBuffer_, nameBufferSize);
+            std::memcpy(nameBuffer_, rhs.nameBuffer_, nameBufferSize * sizeof(Ch));
 
             tokens_ = (Token*)allocator_->Malloc(tokenCount_ * sizeof(Token));
             std::memcpy(tokens_, rhs.tokens_, tokenCount_ * sizeof(Token));
@@ -149,20 +149,34 @@ public:
 
     size_t GetTokenCount() const { return tokenCount_; }
 
-    template<typename OutputStream>
-    void Stringify(OutputStream& os) const {
-        RAPIDJSON_ASSERT(IsValid());
-        for (Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
-            os.Put('/');
-            for (size_t j = 0; j < t->length; j++) {
-                Ch c = t->name[j];
-                if      (c == '~') { os.Put('~'); os.Put('0'); }
-                else if (c == '/') { os.Put('~'); os.Put('1'); }
-                else os.Put(c);
+    bool operator==(const GenericPointer& rhs) const {
+        if (!IsValid() || !rhs.IsValid() || tokenCount_ != rhs.tokenCount_)
+            return false;
+
+        for (size_t i = 0; i < tokenCount_; i++) {
+            if (tokens_[i].index != rhs.tokens_[i].index ||
+                tokens_[i].length != rhs.tokens_[i].length || 
+                std::memcmp(tokens_[i].name, rhs.tokens_[i].name, sizeof(Ch) * tokens_[i].length) != 0)
+            {
+                return false;
             }
         }
+
+        return true;
     }
 
+    bool operator!=(const GenericPointer& rhs) const { return !(*this == rhs); }
+
+    template<typename OutputStream>
+    bool Stringify(OutputStream& os) const {
+        return Stringify<false, OutputStream>(os);
+    }
+
+    template<typename OutputStream>
+    bool StringifyUriFragment(OutputStream& os) const {
+        return Stringify<true, OutputStream>(os);
+    }
+    
     ValueType& Create(ValueType& root, typename ValueType::AllocatorType& allocator, bool* alreadyExist = 0) const {
         RAPIDJSON_ASSERT(IsValid());
         ValueType* v = &root;
@@ -365,6 +379,11 @@ public:
     }
 
 private:
+    bool NeedPercentEncode(Ch c) const {
+        // RFC 3986 2.3 Unreserved Characters
+        return !((c >= '0' && c <= '9') || (c >= 'A' && c <='Z') || (c >= 'a' && c <= 'z') || c == '-' || c == '.' || c == '_' || c =='~');
+    }
+
     //! Parse a JSON String or its URI fragment representation into tokens.
     /*!
         \param source Either a JSON Pointer string, or its URI fragment representation. Not need to be null terminated.
@@ -409,32 +428,37 @@ private:
             bool isNumber = true;
 
             while (i < length && source[i] != '/') {
-                Ch c = source[i++];
+                Ch c = source[i];
 
                 if (uriFragment) {
                     // Decoding percent-encoding for URI fragment
                     if (c == '%') {
-                        c = 0;
-                        for (int j = 0; j < 2; j++) {
-                            c <<= 4;
-                            Ch h = source[i];
-                            if      (h >= '0' && h <= '9') c += h - '0';
-                            else if (h >= 'A' && h <= 'F') c += h - 'A' + 10;
-                            else if (h >= 'a' && h <= 'f') c += h - 'a' + 10;
-                            else {
-                                parseErrorCode_ = kPointerParseErrorInvalidPercentEncoding;
-                                goto error;
-                            }
+                        PercentDecodeStream is(&source[i]);
+                        GenericInsituStringStream<EncodingType> os(name);
+                        Ch* begin = os.PutBegin();
+                        Transcoder<UTF8<>, EncodingType> transcoder;
+                        if (!transcoder.Transcode(is, os) || !is.IsValid()) {
+                            parseErrorCode_ = kPointerParseErrorInvalidPercentEncoding;
+                            goto error;
+                        }
+                        size_t len = os.PutEnd(begin);
+                        i += is.Tell() - 1;
+                        if (len == 1)
+                            c = *name;
+                        else {
+                            name += len;
+                            isNumber = false;
                             i++;
+                            continue;
                         }
                     }
-                    else if (!((c >= '0' && c <= '9') || (c >= 'A' && c <='Z') || (c >= 'a' && c <= 'z') || c == '-' || c == '.' || c == '_' || c =='~')) {
-                        // RFC 3986 2.3 Unreserved Characters
-                        i--;
+                    else if (NeedPercentEncode(c)) {
                         parseErrorCode_ = kPointerParseErrorCharacterMustPercentEncode;
                         goto error;
                     }
                 }
+
+                i++;
                 
                 // Escaping "~0" -> '~', "~1" -> '/'
                 if (c == '~') {
@@ -497,6 +521,92 @@ private:
         parseErrorOffset_ = i;
         return;
     }
+
+    template<bool uriFragment, typename OutputStream>
+    bool Stringify(OutputStream& os) const {
+        RAPIDJSON_ASSERT(IsValid());
+
+        if (uriFragment)
+            os.Put('#');
+
+        for (Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
+            os.Put('/');
+            for (size_t j = 0; j < t->length; j++) {
+                Ch c = t->name[j];
+                if (c == '~') {
+                    os.Put('~');
+                    os.Put('0');
+                }
+                else if (c == '/') {
+                    os.Put('~');
+                    os.Put('1');
+                }
+                else if (uriFragment && NeedPercentEncode(c)) { 
+                    // Transcode to UTF8 sequence
+                    GenericStringStream<typename ValueType::EncodingType> source(&t->name[j]);
+                    PercentEncodeStream<OutputStream> target(os);
+                    Transcoder<EncodingType, UTF8<> > transcoder;
+                    if (!transcoder.Transcode(source, target))
+                        return false;
+                    j += source.Tell() - 1;
+                }
+                else
+                    os.Put(c);
+            }
+        }
+        return true;
+    }
+
+    class PercentDecodeStream {
+    public:
+        PercentDecodeStream(const Ch* source) : src_(source), head_(source), valid_(true) {}
+
+        Ch Take() {
+            if (*src_ != '%') {
+                valid_ = false;
+                return 0;
+            }
+            src_++;
+            Ch c = 0;
+            for (int j = 0; j < 2; j++) {
+                c <<= 4;
+                Ch h = *src_;
+                if      (h >= '0' && h <= '9') c += h - '0';
+                else if (h >= 'A' && h <= 'F') c += h - 'A' + 10;
+                else if (h >= 'a' && h <= 'f') c += h - 'a' + 10;
+                else {
+                    valid_ = false;
+                    return 0;
+                }
+                src_++;
+            }
+            return c;
+        }
+
+        size_t Tell() const { return src_ - head_; }
+
+        bool IsValid() const { return valid_; }
+
+    private:
+        const Ch* src_;     //!< Current read position.
+        const Ch* head_;    //!< Original head of the string.
+        bool valid_;
+    };
+
+    template <typename OutputStream>
+    class PercentEncodeStream {
+    public:
+        PercentEncodeStream(OutputStream& os) : os_(os) {}
+        void Put(char c) { // UTF-8 must be byte
+            unsigned char u = static_cast<unsigned char>(c);
+            static const char hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+            os_.Put('%');
+            os_.Put(hexDigits[u >> 4]);
+            os_.Put(hexDigits[u & 15]);
+        }
+    private:
+        OutputStream& os_;
+    };
 
     Allocator* allocator_;
     Allocator* ownAllocator_;
