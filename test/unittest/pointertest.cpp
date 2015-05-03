@@ -300,22 +300,6 @@ TEST(Pointer, Parse_URIFragment) {
         GenericPointer<GenericValue<UTF16<> > > p(L"#/%C2%A2");
         EXPECT_TRUE(p.IsValid());
         EXPECT_EQ(1u, p.GetTokenCount());
-        EXPECT_STREQ(L"\xA2", p.GetTokens()[0].name);
-    }
-
-    {
-        // Decode UTF-8 perecent encoding to UTF-16
-        GenericPointer<GenericValue<UTF16<> > > p(L"#/%C2%A2");
-        EXPECT_TRUE(p.IsValid());
-        EXPECT_EQ(1u, p.GetTokenCount());
-        EXPECT_STREQ(L"\xA2", p.GetTokens()[0].name);
-    }
-
-    {
-        // Decode UTF-8 perecent encoding to UTF-16
-        GenericPointer<GenericValue<UTF16<> > > p(L"#/%C2%A2");
-        EXPECT_TRUE(p.IsValid());
-        EXPECT_EQ(1u, p.GetTokenCount());
         EXPECT_STREQ(L"\x00A2", p.GetTokens()[0].name);
     }
 
