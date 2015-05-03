@@ -146,6 +146,7 @@ TEST(Document, ParseStream_EncodedInputStream) {
         StringBuffer bos2;
         Writer<StringBuffer> writer(bos2);
         reader.Parse(is, writer);
+        fclose(fp);
 
         EXPECT_EQ(bos.GetSize(), bos2.GetSize());
         EXPECT_EQ(0, memcmp(bos.GetString(), bos2.GetString(), bos2.GetSize()));
@@ -184,6 +185,7 @@ TEST(Document, ParseStream_AutoUTFInputStream) {
         StringBuffer bos2;
         Writer<StringBuffer> writer(bos2);
         reader.Parse(is, writer);
+        fclose(fp);
 
         EXPECT_EQ(bos.GetSize(), bos2.GetSize());
         EXPECT_EQ(0, memcmp(bos.GetString(), bos2.GetString(), bos2.GetSize()));
