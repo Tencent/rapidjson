@@ -300,8 +300,8 @@ TEST(Pointer, Parse_URIFragment) {
         GenericPointer<GenericValue<UTF16<> > > p(L"#/%C2%A2");
         EXPECT_TRUE(p.IsValid());
         EXPECT_EQ(1u, p.GetTokenCount());
-        printf("%x %x %u\n", p.GetTokens()[0].name[0], p.GetTokens()[0].name[1], p.GetTokens()[0].length);
-        EXPECT_STREQ(L"\x00A2", p.GetTokens()[0].name);
+        EXPECT_EQ(0x00A2, p.GetTokens()[0].name[0]);
+        EXPECT_EQ(1u, p.GetTokens()[0].length);
     }
 
     {
@@ -309,8 +309,8 @@ TEST(Pointer, Parse_URIFragment) {
         GenericPointer<GenericValue<UTF16<> > > p(L"#/%E2%82%AC");
         EXPECT_TRUE(p.IsValid());
         EXPECT_EQ(1u, p.GetTokenCount());
-        printf("%x %x %u\n", p.GetTokens()[0].name[0], p.GetTokens()[0].name[1], p.GetTokens()[0].length);
-        EXPECT_STREQ(L"\x20AC", p.GetTokens()[0].name);
+        EXPECT_EQ(0x20AC, p.GetTokens()[0].name[0]);
+        EXPECT_EQ(1u, p.GetTokens()[0].length);
     }
 
     {
