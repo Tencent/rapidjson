@@ -425,7 +425,7 @@ private:
                 if (uriFragment) {
                     // Decoding percent-encoding for URI fragment
                     if (c == '%') {
-                        PercentDecodeStream is(&source[i]);
+                        PercentDecodeStream is(&source[i], source + length);
                         GenericInsituStringStream<EncodingType> os(name);
                         Ch* begin = os.PutBegin();
                         Transcoder<UTF8<>, EncodingType> transcoder;
@@ -551,10 +551,11 @@ private:
 
     class PercentDecodeStream {
     public:
-        PercentDecodeStream(const Ch* source) : src_(source), head_(source), valid_(true) {}
+        PercentDecodeStream(const Ch* source, const Ch* end) : src_(source), head_(source), end_(end), valid_(true) {}
 
         Ch Take() {
-            if (*src_ != '%') {
+            // %XX triplet
+            if (src_ + 3 > end_ || *src_ != '%') {
                 valid_ = false;
                 return 0;
             }
@@ -582,6 +583,7 @@ private:
     private:
         const Ch* src_;     //!< Current read position.
         const Ch* head_;    //!< Original head of the string.
+        const Ch* end_;
         bool valid_;
     };
 
