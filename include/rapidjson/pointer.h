@@ -231,11 +231,6 @@ public:
         return v;
     }
 
-    ValueType& GetWithDefault(ValueType& root, GenericStringRef<Ch> defaultValue, typename ValueType::AllocatorType& allocator) const {
-        ValueType v(defaultValue);
-        return GetWithDefault(root, v, allocator);
-    }
-
     ValueType& GetWithDefault(ValueType& root, const Ch* defaultValue, typename ValueType::AllocatorType& allocator) const {
         bool alreadyExist;
         Value& v = Create(root, allocator, &alreadyExist);
@@ -271,11 +266,6 @@ public:
     }
 
     template <typename stackAllocator>
-    ValueType& GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, GenericStringRef<Ch> defaultValue) const {
-        return GetWithDefault(root, defaultValue, root.GetAllocator());
-    }
-
-    template <typename stackAllocator>
     ValueType& GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, const Ch* defaultValue) const {
         return GetWithDefault(root, defaultValue, root.GetAllocator());
     }
@@ -301,11 +291,6 @@ public:
     // Copy semantics, create parents if non-exist
     ValueType& Set(ValueType& root, const ValueType& value, typename ValueType::AllocatorType& allocator) const {
         return Create(root, allocator).CopyFrom(value, allocator);
-    }
-
-    ValueType& Set(ValueType& root, GenericStringRef<Ch> value, typename ValueType::AllocatorType& allocator) const {
-        ValueType v(value);
-        return Create(root, allocator) = v;
     }
 
     ValueType& Set(ValueType& root, const Ch* value, typename ValueType::AllocatorType& allocator) const {
@@ -335,11 +320,6 @@ public:
     template <typename stackAllocator>
     ValueType& Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, const ValueType& value) const {
         return Create(root).CopyFrom(value, root.GetAllocator());
-    }
-
-    template <typename stackAllocator>
-    ValueType& Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, GenericStringRef<Ch> value) const {
-        return Create(root) = value;
     }
 
     template <typename stackAllocator>
@@ -667,11 +647,6 @@ typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointe
 }
 
 template <typename T>
-typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType>& pointer, GenericStringRef<typename T::Ch> defaultValue, typename T::AllocatorType& a) {
-    return pointer.GetWithDefault(root, defaultValue, a);
-}
-
-template <typename T>
 typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::Ch* defaultValue, typename T::AllocatorType& a) {
     return pointer.GetWithDefault(root, defaultValue, a);
 }
@@ -691,11 +666,6 @@ GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType
 
 template <typename T, typename CharType, size_t N>
 typename T::ValueType& GetValueByPointerWithDefault(T& root, const CharType(&source)[N], const typename T::ValueType& defaultValue, typename T::AllocatorType& a) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).GetWithDefault(root, defaultValue, a);
-}
-
-template <typename T, typename CharType, size_t N>
-typename T::ValueType& GetValueByPointerWithDefault(T& root, const CharType(&source)[N], GenericStringRef<typename T::Ch> defaultValue, typename T::AllocatorType& a) {
     return GenericPointer<typename T::ValueType>(source, N - 1).GetWithDefault(root, defaultValue, a);
 }
 
@@ -725,11 +695,6 @@ typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointe
 }
 
 template <typename T>
-typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType>& pointer, GenericStringRef<typename T::Ch> defaultValue) {
-    return pointer.GetWithDefault(root, defaultValue);
-}
-
-template <typename T>
 typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::Ch* defaultValue) {
     return pointer.GetWithDefault(root, defaultValue);
 }
@@ -749,11 +714,6 @@ GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType
 
 template <typename T, typename CharType, size_t N>
 typename T::ValueType& GetValueByPointerWithDefault(T& root, const CharType(&source)[N], const typename T::ValueType& defaultValue) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).GetWithDefault(root, defaultValue);
-}
-
-template <typename T, typename CharType, size_t N>
-typename T::ValueType& GetValueByPointerWithDefault(T& root, const CharType(&source)[N], GenericStringRef<typename T::Ch> defaultValue) {
     return GenericPointer<typename T::ValueType>(source, N - 1).GetWithDefault(root, defaultValue);
 }
 
@@ -783,11 +743,6 @@ typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename 
 }
 
 template <typename T>
-typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, GenericStringRef<typename T::Ch> value, typename T::AllocatorType& a) {
-    return pointer.Set(root, value, a);
-}
-
-template <typename T>
 typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::Ch* value, typename T::AllocatorType& a) {
     return pointer.Set(root, value, a);
 }
@@ -807,11 +762,6 @@ SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer,
 
 template <typename T, typename CharType, size_t N>
 typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], typename T::ValueType& value, typename T::AllocatorType& a) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).Set(root, value, a);
-}
-
-template <typename T, typename CharType, size_t N>
-typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], GenericStringRef<typename T::Ch> value, typename T::AllocatorType& a) {
     return GenericPointer<typename T::ValueType>(source, N - 1).Set(root, value, a);
 }
 
@@ -841,11 +791,6 @@ typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename 
 }
 
 template <typename T>
-typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, GenericStringRef<typename T::Ch> value) {
-    return pointer.Set(root, value);
-}
-
-template <typename T>
 typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::Ch* value) {
     return pointer.Set(root, value);
 }
@@ -865,11 +810,6 @@ SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer,
 
 template <typename T, typename CharType, size_t N>
 typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], typename T::ValueType& value) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).Set(root, value);
-}
-
-template <typename T, typename CharType, size_t N>
-typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], GenericStringRef<typename T::Ch> value) {
     return GenericPointer<typename T::ValueType>(source, N - 1).Set(root, value);
 }
 
