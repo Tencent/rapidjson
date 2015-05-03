@@ -42,6 +42,9 @@ void TestAllocator(Allocator& a) {
         EXPECT_EQ(i, r[i]);
 
     Allocator::Free(r);
+
+    // Realloc to zero size
+    EXPECT_TRUE(a.Realloc(a.Malloc(1), 1, 0) == 0);
 }
 
 TEST(Allocator, CrtAllocator) {

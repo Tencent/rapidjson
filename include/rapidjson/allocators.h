@@ -189,6 +189,9 @@ public:
         if (originalPtr == 0)
             return Malloc(newSize);
 
+        if (newSize == 0)
+            return NULL;
+
         // Do not shrink if new size is smaller than original
         if (originalSize >= newSize)
             return originalPtr;
