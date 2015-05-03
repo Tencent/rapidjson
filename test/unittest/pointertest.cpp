@@ -165,6 +165,184 @@ TEST(Pointer, Parse) {
     }
 }
 
+TEST(Pointer, Parse_URIFragment) {
+    {
+        Pointer p("#");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(0u, p.GetTokenCount());
+    }
+
+    {
+        Pointer p("#/foo");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_EQ(3u, p.GetTokens()[0].length);
+        EXPECT_STREQ("foo", p.GetTokens()[0].name);
+    }
+
+    {
+        Pointer p("#/foo/0");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(2u, p.GetTokenCount());
+        EXPECT_EQ(3u, p.GetTokens()[0].length);
+        EXPECT_STREQ("foo", p.GetTokens()[0].name);
+        EXPECT_EQ(1u, p.GetTokens()[1].length);
+        EXPECT_STREQ("0", p.GetTokens()[1].name);
+        EXPECT_EQ(0u, p.GetTokens()[1].index);
+    }
+
+    {
+        // Unescape ~1
+        Pointer p("#/a~1b");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_EQ(3u, p.GetTokens()[0].length);
+        EXPECT_STREQ("a/b", p.GetTokens()[0].name);
+    }
+
+    {
+        // Unescape ~0
+        Pointer p("#/m~0n");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_EQ(3u, p.GetTokens()[0].length);
+        EXPECT_STREQ("m~n", p.GetTokens()[0].name);
+    }
+
+    {
+        // empty name
+        Pointer p("#/");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_EQ(0u, p.GetTokens()[0].length);
+        EXPECT_STREQ("", p.GetTokens()[0].name);
+    }
+
+    {
+        // empty and non-empty name
+        Pointer p("#//a");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(2u, p.GetTokenCount());
+        EXPECT_EQ(0u, p.GetTokens()[0].length);
+        EXPECT_STREQ("", p.GetTokens()[0].name);
+        EXPECT_EQ(1u, p.GetTokens()[1].length);
+        EXPECT_STREQ("a", p.GetTokens()[1].name);
+    }
+
+    {
+        // Null characters
+        Pointer p("#/%00%00");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_EQ(2u, p.GetTokens()[0].length);
+        EXPECT_EQ('\0', p.GetTokens()[0].name[0]);
+        EXPECT_EQ('\0', p.GetTokens()[0].name[1]);
+        EXPECT_EQ('\0', p.GetTokens()[0].name[2]);
+    }
+
+    {
+        // Percentage Escapes
+        EXPECT_STREQ("c%d", Pointer("#/c%25d").GetTokens()[0].name);
+        EXPECT_STREQ("e^f", Pointer("#/e%5Ef").GetTokens()[0].name);
+        EXPECT_STREQ("g|h", Pointer("#/g%7Ch").GetTokens()[0].name);
+        EXPECT_STREQ("i\\j", Pointer("#/i%5Cj").GetTokens()[0].name);
+        EXPECT_STREQ("k\"l", Pointer("#/k%22l").GetTokens()[0].name);
+        EXPECT_STREQ(" ", Pointer("#/%20").GetTokens()[0].name);
+    }
+
+    {
+        // Valid index
+        Pointer p("#/123");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_STREQ("123", p.GetTokens()[0].name);
+        EXPECT_EQ(123u, p.GetTokens()[0].index);
+    }
+
+    {
+        // Invalid index (with leading zero)
+        Pointer p("#/01");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_STREQ("01", p.GetTokens()[0].name);
+        EXPECT_EQ(kPointerInvalidIndex, p.GetTokens()[0].index);
+    }
+
+    if (sizeof(SizeType) == 4) {
+        // Invalid index (overflow)
+        Pointer p("#/4294967296");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_STREQ("4294967296", p.GetTokens()[0].name);
+        EXPECT_EQ(kPointerInvalidIndex, p.GetTokens()[0].index);
+    }
+
+    {
+        // kPointerParseErrorTokenMustBeginWithSolidus
+        Pointer p("# ");
+        EXPECT_FALSE(p.IsValid());
+        EXPECT_EQ(kPointerParseErrorTokenMustBeginWithSolidus, p.GetParseErrorCode());
+        EXPECT_EQ(1u, p.GetParseErrorOffset());
+    }
+
+    {
+        // kPointerParseErrorInvalidEscape
+        Pointer p("#/~");
+        EXPECT_FALSE(p.IsValid());
+        EXPECT_EQ(kPointerParseErrorInvalidEscape, p.GetParseErrorCode());
+        EXPECT_EQ(3u, p.GetParseErrorOffset());
+    }
+
+    {
+        // kPointerParseErrorInvalidEscape
+        Pointer p("#/~2");
+        EXPECT_FALSE(p.IsValid());
+        EXPECT_EQ(kPointerParseErrorInvalidEscape, p.GetParseErrorCode());
+        EXPECT_EQ(3u, p.GetParseErrorOffset());
+    }
+
+    {
+        // kPointerParseErrorInvalidPercentEncoding
+        Pointer p("#/%");
+        EXPECT_FALSE(p.IsValid());
+        EXPECT_EQ(kPointerParseErrorInvalidPercentEncoding, p.GetParseErrorCode());
+        EXPECT_EQ(3u, p.GetParseErrorOffset());
+    }
+
+    {
+        // kPointerParseErrorInvalidPercentEncoding
+        Pointer p("#/%g0");
+        EXPECT_FALSE(p.IsValid());
+        EXPECT_EQ(kPointerParseErrorInvalidPercentEncoding, p.GetParseErrorCode());
+        EXPECT_EQ(3u, p.GetParseErrorOffset());
+    }
+
+    {
+        // kPointerParseErrorInvalidPercentEncoding
+        Pointer p("#/%0g");
+        EXPECT_FALSE(p.IsValid());
+        EXPECT_EQ(kPointerParseErrorInvalidPercentEncoding, p.GetParseErrorCode());
+        EXPECT_EQ(4u, p.GetParseErrorOffset());
+    }
+
+    {
+        // kPointerParseErrorCharacterMustPercentEncode
+        Pointer p("#/ ");
+        EXPECT_FALSE(p.IsValid());
+        EXPECT_EQ(kPointerParseErrorCharacterMustPercentEncode, p.GetParseErrorCode());
+        EXPECT_EQ(2u, p.GetParseErrorOffset());
+    }
+
+    {
+        // kPointerParseErrorCharacterMustPercentEncode
+        Pointer p("#/\\");
+        EXPECT_FALSE(p.IsValid());
+        EXPECT_EQ(kPointerParseErrorCharacterMustPercentEncode, p.GetParseErrorCode());
+        EXPECT_EQ(2u, p.GetParseErrorOffset());
+    }
+
+}
+
 TEST(Pointer, Stringify) {
     // Test by roundtrip
     const char* sources[] = {

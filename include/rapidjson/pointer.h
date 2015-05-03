@@ -25,7 +25,9 @@ enum PointerParseErrorCode {
     kPointerParseErrorNone = 0,
 
     kPointerParseErrorTokenMustBeginWithSolidus,
-    kPointerParseErrorInvalidEscape
+    kPointerParseErrorInvalidEscape,
+    kPointerParseErrorInvalidPercentEncoding,
+    kPointerParseErrorCharacterMustPercentEncode
 };
 
 template <typename ValueType, typename Allocator = CrtAllocator>
@@ -363,6 +365,12 @@ public:
     }
 
 private:
+    //! Parse a JSON String or its URI fragment representation into tokens.
+    /*!
+        \param source Either a JSON Pointer string, or its URI fragment representation. Not need to be null terminated.
+        \param length Length of the source string.
+        \note Source cannot be JSON String Representation of JSON Pointer, e.g. In "/\u0000", \u0000 will not be unescaped.
+    */
     void Parse(const Ch* source, size_t length) {
         // Create own allocator if user did not supply.
         if (!allocator_)
@@ -380,7 +388,14 @@ private:
 
         size_t i = 0;
 
-        if (length != 0 && source[i] != '/') {
+        // Detect if it is a URI fragment
+        bool uriFragment = false;
+        if (source[i] == '#') {
+            uriFragment = true;
+            i++;
+        }
+
+        if (i != length && source[i] != '/') {
             parseErrorCode_ = kPointerParseErrorTokenMustBeginWithSolidus;
             goto error;
         }
@@ -395,6 +410,31 @@ private:
 
             while (i < length && source[i] != '/') {
                 Ch c = source[i++];
+
+                if (uriFragment) {
+                    // Decoding percent-encoding for URI fragment
+                    if (c == '%') {
+                        c = 0;
+                        for (int j = 0; j < 2; j++) {
+                            c <<= 4;
+                            Ch h = source[i];
+                            if      (h >= '0' && h <= '9') c += h - '0';
+                            else if (h >= 'A' && h <= 'F') c += h - 'A' + 10;
+                            else if (h >= 'a' && h <= 'f') c += h - 'a' + 10;
+                            else {
+                                parseErrorCode_ = kPointerParseErrorInvalidPercentEncoding;
+                                goto error;
+                            }
+                            i++;
+                        }
+                    }
+                    else if (!((c >= '0' && c <= '9') || (c >= 'A' && c <='Z') || (c >= 'a' && c <= 'z') || c == '-' || c == '.' || c == '_' || c =='~')) {
+                        // RFC 3986 2.3 Unreserved Characters
+                        i--;
+                        parseErrorCode_ = kPointerParseErrorCharacterMustPercentEncode;
+                        goto error;
+                    }
+                }
                 
                 // Escaping "~0" -> '~', "~1" -> '/'
                 if (c == '~') {
