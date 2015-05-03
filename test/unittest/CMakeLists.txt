@@ -8,11 +8,8 @@ set(UNITTEST_SOURCES
     itoatest.cpp
     jsoncheckertest.cpp
     namespacetest.cpp
-<<<<<<< HEAD
     pointertest.cpp
-=======
     prettywritertest.cpp
->>>>>>> master
     readertest.cpp
 	simdtest.cpp
     stringbuffertest.cpp
