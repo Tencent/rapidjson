@@ -9,6 +9,7 @@ var classrapidjson_1_1_generic_value =
     [ "MemberIterator", "classrapidjson_1_1_generic_value.html#aca5596987335016c1a7c2a9467baf80b", null ],
     [ "StringRefType", "classrapidjson_1_1_generic_value.html#a559eb9cea54364a35518b02f6d74f379", null ],
     [ "ValueIterator", "classrapidjson_1_1_generic_value.html#a06ce0e14ec83b53c83e1b1699b53a25e", null ],
+    [ "ValueType", "classrapidjson_1_1_generic_value.html#ad2935191ab28c2c2e472b739a9d58202", null ],
     [ "GenericValue", "classrapidjson_1_1_generic_value.html#ad1f8199e65662e0d52a13a1577d4e4a5", null ],
     [ "GenericValue", "classrapidjson_1_1_generic_value.html#a646b6d4d3d98799a0926d96ffa127a58", null ],
     [ "GenericValue", "classrapidjson_1_1_generic_value.html#a62a9fac23db014e88c508c2020573679", null ],
