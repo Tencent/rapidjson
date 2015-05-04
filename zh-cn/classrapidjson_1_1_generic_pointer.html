@@ -79,6 +79,7 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_generic_pointer.htm
   <div class="summary">
 <a href="#nested-classes">类</a> &#124;
 <a href="#pub-types">Public 类型</a> &#124;
+<a href="#pub-methods">Public 成员函数</a> &#124;
 <a href="classrapidjson_1_1_generic_pointer-members.html">所有成员列表</a>  </div>
   <div class="headertitle">
 <div class="title">rapidjson::GenericPointer&lt; ValueType, Allocator &gt; 模板类 参考</div>  </div>
@@ -109,6 +110,9 @@ typedef EncodingType::Ch&#160;</td><td class="memItemRight" valign="bottom"><a c
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
+<tr class="memitem:aec10492caf6e853935d9a360bbe73713"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#aec10492caf6e853935d9a360bbe73713">Erase</a> (ValueType &amp;root) const </td></tr>
+<tr class="memdesc:aec10492caf6e853935d9a360bbe73713"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erase a value in a subtree.  <a href="#aec10492caf6e853935d9a360bbe73713">更多...</a><br /></td></tr>
+<tr class="separator:aec10492caf6e853935d9a360bbe73713"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Constructors and destructor.</div></td></tr>
 <tr class="memitem:a1e62d3874c00e68c11388503c00eebac"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1e62d3874c00e68c11388503c00eebac"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a1e62d3874c00e68c11388503c00eebac">GenericPointer</a> ()</td></tr>
@@ -601,6 +605,42 @@ template&lt;typename stackAllocator &gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>返回</dt><dd>The resolved newly created, or already exists value. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aec10492caf6e853935d9a360bbe73713"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::Erase </td>
+          <td>(</td>
+          <td class="paramtype">ValueType &amp;&#160;</td>
+          <td class="paramname"><em>root</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Erase a value in a subtree. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">root</td><td>Root value of a DOM sub-tree to be resolved. It can be any value other than document root. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>Whether the resolved value is found and erased.</dd></dl>
+<dl class="section note"><dt>注解</dt><dd>Erasing with an empty pointer <code>Pointer</code>(""), i.e. the root, always fail and return false. </dd></dl>
 
 </div>
 </div>
