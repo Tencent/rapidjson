@@ -18,6 +18,20 @@
 #include "document.h"
 #include <cmath> // HUGE_VAL, fmod
 
+#if !defined(RAPIDJSON_SCHEMA_USE_STDREGEX) && __cplusplus >=201103L
+#define RAPIDJSON_SCHEMA_USE_STDREGEX 1
+#endif
+
+#if RAPIDJSON_SCHEMA_USE_STDREGEX
+#include <regex>
+#endif
+
+#if RAPIDJSON_SCHEMA_USE_STDREGEX // or some other implementation
+#define RAPIDJSON_SCHEMA_HAS_REGEX 1
+#else
+#define RAPIDJSON_SCHEMA_HAS_REGEX 0
+#endif
+
 #if defined(__GNUC__)
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
@@ -602,6 +616,9 @@ public:
     template <typename ValueType>
     StringSchema(const ValueType& value) : 
         BaseSchema<Encoding>(value),
+#if RAPIDJSON_SCHEMA_USE_STDREGEX
+        pattern_(),
+#endif
         minLength_(0),
         maxLength_(~SizeType(0))
     {
@@ -622,6 +639,34 @@ public:
                 // Error
             }
         }
+
+#if RAPIDJSON_SCHEMA_HAS_REGEX
+        typename ValueType::ConstMemberIterator patternItr = value.FindMember("pattern");
+        if (patternItr != value.MemberEnd()) {
+            if (patternItr->value.IsString()) {
+#if RAPIDJSON_SCHEMA_USE_STDREGEX
+                try {
+                    pattern_ = new std::basic_regex<Ch>(
+                        patternItr->value.GetString(),
+                        std::size_t(patternItr->value.GetStringLength()),
+                        std::regex_constants::ECMAScript);
+                }
+                catch (const std::regex_error&) {
+                    // Error
+                }
+#endif // RAPIDJSON_SCHEMA_USE_STDREGEX
+            }
+            else {
+                // Error
+            }
+        }
+#endif // RAPIDJSON_SCHEMA_HAS_REGEX
+    }
+
+    ~StringSchema() {
+#if RAPIDJSON_SCHEMA_USE_STDREGEX
+        delete pattern_;
+#endif
     }
 
     virtual SchemaType GetSchemaType() const { return kStringSchemaType; }
@@ -635,7 +680,22 @@ public:
     virtual bool Double(double) const { return false; }
 
     virtual bool String(const Ch* str, SizeType length, bool copy) const {
-        return BaseSchema<Encoding>::String(str, length, copy) && length >= minLength_ && length <= maxLength_;
+        if (!BaseSchema<Encoding>::String(str, length, copy))
+            return false;
+        if (length < minLength_ || length > maxLength_)
+            return false;
+
+#if RAPIDJSON_SCHEMA_HAS_REGEX
+        if (pattern_) {
+#if RAPIDJSON_SCHEMA_USE_STDREGEX
+            std::match_results<const Ch*> r;
+            if (!std::regex_match(str, str + length, r, *pattern_))
+                return false;
+#endif // RAPIDJSON_SCHEMA_USE_STDREGEX
+        }
+#endif // RAPIDJSON_SCHEMA_HAS_REGEX
+
+        return true;
     }
 
     virtual bool StartObject(Context&) const { return false; }
@@ -645,6 +705,9 @@ public:
     virtual bool EndArray(Context&, SizeType) const { return true; }
 
 private:
+#if RAPIDJSON_SCHEMA_USE_STDREGEX
+    std::basic_regex<Ch>* pattern_;
+#endif
     SizeType minLength_;
     SizeType maxLength_;
 };

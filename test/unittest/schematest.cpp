@@ -102,6 +102,19 @@ TEST(SchemaValidator, String_LengthRange) {
     VALIDATE(s, "\"ABCD\"", false);
 }
 
+#if RAPIDJSON_SCHEMA_HAS_REGEX
+TEST(SchemaValidator, String_Pattern) {
+    Document sd;
+    sd.Parse("{\"type\":\"string\",\"pattern\":\"^(\\\\([0-9]{3}\\\\))?[0-9]{3}-[0-9]{4}$\"}");
+    Schema s(sd);
+
+    VALIDATE(s, "\"555-1212\"", true);
+    VALIDATE(s, "\"(888)555-1212\"", true);
+    VALIDATE(s, "\"(888)555-1212 ext. 532\"", false);
+    VALIDATE(s, "\"(800)FLOWERS\"", false);
+}
+#endif
+
 TEST(SchemaValidator, Integer) {
     Document sd;
     sd.Parse("{\"type\":\"integer\"}");
