@@ -259,6 +259,10 @@ public:
         BaseSchema<Encoding>(value),
         properties_(),
         additionalPropertySchema_(),
+#if RAPIDJSON_SCHEMA_HAS_REGEX
+        patternProperties_(),
+        patternPropertyCount_(),
+#endif
         propertyCount_(),
         requiredCount_(),
         minProperties_(),
@@ -278,6 +282,31 @@ public:
                 propertyCount_++;
             }
         }
+
+#if RAPIDJSON_SCHEMA_HAS_REGEX
+        typename ValueType::ConstMemberIterator patternPropretiesItr = value.FindMember("patternProperties");
+        if (patternPropretiesItr != value.MemberEnd()) {
+            const ValueType& patternProperties = patternPropretiesItr->value;
+            patternProperties_ = new PatternProperty[patternProperties.MemberCount()];
+            patternPropertyCount_ = 0;
+
+            for (typename ValueType::ConstMemberIterator propertyItr = patternProperties.MemberBegin(); propertyItr != patternProperties.MemberEnd(); ++propertyItr) {
+#if RAPIDJSON_SCHEMA_USE_STDREGEX
+                try {
+                    patternProperties_[patternPropertyCount_].pattern = new std::basic_regex<Ch>(
+                        propertyItr->name.GetString(),
+                        std::size_t(propertyItr->name.GetStringLength()),
+                        std::regex_constants::ECMAScript);
+                }
+                catch (const std::regex_error&) {
+                    // Error
+                }
+#endif
+                patternProperties_[patternPropertyCount_].schema = CreateSchema<Encoding>(propertyItr->value);    // TODO: Check error
+                patternPropertyCount_++;
+            }
+        }
+#endif
 
         // Establish required after properties
         typename ValueType::ConstMemberIterator requiredItr = value.FindMember("required");
@@ -372,6 +401,9 @@ public:
     ~ObjectSchema() {
         delete [] properties_;
         delete additionalPropertySchema_;
+#if RAPIDJSON_SCHEMA_HAS_REGEX
+        delete [] patternProperties_;
+#endif
     }
 
     virtual SchemaType GetSchemaType() const { return kObjectSchemaType; }
@@ -407,6 +439,22 @@ public:
 
             return true;
         }
+
+#if RAPIDJSON_SCHEMA_HAS_REGEX
+        if (patternProperties_) {
+            for (SizeType i = 0; i < patternPropertyCount_; i++) {
+#if RAPIDJSON_SCHEMA_USE_STDREGEX
+                if (patternProperties_[i].pattern) {
+                    std::match_results<const Ch*> r;
+                    if (std::regex_search(str, str + len, r, *patternProperties_[i].pattern)) {
+                        context.valueSchema = patternProperties_[i].schema;
+                        return true;
+                    }
+                }
+#endif // RAPIDJSON_SCHEMA_USE_STDREGEX
+            }
+        }
+#endif
 
         if (additionalPropertySchema_) {
             context.valueSchema = additionalPropertySchema_;
@@ -477,9 +525,28 @@ private:
         bool required;
     };
 
+#if RAPIDJSON_SCHEMA_HAS_REGEX
+    struct PatternProperty {
+        PatternProperty() : schema(), pattern() {}
+        ~PatternProperty() {
+            delete schema;
+            delete pattern;
+        }
+
+        BaseSchema<Encoding>* schema;
+#if RAPIDJSON_SCHEMA_USE_STDREGEX
+        std::basic_regex<Ch>* pattern;
+#endif
+    };
+#endif
+
     TypelessSchema<Encoding> typeless_;
     Property* properties_;
     BaseSchema<Encoding>* additionalPropertySchema_;
+#if RAPIDJSON_SCHEMA_HAS_REGEX
+    PatternProperty* patternProperties_;
+    SizeType patternPropertyCount_;
+#endif
     SizeType propertyCount_;
     SizeType requiredCount_;
     SizeType minProperties_;
@@ -689,7 +756,7 @@ public:
         if (pattern_) {
 #if RAPIDJSON_SCHEMA_USE_STDREGEX
             std::match_results<const Ch*> r;
-            if (!std::regex_match(str, str + length, r, *pattern_))
+            if (!std::regex_search(str, str + length, r, *pattern_))
                 return false;
 #endif // RAPIDJSON_SCHEMA_USE_STDREGEX
         }

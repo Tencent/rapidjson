@@ -314,6 +314,46 @@ TEST(SchemaValidator, Object_PropertyDependencies) {
     VALIDATE(s, "{ \"name\": \"John Doe\", \"billing_address\": \"555 Debtor's Lane\" }", true);
 }
 
+TEST(SchemaValidator, Object_PatternProperties) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "  \"type\": \"object\","
+        "  \"patternProperties\": {"
+        "    \"^S_\": { \"type\": \"string\" },"
+        "    \"^I_\": { \"type\": \"integer\" }"
+        "  }"
+        "}");
+    Schema s(sd);
+
+    VALIDATE(s, "{ \"S_25\": \"This is a string\" }", true);
+    VALIDATE(s, "{ \"I_0\": 42 }", true);
+    VALIDATE(s, "{ \"S_0\": 42 }", false);
+    VALIDATE(s, "{ \"I_42\": \"This is a string\" }", false);
+    VALIDATE(s, "{ \"keyword\": \"value\" }", true);
+}
+
+TEST(SchemaValidator, Object_PatternProperties_AdditionalProperties) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "  \"type\": \"object\","
+        "  \"properties\": {"
+        "    \"builtin\": { \"type\": \"number\" }"
+        "  },"
+        "  \"patternProperties\": {"
+        "    \"^S_\": { \"type\": \"string\" },"
+        "    \"^I_\": { \"type\": \"integer\" }"
+        "  },"
+        "  \"additionalProperties\": { \"type\": \"string\" }"
+        "}");
+    Schema s(sd);
+
+    VALIDATE(s, "{ \"builtin\": 42 }", true);
+    VALIDATE(s, "{ \"keyword\": \"value\" }", true);
+    VALIDATE(s, "{ \"keyword\": 42 }", false);
+}
+
 TEST(SchemaValidator, Array) {
     Document sd;
     sd.Parse("{\"type\":\"array\"}");
