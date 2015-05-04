@@ -23,7 +23,7 @@ The following JSON Pointers resolve this JSON as:
 1. `"/foo"` → `[ "bar", "baz" ]`
 2. `"/foo/0"` → `"bar"`
 3. `"/foo/1"` → `"baz"`
-4. `"/pi"` → 3.1416
+4. `"/pi"` → `3.1416`
 
 Note that, an empty JSON Pointer `""` (zero token) resolves to the whole JSON.
 
@@ -40,24 +40,29 @@ Document d;
 // Create DOM by Set()
 Pointer("/project").Set(d, "RapidJSON");
 Pointer("/stars").Set(d, 10);
+
 // { "project" : "RapidJSON", "stars" : 10 }
 
 // Access DOM by Get(). It return nullptr if the value is not exist.
 if (Value* stars = Pointer("/stars").Get(d))
     stars->SetInt(stars->GetInt() + 1);
+
 // { "project" : "RapidJSON", "stars" : 11 }
 
 // Set() and Create() automatically generate parents if not exist.
 Pointer("/a/b/0").Create(d);
+
 // { "project" : "RapidJSON", "stars" : 11, "a" : { "b" : [ null ] } }
 
 // GetWithDefault() returns reference. And it deep clones the default value.
 Value& hello = Pointer("/hello").GetWithDefault(d, "world");
+
 // { "project" : "RapidJSON", "stars" : 11, "a" : { "b" : [ null ] }, "hello" : "world" }
 
 // Swap() is similar to Set()
 Value x("C++");
 Pointer("/hello").Swap(d, x);
+
 // { "project" : "RapidJSON", "stars" : 11, "a" : { "b" : [ null ] }, "hello" : "C++" }
 // x becomes "world"
 ~~~
@@ -109,7 +114,7 @@ Note that, numerical tokens can represent an array index or member name. The res
 
 The token `"0"` is treated as member name in the first pointer. It is treated as an array index in the second pointer.
 
-The other functions, including `Create()`, `GetWithDefault()`, `Set()` and `Swap()`, will change the DOM. These functions will always succeed. They will create the parent values if they do not exist. If the parent values do not match with the tokens, they will also be forced to change their type. Changing the type also mean fully removal of that DOM subtree.
+The other functions, including `Create()`, `GetWithDefault()`, `Set()` and `Swap()`, will change the DOM. These functions will always succeed. They will create the parent values if they do not exist. If the parent values do not match the tokens, they will also be forced to change their type. Changing the type also mean fully removal of that DOM subtree.
 
 Parsing the above JSON into `d`, 
 
