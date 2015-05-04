@@ -408,8 +408,7 @@ private:
                         PercentDecodeStream is(&source[i], source + length);
                         GenericInsituStringStream<EncodingType> os(name);
                         Ch* begin = os.PutBegin();
-                        Transcoder<UTF8<>, EncodingType> transcoder;
-                        if (!transcoder.Validate(is, os) || !is.IsValid()) {
+                        if (!Transcoder<UTF8<>, EncodingType>().Validate(is, os) || !is.IsValid()) {
                             parseErrorCode_ = kPointerParseErrorInvalidPercentEncoding;
                             goto error;
                         }
@@ -517,8 +516,7 @@ private:
                     // Transcode to UTF8 sequence
                     GenericStringStream<typename ValueType::EncodingType> source(&t->name[j]);
                     PercentEncodeStream<OutputStream> target(os);
-                    Transcoder<EncodingType, UTF8<> > transcoder;
-                    if (!transcoder.Validate(source, target))
+                    if (!Transcoder<EncodingType, UTF8<> >().Validate(source, target))
                         return false;
                     j += source.Tell() - 1;
                 }
