@@ -102,9 +102,9 @@ JSON Pointer</h1>
 </div><!-- fragment --><p>The following JSON Pointers resolve this JSON as:</p>
 <ol type="1">
 <li><code>"/foo"</code> → <code>[ "bar", "baz" ]</code></li>
-<li><code>"/foo/0&lt;/tt&gt; → &lt;tt&gt;"bar"&lt;/tt&gt;
-3. &lt;tt&gt;"/foo/1</code> → <code>"baz"</code></li>
-<li><code>"/pi</code> → 3.1416</li>
+<li><code>"/foo/0"</code> → <code>"bar"</code></li>
+<li><code>"/foo/1"</code> → <code>"baz"</code></li>
+<li><code>"/pi"</code> → 3.1416</li>
 </ol>
 <p>Note that, an empty JSON Pointer <code>""</code> (zero token) resolves to the whole JSON.</p>
 <h1><a class="anchor" id="BasicUsage"></a>
@@ -232,7 +232,7 @@ URI Fragment Representation</h1>
 <tr>
 <td><code>"/\\0"</code> </td><td><code>"#/%00"</code> </td><td><code>{"\\0"}</code> </td></tr>
 <tr>
-<td><code>"/\\xE2\\x82\\xAC"</code> </td><td><code>"#/%E2%82%AC&lt;/tt&gt;              &lt;td&gt; &lt;tt&gt;{"\xE2\x82\xAC"}</code> </td></tr>
+<td><code>"/\\xE2\\x82\\xAC"</code> </td><td><code>"#/%E2%82%AC"</code> </td><td><code>{"\\xE2\\x82\\xAC"}</code> </td></tr>
 </table>
 <p>RapidJSON fully support URI fragment representation. It automatically detects the pound sign during parsing.</p>
 <h1>Stringify</h1>
