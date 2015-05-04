@@ -21,9 +21,9 @@ A JSON Pointer is a list of zero-to-many tokens, each prefixed by `/`. Each toke
 The following JSON Pointers resolve this JSON as:
 
 1. `"/foo"` → `[ "bar", "baz" ]`
-2. `"/foo/0` → `"bar"`
-3. `"/foo/1` → `"baz"`
-4. `"/pi` → 3.1416
+2. `"/foo/0"` → `"bar"`
+3. `"/foo/1"` → `"baz"`
+4. `"/pi"` → 3.1416
 
 Note that, an empty JSON Pointer `""` (zero token) resolves to the whole JSON.
 
@@ -180,7 +180,7 @@ String Representation | URI Fragment Representation | Pointer Tokens (UTF-8)
 `"/m~0n"`             | `"#/m~0n"`                  | `{"m~n"}`
 `"/ "`                | `"#/%20"`                   | `{" "}`
 `"/\0"`               | `"#/%00"`                   | `{"\0"}`
-`"/\xE2\x82\xAC"`     | `"#/%E2%82%AC`              | `{"\xE2\x82\xAC"}`
+`"/\xE2\x82\xAC"`     | `"#/%E2%82%AC"`             | `{"\xE2\x82\xAC"}`
 
 RapidJSON fully support URI fragment representation. It automatically detects the pound sign during parsing.
 
