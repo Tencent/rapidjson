@@ -224,40 +224,27 @@ public:
     ValueType& GetWithDefault(ValueType& root, const ValueType& defaultValue, typename ValueType::AllocatorType& allocator) const {
         bool alreadyExist;
         Value& v = Create(root, allocator, &alreadyExist);
-        if (!alreadyExist) {
-            Value clone(defaultValue, allocator);
-            v = clone;
-        }
-        return v;
+        return alreadyExist ? v : v.CopyFrom(defaultValue, allocator);
     }
 
     ValueType& GetWithDefault(ValueType& root, const Ch* defaultValue, typename ValueType::AllocatorType& allocator) const {
         bool alreadyExist;
         Value& v = Create(root, allocator, &alreadyExist);
-        if (!alreadyExist) {
-            Value clone(defaultValue, allocator); // This has overhead, so do it inside if.
-            v = clone;
-        }
-        return v;
+        return alreadyExist ? v : v.SetString(defaultValue, allocator);
     }
 
 #if RAPIDJSON_HAS_STDSTRING
     ValueType& GetWithDefault(ValueType& root, const std::basic_string<Ch>& defaultValue, typename ValueType::AllocatorType& allocator) const {
         bool alreadyExist;
         Value& v = Create(root, allocator, &alreadyExist);
-        if (!alreadyExist) {
-            Value clone(defaultValue, allocator); // This has overhead, so do it inside if.
-            v = clone;
-        }
-        return v;
+        return alreadyExist ? v : v.SetString(defaultValue, allocator);
     }
 #endif
 
     template <typename T>
     RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&))
     GetWithDefault(ValueType& root, T defaultValue, typename ValueType::AllocatorType& allocator) const {
-        ValueType v(defaultValue);
-        return GetWithDefault(root, v, allocator);
+        return GetWithDefault(root, ValueType(defaultValue).Move(), allocator);
     }
 
     template <typename stackAllocator>
@@ -294,22 +281,19 @@ public:
     }
 
     ValueType& Set(ValueType& root, const Ch* value, typename ValueType::AllocatorType& allocator) const {
-        ValueType v(value, allocator);
-        return Create(root, allocator) = v;
+        return Create(root, allocator) = ValueType(value, allocator).Move();
     }
 
 #if RAPIDJSON_HAS_STDSTRING
     ValueType& Set(ValueType& root, const std::basic_string<Ch>& value, typename ValueType::AllocatorType& allocator) const {
-        ValueType v(value, allocator);
-        return Create(root, allocator) = v;
+        return Create(root, allocator) = ValueType(value, allocator).Move();
     }
 #endif
 
     template <typename T>
     RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&))
     Set(ValueType& root, T value, typename ValueType::AllocatorType& allocator) const {
-        ValueType v(value);
-        return Create(root, allocator) = v;
+        return Create(root, allocator) = ValueType(value).Move();
     }
 
     template <typename stackAllocator>
@@ -363,20 +347,19 @@ private:
         \note Source cannot be JSON String Representation of JSON Pointer, e.g. In "/\u0000", \u0000 will not be unescaped.
     */
     void Parse(const Ch* source, size_t length) {
+        RAPIDJSON_ASSERT(source != NULL);
+        RAPIDJSON_ASSERT(nameBuffer_ == 0);
+        RAPIDJSON_ASSERT(tokens_ == 0);
+
         // Create own allocator if user did not supply.
         if (!allocator_)
             ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
 
         // Create a buffer as same size of source
-        RAPIDJSON_ASSERT(nameBuffer_ == 0);
         nameBuffer_ = (Ch*)allocator_->Malloc(length * sizeof(Ch));
-
-        RAPIDJSON_ASSERT(tokens_ == 0);
         tokens_ = (Token*)allocator_->Malloc(length * sizeof(Token)); // Maximum possible tokens in the source
-
         tokenCount_ = 0;
         Ch* name = nameBuffer_;
-
         size_t i = 0;
 
         // Detect if it is a URI fragment
@@ -401,7 +384,6 @@ private:
 
             while (i < length && source[i] != '/') {
                 Ch c = source[i];
-
                 if (uriFragment) {
                     // Decoding percent-encoding for URI fragment
                     if (c == '%') {
