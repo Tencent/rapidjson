@@ -144,6 +144,17 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:ga7d3acf640886b1f2552dc8c4cd6dea60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error code of parsing.  <a href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">More...</a><br /></td></tr>
 <tr class="separator:ga7d3acf640886b1f2552dc8c4cd6dea60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gade540ee4cc2a416c23b8ee2c12393c7b"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gade540ee4cc2a416c23b8ee2c12393c7b">rapidjson::PointerParseErrorCode</a> { <br />
+&#160;&#160;<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7ba9094f236b2ec70c42f1ea91dffc1e39b">rapidjson::kPointerParseErrorNone</a> = 0, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7ba2f2f8b238e201b7d540e8914bbfd2bed">rapidjson::kPointerParseErrorTokenMustBeginWithSolidus</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7ba907c9fe4e541b257513e3a18635379f7">rapidjson::kPointerParseErrorInvalidEscape</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7ba29831a02b8ee23a05d552b47f4d64d28">rapidjson::kPointerParseErrorInvalidPercentEncoding</a>, 
+<br />
+&#160;&#160;<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7bae244a98f53279fda5a750f847b81c54f">rapidjson::kPointerParseErrorCharacterMustPercentEncode</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:gade540ee4cc2a416c23b8ee2c12393c7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error code of parsing.  <a href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gade540ee4cc2a416c23b8ee2c12393c7b">More...</a><br /></td></tr>
+<tr class="separator:gade540ee4cc2a416c23b8ee2c12393c7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -430,6 +441,38 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (<a cl
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="gga7d3acf640886b1f2552dc8c4cd6dea60a7abf1a337294d984a3f4d18b5843fb24"></a>kParseErrorUnspecificSyntaxError&#160;</td><td class="fielddoc">
 <p>Unspecific syntax error. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a class="anchor" id="gade540ee4cc2a416c23b8ee2c12393c7b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gade540ee4cc2a416c23b8ee2c12393c7b">rapidjson::PointerParseErrorCode</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Error code of parsing. </p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classrapidjson_1_1_generic_pointer.html#a1e62d3874c00e68c11388503c00eebac" title="Default constructor. ">GenericPointer::GenericPointer</a>, <a class="el" href="classrapidjson_1_1_generic_pointer.html#ac817b123619422f03c44a46978d9fbd0" title="Get the parsing error code. ">GenericPointer::GetParseErrorCode</a> </dd></dl>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="ggade540ee4cc2a416c23b8ee2c12393c7ba9094f236b2ec70c42f1ea91dffc1e39b"></a>kPointerParseErrorNone&#160;</td><td class="fielddoc">
+<p>The parse is successful. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ggade540ee4cc2a416c23b8ee2c12393c7ba2f2f8b238e201b7d540e8914bbfd2bed"></a>kPointerParseErrorTokenMustBeginWithSolidus&#160;</td><td class="fielddoc">
+<p>A token must begin with a '/'. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ggade540ee4cc2a416c23b8ee2c12393c7ba907c9fe4e541b257513e3a18635379f7"></a>kPointerParseErrorInvalidEscape&#160;</td><td class="fielddoc">
+<p>Invalid escape. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ggade540ee4cc2a416c23b8ee2c12393c7ba29831a02b8ee23a05d552b47f4d64d28"></a>kPointerParseErrorInvalidPercentEncoding&#160;</td><td class="fielddoc">
+<p>Invalid percent encoding in URI fragment. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ggade540ee4cc2a416c23b8ee2c12393c7bae244a98f53279fda5a750f847b81c54f"></a>kPointerParseErrorCharacterMustPercentEncode&#160;</td><td class="fielddoc">
+<p>A character must percent encoded in URI fragment. </p>
 </td></tr>
 </table>
 

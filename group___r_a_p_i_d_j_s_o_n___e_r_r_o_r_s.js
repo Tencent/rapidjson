@@ -38,5 +38,12 @@ var group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s =
       [ "kParseErrorTermination", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60ab250f87c3d8454c579364b5a0f697a50", null ],
       [ "kParseErrorUnspecificSyntaxError", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a7abf1a337294d984a3f4d18b5843fb24", null ]
     ] ],
+    [ "PointerParseErrorCode", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gade540ee4cc2a416c23b8ee2c12393c7b", [
+      [ "kPointerParseErrorNone", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7ba9094f236b2ec70c42f1ea91dffc1e39b", null ],
+      [ "kPointerParseErrorTokenMustBeginWithSolidus", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7ba2f2f8b238e201b7d540e8914bbfd2bed", null ],
+      [ "kPointerParseErrorInvalidEscape", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7ba907c9fe4e541b257513e3a18635379f7", null ],
+      [ "kPointerParseErrorInvalidPercentEncoding", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7ba29831a02b8ee23a05d552b47f4d64d28", null ],
+      [ "kPointerParseErrorCharacterMustPercentEncode", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7bae244a98f53279fda5a750f847b81c54f", null ]
+    ] ],
     [ "GetParseError_En", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79", null ]
 ];

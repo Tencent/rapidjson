@@ -1,0 +1,1207 @@
+<!-- HTML header for doxygen 1.8.7-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.7"/>
+<title>RapidJSON: rapidjson::GenericPointer&lt; ValueType, Allocator &gt; 模板类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript">
+  $(document).ready(initResizable);
+  $(window).load(resizeHeight);
+</script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() { searchBox.OnSelectItem(0); });
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="topbanner"><a href="https://github.com/miloyip/rapidjson" title="RapidJSON GitHub"><i class="githublogo"></i></a></div>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.png"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.png" alt=""/></a>
+          </span>
+        </div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.8.7 -->
+<script type="text/javascript">
+var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){initNavTree('classrapidjson_1_1_generic_pointer.html','');});
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(12)"><span class="SelectionMark">&#160;</span>页</a></div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#pub-types">Public 类型</a> &#124;
+<a href="classrapidjson_1_1_generic_pointer-members.html">所有成员列表</a>  </div>
+  <div class="headertitle">
+<div class="title">rapidjson::GenericPointer&lt; ValueType, Allocator &gt; 模板类 参考</div>  </div>
+</div><!--header-->
+<div class="contents">
+
+<p>Represents a JSON Pointer. Use Pointer for <a class="el" href="structrapidjson_1_1_u_t_f8.html" title="UTF-8 encoding. ">UTF8</a> encoding and default allocator.  
+ <a href="classrapidjson_1_1_generic_pointer.html#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="pointer_8h_source.html">pointer.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrapidjson_1_1_generic_pointer_1_1_token.html">Token</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A token is the basic units of internal representation.  <a href="structrapidjson_1_1_generic_pointer_1_1_token.html#details">更多...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a399790c5fe8076d91a58c621c0c2a79e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a399790c5fe8076d91a58c621c0c2a79e"></a>
+typedef ValueType::EncodingType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e">EncodingType</a></td></tr>
+<tr class="memdesc:a399790c5fe8076d91a58c621c0c2a79e"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classrapidjson_1_1_encoding.html" title="Concept for encoding of Unicode characters. ">Encoding</a> type from Value. <br /></td></tr>
+<tr class="separator:a399790c5fe8076d91a58c621c0c2a79e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae057be4befe709b07ca474e938449601"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae057be4befe709b07ca474e938449601"></a>
+typedef EncodingType::Ch&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601">Ch</a></td></tr>
+<tr class="memdesc:ae057be4befe709b07ca474e938449601"><td class="mdescLeft">&#160;</td><td class="mdescRight">Character type from Value. <br /></td></tr>
+<tr class="separator:ae057be4befe709b07ca474e938449601"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Constructors and destructor.</div></td></tr>
+<tr class="memitem:a1e62d3874c00e68c11388503c00eebac"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1e62d3874c00e68c11388503c00eebac"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a1e62d3874c00e68c11388503c00eebac">GenericPointer</a> ()</td></tr>
+<tr class="memdesc:a1e62d3874c00e68c11388503c00eebac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
+<tr class="separator:a1e62d3874c00e68c11388503c00eebac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f831aae14afc493a82b5fb6aa9c3c43"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a8f831aae14afc493a82b5fb6aa9c3c43">GenericPointer</a> (const <a class="el" href="classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601">Ch</a> *source, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> *allocator=0)</td></tr>
+<tr class="memdesc:a8f831aae14afc493a82b5fb6aa9c3c43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor that parses a string or URI fragment representation.  <a href="#a8f831aae14afc493a82b5fb6aa9c3c43">更多...</a><br /></td></tr>
+<tr class="separator:a8f831aae14afc493a82b5fb6aa9c3c43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeefcd60e5ad37d80ec43f5315ae84809"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#aeefcd60e5ad37d80ec43f5315ae84809">GenericPointer</a> (const std::basic_string&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601">Ch</a> &gt; &amp;source, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> *allocator=0)</td></tr>
+<tr class="memdesc:aeefcd60e5ad37d80ec43f5315ae84809"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor that parses a string or URI fragment representation.  <a href="#aeefcd60e5ad37d80ec43f5315ae84809">更多...</a><br /></td></tr>
+<tr class="separator:aeefcd60e5ad37d80ec43f5315ae84809"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00ad17ea227d2556404df7cc64c6aeb5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a00ad17ea227d2556404df7cc64c6aeb5">GenericPointer</a> (const <a class="el" href="classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601">Ch</a> *source, size_t length, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> *allocator=0)</td></tr>
+<tr class="memdesc:a00ad17ea227d2556404df7cc64c6aeb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor that parses a string or URI fragment representation, with length of the source string.  <a href="#a00ad17ea227d2556404df7cc64c6aeb5">更多...</a><br /></td></tr>
+<tr class="separator:a00ad17ea227d2556404df7cc64c6aeb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6df9f6a01d1b5945811055e1cf8aead6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a6df9f6a01d1b5945811055e1cf8aead6">GenericPointer</a> (const <a class="el" href="structrapidjson_1_1_generic_pointer_1_1_token.html">Token</a> *tokens, size_t tokenCount)</td></tr>
+<tr class="memdesc:a6df9f6a01d1b5945811055e1cf8aead6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor with user-supplied tokens.  <a href="#a6df9f6a01d1b5945811055e1cf8aead6">更多...</a><br /></td></tr>
+<tr class="separator:a6df9f6a01d1b5945811055e1cf8aead6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae071847ed3e7389f5b256d26fcc8fd62"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae071847ed3e7389f5b256d26fcc8fd62"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#ae071847ed3e7389f5b256d26fcc8fd62">GenericPointer</a> (const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a> &amp;rhs)</td></tr>
+<tr class="memdesc:ae071847ed3e7389f5b256d26fcc8fd62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor. <br /></td></tr>
+<tr class="separator:ae071847ed3e7389f5b256d26fcc8fd62"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e144b9956a5272c13ceff3b9306e748"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0e144b9956a5272c13ceff3b9306e748"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a0e144b9956a5272c13ceff3b9306e748">~GenericPointer</a> ()</td></tr>
+<tr class="memdesc:a0e144b9956a5272c13ceff3b9306e748"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
+<tr class="separator:a0e144b9956a5272c13ceff3b9306e748"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23194bb6ce6c07c78981344fe80ac3a6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a23194bb6ce6c07c78981344fe80ac3a6"></a>
+<a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a23194bb6ce6c07c78981344fe80ac3a6">operator=</a> (const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a> &amp;rhs)</td></tr>
+<tr class="memdesc:a23194bb6ce6c07c78981344fe80ac3a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assignment operator. <br /></td></tr>
+<tr class="separator:a23194bb6ce6c07c78981344fe80ac3a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Handling Parse Error</div></td></tr>
+<tr class="memitem:a112f364fe9aeabba2a72e83bcbeb8fda"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a112f364fe9aeabba2a72e83bcbeb8fda"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a112f364fe9aeabba2a72e83bcbeb8fda">IsValid</a> () const </td></tr>
+<tr class="memdesc:a112f364fe9aeabba2a72e83bcbeb8fda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether this is a valid pointer. <br /></td></tr>
+<tr class="separator:a112f364fe9aeabba2a72e83bcbeb8fda"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc01f1be5f05127f849a2bf10a97e89b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adc01f1be5f05127f849a2bf10a97e89b"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#adc01f1be5f05127f849a2bf10a97e89b">GetParseErrorOffset</a> () const </td></tr>
+<tr class="memdesc:adc01f1be5f05127f849a2bf10a97e89b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the parsing error offset in code unit. <br /></td></tr>
+<tr class="separator:adc01f1be5f05127f849a2bf10a97e89b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac817b123619422f03c44a46978d9fbd0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac817b123619422f03c44a46978d9fbd0"></a>
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gade540ee4cc2a416c23b8ee2c12393c7b">PointerParseErrorCode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#ac817b123619422f03c44a46978d9fbd0">GetParseErrorCode</a> () const </td></tr>
+<tr class="memdesc:ac817b123619422f03c44a46978d9fbd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the parsing error code. <br /></td></tr>
+<tr class="separator:ac817b123619422f03c44a46978d9fbd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Tokens</div></td></tr>
+<tr class="memitem:a0ee51e6c996d4665b398dae5dbf00bc4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0ee51e6c996d4665b398dae5dbf00bc4"></a>
+const <a class="el" href="structrapidjson_1_1_generic_pointer_1_1_token.html">Token</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a0ee51e6c996d4665b398dae5dbf00bc4">GetTokens</a> () const </td></tr>
+<tr class="memdesc:a0ee51e6c996d4665b398dae5dbf00bc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the token array (const version only). <br /></td></tr>
+<tr class="separator:a0ee51e6c996d4665b398dae5dbf00bc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2949cb104effdf323781ae70ce469ed9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2949cb104effdf323781ae70ce469ed9"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a2949cb104effdf323781ae70ce469ed9">GetTokenCount</a> () const </td></tr>
+<tr class="memdesc:a2949cb104effdf323781ae70ce469ed9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of tokens. <br /></td></tr>
+<tr class="separator:a2949cb104effdf323781ae70ce469ed9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Equality/inequality operators</div></td></tr>
+<tr class="memitem:af0d009a8322a7b61f63a9539ca8bddaf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#af0d009a8322a7b61f63a9539ca8bddaf">operator==</a> (const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a> &amp;rhs) const </td></tr>
+<tr class="memdesc:af0d009a8322a7b61f63a9539ca8bddaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Equality operator.  <a href="#af0d009a8322a7b61f63a9539ca8bddaf">更多...</a><br /></td></tr>
+<tr class="separator:af0d009a8322a7b61f63a9539ca8bddaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e74f5b9c9fd3307f6ebac61a7131524"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a3e74f5b9c9fd3307f6ebac61a7131524">operator!=</a> (const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a> &amp;rhs) const </td></tr>
+<tr class="memdesc:a3e74f5b9c9fd3307f6ebac61a7131524"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inequality operator.  <a href="#a3e74f5b9c9fd3307f6ebac61a7131524">更多...</a><br /></td></tr>
+<tr class="separator:a3e74f5b9c9fd3307f6ebac61a7131524"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Stringify</div></td></tr>
+<tr class="memitem:ab9166f175517b1bff8c2219ea769e506"><td class="memTemplParams" colspan="2">template&lt;typename OutputStream &gt; </td></tr>
+<tr class="memitem:ab9166f175517b1bff8c2219ea769e506"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#ab9166f175517b1bff8c2219ea769e506">Stringify</a> (OutputStream &amp;os) const </td></tr>
+<tr class="memdesc:ab9166f175517b1bff8c2219ea769e506"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stringify the pointer into string representation.  <a href="#ab9166f175517b1bff8c2219ea769e506">更多...</a><br /></td></tr>
+<tr class="separator:ab9166f175517b1bff8c2219ea769e506"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40413907ac94e218f93625d3a5c8c454"><td class="memTemplParams" colspan="2">template&lt;typename OutputStream &gt; </td></tr>
+<tr class="memitem:a40413907ac94e218f93625d3a5c8c454"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a40413907ac94e218f93625d3a5c8c454">StringifyUriFragment</a> (OutputStream &amp;os) const </td></tr>
+<tr class="memdesc:a40413907ac94e218f93625d3a5c8c454"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stringify the pointer into URI fragment representation.  <a href="#a40413907ac94e218f93625d3a5c8c454">更多...</a><br /></td></tr>
+<tr class="separator:a40413907ac94e218f93625d3a5c8c454"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Create value</div></td></tr>
+<tr class="memitem:a3733a6d6cf2a3a13f2a59b109b56d800"><td class="memItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a3733a6d6cf2a3a13f2a59b109b56d800">Create</a> (ValueType &amp;root, typename ValueType::AllocatorType &amp;allocator, bool *alreadyExist=0) const </td></tr>
+<tr class="memdesc:a3733a6d6cf2a3a13f2a59b109b56d800"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a value in a subtree.  <a href="#a3733a6d6cf2a3a13f2a59b109b56d800">更多...</a><br /></td></tr>
+<tr class="separator:a3733a6d6cf2a3a13f2a59b109b56d800"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b5a8fb688e6b6a1b077ce103df455c3"><td class="memTemplParams" colspan="2">template&lt;typename stackAllocator &gt; </td></tr>
+<tr class="memitem:a2b5a8fb688e6b6a1b077ce103df455c3"><td class="memTemplItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a2b5a8fb688e6b6a1b077ce103df455c3">Create</a> (<a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e">EncodingType</a>, typename ValueType::AllocatorType, stackAllocator &gt; &amp;document, bool *alreadyExist=0) const </td></tr>
+<tr class="memdesc:a2b5a8fb688e6b6a1b077ce103df455c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a value in a document.  <a href="#a2b5a8fb688e6b6a1b077ce103df455c3">更多...</a><br /></td></tr>
+<tr class="separator:a2b5a8fb688e6b6a1b077ce103df455c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Query value</div></td></tr>
+<tr class="memitem:a1089dad43030e8120d25adcf2ec1220c"><td class="memItemLeft" align="right" valign="top">ValueType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a1089dad43030e8120d25adcf2ec1220c">Get</a> (ValueType &amp;root) const </td></tr>
+<tr class="memdesc:a1089dad43030e8120d25adcf2ec1220c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a value in a subtree.  <a href="#a1089dad43030e8120d25adcf2ec1220c">更多...</a><br /></td></tr>
+<tr class="separator:a1089dad43030e8120d25adcf2ec1220c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80032c73fc091a39a779a33b42e38ddf"><td class="memItemLeft" align="right" valign="top">const ValueType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a80032c73fc091a39a779a33b42e38ddf">Get</a> (const ValueType &amp;root) const </td></tr>
+<tr class="memdesc:a80032c73fc091a39a779a33b42e38ddf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a const value in a const subtree.  <a href="#a80032c73fc091a39a779a33b42e38ddf">更多...</a><br /></td></tr>
+<tr class="separator:a80032c73fc091a39a779a33b42e38ddf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Query a value with default</div></td></tr>
+<tr class="memitem:a6c615761374ddce265d542f4b4b476b1"><td class="memItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a6c615761374ddce265d542f4b4b476b1">GetWithDefault</a> (ValueType &amp;root, const ValueType &amp;defaultValue, typename ValueType::AllocatorType &amp;allocator) const </td></tr>
+<tr class="memdesc:a6c615761374ddce265d542f4b4b476b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a value in a subtree with default value.  <a href="#a6c615761374ddce265d542f4b4b476b1">更多...</a><br /></td></tr>
+<tr class="separator:a6c615761374ddce265d542f4b4b476b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9f3e27a210a0974892c1260c2e4a39f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae9f3e27a210a0974892c1260c2e4a39f"></a>
+ValueType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#ae9f3e27a210a0974892c1260c2e4a39f">GetWithDefault</a> (ValueType &amp;root, const <a class="el" href="classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601">Ch</a> *defaultValue, typename ValueType::AllocatorType &amp;allocator) const </td></tr>
+<tr class="memdesc:ae9f3e27a210a0974892c1260c2e4a39f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a value in a subtree with default null-terminated string. <br /></td></tr>
+<tr class="separator:ae9f3e27a210a0974892c1260c2e4a39f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab914090864d0ded21a376867c33ad865"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab914090864d0ded21a376867c33ad865"></a>
+ValueType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#ab914090864d0ded21a376867c33ad865">GetWithDefault</a> (ValueType &amp;root, const std::basic_string&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601">Ch</a> &gt; &amp;defaultValue, typename ValueType::AllocatorType &amp;allocator) const </td></tr>
+<tr class="memdesc:ab914090864d0ded21a376867c33ad865"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a value in a subtree with default std::basic_string. <br /></td></tr>
+<tr class="separator:ab914090864d0ded21a376867c33ad865"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bb1e63a2c0aa61a9e95d6d65c4c3ffd"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a3bb1e63a2c0aa61a9e95d6d65c4c3ffd"><td class="memTemplItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a3bb1e63a2c0aa61a9e95d6d65c4c3ffd">GetWithDefault</a> (ValueType &amp;root, T defaultValue, typename ValueType::AllocatorType &amp;allocator) const </td></tr>
+<tr class="memdesc:a3bb1e63a2c0aa61a9e95d6d65c4c3ffd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a value in a subtree with default primitive value.  <a href="#a3bb1e63a2c0aa61a9e95d6d65c4c3ffd">更多...</a><br /></td></tr>
+<tr class="separator:a3bb1e63a2c0aa61a9e95d6d65c4c3ffd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af89e3e8f87bb833d4eb4bb2fd4074431"><td class="memTemplParams" colspan="2"><a class="anchor" id="af89e3e8f87bb833d4eb4bb2fd4074431"></a>
+template&lt;typename stackAllocator &gt; </td></tr>
+<tr class="memitem:af89e3e8f87bb833d4eb4bb2fd4074431"><td class="memTemplItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#af89e3e8f87bb833d4eb4bb2fd4074431">GetWithDefault</a> (<a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e">EncodingType</a>, typename ValueType::AllocatorType, stackAllocator &gt; &amp;document, const ValueType &amp;defaultValue) const </td></tr>
+<tr class="memdesc:af89e3e8f87bb833d4eb4bb2fd4074431"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a value in a document with default value. <br /></td></tr>
+<tr class="separator:af89e3e8f87bb833d4eb4bb2fd4074431"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad96e263ba29209259fd4abe63d7f4458"><td class="memTemplParams" colspan="2"><a class="anchor" id="ad96e263ba29209259fd4abe63d7f4458"></a>
+template&lt;typename stackAllocator &gt; </td></tr>
+<tr class="memitem:ad96e263ba29209259fd4abe63d7f4458"><td class="memTemplItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#ad96e263ba29209259fd4abe63d7f4458">GetWithDefault</a> (<a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e">EncodingType</a>, typename ValueType::AllocatorType, stackAllocator &gt; &amp;document, const <a class="el" href="classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601">Ch</a> *defaultValue) const </td></tr>
+<tr class="memdesc:ad96e263ba29209259fd4abe63d7f4458"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a value in a document with default null-terminated string. <br /></td></tr>
+<tr class="separator:ad96e263ba29209259fd4abe63d7f4458"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e9e740bec7f5a1703088171e0b2557b"><td class="memTemplParams" colspan="2"><a class="anchor" id="a5e9e740bec7f5a1703088171e0b2557b"></a>
+template&lt;typename stackAllocator &gt; </td></tr>
+<tr class="memitem:a5e9e740bec7f5a1703088171e0b2557b"><td class="memTemplItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a5e9e740bec7f5a1703088171e0b2557b">GetWithDefault</a> (<a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e">EncodingType</a>, typename ValueType::AllocatorType, stackAllocator &gt; &amp;document, const std::basic_string&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601">Ch</a> &gt; &amp;defaultValue) const </td></tr>
+<tr class="memdesc:a5e9e740bec7f5a1703088171e0b2557b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a value in a document with default std::basic_string. <br /></td></tr>
+<tr class="separator:a5e9e740bec7f5a1703088171e0b2557b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a573a35dd96aacffe209e1442720f447a"><td class="memTemplParams" colspan="2">template&lt;typename T , typename stackAllocator &gt; </td></tr>
+<tr class="memitem:a573a35dd96aacffe209e1442720f447a"><td class="memTemplItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a573a35dd96aacffe209e1442720f447a">GetWithDefault</a> (<a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e">EncodingType</a>, typename ValueType::AllocatorType, stackAllocator &gt; &amp;document, T defaultValue) const </td></tr>
+<tr class="memdesc:a573a35dd96aacffe209e1442720f447a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a value in a document with default primitive value.  <a href="#a573a35dd96aacffe209e1442720f447a">更多...</a><br /></td></tr>
+<tr class="separator:a573a35dd96aacffe209e1442720f447a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Set a value</div></td></tr>
+<tr class="memitem:aecea7b5c4786f509e35c3917efa57fce"><td class="memItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#aecea7b5c4786f509e35c3917efa57fce">Set</a> (ValueType &amp;root, ValueType &amp;value, typename ValueType::AllocatorType &amp;allocator) const </td></tr>
+<tr class="memdesc:aecea7b5c4786f509e35c3917efa57fce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a value in a subtree, with move semantics.  <a href="#aecea7b5c4786f509e35c3917efa57fce">更多...</a><br /></td></tr>
+<tr class="separator:aecea7b5c4786f509e35c3917efa57fce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac19f479c656ddd6a8bd9888a9fb27f96"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac19f479c656ddd6a8bd9888a9fb27f96"></a>
+ValueType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#ac19f479c656ddd6a8bd9888a9fb27f96">Set</a> (ValueType &amp;root, const ValueType &amp;value, typename ValueType::AllocatorType &amp;allocator) const </td></tr>
+<tr class="memdesc:ac19f479c656ddd6a8bd9888a9fb27f96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a value in a subtree, with copy semantics. <br /></td></tr>
+<tr class="separator:ac19f479c656ddd6a8bd9888a9fb27f96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98454081fb9557b3d2285c4e89bd34f6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a98454081fb9557b3d2285c4e89bd34f6"></a>
+ValueType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a98454081fb9557b3d2285c4e89bd34f6">Set</a> (ValueType &amp;root, const <a class="el" href="classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601">Ch</a> *value, typename ValueType::AllocatorType &amp;allocator) const </td></tr>
+<tr class="memdesc:a98454081fb9557b3d2285c4e89bd34f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a null-terminated string in a subtree. <br /></td></tr>
+<tr class="separator:a98454081fb9557b3d2285c4e89bd34f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a151f17dc1c655b9dc0a9a3cf06e6bdcb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a151f17dc1c655b9dc0a9a3cf06e6bdcb"></a>
+ValueType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a151f17dc1c655b9dc0a9a3cf06e6bdcb">Set</a> (ValueType &amp;root, const std::basic_string&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601">Ch</a> &gt; &amp;value, typename ValueType::AllocatorType &amp;allocator) const </td></tr>
+<tr class="memdesc:a151f17dc1c655b9dc0a9a3cf06e6bdcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a std::basic_string in a subtree. <br /></td></tr>
+<tr class="separator:a151f17dc1c655b9dc0a9a3cf06e6bdcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9037fa1a22498e2a8c0f96f866f6288"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:ae9037fa1a22498e2a8c0f96f866f6288"><td class="memTemplItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#ae9037fa1a22498e2a8c0f96f866f6288">Set</a> (ValueType &amp;root, T value, typename ValueType::AllocatorType &amp;allocator) const </td></tr>
+<tr class="memdesc:ae9037fa1a22498e2a8c0f96f866f6288"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a primitive value in a subtree.  <a href="#ae9037fa1a22498e2a8c0f96f866f6288">更多...</a><br /></td></tr>
+<tr class="separator:ae9037fa1a22498e2a8c0f96f866f6288"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add58edd4f813645f8ffead6956967f96"><td class="memTemplParams" colspan="2"><a class="anchor" id="add58edd4f813645f8ffead6956967f96"></a>
+template&lt;typename stackAllocator &gt; </td></tr>
+<tr class="memitem:add58edd4f813645f8ffead6956967f96"><td class="memTemplItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#add58edd4f813645f8ffead6956967f96">Set</a> (<a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e">EncodingType</a>, typename ValueType::AllocatorType, stackAllocator &gt; &amp;document, ValueType &amp;value) const </td></tr>
+<tr class="memdesc:add58edd4f813645f8ffead6956967f96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a value in a document, with move semantics. <br /></td></tr>
+<tr class="separator:add58edd4f813645f8ffead6956967f96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83ff802b8fcacd96e60ba1c2627a19f0"><td class="memTemplParams" colspan="2"><a class="anchor" id="a83ff802b8fcacd96e60ba1c2627a19f0"></a>
+template&lt;typename stackAllocator &gt; </td></tr>
+<tr class="memitem:a83ff802b8fcacd96e60ba1c2627a19f0"><td class="memTemplItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a83ff802b8fcacd96e60ba1c2627a19f0">Set</a> (<a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e">EncodingType</a>, typename ValueType::AllocatorType, stackAllocator &gt; &amp;document, const ValueType &amp;value) const </td></tr>
+<tr class="memdesc:a83ff802b8fcacd96e60ba1c2627a19f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a value in a document, with copy semantics. <br /></td></tr>
+<tr class="separator:a83ff802b8fcacd96e60ba1c2627a19f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ee50bcbfa76119094eef0284eeddfbe"><td class="memTemplParams" colspan="2"><a class="anchor" id="a2ee50bcbfa76119094eef0284eeddfbe"></a>
+template&lt;typename stackAllocator &gt; </td></tr>
+<tr class="memitem:a2ee50bcbfa76119094eef0284eeddfbe"><td class="memTemplItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a2ee50bcbfa76119094eef0284eeddfbe">Set</a> (<a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e">EncodingType</a>, typename ValueType::AllocatorType, stackAllocator &gt; &amp;document, const <a class="el" href="classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601">Ch</a> *value) const </td></tr>
+<tr class="memdesc:a2ee50bcbfa76119094eef0284eeddfbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a null-terminated string in a document. <br /></td></tr>
+<tr class="separator:a2ee50bcbfa76119094eef0284eeddfbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9bd1c4076e732ffc1b4527ac5659264e"><td class="memTemplParams" colspan="2"><a class="anchor" id="a9bd1c4076e732ffc1b4527ac5659264e"></a>
+template&lt;typename stackAllocator &gt; </td></tr>
+<tr class="memitem:a9bd1c4076e732ffc1b4527ac5659264e"><td class="memTemplItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a9bd1c4076e732ffc1b4527ac5659264e">Set</a> (<a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e">EncodingType</a>, typename ValueType::AllocatorType, stackAllocator &gt; &amp;document, const std::basic_string&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601">Ch</a> &gt; &amp;value) const </td></tr>
+<tr class="memdesc:a9bd1c4076e732ffc1b4527ac5659264e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets a std::basic_string in a document. <br /></td></tr>
+<tr class="separator:a9bd1c4076e732ffc1b4527ac5659264e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af547130d348ca1805d882955a377bbe4"><td class="memTemplParams" colspan="2">template&lt;typename T , typename stackAllocator &gt; </td></tr>
+<tr class="memitem:af547130d348ca1805d882955a377bbe4"><td class="memTemplItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#af547130d348ca1805d882955a377bbe4">Set</a> (<a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e">EncodingType</a>, typename ValueType::AllocatorType, stackAllocator &gt; &amp;document, T value) const </td></tr>
+<tr class="memdesc:af547130d348ca1805d882955a377bbe4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a primitive value in a document.  <a href="#af547130d348ca1805d882955a377bbe4">更多...</a><br /></td></tr>
+<tr class="separator:af547130d348ca1805d882955a377bbe4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Swap a value</div></td></tr>
+<tr class="memitem:aaaa5b0ecdfa6af45e7dabc1987c87cac"><td class="memItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#aaaa5b0ecdfa6af45e7dabc1987c87cac">Swap</a> (ValueType &amp;root, ValueType &amp;value, typename ValueType::AllocatorType &amp;allocator) const </td></tr>
+<tr class="memdesc:aaaa5b0ecdfa6af45e7dabc1987c87cac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap a value with a value in a subtree.  <a href="#aaaa5b0ecdfa6af45e7dabc1987c87cac">更多...</a><br /></td></tr>
+<tr class="separator:aaaa5b0ecdfa6af45e7dabc1987c87cac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9f28da15453d91c3669618a6f48bfcc"><td class="memTemplParams" colspan="2"><a class="anchor" id="ad9f28da15453d91c3669618a6f48bfcc"></a>
+template&lt;typename stackAllocator &gt; </td></tr>
+<tr class="memitem:ad9f28da15453d91c3669618a6f48bfcc"><td class="memTemplItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#ad9f28da15453d91c3669618a6f48bfcc">Swap</a> (<a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e">EncodingType</a>, typename ValueType::AllocatorType, stackAllocator &gt; &amp;document, ValueType &amp;value) const </td></tr>
+<tr class="memdesc:ad9f28da15453d91c3669618a6f48bfcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap a value with a value in a document. <br /></td></tr>
+<tr class="separator:ad9f28da15453d91c3669618a6f48bfcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<div class="textblock"><h3>template&lt;typename ValueType, typename Allocator = CrtAllocator&gt;<br />
+class rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</h3>
+
+<p>Represents a JSON Pointer. Use Pointer for <a class="el" href="structrapidjson_1_1_u_t_f8.html" title="UTF-8 encoding. ">UTF8</a> encoding and default allocator. </p>
+<p>This class implements RFC 6901 "JavaScript Object Notation (JSON) Pointer" (<a href="https://tools.ietf.org/html/rfc6901">https://tools.ietf.org/html/rfc6901</a>).</p>
+<p>A JSON pointer is for identifying a specific value in a JSON document (<a class="el" href="classrapidjson_1_1_generic_document.html" title="A document for parsing JSON text as DOM. ">GenericDocument</a>). It can simplify coding of DOM tree manipulation, because it can access multiple-level depth of DOM tree with single API call.</p>
+<p>After it parses a string representation (e.g. "/foo/0" or URI fragment representation (e.g. "#/foo/0") into its internal representation (tokens), it can be used to resolve a specific value in multiple documents, or sub-tree of documents.</p>
+<p>Contrary to <a class="el" href="classrapidjson_1_1_generic_value.html" title="Represents a JSON value. Use Value for UTF8 encoding and default allocator. ">GenericValue</a>, Pointer can be copy constructed and copy assigned. Apart from assignment, a Pointer cannot be modified after construction.</p>
+<p>Although Pointer is very convenient, please aware that constructing Pointer involves parsing and dynamic memory allocation. A special constructor with user- supplied tokens eliminates these.</p>
+<p><a class="el" href="classrapidjson_1_1_generic_pointer.html" title="Represents a JSON Pointer. Use Pointer for UTF8 encoding and default allocator. ">GenericPointer</a> depends on <a class="el" href="classrapidjson_1_1_generic_document.html" title="A document for parsing JSON text as DOM. ">GenericDocument</a> and <a class="el" href="classrapidjson_1_1_generic_value.html" title="Represents a JSON value. Use Value for UTF8 encoding and default allocator. ">GenericValue</a>.</p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">ValueType</td><td>The value type of the DOM tree. E.g. <a class="el" href="classrapidjson_1_1_generic_value.html" title="Represents a JSON value. Use Value for UTF8 encoding and default allocator. ">GenericValue</a>&lt;UTF8&lt;&gt; &gt; </td></tr>
+    <tr><td class="paramname"><a class="el" href="classrapidjson_1_1_allocator.html" title="Concept for allocating, resizing and freeing memory block. ">Allocator</a></td><td>The allocator type for allocating memory for internal representation.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd><a class="el" href="classrapidjson_1_1_generic_pointer.html" title="Represents a JSON Pointer. Use Pointer for UTF8 encoding and default allocator. ">GenericPointer</a> uses same encoding of ValueType. However, <a class="el" href="classrapidjson_1_1_allocator.html" title="Concept for allocating, resizing and freeing memory block. ">Allocator</a> of <a class="el" href="classrapidjson_1_1_generic_pointer.html" title="Represents a JSON Pointer. Use Pointer for UTF8 encoding and default allocator. ">GenericPointer</a> is independent of <a class="el" href="classrapidjson_1_1_allocator.html" title="Concept for allocating, resizing and freeing memory block. ">Allocator</a> of Value. </dd></dl>
+</div><h2 class="groupheader">构造及析构函数说明</h2>
+<a class="anchor" id="a8f831aae14afc493a82b5fb6aa9c3c43"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::<a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601">Ch</a> *&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> *&#160;</td>
+          <td class="paramname"><em>allocator</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor that parses a string or URI fragment representation. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source</td><td>A null-terminated, string or URI fragment representation of JSON pointer. </td></tr>
+    <tr><td class="paramname">allocator</td><td>User supplied allocator for this pointer. If no allocator is provided, it creates a self-owned one. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="aeefcd60e5ad37d80ec43f5315ae84809"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::<a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a> </td>
+          <td>(</td>
+          <td class="paramtype">const std::basic_string&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601">Ch</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> *&#160;</td>
+          <td class="paramname"><em>allocator</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor that parses a string or URI fragment representation. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source</td><td>A string or URI fragment representation of JSON pointer. </td></tr>
+    <tr><td class="paramname">allocator</td><td>User supplied allocator for this pointer. If no allocator is provided, it creates a self-owned one. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>Requires the definition of the preprocessor symbol <a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga2f2eef0ee4477f3fe5874703a66e997f">RAPIDJSON_HAS_STDSTRING</a>. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a00ad17ea227d2556404df7cc64c6aeb5"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::<a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601">Ch</a> *&#160;</td>
+          <td class="paramname"><em>source</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> *&#160;</td>
+          <td class="paramname"><em>allocator</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor that parses a string or URI fragment representation, with length of the source string. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">source</td><td>A string or URI fragment representation of JSON pointer. </td></tr>
+    <tr><td class="paramname">length</td><td>Length of source. </td></tr>
+    <tr><td class="paramname">allocator</td><td>User supplied allocator for this pointer. If no allocator is provided, it creates a self-owned one. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>Slightly faster than the overload without length. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a6df9f6a01d1b5945811055e1cf8aead6"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::<a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a> </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structrapidjson_1_1_generic_pointer_1_1_token.html">Token</a> *&#160;</td>
+          <td class="paramname"><em>tokens</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>tokenCount</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor with user-supplied tokens. </p>
+<p>This constructor let user supplies const array of tokens. This prevents the parsing process and eliminates allocation. This is preferred for memory constrained environments.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tokens</td><td>An constant array of tokens representing the JSON pointer. </td></tr>
+    <tr><td class="paramname">tokenCount</td><td>Number of tokens.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p><b>Example</b> </p><div class="fragment"><div class="line"><span class="preprocessor">#define NAME(s) { s, sizeof(s) / sizeof(s[0]) - 1, kPointerInvalidIndex }</span></div>
+<div class="line"><span class="preprocessor">#define INDEX(i) { #i, sizeof(#i) - 1, i }</span></div>
+<div class="line"></div>
+<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> Pointer::Token kTokens[] = { NAME(<span class="stringliteral">&quot;foo&quot;</span>), INDEX(123) };</div>
+<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a> p(kTokens, <span class="keyword">sizeof</span>(kTokens) / <span class="keyword">sizeof</span>(kTokens[0]));</div>
+<div class="line"><span class="comment">// Equivalent to static const Pointer p(&quot;/foo/123&quot;);</span></div>
+<div class="line"></div>
+<div class="line"><span class="preprocessor">#undef NAME</span></div>
+<div class="line"><span class="preprocessor">#undef INDEX</span></div>
+</div><!-- fragment --> 
+</div>
+</div>
+<h2 class="groupheader">成员函数说明</h2>
+<a class="anchor" id="a3733a6d6cf2a3a13f2a59b109b56d800"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ValueType&amp; <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::Create </td>
+          <td>(</td>
+          <td class="paramtype">ValueType &amp;&#160;</td>
+          <td class="paramname"><em>root</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">typename ValueType::AllocatorType &amp;&#160;</td>
+          <td class="paramname"><em>allocator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *&#160;</td>
+          <td class="paramname"><em>alreadyExist</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create a value in a subtree. </p>
+<p>If the value is not exist, it creates all parent values and a JSON Null value. So it always succeed and return the newly created or existing value.</p>
+<p>Remind that it may change types of parents according to tokens, so it potentially removes previously stored values. For example, if a document was an array, and "/foo" is used to create a value, then the document will be changed to an object, and all existing array elements are lost.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">root</td><td>Root value of a DOM subtree to be resolved. It can be any value other than document root. </td></tr>
+    <tr><td class="paramname">allocator</td><td><a class="el" href="classrapidjson_1_1_allocator.html" title="Concept for allocating, resizing and freeing memory block. ">Allocator</a> for creating the values if the specified value or its parents are not exist. </td></tr>
+    <tr><td class="paramname">alreadyExist</td><td>If non-null, it stores whether the resolved value is already exist. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The resolved newly created (a JSON Null value), or already exists value. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a2b5a8fb688e6b6a1b077ce103df455c3"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<div class="memtemplate">
+template&lt;typename stackAllocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ValueType&amp; <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::Create </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e">EncodingType</a>, typename ValueType::AllocatorType, stackAllocator &gt; &amp;&#160;</td>
+          <td class="paramname"><em>document</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool *&#160;</td>
+          <td class="paramname"><em>alreadyExist</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a value in a document. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">document</td><td>A document to be resolved. </td></tr>
+    <tr><td class="paramname">allocator</td><td><a class="el" href="classrapidjson_1_1_allocator.html" title="Concept for allocating, resizing and freeing memory block. ">Allocator</a> for creating the values if the specified value or its parents are not exist. </td></tr>
+    <tr><td class="paramname">alreadyExist</td><td>If non-null, it stores whether the resolved value is already exist. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The resolved newly created, or already exists value. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a1089dad43030e8120d25adcf2ec1220c"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ValueType* <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::Get </td>
+          <td>(</td>
+          <td class="paramtype">ValueType &amp;&#160;</td>
+          <td class="paramname"><em>root</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Query a value in a subtree. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">root</td><td>Root value of a DOM sub-tree to be resolved. It can be any value other than document root. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>Pointer to the value if it can be resolved. Otherwise null. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a80032c73fc091a39a779a33b42e38ddf"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const ValueType* <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::Get </td>
+          <td>(</td>
+          <td class="paramtype">const ValueType &amp;&#160;</td>
+          <td class="paramname"><em>root</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Query a const value in a const subtree. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">root</td><td>Root value of a DOM sub-tree to be resolved. It can be any value other than document root. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>Pointer to the value if it can be resolved. Otherwise null. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a6c615761374ddce265d542f4b4b476b1"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ValueType&amp; <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::GetWithDefault </td>
+          <td>(</td>
+          <td class="paramtype">ValueType &amp;&#160;</td>
+          <td class="paramname"><em>root</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ValueType &amp;&#160;</td>
+          <td class="paramname"><em>defaultValue</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">typename ValueType::AllocatorType &amp;&#160;</td>
+          <td class="paramname"><em>allocator</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Query a value in a subtree with default value. </p>
+<p>Similar to <a class="el" href="classrapidjson_1_1_generic_pointer.html#a1089dad43030e8120d25adcf2ec1220c" title="Query a value in a subtree. ">Get()</a>, but if the specified value do not exists, it creates all parents and clone the default value. So that this function always succeed.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">root</td><td>Root value of a DOM sub-tree to be resolved. It can be any value other than document root. </td></tr>
+    <tr><td class="paramname">defaultValue</td><td>Default value to be cloned if the value was not exists. </td></tr>
+    <tr><td class="paramname">allocator</td><td><a class="el" href="classrapidjson_1_1_allocator.html" title="Concept for allocating, resizing and freeing memory block. ">Allocator</a> for creating the values if the specified value or its parents are not exist. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classrapidjson_1_1_generic_pointer.html#a3733a6d6cf2a3a13f2a59b109b56d800" title="Create a value in a subtree. ">Create()</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a3bb1e63a2c0aa61a9e95d6d65c4c3ffd"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ValueType&amp; <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::GetWithDefault </td>
+          <td>(</td>
+          <td class="paramtype">ValueType &amp;&#160;</td>
+          <td class="paramname"><em>root</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>defaultValue</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">typename ValueType::AllocatorType &amp;&#160;</td>
+          <td class="paramname"><em>allocator</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Query a value in a subtree with default primitive value. </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td></td></tr>
+    <tr><td class="paramname">T</td><td>Either <a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>, <code>int</code>, <code>unsigned</code>, <code>int64_t</code>, <code>uint64_t</code>, <code>bool</code> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a573a35dd96aacffe209e1442720f447a"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<div class="memtemplate">
+template&lt;typename T , typename stackAllocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ValueType&amp; <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::GetWithDefault </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e">EncodingType</a>, typename ValueType::AllocatorType, stackAllocator &gt; &amp;&#160;</td>
+          <td class="paramname"><em>document</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>defaultValue</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Query a value in a document with default primitive value. </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td></td></tr>
+    <tr><td class="paramname">T</td><td>Either <a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>, <code>int</code>, <code>unsigned</code>, <code>int64_t</code>, <code>uint64_t</code>, <code>bool</code> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a3e74f5b9c9fd3307f6ebac61a7131524"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::operator!= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Inequality operator. </p>
+<dl class="section note"><dt>注解</dt><dd>When any pointers are invalid, always returns true. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="af0d009a8322a7b61f63a9539ca8bddaf"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::operator== </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Equality operator. </p>
+<dl class="section note"><dt>注解</dt><dd>When any pointers are invalid, always returns false. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aecea7b5c4786f509e35c3917efa57fce"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ValueType&amp; <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::Set </td>
+          <td>(</td>
+          <td class="paramtype">ValueType &amp;&#160;</td>
+          <td class="paramname"><em>root</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ValueType &amp;&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">typename ValueType::AllocatorType &amp;&#160;</td>
+          <td class="paramname"><em>allocator</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set a value in a subtree, with move semantics. </p>
+<p>It creates all parents if they are not exist or types are different to the tokens. So this function always succeeds but potentially remove existing values.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">root</td><td>Root value of a DOM sub-tree to be resolved. It can be any value other than document root. </td></tr>
+    <tr><td class="paramname">value</td><td>Value to be set. </td></tr>
+    <tr><td class="paramname">allocator</td><td><a class="el" href="classrapidjson_1_1_allocator.html" title="Concept for allocating, resizing and freeing memory block. ">Allocator</a> for creating the values if the specified value or its parents are not exist. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classrapidjson_1_1_generic_pointer.html#a3733a6d6cf2a3a13f2a59b109b56d800" title="Create a value in a subtree. ">Create()</a> </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ae9037fa1a22498e2a8c0f96f866f6288"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ValueType&amp; <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::Set </td>
+          <td>(</td>
+          <td class="paramtype">ValueType &amp;&#160;</td>
+          <td class="paramname"><em>root</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">typename ValueType::AllocatorType &amp;&#160;</td>
+          <td class="paramname"><em>allocator</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set a primitive value in a subtree. </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td></td></tr>
+    <tr><td class="paramname">T</td><td>Either <a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>, <code>int</code>, <code>unsigned</code>, <code>int64_t</code>, <code>uint64_t</code>, <code>bool</code> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="af547130d348ca1805d882955a377bbe4"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<div class="memtemplate">
+template&lt;typename T , typename stackAllocator &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ValueType&amp; <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::Set </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e">EncodingType</a>, typename ValueType::AllocatorType, stackAllocator &gt; &amp;&#160;</td>
+          <td class="paramname"><em>document</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T&#160;</td>
+          <td class="paramname"><em>value</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set a primitive value in a document. </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td></td></tr>
+    <tr><td class="paramname">T</td><td>Either <a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>, <code>int</code>, <code>unsigned</code>, <code>int64_t</code>, <code>uint64_t</code>, <code>bool</code> </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ab9166f175517b1bff8c2219ea769e506"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<div class="memtemplate">
+template&lt;typename OutputStream &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::Stringify </td>
+          <td>(</td>
+          <td class="paramtype">OutputStream &amp;&#160;</td>
+          <td class="paramname"><em>os</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Stringify the pointer into string representation. </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">OutputStream</td><td>Type of output stream. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">os</td><td>The output stream. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a40413907ac94e218f93625d3a5c8c454"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<div class="memtemplate">
+template&lt;typename OutputStream &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::StringifyUriFragment </td>
+          <td>(</td>
+          <td class="paramtype">OutputStream &amp;&#160;</td>
+          <td class="paramname"><em>os</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Stringify the pointer into URI fragment representation. </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">OutputStream</td><td>Type of output stream. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">os</td><td>The output stream. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="aaaa5b0ecdfa6af45e7dabc1987c87cac"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ValueType&amp; <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::Swap </td>
+          <td>(</td>
+          <td class="paramtype">ValueType &amp;&#160;</td>
+          <td class="paramname"><em>root</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ValueType &amp;&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">typename ValueType::AllocatorType &amp;&#160;</td>
+          <td class="paramname"><em>allocator</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Swap a value with a value in a subtree. </p>
+<p>It creates all parents if they are not exist or types are different to the tokens. So this function always succeeds but potentially remove existing values.</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">root</td><td>Root value of a DOM sub-tree to be resolved. It can be any value other than document root. </td></tr>
+    <tr><td class="paramname">value</td><td>Value to be swapped. </td></tr>
+    <tr><td class="paramname">allocator</td><td><a class="el" href="classrapidjson_1_1_allocator.html" title="Concept for allocating, resizing and freeing memory block. ">Allocator</a> for creating the values if the specified value or its parents are not exist. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classrapidjson_1_1_generic_pointer.html#a3733a6d6cf2a3a13f2a59b109b56d800" title="Create a value in a subtree. ">Create()</a> </dd></dl>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>include/rapidjson/<a class="el" href="pointer_8h_source.html">pointer.h</a></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.8.7-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="namespacerapidjson.html">rapidjson</a></li><li class="navelem"><a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a></li>
+  </ul>
+</div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'rapidjson-doc';
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+	    var dt = document.createElement('div');
+	    dt.id = "disqus_thread";
+	    (document.getElementsByClassName('contents')[0]).appendChild(dt);
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+</body>
+</html>

@@ -23,6 +23,15 @@ var NAVTREE =
       ] ],
       [ "What's next", "md_doc_tutorial.html#WhatsNext", null ]
     ] ],
+    [ "Pointer", "md_doc_pointer.html", [
+      [ "JSON Pointer", "md_doc_pointer.html#JsonPointer", null ],
+      [ "Basic Usage", "md_doc_pointer.html#BasicUsage", null ],
+      [ "Helper Functions", "md_doc_pointer.html#HelperFunctions", null ],
+      [ "Resolving Pointer", "md_doc_pointer.html#ResolvingPointer", null ],
+      [ "Error Handling", "md_doc_pointer.html#ErrorHandling", null ],
+      [ "URI Fragment Representation", "md_doc_pointer.html#URIFragment", null ],
+      [ "User-Supplied Tokens", "md_doc_pointer.html#UserSuppliedTokens", null ]
+    ] ],
     [ "Stream", "md_doc_stream.html", [
       [ "Memory Streams", "md_doc_stream.html#MemoryStreams", [
         [ "StringStream (Input)", "md_doc_stream.html#StringStream", null ],
@@ -120,7 +129,7 @@ var NAVTREE =
       [ "Class List", "annotated.html", "annotated" ],
       [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
       [ "Class Members", "functions.html", [
-        [ "All", "functions.html", null ],
+        [ "All", "functions.html", "functions_dup" ],
         [ "Functions", "functions_func.html", null ],
         [ "Variables", "functions_vars.html", null ],
         [ "Typedefs", "functions_type.html", null ],
@@ -140,8 +149,9 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "allocators_8h_source.html",
-"classrapidjson_1_1_generic_value.html#adb109ae9f12615efadf9277cb5e9c4ee",
-"md_doc_internals.html#ParsingOptimization"
+"classrapidjson_1_1_generic_value.html#a899449e1a645b5e377af059fb61113d8",
+"group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7e4636fd48d0148f102b8a13f0539d8c",
+"structrapidjson_1_1_generic_string_stream.html#a01cec5597b6e399ea37df9b4bda8ffce"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -117,6 +117,9 @@ $(document).ready(function(){initNavTree('functions_func.html','');});
 <li>CopyFrom()
 : <a class="el" href="classrapidjson_1_1_generic_value.html#aff61690249189dbbc6ebfdc9e2add00e">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
 </li>
+<li>Create()
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#a3733a6d6cf2a3a13f2a59b109b56d800">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
+</li>
 </ul>
 
 
@@ -163,6 +166,9 @@ $(document).ready(function(){initNavTree('functions_func.html','');});
 <li>GenericMemberIterator()
 : <a class="el" href="classrapidjson_1_1_generic_member_iterator.html#ac920af483c9e31a6746c22acf0dffc50">rapidjson::GenericMemberIterator&lt; Const, Encoding, Allocator &gt;</a>
 </li>
+<li>GenericPointer()
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#a1e62d3874c00e68c11388503c00eebac">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
+</li>
 <li>GenericReader()
 : <a class="el" href="classrapidjson_1_1_generic_reader.html#a56ab1065ea75167aeacb4802425bf57f">rapidjson::GenericReader&lt; SourceEncoding, TargetEncoding, StackAllocator &gt;</a>
 </li>
@@ -170,7 +176,10 @@ $(document).ready(function(){initNavTree('functions_func.html','');});
 : <a class="el" href="structrapidjson_1_1_generic_string_ref.html#acd4d5ebac2b610ce647356aa52998002">rapidjson::GenericStringRef&lt; CharType &gt;</a>
 </li>
 <li>GenericValue()
-: <a class="el" href="classrapidjson_1_1_generic_value.html#ad1f8199e65662e0d52a13a1577d4e4a5">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
+: <a class="el" href="classrapidjson_1_1_generic_value.html#a71b9e2ec1f7bf9e2f034126ca7b4945a">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
+</li>
+<li>Get()
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#a1089dad43030e8120d25adcf2ec1220c">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
 </li>
 <li>GetAllocator()
 : <a class="el" href="classrapidjson_1_1_generic_document.html#ad92c6cd025d411258d1f2ad890e2ee3f">rapidjson::GenericDocument&lt; Encoding, Allocator, StackAllocator &gt;</a>
@@ -186,13 +195,26 @@ $(document).ready(function(){initNavTree('functions_func.html','');});
 : <a class="el" href="classrapidjson_1_1_generic_document.html#ad97e64c123ec1e07ea62ab0a9ce80c00">rapidjson::GenericDocument&lt; Encoding, Allocator, StackAllocator &gt;</a>
 </li>
 <li>GetParseErrorCode()
-: <a class="el" href="classrapidjson_1_1_generic_reader.html#a40fd326bad7d7033f096b549cbf159db">rapidjson::GenericReader&lt; SourceEncoding, TargetEncoding, StackAllocator &gt;</a>
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#ac817b123619422f03c44a46978d9fbd0">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
+, <a class="el" href="classrapidjson_1_1_generic_reader.html#a40fd326bad7d7033f096b549cbf159db">rapidjson::GenericReader&lt; SourceEncoding, TargetEncoding, StackAllocator &gt;</a>
+</li>
+<li>GetParseErrorOffset()
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#adc01f1be5f05127f849a2bf10a97e89b">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
 </li>
 <li>GetStackCapacity()
 : <a class="el" href="classrapidjson_1_1_generic_document.html#ac785c064649dea6cfa67207b6bda748e">rapidjson::GenericDocument&lt; Encoding, Allocator, StackAllocator &gt;</a>
 </li>
 <li>GetStringLength()
 : <a class="el" href="classrapidjson_1_1_generic_value.html#a979c4ba6dd2a311be837ae083423aca8">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
+</li>
+<li>GetTokenCount()
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#a2949cb104effdf323781ae70ce469ed9">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
+</li>
+<li>GetTokens()
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#a0ee51e6c996d4665b398dae5dbf00bc4">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
+</li>
+<li>GetWithDefault()
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#ab914090864d0ded21a376867c33ad865">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
 </li>
 </ul>
 
@@ -214,6 +236,9 @@ $(document).ready(function(){initNavTree('functions_func.html','');});
 </li>
 <li>IsError()
 : <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a5ab5548c7a7776f4da20eac09fe57c1b">rapidjson::ParseResult</a>
+</li>
+<li>IsValid()
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#a112f364fe9aeabba2a72e83bcbeb8fda">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
 </li>
 </ul>
 
@@ -254,19 +279,22 @@ $(document).ready(function(){initNavTree('functions_func.html','');});
 : <a class="el" href="structrapidjson_1_1_generic_string_ref.html#af535787e3593802222f7b3f3096beff0">rapidjson::GenericStringRef&lt; CharType &gt;</a>
 </li>
 <li>operator!=()
-: <a class="el" href="classrapidjson_1_1_generic_value.html#a0cb232adce79932c499c5f04cbc8dc54">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#a3e74f5b9c9fd3307f6ebac61a7131524">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
+, <a class="el" href="classrapidjson_1_1_generic_value.html#aff1711092a1278d36b8152f5520a686e">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
 </li>
 <li>operator-()
 : <a class="el" href="classrapidjson_1_1_generic_member_iterator.html#a6d7cfaef258b0774da1b642907d81060">rapidjson::GenericMemberIterator&lt; Const, Encoding, Allocator &gt;</a>
 </li>
 <li>operator=()
-: <a class="el" href="classrapidjson_1_1_generic_value.html#ae8bcedd951f50b69786aaaa1828e9fac">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#a23194bb6ce6c07c78981344fe80ac3a6">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
+, <a class="el" href="classrapidjson_1_1_generic_value.html#ae8bcedd951f50b69786aaaa1828e9fac">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
 </li>
 <li>operator==()
-: <a class="el" href="classrapidjson_1_1_generic_value.html#a7bed9035dd1beeabe6f47e870874e793">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#af0d009a8322a7b61f63a9539ca8bddaf">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
+, <a class="el" href="classrapidjson_1_1_generic_value.html#a6f7f7c66d8f8c08e496ae831ba114126">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
 </li>
 <li>operator[]()
-: <a class="el" href="classrapidjson_1_1_generic_value.html#a8ec7fc7f221306925c7674dccbe02b07">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
+: <a class="el" href="classrapidjson_1_1_generic_value.html#aa62b57746c96ce3d264b2fe178196062">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
 </li>
 </ul>
 
@@ -318,7 +346,8 @@ $(document).ready(function(){initNavTree('functions_func.html','');});
 
 <h3><a class="anchor" id="index_s"></a>- s -</h3><ul>
 <li>Set()
-: <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a40c0bd4d6c535c57acbb5c2e656bea38">rapidjson::ParseResult</a>
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#aecea7b5c4786f509e35c3917efa57fce">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
+, <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a40c0bd4d6c535c57acbb5c2e656bea38">rapidjson::ParseResult</a>
 </li>
 <li>SetArray()
 : <a class="el" href="classrapidjson_1_1_generic_value.html#a25069c76d045b058e54835d8c467c789">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
@@ -333,7 +362,7 @@ $(document).ready(function(){initNavTree('functions_func.html','');});
 : <a class="el" href="classrapidjson_1_1_generic_value.html#a7cb3cbaefe4fb99aaf9f155fb4ee039b">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
 </li>
 <li>SetString()
-: <a class="el" href="classrapidjson_1_1_generic_value.html#aabb538578a3c1e60c86cda32d062bc1c">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
+: <a class="el" href="classrapidjson_1_1_generic_value.html#afb91480cc6242ca96ffc603e649c319f">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
 </li>
 <li>Size()
 : <a class="el" href="classrapidjson_1_1_generic_value.html#a2e6e849cfb368a3fa708f8bcf1d56ec9">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
@@ -343,11 +372,18 @@ $(document).ready(function(){initNavTree('functions_func.html','');});
 : <a class="el" href="classrapidjson_1_1_pretty_writer.html#aec337a69de964cdbb8eed17d44065f3d">rapidjson::PrettyWriter&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator &gt;</a>
 , <a class="el" href="classrapidjson_1_1_writer.html#a2efd8a54a3cb86f8adedfd6bb692d0d9">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator &gt;</a>
 </li>
+<li>Stringify()
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#ab9166f175517b1bff8c2219ea769e506">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
+</li>
+<li>StringifyUriFragment()
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#a40413907ac94e218f93625d3a5c8c454">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
+</li>
 <li>StringRef()
-: <a class="el" href="structrapidjson_1_1_generic_string_ref.html#a578c51ab574a50a9c760b9da7c7562f2">rapidjson::GenericStringRef&lt; CharType &gt;</a>
+: <a class="el" href="structrapidjson_1_1_generic_string_ref.html#af94951529a5d51e8c4e6e770bb707c1f">rapidjson::GenericStringRef&lt; CharType &gt;</a>
 </li>
 <li>Swap()
-: <a class="el" href="classrapidjson_1_1_generic_value.html#a06f10ef54f5692ce08206c26624a21db">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#aaaa5b0ecdfa6af45e7dabc1987c87cac">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
+, <a class="el" href="classrapidjson_1_1_generic_value.html#a06f10ef54f5692ce08206c26624a21db">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
 </li>
 </ul>
 
@@ -374,6 +410,9 @@ $(document).ready(function(){initNavTree('functions_func.html','');});
 
 
 <h3><a class="anchor" id="index_~"></a>- ~ -</h3><ul>
+<li>~GenericPointer()
+: <a class="el" href="classrapidjson_1_1_generic_pointer.html#a0e144b9956a5272c13ceff3b9306e748">rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</a>
+</li>
 <li>~GenericValue()
 : <a class="el" href="classrapidjson_1_1_generic_value.html#a433a64b466c80cadf7d1acaa6f065437">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a>
 </li>

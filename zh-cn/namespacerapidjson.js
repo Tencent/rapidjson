@@ -17,6 +17,7 @@ var namespacerapidjson =
     [ "GenericMember", "structrapidjson_1_1_generic_member.html", "structrapidjson_1_1_generic_member" ],
     [ "GenericMemberIterator", "classrapidjson_1_1_generic_member_iterator.html", "classrapidjson_1_1_generic_member_iterator" ],
     [ "GenericMemoryBuffer", "structrapidjson_1_1_generic_memory_buffer.html", "structrapidjson_1_1_generic_memory_buffer" ],
+    [ "GenericPointer", "classrapidjson_1_1_generic_pointer.html", "classrapidjson_1_1_generic_pointer" ],
     [ "GenericReader", "classrapidjson_1_1_generic_reader.html", "classrapidjson_1_1_generic_reader" ],
     [ "GenericStringBuffer", "classrapidjson_1_1_generic_string_buffer.html", "classrapidjson_1_1_generic_string_buffer" ],
     [ "GenericStringRef", "structrapidjson_1_1_generic_string_ref.html", "structrapidjson_1_1_generic_string_ref" ],

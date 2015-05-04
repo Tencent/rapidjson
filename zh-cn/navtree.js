@@ -120,7 +120,7 @@ var NAVTREE =
       [ "类列表", "annotated.html", "annotated" ],
       [ "类继承关系", "hierarchy.html", "hierarchy" ],
       [ "类成员", "functions.html", [
-        [ "全部", "functions.html", null ],
+        [ "全部", "functions.html", "functions_dup" ],
         [ "函数", "functions_func.html", null ],
         [ "变量", "functions_vars.html", null ],
         [ "类型定义", "functions_type.html", null ],
@@ -140,8 +140,9 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "allocators_8h_source.html",
-"classrapidjson_1_1_generic_value.html#adb109ae9f12615efadf9277cb5e9c4ee",
-"md_doc_internals.html#ParsingOptimization"
+"classrapidjson_1_1_generic_value.html#a899449e1a645b5e377af059fb61113d8",
+"group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7e4636fd48d0148f102b8a13f0539d8c",
+"structrapidjson_1_1_generic_string_stream.html#a9a515c0ba83ad9029d1560952584cd2e"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

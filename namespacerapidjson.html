@@ -142,6 +142,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrapidjson_1_1_generic_memory_buffer.html">GenericMemoryBuffer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents an in-memory output byte stream.  <a href="structrapidjson_1_1_generic_memory_buffer.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents a JSON Pointer. Use Pointer for <a class="el" href="structrapidjson_1_1_u_t_f8.html" title="UTF-8 encoding. ">UTF8</a> encoding and default allocator.  <a href="classrapidjson_1_1_generic_pointer.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html">GenericReader</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">SAX-style JSON parser. Use <a class="el" href="md_doc_sax.html#Reader">Reader</a> for <a class="el" href="structrapidjson_1_1_u_t_f8.html" title="UTF-8 encoding. ">UTF8</a> encoding and default allocator.  <a href="classrapidjson_1_1_generic_reader.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -244,6 +247,10 @@ typedef <a class="el" href="classrapidjson_1_1_generic_document.html">GenericDoc
 <tr class="memitem:acb643b9055e7988f4cb89ce4f7e6b115"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acb643b9055e7988f4cb89ce4f7e6b115"></a>
 typedef <a class="el" href="structrapidjson_1_1_generic_memory_buffer.html">GenericMemoryBuffer</a>&#160;</td><td class="memItemRight" valign="bottom"><b>MemoryBuffer</b></td></tr>
 <tr class="separator:acb643b9055e7988f4cb89ce4f7e6b115"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c225e4848c5facd20e43084ba2a51a3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9c225e4848c5facd20e43084ba2a51a3"></a>
+typedef <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; <a class="el" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a></td></tr>
+<tr class="memdesc:a9c225e4848c5facd20e43084ba2a51a3"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classrapidjson_1_1_generic_pointer.html" title="Represents a JSON Pointer. Use Pointer for UTF8 encoding and default allocator. ">GenericPointer</a> for Value (UTF-8, default allocator). <br /></td></tr>
+<tr class="separator:a9c225e4848c5facd20e43084ba2a51a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4eaef42a208413d1f2c8d4655ecec52d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4eaef42a208413d1f2c8d4655ecec52d"></a>
 typedef <a class="el" href="classrapidjson_1_1_generic_reader.html">GenericReader</a>&lt; <a class="el" href="structrapidjson_1_1_u_t_f8.html">UTF8</a><br class="typebreak" />
 &lt;&gt;, <a class="el" href="structrapidjson_1_1_u_t_f8.html">UTF8</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a4eaef42a208413d1f2c8d4655ecec52d">Reader</a></td></tr>
@@ -308,6 +315,17 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:ga7d3acf640886b1f2552dc8c4cd6dea60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error code of parsing.  <a href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">More...</a><br /></td></tr>
 <tr class="separator:ga7d3acf640886b1f2552dc8c4cd6dea60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gade540ee4cc2a416c23b8ee2c12393c7b"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gade540ee4cc2a416c23b8ee2c12393c7b">PointerParseErrorCode</a> { <br />
+&#160;&#160;<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7ba9094f236b2ec70c42f1ea91dffc1e39b">kPointerParseErrorNone</a> = 0, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7ba2f2f8b238e201b7d540e8914bbfd2bed">kPointerParseErrorTokenMustBeginWithSolidus</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7ba907c9fe4e541b257513e3a18635379f7">kPointerParseErrorInvalidEscape</a>, 
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7ba29831a02b8ee23a05d552b47f4d64d28">kPointerParseErrorInvalidPercentEncoding</a>, 
+<br />
+&#160;&#160;<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7bae244a98f53279fda5a750f847b81c54f">kPointerParseErrorCharacterMustPercentEncode</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:gade540ee4cc2a416c23b8ee2c12393c7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error code of parsing.  <a href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gade540ee4cc2a416c23b8ee2c12393c7b">More...</a><br /></td></tr>
+<tr class="separator:gade540ee4cc2a416c23b8ee2c12393c7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81379eb4e94a0386d71d15fda882ebc9"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9">ParseFlag</a> { <br />
 &#160;&#160;<a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9af2c7fa21e9e7656e467bd71079ac8fb0">kParseNoFlags</a> = 0, 
 <a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a02748971d6ea0c5e22c69b8aa7f344ea">kParseInsituFlag</a> = 1, 
@@ -373,6 +391,199 @@ template&lt;&gt; </td></tr>
 <tr class="memitem:a9d43be9c033dc49738b713fe6fbafecf"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a9d43be9c033dc49738b713fe6fbafecf">PutN</a> (<a class="el" href="classrapidjson_1_1_generic_string_buffer.html">GenericStringBuffer</a>&lt; <a class="el" href="structrapidjson_1_1_u_t_f8.html">UTF8</a>&lt;&gt; &gt; &amp;stream, char c, size_t n)</td></tr>
 <tr class="memdesc:a9d43be9c033dc49738b713fe6fbafecf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implement specialized version of <a class="el" href="namespacerapidjson.html#a1d49d2cab617858b53a1db23b1759f43" title="Put N copies of a character to a stream. ">PutN()</a> with memset() for better performance. <br /></td></tr>
 <tr class="separator:a9d43be9c033dc49738b713fe6fbafecf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Helper functions for GenericPointer</div></td></tr>
+<tr class="memitem:a6cc308180c1a10dc918da0192aed8fb7"><td class="memTemplParams" colspan="2"><a class="anchor" id="a6cc308180c1a10dc918da0192aed8fb7"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a6cc308180c1a10dc918da0192aed8fb7"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>CreateValueByPointer</b> (T &amp;root, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename T::ValueType &gt; &amp;pointer, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:a6cc308180c1a10dc918da0192aed8fb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb3b041f41b39df3f4219803eb31947e"><td class="memTemplParams" colspan="2"><a class="anchor" id="abb3b041f41b39df3f4219803eb31947e"></a>
+template&lt;typename T , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:abb3b041f41b39df3f4219803eb31947e"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>CreateValueByPointer</b> (T &amp;root, const CharType(&amp;source)[N], typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:abb3b041f41b39df3f4219803eb31947e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afea8374e37ec67d3d1f08eb8c109f40c"><td class="memTemplParams" colspan="2"><a class="anchor" id="afea8374e37ec67d3d1f08eb8c109f40c"></a>
+template&lt;typename DocumentType &gt; </td></tr>
+<tr class="memitem:afea8374e37ec67d3d1f08eb8c109f40c"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>CreateValueByPointer</b> (DocumentType &amp;document, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename DocumentType::ValueType &gt; &amp;pointer)</td></tr>
+<tr class="separator:afea8374e37ec67d3d1f08eb8c109f40c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bebd7d041eb5f91245401c674bc1776"><td class="memTemplParams" colspan="2"><a class="anchor" id="a7bebd7d041eb5f91245401c674bc1776"></a>
+template&lt;typename DocumentType , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:a7bebd7d041eb5f91245401c674bc1776"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>CreateValueByPointer</b> (DocumentType &amp;document, const CharType(&amp;source)[N])</td></tr>
+<tr class="separator:a7bebd7d041eb5f91245401c674bc1776"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:addc8529d507bb8c6349ec07557e01f9d"><td class="memTemplParams" colspan="2"><a class="anchor" id="addc8529d507bb8c6349ec07557e01f9d"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:addc8529d507bb8c6349ec07557e01f9d"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType *&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointer</b> (T &amp;root, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename T::ValueType &gt; &amp;pointer)</td></tr>
+<tr class="separator:addc8529d507bb8c6349ec07557e01f9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29d273907e47dfa61964f324217b3b6d"><td class="memTemplParams" colspan="2"><a class="anchor" id="a29d273907e47dfa61964f324217b3b6d"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a29d273907e47dfa61964f324217b3b6d"><td class="memTemplItemLeft" align="right" valign="top">const T::ValueType *&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointer</b> (const T &amp;root, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename T::ValueType &gt; &amp;pointer)</td></tr>
+<tr class="separator:a29d273907e47dfa61964f324217b3b6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a621d5dcde31367f46871999c24114a26"><td class="memTemplParams" colspan="2"><a class="anchor" id="a621d5dcde31367f46871999c24114a26"></a>
+template&lt;typename T , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:a621d5dcde31367f46871999c24114a26"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType *&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointer</b> (T &amp;root, const CharType(&amp;source)[N])</td></tr>
+<tr class="separator:a621d5dcde31367f46871999c24114a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac31122fe6c5fd0601b53afb9eb93e856"><td class="memTemplParams" colspan="2"><a class="anchor" id="ac31122fe6c5fd0601b53afb9eb93e856"></a>
+template&lt;typename T , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:ac31122fe6c5fd0601b53afb9eb93e856"><td class="memTemplItemLeft" align="right" valign="top">const T::ValueType *&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointer</b> (const T &amp;root, const CharType(&amp;source)[N])</td></tr>
+<tr class="separator:ac31122fe6c5fd0601b53afb9eb93e856"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa33a1f9cd33ac3f6f2af3f90028fee6e"><td class="memTemplParams" colspan="2"><a class="anchor" id="aa33a1f9cd33ac3f6f2af3f90028fee6e"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:aa33a1f9cd33ac3f6f2af3f90028fee6e"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (T &amp;root, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename T::ValueType &gt; &amp;pointer, const typename T::ValueType &amp;defaultValue, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:aa33a1f9cd33ac3f6f2af3f90028fee6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43b1387c2ed5f7dc204d06ffaa9c55d0"><td class="memTemplParams" colspan="2"><a class="anchor" id="a43b1387c2ed5f7dc204d06ffaa9c55d0"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a43b1387c2ed5f7dc204d06ffaa9c55d0"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (T &amp;root, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename T::ValueType &gt; &amp;pointer, const typename T::Ch *defaultValue, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:a43b1387c2ed5f7dc204d06ffaa9c55d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31bef37eefbdc2b4c0c973bef12d4e52"><td class="memTemplParams" colspan="2"><a class="anchor" id="a31bef37eefbdc2b4c0c973bef12d4e52"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a31bef37eefbdc2b4c0c973bef12d4e52"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (T &amp;root, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename T::ValueType &gt; &amp;pointer, const std::basic_string&lt; typename T::Ch &gt; &amp;defaultValue, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:a31bef37eefbdc2b4c0c973bef12d4e52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b425344846dd5d45c1aa41ea1f0fff2"><td class="memTemplParams" colspan="2"><a class="anchor" id="a3b425344846dd5d45c1aa41ea1f0fff2"></a>
+template&lt;typename T , typename T2 &gt; </td></tr>
+<tr class="memitem:a3b425344846dd5d45c1aa41ea1f0fff2"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (T &amp;root, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename T::ValueType &gt; &amp;pointer, T2 defaultValue, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:a3b425344846dd5d45c1aa41ea1f0fff2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4dba118d81ceb01ff22efb3e5e988dc1"><td class="memTemplParams" colspan="2"><a class="anchor" id="a4dba118d81ceb01ff22efb3e5e988dc1"></a>
+template&lt;typename T , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:a4dba118d81ceb01ff22efb3e5e988dc1"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (T &amp;root, const CharType(&amp;source)[N], const typename T::ValueType &amp;defaultValue, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:a4dba118d81ceb01ff22efb3e5e988dc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac91ec0a49e7d5f976da9a1775b1ec501"><td class="memTemplParams" colspan="2"><a class="anchor" id="ac91ec0a49e7d5f976da9a1775b1ec501"></a>
+template&lt;typename T , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:ac91ec0a49e7d5f976da9a1775b1ec501"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (T &amp;root, const CharType(&amp;source)[N], const typename T::Ch *defaultValue, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:ac91ec0a49e7d5f976da9a1775b1ec501"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac84c921d8aae25fd6ddef061bb082a6e"><td class="memTemplParams" colspan="2"><a class="anchor" id="ac84c921d8aae25fd6ddef061bb082a6e"></a>
+template&lt;typename T , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:ac84c921d8aae25fd6ddef061bb082a6e"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (T &amp;root, const CharType(&amp;source)[N], const std::basic_string&lt; typename T::Ch &gt; &amp;defaultValue, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:ac84c921d8aae25fd6ddef061bb082a6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b170ef19224b9aa10e6f2472c63ad17"><td class="memTemplParams" colspan="2"><a class="anchor" id="a5b170ef19224b9aa10e6f2472c63ad17"></a>
+template&lt;typename T , typename CharType , size_t N, typename T2 &gt; </td></tr>
+<tr class="memitem:a5b170ef19224b9aa10e6f2472c63ad17"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (T &amp;root, const CharType(&amp;source)[N], T2 defaultValue, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:a5b170ef19224b9aa10e6f2472c63ad17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e32c018d38a174601d6770be7052f08"><td class="memTemplParams" colspan="2"><a class="anchor" id="a9e32c018d38a174601d6770be7052f08"></a>
+template&lt;typename DocumentType &gt; </td></tr>
+<tr class="memitem:a9e32c018d38a174601d6770be7052f08"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (DocumentType &amp;document, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename DocumentType::ValueType &gt; &amp;pointer, const typename DocumentType::ValueType &amp;defaultValue)</td></tr>
+<tr class="separator:a9e32c018d38a174601d6770be7052f08"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77cbd080374924fd75a24cedb2a017b2"><td class="memTemplParams" colspan="2"><a class="anchor" id="a77cbd080374924fd75a24cedb2a017b2"></a>
+template&lt;typename DocumentType &gt; </td></tr>
+<tr class="memitem:a77cbd080374924fd75a24cedb2a017b2"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (DocumentType &amp;document, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename DocumentType::ValueType &gt; &amp;pointer, const typename DocumentType::Ch *defaultValue)</td></tr>
+<tr class="separator:a77cbd080374924fd75a24cedb2a017b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aff665c069b593d7706ccdde1054e578f"><td class="memTemplParams" colspan="2"><a class="anchor" id="aff665c069b593d7706ccdde1054e578f"></a>
+template&lt;typename DocumentType &gt; </td></tr>
+<tr class="memitem:aff665c069b593d7706ccdde1054e578f"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (DocumentType &amp;document, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename DocumentType::ValueType &gt; &amp;pointer, const std::basic_string&lt; typename DocumentType::Ch &gt; &amp;defaultValue)</td></tr>
+<tr class="separator:aff665c069b593d7706ccdde1054e578f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c3108f18ee973e0ee2306e405b94310"><td class="memTemplParams" colspan="2"><a class="anchor" id="a5c3108f18ee973e0ee2306e405b94310"></a>
+template&lt;typename DocumentType , typename T2 &gt; </td></tr>
+<tr class="memitem:a5c3108f18ee973e0ee2306e405b94310"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (DocumentType &amp;document, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename DocumentType::ValueType &gt; &amp;pointer, T2 defaultValue)</td></tr>
+<tr class="separator:a5c3108f18ee973e0ee2306e405b94310"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82e20f8de529ed67a6533df54a31bb04"><td class="memTemplParams" colspan="2"><a class="anchor" id="a82e20f8de529ed67a6533df54a31bb04"></a>
+template&lt;typename DocumentType , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:a82e20f8de529ed67a6533df54a31bb04"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (DocumentType &amp;document, const CharType(&amp;source)[N], const typename DocumentType::ValueType &amp;defaultValue)</td></tr>
+<tr class="separator:a82e20f8de529ed67a6533df54a31bb04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47212072cc0fe34a06c00a6a993b9752"><td class="memTemplParams" colspan="2"><a class="anchor" id="a47212072cc0fe34a06c00a6a993b9752"></a>
+template&lt;typename DocumentType , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:a47212072cc0fe34a06c00a6a993b9752"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (DocumentType &amp;document, const CharType(&amp;source)[N], const typename DocumentType::Ch *defaultValue)</td></tr>
+<tr class="separator:a47212072cc0fe34a06c00a6a993b9752"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d4605304d9ee95a5e001791b9f157c6"><td class="memTemplParams" colspan="2"><a class="anchor" id="a6d4605304d9ee95a5e001791b9f157c6"></a>
+template&lt;typename DocumentType , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:a6d4605304d9ee95a5e001791b9f157c6"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (DocumentType &amp;document, const CharType(&amp;source)[N], const std::basic_string&lt; typename DocumentType::Ch &gt; &amp;defaultValue)</td></tr>
+<tr class="separator:a6d4605304d9ee95a5e001791b9f157c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7465125676d3ff4a6bb4e87a7986c2b6"><td class="memTemplParams" colspan="2"><a class="anchor" id="a7465125676d3ff4a6bb4e87a7986c2b6"></a>
+template&lt;typename DocumentType , typename CharType , size_t N, typename T2 &gt; </td></tr>
+<tr class="memitem:a7465125676d3ff4a6bb4e87a7986c2b6"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GetValueByPointerWithDefault</b> (DocumentType &amp;document, const CharType(&amp;source)[N], T2 defaultValue)</td></tr>
+<tr class="separator:a7465125676d3ff4a6bb4e87a7986c2b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af52a32038d7db6bd0916e79408bd5bbc"><td class="memTemplParams" colspan="2"><a class="anchor" id="af52a32038d7db6bd0916e79408bd5bbc"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:af52a32038d7db6bd0916e79408bd5bbc"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (T &amp;root, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename T::ValueType &gt; &amp;pointer, typename T::ValueType &amp;value, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:af52a32038d7db6bd0916e79408bd5bbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cd01a20b4256bd943f02fe255e7cc32"><td class="memTemplParams" colspan="2"><a class="anchor" id="a0cd01a20b4256bd943f02fe255e7cc32"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a0cd01a20b4256bd943f02fe255e7cc32"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (T &amp;root, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename T::ValueType &gt; &amp;pointer, const typename T::ValueType &amp;value, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:a0cd01a20b4256bd943f02fe255e7cc32"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03c2d060d62936bab0fe4b89f7205a8d"><td class="memTemplParams" colspan="2"><a class="anchor" id="a03c2d060d62936bab0fe4b89f7205a8d"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a03c2d060d62936bab0fe4b89f7205a8d"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (T &amp;root, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename T::ValueType &gt; &amp;pointer, const typename T::Ch *value, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:a03c2d060d62936bab0fe4b89f7205a8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47dcc954a89f2b233fc7882c4d57fbf1"><td class="memTemplParams" colspan="2"><a class="anchor" id="a47dcc954a89f2b233fc7882c4d57fbf1"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a47dcc954a89f2b233fc7882c4d57fbf1"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (T &amp;root, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename T::ValueType &gt; &amp;pointer, const std::basic_string&lt; typename T::Ch &gt; &amp;value, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:a47dcc954a89f2b233fc7882c4d57fbf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d32ec10f578a2ea9b86a2d1d03963c8"><td class="memTemplParams" colspan="2"><a class="anchor" id="a0d32ec10f578a2ea9b86a2d1d03963c8"></a>
+template&lt;typename T , typename T2 &gt; </td></tr>
+<tr class="memitem:a0d32ec10f578a2ea9b86a2d1d03963c8"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (T &amp;root, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename T::ValueType &gt; &amp;pointer, T2 value, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:a0d32ec10f578a2ea9b86a2d1d03963c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb9fb9b3b5c8377b0155bca9aeb40a51"><td class="memTemplParams" colspan="2"><a class="anchor" id="aeb9fb9b3b5c8377b0155bca9aeb40a51"></a>
+template&lt;typename T , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:aeb9fb9b3b5c8377b0155bca9aeb40a51"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (T &amp;root, const CharType(&amp;source)[N], typename T::ValueType &amp;value, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:aeb9fb9b3b5c8377b0155bca9aeb40a51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c7a1df544ef6745922b7311cbbe98f0"><td class="memTemplParams" colspan="2"><a class="anchor" id="a4c7a1df544ef6745922b7311cbbe98f0"></a>
+template&lt;typename T , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:a4c7a1df544ef6745922b7311cbbe98f0"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (T &amp;root, const CharType(&amp;source)[N], const typename T::ValueType &amp;value, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:a4c7a1df544ef6745922b7311cbbe98f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa637a04f8fc74722bb5aabb0b9567432"><td class="memTemplParams" colspan="2"><a class="anchor" id="aa637a04f8fc74722bb5aabb0b9567432"></a>
+template&lt;typename T , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:aa637a04f8fc74722bb5aabb0b9567432"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (T &amp;root, const CharType(&amp;source)[N], const typename T::Ch *value, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:aa637a04f8fc74722bb5aabb0b9567432"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:addadd408d04e2ba7c2e1ee01d273bce0"><td class="memTemplParams" colspan="2"><a class="anchor" id="addadd408d04e2ba7c2e1ee01d273bce0"></a>
+template&lt;typename T , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:addadd408d04e2ba7c2e1ee01d273bce0"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (T &amp;root, const CharType(&amp;source)[N], const std::basic_string&lt; typename T::Ch &gt; &amp;value, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:addadd408d04e2ba7c2e1ee01d273bce0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e7d1628b355b694b7f54fd4a40d8c67"><td class="memTemplParams" colspan="2"><a class="anchor" id="a1e7d1628b355b694b7f54fd4a40d8c67"></a>
+template&lt;typename T , typename CharType , size_t N, typename T2 &gt; </td></tr>
+<tr class="memitem:a1e7d1628b355b694b7f54fd4a40d8c67"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (T &amp;root, const CharType(&amp;source)[N], T2 value, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:a1e7d1628b355b694b7f54fd4a40d8c67"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ee672e29015d1884533b23769c49dee"><td class="memTemplParams" colspan="2"><a class="anchor" id="a7ee672e29015d1884533b23769c49dee"></a>
+template&lt;typename DocumentType &gt; </td></tr>
+<tr class="memitem:a7ee672e29015d1884533b23769c49dee"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (DocumentType &amp;document, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename DocumentType::ValueType &gt; &amp;pointer, typename DocumentType::ValueType &amp;value)</td></tr>
+<tr class="separator:a7ee672e29015d1884533b23769c49dee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17434145e27de11a23d116f832e62b0e"><td class="memTemplParams" colspan="2"><a class="anchor" id="a17434145e27de11a23d116f832e62b0e"></a>
+template&lt;typename DocumentType &gt; </td></tr>
+<tr class="memitem:a17434145e27de11a23d116f832e62b0e"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (DocumentType &amp;document, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename DocumentType::ValueType &gt; &amp;pointer, const typename DocumentType::ValueType &amp;value)</td></tr>
+<tr class="separator:a17434145e27de11a23d116f832e62b0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1ed433d2762ea314c3936e0e7b3259b"><td class="memTemplParams" colspan="2"><a class="anchor" id="ae1ed433d2762ea314c3936e0e7b3259b"></a>
+template&lt;typename DocumentType &gt; </td></tr>
+<tr class="memitem:ae1ed433d2762ea314c3936e0e7b3259b"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (DocumentType &amp;document, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename DocumentType::ValueType &gt; &amp;pointer, const typename DocumentType::Ch *value)</td></tr>
+<tr class="separator:ae1ed433d2762ea314c3936e0e7b3259b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61888e4b70fc622e72f8fede59535453"><td class="memTemplParams" colspan="2"><a class="anchor" id="a61888e4b70fc622e72f8fede59535453"></a>
+template&lt;typename DocumentType &gt; </td></tr>
+<tr class="memitem:a61888e4b70fc622e72f8fede59535453"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (DocumentType &amp;document, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename DocumentType::ValueType &gt; &amp;pointer, const std::basic_string&lt; typename DocumentType::Ch &gt; &amp;value)</td></tr>
+<tr class="separator:a61888e4b70fc622e72f8fede59535453"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a25b0eebf3fc8c37a0f9b16d90f459e"><td class="memTemplParams" colspan="2"><a class="anchor" id="a3a25b0eebf3fc8c37a0f9b16d90f459e"></a>
+template&lt;typename DocumentType , typename T2 &gt; </td></tr>
+<tr class="memitem:a3a25b0eebf3fc8c37a0f9b16d90f459e"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (DocumentType &amp;document, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename DocumentType::ValueType &gt; &amp;pointer, T2 value)</td></tr>
+<tr class="separator:a3a25b0eebf3fc8c37a0f9b16d90f459e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4a6b91e9ba841920a3eebf7966219ec"><td class="memTemplParams" colspan="2"><a class="anchor" id="aa4a6b91e9ba841920a3eebf7966219ec"></a>
+template&lt;typename DocumentType , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:aa4a6b91e9ba841920a3eebf7966219ec"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (DocumentType &amp;document, const CharType(&amp;source)[N], typename DocumentType::ValueType &amp;value)</td></tr>
+<tr class="separator:aa4a6b91e9ba841920a3eebf7966219ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a903c53365983ea6b11b1e37bcd613a40"><td class="memTemplParams" colspan="2"><a class="anchor" id="a903c53365983ea6b11b1e37bcd613a40"></a>
+template&lt;typename DocumentType , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:a903c53365983ea6b11b1e37bcd613a40"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (DocumentType &amp;document, const CharType(&amp;source)[N], const typename DocumentType::ValueType &amp;value)</td></tr>
+<tr class="separator:a903c53365983ea6b11b1e37bcd613a40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add1fda95f27ace1ba362b2f8ca29b6ff"><td class="memTemplParams" colspan="2"><a class="anchor" id="add1fda95f27ace1ba362b2f8ca29b6ff"></a>
+template&lt;typename DocumentType , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:add1fda95f27ace1ba362b2f8ca29b6ff"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (DocumentType &amp;document, const CharType(&amp;source)[N], const typename DocumentType::Ch *value)</td></tr>
+<tr class="separator:add1fda95f27ace1ba362b2f8ca29b6ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad54683f2c4492c6d12b79c5e1747718f"><td class="memTemplParams" colspan="2"><a class="anchor" id="ad54683f2c4492c6d12b79c5e1747718f"></a>
+template&lt;typename DocumentType , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:ad54683f2c4492c6d12b79c5e1747718f"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (DocumentType &amp;document, const CharType(&amp;source)[N], const std::basic_string&lt; typename DocumentType::Ch &gt; &amp;value)</td></tr>
+<tr class="separator:ad54683f2c4492c6d12b79c5e1747718f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad416a12d786a7d783667953f204a92cd"><td class="memTemplParams" colspan="2"><a class="anchor" id="ad416a12d786a7d783667953f204a92cd"></a>
+template&lt;typename DocumentType , typename CharType , size_t N, typename T2 &gt; </td></tr>
+<tr class="memitem:ad416a12d786a7d783667953f204a92cd"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SetValueByPointer</b> (DocumentType &amp;document, const CharType(&amp;source)[N], T2 value)</td></tr>
+<tr class="separator:ad416a12d786a7d783667953f204a92cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af27fbadfe9c823485374a6b426e3bf1f"><td class="memTemplParams" colspan="2"><a class="anchor" id="af27fbadfe9c823485374a6b426e3bf1f"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:af27fbadfe9c823485374a6b426e3bf1f"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SwapValueByPointer</b> (T &amp;root, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename T::ValueType &gt; &amp;pointer, typename T::ValueType &amp;value, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:af27fbadfe9c823485374a6b426e3bf1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54ef9e175c0a22c8dc894dd001063b43"><td class="memTemplParams" colspan="2"><a class="anchor" id="a54ef9e175c0a22c8dc894dd001063b43"></a>
+template&lt;typename T , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:a54ef9e175c0a22c8dc894dd001063b43"><td class="memTemplItemLeft" align="right" valign="top">T::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SwapValueByPointer</b> (T &amp;root, const CharType(&amp;source)[N], typename T::ValueType &amp;value, typename T::AllocatorType &amp;a)</td></tr>
+<tr class="separator:a54ef9e175c0a22c8dc894dd001063b43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e7fefa7eb27b5093f8f14439718aae3"><td class="memTemplParams" colspan="2"><a class="anchor" id="a8e7fefa7eb27b5093f8f14439718aae3"></a>
+template&lt;typename DocumentType &gt; </td></tr>
+<tr class="memitem:a8e7fefa7eb27b5093f8f14439718aae3"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SwapValueByPointer</b> (DocumentType &amp;document, const <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; typename DocumentType::ValueType &gt; &amp;pointer, typename DocumentType::ValueType &amp;value)</td></tr>
+<tr class="separator:a8e7fefa7eb27b5093f8f14439718aae3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb20ad4981c389a8007b5e58b901c558"><td class="memTemplParams" colspan="2"><a class="anchor" id="adb20ad4981c389a8007b5e58b901c558"></a>
+template&lt;typename DocumentType , typename CharType , size_t N&gt; </td></tr>
+<tr class="memitem:adb20ad4981c389a8007b5e58b901c558"><td class="memTemplItemLeft" align="right" valign="top">DocumentType::ValueType &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SwapValueByPointer</b> (DocumentType &amp;document, const CharType(&amp;source)[N], typename DocumentType::ValueType &amp;value)</td></tr>
+<tr class="separator:adb20ad4981c389a8007b5e58b901c558"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>main RapidJSON namespace </p>
