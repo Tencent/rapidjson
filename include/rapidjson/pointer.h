@@ -304,7 +304,7 @@ public:
         RAPIDJSON_ASSERT(IsValid());
         ValueType* v = &root;
         bool exist = true;
-        for (Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
+        for (const Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
             if (v->IsArray() && t->name[0] == '-' && t->length == 1) {
                 v->PushBack(Value().Move(), allocator);
                 v = &((*v)[v->Size() - 1]);
@@ -373,7 +373,7 @@ public:
     ValueType* Get(ValueType& root) const {
         RAPIDJSON_ASSERT(IsValid());
         ValueType* v = &root;
-        for (Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
+        for (const Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
             switch (v->GetType()) {
             case kObjectType:
                 {
@@ -587,6 +587,50 @@ public:
     }
 
     //@}
+
+    //! Erase a value in a subtree.
+    /*!
+        \param root Root value of a DOM sub-tree to be resolved. It can be any value other than document root.
+        \return Whether the resolved value is found and erased.
+
+        \note Erasing with an empty pointer \c Pointer(""), i.e. the root, always fail and return false.
+    */
+    bool Erase(ValueType& root) const {
+        RAPIDJSON_ASSERT(IsValid());
+        if (tokenCount_ == 0) // Cannot erase the root
+            return false;
+
+        ValueType* v = &root;
+        const Token* last = tokens_ + (tokenCount_ - 1);
+        for (const Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
+            switch (v->GetType()) {
+            case kObjectType:
+                {
+                    typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
+                    if (m == v->MemberEnd())
+                        return false;
+                    if (t == last) {
+                        v->EraseMember(m);
+                        return true;
+                    }
+                    v = &m->value;
+                }
+                break;
+            case kArrayType:
+                if (t->index == kPointerInvalidIndex || t->index >= v->Size())
+                    return false;
+                if (t == last) {
+                    v->Erase(v->Begin() + t->index);
+                    return true;
+                }
+                v = &((*v)[t->index]);
+                break;
+            default:
+                return false;
+            }
+        }
+        return false;
+    }
 
 private:
     //! Check whether a character should be percent-encoded.
@@ -1129,6 +1173,18 @@ typename DocumentType::ValueType& SwapValueByPointer(DocumentType& document, con
 template <typename DocumentType, typename CharType, size_t N>
 typename DocumentType::ValueType& SwapValueByPointer(DocumentType& document, const CharType(&source)[N], typename DocumentType::ValueType& value) {
     return GenericPointer<typename DocumentType::ValueType>(source, N - 1).Swap(document, value);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+bool EraseValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer) {
+    return pointer.Erase(root);
+}
+
+template <typename T, typename CharType, size_t N>
+bool EraseValueByPointer(T& root, const CharType(&source)[N]) {
+    return GenericPointer<typename T::ValueType>(source, N - 1).Erase(root);
 }
 
 //@}

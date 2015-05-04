@@ -818,6 +818,21 @@ TEST(Pointer, Swap_NoAllocator) {
     EXPECT_STREQ("bar", d["foo"][1].GetString());
 }
 
+TEST(Pointer, Erase) {
+    Document d;
+    d.Parse(kJson);
+
+    EXPECT_FALSE(Pointer("").Erase(d));
+    EXPECT_FALSE(Pointer("/foo/nonexist").Erase(d));
+    EXPECT_TRUE(Pointer("/foo/0").Erase(d));
+    EXPECT_EQ(1u, d["foo"].Size());
+    EXPECT_STREQ("baz", d["foo"][0].GetString());
+    EXPECT_TRUE(Pointer("/foo/0").Erase(d));
+    EXPECT_TRUE(d["foo"].Empty());
+    EXPECT_TRUE(Pointer("/foo").Erase(d));
+    EXPECT_TRUE(Pointer("/foo").Get(d) == 0);
+}
+
 TEST(Pointer, CreateValueByPointer) {
     Document d;
     Document::AllocatorType& a = d.GetAllocator();
@@ -1317,6 +1332,36 @@ TEST(Pointer, SwapValueByPointer_NoAllocator) {
     SwapValueByPointer(d, "/foo/0", *GetValueByPointer(d, "/foo/1"));
     EXPECT_STREQ("bar", d["foo"][0].GetString());
     EXPECT_STREQ("baz", d["foo"][1].GetString());
+}
+
+TEST(Pointer, EraseValueByPointer_Pointer) {
+    Document d;
+    d.Parse(kJson);
+
+    EXPECT_FALSE(EraseValueByPointer(d, Pointer("")));
+    EXPECT_FALSE(Pointer("/foo/nonexist").Erase(d));
+    EXPECT_TRUE(EraseValueByPointer(d, Pointer("/foo/0")));
+    EXPECT_EQ(1u, d["foo"].Size());
+    EXPECT_STREQ("baz", d["foo"][0].GetString());
+    EXPECT_TRUE(EraseValueByPointer(d, Pointer("/foo/0")));
+    EXPECT_TRUE(d["foo"].Empty());
+    EXPECT_TRUE(EraseValueByPointer(d, Pointer("/foo")));
+    EXPECT_TRUE(Pointer("/foo").Get(d) == 0);
+}
+
+TEST(Pointer, EraseValueByPointer_String) {
+    Document d;
+    d.Parse(kJson);
+
+    EXPECT_FALSE(EraseValueByPointer(d, ""));
+    EXPECT_FALSE(Pointer("/foo/nonexist").Erase(d));
+    EXPECT_TRUE(EraseValueByPointer(d, "/foo/0"));
+    EXPECT_EQ(1u, d["foo"].Size());
+    EXPECT_STREQ("baz", d["foo"][0].GetString());
+    EXPECT_TRUE(EraseValueByPointer(d, "/foo/0"));
+    EXPECT_TRUE(d["foo"].Empty());
+    EXPECT_TRUE(EraseValueByPointer(d, "/foo"));
+    EXPECT_TRUE(Pointer("/foo").Get(d) == 0);
 }
 
 TEST(Pointer, Ambiguity) {

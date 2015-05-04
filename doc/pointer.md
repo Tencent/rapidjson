@@ -65,6 +65,12 @@ Pointer("/hello").Swap(d, x);
 
 // { "project" : "RapidJSON", "stars" : 11, "a" : { "b" : [ null ] }, "hello" : "C++" }
 // x becomes "world"
+
+// Erase a member or element, return true if the value exists
+bool success = Pointer("/a").Erase(d);
+assert(success);
+
+// { "project" : "RapidJSON", "stars" : 10 }
 ~~~
 
 # Helper Functions {#HelperFunctions}
@@ -88,6 +94,9 @@ Value& hello = GetValueByPointerWithDefault(d, "/hello", "world");
 
 Value x("C++");
 SwapValueByPointer(d, "/hello", x);
+
+bool success = EraseValueByPointer(d, "/a");
+assert(success);
 ~~~
 
 The conventions are shown here for comparison:
@@ -165,6 +174,8 @@ private:
     Document* document_;
 };
 ~~~
+
+`Erase()` or `EraseValueByPointer()` does not need allocator. And they return `true` if the value is erased successfully.
 
 # Error Handling {#ErrorHandling}
 
