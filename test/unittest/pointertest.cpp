@@ -532,9 +532,13 @@ TEST(Pointer, Create) {
         Value* v = &Pointer("/foo/-").Create(d, d.GetAllocator());
         EXPECT_EQ(&d["foo"][1], v);
     }
+
     {
         Value* v = &Pointer("/foo/-/-").Create(d, d.GetAllocator());
-        EXPECT_EQ(&d["foo"][2][0], v);
+        // "foo/-" is a newly created null value x.
+        // "foo/-/-" finds that x is not an array, it converts x to empty object
+        // and treats - as "-" member name
+        EXPECT_EQ(&d["foo"][2]["-"], v);
     }
 
     {
@@ -1313,4 +1317,23 @@ TEST(Pointer, SwapValueByPointer_NoAllocator) {
     SwapValueByPointer(d, "/foo/0", *GetValueByPointer(d, "/foo/1"));
     EXPECT_STREQ("bar", d["foo"][0].GetString());
     EXPECT_STREQ("baz", d["foo"][1].GetString());
+}
+
+TEST(Pointer, Ambiguity) {
+    {
+        Document d;
+        d.Parse("{\"0\" : [123]}");
+        EXPECT_EQ(123, Pointer("/0/0").Get(d)->GetInt());
+        Pointer("/0/a").Set(d, 456);    // Change array [123] to object {456}
+        EXPECT_EQ(456, Pointer("/0/a").Get(d)->GetInt());
+    }
+
+    {
+        Document d;
+        EXPECT_FALSE(d.Parse("[{\"0\": 123}]").HasParseError());
+        EXPECT_EQ(123, Pointer("/0/0").Get(d)->GetInt());
+        Pointer("/0/1").Set(d, 456); // 1 is treated as "1" to index object
+        EXPECT_EQ(123, Pointer("/0/0").Get(d)->GetInt());
+        EXPECT_EQ(456, Pointer("/0/1").Get(d)->GetInt());
+    }
 }

@@ -305,19 +305,31 @@ public:
         ValueType* v = &root;
         bool exist = true;
         for (Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
-            if (t->index == kPointerInvalidIndex) { // object name
-                // Handling of '-' for last element of array
-                if (t->name[0] == '-' && t->length == 1) {
-                    if (!v->IsArray())
-                        v->SetArray(); // Change to Array
-                    v->PushBack(Value().Move(), allocator);
-                    v = &((*v)[v->Size() - 1]);
-                    exist = false;
-                }
-                else {
+            if (v->IsArray() && t->name[0] == '-' && t->length == 1) {
+                v->PushBack(Value().Move(), allocator);
+                v = &((*v)[v->Size() - 1]);
+                exist = false;
+            }
+            else {
+                if (t->index == kPointerInvalidIndex) { // must be object name
                     if (!v->IsObject())
                         v->SetObject(); // Change to Object
+                }
+                else { // object name or array index
+                    if (!v->IsArray() && !v->IsObject())
+                        v->SetArray(); // Change to Array
+                }
 
+                if (v->IsArray()) {
+                    if (t->index >= v->Size()) {
+                        v->Reserve(t->index + 1, allocator);
+                        while (t->index >= v->Size())
+                            v->PushBack(Value().Move(), allocator);
+                        exist = false;
+                    }
+                    v = &((*v)[t->index]);
+                }
+                else {
                     typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
                     if (m == v->MemberEnd()) {
                         v->AddMember(Value(t->name, t->length, allocator).Move(), Value().Move(), allocator);
@@ -327,18 +339,6 @@ public:
                     else
                         v = &m->value;
                 }
-            }
-            else { // array index
-                if (!v->IsArray())
-                    v->SetArray(); // Change to Array
-
-                if (t->index >= v->Size()) {
-                    v->Reserve(t->index + 1, allocator);
-                    while (t->index >= v->Size())
-                        v->PushBack(Value().Move(), allocator);
-                    exist = false;
-                }
-                v = &((*v)[t->index]);
             }
         }
 
