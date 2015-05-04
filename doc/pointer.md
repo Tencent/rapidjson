@@ -196,7 +196,7 @@ String Representation | URI Fragment Representation | Pointer Tokens (UTF-8)
 `"/m~0n"`             | `"#/m~0n"`                  | `{"m~n"}`
 `"/ "`                | `"#/%20"`                   | `{" "}`
 `"/\0"`               | `"#/%00"`                   | `{"\0"}`
-`"/\xE2\x82\xAC"`     | `"#/%E2%82%AC"`             | `{"\xE2\x82\xAC"}`
+`"/€"`                | `"#/%E2%82%AC"`             | `{"€"}`
 
 RapidJSON fully support URI fragment representation. It automatically detects the pound sign during parsing.
 
