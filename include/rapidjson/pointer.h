@@ -19,59 +19,155 @@
 
 RAPIDJSON_NAMESPACE_BEGIN
 
-static const SizeType kPointerInvalidIndex = ~SizeType(0);
+static const SizeType kPointerInvalidIndex = ~SizeType(0);  //!< Represents an invalid index in GenericPointer::Token
 
+//! Error code of parsing.
+/*! \ingroup RAPIDJSON_ERRORS
+    \see GenericPointer::GenericPointer, GenericPointer::GetParseErrorCode
+*/
 enum PointerParseErrorCode {
-    kPointerParseErrorNone = 0,
+    kPointerParseErrorNone = 0,                     //!< The parse is successful
 
-    kPointerParseErrorTokenMustBeginWithSolidus,
-    kPointerParseErrorInvalidEscape,
-    kPointerParseErrorInvalidPercentEncoding,
-    kPointerParseErrorCharacterMustPercentEncode
+    kPointerParseErrorTokenMustBeginWithSolidus,    //!< A token must begin with a '/'
+    kPointerParseErrorInvalidEscape,                //!< Invalid escape
+    kPointerParseErrorInvalidPercentEncoding,       //!< Invalid percent encoding in URI fragment
+    kPointerParseErrorCharacterMustPercentEncode    //!< A character must percent encoded in URI fragment
 };
 
+///////////////////////////////////////////////////////////////////////////////
+// GenericPointer
+
+//! Represents a JSON Pointer. Use Pointer for UTF8 encoding and default allocator.
+/*!
+    This class implements RFC 6901 "JavaScript Object Notation (JSON) Pointer" 
+    (https://tools.ietf.org/html/rfc6901).
+
+    A JSON pointer is for identifying a specific value in a JSON document
+    (GenericDocument). It can simplify coding of DOM tree manipulation, because it
+    can access multiple-level depth of DOM tree with single API call.
+
+    After it parses a string representation (e.g. "/foo/0" or URI fragment 
+    representation (e.g. "#/foo/0") into its internal representation (tokens),
+    it can be used to resolve a specific value in multiple documents, or sub-tree 
+    of documents.
+
+    Contrary to GenericValue, Pointer can be copy constructed and copy assigned.
+    Apart from assignment, a Pointer cannot be modified after construction.
+
+    Although Pointer is very convenient, please aware that constructing Pointer
+    involves parsing and dynamic memory allocation. A special constructor with user-
+    supplied tokens eliminates these.
+
+    GenericPointer depends on GenericDocument and GenericValue.
+    
+    \tparam ValueType The value type of the DOM tree. E.g. GenericValue<UTF8<> >
+    \tparam Allocator The allocator type for allocating memory for internal representation.
+    
+    \note GenericPointer uses same encoding of ValueType.
+    However, Allocator of GenericPointer is independent of Allocator of Value.
+*/
 template <typename ValueType, typename Allocator = CrtAllocator>
 class GenericPointer {
 public:
-    typedef typename ValueType::EncodingType EncodingType;
-    typedef typename EncodingType::Ch Ch;
+    typedef typename ValueType::EncodingType EncodingType;  //!< Encoding type from Value
+    typedef typename EncodingType::Ch Ch;                   //!< Character type from Value
 
+    //! A token is the basic units of internal representation.
+    /*!
+        A JSON pointer string representation "/foo/123" is parsed to two tokens: 
+        "foo" and 123. 123 will be represented in both numeric form and string form.
+        They are resolved according to the actual value type (object or array).
+
+        For token that are not numbers, or the numeric value is out of bound
+        (greater than limits of SizeType), they are only treated as string form
+        (i.e. the token's index will be equal to kPointerInvalidIndex).
+
+        This struct is public so that user can create a Pointer without parsing and 
+        allocation, using a special constructor.
+    */
     struct Token {
-        const Ch* name;
-        SizeType length;
-        SizeType index;             //!< A valid index if not equal to kPointerInvalidIndex.
+        const Ch* name;             //!< Name of the token. It has null character at the end but it can contain null character.
+        SizeType length;            //!< Length of the name.
+        SizeType index;             //!< A valid array index, if it is not equal to kPointerInvalidIndex.
     };
 
+    //!@name Constructors and destructor.
+    //@{
+
+    //! Default constructor.
     GenericPointer() : allocator_(), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {}
 
+    //! Constructor that parses a string or URI fragment representation.
+    /*!
+        \param source A null-terminated, string or URI fragment representation of JSON pointer.
+        \param allocator User supplied allocator for this pointer. If no allocator is provided, it creates a self-owned one.
+    */
     explicit GenericPointer(const Ch* source, Allocator* allocator = 0) : allocator_(allocator), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
         Parse(source, internal::StrLen(source));
     }
 
 #if RAPIDJSON_HAS_STDSTRING
+    //! Constructor that parses a string or URI fragment representation.
+    /*!
+        \param source A string or URI fragment representation of JSON pointer.
+        \param allocator User supplied allocator for this pointer. If no allocator is provided, it creates a self-owned one.
+        \note Requires the definition of the preprocessor symbol \ref RAPIDJSON_HAS_STDSTRING.
+    */
     explicit GenericPointer(const std::basic_string<Ch>& source, Allocator* allocator = 0) : allocator_(allocator), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
         Parse(source.c_str(), source.size());
     }
 #endif
 
+    //! Constructor that parses a string or URI fragment representation, with length of the source string.
+    /*!
+        \param source A string or URI fragment representation of JSON pointer.
+        \param length Length of source.
+        \param allocator User supplied allocator for this pointer. If no allocator is provided, it creates a self-owned one.
+        \note Slightly faster than the overload without length.
+    */
     GenericPointer(const Ch* source, size_t length, Allocator* allocator = 0) : allocator_(allocator), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
         Parse(source, length);
     }
 
+    //! Constructor with user-supplied tokens.
+    /*!
+        This constructor let user supplies const array of tokens.
+        This prevents the parsing process and eliminates allocation.
+        This is preferred for memory constrained environments.
+
+        \param tokens An constant array of tokens representing the JSON pointer.
+        \param tokenCount Number of tokens.
+
+        \b Example
+        \code
+        #define NAME(s) { s, sizeof(s) / sizeof(s[0]) - 1, kPointerInvalidIndex }
+        #define INDEX(i) { #i, sizeof(#i) - 1, i }
+
+        static const Pointer::Token kTokens[] = { NAME("foo"), INDEX(123) };
+        static const Pointer p(kTokens, sizeof(kTokens) / sizeof(kTokens[0]));
+        // Equivalent to static const Pointer p("/foo/123");
+
+        #undef NAME
+        #undef INDEX
+        \endcode
+    */
     GenericPointer(const Token* tokens, size_t tokenCount) : allocator_(), ownAllocator_(), nameBuffer_(), tokens_(const_cast<Token*>(tokens)), tokenCount_(tokenCount), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {}
 
+    //! Copy constructor.
     GenericPointer(const GenericPointer& rhs) : allocator_(), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
         *this = rhs;
     }
 
+    //! Destructor.
     ~GenericPointer() {
-        if (nameBuffer_) {
+        if (nameBuffer_) {  // If user-supplied tokens constructor is used, nameBuffer_ is nullptr and tokens_ are not deallocated.
             Allocator::Free(nameBuffer_);
             Allocator::Free(tokens_);
         }
         RAPIDJSON_DELETE(ownAllocator_);
     }
 
+    //! Assignment operator.
     GenericPointer& operator=(const GenericPointer& rhs) {
         this->~GenericPointer();
 
@@ -79,11 +175,11 @@ public:
         parseErrorOffset_ = rhs.parseErrorOffset_;
         parseErrorCode_ = rhs.parseErrorCode_;
 
-        if (rhs.nameBuffer_) {
-            if (!allocator_)
+        if (rhs.nameBuffer_) { // Normally parsed tokens.
+            if (!allocator_) // allocator is independently owned.
                 ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
 
-            size_t nameBufferSize = tokenCount_; // null terminators
+            size_t nameBufferSize = tokenCount_; // null terminators for tokens
             for (Token *t = rhs.tokens_; t != rhs.tokens_ + tokenCount_; ++t)
                 nameBufferSize += t->length;
             nameBuffer_ = (Ch*)allocator_->Malloc(nameBufferSize * sizeof(Ch));
@@ -98,21 +194,45 @@ public:
                 t->name += diff;
         }
         else
-            tokens_ = rhs.tokens_;
+            tokens_ = rhs.tokens_; // User supplied const tokens.
 
         return *this;
     }
 
+    //@}
+
+    //!@name Handling Parse Error
+    //@{
+
+    //! Check whether this is a valid pointer.
     bool IsValid() const { return parseErrorCode_ == kPointerParseErrorNone; }
 
+    //! Get the parsing error offset in code unit.
     size_t GetParseErrorOffset() const { return parseErrorOffset_; }
 
+    //! Get the parsing error code.
     PointerParseErrorCode GetParseErrorCode() const { return parseErrorCode_; }
 
+    //@}
+
+    //!@name Tokens
+    //@{
+
+    //! Get the token array (const version only).
     const Token* GetTokens() const { return tokens_; }
 
+    //! Get the number of tokens.
     size_t GetTokenCount() const { return tokenCount_; }
 
+    //@}
+
+    //!@name Equality/inequality operators
+    //@{
+
+    //! Equality operator.
+    /*!
+        \note When any pointers are invalid, always returns false.
+    */
     bool operator==(const GenericPointer& rhs) const {
         if (!IsValid() || !rhs.IsValid() || tokenCount_ != rhs.tokenCount_)
             return false;
@@ -129,18 +249,57 @@ public:
         return true;
     }
 
+    //! Inequality operator.
+    /*!
+        \note When any pointers are invalid, always returns true.
+    */
     bool operator!=(const GenericPointer& rhs) const { return !(*this == rhs); }
 
+    //@}
+
+    //!@name Stringify
+    //@{
+
+    //! Stringify the pointer into string representation.
+    /*!
+        \tparam OutputStream Type of output stream.
+        \param os The output stream.
+    */
     template<typename OutputStream>
     bool Stringify(OutputStream& os) const {
         return Stringify<false, OutputStream>(os);
     }
 
+    //! Stringify the pointer into URI fragment representation.
+    /*!
+        \tparam OutputStream Type of output stream.
+        \param os The output stream.
+    */
     template<typename OutputStream>
     bool StringifyUriFragment(OutputStream& os) const {
         return Stringify<true, OutputStream>(os);
     }
-    
+
+    //@}
+
+    //!@name Create value
+    //@{
+
+    //! Create a value in a subtree.
+    /*!
+        If the value is not exist, it creates all parent values and a JSON Null value.
+        So it always succeed and return the newly created or existing value.
+
+        Remind that it may change types of parents according to tokens, so it 
+        potentially removes previously stored values. For example, if a document 
+        was an array, and "/foo" is used to create a value, then the document 
+        will be changed to an object, and all existing array elements are lost.
+
+        \param root Root value of a DOM subtree to be resolved. It can be any value other than document root.
+        \param allocator Allocator for creating the values if the specified value or its parents are not exist.
+        \param alreadyExist If non-null, it stores whether the resolved value is already exist.
+        \return The resolved newly created (a JSON Null value), or already exists value.
+    */
     ValueType& Create(ValueType& root, typename ValueType::AllocatorType& allocator, bool* alreadyExist = 0) const {
         RAPIDJSON_ASSERT(IsValid());
         ValueType* v = &root;
@@ -189,11 +348,28 @@ public:
         return *v;
     }
 
+    //! Creates a value in a document.
+    /*!
+        \param document A document to be resolved.
+        \param allocator Allocator for creating the values if the specified value or its parents are not exist.
+        \param alreadyExist If non-null, it stores whether the resolved value is already exist.
+        \return The resolved newly created, or already exists value.
+    */
     template <typename stackAllocator>
-    ValueType& Create(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, bool* alreadyExist = 0) const {
-        return Create(root, root.GetAllocator(), alreadyExist);
+    ValueType& Create(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, bool* alreadyExist = 0) const {
+        return Create(document, document.GetAllocator(), alreadyExist);
     }
 
+    //@}
+
+    //!@name Query value
+    //@{
+
+    //! Query a value in a subtree.
+    /*!
+        \param root Root value of a DOM sub-tree to be resolved. It can be any value other than document root.
+        \return Pointer to the value if it can be resolved. Otherwise null.
+    */
     ValueType* Get(ValueType& root) const {
         RAPIDJSON_ASSERT(IsValid());
         ValueType* v = &root;
@@ -219,14 +395,35 @@ public:
         return v;
     }
 
+    //! Query a const value in a const subtree.
+    /*!
+        \param root Root value of a DOM sub-tree to be resolved. It can be any value other than document root.
+        \return Pointer to the value if it can be resolved. Otherwise null.
+    */
     const ValueType* Get(const ValueType& root) const { return Get(const_cast<ValueType&>(root)); }
 
+    //@}
+
+    //!@name Query a value with default
+    //@{
+
+    //! Query a value in a subtree with default value.
+    /*!
+        Similar to Get(), but if the specified value do not exists, it creates all parents and clone the default value.
+        So that this function always succeed.
+
+        \param root Root value of a DOM sub-tree to be resolved. It can be any value other than document root.
+        \param defaultValue Default value to be cloned if the value was not exists.
+        \param allocator Allocator for creating the values if the specified value or its parents are not exist.
+        \see Create()
+    */
     ValueType& GetWithDefault(ValueType& root, const ValueType& defaultValue, typename ValueType::AllocatorType& allocator) const {
         bool alreadyExist;
         Value& v = Create(root, allocator, &alreadyExist);
         return alreadyExist ? v : v.CopyFrom(defaultValue, allocator);
     }
 
+    //! Query a value in a subtree with default null-terminated string.
     ValueType& GetWithDefault(ValueType& root, const Ch* defaultValue, typename ValueType::AllocatorType& allocator) const {
         bool alreadyExist;
         Value& v = Create(root, allocator, &alreadyExist);
@@ -234,6 +431,7 @@ public:
     }
 
 #if RAPIDJSON_HAS_STDSTRING
+    //! Query a value in a subtree with default std::basic_string.
     ValueType& GetWithDefault(ValueType& root, const std::basic_string<Ch>& defaultValue, typename ValueType::AllocatorType& allocator) const {
         bool alreadyExist;
         Value& v = Create(root, allocator, &alreadyExist);
@@ -241,102 +439,162 @@ public:
     }
 #endif
 
+    //! Query a value in a subtree with default primitive value.
+    /*!
+        \tparam T \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c bool
+    */
     template <typename T>
     RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&))
     GetWithDefault(ValueType& root, T defaultValue, typename ValueType::AllocatorType& allocator) const {
         return GetWithDefault(root, ValueType(defaultValue).Move(), allocator);
     }
 
+    //! Query a value in a document with default value.
     template <typename stackAllocator>
-    ValueType& GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, const ValueType& defaultValue) const {
-        return GetWithDefault(root, defaultValue, root.GetAllocator());
+    ValueType& GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, const ValueType& defaultValue) const {
+        return GetWithDefault(document, defaultValue, document.GetAllocator());
     }
 
+    //! Query a value in a document with default null-terminated string.
     template <typename stackAllocator>
-    ValueType& GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, const Ch* defaultValue) const {
-        return GetWithDefault(root, defaultValue, root.GetAllocator());
+    ValueType& GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, const Ch* defaultValue) const {
+        return GetWithDefault(document, defaultValue, document.GetAllocator());
     }
     
 #if RAPIDJSON_HAS_STDSTRING
+    //! Query a value in a document with default std::basic_string.
     template <typename stackAllocator>
-    ValueType& GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, const std::basic_string<Ch>& defaultValue) const {
-        return GetWithDefault(root, defaultValue, root.GetAllocator());
+    ValueType& GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, const std::basic_string<Ch>& defaultValue) const {
+        return GetWithDefault(document, defaultValue, document.GetAllocator());
     }
 #endif
 
+    //! Query a value in a document with default primitive value.
+    /*!
+        \tparam T \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c bool
+    */
     template <typename T, typename stackAllocator>
     RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&))
-    GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, T defaultValue) const {
-        return GetWithDefault(root, defaultValue, root.GetAllocator());
+    GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, T defaultValue) const {
+        return GetWithDefault(document, defaultValue, document.GetAllocator());
     }
 
-    // Move semantics, create parents if non-exist
+    //@}
+
+    //!@name Set a value
+    //@{
+
+    //! Set a value in a subtree, with move semantics.
+    /*!
+        It creates all parents if they are not exist or types are different to the tokens.
+        So this function always succeeds but potentially remove existing values.
+
+        \param root Root value of a DOM sub-tree to be resolved. It can be any value other than document root.
+        \param value Value to be set.
+        \param allocator Allocator for creating the values if the specified value or its parents are not exist.
+        \see Create()
+    */
     ValueType& Set(ValueType& root, ValueType& value, typename ValueType::AllocatorType& allocator) const {
         return Create(root, allocator) = value;
     }
 
-    // Copy semantics, create parents if non-exist
+    //! Set a value in a subtree, with copy semantics.
     ValueType& Set(ValueType& root, const ValueType& value, typename ValueType::AllocatorType& allocator) const {
         return Create(root, allocator).CopyFrom(value, allocator);
     }
 
+    //! Set a null-terminated string in a subtree.
     ValueType& Set(ValueType& root, const Ch* value, typename ValueType::AllocatorType& allocator) const {
         return Create(root, allocator) = ValueType(value, allocator).Move();
     }
 
 #if RAPIDJSON_HAS_STDSTRING
+    //! Set a std::basic_string in a subtree.
     ValueType& Set(ValueType& root, const std::basic_string<Ch>& value, typename ValueType::AllocatorType& allocator) const {
         return Create(root, allocator) = ValueType(value, allocator).Move();
     }
 #endif
 
+    //! Set a primitive value in a subtree.
+    /*!
+        \tparam T \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c bool
+    */
     template <typename T>
     RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&))
     Set(ValueType& root, T value, typename ValueType::AllocatorType& allocator) const {
         return Create(root, allocator) = ValueType(value).Move();
     }
 
+    //! Set a value in a document, with move semantics.
     template <typename stackAllocator>
-    ValueType& Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, ValueType& value) const {
-        return Create(root) = value;
+    ValueType& Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, ValueType& value) const {
+        return Create(document) = value;
     }
 
+    //! Set a value in a document, with copy semantics.
     template <typename stackAllocator>
-    ValueType& Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, const ValueType& value) const {
-        return Create(root).CopyFrom(value, root.GetAllocator());
+    ValueType& Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, const ValueType& value) const {
+        return Create(document).CopyFrom(value, document.GetAllocator());
     }
 
+    //! Set a null-terminated string in a document.
     template <typename stackAllocator>
-    ValueType& Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, const Ch* value) const {
-        return Create(root) = ValueType(value, root.GetAllocator()).Move();
+    ValueType& Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, const Ch* value) const {
+        return Create(document) = ValueType(value, document.GetAllocator()).Move();
     }
 
 #if RAPIDJSON_HAS_STDSTRING
+    //! Sets a std::basic_string in a document.
     template <typename stackAllocator>
-    ValueType& Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, const std::basic_string<Ch>& value) const {
-        return Create(root) = ValueType(value, root.GetAllocator()).Move();
+    ValueType& Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, const std::basic_string<Ch>& value) const {
+        return Create(document) = ValueType(value, document.GetAllocator()).Move();
     }
 #endif
 
+    //! Set a primitive value in a document.
+    /*!
+    \tparam T \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c bool
+    */
     template <typename T, typename stackAllocator>
     RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&))
-    Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, T value) const {
-        return Create(root) = value;
+        Set(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, T value) const {
+            return Create(document) = value;
     }
 
-    // Create parents if non-exist
+    //@}
+
+    //!@name Swap a value
+    //@{
+
+    //! Swap a value with a value in a subtree.
+    /*!
+        It creates all parents if they are not exist or types are different to the tokens.
+        So this function always succeeds but potentially remove existing values.
+
+        \param root Root value of a DOM sub-tree to be resolved. It can be any value other than document root.
+        \param value Value to be swapped.
+        \param allocator Allocator for creating the values if the specified value or its parents are not exist.
+        \see Create()
+    */
     ValueType& Swap(ValueType& root, ValueType& value, typename ValueType::AllocatorType& allocator) const {
         return Create(root, allocator).Swap(value);
     }
 
+    //! Swap a value with a value in a document.
     template <typename stackAllocator>
-    ValueType& Swap(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& root, ValueType& value) const {
-        return Create(root).Swap(value);
+    ValueType& Swap(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, ValueType& value) const {
+        return Create(document).Swap(value);
     }
 
+    //@}
+
 private:
+    //! Check whether a character should be percent-encoded.
+    /*!
+        According to RFC 3986 2.3 Unreserved Characters.
+        \param c The character (code unit) to be tested.
+    */
     bool NeedPercentEncode(Ch c) const {
-        // RFC 3986 2.3 Unreserved Characters
         return !((c >= '0' && c <= '9') || (c >= 'A' && c <='Z') || (c >= 'a' && c <= 'z') || c == '-' || c == '.' || c == '_' || c =='~');
     }
 
@@ -475,6 +733,12 @@ private:
         return;
     }
 
+    //! Stringify to string or URI fragment representation.
+    /*!
+        \tparam uriFragment True for stringifying to URI fragment representation. False for string representation.
+        \tparam OutputStream type of output stream.
+        \param os The output stream.
+    */
     template<bool uriFragment, typename OutputStream>
     bool Stringify(OutputStream& os) const {
         RAPIDJSON_ASSERT(IsValid());
@@ -509,13 +773,23 @@ private:
         return true;
     }
 
+    //! A helper stream for decoding a percent-encoded sequence into code unit.
+    /*!
+        This stream decodes %XY triplet into code unit (0-255).
+        If it encounters invalid characters, it sets output code unit as 0 and 
+        mark invalid, and to be checked by IsValid().
+    */
     class PercentDecodeStream {
     public:
+        //! Constructor
+        /*!
+            \param source Start of the stream
+            \param end Past-the-end of the stream.
+        */
         PercentDecodeStream(const Ch* source, const Ch* end) : src_(source), head_(source), end_(end), valid_(true) {}
 
         Ch Take() {
-            // %XX triplet
-            if (src_ + 3 > end_ || *src_ != '%') {
+            if (*src_ != '%' || src_ + 3 > end_) { // %XY triplet
                 valid_ = false;
                 return 0;
             }
@@ -537,16 +811,16 @@ private:
         }
 
         size_t Tell() const { return src_ - head_; }
-
         bool IsValid() const { return valid_; }
 
     private:
         const Ch* src_;     //!< Current read position.
         const Ch* head_;    //!< Original head of the string.
-        const Ch* end_;
-        bool valid_;
+        const Ch* end_;     //!< Past-the-end position.
+        bool valid_;        //!< Whether the parsing is valid.
     };
 
+    //! A helper stream to encode character (UTF-8 code unit) into percent-encoded sequence.
     template <typename OutputStream>
     class PercentEncodeStream {
     public:
@@ -562,16 +836,20 @@ private:
         OutputStream& os_;
     };
 
-    Allocator* allocator_;
-    Allocator* ownAllocator_;
-    Ch* nameBuffer_;
-    Token* tokens_;
-    size_t tokenCount_;
-    size_t parseErrorOffset_;
-    PointerParseErrorCode parseErrorCode_;
+    Allocator* allocator_;                  //!< The current allocator. It is either user-supplied or equal to ownAllocator_.
+    Allocator* ownAllocator_;               //!< Allocator owned by this Pointer.
+    Ch* nameBuffer_;                        //!< A buffer containing all names in tokens.
+    Token* tokens_;                         //!< A list of tokens.
+    size_t tokenCount_;                     //!< Number of tokens in tokens_.
+    size_t parseErrorOffset_;               //!< Offset in code unit when parsing fail.
+    PointerParseErrorCode parseErrorCode_;  //!< Parsing error code.
 };
 
+//! GenericPointer for Value (UTF-8, default allocator).
 typedef GenericPointer<Value> Pointer;
+
+//!@name Helper functions for GenericPointer
+//@{
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -587,14 +865,14 @@ typename T::ValueType& CreateValueByPointer(T& root, const CharType(&source)[N],
 
 // No allocator parameter
 
-template <typename T>
-typename T::ValueType& CreateValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer) {
-    return pointer.Create(root);
+template <typename DocumentType>
+typename DocumentType::ValueType& CreateValueByPointer(DocumentType& document, const GenericPointer<typename DocumentType::ValueType>& pointer) {
+    return pointer.Create(document);
 }
 
-template <typename T, typename CharType, size_t N>
-typename T::ValueType& CreateValueByPointer(T& root, const CharType(&source)[N]) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).Create(root);
+template <typename DocumentType, typename CharType, size_t N>
+typename DocumentType::ValueType& CreateValueByPointer(DocumentType& document, const CharType(&source)[N]) {
+    return GenericPointer<typename DocumentType::ValueType>(source, N - 1).Create(document);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -669,50 +947,50 @@ GetValueByPointerWithDefault(T& root, const CharType(&source)[N], T2 defaultValu
 
 // No allocator parameter
 
-template <typename T>
-typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::ValueType& defaultValue) {
-    return pointer.GetWithDefault(root, defaultValue);
+template <typename DocumentType>
+typename DocumentType::ValueType& GetValueByPointerWithDefault(DocumentType& document, const GenericPointer<typename DocumentType::ValueType>& pointer, const typename DocumentType::ValueType& defaultValue) {
+    return pointer.GetWithDefault(document, defaultValue);
 }
 
-template <typename T>
-typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::Ch* defaultValue) {
-    return pointer.GetWithDefault(root, defaultValue);
-}
-
-#if RAPIDJSON_HAS_STDSTRING
-template <typename T>
-typename T::ValueType& GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType>& pointer, const std::basic_string<typename T::Ch>& defaultValue) {
-    return pointer.GetWithDefault(root, defaultValue);
-}
-#endif
-
-template <typename T, typename T2>
-RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T2>, internal::IsGenericValue<T2> >), (typename T::ValueType&))
-GetValueByPointerWithDefault(T& root, const GenericPointer<typename T::ValueType>& pointer, T2 defaultValue) {
-    return pointer.GetWithDefault(root, defaultValue);
-}
-
-template <typename T, typename CharType, size_t N>
-typename T::ValueType& GetValueByPointerWithDefault(T& root, const CharType(&source)[N], const typename T::ValueType& defaultValue) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).GetWithDefault(root, defaultValue);
-}
-
-template <typename T, typename CharType, size_t N>
-typename T::ValueType& GetValueByPointerWithDefault(T& root, const CharType(&source)[N], const typename T::Ch* defaultValue) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).GetWithDefault(root, defaultValue);
+template <typename DocumentType>
+typename DocumentType::ValueType& GetValueByPointerWithDefault(DocumentType& document, const GenericPointer<typename DocumentType::ValueType>& pointer, const typename DocumentType::Ch* defaultValue) {
+    return pointer.GetWithDefault(document, defaultValue);
 }
 
 #if RAPIDJSON_HAS_STDSTRING
-template <typename T, typename CharType, size_t N>
-typename T::ValueType& GetValueByPointerWithDefault(T& root, const CharType(&source)[N], const std::basic_string<typename T::Ch>& defaultValue) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).GetWithDefault(root, defaultValue);
+template <typename DocumentType>
+typename DocumentType::ValueType& GetValueByPointerWithDefault(DocumentType& document, const GenericPointer<typename DocumentType::ValueType>& pointer, const std::basic_string<typename DocumentType::Ch>& defaultValue) {
+    return pointer.GetWithDefault(document, defaultValue);
 }
 #endif
 
-template <typename T, typename CharType, size_t N, typename T2>
-RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T2>, internal::IsGenericValue<T2> >), (typename T::ValueType&))
-GetValueByPointerWithDefault(T& root, const CharType(&source)[N], T2 defaultValue) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).GetWithDefault(root, defaultValue);
+template <typename DocumentType, typename T2>
+RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T2>, internal::IsGenericValue<T2> >), (typename DocumentType::ValueType&))
+GetValueByPointerWithDefault(DocumentType& document, const GenericPointer<typename DocumentType::ValueType>& pointer, T2 defaultValue) {
+    return pointer.GetWithDefault(document, defaultValue);
+}
+
+template <typename DocumentType, typename CharType, size_t N>
+typename DocumentType::ValueType& GetValueByPointerWithDefault(DocumentType& document, const CharType(&source)[N], const typename DocumentType::ValueType& defaultValue) {
+    return GenericPointer<typename DocumentType::ValueType>(source, N - 1).GetWithDefault(document, defaultValue);
+}
+
+template <typename DocumentType, typename CharType, size_t N>
+typename DocumentType::ValueType& GetValueByPointerWithDefault(DocumentType& document, const CharType(&source)[N], const typename DocumentType::Ch* defaultValue) {
+    return GenericPointer<typename DocumentType::ValueType>(source, N - 1).GetWithDefault(document, defaultValue);
+}
+
+#if RAPIDJSON_HAS_STDSTRING
+template <typename DocumentType, typename CharType, size_t N>
+typename DocumentType::ValueType& GetValueByPointerWithDefault(DocumentType& document, const CharType(&source)[N], const std::basic_string<typename DocumentType::Ch>& defaultValue) {
+    return GenericPointer<typename DocumentType::ValueType>(source, N - 1).GetWithDefault(document, defaultValue);
+}
+#endif
+
+template <typename DocumentType, typename CharType, size_t N, typename T2>
+RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T2>, internal::IsGenericValue<T2> >), (typename DocumentType::ValueType&))
+GetValueByPointerWithDefault(DocumentType& document, const CharType(&source)[N], T2 defaultValue) {
+    return GenericPointer<typename DocumentType::ValueType>(source, N - 1).GetWithDefault(document, defaultValue);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -775,60 +1053,60 @@ SetValueByPointer(T& root, const CharType(&source)[N], T2 value, typename T::All
 
 // No allocator parameter
 
-template <typename T>
-typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, typename T::ValueType& value) {
-    return pointer.Set(root, value);
+template <typename DocumentType>
+typename DocumentType::ValueType& SetValueByPointer(DocumentType& document, const GenericPointer<typename DocumentType::ValueType>& pointer, typename DocumentType::ValueType& value) {
+    return pointer.Set(document, value);
 }
 
-template <typename T>
-typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::ValueType& value) {
-    return pointer.Set(root, value);
+template <typename DocumentType>
+typename DocumentType::ValueType& SetValueByPointer(DocumentType& document, const GenericPointer<typename DocumentType::ValueType>& pointer, const typename DocumentType::ValueType& value) {
+    return pointer.Set(document, value);
 }
 
-template <typename T>
-typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::Ch* value) {
-    return pointer.Set(root, value);
-}
-
-#if RAPIDJSON_HAS_STDSTRING
-template <typename T>
-typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, const std::basic_string<typename T::Ch>& value) {
-    return pointer.Set(root, value);
-}
-#endif
-
-template <typename T, typename T2>
-RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T2>, internal::IsGenericValue<T2> >), (typename T::ValueType&))
-SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, T2 value) {
-    return pointer.Set(root, value);
-}
-
-template <typename T, typename CharType, size_t N>
-typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], typename T::ValueType& value) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).Set(root, value);
-}
-
-template <typename T, typename CharType, size_t N>
-typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], const typename T::ValueType& value) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).Set(root, value);
-}
-
-template <typename T, typename CharType, size_t N>
-typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], const typename T::Ch* value) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).Set(root, value);
+template <typename DocumentType>
+typename DocumentType::ValueType& SetValueByPointer(DocumentType& document, const GenericPointer<typename DocumentType::ValueType>& pointer, const typename DocumentType::Ch* value) {
+    return pointer.Set(document, value);
 }
 
 #if RAPIDJSON_HAS_STDSTRING
-template <typename T, typename CharType, size_t N>
-typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], const std::basic_string<typename T::Ch>& value) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).Set(root, value);
+template <typename DocumentType>
+typename DocumentType::ValueType& SetValueByPointer(DocumentType& document, const GenericPointer<typename DocumentType::ValueType>& pointer, const std::basic_string<typename DocumentType::Ch>& value) {
+    return pointer.Set(document, value);
 }
 #endif
 
-template <typename T, typename CharType, size_t N, typename T2>
-RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T2>, internal::IsGenericValue<T2> >), (typename T::ValueType&))
-SetValueByPointer(T& root, const CharType(&source)[N], T2 value) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).Set(root, value);
+template <typename DocumentType, typename T2>
+RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T2>, internal::IsGenericValue<T2> >), (typename DocumentType::ValueType&))
+SetValueByPointer(DocumentType& document, const GenericPointer<typename DocumentType::ValueType>& pointer, T2 value) {
+    return pointer.Set(document, value);
+}
+
+template <typename DocumentType, typename CharType, size_t N>
+typename DocumentType::ValueType& SetValueByPointer(DocumentType& document, const CharType(&source)[N], typename DocumentType::ValueType& value) {
+    return GenericPointer<typename DocumentType::ValueType>(source, N - 1).Set(document, value);
+}
+
+template <typename DocumentType, typename CharType, size_t N>
+typename DocumentType::ValueType& SetValueByPointer(DocumentType& document, const CharType(&source)[N], const typename DocumentType::ValueType& value) {
+    return GenericPointer<typename DocumentType::ValueType>(source, N - 1).Set(document, value);
+}
+
+template <typename DocumentType, typename CharType, size_t N>
+typename DocumentType::ValueType& SetValueByPointer(DocumentType& document, const CharType(&source)[N], const typename DocumentType::Ch* value) {
+    return GenericPointer<typename DocumentType::ValueType>(source, N - 1).Set(document, value);
+}
+
+#if RAPIDJSON_HAS_STDSTRING
+template <typename DocumentType, typename CharType, size_t N>
+typename DocumentType::ValueType& SetValueByPointer(DocumentType& document, const CharType(&source)[N], const std::basic_string<typename DocumentType::Ch>& value) {
+    return GenericPointer<typename DocumentType::ValueType>(source, N - 1).Set(document, value);
+}
+#endif
+
+template <typename DocumentType, typename CharType, size_t N, typename T2>
+RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T2>, internal::IsGenericValue<T2> >), (typename DocumentType::ValueType&))
+SetValueByPointer(DocumentType& document, const CharType(&source)[N], T2 value) {
+    return GenericPointer<typename DocumentType::ValueType>(source, N - 1).Set(document, value);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -843,15 +1121,17 @@ typename T::ValueType& SwapValueByPointer(T& root, const CharType(&source)[N], t
     return GenericPointer<typename T::ValueType>(source, N - 1).Swap(root, value, a);
 }
 
-template <typename T>
-typename T::ValueType& SwapValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, typename T::ValueType& value) {
-    return pointer.Swap(root, value);
+template <typename DocumentType>
+typename DocumentType::ValueType& SwapValueByPointer(DocumentType& document, const GenericPointer<typename DocumentType::ValueType>& pointer, typename DocumentType::ValueType& value) {
+    return pointer.Swap(document, value);
 }
 
-template <typename T, typename CharType, size_t N>
-typename T::ValueType& SwapValueByPointer(T& root, const CharType(&source)[N], typename T::ValueType& value) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).Swap(root, value);
+template <typename DocumentType, typename CharType, size_t N>
+typename DocumentType::ValueType& SwapValueByPointer(DocumentType& document, const CharType(&source)[N], typename DocumentType::ValueType& value) {
+    return GenericPointer<typename DocumentType::ValueType>(source, N - 1).Swap(document, value);
 }
+
+//@}
 
 RAPIDJSON_NAMESPACE_END
 
