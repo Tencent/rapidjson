@@ -693,6 +693,11 @@ TEST(Pointer, Set) {
     Pointer("/foo/null").Set(d, Value().Move(), a);
     EXPECT_TRUE(GetValueByPointer(d, "/foo/null")->IsNull());
 
+    // Const Value version
+    const Value foo(d["foo"], a);
+    Pointer("/clone").Set(d, foo, a);
+    EXPECT_EQ(foo, *GetValueByPointer(d, "/clone"));
+
     // Generic version
     Pointer("/foo/int").Set(d, -1, a);
     EXPECT_EQ(-1, GetValueByPointer(d, "/foo/int")->GetInt());
@@ -746,6 +751,11 @@ TEST(Pointer, Set_NoAllocator) {
 
     Pointer("/foo/null").Set(d, Value().Move());
     EXPECT_TRUE(GetValueByPointer(d, "/foo/null")->IsNull());
+
+    // Const Value version
+    const Value foo(d["foo"], d.GetAllocator());
+    Pointer("/clone").Set(d, foo);
+    EXPECT_EQ(foo, *GetValueByPointer(d, "/clone"));
 
     // Generic version
     Pointer("/foo/int").Set(d, -1);
@@ -1066,6 +1076,11 @@ TEST(Pointer, SetValueByPointer_Pointer) {
     SetValueByPointer(d, Pointer("/foo/null"), Value().Move(), a);
     EXPECT_TRUE(GetValueByPointer(d, "/foo/null")->IsNull());
 
+    // Const Value version
+    const Value foo(d["foo"], d.GetAllocator());
+    SetValueByPointer(d, Pointer("/clone"), foo, a);
+    EXPECT_EQ(foo, *GetValueByPointer(d, "/clone"));
+
     // Generic version
     SetValueByPointer(d, Pointer("/foo/int"), -1, a);
     EXPECT_EQ(-1, GetValueByPointer(d, "/foo/int")->GetInt());
@@ -1118,6 +1133,11 @@ TEST(Pointer, SetValueByPointer_String) {
     SetValueByPointer(d, "/foo/null", Value().Move(), a);
     EXPECT_TRUE(GetValueByPointer(d, "/foo/null")->IsNull());
 
+    // Const Value version
+    const Value foo(d["foo"], d.GetAllocator());
+    SetValueByPointer(d, "/clone", foo, a);
+    EXPECT_EQ(foo, *GetValueByPointer(d, "/clone"));
+
     // Generic version
     SetValueByPointer(d, "/foo/int", -1, a);
     EXPECT_EQ(-1, GetValueByPointer(d, "/foo/int")->GetInt());
@@ -1169,6 +1189,11 @@ TEST(Pointer, SetValueByPointer_Pointer_NoAllocator) {
     SetValueByPointer(d, Pointer("/foo/null"), Value().Move());
     EXPECT_TRUE(GetValueByPointer(d, "/foo/null")->IsNull());
 
+    // Const Value version
+    const Value foo(d["foo"], d.GetAllocator());
+    SetValueByPointer(d, Pointer("/clone"), foo);
+    EXPECT_EQ(foo, *GetValueByPointer(d, "/clone"));
+
     // Generic version
     SetValueByPointer(d, Pointer("/foo/int"), -1);
     EXPECT_EQ(-1, GetValueByPointer(d, "/foo/int")->GetInt());
@@ -1219,6 +1244,11 @@ TEST(Pointer, SetValueByPointer_String_NoAllocator) {
 
     SetValueByPointer(d, "/foo/null", Value().Move());
     EXPECT_TRUE(GetValueByPointer(d, "/foo/null")->IsNull());
+
+    // Const Value version
+    const Value foo(d["foo"], d.GetAllocator());
+    SetValueByPointer(d, "/clone", foo);
+    EXPECT_EQ(foo, *GetValueByPointer(d, "/clone"));
 
     // Generic version
     SetValueByPointer(d, "/foo/int", -1);

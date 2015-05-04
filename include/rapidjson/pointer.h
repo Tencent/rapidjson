@@ -743,6 +743,11 @@ typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename 
 }
 
 template <typename T>
+typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::ValueType& value, typename T::AllocatorType& a) {
+    return pointer.Set(root, value, a);
+}
+
+template <typename T>
 typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::Ch* value, typename T::AllocatorType& a) {
     return pointer.Set(root, value, a);
 }
@@ -762,6 +767,11 @@ SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer,
 
 template <typename T, typename CharType, size_t N>
 typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], typename T::ValueType& value, typename T::AllocatorType& a) {
+    return GenericPointer<typename T::ValueType>(source, N - 1).Set(root, value, a);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], const typename T::ValueType& value, typename T::AllocatorType& a) {
     return GenericPointer<typename T::ValueType>(source, N - 1).Set(root, value, a);
 }
 
@@ -791,6 +801,11 @@ typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename 
 }
 
 template <typename T>
+typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::ValueType& value) {
+    return pointer.Set(root, value);
+}
+
+template <typename T>
 typename T::ValueType& SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, const typename T::Ch* value) {
     return pointer.Set(root, value);
 }
@@ -810,6 +825,11 @@ SetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer,
 
 template <typename T, typename CharType, size_t N>
 typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], typename T::ValueType& value) {
+    return GenericPointer<typename T::ValueType>(source, N - 1).Set(root, value);
+}
+
+template <typename T, typename CharType, size_t N>
+typename T::ValueType& SetValueByPointer(T& root, const CharType(&source)[N], const typename T::ValueType& value) {
     return GenericPointer<typename T::ValueType>(source, N - 1).Set(root, value);
 }
 
