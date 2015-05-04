@@ -43,7 +43,7 @@ Pointer("/stars").Set(d, 10);
 
 // { "project" : "RapidJSON", "stars" : 10 }
 
-// Access DOM by Get(). It return nullptr if the value is not exist.
+// Access DOM by Get(). It return nullptr if the value does not exist.
 if (Value* stars = Pointer("/stars").Get(d))
     stars->SetInt(stars->GetInt() + 1);
 
@@ -98,7 +98,7 @@ The conventions are shown here for comparison:
 
 # Resolving Pointer {#ResolvingPointer}
 
-`Pointer::Get()` or `GetValueByPointer()` function does not modify the DOM. If the tokens cannot match a value in the DOM, it returns `nullptr`. User can use this to see whether a value is exists.
+`Pointer::Get()` or `GetValueByPointer()` function does not modify the DOM. If the tokens cannot match a value in the DOM, it returns `nullptr`. User can use this to check whether a value exists.
 
 Note that, numerical tokens can represent an array index or member name. The resolving process will match the values according to the types of value.
 
@@ -124,7 +124,7 @@ SetValueByPointer(d, "1/a", 789); // { "0" : 123, "1" : { "a" : 789 } }
 
 ## Resolving Minus Sign Token
 
-Besides, [RFC6901] defines a special token `-` (single minus sign), which means the pass-the-end value of an array. `Get()` only treats this token as a member name '"-"'. Yet the other functions can resolve this for array, equivalent to calling `Value::PushBack()` to the array.
+Besides, [RFC6901] defines a special token `-` (single minus sign), which represents the pass-the-end element of an array. `Get()` only treats this token as a member name '"-"'. Yet the other functions can resolve this for array, equivalent to calling `Value::PushBack()` to the array.
 
 ~~~cpp
 Document d;
