@@ -104,7 +104,7 @@ JSON Pointer</h1>
 <li><code>"/foo"</code> → <code>[ "bar", "baz" ]</code></li>
 <li><code>"/foo/0"</code> → <code>"bar"</code></li>
 <li><code>"/foo/1"</code> → <code>"baz"</code></li>
-<li><code>"/pi"</code> → 3.1416</li>
+<li><code>"/pi"</code> → <code>3.1416</code></li>
 </ol>
 <p>Note that, an empty JSON Pointer <code>""</code> (zero token) resolves to the whole JSON.</p>
 <h1><a class="anchor" id="BasicUsage"></a>
@@ -118,24 +118,29 @@ Basic Usage</h1>
 <div class="line"><span class="comment">// Create DOM by Set()</span></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/project&quot;</span>).Set(d, <span class="stringliteral">&quot;RapidJSON&quot;</span>);</div>
 <div class="line"><a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/stars&quot;</span>).Set(d, 10);</div>
+<div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 10 }</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// Access DOM by Get(). It return nullptr if the value is not exist.</span></div>
 <div class="line"><span class="keywordflow">if</span> (<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>* stars = <a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/stars&quot;</span>).Get(d))</div>
 <div class="line">    stars-&gt;SetInt(stars-&gt;GetInt() + 1);</div>
+<div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11 }</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// Set() and Create() automatically generate parents if not exist.</span></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/a/b/0&quot;</span>).Create(d);</div>
+<div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11, &quot;a&quot; : { &quot;b&quot; : [ null ] } }</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// GetWithDefault() returns reference. And it deep clones the default value.</span></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>&amp; hello = <a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/hello&quot;</span>).GetWithDefault(d, <span class="stringliteral">&quot;world&quot;</span>);</div>
+<div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11, &quot;a&quot; : { &quot;b&quot; : [ null ] }, &quot;hello&quot; : &quot;world&quot; }</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// Swap() is similar to Set()</span></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> x(<span class="stringliteral">&quot;C++&quot;</span>);</div>
 <div class="line"><a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/hello&quot;</span>).Swap(d, x);</div>
+<div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11, &quot;a&quot; : { &quot;b&quot; : [ null ] }, &quot;hello&quot; : &quot;C++&quot; }</span></div>
 <div class="line"><span class="comment">// x becomes &quot;world&quot;</span></div>
 </div><!-- fragment --><h1><a class="anchor" id="HelperFunctions"></a>
@@ -175,7 +180,7 @@ Resolving Pointer</h1>
 <li><code>"/1/0"</code> → <code>456</code></li>
 </ol>
 <p>The token <code>"0"</code> is treated as member name in the first pointer. It is treated as an array index in the second pointer.</p>
-<p>The other functions, including <code>Create()</code>, <code>GetWithDefault()</code>, <code>Set()</code> and <code>Swap()</code>, will change the DOM. These functions will always succeed. They will create the parent values if they do not exist. If the parent values do not match with the tokens, they will also be forced to change their type. Changing the type also mean fully removal of that DOM subtree.</p>
+<p>The other functions, including <code>Create()</code>, <code>GetWithDefault()</code>, <code>Set()</code> and <code>Swap()</code>, will change the DOM. These functions will always succeed. They will create the parent values if they do not exist. If the parent values do not match the tokens, they will also be forced to change their type. Changing the type also mean fully removal of that DOM subtree.</p>
 <p>Parsing the above JSON into <code>d</code>,</p>
 <div class="fragment"><div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;1/a&quot;</span>, 789); <span class="comment">// { &quot;0&quot; : 123, &quot;1&quot; : { &quot;a&quot; : 789 } }</span></div>
 </div><!-- fragment --><h2>Resolving Minus Sign Token</h2>
