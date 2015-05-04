@@ -68,7 +68,14 @@ public:
         else
             return NULL; // standardize to returning NULL.
     }
-    void* Realloc(void* originalPtr, size_t originalSize, size_t newSize) { (void)originalSize; return std::realloc(originalPtr, newSize); }
+    void* Realloc(void* originalPtr, size_t originalSize, size_t newSize) {
+        (void)originalSize;
+        if (newSize == 0) {
+            std::free(originalPtr);
+            return NULL;
+        }
+        return std::realloc(originalPtr, newSize);
+    }
     static void Free(void *ptr) { std::free(ptr); }
 };
 
@@ -181,6 +188,9 @@ public:
     void* Realloc(void* originalPtr, size_t originalSize, size_t newSize) {
         if (originalPtr == 0)
             return Malloc(newSize);
+
+        if (newSize == 0)
+            return NULL;
 
         // Do not shrink if new size is smaller than original
         if (originalSize >= newSize)
