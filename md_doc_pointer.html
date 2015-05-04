@@ -121,7 +121,7 @@ Basic Usage</h1>
 <div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 10 }</span></div>
 <div class="line"></div>
-<div class="line"><span class="comment">// Access DOM by Get(). It return nullptr if the value is not exist.</span></div>
+<div class="line"><span class="comment">// Access DOM by Get(). It return nullptr if the value does not exist.</span></div>
 <div class="line"><span class="keywordflow">if</span> (<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>* stars = <a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/stars&quot;</span>).Get(d))</div>
 <div class="line">    stars-&gt;SetInt(stars-&gt;GetInt() + 1);</div>
 <div class="line"></div>
@@ -169,7 +169,7 @@ Helper Functions</h1>
 </ol>
 <h1><a class="anchor" id="ResolvingPointer"></a>
 Resolving Pointer</h1>
-<p><code>Pointer::Get()</code> or <code>GetValueByPointer()</code> function does not modify the DOM. If the tokens cannot match a value in the DOM, it returns <code>nullptr</code>. User can use this to see whether a value is exists.</p>
+<p><code>Pointer::Get()</code> or <code>GetValueByPointer()</code> function does not modify the DOM. If the tokens cannot match a value in the DOM, it returns <code>nullptr</code>. User can use this to check whether a value exists.</p>
 <p>Note that, numerical tokens can represent an array index or member name. The resolving process will match the values according to the types of value.</p>
 <div class="fragment"><div class="line">{</div>
 <div class="line">    <span class="stringliteral">&quot;0&quot;</span> : 123,</div>
@@ -184,7 +184,7 @@ Resolving Pointer</h1>
 <p>Parsing the above JSON into <code>d</code>,</p>
 <div class="fragment"><div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;1/a&quot;</span>, 789); <span class="comment">// { &quot;0&quot; : 123, &quot;1&quot; : { &quot;a&quot; : 789 } }</span></div>
 </div><!-- fragment --><h2>Resolving Minus Sign Token</h2>
-<p>Besides, <a href="https://tools.ietf.org/html/rfc6901">RFC6901</a> defines a special token <code>-</code> (single minus sign), which means the pass-the-end value of an array. <code>Get()</code> only treats this token as a member name '"-"'. Yet the other functions can resolve this for array, equivalent to calling <code>Value::PushBack()</code> to the array.</p>
+<p>Besides, <a href="https://tools.ietf.org/html/rfc6901">RFC6901</a> defines a special token <code>-</code> (single minus sign), which represents the pass-the-end element of an array. <code>Get()</code> only treats this token as a member name '"-"'. Yet the other functions can resolve this for array, equivalent to calling <code>Value::PushBack()</code> to the array.</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
 <div class="line">d.Parse(<span class="stringliteral">&quot;{\&quot;foo\&quot;:[123]}&quot;</span>);</div>
 <div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;/foo/-&quot;</span>, 456); <span class="comment">// { &quot;foo&quot; : [123, 456] }</span></div>
