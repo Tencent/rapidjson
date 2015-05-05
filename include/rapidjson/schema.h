@@ -86,6 +86,7 @@ public:
 template <typename Encoding>
 class ISchemaValidatorFactory {
 public:
+    virtual ~ISchemaValidatorFactory() {}
     virtual ISchemaValidator<Encoding>* CreateSchemaValidator(const BaseSchema<Encoding>& root) = 0;
 };
 
@@ -309,7 +310,8 @@ public:
     typedef SchemaValidationContext<Encoding> Context;
 
     template <typename ValueType>
-    MultiTypeSchema(const ValueType& value, const ValueType& type) : BaseSchema<Encoding>(), typedSchemas_() {
+    MultiTypeSchema(const ValueType& value, const ValueType& type) : BaseSchema<Encoding>() {
+        std::memset(typedSchemas_, 0, sizeof(typedSchemas_));
         RAPIDJSON_ASSERT(type.IsArray());
         for (typename ValueType::ConstValueIterator itr = type.Begin(); itr != type.End(); ++itr) {
             if (itr->IsString()) {
