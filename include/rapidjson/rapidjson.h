@@ -241,7 +241,11 @@
     alignment. User can customize by defining the RAPIDJSON_ALIGN function macro.,
 */
 #ifndef RAPIDJSON_ALIGN
+#if RAPIDJSON_64BIT == 1
+#define RAPIDJSON_ALIGN(x) ((x + 7u) & ~7u)
+#else
 #define RAPIDJSON_ALIGN(x) ((x + 3u) & ~3u)
+#endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
