@@ -36,7 +36,7 @@ public:
 
     bool Sign() const { return (u_ & kSignMask) != 0; }
     uint64_t Significand() const { return u_ & kSignificandMask; }
-    int Exponent() const { return ((u_ & kExponentMask) >> kSignificandSize) - kExponentBias; }
+    int Exponent() const { return static_cast<int>(((u_ & kExponentMask) >> kSignificandSize) - kExponentBias); }
 
     bool IsNan() const { return (u_ & kExponentMask) == kExponentMask && Significand() != 0; }
     bool IsInf() const { return (u_ & kExponentMask) == kExponentMask && Significand() == 0; }
