@@ -539,3 +539,34 @@ TEST(SchemaValidator, MultiTypeWithObject) {
     VALIDATE(s, "{ \"tel\": \"fail\" }", false);
 }
 
+TEST(SchemaValidator, AllOf) {
+    Document sd;
+    sd.Parse("{\"allOf\": [{ \"type\": \"string\", \"minLength\": 2 }, { \"type\": \"string\", \"maxLength\": 5 }]}");
+    Schema s(sd);
+
+    VALIDATE(s, "\"ok\"", true);
+    VALIDATE(s, "\"n\"", false);
+    VALIDATE(s, "\"too long\"", false);
+    VALIDATE(s, "123", false);
+}
+
+TEST(SchemaValidator, AllOf_Nested) {
+    Document sd;
+    sd.Parse(
+    "{"
+    "    \"allOf\": ["
+    "        { \"type\": \"string\", \"minLength\": 2 },"
+    "        { \"type\": \"string\", \"maxLength\": 5 },"
+    "        { \"allOf\": [ { \"enum\" : [\"ok\", \"okay\", \"OK\", \"o\"] }, { \"enum\" : [\"ok\", \"OK\", \"o\"]} ] }"
+    "    ]"
+    "}");
+    Schema s(sd);
+
+    VALIDATE(s, "\"ok\"", true);
+    VALIDATE(s, "\"OK\"", true);
+    VALIDATE(s, "\"okay\"", false);
+    VALIDATE(s, "\"o\"", false);
+    VALIDATE(s, "\"n\"", false);
+    VALIDATE(s, "\"too long\"", false);
+    VALIDATE(s, "123", false);
+}

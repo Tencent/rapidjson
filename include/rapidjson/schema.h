@@ -56,17 +56,61 @@ enum SchemaType {
 template <typename Encoding>
 class BaseSchema;
 
+template <typename Encoding, typename ValueType>
+inline BaseSchema<Encoding>* CreateSchema(const ValueType& value, const ValueType& type);
+
+template <typename Encoding, typename ValueType>
+inline BaseSchema<Encoding>* CreateSchema(const ValueType& value);
+
+template <typename Encoding>
+class ISchemaValidator {
+public:
+    typedef typename Encoding::Ch Ch;
+
+    virtual ~ISchemaValidator() {};
+    virtual bool Null() = 0;
+    virtual bool Bool(bool) = 0;
+    virtual bool Int(int) = 0;
+    virtual bool Uint(unsigned) = 0;
+    virtual bool Int64(int64_t) = 0;
+    virtual bool Uint64(uint64_t) = 0;
+    virtual bool Double(double) = 0;
+    virtual bool String(const Ch*, SizeType, bool) = 0;
+    virtual bool StartObject() = 0;
+    virtual bool Key(const Ch*, SizeType, bool) = 0;
+    virtual bool EndObject(SizeType) = 0;
+    virtual bool StartArray() = 0;
+    virtual bool EndArray(SizeType) = 0;
+};
+
+template <typename Encoding>
+class ISchemaValidatorFactory {
+public:
+    virtual ISchemaValidator<Encoding>* CreateSchemaValidator(const BaseSchema<Encoding>& root) = 0;
+};
+
 template <typename Encoding>
 struct SchemaValidationContext {
-    SchemaValidationContext(const BaseSchema<Encoding>* s) : schema(s), valueSchema(), multiTypeSchema(), objectDependencies() {}
+    SchemaValidationContext(ISchemaValidatorFactory<Encoding>* factory, const BaseSchema<Encoding>* s) : 
+        schemaValidatorFactory(factory), schema(s), valueSchema(), multiTypeSchema(), allOfValidators(), objectDependencies()
+    {
+    }
 
     ~SchemaValidationContext() {
+        if (allOfValidators) {
+            for (SizeType i = 0; i < allOfValidatorCount; i++)
+                delete allOfValidators[i];
+            delete[] allOfValidators;
+        }
         delete[] objectDependencies;
     }
 
+    ISchemaValidatorFactory<Encoding>* schemaValidatorFactory;
     const BaseSchema<Encoding>* schema;
     const BaseSchema<Encoding>* valueSchema;
     const BaseSchema<Encoding>* multiTypeSchema;
+    ISchemaValidator<Encoding>** allOfValidators;
+    SizeType allOfValidatorCount;
     SizeType objectRequiredCount;
     SizeType arrayElementIndex;
     bool* objectDependencies;
@@ -78,10 +122,11 @@ public:
     typedef typename Encoding::Ch Ch;
     typedef SchemaValidationContext<Encoding> Context;
 
-    BaseSchema() {}
+    BaseSchema() : allOf_(), allOfCount_() {
+    }
 
     template <typename ValueType>
-    BaseSchema(const ValueType& value) {
+    BaseSchema(const ValueType& value) : allOf_(), allOfCount_() {
         typename ValueType::ConstMemberIterator enumItr = value.FindMember("enum");
         if (enumItr != value.MemberEnd()) {
             if (enumItr->value.IsArray() && enumItr->value.Size() > 0)
@@ -90,28 +135,66 @@ public:
                 // Error
             }
         }
+
+        typename ValueType::ConstMemberIterator allOfItr = value.FindMember("allOf");
+        if (allOfItr != value.MemberEnd()) {
+            const Value& allOf = allOfItr->value;
+            if (allOf.IsArray() && allOf.Size() > 0) {
+                allOfCount_ = allOf.Size();
+                allOf_ = new BaseSchema*[allOfCount_];
+                memset(allOf_, 0, sizeof(BaseSchema*) * allOfCount_);
+                for (SizeType i = 0; i < allOfCount_; i++)
+                    allOf_[i] = CreateSchema<Encoding>(allOf[i]);
+            }
+            else {
+                // Error
+            }
+        }
+
     }
     
-    virtual ~BaseSchema() {}
+    virtual ~BaseSchema() {
+        if (allOf_) {
+            for (SizeType i = 0; i < allOfCount_; i++)
+                delete allOf_[i];
+            delete [] allOf_;
+        }
+    }
 
     virtual SchemaType GetSchemaType() const = 0;
 
     virtual bool HandleMultiType(Context&, SchemaType) const { return true; }
     virtual bool BeginValue(Context&) const { return true; }
 
-    virtual bool Null() const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>().Move()); }
-    virtual bool Bool(bool b) const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(b).Move()); }
-    virtual bool Int(int i) const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(i).Move()); }
-    virtual bool Uint(unsigned u) const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(u).Move()); }
-    virtual bool Int64(int64_t i) const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(i).Move()); }
-    virtual bool Uint64(uint64_t u) const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(u).Move()); }
-    virtual bool Double(double d) const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(d).Move()); }
-    virtual bool String(const Ch* s, SizeType length, bool) const { return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(s, length).Move()); }
-    virtual bool StartObject(Context&) const { return true; }
-    virtual bool Key(Context&, const Ch*, SizeType, bool) const { return true; }
-    virtual bool EndObject(Context&, SizeType) const { return true; }
-    virtual bool StartArray(Context&) const { return true; }
-    virtual bool EndArray(Context&, SizeType) const { return true; }
+#define RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, method_call)\
+    if (allOf_) {\
+        CreateAllOfSchemaValidators(context);\
+        for (SizeType i = 0; i < allOfCount_; i++)\
+            if (!context.allOfValidators[i]->method_call)\
+                return false;\
+    }\
+    return true
+#define RAPIDJSON_BASESCHEMA_HANDLER_(context, arg, method_call)\
+    if (enum_.IsArray() && !CheckEnum(GenericValue<Encoding> arg .Move()))\
+        return false;\
+    RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, method_call);
+
+    virtual bool Null(Context& context) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (), Null()); }
+    virtual bool Bool(Context& context, bool b) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (b), Bool(b)); }
+    virtual bool Int(Context& context, int i) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (i), Int(i)); }
+    virtual bool Uint(Context& context, unsigned u) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (u), Uint(u)); }
+    virtual bool Int64(Context& context, int64_t i) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (i), Int64(i)); }
+    virtual bool Uint64(Context& context, uint64_t u) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (u), Int(i)); }
+    virtual bool Double(Context& context, double d) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (d), Double(d)); }
+    virtual bool String(Context& context, const Ch* s, SizeType length, bool copy) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (s, length), String(s, length, copy)); }
+    virtual bool StartObject(Context& context) const { RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, StartObject()); }
+    virtual bool Key(Context& context, const Ch* s, SizeType length, bool copy) const { RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, Key(s, length, copy)); }
+    virtual bool EndObject(Context& context, SizeType memberCount) const { RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, EndObject(memberCount)); }
+    virtual bool StartArray(Context& context) const { RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, StartArray()); }
+    virtual bool EndArray(Context& context, SizeType elementCount) const { RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, EndArray(elementCount)); }
+
+#undef RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_
+#undef RAPIDJSON_BASESCHEMA_HANDLER_
 
 protected:
     bool CheckEnum(const GenericValue<Encoding>& v) const {
@@ -121,15 +204,20 @@ protected:
         return false;
     }
 
+    void CreateAllOfSchemaValidators(Context& context) const {
+        if (!context.allOfValidators) {
+            context.allOfValidators = new ISchemaValidator<Encoding>*[allOfCount_];
+            context.allOfValidatorCount = allOfCount_;
+            for (SizeType i = 0; i < allOfCount_; i++)
+                context.allOfValidators[i] = context.schemaValidatorFactory->CreateSchemaValidator(*allOf_[i]);
+        }
+    }
+
     MemoryPoolAllocator<> allocator_;
     GenericValue<Encoding> enum_;
+    BaseSchema<Encoding>** allOf_;
+    SizeType allOfCount_;
 };
-
-template <typename Encoding, typename ValueType>
-inline BaseSchema<Encoding>* CreateSchema(const ValueType& value, const ValueType& type);
-
-template <typename Encoding, typename ValueType>
-inline BaseSchema<Encoding>* CreateSchema(const ValueType& value);
 
 template <typename Encoding>
 class TypelessSchema : public BaseSchema<Encoding> {
@@ -207,14 +295,14 @@ public:
 
     virtual SchemaType GetSchemaType() const { return kNullSchemaType; }
 
-    virtual bool Null() const { return BaseSchema<Encoding>::Null(); }
-    virtual bool Bool(bool) const { return false; }
-    virtual bool Int(int) const { return false; }
-    virtual bool Uint(unsigned) const { return false; }
-    virtual bool Int64(int64_t) const { return false; }
-    virtual bool Uint64(uint64_t) const { return false; }
-    virtual bool Double(double) const { return false; }
-    virtual bool String(const Ch*, SizeType, bool) const { return false; }
+    virtual bool Null(Context& context) const { return BaseSchema<Encoding>::Null(context); }
+    virtual bool Bool(Context&, bool) const { return false; }
+    virtual bool Int(Context&, int) const { return false; }
+    virtual bool Uint(Context&, unsigned) const { return false; }
+    virtual bool Int64(Context&, int64_t) const { return false; }
+    virtual bool Uint64(Context&, uint64_t) const { return false; }
+    virtual bool Double(Context&, double) const { return false; }
+    virtual bool String(Context&, const Ch*, SizeType, bool) const { return false; }
     virtual bool StartObject(Context&) const { return false; }
     virtual bool Key(Context&, const Ch*, SizeType, bool) const { return false; }
     virtual bool EndObject(Context&, SizeType) const { return false; }
@@ -233,14 +321,14 @@ public:
 
     virtual SchemaType GetSchemaType() const { return kBooleanSchemaType; }
 
-    virtual bool Null() const { return false; }
-    virtual bool Bool(bool b) const { return BaseSchema<Encoding>::Bool(b); }
-    virtual bool Int(int) const { return false; }
-    virtual bool Uint(unsigned) const { return false; }
-    virtual bool Int64(int64_t) const { return false; }
-    virtual bool Uint64(uint64_t) const { return false; }
-    virtual bool Double(double) const { return false; }
-    virtual bool String(const Ch*, SizeType, bool) const { return false; }
+    virtual bool Null(Context&) const { return false; }
+    virtual bool Bool(Context& context, bool b) const { return BaseSchema<Encoding>::Bool(context, b); }
+    virtual bool Int(Context&, int) const { return false; }
+    virtual bool Uint(Context&, unsigned) const { return false; }
+    virtual bool Int64(Context&, int64_t) const { return false; }
+    virtual bool Uint64(Context&, uint64_t) const { return false; }
+    virtual bool Double(Context&, double) const { return false; }
+    virtual bool String(Context&, const Ch*, SizeType, bool) const { return false; }
     virtual bool StartObject(Context&) const { return false; }
     virtual bool Key(Context&, const Ch*, SizeType, bool) const { return false; }
     virtual bool EndObject(Context&, SizeType) const { return false; }
@@ -408,16 +496,19 @@ public:
 
     virtual SchemaType GetSchemaType() const { return kObjectSchemaType; }
 
-    virtual bool Null() const { return false; }
-    virtual bool Bool(bool) const { return false; }
-    virtual bool Int(int) const { return false; }
-    virtual bool Uint(unsigned) const { return false; }
-    virtual bool Int64(int64_t) const { return false; }
-    virtual bool Uint64(uint64_t) const { return false; }
-    virtual bool Double(double) const { return false; }
-    virtual bool String(const Ch*, SizeType, bool) const { return false; }
+    virtual bool Null(Context&) const { return false; }
+    virtual bool Bool(Context&, bool) const { return false; }
+    virtual bool Int(Context&, int) const { return false; }
+    virtual bool Uint(Context&, unsigned) const { return false; }
+    virtual bool Int64(Context&, int64_t) const { return false; }
+    virtual bool Uint64(Context&, uint64_t) const { return false; }
+    virtual bool Double(Context&, double) const { return false; }
+    virtual bool String(Context&, const Ch*, SizeType, bool) const { return false; }
 
     virtual bool StartObject(Context& context) const { 
+        if (!BaseSchema<Encoding>::StartObject(context))
+            return false;
+
         context.objectRequiredCount = 0;
         if (hasDependencies_) {
             context.objectDependencies = new bool[propertyCount_];
@@ -426,7 +517,10 @@ public:
         return true; 
     }
     
-    virtual bool Key(Context& context, const Ch* str, SizeType len, bool) const {
+    virtual bool Key(Context& context, const Ch* str, SizeType len, bool copy) const {
+        if (!BaseSchema<Encoding>::Key(context, str, len, copy))
+            return false;
+        
         SizeType index;
         if (FindPropertyIndex(str, len, &index)) {
             context.valueSchema = properties_[index].schema;
@@ -469,6 +563,9 @@ public:
     }
 
     virtual bool EndObject(Context& context, SizeType memberCount) const {
+        if (!BaseSchema<Encoding>::EndObject(context, memberCount))
+            return false;
+        
         if (context.objectRequiredCount != requiredCount_ || memberCount < minProperties_ || memberCount > maxProperties_)
             return false;
 
@@ -643,24 +740,30 @@ public:
         return true;
     }
 
-    virtual bool Null() const { return false; }
-    virtual bool Bool(bool) const { return false; }
-    virtual bool Int(int) const { return false; }
-    virtual bool Uint(unsigned) const { return false; }
-    virtual bool Int64(int64_t) const { return false; }
-    virtual bool Uint64(uint64_t) const { return false; }
-    virtual bool Double(double) const { return false; }
-    virtual bool String(const Ch*, SizeType, bool) const { return false; }
+    virtual bool Null(Context&) const { return false; }
+    virtual bool Bool(Context&, bool) const { return false; }
+    virtual bool Int(Context&, int) const { return false; }
+    virtual bool Uint(Context&, unsigned) const { return false; }
+    virtual bool Int64(Context&, int64_t) const { return false; }
+    virtual bool Uint64(Context&, uint64_t) const { return false; }
+    virtual bool Double(Context&, double) const { return false; }
+    virtual bool String(Context&, const Ch*, SizeType, bool) const { return false; }
     virtual bool StartObject(Context&) const { return false; }
     virtual bool Key(Context&, const Ch*, SizeType, bool) const { return false; }
     virtual bool EndObject(Context&, SizeType) const { return false; }
 
     virtual bool StartArray(Context& context) const { 
+        if (!BaseSchema<Encoding>::StartArray(context))
+            return false;
+        
         context.arrayElementIndex = 0;
         return true;
     }
 
-    virtual bool EndArray(Context&, SizeType elementCount) const { 
+    virtual bool EndArray(Context& context, SizeType elementCount) const { 
+        if (!BaseSchema<Encoding>::EndArray(context, elementCount))
+            return false;
+        
         return elementCount >= minItems_ && elementCount <= maxItems_;
     }
 
@@ -738,17 +841,18 @@ public:
 
     virtual SchemaType GetSchemaType() const { return kStringSchemaType; }
 
-    virtual bool Null() const { return false; }
-    virtual bool Bool(bool) const { return false; }
-    virtual bool Int(int) const { return false; }
-    virtual bool Uint(unsigned) const { return false; }
-    virtual bool Int64(int64_t) const { return false; }
-    virtual bool Uint64(uint64_t) const { return false; }
-    virtual bool Double(double) const { return false; }
+    virtual bool Null(Context&) const { return false; }
+    virtual bool Bool(Context&, bool) const { return false; }
+    virtual bool Int(Context&, int) const { return false; }
+    virtual bool Uint(Context&, unsigned) const { return false; }
+    virtual bool Int64(Context&, int64_t) const { return false; }
+    virtual bool Uint64(Context&, uint64_t) const { return false; }
+    virtual bool Double(Context&, double) const { return false; }
 
-    virtual bool String(const Ch* str, SizeType length, bool copy) const {
-        if (!BaseSchema<Encoding>::String(str, length, copy))
+    virtual bool String(Context& context, const Ch* str, SizeType length, bool copy) const {
+        if (!BaseSchema<Encoding>::String(context, str, length, copy))
             return false;
+
         if (length < minLength_ || length > maxLength_)
             return false;
 
@@ -844,16 +948,14 @@ public:
 
     virtual SchemaType GetSchemaType() const { return kIntegerSchemaType; }
 
-    virtual bool Null() const { return false; }
-    virtual bool Bool(bool) const { return false; }
-
-    virtual bool Int(int i) const { return BaseSchema<Encoding>::Int64(i) && Int64(i); }
-    virtual bool Uint(unsigned u) const { return BaseSchema<Encoding>::Uint64(u) && Uint64(u); }
-    virtual bool Int64(int64_t i) const { return BaseSchema<Encoding>::Int64(i) && CheckInt64(i); }
-    virtual bool Uint64(uint64_t u) const { return BaseSchema<Encoding>::Uint64(u) && CheckUint64(u); }
-
-    virtual bool Double(double) const { return false; }
-    virtual bool String(const Ch*, SizeType, bool) const { return false; }
+    virtual bool Null(Context&) const { return false; }
+    virtual bool Bool(Context&, bool) const { return false; }
+    virtual bool Int(Context& context, int i) const { return BaseSchema<Encoding>::Int64(context, i) && CheckInt64(i); }
+    virtual bool Uint(Context& context, unsigned u) const { return BaseSchema<Encoding>::Uint64(context, u) && CheckUint64(u); }
+    virtual bool Int64(Context& context, int64_t i) const { return BaseSchema<Encoding>::Int64(context, i) && CheckInt64(i); }
+    virtual bool Uint64(Context& context, uint64_t u) const { return BaseSchema<Encoding>::Uint64(context, u) && CheckUint64(u); }
+    virtual bool Double(Context&, double) const { return false; }
+    virtual bool String(Context&, const Ch*, SizeType, bool) const { return false; }
     virtual bool StartObject(Context&) const { return false; }
     virtual bool Key(Context&, const Ch*, SizeType, bool) const { return false; }
     virtual bool EndObject(Context&, SizeType) const { return false; }
@@ -991,16 +1093,16 @@ public:
 
     virtual SchemaType GetSchemaType() const { return kNumberSchemaType; }
 
-    virtual bool Null() const { return false; }
-    virtual bool Bool(bool) const { return false; }
+    virtual bool Null(Context&) const { return false; }
+    virtual bool Bool(Context&, bool) const { return false; }
 
-    virtual bool Int(int i) const         { return BaseSchema<Encoding>::Int(i)    && CheckDouble(i); }
-    virtual bool Uint(unsigned u) const   { return BaseSchema<Encoding>::Uint(u)   && CheckDouble(u); }
-    virtual bool Int64(int64_t i) const   { return BaseSchema<Encoding>::Int64(i)  && CheckDouble(i); }
-    virtual bool Uint64(uint64_t u) const { return BaseSchema<Encoding>::Uint64(u) && CheckDouble(u); }
-    virtual bool Double(double d) const   { return BaseSchema<Encoding>::Double(d) && CheckDouble(d); }
+    virtual bool Int(Context& context, int i) const         { return BaseSchema<Encoding>::Int(context, i)    && CheckDouble(i); }
+    virtual bool Uint(Context& context, unsigned u) const   { return BaseSchema<Encoding>::Uint(context, u)   && CheckDouble(u); }
+    virtual bool Int64(Context& context, int64_t i) const   { return BaseSchema<Encoding>::Int64(context, i)  && CheckDouble(i); }
+    virtual bool Uint64(Context& context, uint64_t u) const { return BaseSchema<Encoding>::Uint64(context, u) && CheckDouble(u); }
+    virtual bool Double(Context& context, double d) const   { return BaseSchema<Encoding>::Double(context, d) && CheckDouble(d); }
 
-    virtual bool String(const Ch*, SizeType, bool) const { return false; }
+    virtual bool String(Context&, const Ch*, SizeType, bool) const { return false; }
     virtual bool StartObject(Context&) const { return false; }
     virtual bool Key(Context&, const Ch*, SizeType, bool) const { return false; }
     virtual bool EndObject(Context&, SizeType) const { return false; }
@@ -1071,7 +1173,7 @@ private:
 typedef GenericSchema<UTF8<> > Schema;
 
 template <typename Encoding, typename OutputHandler = BaseReaderHandler<Encoding>, typename Allocator = CrtAllocator >
-class GenericSchemaValidator {
+class GenericSchemaValidator : public ISchemaValidator<Encoding>, public ISchemaValidatorFactory<Encoding> {
 public:
     typedef typename Encoding::Ch Ch;               //!< Character type derived from Encoding.
     typedef GenericSchema<Encoding> SchemaT;
@@ -1079,13 +1181,13 @@ public:
     GenericSchemaValidator(
         const SchemaT& schema,
         Allocator* allocator = 0, 
-        size_t schemaStackCapacity = kDefaultSchemaStackCapacity,
-        size_t documentStackCapacity = kDefaultDocumentStackCapacity)
+        size_t schemaStackCapacity = kDefaultSchemaStackCapacity/*,
+        size_t documentStackCapacity = kDefaultDocumentStackCapacity*/)
         :
-        schema_(schema), 
+        root_(*schema.root_), 
         outputHandler_(nullOutputHandler_),
-        schemaStack_(allocator, schemaStackCapacity),
-        documentStack_(allocator, documentStackCapacity)
+        schemaStack_(allocator, schemaStackCapacity)
+        // ,documentStack_(allocator, documentStackCapacity)
     {
     }
 
@@ -1093,13 +1195,13 @@ public:
         const SchemaT& schema,
         OutputHandler& outputHandler,
         Allocator* allocator = 0,
-        size_t schemaStackCapacity = kDefaultSchemaStackCapacity,
-        size_t documentStackCapacity = kDefaultDocumentStackCapacity)
+        size_t schemaStackCapacity = kDefaultSchemaStackCapacity/*,
+        size_t documentStackCapacity = kDefaultDocumentStackCapacity*/)
         :
-        schema_(schema),
+        root_(*schema.root_), 
         outputHandler_(outputHandler),
-        schemaStack_(allocator, schemaStackCapacity),
-        documentStack_(allocator, documentStackCapacity)
+        schemaStack_(allocator, schemaStackCapacity)
+        // , documentStack_(allocator, documentStackCapacity)
     {
     }
 
@@ -1110,32 +1212,49 @@ public:
     void Reset() {
         while (!schemaStack_.Empty())
             PopSchema();
-        documentStack_.Clear();
+        //documentStack_.Clear();
     };
 
-    bool Null()               { return BeginValue(kNullSchemaType)    && CurrentSchema().Null()      && EndValue() && outputHandler_.Null();      }
-    bool Bool(bool b)         { return BeginValue(kBooleanSchemaType) && CurrentSchema().Bool(b)     && EndValue() && outputHandler_.Bool(b);     }
-    bool Int(int i)           { return BeginValue(kIntegerSchemaType) && CurrentSchema().Int(i)      && EndValue() && outputHandler_.Int(i);      }
-    bool Uint(unsigned u)     { return BeginValue(kIntegerSchemaType) && CurrentSchema().Uint(u)     && EndValue() && outputHandler_.Uint(u);     }
-    bool Int64(int64_t i64)   { return BeginValue(kIntegerSchemaType) && CurrentSchema().Int64(i64)  && EndValue() && outputHandler_.Int64(i64);  }
-    bool Uint64(uint64_t u64) { return BeginValue(kIntegerSchemaType) && CurrentSchema().Uint64(u64) && EndValue() && outputHandler_.Uint64(u64); }
-    bool Double(double d)     { return BeginValue(kNumberSchemaType)  && CurrentSchema().Double(d)   && EndValue() && outputHandler_.Double(d);   }
-    bool String(const Ch* str, SizeType length, bool copy) { return BeginValue(kStringSchemaType) && CurrentSchema().String(str, length, copy) && EndValue() && outputHandler_.String(str, length, copy); }
-    
-    bool StartObject() { return BeginValue(kObjectSchemaType) && CurrentSchema().StartObject(CurrentContext()) && outputHandler_.StartObject(); }
-    bool Key(const Ch* str, SizeType len, bool copy) { return CurrentSchema().Key(CurrentContext(), str, len, copy) && outputHandler_.Key(str, len, copy); }
-    bool EndObject(SizeType memberCount) { return CurrentSchema().EndObject(CurrentContext(), memberCount) && EndValue() && outputHandler_.EndObject(memberCount); }
-    
-    bool StartArray() { return BeginValue(kArraySchemaType) && CurrentSchema().StartArray(CurrentContext()) ? outputHandler_.StartArray() : false; }
-    bool EndArray(SizeType elementCount) { return CurrentSchema().EndArray(CurrentContext(), elementCount) && EndValue() && outputHandler_.EndArray(elementCount); }
+    // Implementation of ISchemaValidator<Encoding>
+    virtual bool Null()               { return BeginValue(kNullSchemaType)    && CurrentSchema().Null  (CurrentContext()     ) && EndValue() && outputHandler_.Null  (   ); }
+    virtual bool Bool(bool b)         { return BeginValue(kBooleanSchemaType) && CurrentSchema().Bool  (CurrentContext(), b  ) && EndValue() && outputHandler_.Bool  (b  ); }
+    virtual bool Int(int i)           { return BeginValue(kIntegerSchemaType) && CurrentSchema().Int   (CurrentContext(), i  ) && EndValue() && outputHandler_.Int   (i  ); }
+    virtual bool Uint(unsigned u)     { return BeginValue(kIntegerSchemaType) && CurrentSchema().Uint  (CurrentContext(), u  ) && EndValue() && outputHandler_.Uint  (u  ); }
+    virtual bool Int64(int64_t i64)   { return BeginValue(kIntegerSchemaType) && CurrentSchema().Int64 (CurrentContext(), i64) && EndValue() && outputHandler_.Int64 (i64); }
+    virtual bool Uint64(uint64_t u64) { return BeginValue(kIntegerSchemaType) && CurrentSchema().Uint64(CurrentContext(), u64) && EndValue() && outputHandler_.Uint64(u64); }
+    virtual bool Double(double d)     { return BeginValue(kNumberSchemaType)  && CurrentSchema().Double(CurrentContext(), d  ) && EndValue() && outputHandler_.Double(  d); }
+    virtual bool String(const Ch* str, SizeType length, bool copy) { return BeginValue(kStringSchemaType) && CurrentSchema().String(CurrentContext(), str, length, copy) && EndValue() && outputHandler_.String(str, length, copy); }    
+    virtual bool StartObject() { return BeginValue(kObjectSchemaType) && CurrentSchema().StartObject(CurrentContext()) && outputHandler_.StartObject(); }
+    virtual bool Key(const Ch* str, SizeType len, bool copy) { return CurrentSchema().Key(CurrentContext(), str, len, copy) && outputHandler_.Key(str, len, copy); }
+    virtual bool EndObject(SizeType memberCount) { return CurrentSchema().EndObject(CurrentContext(), memberCount) && EndValue() && outputHandler_.EndObject(memberCount); }    
+    virtual bool StartArray() { return BeginValue(kArraySchemaType) && CurrentSchema().StartArray(CurrentContext()) ? outputHandler_.StartArray() : false; }
+    virtual bool EndArray(SizeType elementCount) { return CurrentSchema().EndArray(CurrentContext(), elementCount) && EndValue() && outputHandler_.EndArray(elementCount); }
+
+    // Implementation of ISchemaValidatorFactory<Encoding>
+    virtual ISchemaValidator<Encoding>* CreateSchemaValidator(const BaseSchema<Encoding>& root) {
+        return new GenericSchemaValidator(root);
+    }
 
 private:
     typedef BaseSchema<Encoding> BaseSchemaType;
     typedef typename BaseSchemaType::Context Context;
 
+    GenericSchemaValidator( 
+        const BaseSchemaType& root,
+        Allocator* allocator = 0,
+        size_t schemaStackCapacity = kDefaultSchemaStackCapacity/*,
+        size_t documentStackCapacity = kDefaultDocumentStackCapacity*/)
+        :
+        root_(root),
+        outputHandler_(nullOutputHandler_),
+        schemaStack_(allocator, schemaStackCapacity)
+        // , documentStack_(allocator, documentStackCapacity)
+    {
+    }
+
     bool BeginValue(SchemaType schemaType) {
         if (schemaStack_.Empty())
-            PushSchema(*schema_.root_);
+            PushSchema(root_);
         else {
             if (!CurrentSchema().BeginValue(CurrentContext()))
                 return false;
@@ -1160,18 +1279,18 @@ private:
         return true;
     }
 
-    void PushSchema(const BaseSchemaType& schema) { *schemaStack_.template Push<Context>() = Context(&schema); }
+    void PushSchema(const BaseSchemaType& schema) { *schemaStack_.template Push<Context>() = Context(this, &schema); }
     void PopSchema() { schemaStack_.template Pop<Context>(1)->~Context(); }
     const BaseSchemaType& CurrentSchema() { return *schemaStack_.template Top<Context>()->schema; }
     Context& CurrentContext() { return *schemaStack_.template Top<Context>(); }
 
     static const size_t kDefaultSchemaStackCapacity = 256;
-    static const size_t kDefaultDocumentStackCapacity = 256;
-    const SchemaT& schema_;
+    //static const size_t kDefaultDocumentStackCapacity = 256;
+    const BaseSchemaType& root_;
     BaseReaderHandler<Encoding> nullOutputHandler_;
     OutputHandler& outputHandler_;
     internal::Stack<Allocator> schemaStack_;    //!< stack to store the current path of schema (BaseSchemaType *)
-    internal::Stack<Allocator> documentStack_;  //!< stack to store the current path of validating document (Value *)
+    //internal::Stack<Allocator> documentStack_;  //!< stack to store the current path of validating document (Value *)
 };
 
 typedef GenericSchemaValidator<UTF8<> > SchemaValidator;
