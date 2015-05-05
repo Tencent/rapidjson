@@ -314,6 +314,8 @@ TEST(SchemaValidator, Object_PropertyDependencies) {
     VALIDATE(s, "{ \"name\": \"John Doe\", \"billing_address\": \"555 Debtor's Lane\" }", true);
 }
 
+#if RAPIDJSON_SCHEMA_HAS_REGEX
+
 TEST(SchemaValidator, Object_PatternProperties) {
     Document sd;
     sd.Parse(
@@ -353,6 +355,8 @@ TEST(SchemaValidator, Object_PatternProperties_AdditionalProperties) {
     VALIDATE(s, "{ \"keyword\": \"value\" }", true);
     VALIDATE(s, "{ \"keyword\": 42 }", false);
 }
+
+#endif // RAPIDJSON_SCHEMA_HAS_REGEX
 
 TEST(SchemaValidator, Array) {
     Document sd;
