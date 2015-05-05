@@ -90,18 +90,44 @@ public:
 };
 
 template <typename Encoding>
+struct SchemaValidatorArray {
+    SchemaValidatorArray() : validators(), count() {}
+    ~SchemaValidatorArray() {
+        if (validators) {
+            for (SizeType i = 0; i < count; i++)
+                delete validators[i];
+            delete[] validators;
+        }
+    }
+
+    ISchemaValidator<Encoding>** validators;
+    SizeType count;
+};
+
+template <typename Encoding>
+struct BaseSchemaArray {
+    BaseSchemaArray() : schemas(), count() {}
+    ~BaseSchemaArray() {
+        if (schemas) {
+            for (SizeType i = 0; i < count; i++)
+                delete schemas[i];
+            delete[] schemas;
+        }
+    }
+
+    BaseSchema<Encoding>** schemas;
+    SizeType count;
+};
+
+template <typename Encoding>
 struct SchemaValidationContext {
     SchemaValidationContext(ISchemaValidatorFactory<Encoding>* factory, const BaseSchema<Encoding>* s) : 
-        schemaValidatorFactory(factory), schema(s), valueSchema(), multiTypeSchema(), allOfValidators(), objectDependencies()
+        schemaValidatorFactory(factory), schema(s), valueSchema(), multiTypeSchema(), notValidator(), objectDependencies()
     {
     }
 
     ~SchemaValidationContext() {
-        if (allOfValidators) {
-            for (SizeType i = 0; i < allOfValidatorCount; i++)
-                delete allOfValidators[i];
-            delete[] allOfValidators;
-        }
+        delete notValidator;
         delete[] objectDependencies;
     }
 
@@ -109,8 +135,10 @@ struct SchemaValidationContext {
     const BaseSchema<Encoding>* schema;
     const BaseSchema<Encoding>* valueSchema;
     const BaseSchema<Encoding>* multiTypeSchema;
-    ISchemaValidator<Encoding>** allOfValidators;
-    SizeType allOfValidatorCount;
+    SchemaValidatorArray<Encoding> allOfValidators;
+    SchemaValidatorArray<Encoding> anyOfValidators;
+    SchemaValidatorArray<Encoding> oneOfValidators;
+    ISchemaValidator<Encoding>* notValidator;
     SizeType objectRequiredCount;
     SizeType arrayElementIndex;
     bool* objectDependencies;
@@ -122,11 +150,10 @@ public:
     typedef typename Encoding::Ch Ch;
     typedef SchemaValidationContext<Encoding> Context;
 
-    BaseSchema() : allOf_(), allOfCount_() {
-    }
+    BaseSchema() : not_() {}
 
     template <typename ValueType>
-    BaseSchema(const ValueType& value) : allOf_(), allOfCount_() {
+    BaseSchema(const ValueType& value) : not_() {
         typename ValueType::ConstMemberIterator enumItr = value.FindMember("enum");
         if (enumItr != value.MemberEnd()) {
             if (enumItr->value.IsArray() && enumItr->value.Size() > 0)
@@ -137,28 +164,26 @@ public:
         }
 
         typename ValueType::ConstMemberIterator allOfItr = value.FindMember("allOf");
-        if (allOfItr != value.MemberEnd()) {
-            const Value& allOf = allOfItr->value;
-            if (allOf.IsArray() && allOf.Size() > 0) {
-                allOfCount_ = allOf.Size();
-                allOf_ = new BaseSchema*[allOfCount_];
-                memset(allOf_, 0, sizeof(BaseSchema*) * allOfCount_);
-                for (SizeType i = 0; i < allOfCount_; i++)
-                    allOf_[i] = CreateSchema<Encoding>(allOf[i]);
-            }
-            else {
-                // Error
-            }
-        }
+        if (allOfItr != value.MemberEnd())
+            CreateLogicalSchemas(allOfItr->value, allOf_);
 
+        typename ValueType::ConstMemberIterator anyOfItr = value.FindMember("anyOf");
+        if (anyOfItr != value.MemberEnd())
+            CreateLogicalSchemas(anyOfItr->value, anyOf_);
+
+        typename ValueType::ConstMemberIterator oneOfItr = value.FindMember("oneOf");
+        if (oneOfItr != value.MemberEnd())
+            CreateLogicalSchemas(oneOfItr->value, oneOf_);
+
+        typename ValueType::ConstMemberIterator notItr = value.FindMember("not");
+        if (notItr != value.MemberEnd()) {
+            if (notItr->value.IsObject())
+                not_ = CreateSchema<Encoding>(notItr->value);
+        }
     }
     
     virtual ~BaseSchema() {
-        if (allOf_) {
-            for (SizeType i = 0; i < allOfCount_; i++)
-                delete allOf_[i];
-            delete [] allOf_;
-        }
+        delete not_;
     }
 
     virtual SchemaType GetSchemaType() const = 0;
@@ -167,13 +192,42 @@ public:
     virtual bool BeginValue(Context&) const { return true; }
 
 #define RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, method_call)\
-    if (allOf_) {\
-        CreateAllOfSchemaValidators(context);\
-        for (SizeType i = 0; i < allOfCount_; i++)\
-            if (!context.allOfValidators[i]->method_call)\
+    if (allOf_.schemas) {\
+        CreateSchemaValidators(context, context.allOfValidators, allOf_);\
+        for (SizeType i_ = 0; i_ < allOf_.count; i_++)\
+            if (!context.allOfValidators.validators[i_]->method_call)\
                 return false;\
     }\
+    if (anyOf_.schemas) {\
+        CreateSchemaValidators(context, context.anyOfValidators, anyOf_);\
+        bool anyValid = false;\
+        for (SizeType i_ = 0; i_ < anyOf_.count; i_++)\
+            if (context.anyOfValidators.validators[i_]->method_call)\
+                anyValid = true;\
+        if (!anyValid)\
+            return false;\
+    }\
+    if (oneOf_.schemas) {\
+        CreateSchemaValidators(context, context.oneOfValidators, oneOf_);\
+        bool oneValid = false;\
+        for (SizeType i_ = 0; i_ < oneOf_.count; i_++)\
+            if (context.oneOfValidators.validators[i_]->method_call) {\
+                if (oneValid)\
+                    return false;\
+                else\
+                    oneValid = true;\
+            }\
+        if (!oneValid)\
+            return false;\
+    }\
+    if (not_) {\
+        if (!context.notValidator)\
+            context.notValidator = context.schemaValidatorFactory->CreateSchemaValidator(*not_);\
+        if (context.notValidator->method_call)\
+            return false;\
+    }\
     return true
+
 #define RAPIDJSON_BASESCHEMA_HANDLER_(context, arg, method_call)\
     if (enum_.IsArray() && !CheckEnum(GenericValue<Encoding> arg .Move()))\
         return false;\
@@ -184,7 +238,7 @@ public:
     virtual bool Int(Context& context, int i) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (i), Int(i)); }
     virtual bool Uint(Context& context, unsigned u) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (u), Uint(u)); }
     virtual bool Int64(Context& context, int64_t i) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (i), Int64(i)); }
-    virtual bool Uint64(Context& context, uint64_t u) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (u), Int(i)); }
+    virtual bool Uint64(Context& context, uint64_t u) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (u), Int(u)); }
     virtual bool Double(Context& context, double d) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (d), Double(d)); }
     virtual bool String(Context& context, const Ch* s, SizeType length, bool copy) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (s, length), String(s, length, copy)); }
     virtual bool StartObject(Context& context) const { RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, StartObject()); }
@@ -197,6 +251,19 @@ public:
 #undef RAPIDJSON_BASESCHEMA_HANDLER_
 
 protected:
+    void CreateLogicalSchemas(const Value& logic, BaseSchemaArray<Encoding>& logicSchemas) {
+        if (logic.IsArray() && logic.Size() > 0) {
+            logicSchemas.count = logic.Size();
+            logicSchemas.schemas = new BaseSchema*[logicSchemas.count];
+            memset(logicSchemas.schemas, 0, sizeof(BaseSchema*) * logicSchemas.count);
+            for (SizeType i = 0; i < logicSchemas.count; i++)
+                logicSchemas.schemas[i] = CreateSchema<Encoding>(logic[i]);
+        }
+        else {
+            // Error
+        }
+    }
+
     bool CheckEnum(const GenericValue<Encoding>& v) const {
         for (typename GenericValue<Encoding>::ConstValueIterator itr = enum_.Begin(); itr != enum_.End(); ++itr)
             if (v == *itr)
@@ -204,19 +271,21 @@ protected:
         return false;
     }
 
-    void CreateAllOfSchemaValidators(Context& context) const {
-        if (!context.allOfValidators) {
-            context.allOfValidators = new ISchemaValidator<Encoding>*[allOfCount_];
-            context.allOfValidatorCount = allOfCount_;
-            for (SizeType i = 0; i < allOfCount_; i++)
-                context.allOfValidators[i] = context.schemaValidatorFactory->CreateSchemaValidator(*allOf_[i]);
+    void CreateSchemaValidators(Context& context, SchemaValidatorArray<Encoding>& validators, const BaseSchemaArray<Encoding>& schemas) const {
+        if (!validators.validators) {
+            validators.validators = new ISchemaValidator<Encoding>*[schemas.count];
+            validators.count = schemas.count;
+            for (SizeType i = 0; i < schemas.count; i++)
+                validators.validators[i] = context.schemaValidatorFactory->CreateSchemaValidator(*schemas.schemas[i]);
         }
     }
 
     MemoryPoolAllocator<> allocator_;
     GenericValue<Encoding> enum_;
-    BaseSchema<Encoding>** allOf_;
-    SizeType allOfCount_;
+    BaseSchemaArray<Encoding> allOf_;
+    BaseSchemaArray<Encoding> anyOf_;
+    BaseSchemaArray<Encoding> oneOf_;
+    BaseSchema<Encoding>* not_;
 };
 
 template <typename Encoding>

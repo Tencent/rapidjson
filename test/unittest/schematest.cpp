@@ -82,6 +82,56 @@ TEST(SchemaValidator, Enum_InvalidType) {
     VALIDATE(s, "null", false);
 }
 
+TEST(SchemaValidator, AllOf) {
+    {
+        Document sd;
+        sd.Parse("{\"allOf\": [{ \"type\": \"string\" }, { \"type\": \"string\", \"maxLength\": 5 }]}"); // need "type": "string" now
+        Schema s(sd);
+
+        VALIDATE(s, "\"ok\"", true);
+        VALIDATE(s, "\"too long\"", false);
+    }
+    {
+        Document sd;
+        sd.Parse("{\"allOf\": [{ \"type\": \"string\" }, { \"type\": \"number\" } ] }");
+        Schema s(sd);
+
+        VALIDATE(s, "\"No way\"", false);
+        VALIDATE(s, "-1", false);
+    }
+}
+
+TEST(SchemaValidator, AnyOf) {
+    Document sd;
+    sd.Parse("{\"anyOf\": [{ \"type\": \"string\" }, { \"type\": \"number\" } ] }");
+    Schema s(sd);
+
+    VALIDATE(s, "\"Yes\"", true);
+    VALIDATE(s, "42", true);
+    VALIDATE(s, "{ \"Not a\": \"string or number\" }", false);
+}
+
+TEST(SchemaValidator, OneOf) {
+    Document sd;
+    sd.Parse("{\"oneOf\": [{ \"type\": \"number\", \"multipleOf\": 5 }, { \"type\": \"number\", \"multipleOf\": 3 } ] }");
+    Schema s(sd);
+
+    VALIDATE(s, "10", true);
+    VALIDATE(s, "9", true);
+    VALIDATE(s, "2", false);
+    VALIDATE(s, "15", false);
+}
+
+TEST(SchemaValidator, Not) {
+    Document sd;
+    sd.Parse("{\"not\":{ \"type\": \"string\"}}");
+    Schema s(sd);
+
+    VALIDATE(s, "42", true);
+    // VALIDATE(s, "{ \"key\": \"value\" }", true); // TO FIX
+    VALIDATE(s, "\"I am a string\"", false);
+}
+
 TEST(SchemaValidator, String) {
     Document sd;
     sd.Parse("{\"type\":\"string\"}");
@@ -537,17 +587,6 @@ TEST(SchemaValidator, MultiTypeWithObject) {
     VALIDATE(s, "\"Hello\"", true);
     VALIDATE(s, "{ \"tel\": 999 }", true);
     VALIDATE(s, "{ \"tel\": \"fail\" }", false);
-}
-
-TEST(SchemaValidator, AllOf) {
-    Document sd;
-    sd.Parse("{\"allOf\": [{ \"type\": \"string\", \"minLength\": 2 }, { \"type\": \"string\", \"maxLength\": 5 }]}");
-    Schema s(sd);
-
-    VALIDATE(s, "\"ok\"", true);
-    VALIDATE(s, "\"n\"", false);
-    VALIDATE(s, "\"too long\"", false);
-    VALIDATE(s, "123", false);
 }
 
 TEST(SchemaValidator, AllOf_Nested) {
