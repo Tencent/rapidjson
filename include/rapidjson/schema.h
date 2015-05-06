@@ -68,6 +68,7 @@ public:
     typedef typename Encoding::Ch Ch;
 
     virtual ~ISchemaValidator() {};
+    virtual bool IsValid() = 0;
     virtual bool Null() = 0;
     virtual bool Bool(bool) = 0;
     virtual bool Int(int) = 0;
@@ -190,49 +191,47 @@ public:
     virtual SchemaType GetSchemaType() const = 0;
 
     virtual bool HandleMultiType(Context&, SchemaType) const { return true; }
-    virtual bool BeginValue(Context&) const { return true; }
 
-#define RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, method_call)\
-    if (allOf_.schemas) {\
-        CreateSchemaValidators(context, context.allOfValidators, allOf_);\
-        for (SizeType i_ = 0; i_ < allOf_.count; i_++)\
-            if (!context.allOfValidators.validators[i_]->method_call)\
-                return false;\
-    }\
-    if (anyOf_.schemas) {\
-        CreateSchemaValidators(context, context.anyOfValidators, anyOf_);\
-        bool anyValid = false;\
-        for (SizeType i_ = 0; i_ < anyOf_.count; i_++)\
-            if (context.anyOfValidators.validators[i_]->method_call)\
-                anyValid = true;\
-        if (!anyValid)\
-            return false;\
-    }\
-    if (oneOf_.schemas) {\
-        CreateSchemaValidators(context, context.oneOfValidators, oneOf_);\
-        bool oneValid = false;\
-        for (SizeType i_ = 0; i_ < oneOf_.count; i_++)\
-            if (context.oneOfValidators.validators[i_]->method_call) {\
-                if (oneValid)\
-                    return false;\
-                else\
-                    oneValid = true;\
-            }\
-        if (!oneValid)\
-            return false;\
-    }\
-    if (not_) {\
-        if (!context.notValidator)\
-            context.notValidator = context.schemaValidatorFactory->CreateSchemaValidator(*not_);\
-        if (context.notValidator->method_call)\
-            return false;\
-    }\
-    return true
+    virtual bool BeginValue(Context& context) const { return true; }
+
+    virtual bool EndValue(Context& context) const {
+        if (allOf_.schemas) {
+            for (SizeType i_ = 0; i_ < allOf_.count; i_++)
+                if (!context.allOfValidators.validators[i_]->IsValid())
+                    return false;
+        }
+        if (anyOf_.schemas) {
+            bool anyValid = false;
+            for (SizeType i_ = 0; i_ < anyOf_.count; i_++)
+                if (context.anyOfValidators.validators[i_]->IsValid()) {
+                    anyValid = true;
+                    break;
+                }
+            if (!anyValid)
+                return false;
+        }
+        if (oneOf_.schemas) {
+            CreateSchemaValidators(context, context.oneOfValidators, oneOf_);
+            bool oneValid = false;
+            for (SizeType i_ = 0; i_ < oneOf_.count; i_++)
+                if (context.oneOfValidators.validators[i_]->IsValid()) {
+                    if (oneValid)
+                        return false;
+                    else
+                        oneValid = true;
+                }
+            if (!oneValid)
+                return false;
+        }
+        if (not_) {
+            if (context.notValidator->IsValid())
+                return false;
+        }
+        return true;
+    }
 
 #define RAPIDJSON_BASESCHEMA_HANDLER_(context, arg, method_call)\
-    if (enum_.IsArray() && !CheckEnum(GenericValue<Encoding> arg .Move()))\
-        return false;\
-    RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, method_call);
+    CreateLogicValidators(context); return !enum_.IsArray() || CheckEnum(GenericValue<Encoding> arg .Move())
 
     virtual bool Null(Context& context) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (), Null()); }
     virtual bool Bool(Context& context, bool b) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (b), Bool(b)); }
@@ -242,11 +241,11 @@ public:
     virtual bool Uint64(Context& context, uint64_t u) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (u), Int(u)); }
     virtual bool Double(Context& context, double d) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (d), Double(d)); }
     virtual bool String(Context& context, const Ch* s, SizeType length, bool copy) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (s, length), String(s, length, copy)); }
-    virtual bool StartObject(Context& context) const { RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, StartObject()); }
-    virtual bool Key(Context& context, const Ch* s, SizeType length, bool copy) const { RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, Key(s, length, copy)); }
-    virtual bool EndObject(Context& context, SizeType memberCount) const { RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, EndObject(memberCount)); }
-    virtual bool StartArray(Context& context) const { RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, StartArray()); }
-    virtual bool EndArray(Context& context, SizeType elementCount) const { RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_(context, EndArray(elementCount)); }
+    virtual bool StartObject(Context& context) const { CreateLogicValidators(context);  return true; }
+    virtual bool Key(Context& context, const Ch* s, SizeType length, bool copy) const { return true; }
+    virtual bool EndObject(Context& context, SizeType memberCount) const { return true; }
+    virtual bool StartArray(Context& context) const { CreateLogicValidators(context); return true; }
+    virtual bool EndArray(Context& context, SizeType elementCount) const { return true; }
 
 #undef RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_
 #undef RAPIDJSON_BASESCHEMA_HANDLER_
@@ -272,6 +271,14 @@ protected:
         return false;
     }
 
+    void CreateLogicValidators(Context& context) const {
+        if (allOf_.schemas) CreateSchemaValidators(context, context.allOfValidators, allOf_);
+        if (anyOf_.schemas) CreateSchemaValidators(context, context.anyOfValidators, anyOf_);
+        if (oneOf_.schemas) CreateSchemaValidators(context, context.oneOfValidators, oneOf_);
+        if (not_ && !context.notValidator)
+            context.notValidator = context.schemaValidatorFactory->CreateSchemaValidator(*not_);
+    }
+
     void CreateSchemaValidators(Context& context, SchemaValidatorArray<Encoding>& validators, const BaseSchemaArray<Encoding>& schemas) const {
         if (!validators.validators) {
             validators.validators = new ISchemaValidator<Encoding>*[schemas.count];
@@ -290,18 +297,28 @@ protected:
 };
 
 template <typename Encoding>
+class EmptySchema : public BaseSchema<Encoding> {
+public:
+    virtual ~EmptySchema() {}
+    virtual SchemaType GetSchemaType() const { return kTypelessSchemaType; }
+    virtual bool BeginValue(Context& context) const { context.valueSchema = this; return BaseSchema::BeginValue(context); }
+};
+
+template <typename Encoding>
 class TypelessSchema : public BaseSchema<Encoding> {
 public:
     typedef SchemaValidationContext<Encoding> Context;
 
     TypelessSchema() {}
-
+    
     template <typename ValueType>
     TypelessSchema(const ValueType& value) : BaseSchema<Encoding>(value) {}
 
     virtual SchemaType GetSchemaType() const { return kTypelessSchemaType; }
+    virtual bool BeginValue(Context& context) const { context.valueSchema = &empty_; return BaseSchema::BeginValue(context); }
 
-    virtual bool BeginValue(Context& context) const { context.valueSchema = this; return true; }
+private:
+    EmptySchema<Encoding> empty_;
 };
 
 template <typename Encoding>
@@ -1257,8 +1274,9 @@ public:
         :
         root_(*schema.root_), 
         outputHandler_(nullOutputHandler_),
-        schemaStack_(allocator, schemaStackCapacity)
-        // ,documentStack_(allocator, documentStackCapacity)
+        schemaStack_(allocator, schemaStackCapacity),
+        // documentStack_(allocator, documentStackCapacity),
+        valid_(true)
     {
     }
 
@@ -1271,8 +1289,9 @@ public:
         :
         root_(*schema.root_), 
         outputHandler_(outputHandler),
-        schemaStack_(allocator, schemaStackCapacity)
-        // , documentStack_(allocator, documentStackCapacity)
+        schemaStack_(allocator, schemaStackCapacity),
+        // documentStack_(allocator, documentStackCapacity),
+        valid_(true)
     {
     }
 
@@ -1287,19 +1306,81 @@ public:
     };
 
     // Implementation of ISchemaValidator<Encoding>
-    virtual bool Null()               { return BeginValue(kNullSchemaType)    && CurrentSchema().Null  (CurrentContext()     ) && EndValue() && outputHandler_.Null  (   ); }
-    virtual bool Bool(bool b)         { return BeginValue(kBooleanSchemaType) && CurrentSchema().Bool  (CurrentContext(), b  ) && EndValue() && outputHandler_.Bool  (b  ); }
-    virtual bool Int(int i)           { return BeginValue(kIntegerSchemaType) && CurrentSchema().Int   (CurrentContext(), i  ) && EndValue() && outputHandler_.Int   (i  ); }
-    virtual bool Uint(unsigned u)     { return BeginValue(kIntegerSchemaType) && CurrentSchema().Uint  (CurrentContext(), u  ) && EndValue() && outputHandler_.Uint  (u  ); }
-    virtual bool Int64(int64_t i64)   { return BeginValue(kIntegerSchemaType) && CurrentSchema().Int64 (CurrentContext(), i64) && EndValue() && outputHandler_.Int64 (i64); }
-    virtual bool Uint64(uint64_t u64) { return BeginValue(kIntegerSchemaType) && CurrentSchema().Uint64(CurrentContext(), u64) && EndValue() && outputHandler_.Uint64(u64); }
-    virtual bool Double(double d)     { return BeginValue(kNumberSchemaType)  && CurrentSchema().Double(CurrentContext(), d  ) && EndValue() && outputHandler_.Double(  d); }
-    virtual bool String(const Ch* str, SizeType length, bool copy) { return BeginValue(kStringSchemaType) && CurrentSchema().String(CurrentContext(), str, length, copy) && EndValue() && outputHandler_.String(str, length, copy); }    
-    virtual bool StartObject() { return BeginValue(kObjectSchemaType) && CurrentSchema().StartObject(CurrentContext()) && outputHandler_.StartObject(); }
-    virtual bool Key(const Ch* str, SizeType len, bool copy) { return CurrentSchema().Key(CurrentContext(), str, len, copy) && outputHandler_.Key(str, len, copy); }
-    virtual bool EndObject(SizeType memberCount) { return CurrentSchema().EndObject(CurrentContext(), memberCount) && EndValue() && outputHandler_.EndObject(memberCount); }    
-    virtual bool StartArray() { return BeginValue(kArraySchemaType) && CurrentSchema().StartArray(CurrentContext()) ? outputHandler_.StartArray() : false; }
-    virtual bool EndArray(SizeType elementCount) { return CurrentSchema().EndArray(CurrentContext(), elementCount) && EndValue() && outputHandler_.EndArray(elementCount); }
+    virtual bool IsValid() { return valid_; }
+
+#define RAPIDJSON_SCHEMA_HANDLE_BEGIN_(schemaType, method, arg1)\
+    if (!valid_) return false; \
+    if (!BeginValue(schemaType) || !CurrentSchema().method arg1) return valid_ = false;
+
+#define RAPIDJSON_SCHEMA_HANDLE_LOGIC_(method, arg2)\
+    for (Context* context = schemaStack_.template Bottom<Context>(); context <= schemaStack_.template Top<Context>(); context++) {\
+        if (context->allOfValidators.validators)\
+            for (SizeType i_ = 0; i_ < context->allOfValidators.count; i_++)\
+                context->allOfValidators.validators[i_]->method arg2;\
+        if (context->anyOfValidators.validators)\
+            for (SizeType i_ = 0; i_ < context->anyOfValidators.count; i_++)\
+                context->anyOfValidators.validators[i_]->method arg2;\
+        if (context->oneOfValidators.validators)\
+            for (SizeType i_ = 0; i_ < context->oneOfValidators.count; i_++)\
+                context->oneOfValidators.validators[i_]->method arg2;\
+        if (context->notValidator)\
+            context->notValidator->method arg2;\
+    }
+
+#define RAPIDJSON_SCHEMA_HANDLE_END_(method, arg2)\
+    return valid_ = EndValue() && outputHandler_.method arg2
+
+#define RAPIDJSON_SCHEMA_HANDLE_VALUE_(schemaType, method, arg1, arg2) \
+    RAPIDJSON_SCHEMA_HANDLE_BEGIN_(schemaType, method, arg1);\
+    RAPIDJSON_SCHEMA_HANDLE_LOGIC_(method, arg2);\
+    RAPIDJSON_SCHEMA_HANDLE_END_  (method, arg2)
+
+    virtual bool Null()             { RAPIDJSON_SCHEMA_HANDLE_VALUE_(kNullSchemaType,    Null,   (CurrentContext()   ), ( )); }
+    virtual bool Bool(bool b)       { RAPIDJSON_SCHEMA_HANDLE_VALUE_(kBooleanSchemaType, Bool,   (CurrentContext(), b), (b)); }
+    virtual bool Int(int i)         { RAPIDJSON_SCHEMA_HANDLE_VALUE_(kIntegerSchemaType, Int,    (CurrentContext(), i), (i)); }
+    virtual bool Uint(unsigned u)   { RAPIDJSON_SCHEMA_HANDLE_VALUE_(kIntegerSchemaType, Uint,   (CurrentContext(), u), (u)); }
+    virtual bool Int64(int64_t i)   { RAPIDJSON_SCHEMA_HANDLE_VALUE_(kIntegerSchemaType, Int64,  (CurrentContext(), i), (i)); }
+    virtual bool Uint64(uint64_t u) { RAPIDJSON_SCHEMA_HANDLE_VALUE_(kIntegerSchemaType, Uint64, (CurrentContext(), u), (u)); }
+    virtual bool Double(double d)   { RAPIDJSON_SCHEMA_HANDLE_VALUE_(kNumberSchemaType,  Double, (CurrentContext(), d), (d)); }
+    virtual bool String(const Ch* str, SizeType length, bool copy)
+                                    { RAPIDJSON_SCHEMA_HANDLE_VALUE_(kStringSchemaType, String, (CurrentContext(), str, length, copy), (str, length, copy)); }
+
+    virtual bool StartObject() {
+        RAPIDJSON_SCHEMA_HANDLE_BEGIN_(kObjectSchemaType, StartObject, (CurrentContext()));
+        RAPIDJSON_SCHEMA_HANDLE_LOGIC_(StartObject, ());
+        return valid_ = outputHandler_.StartObject();
+    }
+    
+    virtual bool Key(const Ch* str, SizeType len, bool copy) {
+        if (!valid_) return false;
+        if (!CurrentSchema().Key(CurrentContext(), str, len, copy)) return valid_ = false;
+        RAPIDJSON_SCHEMA_HANDLE_LOGIC_(Key, (str, len, copy));
+        return valid_ = outputHandler_.Key(str, len, copy);
+    }
+    
+    virtual bool EndObject(SizeType memberCount) { 
+        if (!valid_) return false;
+        if (!CurrentSchema().EndObject(CurrentContext(), memberCount)) return valid_ = false;
+        RAPIDJSON_SCHEMA_HANDLE_LOGIC_(EndObject, (memberCount));
+        RAPIDJSON_SCHEMA_HANDLE_END_  (EndObject, (memberCount));
+    }
+
+    virtual bool StartArray() {
+        RAPIDJSON_SCHEMA_HANDLE_BEGIN_(kArraySchemaType, StartArray, (CurrentContext()));
+        RAPIDJSON_SCHEMA_HANDLE_LOGIC_(StartArray, ());
+        return valid_ = outputHandler_.StartArray();
+    }
+    
+    virtual bool EndArray(SizeType elementCount) {
+        if (!valid_) return false;
+        if (!CurrentSchema().EndArray(CurrentContext(), elementCount)) return valid_ = false;
+        RAPIDJSON_SCHEMA_HANDLE_LOGIC_(EndArray, (elementCount));
+        RAPIDJSON_SCHEMA_HANDLE_END_  (EndArray, (elementCount));
+    }
+
+#undef RAPIDJSON_SCHEMA_HANDLE_BEGIN_
+#undef RAPIDJSON_SCHEMA_HANDLE_LOGIC_
+#undef RAPIDJSON_SCHEMA_HANDLE_VALUE_
 
     // Implementation of ISchemaValidatorFactory<Encoding>
     virtual ISchemaValidator<Encoding>* CreateSchemaValidator(const BaseSchema<Encoding>& root) {
@@ -1318,8 +1399,9 @@ private:
         :
         root_(root),
         outputHandler_(nullOutputHandler_),
-        schemaStack_(allocator, schemaStackCapacity)
-        // , documentStack_(allocator, documentStackCapacity)
+        schemaStack_(allocator, schemaStackCapacity),
+        // documentStack_(allocator, documentStackCapacity),
+        valid_(true)
     {
     }
 
@@ -1344,9 +1426,13 @@ private:
     }
 
     bool EndValue() {
+        if (!CurrentSchema().EndValue(CurrentContext()))
+            return false;
+
         PopSchema();
         if (!schemaStack_.Empty() && CurrentContext().multiTypeSchema)
              PopSchema();
+
         return true;
     }
 
@@ -1362,6 +1448,7 @@ private:
     OutputHandler& outputHandler_;
     internal::Stack<Allocator> schemaStack_;    //!< stack to store the current path of schema (BaseSchemaType *)
     //internal::Stack<Allocator> documentStack_;  //!< stack to store the current path of validating document (Value *)
+    bool valid_;
 };
 
 typedef GenericSchemaValidator<UTF8<> > SchemaValidator;
