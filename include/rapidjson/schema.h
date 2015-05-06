@@ -960,8 +960,8 @@ public:
     virtual bool StartObject(Context&) const { return false; }
     virtual bool Key(Context&, const Ch*, SizeType, bool) const { return false; }
     virtual bool EndObject(Context&, SizeType) const { return false; }
-    virtual bool StartArray(Context&) const { return true; }
-    virtual bool EndArray(Context&, SizeType) const { return true; }
+    virtual bool StartArray(Context&) const { return false; }
+    virtual bool EndArray(Context&, SizeType) const { return false; }
 
 private:
 #if RAPIDJSON_SCHEMA_USE_STDREGEX
@@ -1350,6 +1350,7 @@ public:
         while (!schemaStack_.Empty())
             PopSchema();
         //documentStack_.Clear();
+        valid_ = true;
     };
 
     // Implementation of ISchemaValidator<Encoding>
