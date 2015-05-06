@@ -105,29 +105,29 @@ $(document).ready(function(){initNavTree('ieee754_8h_source.html','');});
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">class </span>Double {</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    Double() {}</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    Double(<span class="keywordtype">double</span> d) : d(d) {}</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    Double(uint64_t u) : u(u) {}</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    Double(<span class="keywordtype">double</span> d) : d_(d) {}</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;    Double(uint64_t u) : u_(u) {}</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordtype">double</span> <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> d; }</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    uint64_t Uint64Value()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> u; }</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keywordtype">double</span> <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> d_; }</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    uint64_t Uint64Value()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> u_; }</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keywordtype">double</span> NextPositiveDouble()<span class="keyword"> const </span>{</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(!Sign());</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        <span class="keywordflow">return</span> Double(u + 1).Value();</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        <span class="keywordflow">return</span> Double(u_ + 1).Value();</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    }</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordtype">bool</span> Sign()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u &amp; kSignMask) != 0; }</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    uint64_t Significand()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> u &amp; kSignificandMask; }</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">int</span> Exponent()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> ((u &amp; kExponentMask) &gt;&gt; kSignificandSize) - kExponentBias; }</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keywordtype">bool</span> Sign()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u_ &amp; kSignMask) != 0; }</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    uint64_t Significand()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> u_ &amp; kSignificandMask; }</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">int</span> Exponent()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(((u_ &amp; kExponentMask) &gt;&gt; kSignificandSize) - kExponentBias); }</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">bool</span> IsNan()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u &amp; kExponentMask) == kExponentMask &amp;&amp; Significand() != 0; }</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">bool</span> IsInf()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u &amp; kExponentMask) == kExponentMask &amp;&amp; Significand() == 0; }</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">bool</span> IsNormal()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u &amp; kExponentMask) != 0 || Significand() == 0; }</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">bool</span> IsZero()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u &amp; (kExponentMask | kSignificandMask)) == 0; }</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">bool</span> IsNan()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u_ &amp; kExponentMask) == kExponentMask &amp;&amp; Significand() != 0; }</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">bool</span> IsInf()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u_ &amp; kExponentMask) == kExponentMask &amp;&amp; Significand() == 0; }</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">bool</span> IsNormal()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u_ &amp; kExponentMask) != 0 || Significand() == 0; }</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">bool</span> IsZero()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u_ &amp; (kExponentMask | kSignificandMask)) == 0; }</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    uint64_t IntegerSignificand()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> IsNormal() ? Significand() | kHiddenBit : Significand(); }</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordtype">int</span> IntegerExponent()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (IsNormal() ? Exponent() : kDenormalExponent) - kSignificandSize; }</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    uint64_t ToBias()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u &amp; kSignMask) ? ~u + 1 : u | kSignMask; }</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    uint64_t ToBias()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u_ &amp; kSignMask) ? ~u_ + 1 : u_ | kSignMask; }</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">unsigned</span> EffectiveSignificandSize(<span class="keywordtype">int</span> order) {</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <span class="keywordflow">if</span> (order &gt;= -1021)</div>
@@ -148,8 +148,8 @@ $(document).ready(function(){initNavTree('ieee754_8h_source.html','');});
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> uint64_t kHiddenBit = <a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0x00100000, 0x00000000);</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">union </span>{</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keywordtype">double</span> d;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        uint64_t u;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keywordtype">double</span> d_;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        uint64_t u_;</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    };</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;};</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>

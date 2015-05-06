@@ -127,7 +127,7 @@ $(document).ready(function(){initNavTree('diyfp_8h_source.html','');});
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;            uint64_t u64;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        } u = { d };</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keywordtype">int</span> biased_e = (u.u64 &amp; kDpExponentMask) &gt;&gt; kDpSignificandSize;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keywordtype">int</span> biased_e = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>((u.u64 &amp; kDpExponentMask) &gt;&gt; kDpSignificandSize);</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        uint64_t significand = (u.u64 &amp; kDpSignificandMask);</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        <span class="keywordflow">if</span> (biased_e != 0) {</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;            f = significand + kDpHiddenBit;</div>
@@ -153,7 +153,7 @@ $(document).ready(function(){initNavTree('diyfp_8h_source.html','');});
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="preprocessor">#elif (__GNUC__ &gt; 4 || (__GNUC__ == 4 &amp;&amp; __GNUC_MINOR__ &gt;= 6)) &amp;&amp; defined(__x86_64__)</span></div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        __extension__ <span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> __int128 uint128;</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        uint128 p = <span class="keyword">static_cast&lt;</span>uint128<span class="keyword">&gt;</span>(f) * static_cast&lt;uint128&gt;(rhs.f);</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        uint64_t h = p &gt;&gt; 64;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        uint64_t h = <span class="keyword">static_cast&lt;</span>uint64_t<span class="keyword">&gt;</span>(p &gt;&gt; 64);</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        uint64_t l = <span class="keyword">static_cast&lt;</span>uint64_t<span class="keyword">&gt;</span>(p);</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        <span class="keywordflow">if</span> (l &amp; (uint64_t(1) &lt;&lt; 63)) <span class="comment">// rounding</span></div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;            h++;</div>

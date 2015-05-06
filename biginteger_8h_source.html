@@ -179,7 +179,7 @@ $(document).ready(function(){initNavTree('biginteger_8h_source.html','');});
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;        <span class="keywordflow">if</span> (u == 1) <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        <span class="keywordflow">if</span> (*<span class="keyword">this</span> == 1) <span class="keywordflow">return</span> *<span class="keyword">this</span> = u;</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        uint32_t k = 0;</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        uint64_t k = 0;</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; count_; i++) {</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;            <span class="keyword">const</span> uint64_t c = digits_[i] &gt;&gt; 32;</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            <span class="keyword">const</span> uint64_t d = digits_[i] &amp; 0xFFFFFFFF;</div>
@@ -328,7 +328,7 @@ $(document).ready(function(){initNavTree('biginteger_8h_source.html','');});
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;        __extension__ <span class="keyword">typedef</span> <span class="keywordtype">unsigned</span> __int128 uint128;</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        uint128 p = <span class="keyword">static_cast&lt;</span>uint128<span class="keyword">&gt;</span>(a) * static_cast&lt;uint128&gt;(b);</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;        p += k;</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        *outHigh = p &gt;&gt; 64;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        *outHigh = <span class="keyword">static_cast&lt;</span>uint64_t<span class="keyword">&gt;</span>(p &gt;&gt; 64);</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>uint64_t<span class="keyword">&gt;</span>(p);</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;<span class="preprocessor">#else</span></div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        <span class="keyword">const</span> uint64_t a0 = a &amp; 0xFFFFFFFF, a1 = a &gt;&gt; 32, b0 = b &amp; 0xFFFFFFFF, b1 = b &gt;&gt; 32;</div>
