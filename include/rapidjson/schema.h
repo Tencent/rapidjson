@@ -192,7 +192,7 @@ public:
 
     virtual bool HandleMultiType(Context&, SchemaType) const { return true; }
 
-    virtual bool BeginValue(Context& context) const { return true; }
+    virtual bool BeginValue(Context&) const { return true; }
 
     virtual bool EndValue(Context& context) const {
         if (allOf_.schemas) {
@@ -230,22 +230,22 @@ public:
         return true;
     }
 
-#define RAPIDJSON_BASESCHEMA_HANDLER_(context, arg, method_call)\
+#define RAPIDJSON_BASESCHEMA_HANDLER_(context, arg)\
     CreateLogicValidators(context); return !enum_.IsArray() || CheckEnum(GenericValue<Encoding> arg .Move())
 
-    virtual bool Null(Context& context) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (), Null()); }
-    virtual bool Bool(Context& context, bool b) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (b), Bool(b)); }
-    virtual bool Int(Context& context, int i) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (i), Int(i)); }
-    virtual bool Uint(Context& context, unsigned u) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (u), Uint(u)); }
-    virtual bool Int64(Context& context, int64_t i) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (i), Int64(i)); }
-    virtual bool Uint64(Context& context, uint64_t u) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (u), Int(u)); }
-    virtual bool Double(Context& context, double d) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (d), Double(d)); }
-    virtual bool String(Context& context, const Ch* s, SizeType length, bool copy) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (s, length), String(s, length, copy)); }
+    virtual bool Null(Context& context) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, ()); }
+    virtual bool Bool(Context& context, bool b) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (b)); }
+    virtual bool Int(Context& context, int i) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (i)); }
+    virtual bool Uint(Context& context, unsigned u) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (u)); }
+    virtual bool Int64(Context& context, int64_t i) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (i)); }
+    virtual bool Uint64(Context& context, uint64_t u) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (u)); }
+    virtual bool Double(Context& context, double d) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (d)); }
+    virtual bool String(Context& context, const Ch* s, SizeType length, bool) const { RAPIDJSON_BASESCHEMA_HANDLER_(context, (s, length)); }
     virtual bool StartObject(Context& context) const { CreateLogicValidators(context);  return true; }
-    virtual bool Key(Context& context, const Ch* s, SizeType length, bool copy) const { return true; }
-    virtual bool EndObject(Context& context, SizeType memberCount) const { return true; }
+    virtual bool Key(Context&, const Ch*, SizeType, bool) const { return true; }
+    virtual bool EndObject(Context&, SizeType) const { return true; }
     virtual bool StartArray(Context& context) const { CreateLogicValidators(context); return true; }
-    virtual bool EndArray(Context& context, SizeType elementCount) const { return true; }
+    virtual bool EndArray(Context&, SizeType) const { return true; }
 
 #undef RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_
 #undef RAPIDJSON_BASESCHEMA_HANDLER_
@@ -299,9 +299,11 @@ protected:
 template <typename Encoding>
 class EmptySchema : public BaseSchema<Encoding> {
 public:
+    typedef SchemaValidationContext<Encoding> Context;
+
     virtual ~EmptySchema() {}
     virtual SchemaType GetSchemaType() const { return kTypelessSchemaType; }
-    virtual bool BeginValue(Context& context) const { context.valueSchema = this; return BaseSchema::BeginValue(context); }
+    virtual bool BeginValue(Context& context) const { context.valueSchema = this; return BaseSchema<Encoding>::BeginValue(context); }
 };
 
 template <typename Encoding>
@@ -315,7 +317,7 @@ public:
     TypelessSchema(const ValueType& value) : BaseSchema<Encoding>(value) {}
 
     virtual SchemaType GetSchemaType() const { return kTypelessSchemaType; }
-    virtual bool BeginValue(Context& context) const { context.valueSchema = &empty_; return BaseSchema::BeginValue(context); }
+    virtual bool BeginValue(Context& context) const { context.valueSchema = &empty_; return BaseSchema<Encoding>::BeginValue(context); }
 
 private:
     EmptySchema<Encoding> empty_;

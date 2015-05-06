@@ -706,11 +706,8 @@ TEST(SchemaValidator, TestSuite) {
                             testCount++;
                             validator.Reset();
                             bool actual = data.Accept(validator);
-                            if (expected != actual) {
-                                char buffer[256];
-                                sprintf(buffer, "%s \"%s\"", filename, description);
-                                GTEST_NONFATAL_FAILURE_(buffer);
-                            }
+                            if (expected != actual)
+                                printf("Fail: %30s \"%s\"\n", filename, description);
                             else
                                 passCount++;
                         }
@@ -721,4 +718,6 @@ TEST(SchemaValidator, TestSuite) {
         free(json);
     }
     printf("%d / %d passed (%2d%%)\n", passCount, testCount, passCount * 100 / testCount);
+    if (passCount != testCount)
+        ADD_FAILURE();
 }
