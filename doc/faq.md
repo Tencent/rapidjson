@@ -1,10 +1,12 @@
 # FAQ
 
+[TOC]
+
 ## General
 
 1. What is RapidJSON?
 
-   RapidJSON is a C++ library for parsing and generating JSON. You may check all [features](features.md) of it.
+   RapidJSON is a C++ library for parsing and generating JSON. You may check all [features](doc/features.md) of it.
 
 2. Why is RapidJSON named so?
 
@@ -26,7 +28,7 @@
 
 6. How to install RapidJSON?
 
-   Check [Installation section](http://miloyip.github.io/rapidjson/).
+   Check [Installation section](https://miloyip.github.io/rapidjson/).
 
 7. Can RapidJSON run on my platform?
 
@@ -42,11 +44,11 @@
 
 10. How RapidJSON is tested?
 
-   RapidJSON contains a unit test suite for automatic testing. [Travis](https://travis-ci.org/miloyip/rapidjson/) will compile and run the unit test suite for all modifications. The test process also uses Valgrind to detect memory leaks.
+   RapidJSON contains a unit test suite for automatic testing. [Travis](https://travis-ci.org/miloyip/rapidjson/)(for Linux) and [AppVeyor](https://ci.appveyor.com/project/miloyip/rapidjson/)(for Windows) will compile and run the unit test suite for all modifications. The test process also uses Valgrind (in Linux) to detect memory leaks.
 
 11. Is RapidJSON well documented?
 
-   RapidJSON provides [user guide and API documentationn](http://miloyip.github.io/rapidjson/index.html).
+   RapidJSON provides user guide and API documentationn.
 
 12. Are there alternatives?
 
@@ -86,11 +88,11 @@
 
 4. What is *in situ* parsing?
 
-   *in situ* parsing decodes the JSON strings directly into the input JSON. This is an optimization which can reduce memory consumption and improve performance, but the input JSON will be modified. Check [in-situ parsing](http://miloyip.github.io/rapidjson/md_doc_dom.html#InSituParsing) for details.
+   *in situ* parsing decodes the JSON strings directly into the input JSON. This is an optimization which can reduce memory consumption and improve performance, but the input JSON will be modified. Check [in-situ parsing](doc/dom.md) for details.
 
 5. When does parsing generate an error?
 
-   The parser generates an error when the input JSON contains invalid syntax, or a value can not be represented (a number is too big), or the handler of parsers terminate the parsing. Check [parse error](http://miloyip.github.io/rapidjson/md_doc_dom.html#ParseError) for details.
+   The parser generates an error when the input JSON contains invalid syntax, or a value can not be represented (a number is too big), or the handler of parsers terminate the parsing. Check [parse error](doc/dom.md) for details.
 
 6. What error information is provided? 
 
@@ -103,44 +105,127 @@
 ## Document/Value (DOM)
 
 1. What is move semantics? Why?
+
+   Instead of copy semantics, move semantics is used in `Value`. That means, when assigning a source value to a target value, the ownership of source value is moved to the target value.
+
+   Since moving is faster than copying, this design decision forces user to aware of the copying overhead.
+
 2. How to copy a value?
+
+   There are two APIs: constructor with allocator, and `CopyFrom()`. See [Deep Copy Value](doc/tutorial.md) for an example.
+
 3. Why do I need to provide the length of string?
-4. Why do I need to provide allocator in many DOM manipulation API?
+
+   Since C string is null-terminated, the length of string needs to be computed via `strlen()`, with linear runtime complexity. This incurs an unncessary overhead of many operations, if the user already knows the length of string.
+
+   Also, RapidJSON can handle `\u0000` (null character) within a string. If a string contains null characters, `strlen()` cannot return the true length of it. In such case user must provide the length of string explicitly.
+
+4. Why do I need to provide allocator parameter in many DOM manipulation API?
+
+   Since the APIs are member functions of `Value`, we do not want to save an allocator pointer in every `Value`.
+
 5. Does it convert between numerical types?
+
+   When using `GetInt()`, `GetUint()`, ... conversion may occur. For integer-to-integer conversion, it only convert when it is safe (otherwise it will assert). However, when converting a 64-bit signed/unsigned integer to double, it will convert but be aware that it may lose precision. A number with fraction, or an integer larger than 64-bit, can only be obtained by `GetDouble()`.
 
 ## Reader/Writer (SAX)
 
-1. Why not just `printf` a JSON? Why need a `Writer`? 
-2. Why can't I parse a JSON which is just a number?
-3. Can I pause the parsing process and resume it later?
+1. Why don't we just `printf` a JSON? Why do we need a `Writer`? 
+
+   Most importantly, `Writer` will ensure the output JSON is well-formed. Calling SAX events incorrectly (e.g. `StartObject()` pairing with `EndArray()`) will assert. Besides, `Writer` will escapes strings (e.g., `\n`). Finally, the numeric output of `printf()` may not be a valid JSON number, especially in some locale with digit delimiters. And the number-to-string conversion in `Writer` is implemented with very fast algorithms, which outperforms than `printf()` or `iostream`.
+
+2. Can I pause the parsing process and resume it later?
+
+   This is not directly supported in the current version due to performance consideration. However, if the execution environment supports multi-threading, user can parse a JSON in a separate thread, and pause it by blocking in the input stream.
 
 ## Unicode
 
 1. Does it support UTF-8, UTF-16 and other format?
+
+   Yes. It fully support UTF-8, UTF-16 (LE/BE), UTF-32 (LE/BE) and ASCII. 
+
 2. Can it validate the encoding?
+
+   Yes, just pass `kParseValidateEncodingFlag` to `Parse()`. If there is invalid encoding in the stream, it wil generate `kParseErrorStringInvalidEncoding` error.
+
 3. What is surrogate pair? Does RapidJSON support it?
-4. Can it handle '\u0000' (null character) in JSON string?
-5. Can I output '\uxxxx' for all non-ASCII character?
+
+   JSON uses UTF-16 encoding when escaping unicode character, e.g. `\u5927` representing Chinese character "big". To handle characters other than those in basic multilingual plane (BMP), UTF-16 encodes those characters with two 16-bit values, which is called UTF-16 surrogate pair. For example, the Emoji character U+1F602 can be encoded as `\uD83D\uDE02` in JSON.
+
+   RapidJSON fully support parsing/generating UTF-16 surrogates. 
+
+4. Can it handle `\u0000` (null character) in JSON string?
+
+   Yes. RapidJSON fully support null character in JSON string. However, user need to be aware of it and using `GetStringLength()` and related APIs to obtain the true length of string.
+
+5. Can I output `\uxxxx` for all non-ASCII character?
+
+   Yes, use `ASCII<>` as output encoding template parameter in `Writer` can enforce escaping those characters.
 
 ## Stream
 
 1. I have a big JSON file. Should I load the whole file to memory?
+
+   User can use `FileReadStream` to read the file chunk-by-chunk. But for *in situ* parsing, the whole file must be loaded.
+
 2. Can I parse JSON while it is streamed from network?
-3. I don't know what format will the JSON be. How to handle them?
+
+   Yes. User can implement a custom stream for this. Please refer to the implementation of `FileReadStream`.
+
+3. I don't know what encoding will the JSON be. How to handle them?
+
+   You may use `AutoUTFInputStream` which detects the encoding of input stream automatically. However, it will incur some performance overhead.
+
 4. What is BOM? How RapidJSON handle it?
+
+   [Byte order mark (BOM)](http://en.wikipedia.org/wiki/Byte_order_mark) sometimes reside at the beginning of file/stream to indiciate the UTF encoding type of it.
+
+   RapidJSON's `EncodedInputStream` can detect/consume BOM. `EncodedOutputStream` can optionally write a BOM. See [Encoded Streams](doc/stream.md) for example.
+
 5. Why little/big endian is related?
+
+   little/big endian of stream is an issue for UTF-16 and UTF-32 streams, but not UTF-8 stream.
 
 ## Performance
 
 1. Is RapidJSON really fast?
+
+   Yes. It may be the fastest open source JSON library. There is a [benchmark](https://github.com/miloyip/nativejson-benchmark) for evaluating performance of C/C++ JSON libaries.
+
 2. Why is it fast?
+
+   Many design decisions of RapidJSON is aimed at time/space performance. These may reduce user-friendliness of APIs. Besides, it also employs low-level optimizations (intrinsics, SIMD) and special algorithms (custom double-to-string, string-to-double conversions).
+
 3. What is SIMD? How it is applied in RapidJSON?
+
+   [SIMD](http://en.wikipedia.org/wiki/SIMD) instructions can perform parallel computation in modern CPUs. RapidJSON support Intel's SSE2/SSE4.2 to accelerate whitespace skipping. This improves performance of parsing indent formatted JSON. Define `RAPIDJSON_SSE2` or `RAPIDJSON_SSE42` macro to enable this feature. However, running the executable on a machine without such instruction set support will make it crash.
+
 4. Does it consume a lot of memory?
+
+   The design of RapidJSON aims at reducing memory footprint.
+
+   In the SAX API, `Reader` consumes memory portional to maximum depth of JSON tree, plus maximum length of JSON string.
+
+   In the DOM API, each `Value` consumes exactly 16/24 bytes for 32/64-bit architecture respectively. RapidJSON also uses a special memory allocator to minimize overhead of allocations.
+
 5. What is the purpose of being high performance?
+
+   Some applications need to process very large JSON files. Some server-side applications need to process huge amount of JSONs. Being high performance can improve both latency and throuput. In a broad sense, it will also save energy.
 
 ## Gossip
 
 1. Who are the developers of RapidJSON?
+
+   Milo Yip ([miloyip](https://github.com/miloyip)) is the original author of RapidJSON. Many contributors from the world have improved RapidJSON.  Philipp A. Hartmann ([pah](https://github.com/pah)) has implemented a lot of improvements, setting up automatic testing and also involves in a lot of discussions for the community. Don Ding ([thebusytypist](https://github.com/thebusytypist)) implemented the iterative parser. Andrii Senkovych ([jollyroger](https://github.com/jollyroger)) completed the CMake migration. Kosta ([Kosta-Github](https://github.com/Kosta-Github)) provided a very neat short-string optimization. Thank you for all other contributors and community members as well.
+
 2. Why do you develop RapidJSON?
+
+   It was just a hobby project initially in 2011. Milo Yip is a game programmer and he just knew about JSON at that time and would like to apply JSON in future projects. As JSON seems very simple he would like to write a header-only and fast library.
+
 3. Why there is a long empty period of development?
+
+   It is basically due to personal issues, such as getting new family members. Also, Milo Yip has spent a lot of spare time on translating "Game Engine Architecture" by Jason Gregory into Chinese.
+
 4. Why did the repository move from Google Code to GitHub?
+
+   This is the trend. And GitHub is much more powerful and convenient.

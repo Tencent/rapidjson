@@ -1,22 +1,16 @@
-// Copyright (C) 2011 Milo Yip
+// Tencent is pleased to support the open source community by making RapidJSON available.
+// 
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// Licensed under the MIT License (the "License"); you may not use this file except
+// in compliance with the License. You may obtain a copy of the License at
 //
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
+// http://opensource.org/licenses/MIT
 //
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// Unless required by applicable law or agreed to in writing, software distributed 
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// specific language governing permissions and limitations under the License.
 
 #include "unittest.h"
 #include "rapidjson/document.h"
@@ -28,13 +22,11 @@
 
 using namespace rapidjson;
 
-template <typename Allocator, typename StackAllocator>
-void ParseTest() {
-    typedef GenericDocument<UTF8<>, Allocator, StackAllocator> DocumentType;
+template <typename DocumentType>
+void ParseCheck(DocumentType& doc) {
     typedef typename DocumentType::ValueType ValueType;
-    DocumentType doc;
 
-    doc.Parse(" { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3, 4] } ");
+    EXPECT_FALSE(doc.HasParseError());
 
     EXPECT_TRUE(doc.IsObject());
 
@@ -63,7 +55,7 @@ void ParseTest() {
     EXPECT_TRUE(doc.HasMember("pi"));
     const ValueType& pi = doc["pi"];
     EXPECT_TRUE(pi.IsNumber());
-    EXPECT_EQ(3.1416, pi.GetDouble());
+    EXPECT_DOUBLE_EQ(3.1416, pi.GetDouble());
 
     EXPECT_TRUE(doc.HasMember("a"));
     const ValueType& a = doc["a"];
@@ -71,6 +63,28 @@ void ParseTest() {
     EXPECT_EQ(4u, a.Size());
     for (SizeType i = 0; i < 4; i++)
         EXPECT_EQ(i + 1, a[i].GetUint());
+}
+
+template <typename Allocator, typename StackAllocator>
+void ParseTest() {
+    typedef GenericDocument<UTF8<>, Allocator, StackAllocator> DocumentType;
+    DocumentType doc;
+
+    const char* json = " { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3, 4] } ";
+
+    doc.Parse(json);
+    ParseCheck(doc);
+
+    doc.SetNull();
+    StringStream s(json);
+    doc.template ParseStream<0>(s);
+    ParseCheck(doc);
+
+    doc.SetNull();
+    char *buffer = strdup(json);
+    doc.ParseInsitu(buffer);
+    ParseCheck(doc);
+    free(buffer);
 }
 
 TEST(Document, Parse) {
@@ -81,14 +95,21 @@ TEST(Document, Parse) {
 }
 
 static FILE* OpenEncodedFile(const char* filename) {
+    const char *paths[] = {
+        "encodings/%s",
+        "bin/encodings/%s",
+        "../bin/encodings/%s",
+        "../../bin/encodings/%s",
+        "../../../bin/encodings/%s"
+    };
     char buffer[1024];
-    sprintf(buffer, "encodings/%s", filename);
-    FILE *fp = fopen(buffer, "rb");
-    if (!fp) {
-        sprintf(buffer, "../../bin/encodings/%s", filename);
-        fp = fopen(buffer, "rb");
+    for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
+        sprintf(buffer, paths[i], filename);
+        FILE *fp = fopen(buffer, "rb");
+        if (fp)
+            return fp;
     }
-    return fp;
+    return 0;
 }
 
 TEST(Document, ParseStream_EncodedInputStream) {
@@ -125,6 +146,7 @@ TEST(Document, ParseStream_EncodedInputStream) {
         StringBuffer bos2;
         Writer<StringBuffer> writer(bos2);
         reader.Parse(is, writer);
+        fclose(fp);
 
         EXPECT_EQ(bos.GetSize(), bos2.GetSize());
         EXPECT_EQ(0, memcmp(bos.GetString(), bos2.GetString(), bos2.GetSize()));
@@ -163,6 +185,7 @@ TEST(Document, ParseStream_AutoUTFInputStream) {
         StringBuffer bos2;
         Writer<StringBuffer> writer(bos2);
         reader.Parse(is, writer);
+        fclose(fp);
 
         EXPECT_EQ(bos.GetSize(), bos2.GetSize());
         EXPECT_EQ(0, memcmp(bos.GetString(), bos2.GetString(), bos2.GetSize()));
@@ -212,6 +235,23 @@ TEST(Document, AcceptWriter) {
     EXPECT_EQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3,4]}", os.str());
 }
 
+TEST(Document, UserBuffer) {
+    typedef GenericDocument<UTF8<>, MemoryPoolAllocator<>, MemoryPoolAllocator<> > DocumentType;
+    char valueBuffer[4096];
+    char parseBuffer[1024];
+    MemoryPoolAllocator<> valueAllocator(valueBuffer, sizeof(valueBuffer));
+    MemoryPoolAllocator<> parseAllocator(parseBuffer, sizeof(parseBuffer));
+    DocumentType doc(&valueAllocator, sizeof(parseBuffer), &parseAllocator);
+    doc.Parse(" { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3, 4] } ");
+    EXPECT_FALSE(doc.HasParseError());
+    EXPECT_LE(valueAllocator.Size(), sizeof(valueBuffer));
+    EXPECT_LE(parseAllocator.Size(), sizeof(parseBuffer));
+
+    // Cover MemoryPoolAllocator::Capacity()
+    EXPECT_LE(valueAllocator.Size(), valueAllocator.Capacity());
+    EXPECT_LE(parseAllocator.Size(), parseAllocator.Capacity());
+}
+
 // Issue 226: Value of string type should not point to NULL
 TEST(Document, AssertAcceptInvalidNameType) {
     Document doc;
@@ -236,7 +276,7 @@ TEST(Document, UTF16_Document) {
     GenericValue< UTF16<> >& s = v[L"created_at"];
     ASSERT_TRUE(s.IsString());
 
-    EXPECT_EQ(0, wcscmp(L"Wed Oct 30 17:13:20 +0000 2012", s.GetString()));
+    EXPECT_EQ(0, memcmp(L"Wed Oct 30 17:13:20 +0000 2012", s.GetString(), (s.GetStringLength() + 1) * sizeof(wchar_t)));
 }
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
@@ -253,8 +293,8 @@ TEST(Document, Traits) {
 
     static_assert(!std::is_nothrow_constructible<Document>::value, "");
     static_assert(!std::is_nothrow_default_constructible<Document>::value, "");
-    static_assert(!std::is_nothrow_copy_constructible<Document>::value, "");
 #ifndef _MSC_VER
+    static_assert(!std::is_nothrow_copy_constructible<Document>::value, "");
     static_assert(std::is_nothrow_move_constructible<Document>::value, "");
 #endif
 

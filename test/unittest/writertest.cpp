@@ -1,22 +1,16 @@
-// Copyright (C) 2011 Milo Yip
+// Tencent is pleased to support the open source community by making RapidJSON available.
+// 
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// Licensed under the MIT License (the "License"); you may not use this file except
+// in compliance with the License. You may obtain a copy of the License at
 //
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
+// http://opensource.org/licenses/MIT
 //
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// Unless required by applicable law or agreed to in writing, software distributed 
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// specific language governing permissions and limitations under the License.
 
 #include "unittest.h"
 
@@ -46,7 +40,7 @@ TEST(Writer, Compact) {
         StringBuffer buffer; \
         Writer<StringBuffer> writer(buffer); \
         Reader reader; \
-        reader.Parse<0>(s, writer); \
+        reader.Parse<kParseFullPrecisionFlag>(s, writer); \
         EXPECT_STREQ(json, buffer.GetString()); \
         EXPECT_TRUE(writer.IsComplete()); \
     }
@@ -89,10 +83,27 @@ TEST(Writer, String) {
     TEST_ROUNDTRIP("[\"Hello\"]");
     TEST_ROUNDTRIP("[\"Hello\\u0000World\"]");
     TEST_ROUNDTRIP("[\"\\\"\\\\/\\b\\f\\n\\r\\t\"]");
+
+#if RAPIDJSON_HAS_STDSTRING
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.String(std::string("Hello\n"));
+        EXPECT_STREQ("\"Hello\\n\"", buffer.GetString());
+    }
+#endif
 }
 
 TEST(Writer, Double) {
     TEST_ROUNDTRIP("[1.2345,1.2345678,0.123456789012,1234567.8]");
+    TEST_ROUNDTRIP("0.0");
+    TEST_ROUNDTRIP("-0.0"); // Issue #289
+    TEST_ROUNDTRIP("1e30");
+    TEST_ROUNDTRIP("1.0");
+    TEST_ROUNDTRIP("5e-324"); // Min subnormal positive double
+    TEST_ROUNDTRIP("2.225073858507201e-308"); // Max subnormal positive double
+    TEST_ROUNDTRIP("2.2250738585072014e-308"); // Min normal positive double
+    TEST_ROUNDTRIP("1.7976931348623157e308"); // Max double
 
 }
 
@@ -152,7 +163,7 @@ private:
 };
 
 TEST(Writer, OStreamWrapper) {
-    StringStream s("{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] } ");
+    StringStream s("{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3], \"u64\": 1234567890123456789, \"i64\":-1234567890123456789 } ");
     
     std::stringstream ss;
     OStreamWrapper os(ss);
@@ -163,7 +174,7 @@ TEST(Writer, OStreamWrapper) {
     reader.Parse<0>(s, writer);
     
     std::string actual = ss.str();
-    EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3]}", actual.c_str());
+    EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3],\"u64\":1234567890123456789,\"i64\":-1234567890123456789}", actual.c_str());
 }
 
 TEST(Writer, AssertRootMayBeAnyValue) {
@@ -305,4 +316,62 @@ TEST(Writer, RootValueIsComplete) {
     T(writer.Double(0));
     T(writer.String(""));
 #undef T
+}
+
+TEST(Writer, InvalidEncoding) {
+    // Fail in decoding invalid UTF-8 sequence http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
+    {
+        GenericStringBuffer<UTF16<> > buffer;
+        Writer<GenericStringBuffer<UTF16<> >, UTF8<>, UTF16<> > writer(buffer);
+        writer.StartArray();
+        EXPECT_FALSE(writer.String("\xfe"));
+        EXPECT_FALSE(writer.String("\xff"));
+        EXPECT_FALSE(writer.String("\xfe\xfe\xff\xff"));
+        writer.EndArray();
+    }
+
+    // Fail in encoding
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer, UTF32<> > writer(buffer);
+        static const UTF32<>::Ch s[] = { 0x110000, 0 }; // Out of U+0000 to U+10FFFF
+        EXPECT_FALSE(writer.String(s));
+    }
+
+    // Fail in unicode escaping in ASCII output
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer, UTF32<>, ASCII<> > writer(buffer);
+        static const UTF32<>::Ch s[] = { 0x110000, 0 }; // Out of U+0000 to U+10FFFF
+        EXPECT_FALSE(writer.String(s));
+    }
+}
+
+TEST(Writer, InvalidEventSequence) {
+    // {]
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.StartObject();
+        EXPECT_THROW(writer.EndArray(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+
+    // [}
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.StartArray();
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+
+    // { 1: 
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.StartObject();
+        EXPECT_THROW(writer.Int(1), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
 }

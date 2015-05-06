@@ -74,6 +74,18 @@ div.toc li {
 	margin-top: 0px;
 }
 
+.summary {
+	float: none !important;
+	width: auto !important;
+	padding-top: 10px;
+	padding-right: 10px !important;
+}
+
+.summary + .headertitle .title {
+	font-size: 1.5em;
+	line-height: 2.0em;
+}
+
 body h1 {
 	font-size: 2em;
 	line-height: 1.7;
@@ -113,6 +125,7 @@ table.doxtable td, table.doxtable th {
 	background-color: #fff;
 	width: 918px;
 	height: auto !important;
+	margin-left: 270px !important;
 }
 
 div.contents {
@@ -177,7 +190,8 @@ div.fragment {
 	border-top: 60px solid #2980b9;
 	background-color: #343131;
 	width: 250px !important;
-	position: fixed
+	height: 100% !important;
+	position: fixed;
 }
 
 #nav-tree

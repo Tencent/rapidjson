@@ -1,22 +1,16 @@
-// Copyright (C) 2011 Milo Yip
+// Tencent is pleased to support the open source community by making RapidJSON available.
+// 
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// Licensed under the MIT License (the "License"); you may not use this file except
+// in compliance with the License. You may obtain a copy of the License at
 //
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
+// http://opensource.org/licenses/MIT
 //
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// Unless required by applicable law or agreed to in writing, software distributed 
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// specific language governing permissions and limitations under the License.
 
 #ifndef RAPIDJSON_ENCODEDSTREAM_H_
 #define RAPIDJSON_ENCODEDSTREAM_H_
@@ -115,6 +109,7 @@ public:
         \param type UTF encoding type if it is not detected from the stream.
     */
     AutoUTFInputStream(InputByteStream& is, UTFType type = kUTF8) : is_(&is), type_(type), hasBOM_(false) {
+        RAPIDJSON_ASSERT(type >= kUTF8 && type <= kUTF32BE);        
         DetectType();
         static const TakeFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Take) };
         takeFunc_ = f[type_];
@@ -183,21 +178,8 @@ private:
         }
 
         // Runtime check whether the size of character type is sufficient. It only perform checks with assertion.
-        switch (type_) {
-        case kUTF8:
-            // Do nothing
-            break;
-        case kUTF16LE:
-        case kUTF16BE:
-            RAPIDJSON_ASSERT(sizeof(Ch) >= 2);
-            break;
-        case kUTF32LE:
-        case kUTF32BE:
-            RAPIDJSON_ASSERT(sizeof(Ch) >= 4);
-            break;
-        default:
-            RAPIDJSON_ASSERT(false);    // Invalid type
-        }
+        if (type_ == kUTF16LE || type_ == kUTF16BE) RAPIDJSON_ASSERT(sizeof(Ch) >= 2);
+        if (type_ == kUTF32LE || type_ == kUTF32BE) RAPIDJSON_ASSERT(sizeof(Ch) >= 4);
     }
 
     typedef Ch (*TakeFunc)(InputByteStream& is);
@@ -226,22 +208,11 @@ public:
         \param putBOM Whether to write BOM at the beginning of the stream.
     */
     AutoUTFOutputStream(OutputByteStream& os, UTFType type, bool putBOM) : os_(&os), type_(type) {
-        // RUntime check whether the size of character type is sufficient. It only perform checks with assertion.
-        switch (type_) {
-        case kUTF16LE:
-        case kUTF16BE:
-            RAPIDJSON_ASSERT(sizeof(Ch) >= 2);
-            break;
-        case kUTF32LE:
-        case kUTF32BE:
-            RAPIDJSON_ASSERT(sizeof(Ch) >= 4);
-            break;
-        case kUTF8:
-            // Do nothing
-            break;
-        default:
-            RAPIDJSON_ASSERT(false);    // Invalid UTFType
-        }
+        RAPIDJSON_ASSERT(type >= kUTF8 && type <= kUTF32BE);
+
+        // Runtime check whether the size of character type is sufficient. It only perform checks with assertion.
+        if (type_ == kUTF16LE || type_ == kUTF16BE) RAPIDJSON_ASSERT(sizeof(Ch) >= 2);
+        if (type_ == kUTF32LE || type_ == kUTF32BE) RAPIDJSON_ASSERT(sizeof(Ch) >= 4);
 
         static const PutFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Put) };
         putFunc_ = f[type_];

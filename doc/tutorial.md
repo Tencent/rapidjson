@@ -2,7 +2,7 @@
 
 This tutorial introduces the basics of the Document Object Model(DOM) API.
 
-As shown in [Usage at a glance](readme.md), a JSON can be parsed into DOM, and then the DOM can be queried and modified easily, and finally be converted back to JSON.
+As shown in [Usage at a glance](@ref index), a JSON can be parsed into DOM, and then the DOM can be queried and modified easily, and finally be converted back to JSON.
 
 [TOC]
 
@@ -192,7 +192,7 @@ Checking          | Obtaining
 `bool IsNumber()` | N/A
 `bool IsUint()`   | `unsigned GetUint()`
 `bool IsInt()`    | `int GetInt()`
-`bool IsUint64()` | `uint64_t GetUint()`
+`bool IsUint64()` | `uint64_t GetUint64()`
 `bool IsInt64()`  | `int64_t GetInt64()`
 `bool IsDouble()` | `double GetDouble()`
 
@@ -512,4 +512,4 @@ This tutorial shows the basics of DOM tree query and manipulation. There are sev
 5. [Performance](doc/performance.md) shows some in-house and third-party benchmarks.
 6. [Internals](doc/internals.md) describes some internal designs and techniques of RapidJSON.
 
-You may also refer to the [FAQ](faq.md), API documentation, examples and unit tests.
+You may also refer to the [FAQ](doc/faq.md), API documentation, examples and unit tests.

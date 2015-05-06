@@ -4,7 +4,6 @@
 
 set -e
 
-SUDO=sudo
 DOXYGEN_VER=doxygen-1.8.7
 DOXYGEN_TAR=${DOXYGEN_VER}.linux.bin.tar.gz
 DOXYGEN_URL="http://ftp.stack.nl/pub/users/dimitri/${DOXYGEN_TAR}"
@@ -51,19 +50,19 @@ doxygen_install()
 {
 	wget -O - "${DOXYGEN_URL}" | \
 		tar xz -C ${TMPDIR-/tmp} ${DOXYGEN_VER}/bin/doxygen
-	$SUDO install -m 755 ${TMPDIR-/tmp}/${DOXYGEN_VER}/bin/doxygen \
-		${DOXYGEN_BIN};
+    export PATH="${TMPDIR-/tmp}/${DOXYGEN_VER}/bin:$PATH"
 }
 
 doxygen_run()
 {
 	cd "${TRAVIS_BUILD_DIR}";
-	doxygen build/Doxyfile;
+	doxygen ${TRAVIS_BUILD_DIR}/build/doc/Doxyfile;
+	doxygen ${TRAVIS_BUILD_DIR}/build/doc/Doxyfile.zh-cn;
 }
 
 gh_pages_prepare()
 {
-	cd "${TRAVIS_BUILD_DIR}/doc";
+	cd "${TRAVIS_BUILD_DIR}/build/doc";
 	[ ! -d "html" ] || \
 		abort "Doxygen target directory already exists."
 	git --version
@@ -78,7 +77,7 @@ gh_pages_prepare()
 }
 
 gh_pages_commit() {
-	cd "${TRAVIS_BUILD_DIR}/doc/html";
+	cd "${TRAVIS_BUILD_DIR}/build/doc/html";
 	git add --all;
 	git diff-index --quiet HEAD || git commit -m "Automatic doxygen build";
 }
@@ -102,7 +101,7 @@ gh_pages_push() {
 	[ "${#GH_TOKEN}" -eq 40 ] || \
 		abort "GitHub token invalid: found ${#GH_TOKEN} characters, expected 40."
 
-	cd "${TRAVIS_BUILD_DIR}/doc/html";
+	cd "${TRAVIS_BUILD_DIR}/build/doc/html";
 	# setup credentials (hide in "set -x" mode)
 	git remote set-url --push origin "${GITHUB_URL}"
 	git config credential.helper 'store'

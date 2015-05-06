@@ -1,22 +1,16 @@
-// Copyright (C) 2011 Milo Yip
+// Tencent is pleased to support the open source community by making RapidJSON available.
+// 
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// Licensed under the MIT License (the "License"); you may not use this file except
+// in compliance with the License. You may obtain a copy of the License at
 //
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
+// http://opensource.org/licenses/MIT
 //
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// Unless required by applicable law or agreed to in writing, software distributed 
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// specific language governing permissions and limitations under the License.
 
 // This is a C++ header-only implementation of Grisu2 algorithm from the publication:
 // Loitsch, Florian. "Printing floating-point numbers quickly and accurately with
@@ -25,11 +19,11 @@
 #ifndef RAPIDJSON_DIYFP_H_
 #define RAPIDJSON_DIYFP_H_
 
-#if defined(_MSC_VER)
+#include "../rapidjson.h"
+
+#if defined(_MSC_VER) && defined(_M_AMD64)
 #include <intrin.h>
-#if defined(_M_AMD64)
 #pragma intrinsic(_BitScanReverse64)
-#endif
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -51,7 +45,7 @@ struct DiyFp {
             uint64_t u64;
         } u = { d };
 
-        int biased_e = (u.u64 & kDpExponentMask) >> kDpSignificandSize;
+        int biased_e = static_cast<int>((u.u64 & kDpExponentMask) >> kDpSignificandSize);
         uint64_t significand = (u.u64 & kDpSignificandMask);
         if (biased_e != 0) {
             f = significand + kDpHiddenBit;
@@ -75,8 +69,9 @@ struct DiyFp {
             h++;
         return DiyFp(h, e + rhs.e + 64);
 #elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) && defined(__x86_64__)
-        unsigned __int128 p = static_cast<unsigned __int128>(f) * static_cast<unsigned __int128>(rhs.f);
-        uint64_t h = p >> 64;
+        __extension__ typedef unsigned __int128 uint128;
+        uint128 p = static_cast<uint128>(f) * static_cast<uint128>(rhs.f);
+        uint64_t h = static_cast<uint64_t>(p >> 64);
         uint64_t l = static_cast<uint64_t>(p);
         if (l & (uint64_t(1) << 63)) // rounding
             h++;
@@ -140,25 +135,9 @@ struct DiyFp {
             double d;
             uint64_t u64;
         }u;
-        uint64_t significand = f;
-        int exponent = e;
-        while (significand > kDpHiddenBit + kDpSignificandMask) {
-            significand >>= 1;
-            exponent++;
-        }
-        while (exponent > kDpDenormalExponent && (significand & kDpHiddenBit) == 0) {
-            significand <<= 1;
-            exponent--;
-        }
-        if (exponent >= kDpMaxExponent) {
-            u.u64 = kDpExponentMask;    // Infinity
-            return u.d;
-        }
-        else if (exponent < kDpDenormalExponent)
-            return 0.0;
-        const uint64_t be = (exponent == kDpDenormalExponent && (significand & kDpHiddenBit) == 0) ? 0 : 
-            static_cast<uint64_t>(exponent + kDpExponentBias);
-        u.u64 = (significand & kDpSignificandMask) | (be << kDpSignificandSize);
+        const uint64_t be = (e == kDpDenormalExponent && (f & kDpHiddenBit) == 0) ? 0 : 
+            static_cast<uint64_t>(e + kDpExponentBias);
+        u.u64 = (f & kDpSignificandMask) | (be << kDpSignificandSize);
         return u.d;
     }
 
@@ -243,7 +222,7 @@ inline DiyFp GetCachedPower(int e, int* K) {
     //int k = static_cast<int>(ceil((-61 - e) * 0.30102999566398114)) + 374;
     double dk = (-61 - e) * 0.30102999566398114 + 347;  // dk must be positive, so can do ceiling in positive
     int k = static_cast<int>(dk);
-    if (k != dk)
+    if (dk - k > 0.0)
         k++;
 
     unsigned index = static_cast<unsigned>((k >> 3) + 1);

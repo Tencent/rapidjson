@@ -6,36 +6,46 @@ compiler:
 
 env:
   matrix:
-    - CONF=debug   BITS=64
-    - CONF=release BITS=64
-    - CONF=debug   BITS=32
-    - CONF=release BITS=32
+    - CONF=debug   ARCH=x86_64
+    - CONF=release ARCH=x86_64
+    - CONF=debug   ARCH=x86
+    - CONF=release ARCH=x86
   global:
+    - ARCH_FLAGS_x86='-m32'        # #266: don't use SSE on 32-bit
+    - ARCH_FLAGS_x86_64='-msse4.2' #       use SSE4.2 on 64-bit
     - GITHUB_REPO='miloyip/rapidjson'
-    - DEFINES='-DRAPIDJSON_HAS_STDSTRING'
     - secure: "HrsaCb+N66EG1HR+LWH1u51SjaJyRwJEDzqJGYMB7LJ/bfqb9mWKF1fLvZGk46W5t7TVaXRDD5KHFx9DPWvKn4gRUVkwTHEy262ah5ORh8M6n/6VVVajeV/AYt2C0sswdkDBDO4Xq+xy5gdw3G8s1A4Inbm73pUh+6vx+7ltBbk="
 
 before_install:
-  - sudo add-apt-repository -y ppa:codegear/release
   - sudo apt-get update -qq
-  - sudo apt-get install -qq premake4 valgrind
-  - if [ "$BITS" = 32 ]; then sudo apt-get install -qq g++-multilib libc6-dbg:i386; fi
+  - sudo apt-get install -qq cmake valgrind
+  - sudo apt-get --no-install-recommends install doxygen # Don't install LaTeX stuffs
+  - if [ "$ARCH" = "x86" ]; then sudo apt-get install -qq g++-multilib libc6-dbg:i386; fi
+  - if [ "$CC" = "gcc" ] && [ "$CONF" = "debug" ]; then sudo pip install cpp-coveralls; export GCOV_FLAGS='--coverage'; fi
 
 install: true
 
 before_script:
-  - (cd build && premake4 'gmake')
 #   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
 #   exposed by merging PR#163 (using -march=native)
-  - (cd build/gmake && sed -i 's/march=native/msse4.2/' *.make)
+    - sed -i "s/-march=native//" CMakeLists.txt
+    - mkdir build 
+    - >
+        eval "ARCH_FLAGS=\${ARCH_FLAGS_${ARCH}}" ;
+        (cd build && cmake 
+        -DRAPIDJSON_HAS_STDSTRING=ON
+        -DCMAKE_VERBOSE_MAKEFILE=ON 
+        -DCMAKE_BUILD_TYPE=$CONF 
+        -DCMAKE_CXX_FLAGS="$ARCH_FLAGS $GCOV_FLAGS"
+        -DCMAKE_EXE_LINKER_FLAGS=$GCOV_FLAGS
+        ..)
 
 script:
-  - make -C build/gmake -f test.make    config=${CONF}${BITS}
-  - make -C build/gmake -f example.make config=${CONF}${BITS}
-  - if [ "$CONF" = "debug" ] && ( objdump -t -C intermediate/${CONF}/gmake/unittest/x${BITS}/namespacetest.o | grep rapidjson ) ; then echo "Symbol check failed!" ; false; fi
-  - pushd bin
-  -  ./unittest_${CONF}_x${BITS}_gmake
-  - valgrind --leak-check=full --error-exitcode=1 ./unittest_${CONF}_x${BITS}_gmake
-  - if [ "$CONF" = "release" ]; then ./perftest_${CONF}_x${BITS}_gmake; fi
-  - popd
-  - ./build/travis-doxygen.sh;
+  - cd build
+  - make tests
+  - make examples
+  - ctest -V `[ "$CONF" = "release" ] || echo "-E perftest"`
+  - make travis_doc
+
+after_success:
+  - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h

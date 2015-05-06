@@ -1,22 +1,16 @@
-// Copyright (C) 2011 Milo Yip
+// Tencent is pleased to support the open source community by making RapidJSON available.
+// 
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// Licensed under the MIT License (the "License"); you may not use this file except
+// in compliance with the License. You may obtain a copy of the License at
 //
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
+// http://opensource.org/licenses/MIT
 //
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// Unless required by applicable law or agreed to in writing, software distributed 
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// specific language governing permissions and limitations under the License.
 
 #ifndef RAPIDJSON_STRTOD_
 #define RAPIDJSON_STRTOD_
@@ -58,7 +52,7 @@ inline T Min3(T a, T b, T c) {
     return m;
 }
 
-inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp, bool* adjustToNegative) {
+inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp) {
     const Double db(b);
     const uint64_t bInt = db.IntegerSignificand();
     const int bExp = db.IntegerExponent();
@@ -110,19 +104,9 @@ inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp, bool* adj
     hS.MultiplyPow5(hS_Exp5) <<= hS_Exp2;
 
     BigInteger delta(0);
-    *adjustToNegative = dS.Difference(bS, &delta);
+    dS.Difference(bS, &delta);
 
-    int cmp = delta.Compare(hS);
-    // If delta is within 1/2 ULP, check for special case when significand is power of two.
-    // In this case, need to compare with 1/2h in the lower bound.
-    if (cmp < 0 && *adjustToNegative && // within and dS < bS
-        db.IsNormal() && (bInt & (bInt - 1)) == 0 && // Power of 2
-        db.Uint64Value() != RAPIDJSON_UINT64_C2(0x00100000, 0x00000000)) // minimum normal number must not do this
-    {
-        delta <<= 1;
-        return delta.Compare(hS);
-    }
-    return cmp;
+    return delta.Compare(hS);
 }
 
 inline bool StrtodFast(double d, int p, double* result) {
@@ -219,24 +203,18 @@ inline double StrtodBigInteger(double approx, const char* decimals, size_t lengt
     const BigInteger dInt(decimals, length);
     const int dExp = (int)decimalPosition - (int)length + exp;
     Double a(approx);
-    for (int i = 0; i < 10; i++) {
-        bool adjustToNegative;
-        int cmp = CheckWithinHalfULP(a.Value(), dInt, dExp, &adjustToNegative);
-        if (cmp < 0)
-            return a.Value();  // within half ULP
-        else if (cmp == 0) {
-            // Round towards even
-            if (a.Significand() & 1)
-                return adjustToNegative ? a.PreviousPositiveDouble() : a.NextPositiveDouble();
-            else
-                return a.Value();
-        }
-        else // adjustment
-            a = adjustToNegative ? a.PreviousPositiveDouble() : a.NextPositiveDouble();
+    int cmp = CheckWithinHalfULP(a.Value(), dInt, dExp);
+    if (cmp < 0)
+        return a.Value();  // within half ULP
+    else if (cmp == 0) {
+        // Round towards even
+        if (a.Significand() & 1)
+            return a.NextPositiveDouble();
+        else
+            return a.Value();
     }
-
-    // This should not happen, but in case there is really a bug, break the infinite-loop
-    return a.Value();
+    else // adjustment
+        return a.NextPositiveDouble();
 }
 
 inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t length, size_t decimalPosition, int exp) {
@@ -264,7 +242,9 @@ inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t 
     // Trim right-most digits
     const int kMaxDecimalDigit = 780;
     if ((int)length > kMaxDecimalDigit) {
-        exp += (int(length) - kMaxDecimalDigit);
+        int delta = (int(length) - kMaxDecimalDigit);
+        exp += delta;
+        decimalPosition -= delta;
         length = kMaxDecimalDigit;
     }
 

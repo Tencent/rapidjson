@@ -44,7 +44,7 @@ PROJECT_NUMBER         =
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "A fast JSON parser/generator for C++ with both SAX/DOM style API"
+PROJECT_BRIEF          = "一个C++快速JSON解析器及生成器，包含SAX/DOM风格API"
 
 # With the PROJECT_LOGO tag one can specify an logo or icon that is included in
 # the documentation. The maximum height of the logo should not exceed 55 pixels
@@ -58,7 +58,7 @@ PROJECT_LOGO           =
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = ./doc
+OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 4096 sub-
 # directories (in 2 levels) under the output directory of each output format and
@@ -91,7 +91,7 @@ ALLOW_UNICODE_NAMES    = NO
 # Ukrainian and Vietnamese.
 # The default value is: English.
 
-OUTPUT_LANGUAGE        = English
+OUTPUT_LANGUAGE        = Chinese
 
 # If the BRIEF_MEMBER_DESC tag is set to YES doxygen will include brief member
 # descriptions after the members that are listed in the file and class
@@ -764,18 +764,18 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ./include/rapidjson/rapidjson.h \
+INPUT                  = ./readme.zh-cn.md \
+                         ./include/rapidjson/rapidjson.h \
                          ./include/ \
-                         ./readme.md \
-                         ./doc/features.md \
-                         ./doc/tutorial.md \
-                         ./doc/stream.md \
-                         ./doc/encoding.md \
-                         ./doc/dom.md \
-                         ./doc/sax.md \
-                         ./doc/performance.md \
+                         ./doc/features.zh-cn.md \
+                         ./doc/tutorial.zh-cn.md \
+                         ./doc/stream.zh-cn.md \
+                         ./doc/encoding.zh-cn.md \
+                         ./doc/dom.zh-cn.md \
+                         ./doc/sax.zh-cn.md \
+                         ./doc/performance.zh-cn.md \
                          ./doc/internals.md \
-                         ./doc/faq.md
+                         ./doc/faq.zh-cn.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -920,7 +920,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the doxygen output.
 
-USE_MDFILE_AS_MAINPAGE = ./readme.md
+USE_MDFILE_AS_MAINPAGE = readme.zh-cn.md
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
@@ -1068,7 +1068,7 @@ GENERATE_HTML          = YES
 # The default directory is: html.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_OUTPUT            = html
+HTML_OUTPUT            = html/zh-cn
 
 # The HTML_FILE_EXTENSION tag can be used to specify the file extension for each
 # generated HTML page (for example: .htm, .php, .asp).

@@ -1,22 +1,16 @@
-// Copyright (C) 2011 Milo Yip
+// Tencent is pleased to support the open source community by making RapidJSON available.
+// 
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// Licensed under the MIT License (the "License"); you may not use this file except
+// in compliance with the License. You may obtain a copy of the License at
 //
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
+// http://opensource.org/licenses/MIT
 //
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// Unless required by applicable law or agreed to in writing, software distributed 
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// specific language governing permissions and limitations under the License.
 
 #ifndef RAPIDJSON_READER_H_
 #define RAPIDJSON_READER_H_
@@ -261,23 +255,23 @@ void SkipWhitespace(InputStream& is) {
 #ifdef RAPIDJSON_SSE42
 //! Skip whitespace with SSE 4.2 pcmpistrm instruction, testing 16 8-byte characters at once.
 inline const char *SkipWhitespace_SIMD(const char* p) {
-	// Fast return for single non-whitespace
-	if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
-		++p;
-	else
-		return p;
+    // Fast return for single non-whitespace
+    if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
+        ++p;
+    else
+        return p;
 
-	// 16-byte align to the next boundary
-	const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & ~15);
-	while (p != nextAligned)
-		if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
-			++p;
-		else
-			return p;
+    // 16-byte align to the next boundary
+    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & ~15);
+    while (p != nextAligned)
+        if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
+            ++p;
+        else
+            return p;
 
     // The rest of string using SIMD
-	static const char whitespace[16] = " \n\r\t";
-	const __m128i w = _mm_load_si128((const __m128i *)&whitespace[0]);
+    static const char whitespace[16] = " \n\r\t";
+    const __m128i w = _mm_load_si128((const __m128i *)&whitespace[0]);
 
     for (;; p += 16) {
         const __m128i s = _mm_load_si128((const __m128i *)p);
@@ -298,31 +292,31 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
 
 //! Skip whitespace with SSE2 instructions, testing 16 8-byte characters at once.
 inline const char *SkipWhitespace_SIMD(const char* p) {
-	// Fast return for single non-whitespace
-	if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
-		++p;
-	else
-		return p;
+    // Fast return for single non-whitespace
+    if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
+        ++p;
+    else
+        return p;
 
     // 16-byte align to the next boundary
-	const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & ~15);
-	while (p != nextAligned)
-		if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
-			++p;
-		else
-			return p;
+    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & ~15);
+    while (p != nextAligned)
+        if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
+            ++p;
+        else
+            return p;
 
     // The rest of string
-	static const char whitespaces[4][17] = {
-		"                ",
-		"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
-		"\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r",
-		"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"};
+    static const char whitespaces[4][17] = {
+        "                ",
+        "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+        "\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r",
+        "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"};
 
-		const __m128i w0 = _mm_loadu_si128((const __m128i *)&whitespaces[0][0]);
-		const __m128i w1 = _mm_loadu_si128((const __m128i *)&whitespaces[1][0]);
-		const __m128i w2 = _mm_loadu_si128((const __m128i *)&whitespaces[2][0]);
-		const __m128i w3 = _mm_loadu_si128((const __m128i *)&whitespaces[3][0]);
+        const __m128i w0 = _mm_loadu_si128((const __m128i *)&whitespaces[0][0]);
+        const __m128i w1 = _mm_loadu_si128((const __m128i *)&whitespaces[1][0]);
+        const __m128i w2 = _mm_loadu_si128((const __m128i *)&whitespaces[2][0]);
+        const __m128i w3 = _mm_loadu_si128((const __m128i *)&whitespaces[3][0]);
 
     for (;; p += 16) {
         const __m128i s = _mm_load_si128((const __m128i *)p);
@@ -695,11 +689,13 @@ private:
                 }
                 else if (e == 'u') {    // Unicode
                     unsigned codepoint = ParseHex4(is);
+                    RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
                     if (codepoint >= 0xD800 && codepoint <= 0xDBFF) {
                         // Handle UTF-16 surrogate pair
                         if (is.Take() != '\\' || is.Take() != 'u')
                             RAPIDJSON_PARSE_ERROR(kParseErrorStringUnicodeSurrogateInvalid, is.Tell() - 2);
                         unsigned codepoint2 = ParseHex4(is);
+                        RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
                         if (codepoint2 < 0xDC00 || codepoint2 > 0xDFFF)
                             RAPIDJSON_PARSE_ERROR(kParseErrorStringUnicodeSurrogateInvalid, is.Tell() - 2);
                         codepoint = (((codepoint - 0xD800) << 10) | (codepoint2 - 0xDC00)) + 0x10000;
@@ -900,7 +896,7 @@ private:
                 if (significandDigit < 17) {
                     d = d * 10.0 + (s.TakePush() - '0');
                     --expFrac;
-                    if (d != 0.0)
+                    if (d > 0.0)
                         significandDigit++;
                 }
                 else
@@ -929,10 +925,22 @@ private:
 
             if (s.Peek() >= '0' && s.Peek() <= '9') {
                 exp = s.Take() - '0';
-                while (s.Peek() >= '0' && s.Peek() <= '9') {
-                    exp = exp * 10 + (s.Take() - '0');
-                    if (exp > 308 && !expMinus) // exp > 308 should be rare, so it should be checked first.
-                        RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
+                if (expMinus) {
+                    while (s.Peek() >= '0' && s.Peek() <= '9') {
+                        exp = exp * 10 + (s.Take() - '0');
+                        if (exp >= 214748364) {                         // Issue #313: prevent overflow exponent
+                            while (s.Peek() >= '0' && s.Peek() <= '9')  // Consume the rest of exponent
+                                s.Take();
+                        }
+                    }
+                }
+                else {  // positive exp
+                    int maxExp = 308 - expFrac;
+                    while (s.Peek() >= '0' && s.Peek() <= '9') {
+                        exp = exp * 10 + (s.Take() - '0');
+                        if (exp > maxExp)
+                            RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
+                    }
                 }
             }
             else
@@ -1231,14 +1239,9 @@ private:
     // May return a new state on state pop.
     template <unsigned parseFlags, typename InputStream, typename Handler>
     RAPIDJSON_FORCEINLINE IterativeParsingState Transit(IterativeParsingState src, Token token, IterativeParsingState dst, InputStream& is, Handler& handler) {
+        (void)token;
+
         switch (dst) {
-        case IterativeParsingStartState:
-            RAPIDJSON_ASSERT(false);
-            return IterativeParsingErrorState;
-
-        case IterativeParsingFinishState:
-            return dst;
-
         case IterativeParsingErrorState:
             return dst;
 
@@ -1277,12 +1280,9 @@ private:
                 return dst;
 
         case IterativeParsingKeyValueDelimiterState:
-            if (token == ColonToken) {
-                is.Take();
-                return dst;
-            }
-            else
-                return IterativeParsingErrorState;
+            RAPIDJSON_ASSERT(token == ColonToken);
+            is.Take();
+            return dst;
 
         case IterativeParsingMemberValueState:
             // Must be non-compound value. Or it would be ObjectInitial or ArrayInitial state.
@@ -1357,17 +1357,25 @@ private:
             }
         }
 
-        case IterativeParsingValueState:
+        default:
+            // This branch is for IterativeParsingValueState actually.
+            // Use `default:` rather than
+            // `case IterativeParsingValueState:` is for code coverage.
+
+            // The IterativeParsingStartState is not enumerated in this switch-case.
+            // It is impossible for that case. And it can be caught by following assertion.
+
+            // The IterativeParsingFinishState is not enumerated in this switch-case either.
+            // It is a "derivative" state which cannot triggered from Predict() directly.
+            // Therefore it cannot happen here. And it can be caught by following assertion.
+            RAPIDJSON_ASSERT(dst == IterativeParsingValueState);
+
             // Must be non-compound value. Or it would be ObjectInitial or ArrayInitial state.
             ParseValue<parseFlags>(is, handler);
             if (HasParseError()) {
                 return IterativeParsingErrorState;
             }
             return IterativeParsingFinishState;
-
-        default:
-            RAPIDJSON_ASSERT(false);
-            return IterativeParsingErrorState;
         }
     }
 

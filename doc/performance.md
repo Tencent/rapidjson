@@ -1,14 +1,10 @@
 # Performance
 
-The old performance article for RapidJSON 0.1 is provided [here](https://code.google.com/p/rapidjson/wiki/Performance).
-
-The (third-party) performance tests have been removed from this repository
-and are now part of a dedicated [native JSON benchmark collection] [1].
-
-This file will be updated with a summary of benchmarking results based on
-the above benchmark collection in the future.
+There is a [native JSON benchmark collection] [1] which evaluates speed, memory usage and code size of various operations among 20 JSON libaries.
 
 [1]: https://github.com/miloyip/nativejson-benchmark
+
+The old performance article for RapidJSON 0.1 is provided [here](https://code.google.com/p/rapidjson/wiki/Performance).
 
 Additionally, you may refer to the following third-party benchmarks.
 
