@@ -1,7 +1,3 @@
-/bin/*
-!/bin/data
-!/bin/encodings
-!/bin/jsonchecker
 /build
 /doc/html
 /doc/doxygen_*.db

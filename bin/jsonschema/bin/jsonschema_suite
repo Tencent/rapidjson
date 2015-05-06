@@ -1,0 +1,283 @@
+#! /usr/bin/env python
+from __future__ import print_function
+import sys
+import textwrap
+
+try:
+    import argparse
+except ImportError:
+    print(textwrap.dedent("""
+        The argparse library could not be imported. jsonschema_suite requires
+        either Python 2.7 or for you to install argparse. You can do so by
+        running `pip install argparse`, `easy_install argparse` or by
+        downloading argparse and running `python2.6 setup.py install`.
+
+        See https://pypi.python.org/pypi/argparse for details.
+    """.strip("\n")))
+    sys.exit(1)
+
+import errno
+import fnmatch
+import json
+import os
+import random
+import shutil
+import unittest
+import warnings
+
+if getattr(unittest, "skipIf", None) is None:
+    unittest.skipIf = lambda cond, msg : lambda fn : fn
+
+try:
+    import jsonschema
+except ImportError:
+    jsonschema = None
+else:
+    validators = getattr(
+        jsonschema.validators, "validators", jsonschema.validators
+    )
+
+
+ROOT_DIR = os.path.join(
+    os.path.dirname(__file__), os.pardir).rstrip("__pycache__")
+SUITE_ROOT_DIR = os.path.join(ROOT_DIR, "tests")
+
+REMOTES = {
+    "integer.json": {"type": "integer"},
+    "subSchemas.json": {
+        "integer": {"type": "integer"},
+        "refToInteger": {"$ref": "#/integer"},
+    },
+    "folder/folderInteger.json": {"type": "integer"}
+}
+REMOTES_DIR = os.path.join(ROOT_DIR, "remotes")
+
+TESTSUITE_SCHEMA = {
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "description": {"type": "string", "required": True},
+            "schema": {"required": True},
+            "tests": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "description": {"type": "string", "required": True},
+                        "data": {"required": True},
+                        "valid": {"type": "boolean", "required": True}
+                    },
+                    "additionalProperties": False
+                },
+                "minItems": 1
+            }
+        },
+        "additionalProperties": False,
+        "minItems": 1
+    }
+}
+
+
+def files(paths):
+    for path in paths:
+        with open(path) as test_file:
+            yield json.load(test_file)
+
+
+def groups(paths):
+    for test_file in files(paths):
+        for group in test_file:
+            yield group
+
+
+def cases(paths):
+    for test_group in groups(paths):
+        for test in test_group["tests"]:
+            test["schema"] = test_group["schema"]
+            yield test
+
+
+def collect(root_dir):
+    for root, dirs, files in os.walk(root_dir):
+        for filename in fnmatch.filter(files, "*.json"):
+            yield os.path.join(root, filename)
+
+
+class SanityTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        print("Looking for tests in %s" % SUITE_ROOT_DIR)
+        cls.test_files = list(collect(SUITE_ROOT_DIR))
+        print("Found %s test files" % len(cls.test_files))
+        assert cls.test_files, "Didn't find the test files!"
+
+    def test_all_files_are_valid_json(self):
+        for path in self.test_files:
+            with open(path) as test_file:
+                try:
+                    json.load(test_file)
+                except ValueError as error:
+                    self.fail("%s contains invalid JSON (%s)" % (path, error))
+
+    def test_all_descriptions_have_reasonable_length(self):
+        for case in cases(self.test_files):
+            descript = case["description"]
+            self.assertLess(
+                len(descript),
+                60,
+                "%r is too long! (keep it to less than 60 chars)" % (descript,)
+            )
+
+    def test_all_descriptions_are_unique(self):
+        for group in groups(self.test_files):
+            descriptions = set(test["description"] for test in group["tests"])
+            self.assertEqual(
+                len(descriptions),
+                len(group["tests"]),
+                "%r contains a duplicate description" % (group,)
+            )
+
+    @unittest.skipIf(jsonschema is None, "Validation library not present!")
+    def test_all_schemas_are_valid(self):
+        for schema in os.listdir(SUITE_ROOT_DIR):
+            schema_validator = validators.get(schema)
+            if schema_validator is not None:
+                test_files = collect(os.path.join(SUITE_ROOT_DIR, schema))
+                for case in cases(test_files):
+                    try:
+                        schema_validator.check_schema(case["schema"])
+                    except jsonschema.SchemaError as error:
+                        self.fail("%s contains an invalid schema (%s)" %
+                                  (case, error))
+            else:
+                warnings.warn("No schema validator for %s" % schema)
+
+    @unittest.skipIf(jsonschema is None, "Validation library not present!")
+    def test_suites_are_valid(self):
+        validator = jsonschema.Draft3Validator(TESTSUITE_SCHEMA)
+        for tests in files(self.test_files):
+            try:
+                validator.validate(tests)
+            except jsonschema.ValidationError as error:
+                self.fail(str(error))
+
+    def test_remote_schemas_are_updated(self):
+        for url, schema in REMOTES.items():
+            filepath = os.path.join(REMOTES_DIR, url)
+            with open(filepath) as schema_file:
+                self.assertEqual(json.load(schema_file), schema)
+
+
+def main(arguments):
+    if arguments.command == "check":
+        suite = unittest.TestLoader().loadTestsFromTestCase(SanityTests)
+        result = unittest.TextTestRunner(verbosity=2).run(suite)
+        sys.exit(not result.wasSuccessful())
+    elif arguments.command == "flatten":
+        selected_cases = [case for case in cases(collect(arguments.version))]
+
+        if arguments.randomize:
+            random.shuffle(selected_cases)
+
+        json.dump(selected_cases, sys.stdout, indent=4, sort_keys=True)
+    elif arguments.command == "remotes":
+        json.dump(REMOTES, sys.stdout, indent=4, sort_keys=True)
+    elif arguments.command == "dump_remotes":
+        if arguments.update:
+            shutil.rmtree(arguments.out_dir, ignore_errors=True)
+
+        try:
+            os.makedirs(arguments.out_dir)
+        except OSError as e:
+            if e.errno == errno.EEXIST:
+                print("%s already exists. Aborting." % arguments.out_dir)
+                sys.exit(1)
+            raise
+
+        for url, schema in REMOTES.items():
+            filepath = os.path.join(arguments.out_dir, url)
+
+            try:
+                os.makedirs(os.path.dirname(filepath))
+            except OSError as e:
+                if e.errno != errno.EEXIST:
+                    raise
+
+            with open(filepath, "wb") as out_file:
+                json.dump(schema, out_file, indent=4, sort_keys=True)
+    elif arguments.command == "serve":
+        try:
+            from flask import Flask, jsonify
+        except ImportError:
+            print(textwrap.dedent("""
+                The Flask library is required to serve the remote schemas.
+
+                You can install it by running `pip install Flask`.
+
+                Alternatively, see the `jsonschema_suite remotes` or
+                `jsonschema_suite dump_remotes` commands to create static files
+                that can be served with your own web server.
+            """.strip("\n")))
+            sys.exit(1)
+
+        app = Flask(__name__)
+
+        @app.route("/<path:path>")
+        def serve_path(path):
+            if path in REMOTES:
+                return jsonify(REMOTES[path])
+            return "Document does not exist.", 404
+
+        app.run(port=1234)
+
+
+parser = argparse.ArgumentParser(
+    description="JSON Schema Test Suite utilities",
+)
+subparsers = parser.add_subparsers(help="utility commands", dest="command")
+
+check = subparsers.add_parser("check", help="Sanity check the test suite.")
+
+flatten = subparsers.add_parser(
+    "flatten",
+    help="Output a flattened file containing a selected version's test cases."
+)
+flatten.add_argument(
+    "--randomize",
+    action="store_true",
+    help="Randomize the order of the outputted cases.",
+)
+flatten.add_argument(
+    "version", help="The directory containing the version to output",
+)
+
+remotes = subparsers.add_parser(
+    "remotes",
+    help="Output the expected URLs and their associated schemas for remote "
+         "ref tests as a JSON object."
+)
+
+dump_remotes = subparsers.add_parser(
+    "dump_remotes", help="Dump the remote ref schemas into a file tree",
+)
+dump_remotes.add_argument(
+    "--update",
+    action="store_true",
+    help="Update the remotes in an existing directory.",
+)
+dump_remotes.add_argument(
+    "--out-dir",
+    default=REMOTES_DIR,
+    type=os.path.abspath,
+    help="The output directory to create as the root of the file tree",
+)
+
+serve = subparsers.add_parser(
+    "serve",
+    help="Start a webserver to serve schemas used by remote ref tests."
+)
+
+if __name__ == "__main__":
+    main(parser.parse_args())

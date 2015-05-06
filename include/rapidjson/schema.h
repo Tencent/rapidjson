@@ -18,7 +18,7 @@
 #include "document.h"
 #include <cmath> // HUGE_VAL, fmod
 
-#if !defined(RAPIDJSON_SCHEMA_USE_STDREGEX) && __cplusplus >=201103L
+#if !defined(RAPIDJSON_SCHEMA_USE_STDREGEX) && (__cplusplus >=201103L || (defined(_MSC_VER) && _MSC_VER >= 1800))
 #define RAPIDJSON_SCHEMA_USE_STDREGEX 1
 #endif
 
@@ -1226,15 +1226,62 @@ inline BaseSchema<Encoding>* CreateSchema(const ValueType& value, const ValueTyp
 }
 
 template <typename Encoding, typename ValueType>
+inline BaseSchema<Encoding>* CreateSchema(const ValueType& value, SchemaType type) {
+    if      (type == kNullSchemaType   ) return new NullSchema<Encoding>(value);
+    else if (type == kBooleanSchemaType) return new BooleanSchema<Encoding>(value);
+    else if (type == kObjectSchemaType ) return new ObjectSchema<Encoding>(value);
+    else if (type == kArraySchemaType  ) return new ArraySchema<Encoding>(value);
+    else if (type == kStringSchemaType ) return new StringSchema<Encoding>(value);
+    else if (type == kIntegerSchemaType) return new IntegerSchema<Encoding>(value);
+    else if (type == kNumberSchemaType ) return new NumberSchema<Encoding>(value);
+    else                                return 0;
+}
+
+template <typename Encoding, typename ValueType>
 inline BaseSchema<Encoding>* CreateSchema(const ValueType& value) {
     if (!value.IsObject())
         return 0;
 
     typename ValueType::ConstMemberIterator typeItr = value.FindMember("type");
 
-    if (typeItr == value.MemberEnd())  return new TypelessSchema<Encoding>(value);
-    else if (typeItr->value.IsArray()) return new MultiTypeSchema<Encoding>(value, typeItr->value);
-    else                               return CreateSchema<Encoding, ValueType>(value, typeItr->value);
+    if (typeItr == value.MemberEnd()) {
+        // Detect type with existing properties
+        struct PropertyMap {
+            const char* name;
+            SchemaType type;
+        };
+        static const PropertyMap kPropertyMap[] = {
+            { "additional", kArraySchemaType },
+            { "additionalProperties", kObjectSchemaType },
+            { "dependencies", kObjectSchemaType },
+            { "exclusiveMinimum", kNumberSchemaType },
+            { "exclusiveMaximum", kNumberSchemaType },
+            { "items", kArraySchemaType },
+            { "minimum", kNumberSchemaType },
+            { "minItems", kArraySchemaType },
+            { "minLength", kStringSchemaType },
+            { "minProperties", kObjectSchemaType },
+            { "maximum", kNumberSchemaType },
+            { "maxItems", kArraySchemaType },
+            { "maxLength", kStringSchemaType },
+            { "maxProperties", kObjectSchemaType },
+            { "multipleOf", kNumberSchemaType },
+            { "pattern", kStringSchemaType },
+            { "patternProperties", kObjectSchemaType },
+            { "properties", kObjectSchemaType },
+            { "required", kObjectSchemaType },
+        };
+
+        for (size_t i = 0; i < sizeof(kPropertyMap) / sizeof(kPropertyMap[0]); i++)
+            if (value.HasMember(kPropertyMap[i].name))
+                return CreateSchema<Encoding, ValueType>(value, kPropertyMap[i].type);
+        
+        return new TypelessSchema<Encoding>(value);
+    }
+    else if (typeItr->value.IsArray())
+        return new MultiTypeSchema<Encoding>(value, typeItr->value);
+    else
+        return CreateSchema<Encoding, ValueType>(value, typeItr->value);
 }
 
 template <typename Encoding, typename Allocator = MemoryPoolAllocator<> >

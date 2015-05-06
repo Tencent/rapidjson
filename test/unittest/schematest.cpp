@@ -27,14 +27,8 @@ using namespace rapidjson;
     /*printf("\n%s\n", json);*/\
     d.Parse(json);\
     EXPECT_FALSE(d.HasParseError());\
-    if (expected) {\
-        EXPECT_TRUE(d.Accept(validator));\
-        EXPECT_TRUE(validator.IsValid());\
-    }\
-    else {\
-        EXPECT_FALSE(d.Accept(validator));\
-        EXPECT_FALSE(validator.IsValid()); \
-    }\
+    EXPECT_TRUE(expected == d.Accept(validator));\
+    EXPECT_TRUE(expected == validator.IsValid());\
 }
 
 TEST(SchemaValidator, Typeless) {
@@ -612,4 +606,112 @@ TEST(SchemaValidator, AllOf_Nested) {
     VALIDATE(s, "\"n\"", false);
     VALIDATE(s, "\"too long\"", false);
     VALIDATE(s, "123", false);
+}
+
+static char* ReadFile(const char* filename, size_t& length) {
+    const char *paths[] = {
+        "jsonschema/tests/draft4/%s",
+        "bin/jsonschema/tests/draft4/%s",
+        "../bin/jsonschema/tests/draft4/%s",
+        "../../bin/jsonschema/tests/draft4/%s",
+        "../../../bin/jsonschema/tests/draft4/%s"
+    };
+    char buffer[1024];
+    FILE *fp = 0;
+    for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
+        sprintf(buffer, paths[i], filename);
+        fp = fopen(buffer, "rb");
+        if (fp)
+            break;
+    }
+
+    if (!fp)
+        return 0;
+
+    fseek(fp, 0, SEEK_END);
+    length = (size_t)ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    char* json = (char*)malloc(length + 1);
+    size_t readLength = fread(json, 1, length, fp);
+    json[readLength] = '\0';
+    fclose(fp);
+    return json;
+}
+
+
+TEST(SchemaValidator, TestSuite) {
+    const char* filenames[] = {
+        "additionalItems.json",
+        "additionalProperties.json",
+        "allOf.json",
+        "anyOf.json",
+        "definitions.json",
+        "dependencies.json",
+        "enum.json",
+        "items.json",
+        "maximum.json",
+        "maxItems.json",
+        "maxLength.json",
+        "maxProperties.json",
+        "minimum.json",
+        "minItems.json",
+        "minLength.json",
+        "minProperties.json",
+        "multipleOf.json",
+        "not.json",
+        "oneOf.json",
+        "pattern.json",
+        "patternProperties.json",
+        "properties.json",
+        "ref.json",
+        "refRemote.json",
+        "required.json",
+        "type.json",
+        "uniqueItems.json"
+    };
+
+    unsigned testCount = 0;
+    unsigned passCount = 0;
+
+    for (size_t i = 0; i < sizeof(filenames) / sizeof(filenames[0]); i++) {
+        const char* filename = filenames[i];
+        size_t length;
+        char* json = ReadFile(filename, length);
+        if (!json) {
+            printf("json test suite file %s not found", filename);
+            ADD_FAILURE();
+        }
+        else {
+            Document d;
+            d.Parse(json);
+            if (d.HasParseError()) {
+                printf("json test suite file %s has parse error", filename);
+                ADD_FAILURE();
+            }
+            else {
+                for (Value::ConstValueIterator schemaItr = d.Begin(); schemaItr != d.End(); ++schemaItr) {
+                    Schema schema((*schemaItr)["schema"]);
+                    SchemaValidator validator(schema);
+                    const Value& tests = (*schemaItr)["tests"];
+                    for (Value::ConstValueIterator testItr = tests.Begin(); testItr != tests.End(); ++testItr) {
+                        testCount++;
+                        const Value& data = (*testItr)["data"];
+                        bool expected = (*testItr)["valid"].GetBool();
+                        const char* description = (*testItr)["description"].GetString();
+                        validator.Reset();
+                        bool actual = data.Accept(validator);
+                        if (expected != actual) {
+                            char buffer[256];
+                            sprintf(buffer, "%s \"%s\"", filename, description);
+                            GTEST_NONFATAL_FAILURE_(buffer);
+                        }
+                        else
+                            passCount++;
+                    }
+                }
+            }
+        }
+        free(json);
+    }
+    printf("%d / %d passed (%2d%%)\n", passCount, testCount, passCount * 100 / testCount);
 }
