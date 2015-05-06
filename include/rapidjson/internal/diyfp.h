@@ -45,7 +45,7 @@ struct DiyFp {
             uint64_t u64;
         } u = { d };
 
-        int biased_e = (u.u64 & kDpExponentMask) >> kDpSignificandSize;
+        int biased_e = static_cast<int>((u.u64 & kDpExponentMask) >> kDpSignificandSize);
         uint64_t significand = (u.u64 & kDpSignificandMask);
         if (biased_e != 0) {
             f = significand + kDpHiddenBit;
@@ -71,7 +71,7 @@ struct DiyFp {
 #elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) && defined(__x86_64__)
         __extension__ typedef unsigned __int128 uint128;
         uint128 p = static_cast<uint128>(f) * static_cast<uint128>(rhs.f);
-        uint64_t h = p >> 64;
+        uint64_t h = static_cast<uint64_t>(p >> 64);
         uint64_t l = static_cast<uint64_t>(p);
         if (l & (uint64_t(1) << 63)) // rounding
             h++;
