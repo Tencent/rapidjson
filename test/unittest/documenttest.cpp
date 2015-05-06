@@ -276,7 +276,7 @@ TEST(Document, UTF16_Document) {
     GenericValue< UTF16<> >& s = v[L"created_at"];
     ASSERT_TRUE(s.IsString());
 
-    EXPECT_EQ(0, wcscmp(L"Wed Oct 30 17:13:20 +0000 2012", s.GetString()));
+    EXPECT_EQ(0, memcmp(L"Wed Oct 30 17:13:20 +0000 2012", s.GetString(), (s.GetStringLength() + 1) * sizeof(wchar_t)));
 }
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
