@@ -21,7 +21,6 @@ using namespace rapidjson;
 
 #define VALIDATE(schema, json, expected) \
 {\
-    ASSERT_TRUE(schema.IsValid());\
     SchemaValidator validator(schema);\
     Document d;\
     /*printf("\n%s\n", json);*/\

@@ -89,8 +89,8 @@ struct BaseSchemaArray {
 
 template <typename Encoding>
 struct SchemaValidationContext {
-    SchemaValidationContext(/*ISchemaValidatorFactory<Encoding>* factory, */const BaseSchema<Encoding>* s) : 
-        /*schemaValidatorFactory(factory), */schema(s), valueSchema(), multiTypeSchema(), notValidator(), objectDependencies(), inArray(false)
+    SchemaValidationContext(const BaseSchema<Encoding>* s) : 
+        schema(s), valueSchema(), multiTypeSchema(), notValidator(), objectDependencies(), inArray(false)
     {
     }
 
@@ -99,7 +99,6 @@ struct SchemaValidationContext {
         delete[] objectDependencies;
     }
 
-    //ISchemaValidatorFactory<Encoding>* schemaValidatorFactory;
     const BaseSchema<Encoding>* schema;
     const BaseSchema<Encoding>* valueSchema;
     const BaseSchema<Encoding>* multiTypeSchema;
@@ -122,6 +121,7 @@ public:
     template <typename ValueType>
     BaseSchema(const ValueType& value) : 
         not_(),
+        type_((1 << kTotalSchemaType) - 1), // typeless
         properties_(),
         additionalPropertySchema_(),
 #if RAPIDJSON_SCHEMA_HAS_REGEX
@@ -152,328 +152,158 @@ public:
         exclusiveMinimum_(false),
         exclusiveMaximum_(false)
     {
-        type_ = (1 << kTotalSchemaType) - 1; // typeless
+        typedef typename ValueType::ConstValueIterator ConstValueIterator;
+        typedef typename ValueType::ConstMemberIterator ConstMemberIterator;
 
-        typename ValueType::ConstMemberIterator typeItr = value.FindMember("type");
-        if (typeItr != value.MemberEnd()) {
-            if (typeItr->value.IsString()) {
-                type_ = 0;
-                AddType(typeItr->value);
-            }
-            else if (typeItr->value.IsArray()) {
-                type_ = 0;
-                for (typename ValueType::ConstValueIterator itr = typeItr->value.Begin(); itr != typeItr->value.End(); ++itr) 
+        if (!value.IsObject())
+            return;
+
+        if (const ValueType* v = GetMember(value, "type")) {
+            type_ = 0;
+            if (v->IsString())
+                AddType(*v);
+            else if (v->IsArray())
+                for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr)
                     AddType(*itr);
-            }
-            else {
-                // Error
-            }
         }
 
-        typename ValueType::ConstMemberIterator enumItr = value.FindMember("enum");
-        if (enumItr != value.MemberEnd()) {
-            if (enumItr->value.IsArray() && enumItr->value.Size() > 0)
-                enum_.CopyFrom(enumItr->value, allocator_);
-            else {
-                // Error
-            }
-        }
+        if (const ValueType* v = GetMember(value, "enum"))
+            if (v->IsArray() && v->Size() > 0)
+                enum_.CopyFrom(*v, allocator_);
 
-        typename ValueType::ConstMemberIterator allOfItr = value.FindMember("allOf");
-        if (allOfItr != value.MemberEnd())
-            CreateLogicalSchemas(allOfItr->value, allOf_);
+        AssigIfExist(allOf_, value, "allOf");
+        AssigIfExist(anyOf_, value, "anyOf");
+        AssigIfExist(oneOf_, value, "oneOf");
 
-        typename ValueType::ConstMemberIterator anyOfItr = value.FindMember("anyOf");
-        if (anyOfItr != value.MemberEnd())
-            CreateLogicalSchemas(anyOfItr->value, anyOf_);
-
-        typename ValueType::ConstMemberIterator oneOfItr = value.FindMember("oneOf");
-        if (oneOfItr != value.MemberEnd())
-            CreateLogicalSchemas(oneOfItr->value, oneOf_);
-
-        typename ValueType::ConstMemberIterator notItr = value.FindMember("not");
-        if (notItr != value.MemberEnd()) {
-            if (notItr->value.IsObject())
-                not_ = new BaseSchema<Encoding>(notItr->value);
-        }
+        if (const ValueType* v = GetMember(value, "not"))
+            not_ = new BaseSchema<Encoding>(*v);
 
         // Object
-        typename ValueType::ConstMemberIterator propretiesItr = value.FindMember("properties");
-        if (propretiesItr != value.MemberEnd()) {
-            const ValueType& properties = propretiesItr->value;
-            properties_ = new Property[properties.MemberCount()];
-            propertyCount_ = 0;
-
-            for (typename ValueType::ConstMemberIterator propertyItr = properties.MemberBegin(); propertyItr != properties.MemberEnd(); ++propertyItr) {
-                properties_[propertyCount_].name.SetString(propertyItr->name.GetString(), propertyItr->name.GetStringLength(), BaseSchema<Encoding>::allocator_);
-                properties_[propertyCount_].schema = new BaseSchema(propertyItr->value);    // TODO: Check error
-                propertyCount_++;
+        if (const ValueType* v = GetMember(value, "properties"))
+            if (v->IsObject()) {
+                properties_ = new Property[v->MemberCount()];
+                propertyCount_ = 0;
+                for (ConstMemberIterator itr = v->MemberBegin(); itr != v->MemberEnd(); ++itr) {
+                    properties_[propertyCount_].name.SetString(itr->name.GetString(), itr->name.GetStringLength(), allocator_);
+                    properties_[propertyCount_].schema = new BaseSchema(itr->value);
+                    propertyCount_++;
+                }
             }
-        }
 
 #if RAPIDJSON_SCHEMA_HAS_REGEX
-        typename ValueType::ConstMemberIterator patternPropretiesItr = value.FindMember("patternProperties");
-        if (patternPropretiesItr != value.MemberEnd()) {
-            const ValueType& patternProperties = patternPropretiesItr->value;
-            patternProperties_ = new PatternProperty[patternProperties.MemberCount()];
+        if (const ValueType* v = GetMember(value, "patternProperties")) {
+            patternProperties_ = new PatternProperty[v->MemberCount()];
             patternPropertyCount_ = 0;
 
-            for (typename ValueType::ConstMemberIterator propertyItr = patternProperties.MemberBegin(); propertyItr != patternProperties.MemberEnd(); ++propertyItr) {
-#if RAPIDJSON_SCHEMA_USE_STDREGEX
-                try {
-                    patternProperties_[patternPropertyCount_].pattern = new std::basic_regex<Ch>(
-                        propertyItr->name.GetString(),
-                        std::size_t(propertyItr->name.GetStringLength()),
-                        std::regex_constants::ECMAScript);
-                }
-                catch (const std::regex_error&) {
-                    // Error
-                }
-#endif
-                patternProperties_[patternPropertyCount_].schema = new BaseSchema<Encoding>(propertyItr->value);    // TODO: Check error
+            for (ConstMemberIterator itr = v->MemberBegin(); itr != v->MemberEnd(); ++itr) {
+                patternProperties_[patternPropertyCount_].pattern = CreatePattern(itr->name);
+                patternProperties_[patternPropertyCount_].schema = new BaseSchema<Encoding>(itr->value);    // TODO: Check error
                 patternPropertyCount_++;
             }
         }
 #endif
 
-        // Establish required after properties
-        typename ValueType::ConstMemberIterator requiredItr = value.FindMember("required");
-        if (requiredItr != value.MemberEnd()) {
-            if (requiredItr->value.IsArray()) {
-                for (typename ValueType::ConstValueIterator itr = requiredItr->value.Begin(); itr != requiredItr->value.End(); ++itr) {
+        if (const ValueType* v = GetMember(value, "required"))
+            if (v->IsArray())
+                for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr)
                     if (itr->IsString()) {
                         SizeType index;
                         if (FindPropertyIndex(*itr, &index)) {
                             properties_[index].required = true;
                             requiredCount_++;
                         }
-                        else {
-                            // Error
-                        }
                     }
-                    else {
-                        // Error
-                    }
-                }
-            }
-            else {
-                // Error
-            }
-        }
 
-        // Establish dependencies after properties
-        typename ValueType::ConstMemberIterator dependenciesItr = value.FindMember("dependencies");
-        if (dependenciesItr != value.MemberEnd()) {
-            if (dependenciesItr->value.IsObject()) {
+        if (const ValueType* v = GetMember(value, "dependencies"))
+            if (v->IsObject()) {
                 hasDependencies_ = true;
-                for (typename ValueType::ConstMemberIterator itr = dependenciesItr->value.MemberBegin(); itr != dependenciesItr->value.MemberEnd(); ++itr) {
+                for (ConstMemberIterator itr = v->MemberBegin(); itr != v->MemberEnd(); ++itr) {
                     SizeType sourceIndex;
                     if (FindPropertyIndex(itr->name, &sourceIndex)) {
-                        properties_[sourceIndex].dependencies = new bool[propertyCount_];
-                        std::memset(properties_[sourceIndex].dependencies, 0, sizeof(bool) * propertyCount_);
                         if (itr->value.IsArray()) {
-                            for (typename ValueType::ConstValueIterator targetItr = itr->value.Begin(); targetItr != itr->value.End(); ++targetItr) {
+                            properties_[sourceIndex].dependencies = new bool[propertyCount_];
+                            std::memset(properties_[sourceIndex].dependencies, 0, sizeof(bool)* propertyCount_);
+                            for (ConstValueIterator targetItr = itr->value.Begin(); targetItr != itr->value.End(); ++targetItr) {
                                 SizeType targetIndex;
-                                if (FindPropertyIndex(*targetItr, &targetIndex)) {
+                                if (FindPropertyIndex(*targetItr, &targetIndex))
                                     properties_[sourceIndex].dependencies[targetIndex] = true;
-                                }
-                                else {
-                                    // Error
-                                }
                             }
                         }
-                        else {
-                            // Error
+                        else if (itr->value.IsObject()) {
+                            // TODO
                         }
                     }
-                    else {
-                        // Error
-                    }
                 }
             }
-            else {
-                // Error
-            }
+
+        if (const ValueType* v = GetMember(value, "additionalProperties")) {
+            if (v->IsBool())
+                additionalProperty_ = v->GetBool();
+            else if (v->IsObject())
+                additionalPropertySchema_ = new BaseSchema<Encoding>(*v);
         }
 
-        typename ValueType::ConstMemberIterator additionalPropretiesItr = value.FindMember("additionalProperties");
-        if (additionalPropretiesItr != value.MemberEnd()) {
-            if (additionalPropretiesItr->value.IsBool())
-                additionalProperty_ = additionalPropretiesItr->value.GetBool();
-            else if (additionalPropretiesItr->value.IsObject())
-                additionalPropertySchema_ = new BaseSchema<Encoding>(additionalPropretiesItr->value);
-            else {
-                // Error
-            }
-        }
-
-        typename ValueType::ConstMemberIterator minPropertiesItr = value.FindMember("minProperties");
-        if (minPropertiesItr != value.MemberEnd()) {
-            if (minPropertiesItr->value.IsUint64() && minPropertiesItr->value.GetUint64() <= SizeType(~0))
-                minProperties_ = static_cast<SizeType>(minPropertiesItr->value.GetUint64());
-            else {
-                // Error
-            }
-        }
-
-        typename ValueType::ConstMemberIterator maxPropertiesItr = value.FindMember("maxProperties");
-        if (maxPropertiesItr != value.MemberEnd()) {
-            if (maxPropertiesItr->value.IsUint64() && maxPropertiesItr->value.GetUint64() <= SizeType(~0))
-                maxProperties_ = static_cast<SizeType>(maxPropertiesItr->value.GetUint64());
-            else {
-                // Error
-            }
-        }
+        AssignIfExist(minProperties_, value, "minProperties");
+        AssignIfExist(maxProperties_, value, "maxProperties");
 
         // Array
-        typename ValueType::ConstMemberIterator itemsItr = value.FindMember("items");
-        if (itemsItr != value.MemberEnd()) {
-            if (itemsItr->value.IsObject())
-                itemsList_ = new BaseSchema<Encoding>(itemsItr->value); // List validation
-            else if (itemsItr->value.IsArray()) {
-                // Tuple validation
-                itemsTuple_ = new BaseSchema<Encoding>*[itemsItr->value.Size()];
-                for (typename ValueType::ConstValueIterator itr = itemsItr->value.Begin(); itr != itemsItr->value.End(); ++itr) {
-                    itemsTuple_[itemsTupleCount_] = new BaseSchema<Encoding>(*itr);
-                    itemsTupleCount_++;
-                }
-            }
-            else {
-                // Error
+        if (const ValueType* v = GetMember(value, "items")) {
+            if (v->IsObject()) // List validation
+                itemsList_ = new BaseSchema<Encoding>(*v);
+            else if (v->IsArray()) { // Tuple validation
+                itemsTuple_ = new BaseSchema<Encoding>*[v->Size()];
+                for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr)
+                    itemsTuple_[itemsTupleCount_++] = new BaseSchema<Encoding>(*itr);
             }
         }
 
-        typename ValueType::ConstMemberIterator minItemsItr = value.FindMember("minItems");
-        if (minItemsItr != value.MemberEnd()) {
-            if (minItemsItr->value.IsUint64() && minItemsItr->value.GetUint64() <= SizeType(~0))
-                minItems_ = static_cast<SizeType>(minItemsItr->value.GetUint64());
-            else {
-                // Error
-            }
-        }
-
-        typename ValueType::ConstMemberIterator maxItemsItr = value.FindMember("maxItems");
-        if (maxItemsItr != value.MemberEnd()) {
-            if (maxItemsItr->value.IsUint64() && maxItemsItr->value.GetUint64() <= SizeType(~0))
-                maxItems_ = static_cast<SizeType>(maxItemsItr->value.GetUint64());
-            else {
-                // Error
-            }
-        }
-
-        typename ValueType::ConstMemberIterator additionalItemsItr = value.FindMember("additionalItems");
-        if (additionalItemsItr != value.MemberEnd()) {
-            if (additionalItemsItr->value.IsBool())
-                additionalItems_ = additionalItemsItr->value.GetBool();
-            else {
-                // Error
-            }
-        }
+        AssignIfExist(minItems_, value, "minItems");
+        AssignIfExist(maxItems_, value, "maxItems");
+        AssignIfExist(additionalItems_, value, "additionalItems");
 
         // String
-        typename ValueType::ConstMemberIterator minLengthItr = value.FindMember("minLength");
-        if (minLengthItr != value.MemberEnd()) {
-            if (minLengthItr->value.IsUint64() && minLengthItr->value.GetUint64() <= ~SizeType(0))
-                minLength_ = static_cast<SizeType>(minLengthItr->value.GetUint64());
-            else {
-                // Error
-            }
-        }
-
-        typename ValueType::ConstMemberIterator maxLengthItr = value.FindMember("maxLength");
-        if (maxLengthItr != value.MemberEnd()) {
-            if (maxLengthItr->value.IsUint64() && maxLengthItr->value.GetUint64() <= ~SizeType(0))
-                maxLength_ = static_cast<SizeType>(maxLengthItr->value.GetUint64());
-            else {
-                // Error
-            }
-        }
+        AssignIfExist(minLength_, value, "minLength");
+        AssignIfExist(maxLength_, value, "maxLength");
 
 #if RAPIDJSON_SCHEMA_HAS_REGEX
-        typename ValueType::ConstMemberIterator patternItr = value.FindMember("pattern");
-        if (patternItr != value.MemberEnd()) {
-            if (patternItr->value.IsString()) {
-#if RAPIDJSON_SCHEMA_USE_STDREGEX
-                try {
-                    pattern_ = new std::basic_regex<Ch>(
-                        patternItr->value.GetString(),
-                        std::size_t(patternItr->value.GetStringLength()),
-                        std::regex_constants::ECMAScript);
-                }
-                catch (const std::regex_error&) {
-                    // Error
-                }
-#endif // RAPIDJSON_SCHEMA_USE_STDREGEX
-            }
-            else {
-                // Error
-            }
-        }
+        if (const ValueType* v = GetMember(value, "pattern"))
+            pattern_ = CreatePattern(*v);
 #endif // RAPIDJSON_SCHEMA_HAS_REGEX
 
         // Number
-        typename ValueType::ConstMemberIterator minimumItr = value.FindMember("minimum");
-        if (minimumItr != value.MemberEnd()) {
+        ConstMemberIterator minimumItr = value.FindMember("minimum");
+        if (minimumItr != value.MemberEnd())
             if (minimumItr->value.IsNumber())
                 minimum_ = minimumItr->value.GetDouble();
-            else {
-                // Error
-            }
-        }
 
-        typename ValueType::ConstMemberIterator maximumItr = value.FindMember("maximum");
-        if (maximumItr != value.MemberEnd()) {
+        ConstMemberIterator maximumItr = value.FindMember("maximum");
+        if (maximumItr != value.MemberEnd())
             if (maximumItr->value.IsNumber())
                 maximum_ = maximumItr->value.GetDouble();
-            else {
-                // Error
-            }
-        }
 
-        typename ValueType::ConstMemberIterator exclusiveMinimumItr = value.FindMember("exclusiveMinimum");
-        if (exclusiveMinimumItr != value.MemberEnd()) {
-            if (exclusiveMinimumItr->value.IsBool())
-                exclusiveMinimum_ = exclusiveMinimumItr->value.GetBool();
-            else {
-                // Error
-            }
-        }
+        AssignIfExist(exclusiveMinimum_, value, "exclusiveMinimum");
+        AssignIfExist(exclusiveMaximum_, value, "exclusiveMaximum");
 
-        typename ValueType::ConstMemberIterator exclusiveMaximumItr = value.FindMember("exclusiveMaximum");
-        if (exclusiveMaximumItr != value.MemberEnd()) {
-            if (exclusiveMaximumItr->value.IsBool())
-                exclusiveMaximum_ = exclusiveMaximumItr->value.GetBool();
-            else {
-                // Error
-            }
-        }
-
-        typename ValueType::ConstMemberIterator multipleOfItr = value.FindMember("multipleOf");
+        ConstMemberIterator multipleOfItr = value.FindMember("multipleOf");
         if (multipleOfItr != value.MemberEnd()) {
             if (multipleOfItr->value.IsNumber()) {
                 multipleOf_ = multipleOfItr->value.GetDouble();
                 hasMultipleOf_ = true;
-            }
-            else {
-                // Error
             }
         }
     }
 
     ~BaseSchema() {
         delete not_;
-
         delete [] properties_;
         delete additionalPropertySchema_;
 #if RAPIDJSON_SCHEMA_HAS_REGEX
         delete [] patternProperties_;
 #endif
-
         delete itemsList_;
         for (SizeType i = 0; i < itemsTupleCount_; i++)
             delete itemsTuple_[i];
         delete [] itemsTuple_;
-
 #if RAPIDJSON_SCHEMA_USE_STDREGEX
         delete pattern_;
 #endif
@@ -500,21 +330,19 @@ public:
     }
 
     bool EndValue(Context& context) const {
-        if (allOf_.schemas) {
+        if (allOf_.schemas)
             for (SizeType i_ = 0; i_ < allOf_.count; i_++)
                 if (!context.allOfValidators.validators[i_]->IsValid())
                     return false;
-        }
+        
         if (anyOf_.schemas) {
-            bool anyValid = false;
             for (SizeType i_ = 0; i_ < anyOf_.count; i_++)
-                if (context.anyOfValidators.validators[i_]->IsValid()) {
-                    anyValid = true;
-                    break;
-                }
-            if (!anyValid)
-                return false;
+                if (context.anyOfValidators.validators[i_]->IsValid())
+                    goto foundAny;
+            return false;
+            foundAny:;
         }
+
         if (oneOf_.schemas) {
             CreateSchemaValidators(context, context.oneOfValidators, oneOf_);
             bool oneValid = false;
@@ -528,11 +356,8 @@ public:
             if (!oneValid)
                 return false;
         }
-        if (not_) {
-            if (context.notValidator->IsValid())
-                return false;
-        }
-        return true;
+
+        return !not_ || !context.notValidator->IsValid();
     }
 
     bool Null(Context& context) const { 
@@ -599,14 +424,9 @@ public:
             return false;
 
 #if RAPIDJSON_SCHEMA_HAS_REGEX
-        if (pattern_) {
-#if RAPIDJSON_SCHEMA_USE_STDREGEX
-            std::match_results<const Ch*> r;
-            if (!std::regex_search(str, str + length, r, *pattern_))
-                return false;
-#endif // RAPIDJSON_SCHEMA_USE_STDREGEX
-        }
-#endif // RAPIDJSON_SCHEMA_HAS_REGEX
+        if (pattern_ && !IsPatternMatch(*pattern_, str, length))
+            return false;
+#endif
 
         return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(str, length).Move());
     }
@@ -643,19 +463,12 @@ public:
         }
 
 #if RAPIDJSON_SCHEMA_HAS_REGEX
-        if (patternProperties_) {
-            for (SizeType i = 0; i < patternPropertyCount_; i++) {
-#if RAPIDJSON_SCHEMA_USE_STDREGEX
-                if (patternProperties_[i].pattern) {
-                    std::match_results<const Ch*> r;
-                    if (std::regex_search(str, str + len, r, *patternProperties_[i].pattern)) {
-                        context.valueSchema = patternProperties_[i].schema;
-                        return true;
-                    }
+        if (patternProperties_)
+            for (SizeType i = 0; i < patternPropertyCount_; i++)
+                if (patternProperties_[i].pattern && IsPatternMatch(*patternProperties_[i].pattern, str, len)) {
+                    context.valueSchema = patternProperties_[i].schema;
+                    return true;
                 }
-#endif // RAPIDJSON_SCHEMA_USE_STDREGEX
-            }
-        }
 #endif
 
         if (additionalPropertySchema_) {
@@ -678,13 +491,12 @@ public:
         if (context.objectRequiredCount != requiredCount_ || memberCount < minProperties_ || memberCount > maxProperties_)
             return false;
 
-        if (hasDependencies_) {
+        if (hasDependencies_)
             for (SizeType sourceIndex = 0; sourceIndex < propertyCount_; sourceIndex++)
                 if (context.objectDependencies[sourceIndex] && properties_[sourceIndex].dependencies)
                     for (SizeType targetIndex = 0; targetIndex < propertyCount_; targetIndex++)
                         if (properties_[sourceIndex].dependencies[targetIndex] && !context.objectDependencies[targetIndex])
                             return false;
-        }
 
         return true;
     }
@@ -708,39 +520,70 @@ public:
         return elementCount >= minItems_ && elementCount <= maxItems_;
     }
 
-#undef RAPIDJSON_BASESCHEMA_HANDLER_LGOICAL_
-#undef RAPIDJSON_BASESCHEMA_HANDLER_
-
-protected:
+private:
     static const BaseSchema<Encoding>* GetTypeless() {
         static BaseSchema<Encoding> typeless(Value(kObjectType).Move());
         return &typeless;
     }
 
-    void AddType(const Value& type) {
-        if      (type == Value("null"   ).Move()) type_ |= 1 << kNullSchemaType;
-        else if (type == Value("boolean").Move()) type_ |= 1 << kBooleanSchemaType;
-        else if (type == Value("object" ).Move()) type_ |= 1 << kObjectSchemaType;
-        else if (type == Value("array"  ).Move()) type_ |= 1 << kArraySchemaType;
-        else if (type == Value("string" ).Move()) type_ |= 1 << kStringSchemaType;
-        else if (type == Value("integer").Move()) type_ |= 1 << kIntegerSchemaType;
-        else if (type == Value("number" ).Move()) type_ |= (1 << kNumberSchemaType) | (1 << kIntegerSchemaType);
-        else {
-            // Error
-        }
+    template <typename ValueType>
+    static const ValueType* GetMember(const ValueType& value, const char* name) {
+        typename ValueType::ConstMemberIterator itr = value.FindMember(name);
+        return itr != value.MemberEnd() ? &(itr->value) : 0;
     }
 
-    void CreateLogicalSchemas(const Value& logic, BaseSchemaArray<Encoding>& logicSchemas) {
-        if (logic.IsArray() && logic.Size() > 0) {
-            logicSchemas.count = logic.Size();
-            logicSchemas.schemas = new BaseSchema*[logicSchemas.count];
-            memset(logicSchemas.schemas, 0, sizeof(BaseSchema*) * logicSchemas.count);
-            for (SizeType i = 0; i < logicSchemas.count; i++)
-                logicSchemas.schemas[i] = new BaseSchema<Encoding>(logic[i]);
-        }
-        else {
-            // Error
-        }
+    template <typename ValueType>
+    static void AssignIfExist(bool& out, const ValueType& value, const char* name) {
+        if (const ValueType* v = GetMember(value, name))
+            if (v->IsBool())
+                out = v->GetBool();
+    }
+
+    template <typename ValueType>
+    static void AssignIfExist(SizeType& out, const ValueType& value, const char* name) {
+        if (const ValueType* v = GetMember(value, name))
+            if (v->IsUint64() && v->GetUint64() <= SizeType(~0))
+                out = static_cast<SizeType>(v->GetUint64());
+    }
+
+    template <typename ValueType>
+    static void AssigIfExist(BaseSchemaArray<Encoding>& out, const ValueType& value, const char* name) {
+        if (const ValueType* v = GetMember(value, name))
+            if (v->IsArray() && v->Size() > 0) {
+                out.count = v->Size();
+                out.schemas = new BaseSchema*[out.count];
+                memset(out.schemas, 0, sizeof(BaseSchema*)* out.count);
+                for (SizeType i = 0; i < out.count; i++)
+                    out.schemas[i] = new BaseSchema<Encoding>((*v)[i]);
+            }
+    }
+
+#if RAPIDJSON_SCHEMA_USE_STDREGEX
+    template <typename ValueType>
+    static std::basic_regex<Ch>* CreatePattern(const ValueType& value) {
+        if (value.IsString())
+            try {
+                return new std::basic_regex<Ch>(value.GetString(), std::size_t(value.GetStringLength()), std::regex_constants::ECMAScript);
+            }
+            catch (const std::regex_error&) {
+            }
+        return 0;
+    }
+
+    static bool IsPatternMatch(const std::basic_regex<Ch>& pattern, const Ch *str, SizeType length) {
+        std::match_results<const Ch*> r;
+        return std::regex_search(str, str + length, r, pattern);
+    }
+#endif // RAPIDJSON_SCHEMA_USE_STDREGEX
+
+    void AddType(const Value& type) {
+        if      (type == "null"   ) type_ |= 1 << kNullSchemaType;
+        else if (type == "boolean") type_ |= 1 << kBooleanSchemaType;
+        else if (type == "object" ) type_ |= 1 << kObjectSchemaType;
+        else if (type == "array"  ) type_ |= 1 << kArraySchemaType;
+        else if (type == "string" ) type_ |= 1 << kStringSchemaType;
+        else if (type == "integer") type_ |= 1 << kIntegerSchemaType;
+        else if (type == "number" ) type_ |= (1 << kNumberSchemaType) | (1 << kIntegerSchemaType);
     }
 
     bool CheckEnum(const GenericValue<Encoding>& v) const {
@@ -755,7 +598,7 @@ protected:
         if (anyOf_.schemas) CreateSchemaValidators(context, context.anyOfValidators, anyOf_);
         if (oneOf_.schemas) CreateSchemaValidators(context, context.oneOfValidators, oneOf_);
         if (not_ && !context.notValidator)
-            context.notValidator = new GenericSchemaValidator<Encoding>(*not_);//context.schemaValidatorFactory->CreateSchemaValidator(*not_);
+            context.notValidator = new GenericSchemaValidator<Encoding>(*not_);
     }
 
     void CreateSchemaValidators(Context& context, SchemaValidatorArray<Encoding>& validators, const BaseSchemaArray<Encoding>& schemas) const {
@@ -770,25 +613,21 @@ protected:
     // O(n)
     template <typename ValueType>
     bool FindPropertyIndex(const ValueType& name, SizeType* outIndex) const {
-        for (SizeType index = 0; index < propertyCount_; index++) {
+        for (SizeType index = 0; index < propertyCount_; index++)
             if (properties_[index].name == name) {
                 *outIndex = index;
                 return true;
             }
-        }
         return false;
     }
 
     // O(n)
     bool FindPropertyIndex(const Ch* str, SizeType length, SizeType* outIndex) const {
-        for (SizeType index = 0; index < propertyCount_; index++) {
-            if (properties_[index].name.GetStringLength() == length && 
-                std::memcmp(properties_[index].name.GetString(), str, length) == 0)
-            {
+        for (SizeType index = 0; index < propertyCount_; index++)
+            if (properties_[index].name.GetStringLength() == length && std::memcmp(properties_[index].name.GetString(), str, length) == 0) {
                 *outIndex = index;
                 return true;
             }
-        }
         return false;
     }
 
@@ -883,8 +722,6 @@ public:
     ~GenericSchema() {
         delete root_;
     }
-
-    bool IsValid() const { return root_ != 0; }
 
 private:
     BaseSchema<Encoding>* root_;
