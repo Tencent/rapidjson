@@ -361,6 +361,32 @@ TEST(SchemaValidator, Object_PropertyDependencies) {
     VALIDATE(s, "{ \"name\": \"John Doe\", \"billing_address\": \"555 Debtor's Lane\" }", true);
 }
 
+TEST(SchemaValidator, Object_SchemaDependencies) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "    \"type\": \"object\","
+        "    \"properties\" : {"
+        "    \"name\": { \"type\": \"string\" },"
+        "        \"credit_card\" : { \"type\": \"number\" }"
+        "    },"
+        "    \"required\" : [\"name\"],"
+        "        \"dependencies\" : {"
+        "        \"credit_card\": {"
+        "            \"properties\": {"
+        "                \"billing_address\": { \"type\": \"string\" }"
+        "            },"
+        "            \"required\" : [\"billing_address\"]"
+        "        }"
+        "    }"
+        "}");
+    Schema s(sd);
+
+    //VALIDATE(s, "{\"name\": \"John Doe\", \"credit_card\" : 5555555555555555,\"billing_address\" : \"555 Debtor's Lane\"}", true);
+    VALIDATE(s, "{\"name\": \"John Doe\", \"credit_card\" : 5555555555555555 }", false);
+    VALIDATE(s, "{\"name\": \"John Doe\", \"billing_address\" : \"555 Debtor's Lane\"}", true);
+}
+
 #if RAPIDJSON_SCHEMA_HAS_REGEX
 
 TEST(SchemaValidator, Object_PatternProperties) {
@@ -645,7 +671,7 @@ TEST(SchemaValidator, TestSuite) {
         "allOf.json",
         "anyOf.json",
         //"definitions.json",
-        //"dependencies.json",
+        "dependencies.json",
         "enum.json",
         "items.json",
         "maximum.json",
@@ -696,17 +722,18 @@ TEST(SchemaValidator, TestSuite) {
                 for (Value::ConstValueIterator schemaItr = d.Begin(); schemaItr != d.End(); ++schemaItr) {
                     Schema schema((*schemaItr)["schema"]);
                     SchemaValidator validator(schema);
+                    const char* description1 = (*schemaItr)["description"].GetString();
                     const Value& tests = (*schemaItr)["tests"];
                     for (Value::ConstValueIterator testItr = tests.Begin(); testItr != tests.End(); ++testItr) {
-                        const char* description = (*testItr)["description"].GetString();
-                        if (!onlyRunDescription || strcmp(description, onlyRunDescription) == 0) {
+                        const char* description2 = (*testItr)["description"].GetString();
+                        if (!onlyRunDescription || strcmp(description2, onlyRunDescription) == 0) {
                             const Value& data = (*testItr)["data"];
                             bool expected = (*testItr)["valid"].GetBool();
                             testCount++;
                             validator.Reset();
                             bool actual = data.Accept(validator);
                             if (expected != actual)
-                                printf("Fail: %30s \"%s\"\n", filename, description);
+                                printf("Fail: %30s \"%s, %s\"\n", filename, description1, description2);
                             else
                                 passCount++;
                         }

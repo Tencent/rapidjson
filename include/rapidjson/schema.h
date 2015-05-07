@@ -60,11 +60,9 @@ template <typename Encoding>
 struct SchemaValidatorArray {
     SchemaValidatorArray() : validators(), count() {}
     ~SchemaValidatorArray() {
-        if (validators) {
-            for (SizeType i = 0; i < count; i++)
-                delete validators[i];
-            delete[] validators;
-        }
+        for (SizeType i = 0; i < count; i++)
+            delete validators[i];
+        delete[] validators;
     }
 
     GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator>** validators;
@@ -75,11 +73,9 @@ template <typename Encoding>
 struct BaseSchemaArray {
     BaseSchemaArray() : schemas(), count() {}
     ~BaseSchemaArray() {
-        if (schemas) {
-            for (SizeType i = 0; i < count; i++)
-                delete schemas[i];
-            delete[] schemas;
-        }
+        for (SizeType i = 0; i < count; i++)
+            delete schemas[i];
+        delete[] schemas;
     }
 
     BaseSchema<Encoding>** schemas;
@@ -103,6 +99,7 @@ struct SchemaValidationContext {
     SchemaValidatorArray<Encoding> allOfValidators;
     SchemaValidatorArray<Encoding> anyOfValidators;
     SchemaValidatorArray<Encoding> oneOfValidators;
+    SchemaValidatorArray<Encoding> dependencyValidators;
     GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator>* notValidator;
     SizeType objectRequiredCount;
     SizeType arrayElementIndex;
@@ -132,6 +129,7 @@ public:
         maxProperties_(SizeType(~0)),
         additionalProperties_(true),
         hasDependencies_(),
+        hasSchemaDependencies_(),
         additionalItemsSchema_(),
         itemsList_(),
         itemsTuple_(),
@@ -196,7 +194,7 @@ public:
 
             for (ConstMemberIterator itr = v->MemberBegin(); itr != v->MemberEnd(); ++itr) {
                 patternProperties_[patternPropertyCount_].pattern = CreatePattern(itr->name);
-                patternProperties_[patternPropertyCount_].schema = new BaseSchema<Encoding>(itr->value);    // TODO: Check error
+                patternProperties_[patternPropertyCount_].schema = new BaseSchema<Encoding>(itr->value);
                 patternPropertyCount_++;
             }
         }
@@ -229,7 +227,8 @@ public:
                             }
                         }
                         else if (itr->value.IsObject()) {
-                            // TODO
+                            hasSchemaDependencies_ = true;
+                            properties_[sourceIndex].dependenciesSchema = new BaseSchema<Encoding>(itr->value);
                         }
                     }
                 }
@@ -503,12 +502,19 @@ public:
         if (context.objectRequiredCount != requiredCount_ || memberCount < minProperties_ || memberCount > maxProperties_)
             return false;
 
-        if (hasDependencies_)
+        if (hasDependencies_) {
             for (SizeType sourceIndex = 0; sourceIndex < propertyCount_; sourceIndex++)
-                if (context.objectDependencies[sourceIndex] && properties_[sourceIndex].dependencies)
-                    for (SizeType targetIndex = 0; targetIndex < propertyCount_; targetIndex++)
-                        if (properties_[sourceIndex].dependencies[targetIndex] && !context.objectDependencies[targetIndex])
+                if (context.objectDependencies[sourceIndex]) {
+                    if (properties_[sourceIndex].dependencies) {
+                        for (SizeType targetIndex = 0; targetIndex < propertyCount_; targetIndex++)
+                            if (properties_[sourceIndex].dependencies[targetIndex] && !context.objectDependencies[targetIndex])
+                                return false;
+                    }
+                    else if (properties_[sourceIndex].dependenciesSchema)
+                        if (!context.dependencyValidators.validators[sourceIndex]->IsValid())
                             return false;
+                }
+        }
 
         return true;
     }
@@ -533,6 +539,7 @@ public:
     }
 
 private:
+    typedef GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator> SchemaValidatorType;
     static const BaseSchema<Encoding>* GetTypeless() {
         static BaseSchema<Encoding> typeless(Value(kObjectType).Move());
         return &typeless;
@@ -610,15 +617,22 @@ private:
         if (anyOf_.schemas) CreateSchemaValidators(context.anyOfValidators, anyOf_);
         if (oneOf_.schemas) CreateSchemaValidators(context.oneOfValidators, oneOf_);
         if (not_ && !context.notValidator)
-            context.notValidator = new GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator>(*not_);
+            context.notValidator = new SchemaValidatorType(*not_);
+
+        if (hasSchemaDependencies_ && !context.dependencyValidators.validators) {
+            context.dependencyValidators.validators = new SchemaValidatorType*[propertyCount_];
+            context.dependencyValidators.count = propertyCount_;
+            for (SizeType i = 0; i < propertyCount_; i++)
+                context.dependencyValidators.validators[i] = properties_[i].dependenciesSchema ? new SchemaValidatorType(*properties_[i].dependenciesSchema) : 0;
+        }
     }
 
     void CreateSchemaValidators(SchemaValidatorArray<Encoding>& validators, const BaseSchemaArray<Encoding>& schemas) const {
         if (!validators.validators) {
-            validators.validators = new GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator>*[schemas.count];
+            validators.validators = new SchemaValidatorType*[schemas.count];
             validators.count = schemas.count;
             for (SizeType i = 0; i < schemas.count; i++)
-                validators.validators[i] = new GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator>(*schemas.schemas[i]);
+                validators.validators[i] = new SchemaValidatorType(*schemas.schemas[i]);
         }
     }
 
@@ -657,14 +671,16 @@ private:
     }
 
     struct Property {
-        Property() : schema(), dependencies(), required(false) {}
+        Property() : schema(), dependenciesSchema(), dependencies(), required(false) {}
         ~Property() { 
             delete schema;
+            delete dependenciesSchema;
             delete[] dependencies;
         }
 
         GenericValue<Encoding> name;
         BaseSchema<Encoding>* schema;
+        BaseSchema<Encoding>* dependenciesSchema;
         bool* dependencies;
         bool required;
     };
@@ -704,6 +720,7 @@ private:
     SizeType maxProperties_;
     bool additionalProperties_;
     bool hasDependencies_;
+    bool hasSchemaDependencies_;
 
     BaseSchema<Encoding>* additionalItemsSchema_;
     BaseSchema<Encoding>* itemsList_;
@@ -814,6 +831,10 @@ public:
                 context->oneOfValidators.validators[i_]->method arg2;\
         if (context->notValidator)\
             context->notValidator->method arg2;\
+        if (context->dependencyValidators.validators)\
+            for (SizeType i_ = 0; i_ < context->dependencyValidators.count; i_++)\
+                if (context->dependencyValidators.validators[i_])\
+                    context->dependencyValidators.validators[i_]->method arg2;\
     }
 
 #define RAPIDJSON_SCHEMA_HANDLE_END_(method, arg2)\
@@ -849,8 +870,8 @@ public:
     
     bool EndObject(SizeType memberCount) { 
         if (!valid_) return false;
-        if (!CurrentSchema().EndObject(CurrentContext(), memberCount)) return valid_ = false;
         RAPIDJSON_SCHEMA_HANDLE_LOGIC_(EndObject, (memberCount));
+        if (!CurrentSchema().EndObject(CurrentContext(), memberCount)) return valid_ = false;
         RAPIDJSON_SCHEMA_HANDLE_END_  (EndObject, (memberCount));
     }
 
@@ -862,8 +883,8 @@ public:
     
     bool EndArray(SizeType elementCount) {
         if (!valid_) return false;
-        if (!CurrentSchema().EndArray(CurrentContext(), elementCount)) return valid_ = false;
         RAPIDJSON_SCHEMA_HANDLE_LOGIC_(EndArray, (elementCount));
+        if (!CurrentSchema().EndArray(CurrentContext(), elementCount)) return valid_ = false;
         RAPIDJSON_SCHEMA_HANDLE_END_  (EndArray, (elementCount));
     }
 
