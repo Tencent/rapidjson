@@ -16,7 +16,7 @@
 #define RAPIDJSON_SCHEMA_H_
 
 #include "document.h"
-#include <cmath> // HUGE_VAL, fmod
+#include <cmath> // HUGE_VAL, abs, floor
 
 #if !defined(RAPIDJSON_SCHEMA_USE_STDREGEX) && (__cplusplus >=201103L || (defined(_MSC_VER) && _MSC_VER >= 1800))
 #define RAPIDJSON_SCHEMA_USE_STDREGEX 1
@@ -35,7 +35,6 @@
 #if defined(__GNUC__)
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
-RAPIDJSON_DIAG_OFF(float-equal)
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -647,7 +646,13 @@ private:
     bool CheckDouble(double d) const {
         if (exclusiveMinimum_ ? d <= minimum_ : d < minimum_) return false;
         if (exclusiveMaximum_ ? d >= maximum_ : d > maximum_) return false;
-        if (hasMultipleOf_ && std::fmod(d, multipleOf_) != 0.0) return false;
+        if (hasMultipleOf_) {
+            double a = std::abs(d), b = std::abs(multipleOf_);
+            double q = std::floor(a / b);
+            double r = a - q * b;
+            if (r > 0.0)
+                return false;
+        }
         return true;
     }
 
