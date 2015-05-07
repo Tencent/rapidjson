@@ -344,7 +344,6 @@ public:
         }
 
         if (oneOf_.schemas) {
-            CreateSchemaValidators(context, context.oneOfValidators, oneOf_);
             bool oneValid = false;
             for (SizeType i_ = 0; i_ < oneOf_.count; i_++)
                 if (context.oneOfValidators.validators[i_]->IsValid()) {
@@ -594,19 +593,19 @@ private:
     }
 
     void CreateLogicValidators(Context& context) const {
-        if (allOf_.schemas) CreateSchemaValidators(context, context.allOfValidators, allOf_);
-        if (anyOf_.schemas) CreateSchemaValidators(context, context.anyOfValidators, anyOf_);
-        if (oneOf_.schemas) CreateSchemaValidators(context, context.oneOfValidators, oneOf_);
+        if (allOf_.schemas) CreateSchemaValidators(context.allOfValidators, allOf_);
+        if (anyOf_.schemas) CreateSchemaValidators(context.anyOfValidators, anyOf_);
+        if (oneOf_.schemas) CreateSchemaValidators(context.oneOfValidators, oneOf_);
         if (not_ && !context.notValidator)
-            context.notValidator = new GenericSchemaValidator<Encoding>(*not_);
+            context.notValidator = new GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator>(*not_);
     }
 
-    void CreateSchemaValidators(Context& context, SchemaValidatorArray<Encoding>& validators, const BaseSchemaArray<Encoding>& schemas) const {
+    void CreateSchemaValidators(SchemaValidatorArray<Encoding>& validators, const BaseSchemaArray<Encoding>& schemas) const {
         if (!validators.validators) {
-            validators.validators = new GenericSchemaValidator<Encoding>*[schemas.count];
+            validators.validators = new GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator>*[schemas.count];
             validators.count = schemas.count;
             for (SizeType i = 0; i < schemas.count; i++)
-                validators.validators[i] = new GenericSchemaValidator<Encoding>(*schemas.schemas[i]);
+                validators.validators[i] = new GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator>(*schemas.schemas[i]);
         }
     }
 
