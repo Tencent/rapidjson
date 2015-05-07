@@ -89,7 +89,7 @@ struct BaseSchemaArray {
 template <typename Encoding>
 struct SchemaValidationContext {
     SchemaValidationContext(const BaseSchema<Encoding>* s) : 
-        schema(s), valueSchema(), multiTypeSchema(), notValidator(), objectDependencies(), inArray(false)
+        schema(s), valueSchema(), notValidator(), objectDependencies(), inArray(false)
     {
     }
 
@@ -100,7 +100,6 @@ struct SchemaValidationContext {
 
     const BaseSchema<Encoding>* schema;
     const BaseSchema<Encoding>* valueSchema;
-    const BaseSchema<Encoding>* multiTypeSchema;
     SchemaValidatorArray<Encoding> allOfValidators;
     SchemaValidatorArray<Encoding> anyOfValidators;
     SchemaValidatorArray<Encoding> oneOfValidators;
@@ -913,9 +912,6 @@ private:
             return false;
 
         PopSchema();
-        if (!schemaStack_.Empty() && CurrentContext().multiTypeSchema)
-             PopSchema();
-
         return true;
     }
 
