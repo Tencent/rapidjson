@@ -207,7 +207,7 @@ public:
                 propertyCount_ = allProperties.Size();
                 properties_ = new Property[propertyCount_];
                 for (SizeType i = 0; i < propertyCount_; i++) {
-                    properties_[i].name.SetString(allProperties[i].GetString(), allProperties[i].GetStringLength(), allocator_);
+                    properties_[i].name = allProperties[i];
                 }
             }
         }
