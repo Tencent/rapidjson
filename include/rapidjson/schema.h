@@ -123,7 +123,7 @@ public:
         not_(),
         type_((1 << kTotalSchemaType) - 1), // typeless
         properties_(),
-        additionalPropertySchema_(),
+        additionalPropertiesSchema_(),
 #if RAPIDJSON_SCHEMA_HAS_REGEX
         patternProperties_(),
         patternPropertyCount_(),
@@ -132,8 +132,9 @@ public:
         requiredCount_(),
         minProperties_(),
         maxProperties_(SizeType(~0)),
-        additionalProperty_(true),
+        additionalProperties_(true),
         hasDependencies_(),
+        additionalItemsSchema_(),
         itemsList_(),
         itemsTuple_(),
         itemsTupleCount_(),
@@ -238,9 +239,9 @@ public:
 
         if (const ValueType* v = GetMember(value, "additionalProperties")) {
             if (v->IsBool())
-                additionalProperty_ = v->GetBool();
+                additionalProperties_ = v->GetBool();
             else if (v->IsObject())
-                additionalPropertySchema_ = new BaseSchema<Encoding>(*v);
+                additionalPropertiesSchema_ = new BaseSchema<Encoding>(*v);
         }
 
         AssignIfExist(minProperties_, value, "minProperties");
@@ -259,7 +260,13 @@ public:
 
         AssignIfExist(minItems_, value, "minItems");
         AssignIfExist(maxItems_, value, "maxItems");
-        AssignIfExist(additionalItems_, value, "additionalItems");
+
+        if (const ValueType* v = GetMember(value, "additionalItems")) {
+            if (v->IsBool())
+                additionalItems_ = v->GetBool();
+            else if (v->IsObject())
+                additionalItemsSchema_ = new BaseSchema<Encoding>(*v);
+        }
 
         // String
         AssignIfExist(minLength_, value, "minLength");
@@ -296,7 +303,7 @@ public:
     ~BaseSchema() {
         delete not_;
         delete [] properties_;
-        delete additionalPropertySchema_;
+        delete additionalPropertiesSchema_;
 #if RAPIDJSON_SCHEMA_HAS_REGEX
         delete [] patternProperties_;
 #endif
@@ -316,6 +323,8 @@ public:
             else if (itemsTuple_) {
                 if (context.arrayElementIndex < itemsTupleCount_)
                     context.valueSchema = itemsTuple_[context.arrayElementIndex];
+                else if (additionalItemsSchema_)
+                    context.valueSchema = additionalItemsSchema_;
                 else if (additionalItems_)
                     context.valueSchema = GetTypeless();
                 else
@@ -470,11 +479,11 @@ public:
                 }
 #endif
 
-        if (additionalPropertySchema_) {
-            context.valueSchema = additionalPropertySchema_;
+        if (additionalPropertiesSchema_) {
+            context.valueSchema = additionalPropertiesSchema_;
             return true;
         }
-        else if (additionalProperty_) {
+        else if (additionalProperties_) {
             context.valueSchema = GetTypeless();
             return true;
         }
@@ -674,7 +683,7 @@ private:
     unsigned type_; // bitmask of kSchemaType
 
     Property* properties_;
-    BaseSchema<Encoding>* additionalPropertySchema_;
+    BaseSchema<Encoding>* additionalPropertiesSchema_;
 #if RAPIDJSON_SCHEMA_HAS_REGEX
     PatternProperty* patternProperties_;
     SizeType patternPropertyCount_;
@@ -683,9 +692,10 @@ private:
     SizeType requiredCount_;
     SizeType minProperties_;
     SizeType maxProperties_;
-    bool additionalProperty_;
+    bool additionalProperties_;
     bool hasDependencies_;
 
+    BaseSchema<Encoding>* additionalItemsSchema_;
     BaseSchema<Encoding>* itemsList_;
     BaseSchema<Encoding>** itemsTuple_;
     SizeType itemsTupleCount_;
