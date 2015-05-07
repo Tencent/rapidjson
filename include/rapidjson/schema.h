@@ -306,6 +306,7 @@ public:
 #if RAPIDJSON_SCHEMA_HAS_REGEX
         delete [] patternProperties_;
 #endif
+        delete additionalItemsSchema_;
         delete itemsList_;
         for (SizeType i = 0; i < itemsTupleCount_; i++)
             delete itemsTuple_[i];
@@ -431,7 +432,7 @@ public:
         //    return false;
         if (minLength_ != 0 || maxLength_ != SizeType(~0)) {
             SizeType count;
-            if (CountStringCodePoint<Encoding>(str, length, &count) && (count < minLength_ || count > maxLength_))
+            if (internal::CountStringCodePoint<Encoding>(str, length, &count) && (count < minLength_ || count > maxLength_))
                 return false;
         }
 

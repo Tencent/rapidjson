@@ -13,6 +13,7 @@ set(UNITTEST_SOURCES
     readertest.cpp
 	schematest.cpp
 	simdtest.cpp
+    strfunctest.cpp
     stringbuffertest.cpp
     strtodtest.cpp
     unittest.cpp

@@ -616,22 +616,6 @@ struct Transcoder<Encoding, Encoding> {
     }
 };
 
-//! Returns number of code points in a encoded string.
-template<typename Encoding>
-bool CountStringCodePoint(const typename Encoding::Ch* s, SizeType length, SizeType* outCount) {
-    GenericStringStream<Encoding> is(s);
-    const typename Encoding::Ch* end = s + length;
-    SizeType count = 0;
-    while (is.src_ < end) {
-        unsigned codepoint;
-        if (!Encoding::Decode(is, &codepoint))
-            return false;
-        count++;
-    }
-    *outCount = count;
-    return true;
-}
-
 RAPIDJSON_NAMESPACE_END
 
 #if defined(__GNUC__) || defined(_MSV_VER)
