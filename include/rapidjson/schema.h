@@ -428,8 +428,13 @@ public:
         if ((type_ & (1 << kStringSchemaType)) == 0)
             return false;
 
-        if (length < minLength_ || length > maxLength_)
-            return false;
+        //if (length < minLength_ || length > maxLength_)
+        //    return false;
+        if (minLength_ != 0 || maxLength_ != SizeType(~0)) {
+            SizeType count;
+            if (CountStringCodePoint<Encoding>(str, length, &count) && (count < minLength_ || count > maxLength_))
+                return false;
+        }
 
 #if RAPIDJSON_SCHEMA_HAS_REGEX
         if (pattern_ && !IsPatternMatch(*pattern_, str, length))

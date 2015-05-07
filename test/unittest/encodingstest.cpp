@@ -424,3 +424,14 @@ TEST(EncodingsTest, UTF32) {
         }
     }
 }
+
+TEST(EncodingsTest, CountStringCodePoint) {
+    SizeType count;
+    EXPECT_TRUE(CountStringCodePoint<UTF8<> >("", 0, &count));
+    EXPECT_EQ(0u, count);
+    EXPECT_TRUE(CountStringCodePoint<UTF8<> >("Hello", 5, &count));
+    EXPECT_EQ(5u, count);
+    EXPECT_TRUE(CountStringCodePoint<UTF8<> >("\xC2\xA2\xE2\x82\xAC\xF0\x9D\x84\x9E", 9, &count)); // cents euro G-clef
+    EXPECT_EQ(3u, count);
+    EXPECT_FALSE(CountStringCodePoint<UTF8<> >("\xC2\xA2\xE2\x82\xAC\xF0\x9D\x84\x9E\x80", 10, &count));
+}
