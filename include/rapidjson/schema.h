@@ -176,15 +176,48 @@ public:
             not_ = new BaseSchema<Encoding>(*v);
 
         // Object
-        if (const ValueType* v = GetMember(value, "properties"))
-            if (v->IsObject()) {
-                properties_ = new Property[v->MemberCount()];
-                propertyCount_ = 0;
-                for (ConstMemberIterator itr = v->MemberBegin(); itr != v->MemberEnd(); ++itr) {
-                    properties_[propertyCount_].name.SetString(itr->name.GetString(), itr->name.GetStringLength(), allocator_);
-                    properties_[propertyCount_].schema = new BaseSchema(itr->value);
-                    propertyCount_++;
+
+        const ValueType* properties = GetMember(value, "properties");
+        const ValueType* required = GetMember(value, "required");
+        const ValueType* dependencies = GetMember(value, "dependencies");
+        {
+            // Gather properties from properties/required/dependencies
+            typedef GenericValue<Encoding, MemoryPoolAllocator<> > SValue;
+            SValue allProperties(kArrayType);
+
+            if (properties && properties->IsObject())
+                for (ConstMemberIterator itr = properties->MemberBegin(); itr != properties->MemberEnd(); ++itr)
+                    AddUniqueElement(allProperties, itr->name);
+            
+            if (required && required->IsArray())
+                for (ConstValueIterator itr = required->Begin(); itr != required->End(); ++itr)
+                    if (itr->IsString())
+                        AddUniqueElement(allProperties, *itr);
+
+            if (dependencies && dependencies->IsObject())
+                for (ConstMemberIterator itr = dependencies->MemberBegin(); itr != dependencies->MemberEnd(); ++itr) {
+                    AddUniqueElement(allProperties, itr->name);
+                    if (itr->value.IsArray())
+                        for (ConstValueIterator i = itr->value.Begin(); i != itr->value.End(); ++i)
+                            if (i->IsString())
+                                AddUniqueElement(allProperties, *i);
                 }
+
+            if (allProperties.Size() > 0) {
+                propertyCount_ = allProperties.Size();
+                properties_ = new Property[propertyCount_];
+                for (SizeType i = 0; i < propertyCount_; i++) {
+                    properties_[i].name.SetString(allProperties[i].GetString(), allProperties[i].GetStringLength(), allocator_);
+                }
+            }
+        }
+
+        if (properties && properties->IsObject())
+            for (ConstMemberIterator itr = properties->MemberBegin(); itr != properties->MemberEnd(); ++itr) {
+                SizeType index;
+                if (FindPropertyIndex(itr->name, &index))
+                    properties_[index].schema = new BaseSchema(itr->value);
+                    properties_[index].typeless = false;
             }
 
 #if RAPIDJSON_SCHEMA_HAS_REGEX
@@ -200,39 +233,37 @@ public:
         }
 #endif
 
-        if (const ValueType* v = GetMember(value, "required"))
-            if (v->IsArray())
-                for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr)
-                    if (itr->IsString()) {
-                        SizeType index;
-                        if (FindPropertyIndex(*itr, &index)) {
-                            properties_[index].required = true;
-                            requiredCount_++;
+        if (required && required->IsArray())
+            for (ConstValueIterator itr = required->Begin(); itr != required->End(); ++itr)
+                if (itr->IsString()) {
+                    SizeType index;
+                    if (FindPropertyIndex(*itr, &index)) {
+                        properties_[index].required = true;
+                        requiredCount_++;
+                    }
+                }
+
+        if (dependencies && dependencies->IsObject()) {
+            hasDependencies_ = true;
+            for (ConstMemberIterator itr = dependencies->MemberBegin(); itr != dependencies->MemberEnd(); ++itr) {
+                SizeType sourceIndex;
+                if (FindPropertyIndex(itr->name, &sourceIndex)) {
+                    if (itr->value.IsArray()) {
+                        properties_[sourceIndex].dependencies = new bool[propertyCount_];
+                        std::memset(properties_[sourceIndex].dependencies, 0, sizeof(bool)* propertyCount_);
+                        for (ConstValueIterator targetItr = itr->value.Begin(); targetItr != itr->value.End(); ++targetItr) {
+                            SizeType targetIndex;
+                            if (FindPropertyIndex(*targetItr, &targetIndex))
+                                properties_[sourceIndex].dependencies[targetIndex] = true;
                         }
                     }
-
-        if (const ValueType* v = GetMember(value, "dependencies"))
-            if (v->IsObject()) {
-                hasDependencies_ = true;
-                for (ConstMemberIterator itr = v->MemberBegin(); itr != v->MemberEnd(); ++itr) {
-                    SizeType sourceIndex;
-                    if (FindPropertyIndex(itr->name, &sourceIndex)) {
-                        if (itr->value.IsArray()) {
-                            properties_[sourceIndex].dependencies = new bool[propertyCount_];
-                            std::memset(properties_[sourceIndex].dependencies, 0, sizeof(bool)* propertyCount_);
-                            for (ConstValueIterator targetItr = itr->value.Begin(); targetItr != itr->value.End(); ++targetItr) {
-                                SizeType targetIndex;
-                                if (FindPropertyIndex(*targetItr, &targetIndex))
-                                    properties_[sourceIndex].dependencies[targetIndex] = true;
-                            }
-                        }
-                        else if (itr->value.IsObject()) {
-                            hasSchemaDependencies_ = true;
-                            properties_[sourceIndex].dependenciesSchema = new BaseSchema<Encoding>(itr->value);
-                        }
+                    else if (itr->value.IsObject()) {
+                        hasSchemaDependencies_ = true;
+                        properties_[sourceIndex].dependenciesSchema = new BaseSchema<Encoding>(itr->value);
                     }
                 }
             }
+        }
 
         if (const ValueType* v = GetMember(value, "additionalProperties")) {
             if (v->IsBool())
@@ -462,7 +493,7 @@ public:
         
         SizeType index;
         if (FindPropertyIndex(str, len, &index)) {
-            context.valueSchema = properties_[index].schema;
+            context.valueSchema = properties_[index].typeless ? GetTypeless() : properties_[index].schema;
 
             if (properties_[index].required)
                 context.objectRequiredCount++;
@@ -543,6 +574,15 @@ private:
     static const BaseSchema<Encoding>* GetTypeless() {
         static BaseSchema<Encoding> typeless(Value(kObjectType).Move());
         return &typeless;
+    }
+
+    template <typename V1, typename V2>
+    void AddUniqueElement(V1& a, const V2& v) {
+        for (typename V1::ConstValueIterator itr = a.Begin(); itr != a.End(); ++itr)
+            if (*itr == v)
+                return;
+        V1 c(v, allocator_);
+        a.PushBack(c, allocator_);
     }
 
     template <typename ValueType>
@@ -671,7 +711,7 @@ private:
     }
 
     struct Property {
-        Property() : schema(), dependenciesSchema(), dependencies(), required(false) {}
+        Property() : schema(), dependenciesSchema(), dependencies(), required(false), typeless(true) {}
         ~Property() { 
             delete schema;
             delete dependenciesSchema;
@@ -679,10 +719,11 @@ private:
         }
 
         GenericValue<Encoding> name;
-        BaseSchema<Encoding>* schema;
-        BaseSchema<Encoding>* dependenciesSchema;
+        const BaseSchema<Encoding>* schema;
+        const BaseSchema<Encoding>* dependenciesSchema;
         bool* dependencies;
         bool required;
+        bool typeless;
     };
 
 #if RAPIDJSON_SCHEMA_HAS_REGEX
