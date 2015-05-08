@@ -23,29 +23,29 @@ namespace internal {
 class Double {
 public:
     Double() {}
-    Double(double d) : d(d) {}
-    Double(uint64_t u) : u(u) {}
+    Double(double d) : d_(d) {}
+    Double(uint64_t u) : u_(u) {}
 
-    double Value() const { return d; }
-    uint64_t Uint64Value() const { return u; }
+    double Value() const { return d_; }
+    uint64_t Uint64Value() const { return u_; }
 
     double NextPositiveDouble() const {
         RAPIDJSON_ASSERT(!Sign());
-        return Double(u + 1).Value();
+        return Double(u_ + 1).Value();
     }
 
-    bool Sign() const { return (u & kSignMask) != 0; }
-    uint64_t Significand() const { return u & kSignificandMask; }
-    int Exponent() const { return ((u & kExponentMask) >> kSignificandSize) - kExponentBias; }
+    bool Sign() const { return (u_ & kSignMask) != 0; }
+    uint64_t Significand() const { return u_ & kSignificandMask; }
+    int Exponent() const { return static_cast<int>(((u_ & kExponentMask) >> kSignificandSize) - kExponentBias); }
 
-    bool IsNan() const { return (u & kExponentMask) == kExponentMask && Significand() != 0; }
-    bool IsInf() const { return (u & kExponentMask) == kExponentMask && Significand() == 0; }
-    bool IsNormal() const { return (u & kExponentMask) != 0 || Significand() == 0; }
-    bool IsZero() const { return (u & (kExponentMask | kSignificandMask)) == 0; }
+    bool IsNan() const { return (u_ & kExponentMask) == kExponentMask && Significand() != 0; }
+    bool IsInf() const { return (u_ & kExponentMask) == kExponentMask && Significand() == 0; }
+    bool IsNormal() const { return (u_ & kExponentMask) != 0 || Significand() == 0; }
+    bool IsZero() const { return (u_ & (kExponentMask | kSignificandMask)) == 0; }
 
     uint64_t IntegerSignificand() const { return IsNormal() ? Significand() | kHiddenBit : Significand(); }
     int IntegerExponent() const { return (IsNormal() ? Exponent() : kDenormalExponent) - kSignificandSize; }
-    uint64_t ToBias() const { return (u & kSignMask) ? ~u + 1 : u | kSignMask; }
+    uint64_t ToBias() const { return (u_ & kSignMask) ? ~u_ + 1 : u_ | kSignMask; }
 
     static unsigned EffectiveSignificandSize(int order) {
         if (order >= -1021)
@@ -66,8 +66,8 @@ private:
     static const uint64_t kHiddenBit = RAPIDJSON_UINT64_C2(0x00100000, 0x00000000);
 
     union {
-        double d;
-        uint64_t u;
+        double d_;
+        uint64_t u_;
     };
 };
 

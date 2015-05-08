@@ -46,11 +46,21 @@ TEST(Pointer, Parse) {
     }
 
     {
+        Pointer p("/");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_EQ(0u, p.GetTokens()[0].length);
+        EXPECT_STREQ("", p.GetTokens()[0].name);
+        EXPECT_EQ(kPointerInvalidIndex, p.GetTokens()[0].index);
+    }
+
+    {
         Pointer p("/foo");
         EXPECT_TRUE(p.IsValid());
         EXPECT_EQ(1u, p.GetTokenCount());
         EXPECT_EQ(3u, p.GetTokens()[0].length);
         EXPECT_STREQ("foo", p.GetTokens()[0].name);
+        EXPECT_EQ(kPointerInvalidIndex, p.GetTokens()[0].index);
     }
 
     #if RAPIDJSON_HAS_STDSTRING
@@ -60,6 +70,7 @@ TEST(Pointer, Parse) {
         EXPECT_EQ(1u, p.GetTokenCount());
         EXPECT_EQ(3u, p.GetTokens()[0].length);
         EXPECT_STREQ("foo", p.GetTokens()[0].name);
+        EXPECT_EQ(kPointerInvalidIndex, p.GetTokens()[0].index);
     }
     #endif
 
@@ -69,6 +80,7 @@ TEST(Pointer, Parse) {
         EXPECT_EQ(2u, p.GetTokenCount());
         EXPECT_EQ(3u, p.GetTokens()[0].length);
         EXPECT_STREQ("foo", p.GetTokens()[0].name);
+        EXPECT_EQ(kPointerInvalidIndex, p.GetTokens()[0].index);
         EXPECT_EQ(1u, p.GetTokens()[1].length);
         EXPECT_STREQ("0", p.GetTokens()[1].name);
         EXPECT_EQ(0u, p.GetTokens()[1].index);
@@ -487,6 +499,14 @@ TEST(Pointer, Assignment) {
         EXPECT_EQ(1u, q.GetTokens()[1].length);
         EXPECT_STREQ("0", q.GetTokens()[1].name);
         EXPECT_EQ(0u, q.GetTokens()[1].index);
+        q = q;
+        EXPECT_TRUE(q.IsValid());
+        EXPECT_EQ(2u, q.GetTokenCount());
+        EXPECT_EQ(3u, q.GetTokens()[0].length);
+        EXPECT_STREQ("foo", q.GetTokens()[0].name);
+        EXPECT_EQ(1u, q.GetTokens()[1].length);
+        EXPECT_STREQ("0", q.GetTokens()[1].name);
+        EXPECT_EQ(0u, q.GetTokens()[1].index);
     }
 
     // Static tokens
@@ -502,6 +522,26 @@ TEST(Pointer, Assignment) {
         EXPECT_STREQ("0", q.GetTokens()[1].name);
         EXPECT_EQ(0u, q.GetTokens()[1].index);
     }
+}
+
+TEST(Pointer, Append) {
+    {
+        Pointer p;
+        Pointer q = p.Append("foo");
+        EXPECT_TRUE(Pointer("/foo") == q);
+        q = q.Append(0);
+        EXPECT_TRUE(Pointer("/foo/0") == q);
+        q = q.Append("");
+        EXPECT_TRUE(Pointer("/foo/0/") == q);
+    }
+
+#if RAPIDJSON_HAS_STDSTRING
+    {
+        Pointer p;
+        Pointer q = p.Append(std::string("foo"));
+        EXPECT_TRUE(Pointer("/foo") == q);
+    }
+#endif
 }
 
 TEST(Pointer, Equality) {
@@ -822,6 +862,21 @@ TEST(Pointer, Swap_NoAllocator) {
     Pointer("/foo/0").Swap(d, *Pointer("/foo/1").Get(d));
     EXPECT_STREQ("baz", d["foo"][0].GetString());
     EXPECT_STREQ("bar", d["foo"][1].GetString());
+}
+
+TEST(Pointer, Erase) {
+    Document d;
+    d.Parse(kJson);
+
+    EXPECT_FALSE(Pointer("").Erase(d));
+    EXPECT_FALSE(Pointer("/foo/nonexist").Erase(d));
+    EXPECT_TRUE(Pointer("/foo/0").Erase(d));
+    EXPECT_EQ(1u, d["foo"].Size());
+    EXPECT_STREQ("baz", d["foo"][0].GetString());
+    EXPECT_TRUE(Pointer("/foo/0").Erase(d));
+    EXPECT_TRUE(d["foo"].Empty());
+    EXPECT_TRUE(Pointer("/foo").Erase(d));
+    EXPECT_TRUE(Pointer("/foo").Get(d) == 0);
 }
 
 TEST(Pointer, CreateValueByPointer) {
@@ -1323,6 +1378,36 @@ TEST(Pointer, SwapValueByPointer_NoAllocator) {
     SwapValueByPointer(d, "/foo/0", *GetValueByPointer(d, "/foo/1"));
     EXPECT_STREQ("bar", d["foo"][0].GetString());
     EXPECT_STREQ("baz", d["foo"][1].GetString());
+}
+
+TEST(Pointer, EraseValueByPointer_Pointer) {
+    Document d;
+    d.Parse(kJson);
+
+    EXPECT_FALSE(EraseValueByPointer(d, Pointer("")));
+    EXPECT_FALSE(Pointer("/foo/nonexist").Erase(d));
+    EXPECT_TRUE(EraseValueByPointer(d, Pointer("/foo/0")));
+    EXPECT_EQ(1u, d["foo"].Size());
+    EXPECT_STREQ("baz", d["foo"][0].GetString());
+    EXPECT_TRUE(EraseValueByPointer(d, Pointer("/foo/0")));
+    EXPECT_TRUE(d["foo"].Empty());
+    EXPECT_TRUE(EraseValueByPointer(d, Pointer("/foo")));
+    EXPECT_TRUE(Pointer("/foo").Get(d) == 0);
+}
+
+TEST(Pointer, EraseValueByPointer_String) {
+    Document d;
+    d.Parse(kJson);
+
+    EXPECT_FALSE(EraseValueByPointer(d, ""));
+    EXPECT_FALSE(Pointer("/foo/nonexist").Erase(d));
+    EXPECT_TRUE(EraseValueByPointer(d, "/foo/0"));
+    EXPECT_EQ(1u, d["foo"].Size());
+    EXPECT_STREQ("baz", d["foo"][0].GetString());
+    EXPECT_TRUE(EraseValueByPointer(d, "/foo/0"));
+    EXPECT_TRUE(d["foo"].Empty());
+    EXPECT_TRUE(EraseValueByPointer(d, "/foo"));
+    EXPECT_TRUE(Pointer("/foo").Get(d) == 0);
 }
 
 TEST(Pointer, Ambiguity) {

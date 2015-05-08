@@ -97,7 +97,7 @@ public:
         if (u == 1) return *this;
         if (*this == 1) return *this = u;
 
-        uint32_t k = 0;
+        uint64_t k = 0;
         for (size_t i = 0; i < count_; i++) {
             const uint64_t c = digits_[i] >> 32;
             const uint64_t d = digits_[i] & 0xFFFFFFFF;
@@ -246,7 +246,7 @@ private:
         __extension__ typedef unsigned __int128 uint128;
         uint128 p = static_cast<uint128>(a) * static_cast<uint128>(b);
         p += k;
-        *outHigh = p >> 64;
+        *outHigh = static_cast<uint64_t>(p >> 64);
         return static_cast<uint64_t>(p);
 #else
         const uint64_t a0 = a & 0xFFFFFFFF, a1 = a >> 32, b0 = b & 0xFFFFFFFF, b1 = b >> 32;

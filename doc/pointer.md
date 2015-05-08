@@ -65,6 +65,12 @@ Pointer("/hello").Swap(d, x);
 
 // { "project" : "RapidJSON", "stars" : 11, "a" : { "b" : [ null ] }, "hello" : "C++" }
 // x becomes "world"
+
+// Erase a member or element, return true if the value exists
+bool success = Pointer("/a").Erase(d);
+assert(success);
+
+// { "project" : "RapidJSON", "stars" : 10 }
 ~~~
 
 # Helper Functions {#HelperFunctions}
@@ -88,6 +94,9 @@ Value& hello = GetValueByPointerWithDefault(d, "/hello", "world");
 
 Value x("C++");
 SwapValueByPointer(d, "/hello", x);
+
+bool success = EraseValueByPointer(d, "/a");
+assert(success);
 ~~~
 
 The conventions are shown here for comparison:
@@ -166,6 +175,8 @@ private:
 };
 ~~~
 
+`Erase()` or `EraseValueByPointer()` does not need allocator. And they return `true` if the value is erased successfully.
+
 # Error Handling {#ErrorHandling}
 
 A `Pointer` parses a source string in its constructor. If there is parsing error, `Pointer::IsValid()` returns false. And you can use `Pointer::GetParseErrorCode()` and `GetParseErrorOffset()` to retrieve the error information.
@@ -185,7 +196,7 @@ String Representation | URI Fragment Representation | Pointer Tokens (UTF-8)
 `"/m~0n"`             | `"#/m~0n"`                  | `{"m~n"}`
 `"/ "`                | `"#/%20"`                   | `{" "}`
 `"/\0"`               | `"#/%00"`                   | `{"\0"}`
-`"/\xE2\x82\xAC"`     | `"#/%E2%82%AC"`             | `{"\xE2\x82\xAC"}`
+`"/€"`                | `"#/%E2%82%AC"`             | `{"€"}`
 
 RapidJSON fully support URI fragment representation. It automatically detects the pound sign during parsing.
 
