@@ -33,7 +33,7 @@ using namespace rapidjson;
 TEST(SchemaValidator, Typeless) {
     Document sd;
     sd.Parse("{}");
-    Schema s(sd);
+    SchemaDocument s(sd);
     
     VALIDATE(s, "42", true);
     VALIDATE(s, "\"I'm a string\"", true);
@@ -43,7 +43,7 @@ TEST(SchemaValidator, Typeless) {
 TEST(SchemaValidator, MultiType) {
     Document sd;
     sd.Parse("{ \"type\": [\"number\", \"string\"] }");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "42", true);
     VALIDATE(s, "\"Life, the universe, and everything\"", true);
@@ -53,7 +53,7 @@ TEST(SchemaValidator, MultiType) {
 TEST(SchemaValidator, Enum_Typed) {
     Document sd;
     sd.Parse("{ \"type\": \"string\", \"enum\" : [\"red\", \"amber\", \"green\"] }");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "\"red\"", true);
     VALIDATE(s, "\"blue\"", false);
@@ -62,7 +62,7 @@ TEST(SchemaValidator, Enum_Typed) {
 TEST(SchemaValidator, Enum_Typless) {
     Document sd;
     sd.Parse("{  \"enum\": [\"red\", \"amber\", \"green\", null, 42] }");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "\"red\"", true);
     VALIDATE(s, "null", true);
@@ -73,7 +73,7 @@ TEST(SchemaValidator, Enum_Typless) {
 TEST(SchemaValidator, Enum_InvalidType) {
     Document sd;
     sd.Parse("{ \"type\": \"string\", \"enum\": [\"red\", \"amber\", \"green\", null] }");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "\"red\"", true);
     VALIDATE(s, "null", false);
@@ -83,7 +83,7 @@ TEST(SchemaValidator, AllOf) {
     {
         Document sd;
         sd.Parse("{\"allOf\": [{ \"type\": \"string\" }, { \"type\": \"string\", \"maxLength\": 5 }]}"); // need "type": "string" now
-        Schema s(sd);
+        SchemaDocument s(sd);
 
         //VALIDATE(s, "\"ok\"", true);
         VALIDATE(s, "\"too long\"", false);
@@ -91,7 +91,7 @@ TEST(SchemaValidator, AllOf) {
     {
         Document sd;
         sd.Parse("{\"allOf\": [{ \"type\": \"string\" }, { \"type\": \"number\" } ] }");
-        Schema s(sd);
+        SchemaDocument s(sd);
 
         VALIDATE(s, "\"No way\"", false);
         VALIDATE(s, "-1", false);
@@ -101,7 +101,7 @@ TEST(SchemaValidator, AllOf) {
 TEST(SchemaValidator, AnyOf) {
     Document sd;
     sd.Parse("{\"anyOf\": [{ \"type\": \"string\" }, { \"type\": \"number\" } ] }");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     //VALIDATE(s, "\"Yes\"", true);
     //VALIDATE(s, "42", true);
@@ -111,7 +111,7 @@ TEST(SchemaValidator, AnyOf) {
 TEST(SchemaValidator, OneOf) {
     Document sd;
     sd.Parse("{\"oneOf\": [{ \"type\": \"number\", \"multipleOf\": 5 }, { \"type\": \"number\", \"multipleOf\": 3 } ] }");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "10", true);
     VALIDATE(s, "9", true);
@@ -122,7 +122,7 @@ TEST(SchemaValidator, OneOf) {
 TEST(SchemaValidator, Not) {
     Document sd;
     sd.Parse("{\"not\":{ \"type\": \"string\"}}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "42", true);
     VALIDATE(s, "{ \"key\": \"value\" }", true); // TO FIX
@@ -132,7 +132,7 @@ TEST(SchemaValidator, Not) {
 TEST(SchemaValidator, String) {
     Document sd;
     sd.Parse("{\"type\":\"string\"}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "\"I'm a string\"", true);
     VALIDATE(s, "42", false);
@@ -141,7 +141,7 @@ TEST(SchemaValidator, String) {
 TEST(SchemaValidator, String_LengthRange) {
     Document sd;
     sd.Parse("{\"type\":\"string\",\"minLength\":2,\"maxLength\":3}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "\"A\"", false);
     VALIDATE(s, "\"AB\"", true);
@@ -153,7 +153,7 @@ TEST(SchemaValidator, String_LengthRange) {
 TEST(SchemaValidator, String_Pattern) {
     Document sd;
     sd.Parse("{\"type\":\"string\",\"pattern\":\"^(\\\\([0-9]{3}\\\\))?[0-9]{3}-[0-9]{4}$\"}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "\"555-1212\"", true);
     VALIDATE(s, "\"(888)555-1212\"", true);
@@ -165,7 +165,7 @@ TEST(SchemaValidator, String_Pattern) {
 TEST(SchemaValidator, Integer) {
     Document sd;
     sd.Parse("{\"type\":\"integer\"}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "42", true);
     VALIDATE(s, "-1", true);
@@ -176,7 +176,7 @@ TEST(SchemaValidator, Integer) {
 TEST(SchemaValidator, Integer_Range) {
     Document sd;
     sd.Parse("{\"type\":\"integer\",\"minimum\":0,\"maximum\":100,\"exclusiveMaximum\":true}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "-1", false);
     VALIDATE(s, "0", true);
@@ -189,7 +189,7 @@ TEST(SchemaValidator, Integer_Range) {
 TEST(SchemaValidator, Integer_MultipleOf) {
     Document sd;
     sd.Parse("{\"type\":\"integer\",\"multipleOf\":10}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "0", true);
     VALIDATE(s, "10", true);
@@ -200,7 +200,7 @@ TEST(SchemaValidator, Integer_MultipleOf) {
 TEST(SchemaValidator, Number_Range) {
     Document sd;
     sd.Parse("{\"type\":\"number\",\"minimum\":0,\"maximum\":100,\"exclusiveMaximum\":true}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "-1", false);
     VALIDATE(s, "0", true);
@@ -213,7 +213,7 @@ TEST(SchemaValidator, Number_Range) {
 TEST(SchemaValidator, Number_MultipleOf) {
     Document sd;
     sd.Parse("{\"type\":\"number\",\"multipleOf\":10}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "0", true);
     VALIDATE(s, "10", true);
@@ -224,7 +224,7 @@ TEST(SchemaValidator, Number_MultipleOf) {
 TEST(SchemaValidator, Number_MultipleOfOne) {
     Document sd;
     sd.Parse("{\"type\":\"number\",\"multipleOf\":1}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "42", true);
     VALIDATE(s, "42.0", true);
@@ -234,7 +234,7 @@ TEST(SchemaValidator, Number_MultipleOfOne) {
 TEST(SchemaValidator, Object) {
     Document sd;
     sd.Parse("{\"type\":\"object\"}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "{\"key\":\"value\",\"another_key\":\"another_value\"}", true);
     VALIDATE(s, "{\"Sun\":1.9891e30,\"Jupiter\":1.8986e27,\"Saturn\":5.6846e26,\"Neptune\":10.243e25,\"Uranus\":8.6810e25,\"Earth\":5.9736e24,\"Venus\":4.8685e24,\"Mars\":6.4185e23,\"Mercury\":3.3022e23,\"Moon\":7.349e22,\"Pluto\":1.25e22}", true);    
@@ -254,7 +254,7 @@ TEST(SchemaValidator, Object_Properties) {
         "    }"
         "}");
 
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\" }", true);
     VALIDATE(s, "{ \"number\": \"1600\", \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\" }", false);
@@ -278,7 +278,7 @@ TEST(SchemaValidator, Object_AdditionalPropertiesBoolean) {
         "    \"additionalProperties\": false"
         "}");
 
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\" }", true);
     VALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\", \"direction\": \"NW\" }", false);
@@ -298,7 +298,7 @@ TEST(SchemaValidator, Object_AdditionalPropertiesObject) {
         "    },"
         "    \"additionalProperties\": { \"type\": \"string\" }"
         "}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\" }", true);
     VALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\", \"direction\": \"NW\" }", true);
@@ -318,7 +318,7 @@ TEST(SchemaValidator, Object_Required) {
         "    },"
         "    \"required\":[\"name\", \"email\"]"
         "}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "{ \"name\": \"William Shakespeare\", \"email\" : \"bill@stratford-upon-avon.co.uk\" }", true);
     VALIDATE(s, "{ \"name\": \"William Shakespeare\", \"email\" : \"bill@stratford-upon-avon.co.uk\", \"address\" : \"Henley Street, Stratford-upon-Avon, Warwickshire, England\", \"authorship\" : \"in question\"}", true);
@@ -329,7 +329,7 @@ TEST(SchemaValidator, Object_Required) {
 TEST(SchemaValidator, Object_PropertiesRange) {
     Document sd;
     sd.Parse("{\"type\":\"object\", \"minProperties\":2, \"maxProperties\":3}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "{}", false);
     VALIDATE(s, "{\"a\":0}", false);
@@ -353,7 +353,7 @@ TEST(SchemaValidator, Object_PropertyDependencies) {
         "    \"credit_card\": [\"billing_address\"]"
         "  }"
         "}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "{ \"name\": \"John Doe\",  \"credit_card\": 5555555555555555, \"billing_address\": \"555 Debtor's Lane\" }", true);
     VALIDATE(s, "{ \"name\": \"John Doe\", \"credit_card\": 5555555555555555 }", false);
@@ -380,7 +380,7 @@ TEST(SchemaValidator, Object_SchemaDependencies) {
         "        }"
         "    }"
         "}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     //VALIDATE(s, "{\"name\": \"John Doe\", \"credit_card\" : 5555555555555555,\"billing_address\" : \"555 Debtor's Lane\"}", true);
     VALIDATE(s, "{\"name\": \"John Doe\", \"credit_card\" : 5555555555555555 }", false);
@@ -398,7 +398,7 @@ TEST(SchemaValidator, Object_PatternProperties) {
         "    \"^I_\": { \"type\": \"integer\" }"
         "  }"
         "}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "{ \"S_25\": \"This is a string\" }", true);
     VALIDATE(s, "{ \"I_0\": 42 }", true);
@@ -421,7 +421,7 @@ TEST(SchemaValidator, Object_PatternProperties_AdditionalProperties) {
         "  },"
         "  \"additionalProperties\": { \"type\": \"string\" }"
         "}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "{ \"builtin\": 42 }", true);
     VALIDATE(s, "{ \"keyword\": \"value\" }", true);
@@ -432,7 +432,7 @@ TEST(SchemaValidator, Object_PatternProperties_AdditionalProperties) {
 TEST(SchemaValidator, Array) {
     Document sd;
     sd.Parse("{\"type\":\"array\"}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "[1, 2, 3, 4, 5]", true);
     VALIDATE(s, "[3, \"different\", { \"types\" : \"of values\" }]", true);
@@ -448,7 +448,7 @@ TEST(SchemaValidator, Array_ItemsList) {
         "        \"type\": \"number\""
         "    }"
         "}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "[1, 2, 3, 4, 5]", true);
     VALIDATE(s, "[1, 2, \"3\", 4, 5]", false);
@@ -477,7 +477,7 @@ TEST(SchemaValidator, Array_ItemsTuple) {
         "    }"
         "  ]"
         "}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\", \"NW\"]", true);
     VALIDATE(s, "[24, \"Sussex\", \"Drive\"]", false);
@@ -509,7 +509,7 @@ TEST(SchemaValidator, Array_AdditionalItmes) {
         "  ],"
         "  \"additionalItems\": false"
         "}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\", \"NW\"]", true);
     VALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\"]", true);
@@ -519,7 +519,7 @@ TEST(SchemaValidator, Array_AdditionalItmes) {
 TEST(SchemaValidator, Array_ItemsRange) {
     Document sd;
     sd.Parse("{\"type\": \"array\",\"minItems\": 2,\"maxItems\" : 3}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "[]", false);
     VALIDATE(s, "[1]", false);
@@ -533,7 +533,7 @@ TEST(SchemaValidator, Array_ItemsRange) {
 TEST(SchemaValidator, Array_Uniqueness) {
     Document sd;
     sd.Parse("{\"type\": \"array\", \"uniqueItems\": true}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "[1, 2, 3, 4, 5]", true);
     VALIDATE(s, "[1, 2, 3, 4, 5]", false);
@@ -543,7 +543,7 @@ TEST(SchemaValidator, Array_Uniqueness) {
 TEST(SchemaValidator, Boolean) {
     Document sd;
     sd.Parse("{\"type\":\"boolean\"}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "true", true);
     VALIDATE(s, "false", true);
@@ -554,7 +554,7 @@ TEST(SchemaValidator, Boolean) {
 TEST(SchemaValidator, Null) {
     Document sd;
     sd.Parse("{\"type\":\"null\"}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "null", true);
     VALIDATE(s, "false", false);
@@ -567,7 +567,7 @@ TEST(SchemaValidator, Null) {
 TEST(SchemaValidator, ObjectInArray) {
     Document sd;
     sd.Parse("{\"type\":\"array\", \"items\": { \"type\":\"string\" }}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "[\"a\"]", true);
     VALIDATE(s, "[1]", false);
@@ -585,7 +585,7 @@ TEST(SchemaValidator, MultiTypeInObject) {
         "        }"
         "    }"
         "}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "{ \"tel\": 999 }", true);
     VALIDATE(s, "{ \"tel\": \"123-456\" }", true);
@@ -603,7 +603,7 @@ TEST(SchemaValidator, MultiTypeWithObject) {
         "        }"
         "    }"
         "}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "\"Hello\"", true);
     VALIDATE(s, "{ \"tel\": 999 }", true);
@@ -620,7 +620,7 @@ TEST(SchemaValidator, AllOf_Nested) {
     "        { \"allOf\": [ { \"enum\" : [\"ok\", \"okay\", \"OK\", \"o\"] }, { \"enum\" : [\"ok\", \"OK\", \"o\"]} ] }"
     "    ]"
     "}");
-    Schema s(sd);
+    SchemaDocument s(sd);
 
     VALIDATE(s, "\"ok\"", true);
     VALIDATE(s, "\"OK\"", true);
@@ -717,7 +717,7 @@ TEST(SchemaValidator, TestSuite) {
             }
             else {
                 for (Value::ConstValueIterator schemaItr = d.Begin(); schemaItr != d.End(); ++schemaItr) {
-                    Schema schema((*schemaItr)["schema"]);
+                    SchemaDocument schema((*schemaItr)["schema"]);
                     SchemaValidator validator(schema);
                     const char* description1 = (*schemaItr)["description"].GetString();
                     const Value& tests = (*schemaItr)["tests"];
