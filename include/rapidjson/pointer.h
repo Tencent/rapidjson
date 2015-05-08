@@ -16,6 +16,7 @@
 #define RAPIDJSON_POINTER_H_
 
 #include "document.h"
+#include "internal/itoa.h"
 
 RAPIDJSON_NAMESPACE_BEGIN
 
@@ -169,37 +170,108 @@ public:
 
     //! Assignment operator.
     GenericPointer& operator=(const GenericPointer& rhs) {
-        this->~GenericPointer();
+        if (this != &rhs) {
+            // Do not delete ownAllcator
+            if (nameBuffer_) { 
+                Allocator::Free(nameBuffer_);
+                Allocator::Free(tokens_);
+            }
 
-        tokenCount_ = rhs.tokenCount_;
-        parseErrorOffset_ = rhs.parseErrorOffset_;
-        parseErrorCode_ = rhs.parseErrorCode_;
+            tokenCount_ = rhs.tokenCount_;
+            parseErrorOffset_ = rhs.parseErrorOffset_;
+            parseErrorCode_ = rhs.parseErrorCode_;
 
-        if (rhs.nameBuffer_) { // Normally parsed tokens.
-            if (!allocator_) // allocator is independently owned.
-                ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
-
-            size_t nameBufferSize = tokenCount_; // null terminators for tokens
-            for (Token *t = rhs.tokens_; t != rhs.tokens_ + tokenCount_; ++t)
-                nameBufferSize += t->length;
-            nameBuffer_ = (Ch*)allocator_->Malloc(nameBufferSize * sizeof(Ch));
-            std::memcpy(nameBuffer_, rhs.nameBuffer_, nameBufferSize * sizeof(Ch));
-
-            tokens_ = (Token*)allocator_->Malloc(tokenCount_ * sizeof(Token));
-            std::memcpy(tokens_, rhs.tokens_, tokenCount_ * sizeof(Token));
-
-            // Adjust pointers to name buffer
-            std::ptrdiff_t diff = nameBuffer_ - rhs.nameBuffer_;
-            for (Token *t = rhs.tokens_; t != rhs.tokens_ + tokenCount_; ++t)
-                t->name += diff;
+            if (rhs.nameBuffer_)
+                CopyFromRaw(rhs); // Normally parsed tokens.
+            else {
+                tokens_ = rhs.tokens_; // User supplied const tokens.
+                nameBuffer_ = 0;
+            }
         }
-        else
-            tokens_ = rhs.tokens_; // User supplied const tokens.
-
         return *this;
     }
 
     //@}
+
+    //!@name Append token
+    //@{
+
+    //! Append a token and return a new Pointer
+    /*!
+        \param token Token to be appended.
+        \param allocator Allocator for the newly return Pointer.
+        \return A new Pointer with appended token.
+    */
+    GenericPointer Append(const Token& token, Allocator* allocator = 0) const {
+        GenericPointer r;
+        r.allocator_ = allocator;
+        Ch *p = r.CopyFromRaw(*this, 1, (token.length + 1) * sizeof(Ch));
+        std::memcpy(p, token.name, (token.length + 1) * sizeof(Ch));
+        r.tokens_[tokenCount_].name = p;
+        r.tokens_[tokenCount_].length = token.length;
+        r.tokens_[tokenCount_].index = token.index;
+        return r;
+    }
+
+    //! Append a name token with length, and return a new Pointer
+    /*!
+        \param name Name to be appended.
+        \param length Length of name.
+        \param allocator Allocator for the newly return Pointer.
+        \return A new Pointer with appended token.
+    */
+    GenericPointer Append(const Ch* name, SizeType length, Allocator* allocator = 0) const {
+        Token token = { name, length, kPointerInvalidIndex };
+        return Append(token, allocator);
+    }
+
+    //! Append a name token without length, and return a new Pointer
+    /*!
+        \param name Name (const Ch*) to be appended.
+        \param allocator Allocator for the newly return Pointer.
+        \return A new Pointer with appended token.
+    */
+    template <typename T>
+    RAPIDJSON_DISABLEIF_RETURN((internal::NotExpr<internal::IsSame<typename internal::RemoveConst<T>::Type, Ch> >), (GenericPointer))
+    Append(T* name, Allocator* allocator = 0) const {
+        return Append(name, StrLen(name), allocator);
+    }
+
+#if RAPIDJSON_HAS_STDSTRING
+    //! Append a name token, and return a new Pointer
+    /*!
+        \param name Name to be appended.
+        \param allocator Allocator for the newly return Pointer.
+        \return A new Pointer with appended token.
+    */
+    GenericPointer Append(const std::basic_string<Ch>& name, Allocator* allocator = 0) const {
+        return Append(name.c_str(), static_cast<SizeType>(name.size()), allocator);
+    }
+#endif
+
+    //! Append a index token, and return a new Pointer
+    /*!
+        \param index Index to be appended.
+        \param allocator Allocator for the newly return Pointer.
+        \return A new Pointer with appended token.
+    */
+    GenericPointer Append(SizeType index, Allocator* allocator = 0) const {
+        char buffer[21];
+        SizeType length = (sizeof(SizeType) == 4 ? internal::u32toa(index, buffer): internal::u64toa(index, buffer)) - buffer;
+        buffer[length] = '\0';
+
+        if (sizeof(Ch) == 1) {
+            Token token = { (Ch*)buffer, length, index };
+            return Append(token, allocator);
+        }
+        else {
+            Ch name[21];
+            for (size_t i = 0; i <= length; i++)
+                name[i] = buffer[i];
+            Token token = { name, length, index };
+            return Append(token, allocator);
+        }
+    }
 
     //!@name Handling Parse Error
     //@{
@@ -240,7 +312,7 @@ public:
         for (size_t i = 0; i < tokenCount_; i++) {
             if (tokens_[i].index != rhs.tokens_[i].index ||
                 tokens_[i].length != rhs.tokens_[i].length || 
-                std::memcmp(tokens_[i].name, rhs.tokens_[i].name, sizeof(Ch) * tokens_[i].length) != 0)
+                (tokens_[i].length != 0 && std::memcmp(tokens_[i].name, rhs.tokens_[i].name, sizeof(Ch)* tokens_[i].length) != 0))
             {
                 return false;
             }
@@ -633,6 +705,35 @@ public:
     }
 
 private:
+    //! Clone the content from rhs to this.
+    /*!
+        \param rhs Source pointer.
+        \param extraToken Extra tokens to be allocated.
+        \param extraNameBufferSize Extra name buffer size to be allocated.
+        \return Start of non-occupied name buffer, for storing extra names.
+    */
+    Ch* CopyFromRaw(const GenericPointer& rhs, size_t extraToken = 0, size_t extraNameBufferSize = 0) {
+        if (!allocator_) // allocator is independently owned.
+            ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
+
+        size_t nameBufferSize = rhs.tokenCount_; // null terminators for tokens
+        for (Token *t = rhs.tokens_; t != rhs.tokens_ + rhs.tokenCount_; ++t)
+            nameBufferSize += t->length;
+        nameBuffer_ = (Ch*)allocator_->Malloc(nameBufferSize * sizeof(Ch)+extraNameBufferSize);
+        std::memcpy(nameBuffer_, rhs.nameBuffer_, nameBufferSize * sizeof(Ch));
+
+        tokenCount_ = rhs.tokenCount_ + extraToken;
+        tokens_ = (Token*)allocator_->Malloc(tokenCount_ * sizeof(Token));
+        std::memcpy(tokens_, rhs.tokens_, rhs.tokenCount_ * sizeof(Token));
+
+        // Adjust pointers to name buffer
+        std::ptrdiff_t diff = nameBuffer_ - rhs.nameBuffer_;
+        for (Token *t = tokens_; t != tokens_ + rhs.tokenCount_; ++t)
+            t->name += diff;
+
+        return nameBuffer_ + nameBufferSize * sizeof(Ch);
+    }
+
     //! Check whether a character should be percent-encoded.
     /*!
         According to RFC 3986 2.3 Unreserved Characters.
@@ -740,6 +841,8 @@ private:
                 *name++ = c;
             }
             token.length = name - token.name;
+            if (token.length == 0)
+                isNumber = false;
             *name++ = '\0'; // Null terminator
 
             // Second check for index: more than one digit cannot have leading zero

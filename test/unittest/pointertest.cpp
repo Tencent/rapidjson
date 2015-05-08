@@ -40,11 +40,21 @@ TEST(Pointer, Parse) {
     }
 
     {
+        Pointer p("/");
+        EXPECT_TRUE(p.IsValid());
+        EXPECT_EQ(1u, p.GetTokenCount());
+        EXPECT_EQ(0u, p.GetTokens()[0].length);
+        EXPECT_STREQ("", p.GetTokens()[0].name);
+        EXPECT_EQ(kPointerInvalidIndex, p.GetTokens()[0].index);
+    }
+
+    {
         Pointer p("/foo");
         EXPECT_TRUE(p.IsValid());
         EXPECT_EQ(1u, p.GetTokenCount());
         EXPECT_EQ(3u, p.GetTokens()[0].length);
         EXPECT_STREQ("foo", p.GetTokens()[0].name);
+        EXPECT_EQ(kPointerInvalidIndex, p.GetTokens()[0].index);
     }
 
     #if RAPIDJSON_HAS_STDSTRING
@@ -54,6 +64,7 @@ TEST(Pointer, Parse) {
         EXPECT_EQ(1u, p.GetTokenCount());
         EXPECT_EQ(3u, p.GetTokens()[0].length);
         EXPECT_STREQ("foo", p.GetTokens()[0].name);
+        EXPECT_EQ(kPointerInvalidIndex, p.GetTokens()[0].index);
     }
     #endif
 
@@ -63,6 +74,7 @@ TEST(Pointer, Parse) {
         EXPECT_EQ(2u, p.GetTokenCount());
         EXPECT_EQ(3u, p.GetTokens()[0].length);
         EXPECT_STREQ("foo", p.GetTokens()[0].name);
+        EXPECT_EQ(kPointerInvalidIndex, p.GetTokens()[0].index);
         EXPECT_EQ(1u, p.GetTokens()[1].length);
         EXPECT_STREQ("0", p.GetTokens()[1].name);
         EXPECT_EQ(0u, p.GetTokens()[1].index);
@@ -481,6 +493,14 @@ TEST(Pointer, Assignment) {
         EXPECT_EQ(1u, q.GetTokens()[1].length);
         EXPECT_STREQ("0", q.GetTokens()[1].name);
         EXPECT_EQ(0u, q.GetTokens()[1].index);
+        q = q;
+        EXPECT_TRUE(q.IsValid());
+        EXPECT_EQ(2u, q.GetTokenCount());
+        EXPECT_EQ(3u, q.GetTokens()[0].length);
+        EXPECT_STREQ("foo", q.GetTokens()[0].name);
+        EXPECT_EQ(1u, q.GetTokens()[1].length);
+        EXPECT_STREQ("0", q.GetTokens()[1].name);
+        EXPECT_EQ(0u, q.GetTokens()[1].index);
     }
 
     // Static tokens
@@ -496,6 +516,26 @@ TEST(Pointer, Assignment) {
         EXPECT_STREQ("0", q.GetTokens()[1].name);
         EXPECT_EQ(0u, q.GetTokens()[1].index);
     }
+}
+
+TEST(Pointer, Append) {
+    {
+        Pointer p;
+        Pointer q = p.Append("foo");
+        EXPECT_TRUE(Pointer("/foo") == q);
+        q = q.Append(0);
+        EXPECT_TRUE(Pointer("/foo/0") == q);
+        q = q.Append("");
+        EXPECT_TRUE(Pointer("/foo/0/") == q);
+    }
+
+#if RAPIDJSON_HAS_STDSTRING
+    {
+        Pointer p;
+        Pointer q = p.Append(std::string("foo"));
+        EXPECT_TRUE(Pointer("/foo") == q);
+    }
+#endif
 }
 
 TEST(Pointer, Equality) {
