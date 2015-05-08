@@ -16,6 +16,7 @@
 #define RAPIDJSON_SCHEMA_H_
 
 #include "document.h"
+#include "pointer.h"
 #include <cmath> // HUGE_VAL, abs, floor
 
 #if !defined(RAPIDJSON_SCHEMA_USE_STDREGEX) && (__cplusplus >=201103L || (defined(_MSC_VER) && _MSC_VER >= 1800))
@@ -41,7 +42,7 @@ RAPIDJSON_DIAG_OFF(effc++)
 
 RAPIDJSON_NAMESPACE_BEGIN
 
-enum SchemaType {
+enum SchemaValueType {
     kNullSchemaType,
     kBooleanSchemaType,
     kObjectSchemaType,
@@ -52,13 +53,28 @@ enum SchemaType {
     kTotalSchemaType
 };
 
-template <typename Encoding>
+template <typename Encoding, typename Allocator>
 class Schema;
 
-template <typename Encoding, typename OutputHandler, typename Allocator>
+template <typename Encoding, typename Allocator>
+class GenericSchemaDocument;
+
+template <typename Encoding, typename OutputHandler, typename StateAllocator>
 class GenericSchemaValidator;
 
-template <typename Encoding>
+class ISchemaValidator {
+public:
+    virtual ~ISchemaValidator() {}
+    virtual bool IsValid() const = 0;
+};
+
+template <typename SchemaType>
+class ISchemaValidatorFactory {
+public:
+    virtual ~ISchemaValidatorFactory() {}
+    virtual ISchemaValidator* CreateSchemaValidator(const SchemaType&) const = 0;
+};
+
 struct SchemaValidatorArray {
     SchemaValidatorArray() : validators(), count() {}
     ~SchemaValidatorArray() {
@@ -67,11 +83,11 @@ struct SchemaValidatorArray {
         delete[] validators;
     }
 
-    GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator>** validators;
+    ISchemaValidator** validators;
     SizeType count;
 };
 
-template <typename Encoding>
+template <typename Encoding, typename Allocator>
 struct SchemaArray {
     SchemaArray() : schemas(), count() {}
     ~SchemaArray() {
@@ -80,7 +96,7 @@ struct SchemaArray {
         delete[] schemas;
     }
 
-    Schema<Encoding>** schemas;
+    Schema<Encoding, Allocator>** schemas;
     SizeType count;
 };
 
@@ -90,9 +106,14 @@ enum PatternValidatorType {
     kPatternValidatorWithAdditionalProperty
 };
 
-template <typename Encoding>
+template <typename Encoding, typename Allocator>
 struct SchemaValidationContext {
-    SchemaValidationContext(const Schema<Encoding>* s) : 
+    typedef Schema<Encoding, Allocator> SchemaType;
+    typedef GenericSchemaValidator<SchemaType, BaseReaderHandler<>, CrtAllocator> SchemaValidatorType;
+    typedef ISchemaValidatorFactory<SchemaType> SchemaValidatorFactoryType;
+
+    SchemaValidationContext(const SchemaValidatorFactoryType* f, const SchemaType* s) :
+        factory(f),
         schema(s),
         valueSchema(),
         patternPropertiesSchemas(),
@@ -110,15 +131,16 @@ struct SchemaValidationContext {
         delete[] objectDependencies;
     }
 
-    const Schema<Encoding>* schema;
-    const Schema<Encoding>* valueSchema;
-    SchemaValidatorArray<Encoding> allOfValidators;
-    SchemaValidatorArray<Encoding> anyOfValidators;
-    SchemaValidatorArray<Encoding> oneOfValidators;
-    SchemaValidatorArray<Encoding> dependencyValidators;
-    SchemaValidatorArray<Encoding> patternPropertiesValidators;
-    const Schema<Encoding>** patternPropertiesSchemas;
-    GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator>* notValidator;
+    const SchemaValidatorFactoryType* factory;
+    const SchemaType* schema;
+    const SchemaType* valueSchema;
+    SchemaValidatorArray allOfValidators;
+    SchemaValidatorArray anyOfValidators;
+    SchemaValidatorArray oneOfValidators;
+    SchemaValidatorArray dependencyValidators;
+    SchemaValidatorArray patternPropertiesValidators;
+    const SchemaType** patternPropertiesSchemas;
+    ISchemaValidator* notValidator;
     SizeType patternPropertiesSchemaCount;
     PatternValidatorType valuePatternValidatorType;
     PatternValidatorType objectPatternValidatorType;
@@ -128,14 +150,19 @@ struct SchemaValidationContext {
     bool inArray;
 };
 
-template <typename Encoding>
+template <typename Encoding, typename Allocator>
 class Schema {
 public:
+    typedef Encoding EncodingType;
     typedef typename Encoding::Ch Ch;
-    typedef SchemaValidationContext<Encoding> Context;
+    typedef SchemaValidationContext<Encoding, Allocator> Context;
+    typedef GenericSchemaDocument<Encoding, Allocator> SchemaDocumentType;
+    typedef Schema<Encoding, Allocator> SchemaType;
+    typedef GenericValue<Encoding, Allocator> ValueType;
+    typedef GenericPointer<ValueType> PointerType;
 
     template <typename ValueType>
-    Schema(const ValueType& value) : 
+    Schema(SchemaDocumentType* document, const PointerType& p, const ValueType& value) :
         not_(),
         type_((1 << kTotalSchemaType) - 1), // typeless
         properties_(),
@@ -185,12 +212,12 @@ public:
             if (v->IsArray() && v->Size() > 0)
                 enum_.CopyFrom(*v, allocator_);
 
-        AssigIfExist(allOf_, value, "allOf");
-        AssigIfExist(anyOf_, value, "anyOf");
-        AssigIfExist(oneOf_, value, "oneOf");
+        AssigIfExist(allOf_, document, p, value, "allOf");
+        AssigIfExist(anyOf_, document, p, value, "anyOf");
+        AssigIfExist(oneOf_, document, p, value, "oneOf");
 
         if (const ValueType* v = GetMember(value, "not"))
-            not_ = new Schema<Encoding>(*v);
+            not_ = document->CreateSchema(p, *v);
 
         // Object
 
@@ -233,7 +260,7 @@ public:
             for (ConstMemberIterator itr = properties->MemberBegin(); itr != properties->MemberEnd(); ++itr) {
                 SizeType index;
                 if (FindPropertyIndex(itr->name, &index)) {
-                    properties_[index].schema = new Schema(itr->value);
+                    properties_[index].schema = document->CreateSchema(p, itr->value);
                     properties_[index].typeless = false;
                 }
             }
@@ -244,7 +271,7 @@ public:
 
             for (ConstMemberIterator itr = v->MemberBegin(); itr != v->MemberEnd(); ++itr) {
                 patternProperties_[patternPropertyCount_].pattern = CreatePattern(itr->name);
-                patternProperties_[patternPropertyCount_].schema = new Schema<Encoding>(itr->value);
+                patternProperties_[patternPropertyCount_].schema = document->CreateSchema(p, itr->value);
                 patternPropertyCount_++;
             }
         }
@@ -275,7 +302,7 @@ public:
                     }
                     else if (itr->value.IsObject()) {
                         hasSchemaDependencies_ = true;
-                        properties_[sourceIndex].dependenciesSchema = new Schema<Encoding>(itr->value);
+                        properties_[sourceIndex].dependenciesSchema = document->CreateSchema(p, itr->value);
                     }
                 }
             }
@@ -285,7 +312,7 @@ public:
             if (v->IsBool())
                 additionalProperties_ = v->GetBool();
             else if (v->IsObject())
-                additionalPropertiesSchema_ = new Schema<Encoding>(*v);
+                additionalPropertiesSchema_ = document->CreateSchema(p, *v);
         }
 
         AssignIfExist(minProperties_, value, "minProperties");
@@ -294,11 +321,11 @@ public:
         // Array
         if (const ValueType* v = GetMember(value, "items")) {
             if (v->IsObject()) // List validation
-                itemsList_ = new Schema<Encoding>(*v);
+                itemsList_ = document->CreateSchema(p, *v);
             else if (v->IsArray()) { // Tuple validation
-                itemsTuple_ = new Schema<Encoding>*[v->Size()];
+                itemsTuple_ = new Schema*[v->Size()];
                 for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr)
-                    itemsTuple_[itemsTupleCount_++] = new Schema<Encoding>(*itr);
+                    itemsTuple_[itemsTupleCount_++] = document->CreateSchema(p, *itr);
             }
         }
 
@@ -309,7 +336,7 @@ public:
             if (v->IsBool())
                 additionalItems_ = v->GetBool();
             else if (v->IsObject())
-                additionalItemsSchema_ = new Schema<Encoding>(*v);
+                additionalItemsSchema_ = document->CreateSchema(p, *v);
         }
 
         // String
@@ -521,9 +548,9 @@ public:
 
         if (patternProperties_) { // pre-allocate schema array
             SizeType count = patternPropertyCount_ + 1; // extra for valuePatternValidatorType
-            context.patternPropertiesSchemas = new const Schema<Encoding>*[count];
+            context.patternPropertiesSchemas = new const SchemaType*[count];
             context.patternPropertiesSchemaCount = 0;
-            std::memset(context.patternPropertiesSchemas, 0, sizeof(Schema<Encoding>*) * count);
+            std::memset(context.patternPropertiesSchemas, 0, sizeof(SchemaType*) * count);
         }
 
         return true;
@@ -539,7 +566,7 @@ public:
 
         SizeType index;
         if (FindPropertyIndex(str, len, &index)) {
-            const Schema<Encoding>* propertySchema = properties_[index].typeless ? GetTypeless() : properties_[index].schema;
+            const SchemaType* propertySchema = properties_[index].typeless ? GetTypeless() : properties_[index].schema;
             if (context.patternPropertiesSchemaCount > 0) {
                 context.patternPropertiesSchemas[context.patternPropertiesSchemaCount++] = propertySchema;
                 context.valueSchema = GetTypeless();
@@ -619,8 +646,11 @@ private:
 #endif
 
     typedef GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator> SchemaValidatorType;
-    static const Schema<Encoding>* GetTypeless() {
-        static Schema<Encoding> typeless(Value(kObjectType).Move());
+    typedef SchemaArray<Encoding, Allocator> SchemaArrayType;
+    typedef SchemaValidatorArray SchemaValidatorArrayType;
+
+    static const SchemaType* GetTypeless() {
+        static SchemaType typeless(0, PointerType(), Value(kObjectType).Move());
         return &typeless;
     }
 
@@ -653,15 +683,15 @@ private:
                 out = static_cast<SizeType>(v->GetUint64());
     }
 
-    template <typename ValueType>
-    static void AssigIfExist(SchemaArray<Encoding>& out, const ValueType& value, const char* name) {
+    template <typename DocumentType, typename ValueType>
+    static void AssigIfExist(SchemaArrayType& out, const DocumentType& document, const PointerType& p, const ValueType& value, const char* name) {
         if (const ValueType* v = GetMember(value, name))
             if (v->IsArray() && v->Size() > 0) {
                 out.count = v->Size();
                 out.schemas = new Schema*[out.count];
                 memset(out.schemas, 0, sizeof(Schema*)* out.count);
                 for (SizeType i = 0; i < out.count; i++)
-                    out.schemas[i] = new Schema<Encoding>((*v)[i]);
+                    out.schemas[i] = document->CreateSchema(p, (*v)[i]);
             }
     }
 
@@ -706,26 +736,26 @@ private:
     }
 
     void CreateParallelValidator(Context& context) const {
-        if (allOf_.schemas) CreateSchemaValidators(context.allOfValidators, allOf_);
-        if (anyOf_.schemas) CreateSchemaValidators(context.anyOfValidators, anyOf_);
-        if (oneOf_.schemas) CreateSchemaValidators(context.oneOfValidators, oneOf_);
+        if (allOf_.schemas) CreateSchemaValidators(context, context.allOfValidators, allOf_);
+        if (anyOf_.schemas) CreateSchemaValidators(context, context.anyOfValidators, anyOf_);
+        if (oneOf_.schemas) CreateSchemaValidators(context, context.oneOfValidators, oneOf_);
         if (not_ && !context.notValidator)
-            context.notValidator = new SchemaValidatorType(*not_);
+            context.notValidator = context.factory->CreateSchemaValidator(*not_);
 
         if (hasSchemaDependencies_ && !context.dependencyValidators.validators) {
-            context.dependencyValidators.validators = new SchemaValidatorType*[propertyCount_];
+            context.dependencyValidators.validators = new ISchemaValidator*[propertyCount_];
             context.dependencyValidators.count = propertyCount_;
             for (SizeType i = 0; i < propertyCount_; i++)
-                context.dependencyValidators.validators[i] = properties_[i].dependenciesSchema ? new SchemaValidatorType(*properties_[i].dependenciesSchema) : 0;
+                context.dependencyValidators.validators[i] = properties_[i].dependenciesSchema ? context.factory->CreateSchemaValidator(*properties_[i].dependenciesSchema) : 0;
         }
     }
 
-    void CreateSchemaValidators(SchemaValidatorArray<Encoding>& validators, const SchemaArray<Encoding>& schemas) const {
+    void CreateSchemaValidators(Context& context, SchemaValidatorArrayType& validators, const SchemaArrayType& schemas) const {
         if (!validators.validators) {
-            validators.validators = new SchemaValidatorType*[schemas.count];
+            validators.validators = new ISchemaValidator*[schemas.count];
             validators.count = schemas.count;
             for (SizeType i = 0; i < schemas.count; i++)
-                validators.validators[i] = new SchemaValidatorType(*schemas.schemas[i]);
+                validators.validators[i] = context.factory->CreateSchemaValidator(*schemas.schemas[i]);
         }
     }
 
@@ -772,8 +802,8 @@ private:
         }
 
         GenericValue<Encoding> name;
-        const Schema<Encoding>* schema;
-        const Schema<Encoding>* dependenciesSchema;
+        const SchemaType* schema;
+        const SchemaType* dependenciesSchema;
         bool* dependencies;
         bool required;
         bool typeless;
@@ -786,20 +816,20 @@ private:
             delete pattern;
         }
 
-        Schema<Encoding>* schema;
+        SchemaType* schema;
         RegexType* pattern;
     };
 
-    MemoryPoolAllocator<> allocator_;
+    Allocator allocator_;
     GenericValue<Encoding> enum_;
-    SchemaArray<Encoding> allOf_;
-    SchemaArray<Encoding> anyOf_;
-    SchemaArray<Encoding> oneOf_;
-    Schema<Encoding>* not_;
+    SchemaArrayType allOf_;
+    SchemaArrayType anyOf_;
+    SchemaArrayType oneOf_;
+    SchemaType* not_;
     unsigned type_; // bitmask of kSchemaType
 
     Property* properties_;
-    Schema<Encoding>* additionalPropertiesSchema_;
+    SchemaType* additionalPropertiesSchema_;
     PatternProperty* patternProperties_;
     SizeType patternPropertyCount_;
     SizeType propertyCount_;
@@ -810,9 +840,9 @@ private:
     bool hasDependencies_;
     bool hasSchemaDependencies_;
 
-    Schema<Encoding>* additionalItemsSchema_;
-    Schema<Encoding>* itemsList_;
-    Schema<Encoding>** itemsTuple_;
+    SchemaType* additionalItemsSchema_;
+    SchemaType* itemsList_;
+    SchemaType** itemsTuple_;
     SizeType itemsTupleCount_;
     SizeType minItems_;
     SizeType maxItems_;
@@ -836,35 +866,43 @@ public:
     template <typename T1, typename T2, typename T3>
     friend class GenericSchemaValidator;
 
+    typedef Schema<Encoding, Allocator> SchemaType;
+
     template <typename DocumentType>
     GenericSchemaDocument(const DocumentType& document) : root_() {
-        root_ = new Schema<Encoding>(static_cast<const typename DocumentType::ValueType&>(document));
+        typedef typename DocumentType::ValueType ValueType;
+        root_ = CreateSchema(GenericPointer<ValueType>("#"), static_cast<const ValueType&>(document));
     }
 
     ~GenericSchemaDocument() {
         delete root_;
     }
 
+    template <typename ValueType>
+    SchemaType* CreateSchema(const GenericPointer<ValueType>& p, const ValueType& v) {
+        return new SchemaType(this, p, v);
+    }
+
 private:
-    Schema<Encoding>* root_;
+    SchemaType* root_;
 };
 
 typedef GenericSchemaDocument<UTF8<> > SchemaDocument;
 
-template <typename Encoding, typename OutputHandler = BaseReaderHandler<Encoding>, typename Allocator = CrtAllocator >
-class GenericSchemaValidator {
+template <typename SchemaType, typename OutputHandler = BaseReaderHandler<typename SchemaType::EncodingType>, typename StateAllocator = CrtAllocator >
+class GenericSchemaValidator : public ISchemaValidatorFactory<SchemaType>, public ISchemaValidator {
 public:
-    typedef typename Encoding::Ch Ch;               //!< Character type derived from Encoding.
-    typedef GenericSchemaDocument<Encoding> SchemaDocumentType;
-    friend class Schema<Encoding>;
+    typedef typename SchemaType::EncodingType EncodingType;
+    typedef typename EncodingType::Ch Ch;
+    typedef GenericSchemaDocument<EncodingType> SchemaDocumentType;
 
     GenericSchemaValidator(
-        const SchemaDocumentType& schema,
-        Allocator* allocator = 0, 
+        const SchemaDocumentType& schemaDocument,
+        StateAllocator* allocator = 0, 
         size_t schemaStackCapacity = kDefaultSchemaStackCapacity/*,
         size_t documentStackCapacity = kDefaultDocumentStackCapacity*/)
         :
-        root_(*schema.root_), 
+        root_(*schemaDocument.root_),
         outputHandler_(nullOutputHandler_),
         schemaStack_(allocator, schemaStackCapacity),
         // documentStack_(allocator, documentStackCapacity),
@@ -873,13 +911,13 @@ public:
     }
 
     GenericSchemaValidator( 
-        const SchemaDocumentType& schema,
+        const SchemaDocumentType& schemaDocument,
         OutputHandler& outputHandler,
-        Allocator* allocator = 0,
+        StateAllocator* allocator = 0,
         size_t schemaStackCapacity = kDefaultSchemaStackCapacity/*,
         size_t documentStackCapacity = kDefaultDocumentStackCapacity*/)
         :
-        root_(*schema.root_), 
+        root_(*schemaDocument.root_),
         outputHandler_(outputHandler),
         schemaStack_(allocator, schemaStackCapacity),
         // documentStack_(allocator, documentStackCapacity),
@@ -898,7 +936,8 @@ public:
         valid_ = true;
     };
 
-    bool IsValid() { return valid_; }
+    // Implementation of ISchemaValidator
+    virtual bool IsValid() const { return valid_; }
 
 #define RAPIDJSON_SCHEMA_HANDLE_BEGIN_(method, arg1)\
     if (!valid_) return false; \
@@ -908,23 +947,23 @@ public:
     for (Context* context = schemaStack_.template Bottom<Context>(); context <= schemaStack_.template Top<Context>(); context++) {\
         if (context->allOfValidators.validators)\
             for (SizeType i_ = 0; i_ < context->allOfValidators.count; i_++)\
-                context->allOfValidators.validators[i_]->method arg2;\
+                static_cast<GenericSchemaValidator*>(context->allOfValidators.validators[i_])->method arg2;\
         if (context->anyOfValidators.validators)\
             for (SizeType i_ = 0; i_ < context->anyOfValidators.count; i_++)\
-                context->anyOfValidators.validators[i_]->method arg2;\
+                static_cast<GenericSchemaValidator*>(context->anyOfValidators.validators[i_])->method arg2;\
         if (context->oneOfValidators.validators)\
             for (SizeType i_ = 0; i_ < context->oneOfValidators.count; i_++)\
-                context->oneOfValidators.validators[i_]->method arg2;\
+                static_cast<GenericSchemaValidator*>(context->oneOfValidators.validators[i_])->method arg2;\
         if (context->notValidator)\
-            context->notValidator->method arg2;\
+            static_cast<GenericSchemaValidator*>(context->notValidator)->method arg2;\
         if (context->dependencyValidators.validators)\
             for (SizeType i_ = 0; i_ < context->dependencyValidators.count; i_++)\
                 if (context->dependencyValidators.validators[i_])\
-                    context->dependencyValidators.validators[i_]->method arg2;\
+                    static_cast<GenericSchemaValidator*>(context->dependencyValidators.validators[i_])->method arg2;\
         if (context->patternPropertiesValidators.validators)\
             for (SizeType i_ = 0; i_ < context->patternPropertiesValidators.count; i_++)\
                 if (context->patternPropertiesValidators.validators[i_])\
-                    context->patternPropertiesValidators.validators[i_]->method arg2; \
+                    static_cast<GenericSchemaValidator*>(context->patternPropertiesValidators.validators[i_])->method arg2; \
     }
 
 #define RAPIDJSON_SCHEMA_HANDLE_END_(method, arg2)\
@@ -982,18 +1021,17 @@ public:
 #undef RAPIDJSON_SCHEMA_HANDLE_PARALLEL_
 #undef RAPIDJSON_SCHEMA_HANDLE_VALUE_
 
-    // Implementation of ISchemaValidatorFactory<Encoding>
-    GenericSchemaValidator<Encoding>* CreateSchemaValidator(const Schema<Encoding>& root) {
+    // Implementation of ISchemaValidatorFactory<SchemaType>
+    virtual ISchemaValidator* CreateSchemaValidator(const SchemaType& root) const {
         return new GenericSchemaValidator(root);
     }
 
 private:
-    typedef Schema<Encoding> BaseSchemaType;
-    typedef typename BaseSchemaType::Context Context;
+    typedef typename SchemaType::Context Context;
 
     GenericSchemaValidator( 
-        const BaseSchemaType& root,
-        Allocator* allocator = 0,
+        const SchemaType& root,
+        StateAllocator* allocator = 0,
         size_t schemaStackCapacity = kDefaultSchemaStackCapacity/*,
         size_t documentStackCapacity = kDefaultDocumentStackCapacity*/)
         :
@@ -1013,7 +1051,7 @@ private:
                 return false;
 
             SizeType count = CurrentContext().patternPropertiesSchemaCount;
-            const BaseSchemaType** sa = CurrentContext().patternPropertiesSchemas;
+            const SchemaType** sa = CurrentContext().patternPropertiesSchemas;
             PatternValidatorType patternValidatorType = CurrentContext().valuePatternValidatorType;
 
             if (CurrentContext().valueSchema)
@@ -1021,8 +1059,8 @@ private:
 
             if (count > 0) {
                 CurrentContext().objectPatternValidatorType = patternValidatorType;
-                SchemaValidatorArray<Encoding>& va = CurrentContext().patternPropertiesValidators;
-                va.validators = new GenericSchemaValidator*[count];
+                SchemaValidatorArray& va = CurrentContext().patternPropertiesValidators;
+                va.validators = new ISchemaValidator*[count];
                 for (SizeType i = 0; i < count; i++)
                     va.validators[va.count++] = CreateSchemaValidator(*sa[i]);
             }
@@ -1038,22 +1076,22 @@ private:
         return true;
     }
 
-    void PushSchema(const BaseSchemaType& schema) { *schemaStack_.template Push<Context>() = Context(&schema); }
+    void PushSchema(const SchemaType& schema) { *schemaStack_.template Push<Context>() = Context(this, &schema); }
     void PopSchema() { schemaStack_.template Pop<Context>(1)->~Context(); }
-    const BaseSchemaType& CurrentSchema() { return *schemaStack_.template Top<Context>()->schema; }
+    const SchemaType& CurrentSchema() { return *schemaStack_.template Top<Context>()->schema; }
     Context& CurrentContext() { return *schemaStack_.template Top<Context>(); }
 
     static const size_t kDefaultSchemaStackCapacity = 1024;
     //static const size_t kDefaultDocumentStackCapacity = 256;
-    const BaseSchemaType& root_;
-    BaseReaderHandler<Encoding> nullOutputHandler_;
+    const SchemaType& root_;
+    BaseReaderHandler<EncodingType> nullOutputHandler_;
     OutputHandler& outputHandler_;
-    internal::Stack<Allocator> schemaStack_;    //!< stack to store the current path of schema (BaseSchemaType *)
+    internal::Stack<StateAllocator> schemaStack_;    //!< stack to store the current path of schema (BaseSchemaType *)
     //internal::Stack<Allocator> documentStack_;  //!< stack to store the current path of validating document (Value *)
     bool valid_;
 };
 
-typedef GenericSchemaValidator<UTF8<> > SchemaValidator;
+typedef GenericSchemaValidator<SchemaDocument::SchemaType> SchemaValidator;
 
 RAPIDJSON_NAMESPACE_END
 
