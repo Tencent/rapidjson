@@ -18,8 +18,6 @@
 #include "document.h"
 #include <cmath> // HUGE_VAL, abs, floor
 
-#define RAPIDJSON_SCHEMA_USE_STDREGEX 0
-
 #if !defined(RAPIDJSON_SCHEMA_USE_STDREGEX) && (__cplusplus >=201103L || (defined(_MSC_VER) && _MSC_VER >= 1800))
 #define RAPIDJSON_SCHEMA_USE_STDREGEX 1
 #else
@@ -28,6 +26,12 @@
 
 #if RAPIDJSON_SCHEMA_USE_STDREGEX
 #include <regex>
+#endif
+
+#if RAPIDJSON_SCHEMA_USE_STDREGEX
+#define RAPIDJSON_SCHEMA_HAS_REGEX 1
+#else
+#define RAPIDJSON_SCHEMA_HAS_REGEX 0
 #endif
 
 #if defined(__GNUC__)
@@ -669,7 +673,7 @@ private:
 
     static bool IsPatternMatch(const std::basic_regex<Ch>* pattern, const Ch *str, SizeType length) {
         std::match_results<const Ch*> r;
-        return std::regex_search(str, str + length, r, pattern);
+        return std::regex_search(str, str + length, r, *pattern);
     }
 #else
     template <typename ValueType>
