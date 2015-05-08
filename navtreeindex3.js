@@ -1,5 +1,10 @@
 var NAVTREEINDEX3 =
 {
+"structrapidjson_1_1_generic_string_ref.html#acd4d5ebac2b610ce647356aa52998002":[12,0,0,20,1],
+"structrapidjson_1_1_generic_string_ref.html#ad9eb120a58cee500ff3bd5706779c4e4":[12,0,0,20,3],
+"structrapidjson_1_1_generic_string_ref.html#ae223535ec20edf0c1db44a40b7735111":[12,0,0,20,8],
+"structrapidjson_1_1_generic_string_ref.html#af535787e3593802222f7b3f3096beff0":[12,0,0,20,4],
+"structrapidjson_1_1_generic_string_ref.html#af94951529a5d51e8c4e6e770bb707c1f":[12,0,0,20,7],
 "structrapidjson_1_1_generic_string_stream.html":[12,0,0,21],
 "structrapidjson_1_1_generic_string_stream.html#a01cec5597b6e399ea37df9b4bda8ffce":[12,0,0,21,8],
 "structrapidjson_1_1_generic_string_stream.html#a105adc6eec3483f90f6f2cf57aa81c12":[12,0,0,21,6],
