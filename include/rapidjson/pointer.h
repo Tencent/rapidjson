@@ -273,6 +273,21 @@ public:
         }
     }
 
+    //! Append a token by value, and return a new Pointer
+    /*!
+        \param value Value (either Uint or String) to be appended.
+        \param allocator Allocator for the newly return Pointer.
+        \return A new Pointer with appended token.
+    */
+    GenericPointer Append(const ValueType& token, Allocator* allocator = 0) const {
+        if (token.IsString())
+            return Append(token.GetString(), token.GetStringLength(), allocator);
+        else {
+            RAPIDJSON_ASSERT(token.IsUint64());
+            return Append(static_cast<SizeType>(token.GetUint64()), allocator);
+        }
+    }
+
     //!@name Handling Parse Error
     //@{
 

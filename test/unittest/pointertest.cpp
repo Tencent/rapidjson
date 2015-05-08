@@ -523,10 +523,20 @@ TEST(Pointer, Append) {
         Pointer p;
         Pointer q = p.Append("foo");
         EXPECT_TRUE(Pointer("/foo") == q);
-        q = q.Append(0);
-        EXPECT_TRUE(Pointer("/foo/0") == q);
+        q = q.Append(1234);
+        EXPECT_TRUE(Pointer("/foo/1234") == q);
         q = q.Append("");
-        EXPECT_TRUE(Pointer("/foo/0/") == q);
+        EXPECT_TRUE(Pointer("/foo/1234/") == q);
+    }
+
+    {
+        Pointer p;
+        Pointer q = p.Append(Value("foo").Move());
+        EXPECT_TRUE(Pointer("/foo") == q);
+        q = q.Append(Value(1234).Move());
+        EXPECT_TRUE(Pointer("/foo/1234") == q);
+        q = q.Append(Value(kStringType).Move());
+        EXPECT_TRUE(Pointer("/foo/1234/") == q);
     }
 
 #if RAPIDJSON_HAS_STDSTRING
