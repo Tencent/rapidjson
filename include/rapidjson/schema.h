@@ -232,9 +232,10 @@ public:
         if (properties && properties->IsObject())
             for (ConstMemberIterator itr = properties->MemberBegin(); itr != properties->MemberEnd(); ++itr) {
                 SizeType index;
-                if (FindPropertyIndex(itr->name, &index))
+                if (FindPropertyIndex(itr->name, &index)) {
                     properties_[index].schema = new BaseSchema(itr->value);
                     properties_[index].typeless = false;
+                }
             }
 
         if (const ValueType* v = GetMember(value, "patternProperties")) {
