@@ -106,7 +106,7 @@ struct SchemaValidationContext {
 
     ~SchemaValidationContext() {
         delete notValidator;
-        delete patternPropertiesSchemas;
+        delete[] patternPropertiesSchemas;
         delete[] objectDependencies;
     }
 
@@ -392,20 +392,16 @@ public:
                     break;
                 }
 
-            switch (context.objectPatternValidatorType) {
-            case kPatternValidatorOnly:
+            if (context.objectPatternValidatorType == kPatternValidatorOnly) {
                 if (!patternValid)
                     return false;
-                break;
-            case kPatternValidatorWithProperty:
+            }
+            else if (context.objectPatternValidatorType == kPatternValidatorWithProperty) {
                 if (!patternValid || !otherValid)
                     return false;
-                break;
-            case kPatternValidatorWithAdditionalProperty:
-                if (!patternValid && !otherValid)
-                    return false;
-                break;
             }
+            else if (!patternValid && !otherValid) // kPatternValidatorWithAdditionalProperty)
+                return false;
         }
 
         if (allOf_.schemas)
@@ -529,7 +525,7 @@ public:
             std::memset(context.patternPropertiesSchemas, 0, sizeof(BaseSchema<Encoding>*) * count);
         }
 
-        return true; 
+        return true;
     }
     
     bool Key(Context& context, const Ch* str, SizeType len, bool) const {
