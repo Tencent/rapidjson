@@ -616,7 +616,7 @@ public:
 
 private:
 #if RAPIDJSON_SCHEMA_USE_STDREGEX
-        typedef std::basic_regex<Ch>* RegexType;
+        typedef std::basic_regex<Ch> RegexType;
 #else
         typedef char RegexType;
 #endif
