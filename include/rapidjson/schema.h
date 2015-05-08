@@ -93,10 +93,13 @@ enum PatternValidatorType {
 template <typename Encoding>
 struct SchemaValidationContext {
     SchemaValidationContext(const BaseSchema<Encoding>* s) : 
-        schema(s), valueSchema(), notValidator(), objectDependencies(), 
+        schema(s),
+        valueSchema(),
         patternPropertiesSchemas(),
+        notValidator(),
         patternPropertiesSchemaCount(),
         valuePatternValidatorType(kPatternValidatorOnly),
+        objectDependencies(),
         inArray(false)
     {
     }
@@ -115,10 +118,10 @@ struct SchemaValidationContext {
     SchemaValidatorArray<Encoding> dependencyValidators;
     SchemaValidatorArray<Encoding> patternPropertiesValidators;
     const BaseSchema<Encoding>** patternPropertiesSchemas;
+    GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator>* notValidator;
     SizeType patternPropertiesSchemaCount;
     PatternValidatorType valuePatternValidatorType;
     PatternValidatorType objectPatternValidatorType;
-    GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator>* notValidator;
     SizeType objectRequiredCount;
     SizeType arrayElementIndex;
     bool* objectDependencies;
@@ -612,6 +615,12 @@ public:
     }
 
 private:
+#if RAPIDJSON_SCHEMA_USE_STDREGEX
+        typedef std::basic_regex<Ch>* RegexType;
+#else
+        typedef char RegexType;
+#endif
+
     typedef GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator> SchemaValidatorType;
     static const BaseSchema<Encoding>* GetTypeless() {
         static BaseSchema<Encoding> typeless(Value(kObjectType).Move());
@@ -661,25 +670,25 @@ private:
 
 #if RAPIDJSON_SCHEMA_USE_STDREGEX
     template <typename ValueType>
-    static std::basic_regex<Ch>* CreatePattern(const ValueType& value) {
+    static RegexType* CreatePattern(const ValueType& value) {
         if (value.IsString())
             try {
-                return new std::basic_regex<Ch>(value.GetString(), std::size_t(value.GetStringLength()), std::regex_constants::ECMAScript);
+                return new RegexType(value.GetString(), std::size_t(value.GetStringLength()), std::regex_constants::ECMAScript);
             }
             catch (const std::regex_error&) {
             }
         return 0;
     }
 
-    static bool IsPatternMatch(const std::basic_regex<Ch>* pattern, const Ch *str, SizeType length) {
+    static bool IsPatternMatch(const RegexType* pattern, const Ch *str, SizeType length) {
         std::match_results<const Ch*> r;
         return std::regex_search(str, str + length, r, *pattern);
     }
 #else
     template <typename ValueType>
-    void* CreatePattern(const ValueType&) { return 0; }
+    RegexType* CreatePattern(const ValueType&) { return 0; }
 
-    static bool IsPatternMatch(const void*, const Ch *, SizeType) { return true; }
+    static bool IsPatternMatch(const RegexType*, const Ch *, SizeType) { return true; }
 #endif // RAPIDJSON_SCHEMA_USE_STDREGEX
 
     void AddType(const Value& type) {
@@ -781,11 +790,7 @@ private:
         }
 
         BaseSchema<Encoding>* schema;
-#if RAPIDJSON_SCHEMA_USE_STDREGEX
-        std::basic_regex<Ch>* pattern;
-#else
-        void *pattern;
-#endif
+        RegexType* pattern;
     };
 
     MemoryPoolAllocator<> allocator_;
@@ -816,11 +821,7 @@ private:
     SizeType maxItems_;
     bool additionalItems_;
 
-#if RAPIDJSON_SCHEMA_USE_STDREGEX
-    std::basic_regex<Ch>* pattern_;
-#else
-    void* pattern_;
-#endif
+    RegexType* pattern_;
     SizeType minLength_;
     SizeType maxLength_;
 
