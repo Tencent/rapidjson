@@ -18,18 +18,16 @@
 #include "document.h"
 #include <cmath> // HUGE_VAL, abs, floor
 
+#define RAPIDJSON_SCHEMA_USE_STDREGEX 0
+
 #if !defined(RAPIDJSON_SCHEMA_USE_STDREGEX) && (__cplusplus >=201103L || (defined(_MSC_VER) && _MSC_VER >= 1800))
 #define RAPIDJSON_SCHEMA_USE_STDREGEX 1
+#else
+#define RAPIDJSON_SCHEMA_USE_STDREGEX 0
 #endif
 
 #if RAPIDJSON_SCHEMA_USE_STDREGEX
 #include <regex>
-#endif
-
-#if RAPIDJSON_SCHEMA_USE_STDREGEX // or some other implementation
-#define RAPIDJSON_SCHEMA_HAS_REGEX 1
-#else
-#define RAPIDJSON_SCHEMA_HAS_REGEX 0
 #endif
 
 #if defined(__GNUC__)
@@ -92,20 +90,16 @@ template <typename Encoding>
 struct SchemaValidationContext {
     SchemaValidationContext(const BaseSchema<Encoding>* s) : 
         schema(s), valueSchema(), notValidator(), objectDependencies(), 
-#if RAPIDJSON_SCHEMA_HAS_REGEX
         patternPropertiesSchemas(),
         patternPropertiesSchemaCount(),
         valuePatternValidatorType(kPatternValidatorOnly),
-#endif
         inArray(false)
     {
     }
 
     ~SchemaValidationContext() {
         delete notValidator;
-#if RAPIDJSON_SCHEMA_HAS_REGEX
         delete patternPropertiesSchemas;
-#endif
         delete[] objectDependencies;
     }
 
@@ -115,13 +109,11 @@ struct SchemaValidationContext {
     SchemaValidatorArray<Encoding> anyOfValidators;
     SchemaValidatorArray<Encoding> oneOfValidators;
     SchemaValidatorArray<Encoding> dependencyValidators;
-#if RAPIDJSON_SCHEMA_HAS_REGEX
     SchemaValidatorArray<Encoding> patternPropertiesValidators;
     const BaseSchema<Encoding>** patternPropertiesSchemas;
     SizeType patternPropertiesSchemaCount;
     PatternValidatorType valuePatternValidatorType;
     PatternValidatorType objectPatternValidatorType;
-#endif
     GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator>* notValidator;
     SizeType objectRequiredCount;
     SizeType arrayElementIndex;
@@ -141,10 +133,8 @@ public:
         type_((1 << kTotalSchemaType) - 1), // typeless
         properties_(),
         additionalPropertiesSchema_(),
-#if RAPIDJSON_SCHEMA_HAS_REGEX
         patternProperties_(),
         patternPropertyCount_(),
-#endif
         propertyCount_(),
         requiredCount_(),
         minProperties_(),
@@ -159,9 +149,7 @@ public:
         minItems_(),
         maxItems_(SizeType(~0)),
         additionalItems_(true),
-#if RAPIDJSON_SCHEMA_USE_STDREGEX
         pattern_(),
-#endif
         minLength_(0),
         maxLength_(~SizeType(0)),
         minimum_(-HUGE_VAL),
@@ -242,7 +230,6 @@ public:
                     properties_[index].typeless = false;
             }
 
-#if RAPIDJSON_SCHEMA_HAS_REGEX
         if (const ValueType* v = GetMember(value, "patternProperties")) {
             patternProperties_ = new PatternProperty[v->MemberCount()];
             patternPropertyCount_ = 0;
@@ -253,7 +240,6 @@ public:
                 patternPropertyCount_++;
             }
         }
-#endif
 
         if (required && required->IsArray())
             for (ConstValueIterator itr = required->Begin(); itr != required->End(); ++itr)
@@ -322,10 +308,8 @@ public:
         AssignIfExist(minLength_, value, "minLength");
         AssignIfExist(maxLength_, value, "maxLength");
 
-#if RAPIDJSON_SCHEMA_HAS_REGEX
         if (const ValueType* v = GetMember(value, "pattern"))
             pattern_ = CreatePattern(*v);
-#endif // RAPIDJSON_SCHEMA_HAS_REGEX
 
         // Number
         ConstMemberIterator minimumItr = value.FindMember("minimum");
@@ -354,9 +338,7 @@ public:
         delete not_;
         delete [] properties_;
         delete additionalPropertiesSchema_;
-#if RAPIDJSON_SCHEMA_HAS_REGEX
         delete [] patternProperties_;
-#endif
         delete additionalItemsSchema_;
         delete itemsList_;
         for (SizeType i = 0; i < itemsTupleCount_; i++)
@@ -516,10 +498,8 @@ public:
                 return false;
         }
 
-#if RAPIDJSON_SCHEMA_HAS_REGEX
-        if (pattern_ && !IsPatternMatch(*pattern_, str, length))
+        if (pattern_ && !IsPatternMatch(pattern_, str, length))
             return false;
-#endif
 
         return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(str, length).Move());
     }
@@ -546,14 +526,12 @@ public:
     }
     
     bool Key(Context& context, const Ch* str, SizeType len, bool) const {
-#if RAPIDJSON_SCHEMA_HAS_REGEX
         if (patternProperties_) {
             context.patternPropertiesSchemaCount = 0;
             for (SizeType i = 0; i < patternPropertyCount_; i++)
-                if (patternProperties_[i].pattern && IsPatternMatch(*patternProperties_[i].pattern, str, len))
+                if (patternProperties_[i].pattern && IsPatternMatch(patternProperties_[i].pattern, str, len))
                     context.patternPropertiesSchemas[context.patternPropertiesSchemaCount++] = patternProperties_[i].schema;
         }
-#endif
 
         SizeType index;
         if (FindPropertyIndex(str, len, &index)) {
@@ -590,11 +568,7 @@ public:
             return true;
         }
 
-#if RAPIDJSON_SCHEMA_HAS_REGEX
         return context.patternPropertiesSchemaCount != 0; // patternProperties are not additional properties
-#else
-        return false;
-#endif
     }
 
     bool EndObject(Context& context, SizeType memberCount) const {
@@ -693,10 +667,15 @@ private:
         return 0;
     }
 
-    static bool IsPatternMatch(const std::basic_regex<Ch>& pattern, const Ch *str, SizeType length) {
+    static bool IsPatternMatch(const std::basic_regex<Ch>* pattern, const Ch *str, SizeType length) {
         std::match_results<const Ch*> r;
         return std::regex_search(str, str + length, r, pattern);
     }
+#else
+    template <typename ValueType>
+    void* CreatePattern(const ValueType&) { return 0; }
+
+    static bool IsPatternMatch(const void*, const Ch *, SizeType) { return true; }
 #endif // RAPIDJSON_SCHEMA_USE_STDREGEX
 
     void AddType(const Value& type) {
@@ -790,7 +769,6 @@ private:
         bool typeless;
     };
 
-#if RAPIDJSON_SCHEMA_HAS_REGEX
     struct PatternProperty {
         PatternProperty() : schema(), pattern() {}
         ~PatternProperty() {
@@ -801,9 +779,10 @@ private:
         BaseSchema<Encoding>* schema;
 #if RAPIDJSON_SCHEMA_USE_STDREGEX
         std::basic_regex<Ch>* pattern;
+#else
+        void *pattern;
 #endif
     };
-#endif
 
     MemoryPoolAllocator<> allocator_;
     GenericValue<Encoding> enum_;
@@ -815,10 +794,8 @@ private:
 
     Property* properties_;
     BaseSchema<Encoding>* additionalPropertiesSchema_;
-#if RAPIDJSON_SCHEMA_HAS_REGEX
     PatternProperty* patternProperties_;
     SizeType patternPropertyCount_;
-#endif
     SizeType propertyCount_;
     SizeType requiredCount_;
     SizeType minProperties_;
@@ -837,6 +814,8 @@ private:
 
 #if RAPIDJSON_SCHEMA_USE_STDREGEX
     std::basic_regex<Ch>* pattern_;
+#else
+    void* pattern_;
 #endif
     SizeType minLength_;
     SizeType maxLength_;

@@ -149,7 +149,6 @@ TEST(SchemaValidator, String_LengthRange) {
     VALIDATE(s, "\"ABCD\"", false);
 }
 
-#if RAPIDJSON_SCHEMA_HAS_REGEX
 TEST(SchemaValidator, String_Pattern) {
     Document sd;
     sd.Parse("{\"type\":\"string\",\"pattern\":\"^(\\\\([0-9]{3}\\\\))?[0-9]{3}-[0-9]{4}$\"}");
@@ -160,7 +159,6 @@ TEST(SchemaValidator, String_Pattern) {
     VALIDATE(s, "\"(888)555-1212 ext. 532\"", false);
     VALIDATE(s, "\"(800)FLOWERS\"", false);
 }
-#endif
 
 TEST(SchemaValidator, Integer) {
     Document sd;
@@ -387,8 +385,6 @@ TEST(SchemaValidator, Object_SchemaDependencies) {
     VALIDATE(s, "{\"name\": \"John Doe\", \"billing_address\" : \"555 Debtor's Lane\"}", true);
 }
 
-#if RAPIDJSON_SCHEMA_HAS_REGEX
-
 TEST(SchemaValidator, Object_PatternProperties) {
     Document sd;
     sd.Parse(
@@ -428,8 +424,6 @@ TEST(SchemaValidator, Object_PatternProperties_AdditionalProperties) {
     VALIDATE(s, "{ \"keyword\": \"value\" }", true);
     VALIDATE(s, "{ \"keyword\": 42 }", false);
 }
-
-#endif // RAPIDJSON_SCHEMA_HAS_REGEX
 
 TEST(SchemaValidator, Array) {
     Document sd;
@@ -686,10 +680,8 @@ TEST(SchemaValidator, TestSuite) {
         "multipleOf.json",
         "not.json",
         "oneOf.json",
-#if RAPIDJSON_SCHEMA_HAS_REGEX
         "pattern.json",
         "patternProperties.json",
-#endif
         "properties.json",
         //"ref.json",
         //"refRemote.json",
