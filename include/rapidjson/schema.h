@@ -82,15 +82,30 @@ struct BaseSchemaArray {
     SizeType count;
 };
 
+enum PatternValidatorType {
+    kPatternValidatorOnly,
+    kPatternValidatorWithProperty,
+    kPatternValidatorWithAdditionalProperty
+};
+
 template <typename Encoding>
 struct SchemaValidationContext {
     SchemaValidationContext(const BaseSchema<Encoding>* s) : 
-        schema(s), valueSchema(), notValidator(), objectDependencies(), inArray(false)
+        schema(s), valueSchema(), notValidator(), objectDependencies(), 
+#if RAPIDJSON_SCHEMA_HAS_REGEX
+        patternPropertiesSchemas(),
+        patternPropertiesSchemaCount(),
+        valuePatternValidatorType(kPatternValidatorOnly),
+#endif
+        inArray(false)
     {
     }
 
     ~SchemaValidationContext() {
         delete notValidator;
+#if RAPIDJSON_SCHEMA_HAS_REGEX
+        delete patternPropertiesSchemas;
+#endif
         delete[] objectDependencies;
     }
 
@@ -100,6 +115,13 @@ struct SchemaValidationContext {
     SchemaValidatorArray<Encoding> anyOfValidators;
     SchemaValidatorArray<Encoding> oneOfValidators;
     SchemaValidatorArray<Encoding> dependencyValidators;
+#if RAPIDJSON_SCHEMA_HAS_REGEX
+    SchemaValidatorArray<Encoding> patternPropertiesValidators;
+    const BaseSchema<Encoding>** patternPropertiesSchemas;
+    SizeType patternPropertiesSchemaCount;
+    PatternValidatorType valuePatternValidatorType;
+    PatternValidatorType objectPatternValidatorType;
+#endif
     GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator>* notValidator;
     SizeType objectRequiredCount;
     SizeType arrayElementIndex;
@@ -368,14 +390,43 @@ public:
     }
 
     bool EndValue(Context& context) const {
+        if (context.patternPropertiesValidators.count > 0) {
+            bool otherValid = false;
+            SizeType count = context.patternPropertiesValidators.count;
+            if (context.objectPatternValidatorType != kPatternValidatorOnly)
+                otherValid = context.patternPropertiesValidators.validators[--count]->IsValid();
+
+            bool patternValid = true;
+            for (SizeType i = 0; i < count; i++)
+                if (!context.patternPropertiesValidators.validators[i]->IsValid()) {
+                    patternValid = false;
+                    break;
+                }
+
+            switch (context.objectPatternValidatorType) {
+            case kPatternValidatorOnly:
+                if (!patternValid)
+                    return false;
+                break;
+            case kPatternValidatorWithProperty:
+                if (!patternValid || !otherValid)
+                    return false;
+                break;
+            case kPatternValidatorWithAdditionalProperty:
+                if (!patternValid && !otherValid)
+                    return false;
+                break;
+            }
+        }
+
         if (allOf_.schemas)
-            for (SizeType i_ = 0; i_ < allOf_.count; i_++)
-                if (!context.allOfValidators.validators[i_]->IsValid())
+            for (SizeType i = 0; i < allOf_.count; i++)
+                if (!context.allOfValidators.validators[i]->IsValid())
                     return false;
         
         if (anyOf_.schemas) {
-            for (SizeType i_ = 0; i_ < anyOf_.count; i_++)
-                if (context.anyOfValidators.validators[i_]->IsValid())
+            for (SizeType i = 0; i < anyOf_.count; i++)
+                if (context.anyOfValidators.validators[i]->IsValid())
                     goto foundAny;
             return false;
             foundAny:;
@@ -383,8 +434,8 @@ public:
 
         if (oneOf_.schemas) {
             bool oneValid = false;
-            for (SizeType i_ = 0; i_ < oneOf_.count; i_++)
-                if (context.oneOfValidators.validators[i_]->IsValid()) {
+            for (SizeType i = 0; i < oneOf_.count; i++)
+                if (context.oneOfValidators.validators[i]->IsValid()) {
                     if (oneValid)
                         return false;
                     else
@@ -398,21 +449,21 @@ public:
     }
 
     bool Null(Context& context) const { 
-        CreateLogicValidators(context);
+        CreateParallelValidator(context);
         return
             (type_ & (1 << kNullSchemaType)) &&
             (!enum_.IsArray() || CheckEnum(GenericValue<Encoding>().Move()));
     }
     
     bool Bool(Context& context, bool b) const { 
-        CreateLogicValidators(context);
+        CreateParallelValidator(context);
         return
             (type_ & (1 << kBooleanSchemaType)) &&
             (!enum_.IsArray() || CheckEnum(GenericValue<Encoding>(b).Move()));
     }
 
     bool Int(Context& context, int i) const {
-        CreateLogicValidators(context);
+        CreateParallelValidator(context);
         if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
             return false;
 
@@ -420,7 +471,7 @@ public:
     }
 
     bool Uint(Context& context, unsigned u) const {
-        CreateLogicValidators(context);
+        CreateParallelValidator(context);
         if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
             return false;
 
@@ -428,7 +479,7 @@ public:
     }
 
     bool Int64(Context& context, int64_t i) const {
-        CreateLogicValidators(context);
+        CreateParallelValidator(context);
         if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
             return false;
 
@@ -436,7 +487,7 @@ public:
     }
 
     bool Uint64(Context& context, uint64_t u) const {
-        CreateLogicValidators(context);
+        CreateParallelValidator(context);
         if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
             return false;
 
@@ -444,7 +495,7 @@ public:
     }
 
     bool Double(Context& context, double d) const {
-        CreateLogicValidators(context);
+        CreateParallelValidator(context);
         if ((type_ & (1 << kNumberSchemaType)) == 0)
             return false;
 
@@ -453,7 +504,7 @@ public:
     
     bool String(Context& context, const Ch* str, SizeType length, bool) const {
         (void)str;
-        CreateLogicValidators(context);
+        CreateParallelValidator(context);
         if ((type_ & (1 << kStringSchemaType)) == 0)
             return false;
 
@@ -474,7 +525,7 @@ public:
     }
 
     bool StartObject(Context& context) const { 
-        CreateLogicValidators(context);
+        CreateParallelValidator(context);
         if ((type_ & (1 << kObjectSchemaType)) == 0)
             return false;
 
@@ -483,17 +534,37 @@ public:
             context.objectDependencies = new bool[propertyCount_];
             std::memset(context.objectDependencies, 0, sizeof(bool) * propertyCount_);
         }
+
+        if (patternProperties_) { // pre-allocate schema array
+            SizeType count = patternPropertyCount_ + 1; // extra for valuePatternValidatorType
+            context.patternPropertiesSchemas = new const BaseSchema<Encoding>*[count];
+            context.patternPropertiesSchemaCount = 0;
+            std::memset(context.patternPropertiesSchemas, 0, sizeof(BaseSchema<Encoding>*) * count);
+        }
+
         return true; 
     }
     
     bool Key(Context& context, const Ch* str, SizeType len, bool) const {
-        CreateLogicValidators(context);
-        if ((type_ & (1 << kObjectSchemaType)) == 0)
-            return false;
-        
+#if RAPIDJSON_SCHEMA_HAS_REGEX
+        if (patternProperties_) {
+            context.patternPropertiesSchemaCount = 0;
+            for (SizeType i = 0; i < patternPropertyCount_; i++)
+                if (patternProperties_[i].pattern && IsPatternMatch(*patternProperties_[i].pattern, str, len))
+                    context.patternPropertiesSchemas[context.patternPropertiesSchemaCount++] = patternProperties_[i].schema;
+        }
+#endif
+
         SizeType index;
         if (FindPropertyIndex(str, len, &index)) {
-            context.valueSchema = properties_[index].typeless ? GetTypeless() : properties_[index].schema;
+            const BaseSchema<Encoding>* propertySchema = properties_[index].typeless ? GetTypeless() : properties_[index].schema;
+            if (context.patternPropertiesSchemaCount > 0) {
+                context.patternPropertiesSchemas[context.patternPropertiesSchemaCount++] = propertySchema;
+                context.valueSchema = GetTypeless();
+                context.valuePatternValidatorType = kPatternValidatorWithProperty;
+            }
+            else
+                context.valueSchema = propertySchema;
 
             if (properties_[index].required)
                 context.objectRequiredCount++;
@@ -504,32 +575,29 @@ public:
             return true;
         }
 
-#if RAPIDJSON_SCHEMA_HAS_REGEX
-        if (patternProperties_)
-            for (SizeType i = 0; i < patternPropertyCount_; i++)
-                if (patternProperties_[i].pattern && IsPatternMatch(*patternProperties_[i].pattern, str, len)) {
-                    context.valueSchema = patternProperties_[i].schema;
-                    return true;
-                }
-#endif
-
         if (additionalPropertiesSchema_) {
-            context.valueSchema = additionalPropertiesSchema_;
+            if (additionalPropertiesSchema_ && context.patternPropertiesSchemaCount > 0) {
+                context.patternPropertiesSchemas[context.patternPropertiesSchemaCount++] = additionalPropertiesSchema_;
+                context.valueSchema = GetTypeless();
+                context.valuePatternValidatorType = kPatternValidatorWithAdditionalProperty;
+            }
+            else
+                context.valueSchema = additionalPropertiesSchema_;
             return true;
         }
         else if (additionalProperties_) {
             context.valueSchema = GetTypeless();
             return true;
         }
-        else
-            return false;
+
+#if RAPIDJSON_SCHEMA_HAS_REGEX
+        return context.patternPropertiesSchemaCount != 0; // patternProperties are not additional properties
+#else
+        return false;
+#endif
     }
 
     bool EndObject(Context& context, SizeType memberCount) const {
-        CreateLogicValidators(context);
-        if ((type_ & (1 << kObjectSchemaType)) == 0)
-            return false;
-        
         if (context.objectRequiredCount != requiredCount_ || memberCount < minProperties_ || memberCount > maxProperties_)
             return false;
 
@@ -551,7 +619,7 @@ public:
     }
 
     bool StartArray(Context& context) const { 
-        CreateLogicValidators(context);
+        CreateParallelValidator(context);
         if ((type_ & (1 << kArraySchemaType)) == 0)
             return false;
         
@@ -561,10 +629,6 @@ public:
     }
 
     bool EndArray(Context& context, SizeType elementCount) const { 
-        CreateLogicValidators(context);
-        if ((type_ & (1 << kArraySchemaType)) == 0)
-            return false;
-        
         context.inArray = false;
         return elementCount >= minItems_ && elementCount <= maxItems_;
     }
@@ -652,7 +716,7 @@ private:
         return false;
     }
 
-    void CreateLogicValidators(Context& context) const {
+    void CreateParallelValidator(Context& context) const {
         if (allOf_.schemas) CreateSchemaValidators(context.allOfValidators, allOf_);
         if (anyOf_.schemas) CreateSchemaValidators(context.anyOfValidators, anyOf_);
         if (oneOf_.schemas) CreateSchemaValidators(context.oneOfValidators, oneOf_);
@@ -859,7 +923,7 @@ public:
     if (!valid_) return false; \
     if (!BeginValue() || !CurrentSchema().method arg1) return valid_ = false;
 
-#define RAPIDJSON_SCHEMA_HANDLE_LOGIC_(method, arg2)\
+#define RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(method, arg2)\
     for (Context* context = schemaStack_.template Bottom<Context>(); context <= schemaStack_.template Top<Context>(); context++) {\
         if (context->allOfValidators.validators)\
             for (SizeType i_ = 0; i_ < context->allOfValidators.count; i_++)\
@@ -876,15 +940,19 @@ public:
             for (SizeType i_ = 0; i_ < context->dependencyValidators.count; i_++)\
                 if (context->dependencyValidators.validators[i_])\
                     context->dependencyValidators.validators[i_]->method arg2;\
+        if (context->patternPropertiesValidators.validators)\
+            for (SizeType i_ = 0; i_ < context->patternPropertiesValidators.count; i_++)\
+                if (context->patternPropertiesValidators.validators[i_])\
+                    context->patternPropertiesValidators.validators[i_]->method arg2; \
     }
 
 #define RAPIDJSON_SCHEMA_HANDLE_END_(method, arg2)\
     return valid_ = EndValue() && outputHandler_.method arg2
 
 #define RAPIDJSON_SCHEMA_HANDLE_VALUE_(method, arg1, arg2) \
-    RAPIDJSON_SCHEMA_HANDLE_BEGIN_(method, arg1);\
-    RAPIDJSON_SCHEMA_HANDLE_LOGIC_(method, arg2);\
-    RAPIDJSON_SCHEMA_HANDLE_END_  (method, arg2)
+    RAPIDJSON_SCHEMA_HANDLE_BEGIN_   (method, arg1);\
+    RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(method, arg2);\
+    RAPIDJSON_SCHEMA_HANDLE_END_     (method, arg2)
 
     bool Null()             { RAPIDJSON_SCHEMA_HANDLE_VALUE_(Null,   (CurrentContext()   ), ( )); }
     bool Bool(bool b)       { RAPIDJSON_SCHEMA_HANDLE_VALUE_(Bool,   (CurrentContext(), b), (b)); }
@@ -898,39 +966,39 @@ public:
 
     bool StartObject() {
         RAPIDJSON_SCHEMA_HANDLE_BEGIN_(StartObject, (CurrentContext()));
-        RAPIDJSON_SCHEMA_HANDLE_LOGIC_(StartObject, ());
+        RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(StartObject, ());
         return valid_ = outputHandler_.StartObject();
     }
     
     bool Key(const Ch* str, SizeType len, bool copy) {
         if (!valid_) return false;
         if (!CurrentSchema().Key(CurrentContext(), str, len, copy)) return valid_ = false;
-        RAPIDJSON_SCHEMA_HANDLE_LOGIC_(Key, (str, len, copy));
+        RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(Key, (str, len, copy));
         return valid_ = outputHandler_.Key(str, len, copy);
     }
     
     bool EndObject(SizeType memberCount) { 
         if (!valid_) return false;
-        RAPIDJSON_SCHEMA_HANDLE_LOGIC_(EndObject, (memberCount));
+        RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(EndObject, (memberCount));
         if (!CurrentSchema().EndObject(CurrentContext(), memberCount)) return valid_ = false;
-        RAPIDJSON_SCHEMA_HANDLE_END_  (EndObject, (memberCount));
+        RAPIDJSON_SCHEMA_HANDLE_END_(EndObject, (memberCount));
     }
 
     bool StartArray() {
         RAPIDJSON_SCHEMA_HANDLE_BEGIN_(StartArray, (CurrentContext()));
-        RAPIDJSON_SCHEMA_HANDLE_LOGIC_(StartArray, ());
+        RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(StartArray, ());
         return valid_ = outputHandler_.StartArray();
     }
     
     bool EndArray(SizeType elementCount) {
         if (!valid_) return false;
-        RAPIDJSON_SCHEMA_HANDLE_LOGIC_(EndArray, (elementCount));
+        RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(EndArray, (elementCount));
         if (!CurrentSchema().EndArray(CurrentContext(), elementCount)) return valid_ = false;
-        RAPIDJSON_SCHEMA_HANDLE_END_  (EndArray, (elementCount));
+        RAPIDJSON_SCHEMA_HANDLE_END_(EndArray, (elementCount));
     }
 
 #undef RAPIDJSON_SCHEMA_HANDLE_BEGIN_
-#undef RAPIDJSON_SCHEMA_HANDLE_LOGIC_
+#undef RAPIDJSON_SCHEMA_HANDLE_PARALLEL_
 #undef RAPIDJSON_SCHEMA_HANDLE_VALUE_
 
     // Implementation of ISchemaValidatorFactory<Encoding>
@@ -963,8 +1031,20 @@ private:
             if (!CurrentSchema().BeginValue(CurrentContext()))
                 return false;
 
+            SizeType count = CurrentContext().patternPropertiesSchemaCount;
+            const BaseSchemaType** sa = CurrentContext().patternPropertiesSchemas;
+            PatternValidatorType patternValidatorType = CurrentContext().valuePatternValidatorType;
+
             if (CurrentContext().valueSchema)
                 PushSchema(*CurrentContext().valueSchema);
+
+            if (count > 0) {
+                CurrentContext().objectPatternValidatorType = patternValidatorType;
+                SchemaValidatorArray<Encoding>& va = CurrentContext().patternPropertiesValidators;
+                va.validators = new GenericSchemaValidator*[count];
+                for (SizeType i = 0; i < count; i++)
+                    va.validators[va.count++] = CreateSchemaValidator(*sa[i]);
+            }
         }
         return true;
     }
@@ -982,7 +1062,7 @@ private:
     const BaseSchemaType& CurrentSchema() { return *schemaStack_.template Top<Context>()->schema; }
     Context& CurrentContext() { return *schemaStack_.template Top<Context>(); }
 
-    static const size_t kDefaultSchemaStackCapacity = 256;
+    static const size_t kDefaultSchemaStackCapacity = 1024;
     //static const size_t kDefaultDocumentStackCapacity = 256;
     const BaseSchemaType& root_;
     BaseReaderHandler<Encoding> nullOutputHandler_;

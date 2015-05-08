@@ -666,6 +666,7 @@ static char* ReadFile(const char* filename, size_t& length) {
 
 TEST(SchemaValidator, TestSuite) {
     const char* filenames[] = {
+        "properties.json",
         "additionalItems.json",
         "additionalProperties.json",
         "allOf.json",
