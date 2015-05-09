@@ -730,21 +730,20 @@ class RemoteSchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
 public:
     RemoteSchemaDocumentProvider() {
         const char* filenames[kCount] = {
-            "integer.json",
-            "subSchemas.json",
-            "folder/folderInteger.json"
+            "jsonschema/remotes/integer.json",
+            "jsonschema/remotes/subSchemas.json",
+            "jsonschema/remotes/folder/folderInteger.json",
+            "draft-04/schema"
         };
 
         for (size_t i = 0; i < kCount; i++) {
             d_[i] = 0;
             sd_[i] = 0;
 
-            char filename[FILENAME_MAX];
-            sprintf(filename, "jsonschema/remotes/%s", filenames[i]);
             size_t length;
-            char* json = ReadFile(filename, length);
+            char* json = ReadFile(filenames[i], length);
             if (!json) {
-                printf("json remote file %s not found", filename);
+                printf("json remote file %s not found", filenames[i]);
                 ADD_FAILURE();
             }
             else {
@@ -767,7 +766,8 @@ public:
         const char* uris[kCount] = {
             "http://localhost:1234/integer.json",
             "http://localhost:1234/subSchemas.json",
-            "http://localhost:1234/folder/folderInteger.json"
+            "http://localhost:1234/folder/folderInteger.json",
+            "http://json-schema.org/draft-04/schema"
         };
 
         for (size_t i = 0; i < kCount; i++)
@@ -777,7 +777,7 @@ public:
     }
 
 private:
-    static const size_t kCount = 3;
+    static const size_t kCount = 4;
     Document* d_[kCount];
     SchemaDocument* sd_[kCount];
 };
