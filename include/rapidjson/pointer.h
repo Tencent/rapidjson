@@ -205,7 +205,7 @@ public:
     GenericPointer Append(const Token& token, Allocator* allocator = 0) const {
         GenericPointer r;
         r.allocator_ = allocator;
-        Ch *p = r.CopyFromRaw(*this, 1, (token.length + 1) * sizeof(Ch));
+        Ch *p = r.CopyFromRaw(*this, 1, token.length + 1);
         std::memcpy(p, token.name, (token.length + 1) * sizeof(Ch));
         r.tokens_[tokenCount_].name = p;
         r.tokens_[tokenCount_].length = token.length;
@@ -284,6 +284,7 @@ public:
             return Append(token.GetString(), token.GetStringLength(), allocator);
         else {
             RAPIDJSON_ASSERT(token.IsUint64());
+            RAPIDJSON_ASSERT(token.GetUint64() <= SizeType(~0));
             return Append(static_cast<SizeType>(token.GetUint64()), allocator);
         }
     }
@@ -724,7 +725,7 @@ private:
     /*!
         \param rhs Source pointer.
         \param extraToken Extra tokens to be allocated.
-        \param extraNameBufferSize Extra name buffer size to be allocated.
+        \param extraNameBufferSize Extra name buffer size (in number of Ch) to be allocated.
         \return Start of non-occupied name buffer, for storing extra names.
     */
     Ch* CopyFromRaw(const GenericPointer& rhs, size_t extraToken = 0, size_t extraNameBufferSize = 0) {
@@ -734,7 +735,7 @@ private:
         size_t nameBufferSize = rhs.tokenCount_; // null terminators for tokens
         for (Token *t = rhs.tokens_; t != rhs.tokens_ + rhs.tokenCount_; ++t)
             nameBufferSize += t->length;
-        nameBuffer_ = (Ch*)allocator_->Malloc(nameBufferSize * sizeof(Ch)+extraNameBufferSize);
+        nameBuffer_ = (Ch*)allocator_->Malloc((nameBufferSize + extraNameBufferSize) * sizeof(Ch));
         std::memcpy(nameBuffer_, rhs.nameBuffer_, nameBufferSize * sizeof(Ch));
 
         tokenCount_ = rhs.tokenCount_ + extraToken;
@@ -746,7 +747,7 @@ private:
         for (Token *t = tokens_; t != tokens_ + rhs.tokenCount_; ++t)
             t->name += diff;
 
-        return nameBuffer_ + nameBufferSize * sizeof(Ch);
+        return nameBuffer_ + nameBufferSize;
     }
 
     //! Check whether a character should be percent-encoded.
