@@ -46,10 +46,12 @@ RAPIDJSON_NAMESPACE_BEGIN
 // Forward declarations
 
 template <typename Encoding, typename Allocator>
-class Schema;
+class GenericSchemaDocument;
+
+namespace internal {
 
 template <typename Encoding, typename Allocator>
-class GenericSchemaDocument;
+class Schema;
 
 ///////////////////////////////////////////////////////////////////////////////
 // ISchemaValidator
@@ -71,35 +73,6 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-// SchemaValidatorArray
-
-struct SchemaValidatorArray {
-    SchemaValidatorArray() : validators(), count() {}
-    ~SchemaValidatorArray() {
-        for (SizeType i = 0; i < count; i++)
-            delete validators[i];
-        delete[] validators;
-    }
-
-    ISchemaValidator** validators;
-    SizeType count;
-};
-
-///////////////////////////////////////////////////////////////////////////////
-// SchemaArray
-
-template <typename Encoding, typename Allocator>
-struct SchemaArray {
-    SchemaArray() : schemas(), count() {}
-    ~SchemaArray() {
-        delete[] schemas;
-    }
-
-    const Schema<Encoding, Allocator>** schemas;
-    SizeType count;
-};
-
-///////////////////////////////////////////////////////////////////////////////
 // SchemaValidationContext
 
 template <typename Encoding, typename Allocator>
@@ -111,6 +84,18 @@ struct SchemaValidationContext {
         kPatternValidatorOnly,
         kPatternValidatorWithProperty,
         kPatternValidatorWithAdditionalProperty
+    };
+
+    struct SchemaValidatorArray {
+        SchemaValidatorArray() : validators(), count() {}
+        ~SchemaValidatorArray() {
+            for (SizeType i = 0; i < count; i++)
+                delete validators[i];
+            delete[] validators;
+        }
+
+        ISchemaValidator** validators;
+        SizeType count;
     };
 
     SchemaValidationContext(const SchemaValidatorFactoryType* f, const SchemaType* s) :
@@ -671,7 +656,12 @@ private:
         typedef char RegexType;
 #endif
 
-    typedef SchemaArray<Encoding, Allocator> SchemaArrayType;
+    struct SchemaArray {
+        SchemaArray() : schemas(), count() {}
+        ~SchemaArray() { delete[] schemas; }
+        const Schema<Encoding, Allocator>** schemas;
+        SizeType count;
+    };
 
     static const SchemaType* GetTypeless() {
         static SchemaType typeless(0, Pointer(), Value(kObjectType).Move());
@@ -708,7 +698,7 @@ private:
     }
 
     template <typename DocumentType, typename ValueType, typename PointerType>
-    static void AssigIfExist(SchemaArrayType& out, const DocumentType& document, const PointerType& p, const ValueType& value, const char* name) {
+    static void AssigIfExist(SchemaArray& out, const DocumentType& document, const PointerType& p, const ValueType& value, const char* name) {
         if (const ValueType* v = GetMember(value, name)) {
             if (v->IsArray() && v->Size() > 0) {
                 PointerType q = p.Append(name);
@@ -778,7 +768,7 @@ private:
         }
     }
 
-    void CreateSchemaValidators(Context& context, SchemaValidatorArray& validators, const SchemaArrayType& schemas) const {
+    void CreateSchemaValidators(Context& context, typename Context::SchemaValidatorArray& validators, const SchemaArray& schemas) const {
         if (!validators.validators) {
             validators.validators = new ISchemaValidator*[schemas.count];
             validators.count = schemas.count;
@@ -841,9 +831,9 @@ private:
 
     Allocator allocator_;
     GenericValue<Encoding> enum_;
-    SchemaArrayType allOf_;
-    SchemaArrayType anyOf_;
-    SchemaArrayType oneOf_;
+    SchemaArray allOf_;
+    SchemaArray anyOf_;
+    SchemaArray oneOf_;
     const SchemaType* not_;
     const SchemaType* ref_;
     unsigned type_; // bitmask of kSchemaType
@@ -880,14 +870,16 @@ private:
     bool exclusiveMaximum_;
 };
 
+} // namespace internal
+
 ///////////////////////////////////////////////////////////////////////////////
 // GenericSchemaDocument
 
 template <typename Encoding, typename Allocator = MemoryPoolAllocator<> >
 class GenericSchemaDocument {
 public:
-    typedef Schema<Encoding, Allocator> SchemaType;
-    friend class Schema<Encoding, Allocator>;
+    typedef internal::Schema<Encoding, Allocator> SchemaType;
+    friend class internal::Schema<Encoding, Allocator>;
 
     template <typename DocumentType>
     GenericSchemaDocument(const DocumentType& document, Allocator* allocator = 0) : root_(), schemas_(), schemaCount_(), schemaMap_(allocator, kInitialSchemaMapSize), schemaRef_(allocator, kInitialSchemaRefSize) {
@@ -981,7 +973,7 @@ typedef GenericSchemaDocument<UTF8<> > SchemaDocument;
 // GenericSchemaValidator
 
 template <typename SchemaType, typename OutputHandler = BaseReaderHandler<typename SchemaType::EncodingType>, typename StateAllocator = CrtAllocator >
-class GenericSchemaValidator : public ISchemaValidatorFactory<SchemaType>, public ISchemaValidator {
+class GenericSchemaValidator : public internal::ISchemaValidatorFactory<SchemaType>, public internal::ISchemaValidator {
 public:
     typedef typename SchemaType::EncodingType EncodingType;
     typedef typename EncodingType::Ch Ch;
@@ -1152,7 +1144,7 @@ private:
 
             if (count > 0) {
                 CurrentContext().objectPatternValidatorType = patternValidatorType;
-                SchemaValidatorArray& va = CurrentContext().patternPropertiesValidators;
+                typename Context::SchemaValidatorArray& va = CurrentContext().patternPropertiesValidators;
                 va.validators = new ISchemaValidator*[count];
                 for (SizeType i = 0; i < count; i++)
                     va.validators[va.count++] = CreateSchemaValidator(*sa[i]);
