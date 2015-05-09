@@ -882,7 +882,7 @@ public:
     typedef typename ValueType::Ch Ch;
 
     virtual ~IGenericRemoteSchemaDocumentProvider() {}
-    virtual SchemaDocumentType* GetRemoteDocument(const Ch* uri, SizeType length) = 0;
+    virtual const SchemaDocumentType* GetRemoteDocument(const Ch* uri, SizeType length) = 0;
 };
 
 typedef IGenericRemoteSchemaDocumentProvider<Value> IRemoteSchemaDocumentProvider;
@@ -909,10 +909,10 @@ public:
         schemaMap_(allocator, kInitialSchemaMapSize),
         schemaRef_(allocator, kInitialSchemaRefSize)
     {
-        
         // Generate root schema, it will call CreateSchema() to create sub-schemas,
         // And call AddRefSchema() if there are $ref.
-        root_ = CreateSchema(PointerType(), static_cast<const ValueType&>(document));
+        //root_ = CreateSchema(PointerType(), static_cast<const ValueType&>(document));
+        root_ = CreateSchemaRecursive(Pointer(), static_cast<const ValueType&>(document));
 
         // Resolve $ref
         while (!schemaRef_.Empty()) {
@@ -936,12 +936,27 @@ public:
 
 private:
     struct SchemaEntry {
-        SchemaEntry(const GenericPointer<ValueType>& p, SchemaType* s) : pointer(p), schema(s) {}
-        GenericPointer<ValueType> pointer;
+        SchemaEntry(const PointerType& p, SchemaType* s) : pointer(p), schema(s) {}
+        PointerType pointer;
         SchemaType* schema;
     };
 
-    const SchemaType* CreateSchema(const GenericPointer<ValueType>& pointer, const ValueType& v) {
+    const SchemaType* CreateSchemaRecursive(const PointerType& pointer, const ValueType& v) {
+        if (v.GetType() == kObjectType) {
+            const SchemaType* s = GetSchema(pointer);
+            if (!s)
+                s = CreateSchema(pointer, v);
+            for (typename ValueType::ConstMemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr)
+                CreateSchemaRecursive(pointer.Append(itr->name), itr->value);
+            return s;
+        }
+        else if (v.GetType() == kArrayType)
+            for (SizeType i = 0; i < v.Size(); i++)
+                CreateSchemaRecursive(pointer.Append(i), v[i]);
+        return 0;
+    }
+
+    const SchemaType* CreateSchema(const PointerType& pointer, const ValueType& v) {
         RAPIDJSON_ASSERT(pointer.IsValid());
         SchemaType* schema = new SchemaType(this, pointer, v);
         new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(pointer, schema);
@@ -959,8 +974,7 @@ private:
 
                 if (i > 0) { // Remote reference, resolve immediately
                     if (remoteProvider_) {
-                        if (GenericSchemaDocument* remoteDocument = remoteProvider_->GetRemoteDocument(s, i - 1)) {
-                            printf("remote fragment: %*s\n", len - i, &s[i]);
+                        if (const GenericSchemaDocument* remoteDocument = remoteProvider_->GetRemoteDocument(s, i - 1)) {
                             GenericPointer<ValueType> pointer(&s[i], len - i);
                             if (pointer.IsValid())
                                 schema->ref_ = remoteDocument->GetSchema(pointer);
@@ -968,7 +982,6 @@ private:
                     }
                 }
                 else if (s[i] == '#') { // Local reference, defer resolution
-                    printf("local fragment: %*s\n", len - i, &s[i]);
                     GenericPointer<ValueType> pointer(&s[i], len - i);
                     if (pointer.IsValid())
                         new (schemaRef_.template Push<SchemaEntry>()) SchemaEntry(pointer, schema);
@@ -977,15 +990,11 @@ private:
         }
     }
 
-    const SchemaType* GetSchema(const GenericPointer<ValueType>& pointer) {
-        for (SchemaEntry* target = schemaMap_.template Bottom<SchemaEntry>(); target <= schemaMap_.template Top<SchemaEntry>(); ++target)
+    const SchemaType* GetSchema(const PointerType& pointer) const {
+        for (const SchemaEntry* target = schemaMap_.template Bottom<SchemaEntry>(); target != schemaMap_.template End<SchemaEntry>(); ++target)
             if (pointer == target->pointer)
                 return target->schema;
-
-        if (const ValueType* v = pointer.Get(document_))
-            return CreateSchema(pointer, *v);
-        else
-            return 0;
+        return 0;
     }
 
     static const size_t kInitialSchemaMapSize = 1024;
@@ -1061,7 +1070,7 @@ public:
     if (!BeginValue() || !CurrentSchema().method arg1) return valid_ = false;
 
 #define RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(method, arg2)\
-    for (Context* context = schemaStack_.template Bottom<Context>(); context <= schemaStack_.template Top<Context>(); context++) {\
+    for (Context* context = schemaStack_.template Bottom<Context>(); context != schemaStack_.template End<Context>(); context++) {\
         if (context->allOfValidators.validators)\
             for (SizeType i_ = 0; i_ < context->allOfValidators.count; i_++)\
                 static_cast<GenericSchemaValidator*>(context->allOfValidators.validators[i_])->method arg2;\

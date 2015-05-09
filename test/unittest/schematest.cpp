@@ -763,17 +763,16 @@ public:
         }
     }
 
-    virtual SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
+    virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
         const char* uris[kCount] = {
             "http://localhost:1234/integer.json",
             "http://localhost:1234/subSchemas.json",
             "http://localhost:1234/folder/folderInteger.json"
         };
 
-        for (size_t i = 0; i < kCount; i++) {
+        for (size_t i = 0; i < kCount; i++)
             if (strncmp(uri, uris[i], length) == 0)
                 return sd_[i];
-        }
         return 0;
     }
 
@@ -809,7 +808,7 @@ TEST(SchemaValidator, TestSuite) {
         "patternProperties.json",
         "properties.json",
         "ref.json",
-        //"refRemote.json",
+        "refRemote.json",
         "required.json",
         "type.json",
         //"uniqueItems.json"
@@ -854,7 +853,7 @@ TEST(SchemaValidator, TestSuite) {
                             validator.Reset();
                             bool actual = data.Accept(validator);
                             if (expected != actual)
-                                printf("Fail: %30s \"%s, %s\"\n", filename, description1, description2);
+                                printf("Fail: %30s \"%s\" \"%s\"\n", filename, description1, description2);
                             else
                                 passCount++;
                         }
