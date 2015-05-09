@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a51cfd45c07e28aa4fdd78b55d86f0591":[10,1,0,3],
 "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a58c9982e833d1c74686506ac7449200c":[10,1,0,10],
 "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a5ab5548c7a7776f4da20eac09fe57c1b":[10,1,0,4],
 "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ac8865f9231951740a99d3f3ab10f9a4e":[10,1,0,6],
@@ -248,6 +249,5 @@ var NAVTREEINDEX2 =
 "structrapidjson_1_1_generic_string_ref.html#a001276ee57cbcbd3c14449045c71e994":[12,0,0,20,9],
 "structrapidjson_1_1_generic_string_ref.html#a29cf407c6aa2313f13dff78d6ce02687":[12,0,0,20,2],
 "structrapidjson_1_1_generic_string_ref.html#a578c51ab574a50a9c760b9da7c7562f2":[12,0,0,20,6],
-"structrapidjson_1_1_generic_string_ref.html#aa2a8eccae3d7eb14c30bc21afb7d6fba":[12,0,0,20,0],
-"structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5":[12,0,0,20,5]
+"structrapidjson_1_1_generic_string_ref.html#aa2a8eccae3d7eb14c30bc21afb7d6fba":[12,0,0,20,0]
 };

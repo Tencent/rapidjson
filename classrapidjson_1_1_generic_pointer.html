@@ -159,6 +159,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad0bd4948e56dce4b75b39f744050322c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#ad0bd4948e56dce4b75b39f744050322c">Append</a> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> index, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> *allocator=0) const </td></tr>
 <tr class="memdesc:ad0bd4948e56dce4b75b39f744050322c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append a index token, and return a new Pointer.  <a href="#ad0bd4948e56dce4b75b39f744050322c">More...</a><br /></td></tr>
 <tr class="separator:ad0bd4948e56dce4b75b39f744050322c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3baa23b919dc9ba9421b8e6fbf3e0605"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a3baa23b919dc9ba9421b8e6fbf3e0605">Append</a> (const ValueType &amp;token, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> *allocator=0) const </td></tr>
+<tr class="memdesc:a3baa23b919dc9ba9421b8e6fbf3e0605"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append a token by value, and return a new Pointer.  <a href="#a3baa23b919dc9ba9421b8e6fbf3e0605">More...</a><br /></td></tr>
+<tr class="separator:a3baa23b919dc9ba9421b8e6fbf3e0605"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Handling Parse Error</div></td></tr>
 <tr class="memitem:a112f364fe9aeabba2a72e83bcbeb8fda"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a112f364fe9aeabba2a72e83bcbeb8fda"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a112f364fe9aeabba2a72e83bcbeb8fda">IsValid</a> () const </td></tr>
@@ -752,6 +755,52 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">index</td><td>Index to be appended. </td></tr>
+    <tr><td class="paramname">allocator</td><td><a class="el" href="classrapidjson_1_1_allocator.html" title="Concept for allocating, resizing and freeing memory block. ">Allocator</a> for the newly return Pointer. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A new Pointer with appended token. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a3baa23b919dc9ba9421b8e6fbf3e0605"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a> <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::Append </td>
+          <td>(</td>
+          <td class="paramtype">const ValueType &amp;&#160;</td>
+          <td class="paramname"><em>token</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> *&#160;</td>
+          <td class="paramname"><em>allocator</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Append a token by value, and return a new Pointer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">value</td><td>Value (either Uint or String) to be appended. </td></tr>
     <tr><td class="paramname">allocator</td><td><a class="el" href="classrapidjson_1_1_allocator.html" title="Concept for allocating, resizing and freeing memory block. ">Allocator</a> for the newly return Pointer. </td></tr>
   </table>
   </dd>

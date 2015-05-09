@@ -15,6 +15,7 @@ var classrapidjson_1_1_generic_pointer =
     [ "Append", "classrapidjson_1_1_generic_pointer.html#af2e3630aeaebb6628c2b1694a0595452", null ],
     [ "Append", "classrapidjson_1_1_generic_pointer.html#ac4b35d8051c17a8c9408f71ae8541d19", null ],
     [ "Append", "classrapidjson_1_1_generic_pointer.html#ad0bd4948e56dce4b75b39f744050322c", null ],
+    [ "Append", "classrapidjson_1_1_generic_pointer.html#a3baa23b919dc9ba9421b8e6fbf3e0605", null ],
     [ "Create", "classrapidjson_1_1_generic_pointer.html#a3733a6d6cf2a3a13f2a59b109b56d800", null ],
     [ "Create", "classrapidjson_1_1_generic_pointer.html#a2b5a8fb688e6b6a1b077ce103df455c3", null ],
     [ "Erase", "classrapidjson_1_1_generic_pointer.html#aec10492caf6e853935d9a360bbe73713", null ],
