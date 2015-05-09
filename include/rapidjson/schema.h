@@ -152,7 +152,7 @@ public:
     typedef typename EncodingType::Ch Ch;
     typedef SchemaValidationContext<SchemaDocumentType> Context;
     typedef Schema<SchemaDocumentType> SchemaType;
-    friend SchemaDocumentType;
+    friend class GenericSchemaDocument<ValueType, AllocatorType>;
 
     Schema(SchemaDocumentType* document, const PointerType& p, const ValueType& value) :
         not_(),
