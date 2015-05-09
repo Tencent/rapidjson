@@ -217,7 +217,7 @@ public:
         AssigIfExist(oneOf_, document, p, value, "oneOf");
 
         if (const ValueType* v = GetMember(value, "not"))
-            not_ = document->CreateSchema(p, *v);
+            not_ = document->CreateSchema(p.Append("not"), *v);
 
         // Object
 
@@ -256,22 +256,25 @@ public:
             }
         }
 
-        if (properties && properties->IsObject())
+        if (properties && properties->IsObject()) {
+            PointerType q = p.Append("properties");
             for (ConstMemberIterator itr = properties->MemberBegin(); itr != properties->MemberEnd(); ++itr) {
                 SizeType index;
                 if (FindPropertyIndex(itr->name, &index)) {
-                    properties_[index].schema = document->CreateSchema(p, itr->value);
+                    properties_[index].schema = document->CreateSchema(q.Append(itr->name), itr->value);
                     properties_[index].typeless = false;
                 }
             }
+        }
 
         if (const ValueType* v = GetMember(value, "patternProperties")) {
+            PointerType q = p.Append("patternProperties");
             patternProperties_ = new PatternProperty[v->MemberCount()];
             patternPropertyCount_ = 0;
 
             for (ConstMemberIterator itr = v->MemberBegin(); itr != v->MemberEnd(); ++itr) {
                 patternProperties_[patternPropertyCount_].pattern = CreatePattern(itr->name);
-                patternProperties_[patternPropertyCount_].schema = document->CreateSchema(p, itr->value);
+                patternProperties_[patternPropertyCount_].schema = document->CreateSchema(q.Append(itr->name), itr->value);
                 patternPropertyCount_++;
             }
         }
@@ -287,6 +290,7 @@ public:
                 }
 
         if (dependencies && dependencies->IsObject()) {
+            PointerType q = p.Append("dependencies");
             hasDependencies_ = true;
             for (ConstMemberIterator itr = dependencies->MemberBegin(); itr != dependencies->MemberEnd(); ++itr) {
                 SizeType sourceIndex;
@@ -302,7 +306,7 @@ public:
                     }
                     else if (itr->value.IsObject()) {
                         hasSchemaDependencies_ = true;
-                        properties_[sourceIndex].dependenciesSchema = document->CreateSchema(p, itr->value);
+                        properties_[sourceIndex].dependenciesSchema = document->CreateSchema(q.Append(itr->name), itr->value);
                     }
                 }
             }
@@ -312,7 +316,7 @@ public:
             if (v->IsBool())
                 additionalProperties_ = v->GetBool();
             else if (v->IsObject())
-                additionalPropertiesSchema_ = document->CreateSchema(p, *v);
+                additionalPropertiesSchema_ = document->CreateSchema(p.Append("additionalProperties"), *v);
         }
 
         AssignIfExist(minProperties_, value, "minProperties");
@@ -323,9 +327,11 @@ public:
             if (v->IsObject()) // List validation
                 itemsList_ = document->CreateSchema(p, *v);
             else if (v->IsArray()) { // Tuple validation
+                PointerType q = p.Append("items");
                 itemsTuple_ = new Schema*[v->Size()];
-                for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr)
-                    itemsTuple_[itemsTupleCount_++] = document->CreateSchema(p, *itr);
+                SizeType index = 0;
+                for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr, index++)
+                    itemsTuple_[itemsTupleCount_++] = document->CreateSchema(q.Append(index), *itr);
             }
         }
 
@@ -336,7 +342,7 @@ public:
             if (v->IsBool())
                 additionalItems_ = v->GetBool();
             else if (v->IsObject())
-                additionalItemsSchema_ = document->CreateSchema(p, *v);
+                additionalItemsSchema_ = document->CreateSchema(p.Append("additionalItems"), *v);
         }
 
         // String
@@ -685,14 +691,16 @@ private:
 
     template <typename DocumentType, typename ValueType>
     static void AssigIfExist(SchemaArrayType& out, const DocumentType& document, const PointerType& p, const ValueType& value, const char* name) {
-        if (const ValueType* v = GetMember(value, name))
+        if (const ValueType* v = GetMember(value, name)) {
             if (v->IsArray() && v->Size() > 0) {
+                PointerType q = p.Append(name);
                 out.count = v->Size();
                 out.schemas = new Schema*[out.count];
                 memset(out.schemas, 0, sizeof(Schema*)* out.count);
                 for (SizeType i = 0; i < out.count; i++)
-                    out.schemas[i] = document->CreateSchema(p, (*v)[i]);
+                    out.schemas[i] = document->CreateSchema(q.Append(i), (*v)[i]);
             }
+        }
     }
 
 #if RAPIDJSON_SCHEMA_USE_STDREGEX
@@ -863,28 +871,44 @@ private:
 template <typename Encoding, typename Allocator = MemoryPoolAllocator<> >
 class GenericSchemaDocument {
 public:
-    template <typename T1, typename T2, typename T3>
-    friend class GenericSchemaValidator;
-
     typedef Schema<Encoding, Allocator> SchemaType;
+    friend class Schema<Encoding, Allocator>;
 
     template <typename DocumentType>
-    GenericSchemaDocument(const DocumentType& document) : root_() {
+    GenericSchemaDocument(const DocumentType& document, Allocator* allocator = 0) : root_(), schemaMap(allocator, kInitialSchemaMapSize) {
         typedef typename DocumentType::ValueType ValueType;
-        root_ = CreateSchema(GenericPointer<ValueType>("#"), static_cast<const ValueType&>(document));
+        
+        root_ = CreateSchema(GenericPointer<ValueType>(), static_cast<const ValueType&>(document));
+
+        while (!schemaMap.Empty())
+            schemaMap.template Pop<SchemaEntry<ValueType> > (1)->~SchemaEntry<ValueType>();
     }
 
     ~GenericSchemaDocument() {
         delete root_;
     }
 
-    template <typename ValueType>
-    SchemaType* CreateSchema(const GenericPointer<ValueType>& p, const ValueType& v) {
-        return new SchemaType(this, p, v);
-    }
+    const SchemaType& GetRoot() const { return *root_; }
 
 private:
+    template <typename ValueType>
+    struct SchemaEntry {
+        SchemaEntry(const GenericPointer<ValueType>& p, SchemaType* s) : pointer(p), schema(s) {}
+        GenericPointer<ValueType> pointer;
+        SchemaType* schema;
+    };
+
+    template <typename ValueType>
+    SchemaType* CreateSchema(const GenericPointer<ValueType>& pointer, const ValueType& v) {
+        SchemaType* schema = new SchemaType(this, pointer, v);
+        new (schemaMap.template Push<SchemaEntry<ValueType> >()) SchemaEntry<ValueType>(pointer, schema);
+        return schema;
+    }
+
+    static const size_t kInitialSchemaMapSize = 1024;
+
     SchemaType* root_;
+    internal::Stack<Allocator> schemaMap; // Stores SchemaEntry<ValueType>
 };
 
 typedef GenericSchemaDocument<UTF8<> > SchemaDocument;
@@ -902,7 +926,7 @@ public:
         size_t schemaStackCapacity = kDefaultSchemaStackCapacity/*,
         size_t documentStackCapacity = kDefaultDocumentStackCapacity*/)
         :
-        root_(*schemaDocument.root_),
+        root_(schemaDocument.GetRoot()),
         outputHandler_(nullOutputHandler_),
         schemaStack_(allocator, schemaStackCapacity),
         // documentStack_(allocator, documentStackCapacity),
@@ -917,7 +941,7 @@ public:
         size_t schemaStackCapacity = kDefaultSchemaStackCapacity/*,
         size_t documentStackCapacity = kDefaultDocumentStackCapacity*/)
         :
-        root_(*schemaDocument.root_),
+        root_(schemaDocument.GetRoot()),
         outputHandler_(outputHandler),
         schemaStack_(allocator, schemaStackCapacity),
         // documentStack_(allocator, documentStackCapacity),
@@ -1076,7 +1100,7 @@ private:
         return true;
     }
 
-    void PushSchema(const SchemaType& schema) { *schemaStack_.template Push<Context>() = Context(this, &schema); }
+    void PushSchema(const SchemaType& schema) { new (schemaStack_.template Push<Context>()) Context(this, &schema); }
     void PopSchema() { schemaStack_.template Pop<Context>(1)->~Context(); }
     const SchemaType& CurrentSchema() { return *schemaStack_.template Top<Context>()->schema; }
     Context& CurrentContext() { return *schemaStack_.template Top<Context>(); }
