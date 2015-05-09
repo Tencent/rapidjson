@@ -91,8 +91,6 @@ template <typename Encoding, typename Allocator>
 struct SchemaArray {
     SchemaArray() : schemas(), count() {}
     ~SchemaArray() {
-        for (SizeType i = 0; i < count; i++)
-            delete schemas[i];
         delete[] schemas;
     }
 
@@ -376,14 +374,8 @@ public:
     }
 
     ~Schema() {
-        delete not_;
         delete [] properties_;
-        delete additionalPropertiesSchema_;
         delete [] patternProperties_;
-        delete additionalItemsSchema_;
-        delete itemsList_;
-        for (SizeType i = 0; i < itemsTupleCount_; i++)
-            delete itemsTuple_[i];
         delete [] itemsTuple_;
 #if RAPIDJSON_SCHEMA_USE_STDREGEX
         delete pattern_;
@@ -803,12 +795,7 @@ private:
 
     struct Property {
         Property() : schema(), dependenciesSchema(), dependencies(), required(false), typeless(true) {}
-        ~Property() { 
-            delete schema;
-            delete dependenciesSchema;
-            delete[] dependencies;
-        }
-
+        ~Property() { delete[] dependencies; }
         GenericValue<Encoding> name;
         const SchemaType* schema;
         const SchemaType* dependenciesSchema;
@@ -819,11 +806,7 @@ private:
 
     struct PatternProperty {
         PatternProperty() : schema(), pattern() {}
-        ~PatternProperty() {
-            delete schema;
-            delete pattern;
-        }
-
+        ~PatternProperty() { delete pattern; }
         SchemaType* schema;
         RegexType* pattern;
     };
@@ -875,17 +858,25 @@ public:
     friend class Schema<Encoding, Allocator>;
 
     template <typename DocumentType>
-    GenericSchemaDocument(const DocumentType& document, Allocator* allocator = 0) : root_(), schemaMap(allocator, kInitialSchemaMapSize) {
+    GenericSchemaDocument(const DocumentType& document, Allocator* allocator = 0) : root_(), schemas_(), schemaCount_(), schemaMap_(allocator, kInitialSchemaMapSize) {
         typedef typename DocumentType::ValueType ValueType;
         
         root_ = CreateSchema(GenericPointer<ValueType>(), static_cast<const ValueType&>(document));
 
-        while (!schemaMap.Empty())
-            schemaMap.template Pop<SchemaEntry<ValueType> > (1)->~SchemaEntry<ValueType>();
+        // Copy to schemas and destroy the map
+        schemas_ = new SchemaType*[schemaCount_];
+        size_t i = schemaCount_;
+        while (!schemaMap_.Empty()) {
+            SchemaEntry<ValueType>* e = schemaMap_.template Pop<SchemaEntry<ValueType> > (1);
+            schemas_[--i] = e->schema;
+            e->~SchemaEntry<ValueType>();
+        }
     }
 
     ~GenericSchemaDocument() {
-        delete root_;
+        for (size_t i = 0; i < schemaCount_; i++)
+            delete schemas_[i];
+        delete [] schemas_;
     }
 
     const SchemaType& GetRoot() const { return *root_; }
@@ -901,14 +892,17 @@ private:
     template <typename ValueType>
     SchemaType* CreateSchema(const GenericPointer<ValueType>& pointer, const ValueType& v) {
         SchemaType* schema = new SchemaType(this, pointer, v);
-        new (schemaMap.template Push<SchemaEntry<ValueType> >()) SchemaEntry<ValueType>(pointer, schema);
+        new (schemaMap_.template Push<SchemaEntry<ValueType> >()) SchemaEntry<ValueType>(pointer, schema);
+        schemaCount_++;
         return schema;
     }
 
     static const size_t kInitialSchemaMapSize = 1024;
 
     SchemaType* root_;
-    internal::Stack<Allocator> schemaMap; // Stores SchemaEntry<ValueType>
+    SchemaType** schemas_;
+    size_t schemaCount_;
+    internal::Stack<Allocator> schemaMap_; // Stores SchemaEntry<ValueType>
 };
 
 typedef GenericSchemaDocument<UTF8<> > SchemaDocument;
