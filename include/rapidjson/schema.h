@@ -903,6 +903,7 @@ public:
     friend class internal::Schema<GenericSchemaDocument>;
 
     GenericSchemaDocument(const ValueType& document, IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) : 
+        document_(document),
         remoteProvider_(remoteProvider),
         root_(),
         schemaMap_(allocator, kInitialSchemaMapSize),
@@ -918,22 +919,8 @@ public:
             SchemaEntry* refEntry = schemaRef_.template Pop<SchemaEntry>(1);
             PointerType p = refEntry->pointer;      // Due to re-entrance,
             SchemaType* source = refEntry->schema;  // backup the entry first,
-            refEntry->~SchemaEntry();           // and then destruct it.
-
-            bool resolved = false;
-            for (SchemaEntry* target = schemaMap_.template Bottom<SchemaEntry>(); target <= schemaMap_.template Top<SchemaEntry>(); ++target)
-                if (p == target->pointer) {
-                    source->ref_ = target->schema;
-                    resolved = true;
-                    break;
-                }
-
-            // If not reesolved to existing schemas, try to create schema from the pointer
-            if (!resolved) {
-                if (const ValueType* v = p.Get(document)) 
-                    source->ref_ = CreateSchema(p, *v); // cause re-entrance (modifying schemaRef_)
-            }
-
+            refEntry->~SchemaEntry();              // and then destruct it.
+            source->ref_ = GetSchema(p);
         }
     }
 
@@ -970,32 +957,41 @@ private:
                 while (i < len && s[i] != '#') // Find the first #
                     i++;
 
-                if (s[i] == '#') {
-                    if (i > 0) { // Remote reference, resolve immediately
-                        if (remoteProvider_) {
-                            GenericSchemaDocument* remoteDocument = remoteProvider_->GetRemoteDocument(s, i);
-                            GenericPointer<ValueType> pointer(s, len - i);
-                            schema->ref_ = remoteDocument->GetSchema(pointer);
+                if (i > 0) { // Remote reference, resolve immediately
+                    if (remoteProvider_) {
+                        if (GenericSchemaDocument* remoteDocument = remoteProvider_->GetRemoteDocument(s, i - 1)) {
+                            printf("remote fragment: %*s\n", len - i, &s[i]);
+                            GenericPointer<ValueType> pointer(&s[i], len - i);
+                            if (pointer.IsValid())
+                                schema->ref_ = remoteDocument->GetSchema(pointer);
                         }
                     }
-                    else { // Local reference, defer resolution
-                        GenericPointer<ValueType> pointer(v.GetString(), v.GetStringLength());
-                        if (pointer.IsValid())
-                            new (schemaRef_.template Push<SchemaEntry>()) SchemaEntry(pointer, schema);
-                    }
+                }
+                else if (s[i] == '#') { // Local reference, defer resolution
+                    printf("local fragment: %*s\n", len - i, &s[i]);
+                    GenericPointer<ValueType> pointer(&s[i], len - i);
+                    if (pointer.IsValid())
+                        new (schemaRef_.template Push<SchemaEntry>()) SchemaEntry(pointer, schema);
                 }
             }
         }
     }
 
     const SchemaType* GetSchema(const GenericPointer<ValueType>& pointer) {
-        (void)pointer;
-        return 0;
+        for (SchemaEntry* target = schemaMap_.template Bottom<SchemaEntry>(); target <= schemaMap_.template Top<SchemaEntry>(); ++target)
+            if (pointer == target->pointer)
+                return target->schema;
+
+        if (const ValueType* v = pointer.Get(document_))
+            return CreateSchema(pointer, *v);
+        else
+            return 0;
     }
 
     static const size_t kInitialSchemaMapSize = 1024;
     static const size_t kInitialSchemaRefSize = 1024;
 
+    const ValueType& document_;
     IRemoteSchemaDocumentProviderType* remoteProvider_;
     const SchemaType* root_;                //!< Root schema.
     internal::Stack<Allocator> schemaMap_;  // Stores created Pointer -> Schemas

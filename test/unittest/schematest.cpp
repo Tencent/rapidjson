@@ -698,11 +698,11 @@ TEST(SchemaValidator, AllOf_Nested) {
 
 static char* ReadFile(const char* filename, size_t& length) {
     const char *paths[] = {
-        "jsonschema/tests/draft4/%s",
-        "bin/jsonschema/tests/draft4/%s",
-        "../bin/jsonschema/tests/draft4/%s",
-        "../../bin/jsonschema/tests/draft4/%s",
-        "../../../bin/jsonschema/tests/draft4/%s"
+        "%s",
+        "bin/%s",
+        "../bin/%s",
+        "../../bin/%s",
+        "../../../bin/%s"
     };
     char buffer[1024];
     FILE *fp = 0;
@@ -726,6 +726,62 @@ static char* ReadFile(const char* filename, size_t& length) {
     return json;
 }
 
+class RemoteSchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
+public:
+    RemoteSchemaDocumentProvider() {
+        const char* filenames[kCount] = {
+            "integer.json",
+            "subSchemas.json",
+            "folder/folderInteger.json"
+        };
+
+        for (size_t i = 0; i < kCount; i++) {
+            d_[i] = 0;
+            sd_[i] = 0;
+
+            char filename[FILENAME_MAX];
+            sprintf(filename, "jsonschema/remotes/%s", filenames[i]);
+            size_t length;
+            char* json = ReadFile(filename, length);
+            if (!json) {
+                printf("json remote file %s not found", filename);
+                ADD_FAILURE();
+            }
+            else {
+                d_[i] = new Document;
+                d_[i]->Parse(json);
+                sd_[i] = new SchemaDocument(*d_[i]);
+                free(json);
+            }
+        };
+    }
+
+    ~RemoteSchemaDocumentProvider() {
+        for (size_t i = 0; i < kCount; i++) {
+            delete d_[i];
+            delete sd_[i];
+        }
+    }
+
+    virtual SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
+        const char* uris[kCount] = {
+            "http://localhost:1234/integer.json",
+            "http://localhost:1234/subSchemas.json",
+            "http://localhost:1234/folder/folderInteger.json"
+        };
+
+        for (size_t i = 0; i < kCount; i++) {
+            if (strncmp(uri, uris[i], length) == 0)
+                return sd_[i];
+        }
+        return 0;
+    }
+
+private:
+    static const size_t kCount = 3;
+    Document* d_[kCount];
+    SchemaDocument* sd_[kCount];
+};
 
 TEST(SchemaValidator, TestSuite) {
     const char* filenames[] = {
@@ -765,8 +821,11 @@ TEST(SchemaValidator, TestSuite) {
     unsigned testCount = 0;
     unsigned passCount = 0;
 
+    RemoteSchemaDocumentProvider provider;
+
     for (size_t i = 0; i < sizeof(filenames) / sizeof(filenames[0]); i++) {
-        const char* filename = filenames[i];
+        char filename[FILENAME_MAX];
+        sprintf(filename, "jsonschema/tests/draft4/%s", filenames[i]);
         size_t length;
         char* json = ReadFile(filename, length);
         if (!json) {
@@ -782,7 +841,7 @@ TEST(SchemaValidator, TestSuite) {
             }
             else {
                 for (Value::ConstValueIterator schemaItr = d.Begin(); schemaItr != d.End(); ++schemaItr) {
-                    SchemaDocument schema((*schemaItr)["schema"]);
+                    SchemaDocument schema((*schemaItr)["schema"], &provider);
                     SchemaValidator validator(schema);
                     const char* description1 = (*schemaItr)["description"].GetString();
                     const Value& tests = (*schemaItr)["tests"];
