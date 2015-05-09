@@ -129,6 +129,71 @@ TEST(SchemaValidator, Not) {
     VALIDATE(s, "\"I am a string\"", false);
 }
 
+TEST(SchemaValidator, Ref) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "  \"$schema\": \"http://json-schema.org/draft-04/schema#\","
+        ""
+        "  \"definitions\": {"
+        "    \"address\": {"
+        "      \"type\": \"object\","
+        "      \"properties\": {"
+        "        \"street_address\": { \"type\": \"string\" },"
+        "        \"city\":           { \"type\": \"string\" },"
+        "        \"state\":          { \"type\": \"string\" }"
+        "      },"
+        "      \"required\": [\"street_address\", \"city\", \"state\"]"
+        "    }"
+        "  },"
+        "  \"type\": \"object\","
+        "  \"properties\": {"
+        "    \"billing_address\": { \"$ref\": \"#/definitions/address\" },"
+        "    \"shipping_address\": { \"$ref\": \"#/definitions/address\" }"
+        "  }"
+        "}");
+    SchemaDocument s(sd);
+
+    VALIDATE(s, "{\"shipping_address\": {\"street_address\": \"1600 Pennsylvania Avenue NW\", \"city\": \"Washington\", \"state\": \"DC\"}, \"billing_address\": {\"street_address\": \"1st Street SE\", \"city\": \"Washington\", \"state\": \"DC\"} }", true);
+}
+
+TEST(SchemaValidator, Ref_AllOf) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "  \"$schema\": \"http://json-schema.org/draft-04/schema#\","
+        ""
+        "  \"definitions\": {"
+        "    \"address\": {"
+        "      \"type\": \"object\","
+        "      \"properties\": {"
+        "        \"street_address\": { \"type\": \"string\" },"
+        "        \"city\":           { \"type\": \"string\" },"
+        "        \"state\":          { \"type\": \"string\" }"
+        "      },"
+        "      \"required\": [\"street_address\", \"city\", \"state\"]"
+        "    }"
+        "  },"
+        "  \"type\": \"object\","
+        "  \"properties\": {"
+        "    \"billing_address\": { \"$ref\": \"#/definitions/address\" },"
+        "    \"shipping_address\": {"
+        "      \"allOf\": ["
+        "        { \"$ref\": \"#/definitions/address\" },"
+        "        { \"properties\":"
+        "          { \"type\": { \"enum\": [ \"residential\", \"business\" ] } },"
+        "          \"required\": [\"type\"]"
+        "        }"
+        "      ]"
+        "    }"
+        "  }"
+        "}");
+    SchemaDocument s(sd);
+
+    VALIDATE(s, "{\"shipping_address\": {\"street_address\": \"1600 Pennsylvania Avenue NW\", \"city\": \"Washington\", \"state\": \"DC\"} }", false);
+    VALIDATE(s, "{\"shipping_address\": {\"street_address\": \"1600 Pennsylvania Avenue NW\", \"city\": \"Washington\", \"state\": \"DC\", \"type\": \"business\"} }", true);
+}
+
 TEST(SchemaValidator, String) {
     Document sd;
     sd.Parse("{\"type\":\"string\"}");
@@ -669,7 +734,7 @@ TEST(SchemaValidator, TestSuite) {
         "additionalProperties.json",
         "allOf.json",
         "anyOf.json",
-        //"definitions.json",
+        "definitions.json",
         "dependencies.json",
         "enum.json",
         "items.json",
@@ -687,7 +752,7 @@ TEST(SchemaValidator, TestSuite) {
         "pattern.json",
         "patternProperties.json",
         "properties.json",
-        //"ref.json",
+        "ref.json",
         //"refRemote.json",
         "required.json",
         "type.json",

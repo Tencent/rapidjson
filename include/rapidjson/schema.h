@@ -116,6 +116,7 @@ struct SchemaValidationContext {
         valueSchema(),
         patternPropertiesSchemas(),
         notValidator(),
+        refValidator(),
         patternPropertiesSchemaCount(),
         valuePatternValidatorType(kPatternValidatorOnly),
         objectDependencies(),
@@ -125,6 +126,7 @@ struct SchemaValidationContext {
 
     ~SchemaValidationContext() {
         delete notValidator;
+        delete refValidator;
         delete[] patternPropertiesSchemas;
         delete[] objectDependencies;
     }
@@ -139,6 +141,7 @@ struct SchemaValidationContext {
     SchemaValidatorArray patternPropertiesValidators;
     const SchemaType** patternPropertiesSchemas;
     ISchemaValidator* notValidator;
+    ISchemaValidator* refValidator;
     SizeType patternPropertiesSchemaCount;
     PatternValidatorType valuePatternValidatorType;
     PatternValidatorType objectPatternValidatorType;
@@ -158,10 +161,12 @@ public:
     typedef Schema<Encoding, Allocator> SchemaType;
     typedef GenericValue<Encoding, Allocator> ValueType;
     typedef GenericPointer<ValueType> PointerType;
+    friend class GenericSchemaDocument<Encoding, Allocator>;
 
     template <typename ValueType>
     Schema(SchemaDocumentType* document, const PointerType& p, const ValueType& value) :
         not_(),
+        ref_(),
         type_((1 << kTotalSchemaType) - 1), // typeless
         properties_(),
         additionalPropertiesSchema_(),
@@ -216,6 +221,9 @@ public:
 
         if (const ValueType* v = GetMember(value, "not"))
             not_ = document->CreateSchema(p.Append("not"), *v);
+
+        if (const ValueType* v = GetMember(value, "$ref"))
+            document->AddRefSchema(this, *v);
 
         // Object
 
@@ -456,7 +464,10 @@ public:
                 return false;
         }
 
-        return !not_ || !context.notValidator->IsValid();
+        if (not_ && context.notValidator->IsValid())
+            return false;
+
+        return !ref_ || context.refValidator->IsValid();
     }
 
     bool Null(Context& context) const { 
@@ -741,6 +752,8 @@ private:
         if (oneOf_.schemas) CreateSchemaValidators(context, context.oneOfValidators, oneOf_);
         if (not_ && !context.notValidator)
             context.notValidator = context.factory->CreateSchemaValidator(*not_);
+        if (ref_ && !context.refValidator)
+            context.refValidator = context.factory->CreateSchemaValidator(*ref_);
 
         if (hasSchemaDependencies_ && !context.dependencyValidators.validators) {
             context.dependencyValidators.validators = new ISchemaValidator*[propertyCount_];
@@ -817,6 +830,7 @@ private:
     SchemaArrayType anyOf_;
     SchemaArrayType oneOf_;
     SchemaType* not_;
+    SchemaType* ref_;
     unsigned type_; // bitmask of kSchemaType
 
     Property* properties_;
@@ -858,18 +872,44 @@ public:
     friend class Schema<Encoding, Allocator>;
 
     template <typename DocumentType>
-    GenericSchemaDocument(const DocumentType& document, Allocator* allocator = 0) : root_(), schemas_(), schemaCount_(), schemaMap_(allocator, kInitialSchemaMapSize) {
+    GenericSchemaDocument(const DocumentType& document, Allocator* allocator = 0) : root_(), schemas_(), schemaCount_(), schemaMap_(allocator, kInitialSchemaMapSize), schemaRef_(allocator, kInitialSchemaRefSize) {
         typedef typename DocumentType::ValueType ValueType;
+        typedef SchemaEntry<ValueType> SchemaEntryType;
+        typedef GenericPointer<ValueType> PointerType;
         
-        root_ = CreateSchema(GenericPointer<ValueType>(), static_cast<const ValueType&>(document));
+        // Generate root schema, it will call CreateSchema() to create sub-schemas,
+        // And call AddRefSchema() if there are $ref.
+        root_ = CreateSchema(PointerType(), static_cast<const ValueType&>(document));
 
-        // Copy to schemas and destroy the map
+        // Resolve $ref
+        while (!schemaRef_.Empty()) {
+            SchemaEntryType* refEntry = schemaRef_.template Pop<SchemaEntryType>(1);
+            PointerType p = refEntry->pointer;      // Due to re-entrance,
+            SchemaType* source = refEntry->schema;  // backup the entry first,
+            refEntry->~SchemaEntryType();           // and then destruct it.
+
+            bool resolved = false;
+            for (SchemaEntryType* target = schemaMap_.template Bottom<SchemaEntryType>(); target <= schemaMap_.template Top<SchemaEntryType>(); ++target)
+                if (p == target->pointer) {
+                    source->ref_ = target->schema;
+                    resolved = true;
+                    break;
+                }
+
+            // If not reesolved to existing schemas, try to create schema from the pointer
+            if (!resolved) {
+                if (const ValueType* v = p.Get(document)) 
+                    source->ref_ = CreateSchema(p, *v); // cause re-entrance (modifying schemaRef_)
+            }
+        }
+
+        // Copy to schemas_ and destroy schemaMap_ entries.
         schemas_ = new SchemaType*[schemaCount_];
         size_t i = schemaCount_;
         while (!schemaMap_.Empty()) {
-            SchemaEntry<ValueType>* e = schemaMap_.template Pop<SchemaEntry<ValueType> > (1);
+            SchemaEntryType* e = schemaMap_.template Pop<SchemaEntryType>(1);
             schemas_[--i] = e->schema;
-            e->~SchemaEntry<ValueType>();
+            e->~SchemaEntryType();
         }
     }
 
@@ -891,18 +931,30 @@ private:
 
     template <typename ValueType>
     SchemaType* CreateSchema(const GenericPointer<ValueType>& pointer, const ValueType& v) {
+        RAPIDJSON_ASSERT(pointer.IsValid());
         SchemaType* schema = new SchemaType(this, pointer, v);
         new (schemaMap_.template Push<SchemaEntry<ValueType> >()) SchemaEntry<ValueType>(pointer, schema);
         schemaCount_++;
         return schema;
     }
 
-    static const size_t kInitialSchemaMapSize = 1024;
+    template <typename ValueType>
+    void AddRefSchema(SchemaType* schema, const ValueType& v) {
+        if (v.IsString()) {
+            GenericPointer<ValueType> pointer(v.GetString(), v.GetStringLength());
+            if (pointer.IsValid())
+                new (schemaRef_.template Push<SchemaEntry<ValueType> >()) SchemaEntry<ValueType>(pointer, schema);
+        }
+    }
 
-    SchemaType* root_;
-    SchemaType** schemas_;
-    size_t schemaCount_;
-    internal::Stack<Allocator> schemaMap_; // Stores SchemaEntry<ValueType>
+    static const size_t kInitialSchemaMapSize = 1024;
+    static const size_t kInitialSchemaRefSize = 1024;
+
+    SchemaType* root_;                      //!< Root schema.
+    SchemaType** schemas_;                  //!< ALl schemas are owned by SchemaDocument
+    size_t schemaCount_;                    //!< Number of schemas owned
+    internal::Stack<Allocator> schemaMap_;  // Stores created Pointer -> Schemas
+    internal::Stack<Allocator> schemaRef_;  // Stores Pointer from $ref and schema which holds the $ref
 };
 
 typedef GenericSchemaDocument<UTF8<> > SchemaDocument;
@@ -974,6 +1026,8 @@ public:
                 static_cast<GenericSchemaValidator*>(context->oneOfValidators.validators[i_])->method arg2;\
         if (context->notValidator)\
             static_cast<GenericSchemaValidator*>(context->notValidator)->method arg2;\
+        if (context->refValidator)\
+            static_cast<GenericSchemaValidator*>(context->refValidator)->method arg2;\
         if (context->dependencyValidators.validators)\
             for (SizeType i_ = 0; i_ < context->dependencyValidators.count; i_++)\
                 if (context->dependencyValidators.validators[i_])\
