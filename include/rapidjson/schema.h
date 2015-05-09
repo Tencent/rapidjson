@@ -42,16 +42,8 @@ RAPIDJSON_DIAG_OFF(effc++)
 
 RAPIDJSON_NAMESPACE_BEGIN
 
-enum SchemaValueType {
-    kNullSchemaType,
-    kBooleanSchemaType,
-    kObjectSchemaType,
-    kArraySchemaType,
-    kStringSchemaType,
-    kNumberSchemaType,
-    kIntegerSchemaType,
-    kTotalSchemaType
-};
+///////////////////////////////////////////////////////////////////////////////
+// Forward declarations
 
 template <typename Encoding, typename Allocator>
 class Schema;
@@ -59,8 +51,8 @@ class Schema;
 template <typename Encoding, typename Allocator>
 class GenericSchemaDocument;
 
-template <typename Encoding, typename OutputHandler, typename StateAllocator>
-class GenericSchemaValidator;
+///////////////////////////////////////////////////////////////////////////////
+// ISchemaValidator
 
 class ISchemaValidator {
 public:
@@ -68,12 +60,18 @@ public:
     virtual bool IsValid() const = 0;
 };
 
+///////////////////////////////////////////////////////////////////////////////
+// ISchemaValidatorFactory
+
 template <typename SchemaType>
 class ISchemaValidatorFactory {
 public:
     virtual ~ISchemaValidatorFactory() {}
     virtual ISchemaValidator* CreateSchemaValidator(const SchemaType&) const = 0;
 };
+
+///////////////////////////////////////////////////////////////////////////////
+// SchemaValidatorArray
 
 struct SchemaValidatorArray {
     SchemaValidatorArray() : validators(), count() {}
@@ -87,6 +85,9 @@ struct SchemaValidatorArray {
     SizeType count;
 };
 
+///////////////////////////////////////////////////////////////////////////////
+// SchemaArray
+
 template <typename Encoding, typename Allocator>
 struct SchemaArray {
     SchemaArray() : schemas(), count() {}
@@ -94,21 +95,23 @@ struct SchemaArray {
         delete[] schemas;
     }
 
-    Schema<Encoding, Allocator>** schemas;
+    const Schema<Encoding, Allocator>** schemas;
     SizeType count;
 };
 
-enum PatternValidatorType {
-    kPatternValidatorOnly,
-    kPatternValidatorWithProperty,
-    kPatternValidatorWithAdditionalProperty
-};
+///////////////////////////////////////////////////////////////////////////////
+// SchemaValidationContext
 
 template <typename Encoding, typename Allocator>
 struct SchemaValidationContext {
     typedef Schema<Encoding, Allocator> SchemaType;
-    typedef GenericSchemaValidator<SchemaType, BaseReaderHandler<>, CrtAllocator> SchemaValidatorType;
     typedef ISchemaValidatorFactory<SchemaType> SchemaValidatorFactoryType;
+
+    enum PatternValidatorType {
+        kPatternValidatorOnly,
+        kPatternValidatorWithProperty,
+        kPatternValidatorWithAdditionalProperty
+    };
 
     SchemaValidationContext(const SchemaValidatorFactoryType* f, const SchemaType* s) :
         factory(f),
@@ -151,6 +154,9 @@ struct SchemaValidationContext {
     bool inArray;
 };
 
+///////////////////////////////////////////////////////////////////////////////
+// Schema
+
 template <typename Encoding, typename Allocator>
 class Schema {
 public:
@@ -160,10 +166,10 @@ public:
     typedef GenericSchemaDocument<Encoding, Allocator> SchemaDocumentType;
     typedef Schema<Encoding, Allocator> SchemaType;
     typedef GenericValue<Encoding, Allocator> ValueType;
-    typedef GenericPointer<ValueType> PointerType;
+    // typedef GenericPointer<ValueType> PointerType;
     friend class GenericSchemaDocument<Encoding, Allocator>;
 
-    template <typename ValueType>
+    template <typename ValueType, typename PointerType>
     Schema(SchemaDocumentType* document, const PointerType& p, const ValueType& value) :
         not_(),
         ref_(),
@@ -334,7 +340,7 @@ public:
                 itemsList_ = document->CreateSchema(p, *v);
             else if (v->IsArray()) { // Tuple validation
                 PointerType q = p.Append("items");
-                itemsTuple_ = new Schema*[v->Size()];
+                itemsTuple_ = new const Schema*[v->Size()];
                 SizeType index = 0;
                 for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr, index++)
                     itemsTuple_[itemsTupleCount_++] = document->CreateSchema(q.Append(index), *itr);
@@ -416,7 +422,7 @@ public:
         if (context.patternPropertiesValidators.count > 0) {
             bool otherValid = false;
             SizeType count = context.patternPropertiesValidators.count;
-            if (context.objectPatternValidatorType != kPatternValidatorOnly)
+            if (context.objectPatternValidatorType != Context::kPatternValidatorOnly)
                 otherValid = context.patternPropertiesValidators.validators[--count]->IsValid();
 
             bool patternValid = true;
@@ -426,11 +432,11 @@ public:
                     break;
                 }
 
-            if (context.objectPatternValidatorType == kPatternValidatorOnly) {
+            if (context.objectPatternValidatorType == Context::kPatternValidatorOnly) {
                 if (!patternValid)
                     return false;
             }
-            else if (context.objectPatternValidatorType == kPatternValidatorWithProperty) {
+            else if (context.objectPatternValidatorType == Context::kPatternValidatorWithProperty) {
                 if (!patternValid || !otherValid)
                     return false;
             }
@@ -579,7 +585,7 @@ public:
             if (context.patternPropertiesSchemaCount > 0) {
                 context.patternPropertiesSchemas[context.patternPropertiesSchemaCount++] = propertySchema;
                 context.valueSchema = GetTypeless();
-                context.valuePatternValidatorType = kPatternValidatorWithProperty;
+                context.valuePatternValidatorType = Context::kPatternValidatorWithProperty;
             }
             else
                 context.valueSchema = propertySchema;
@@ -597,7 +603,7 @@ public:
             if (additionalPropertiesSchema_ && context.patternPropertiesSchemaCount > 0) {
                 context.patternPropertiesSchemas[context.patternPropertiesSchemaCount++] = additionalPropertiesSchema_;
                 context.valueSchema = GetTypeless();
-                context.valuePatternValidatorType = kPatternValidatorWithAdditionalProperty;
+                context.valuePatternValidatorType = Context::kPatternValidatorWithAdditionalProperty;
             }
             else
                 context.valueSchema = additionalPropertiesSchema_;
@@ -648,18 +654,27 @@ public:
     }
 
 private:
+    enum SchemaValueType {
+        kNullSchemaType,
+        kBooleanSchemaType,
+        kObjectSchemaType,
+        kArraySchemaType,
+        kStringSchemaType,
+        kNumberSchemaType,
+        kIntegerSchemaType,
+        kTotalSchemaType
+    };
+
 #if RAPIDJSON_SCHEMA_USE_STDREGEX
         typedef std::basic_regex<Ch> RegexType;
 #else
         typedef char RegexType;
 #endif
 
-    typedef GenericSchemaValidator<Encoding, BaseReaderHandler<>, CrtAllocator> SchemaValidatorType;
     typedef SchemaArray<Encoding, Allocator> SchemaArrayType;
-    typedef SchemaValidatorArray SchemaValidatorArrayType;
 
     static const SchemaType* GetTypeless() {
-        static SchemaType typeless(0, PointerType(), Value(kObjectType).Move());
+        static SchemaType typeless(0, Pointer(), Value(kObjectType).Move());
         return &typeless;
     }
 
@@ -692,13 +707,13 @@ private:
                 out = static_cast<SizeType>(v->GetUint64());
     }
 
-    template <typename DocumentType, typename ValueType>
+    template <typename DocumentType, typename ValueType, typename PointerType>
     static void AssigIfExist(SchemaArrayType& out, const DocumentType& document, const PointerType& p, const ValueType& value, const char* name) {
         if (const ValueType* v = GetMember(value, name)) {
             if (v->IsArray() && v->Size() > 0) {
                 PointerType q = p.Append(name);
                 out.count = v->Size();
-                out.schemas = new Schema*[out.count];
+                out.schemas = new const Schema*[out.count];
                 memset(out.schemas, 0, sizeof(Schema*)* out.count);
                 for (SizeType i = 0; i < out.count; i++)
                     out.schemas[i] = document->CreateSchema(q.Append(i), (*v)[i]);
@@ -763,7 +778,7 @@ private:
         }
     }
 
-    void CreateSchemaValidators(Context& context, SchemaValidatorArrayType& validators, const SchemaArrayType& schemas) const {
+    void CreateSchemaValidators(Context& context, SchemaValidatorArray& validators, const SchemaArrayType& schemas) const {
         if (!validators.validators) {
             validators.validators = new ISchemaValidator*[schemas.count];
             validators.count = schemas.count;
@@ -820,8 +835,8 @@ private:
     struct PatternProperty {
         PatternProperty() : schema(), pattern() {}
         ~PatternProperty() { delete pattern; }
-        SchemaType* schema;
-        RegexType* pattern;
+        const SchemaType* schema;
+        const RegexType* pattern;
     };
 
     Allocator allocator_;
@@ -829,12 +844,12 @@ private:
     SchemaArrayType allOf_;
     SchemaArrayType anyOf_;
     SchemaArrayType oneOf_;
-    SchemaType* not_;
-    SchemaType* ref_;
+    const SchemaType* not_;
+    const SchemaType* ref_;
     unsigned type_; // bitmask of kSchemaType
 
     Property* properties_;
-    SchemaType* additionalPropertiesSchema_;
+    const SchemaType* additionalPropertiesSchema_;
     PatternProperty* patternProperties_;
     SizeType patternPropertyCount_;
     SizeType propertyCount_;
@@ -845,15 +860,15 @@ private:
     bool hasDependencies_;
     bool hasSchemaDependencies_;
 
-    SchemaType* additionalItemsSchema_;
-    SchemaType* itemsList_;
-    SchemaType** itemsTuple_;
+    const SchemaType* additionalItemsSchema_;
+    const SchemaType* itemsList_;
+    const SchemaType** itemsTuple_;
     SizeType itemsTupleCount_;
     SizeType minItems_;
     SizeType maxItems_;
     bool additionalItems_;
 
-    RegexType* pattern_;
+    const RegexType* pattern_;
     SizeType minLength_;
     SizeType maxLength_;
 
@@ -864,6 +879,9 @@ private:
     bool exclusiveMinimum_;
     bool exclusiveMaximum_;
 };
+
+///////////////////////////////////////////////////////////////////////////////
+// GenericSchemaDocument
 
 template <typename Encoding, typename Allocator = MemoryPoolAllocator<> >
 class GenericSchemaDocument {
@@ -930,7 +948,7 @@ private:
     };
 
     template <typename ValueType>
-    SchemaType* CreateSchema(const GenericPointer<ValueType>& pointer, const ValueType& v) {
+    const SchemaType* CreateSchema(const GenericPointer<ValueType>& pointer, const ValueType& v) {
         RAPIDJSON_ASSERT(pointer.IsValid());
         SchemaType* schema = new SchemaType(this, pointer, v);
         new (schemaMap_.template Push<SchemaEntry<ValueType> >()) SchemaEntry<ValueType>(pointer, schema);
@@ -950,7 +968,7 @@ private:
     static const size_t kInitialSchemaMapSize = 1024;
     static const size_t kInitialSchemaRefSize = 1024;
 
-    SchemaType* root_;                      //!< Root schema.
+    const SchemaType* root_;                //!< Root schema.
     SchemaType** schemas_;                  //!< ALl schemas are owned by SchemaDocument
     size_t schemaCount_;                    //!< Number of schemas owned
     internal::Stack<Allocator> schemaMap_;  // Stores created Pointer -> Schemas
@@ -958,6 +976,9 @@ private:
 };
 
 typedef GenericSchemaDocument<UTF8<> > SchemaDocument;
+
+///////////////////////////////////////////////////////////////////////////////
+// GenericSchemaValidator
 
 template <typename SchemaType, typename OutputHandler = BaseReaderHandler<typename SchemaType::EncodingType>, typename StateAllocator = CrtAllocator >
 class GenericSchemaValidator : public ISchemaValidatorFactory<SchemaType>, public ISchemaValidator {
@@ -1124,7 +1145,7 @@ private:
 
             SizeType count = CurrentContext().patternPropertiesSchemaCount;
             const SchemaType** sa = CurrentContext().patternPropertiesSchemas;
-            PatternValidatorType patternValidatorType = CurrentContext().valuePatternValidatorType;
+            typename Context::PatternValidatorType patternValidatorType = CurrentContext().valuePatternValidatorType;
 
             if (CurrentContext().valueSchema)
                 PushSchema(*CurrentContext().valueSchema);
