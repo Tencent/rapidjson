@@ -45,12 +45,12 @@ RAPIDJSON_NAMESPACE_BEGIN
 ///////////////////////////////////////////////////////////////////////////////
 // Forward declarations
 
-template <typename Encoding, typename Allocator>
+template <typename ValueType, typename Allocator>
 class GenericSchemaDocument;
 
 namespace internal {
 
-template <typename Encoding, typename Allocator>
+template <typename SchemaDocumentType>
 class Schema;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,9 +75,9 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 // SchemaValidationContext
 
-template <typename Encoding, typename Allocator>
+template <typename SchemaDocumentType>
 struct SchemaValidationContext {
-    typedef Schema<Encoding, Allocator> SchemaType;
+    typedef Schema<SchemaDocumentType> SchemaType;
     typedef ISchemaValidatorFactory<SchemaType> SchemaValidatorFactoryType;
 
     enum PatternValidatorType {
@@ -142,19 +142,18 @@ struct SchemaValidationContext {
 ///////////////////////////////////////////////////////////////////////////////
 // Schema
 
-template <typename Encoding, typename Allocator>
+template <typename SchemaDocumentType>
 class Schema {
 public:
-    typedef Encoding EncodingType;
-    typedef typename Encoding::Ch Ch;
-    typedef SchemaValidationContext<Encoding, Allocator> Context;
-    typedef GenericSchemaDocument<Encoding, Allocator> SchemaDocumentType;
-    typedef Schema<Encoding, Allocator> SchemaType;
-    typedef GenericValue<Encoding, Allocator> ValueType;
-    // typedef GenericPointer<ValueType> PointerType;
-    friend class GenericSchemaDocument<Encoding, Allocator>;
+    typedef typename SchemaDocumentType::ValueType ValueType;
+    typedef typename SchemaDocumentType::AllocatorType AllocatorType;
+    typedef typename SchemaDocumentType::PointerType PointerType;
+    typedef typename ValueType::EncodingType EncodingType;
+    typedef typename EncodingType::Ch Ch;
+    typedef SchemaValidationContext<SchemaDocumentType> Context;
+    typedef Schema<SchemaDocumentType> SchemaType;
+    friend SchemaDocumentType;
 
-    template <typename ValueType, typename PointerType>
     Schema(SchemaDocumentType* document, const PointerType& p, const ValueType& value) :
         not_(),
         ref_(),
@@ -187,6 +186,7 @@ public:
         exclusiveMinimum_(false),
         exclusiveMaximum_(false)
     {
+        typedef typename SchemaDocumentType::ValueType ValueType;
         typedef typename ValueType::ConstValueIterator ConstValueIterator;
         typedef typename ValueType::ConstMemberIterator ConstMemberIterator;
 
@@ -223,7 +223,7 @@ public:
         const ValueType* dependencies = GetMember(value, "dependencies");
         {
             // Gather properties from properties/required/dependencies
-            typedef GenericValue<Encoding, MemoryPoolAllocator<> > SValue;
+            typedef ValueType SValue;
             SValue allProperties(kArrayType);
 
             if (properties && properties->IsObject())
@@ -465,14 +465,14 @@ public:
         CreateParallelValidator(context);
         return
             (type_ & (1 << kNullSchemaType)) &&
-            (!enum_.IsArray() || CheckEnum(GenericValue<Encoding>().Move()));
+            (!enum_.IsArray() || CheckEnum(ValueType().Move()));
     }
     
     bool Bool(Context& context, bool b) const { 
         CreateParallelValidator(context);
         return
             (type_ & (1 << kBooleanSchemaType)) &&
-            (!enum_.IsArray() || CheckEnum(GenericValue<Encoding>(b).Move()));
+            (!enum_.IsArray() || CheckEnum(ValueType(b).Move()));
     }
 
     bool Int(Context& context, int i) const {
@@ -480,7 +480,7 @@ public:
         if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
             return false;
 
-        return CheckDouble(i) && (!enum_.IsArray() || CheckEnum(GenericValue<Encoding>(i).Move()));
+        return CheckDouble(i) && (!enum_.IsArray() || CheckEnum(ValueType(i).Move()));
     }
 
     bool Uint(Context& context, unsigned u) const {
@@ -488,7 +488,7 @@ public:
         if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
             return false;
 
-        return CheckDouble(u) && (!enum_.IsArray() || CheckEnum(GenericValue<Encoding>(u).Move()));
+        return CheckDouble(u) && (!enum_.IsArray() || CheckEnum(ValueType(u).Move()));
     }
 
     bool Int64(Context& context, int64_t i) const {
@@ -496,7 +496,7 @@ public:
         if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
             return false;
 
-        return CheckDouble(i) && (!enum_.IsArray() || CheckEnum(GenericValue<Encoding>(i).Move()));
+        return CheckDouble(i) && (!enum_.IsArray() || CheckEnum(ValueType(i).Move()));
     }
 
     bool Uint64(Context& context, uint64_t u) const {
@@ -504,7 +504,7 @@ public:
         if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
             return false;
 
-        return CheckDouble(u) && (!enum_.IsArray() || CheckEnum(GenericValue<Encoding>(u).Move()));
+        return CheckDouble(u) && (!enum_.IsArray() || CheckEnum(ValueType(u).Move()));
     }
 
     bool Double(Context& context, double d) const {
@@ -512,7 +512,7 @@ public:
         if ((type_ & (1 << kNumberSchemaType)) == 0)
             return false;
 
-        return CheckDouble(d) && (!enum_.IsArray() || CheckEnum(GenericValue<Encoding>(d).Move()));
+        return CheckDouble(d) && (!enum_.IsArray() || CheckEnum(ValueType(d).Move()));
     }
     
     bool String(Context& context, const Ch* str, SizeType length, bool) const {
@@ -525,14 +525,14 @@ public:
         //    return false;
         if (minLength_ != 0 || maxLength_ != SizeType(~0)) {
             SizeType count;
-            if (internal::CountStringCodePoint<Encoding>(str, length, &count) && (count < minLength_ || count > maxLength_))
+            if (internal::CountStringCodePoint<EncodingType>(str, length, &count) && (count < minLength_ || count > maxLength_))
                 return false;
         }
 
         if (pattern_ && !IsPatternMatch(pattern_, str, length))
             return false;
 
-        return !enum_.IsArray() || CheckEnum(GenericValue<Encoding>(str, length).Move());
+        return !enum_.IsArray() || CheckEnum(ValueType(str, length).Move());
     }
 
     bool StartObject(Context& context) const { 
@@ -659,7 +659,7 @@ private:
     struct SchemaArray {
         SchemaArray() : schemas(), count() {}
         ~SchemaArray() { delete[] schemas; }
-        const Schema<Encoding, Allocator>** schemas;
+        const SchemaType** schemas;
         SizeType count;
     };
 
@@ -744,8 +744,8 @@ private:
         else if (type == "number" ) type_ |= (1 << kNumberSchemaType) | (1 << kIntegerSchemaType);
     }
 
-    bool CheckEnum(const GenericValue<Encoding>& v) const {
-        for (typename GenericValue<Encoding>::ConstValueIterator itr = enum_.Begin(); itr != enum_.End(); ++itr)
+    bool CheckEnum(const ValueType& v) const {
+        for (typename ValueType::ConstValueIterator itr = enum_.Begin(); itr != enum_.End(); ++itr)
             if (v == *itr)
                 return true;
         return false;
@@ -814,7 +814,7 @@ private:
     struct Property {
         Property() : schema(), dependenciesSchema(), dependencies(), required(false), typeless(true) {}
         ~Property() { delete[] dependencies; }
-        GenericValue<Encoding> name;
+        ValueType name;
         const SchemaType* schema;
         const SchemaType* dependenciesSchema;
         bool* dependencies;
@@ -829,8 +829,8 @@ private:
         const RegexType* pattern;
     };
 
-    Allocator allocator_;
-    GenericValue<Encoding> enum_;
+    AllocatorType allocator_;
+    ValueType enum_;
     SchemaArray allOf_;
     SchemaArray anyOf_;
     SchemaArray oneOf_;
@@ -873,19 +873,41 @@ private:
 } // namespace internal
 
 ///////////////////////////////////////////////////////////////////////////////
+// IGenericRemoteSchemaDocumentProvider
+
+template <typename ValueType, typename Allocator = MemoryPoolAllocator<> >
+class IGenericRemoteSchemaDocumentProvider {
+public:
+    typedef GenericSchemaDocument<ValueType, Allocator> SchemaDocumentType;
+    typedef typename ValueType::Ch Ch;
+
+    virtual ~IGenericRemoteSchemaDocumentProvider() {}
+    virtual SchemaDocumentType* GetRemoteDocument(const Ch* uri, SizeType length) = 0;
+};
+
+typedef IGenericRemoteSchemaDocumentProvider<Value> IRemoteSchemaDocumentProvider;
+
+///////////////////////////////////////////////////////////////////////////////
 // GenericSchemaDocument
 
-template <typename Encoding, typename Allocator = MemoryPoolAllocator<> >
+template <typename ValueT, typename Allocator = MemoryPoolAllocator<> >
 class GenericSchemaDocument {
 public:
-    typedef internal::Schema<Encoding, Allocator> SchemaType;
-    friend class internal::Schema<Encoding, Allocator>;
+    typedef ValueT ValueType;
+    typedef IGenericRemoteSchemaDocumentProvider<ValueType, Allocator> IRemoteSchemaDocumentProviderType;
+    typedef Allocator AllocatorType;
+    typedef typename ValueType::EncodingType EncodingType;
+    typedef typename EncodingType::Ch Ch;
+    typedef internal::Schema<GenericSchemaDocument> SchemaType;
+    typedef GenericPointer<ValueType> PointerType;
+    friend class internal::Schema<GenericSchemaDocument>;
 
-    template <typename DocumentType>
-    GenericSchemaDocument(const DocumentType& document, Allocator* allocator = 0) : root_(), schemas_(), schemaCount_(), schemaMap_(allocator, kInitialSchemaMapSize), schemaRef_(allocator, kInitialSchemaRefSize) {
-        typedef typename DocumentType::ValueType ValueType;
-        typedef SchemaEntry<ValueType> SchemaEntryType;
-        typedef GenericPointer<ValueType> PointerType;
+    GenericSchemaDocument(const ValueType& document, IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) : 
+        remoteProvider_(remoteProvider),
+        root_(),
+        schemaMap_(allocator, kInitialSchemaMapSize),
+        schemaRef_(allocator, kInitialSchemaRefSize)
+    {
         
         // Generate root schema, it will call CreateSchema() to create sub-schemas,
         // And call AddRefSchema() if there are $ref.
@@ -893,13 +915,13 @@ public:
 
         // Resolve $ref
         while (!schemaRef_.Empty()) {
-            SchemaEntryType* refEntry = schemaRef_.template Pop<SchemaEntryType>(1);
+            SchemaEntry* refEntry = schemaRef_.template Pop<SchemaEntry>(1);
             PointerType p = refEntry->pointer;      // Due to re-entrance,
             SchemaType* source = refEntry->schema;  // backup the entry first,
-            refEntry->~SchemaEntryType();           // and then destruct it.
+            refEntry->~SchemaEntry();           // and then destruct it.
 
             bool resolved = false;
-            for (SchemaEntryType* target = schemaMap_.template Bottom<SchemaEntryType>(); target <= schemaMap_.template Top<SchemaEntryType>(); ++target)
+            for (SchemaEntry* target = schemaMap_.template Bottom<SchemaEntry>(); target <= schemaMap_.template Top<SchemaEntry>(); ++target)
                 if (p == target->pointer) {
                     source->ref_ = target->schema;
                     resolved = true;
@@ -911,73 +933,89 @@ public:
                 if (const ValueType* v = p.Get(document)) 
                     source->ref_ = CreateSchema(p, *v); // cause re-entrance (modifying schemaRef_)
             }
-        }
 
-        // Copy to schemas_ and destroy schemaMap_ entries.
-        schemas_ = new SchemaType*[schemaCount_];
-        size_t i = schemaCount_;
-        while (!schemaMap_.Empty()) {
-            SchemaEntryType* e = schemaMap_.template Pop<SchemaEntryType>(1);
-            schemas_[--i] = e->schema;
-            e->~SchemaEntryType();
         }
     }
 
     ~GenericSchemaDocument() {
-        for (size_t i = 0; i < schemaCount_; i++)
-            delete schemas_[i];
-        delete [] schemas_;
+        while (!schemaMap_.Empty()) {
+            SchemaEntry* e = schemaMap_.template Pop<SchemaEntry>(1);
+            delete e->schema;
+            e->~SchemaEntry();
+        }
     }
 
     const SchemaType& GetRoot() const { return *root_; }
 
 private:
-    template <typename ValueType>
     struct SchemaEntry {
         SchemaEntry(const GenericPointer<ValueType>& p, SchemaType* s) : pointer(p), schema(s) {}
         GenericPointer<ValueType> pointer;
         SchemaType* schema;
     };
 
-    template <typename ValueType>
     const SchemaType* CreateSchema(const GenericPointer<ValueType>& pointer, const ValueType& v) {
         RAPIDJSON_ASSERT(pointer.IsValid());
         SchemaType* schema = new SchemaType(this, pointer, v);
-        new (schemaMap_.template Push<SchemaEntry<ValueType> >()) SchemaEntry<ValueType>(pointer, schema);
-        schemaCount_++;
+        new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(pointer, schema);
         return schema;
     }
 
-    template <typename ValueType>
     void AddRefSchema(SchemaType* schema, const ValueType& v) {
         if (v.IsString()) {
-            GenericPointer<ValueType> pointer(v.GetString(), v.GetStringLength());
-            if (pointer.IsValid())
-                new (schemaRef_.template Push<SchemaEntry<ValueType> >()) SchemaEntry<ValueType>(pointer, schema);
+            SizeType len = v.GetStringLength();
+            if (len > 0) {
+                const Ch* s = v.GetString();
+                SizeType i = 0;
+                while (i < len && s[i] != '#') // Find the first #
+                    i++;
+
+                if (s[i] == '#') {
+                    if (i > 0) { // Remote reference, resolve immediately
+                        if (remoteProvider_) {
+                            GenericSchemaDocument* remoteDocument = remoteProvider_->GetRemoteDocument(s, i);
+                            GenericPointer<ValueType> pointer(s, len - i);
+                            schema->ref_ = remoteDocument->GetSchema(pointer);
+                        }
+                    }
+                    else { // Local reference, defer resolution
+                        GenericPointer<ValueType> pointer(v.GetString(), v.GetStringLength());
+                        if (pointer.IsValid())
+                            new (schemaRef_.template Push<SchemaEntry>()) SchemaEntry(pointer, schema);
+                    }
+                }
+            }
         }
+    }
+
+    const SchemaType* GetSchema(const GenericPointer<ValueType>& pointer) {
+        (void)pointer;
+        return 0;
     }
 
     static const size_t kInitialSchemaMapSize = 1024;
     static const size_t kInitialSchemaRefSize = 1024;
 
+    IRemoteSchemaDocumentProviderType* remoteProvider_;
     const SchemaType* root_;                //!< Root schema.
-    SchemaType** schemas_;                  //!< ALl schemas are owned by SchemaDocument
-    size_t schemaCount_;                    //!< Number of schemas owned
     internal::Stack<Allocator> schemaMap_;  // Stores created Pointer -> Schemas
     internal::Stack<Allocator> schemaRef_;  // Stores Pointer from $ref and schema which holds the $ref
 };
 
-typedef GenericSchemaDocument<UTF8<> > SchemaDocument;
+typedef GenericSchemaDocument<Value> SchemaDocument;
 
 ///////////////////////////////////////////////////////////////////////////////
 // GenericSchemaValidator
 
-template <typename SchemaType, typename OutputHandler = BaseReaderHandler<typename SchemaType::EncodingType>, typename StateAllocator = CrtAllocator >
-class GenericSchemaValidator : public internal::ISchemaValidatorFactory<SchemaType>, public internal::ISchemaValidator {
+template <typename SchemaDocumentType, typename OutputHandler = BaseReaderHandler<typename SchemaDocumentType::SchemaType::EncodingType>, typename StateAllocator = CrtAllocator >
+class GenericSchemaValidator :
+    public internal::ISchemaValidatorFactory<typename SchemaDocumentType::SchemaType>, 
+    public internal::ISchemaValidator
+{
 public:
+    typedef typename SchemaDocumentType::SchemaType SchemaType;
     typedef typename SchemaType::EncodingType EncodingType;
     typedef typename EncodingType::Ch Ch;
-    typedef GenericSchemaDocument<EncodingType> SchemaDocumentType;
 
     GenericSchemaValidator(
         const SchemaDocumentType& schemaDocument,
@@ -1176,7 +1214,7 @@ private:
     bool valid_;
 };
 
-typedef GenericSchemaValidator<SchemaDocument::SchemaType> SchemaValidator;
+typedef GenericSchemaValidator<SchemaDocument> SchemaValidator;
 
 RAPIDJSON_NAMESPACE_END
 
