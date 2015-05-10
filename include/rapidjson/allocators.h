@@ -143,11 +143,13 @@ public:
 
     //! Deallocates all memory chunks, excluding the user-supplied buffer.
     void Clear() {
-        while(chunkHead_ != 0 && chunkHead_ != userBuffer_) {
+        while (chunkHead_ && chunkHead_ != userBuffer_) {
             ChunkHeader* next = chunkHead_->next;
             baseAllocator_->Free(chunkHead_);
             chunkHead_ = next;
         }
+        if (chunkHead_ && chunkHead_ == userBuffer_)
+            chunkHead_->size = 0; // Clear user buffer
     }
 
     //! Computes the total capacity of allocated memory chunks.
