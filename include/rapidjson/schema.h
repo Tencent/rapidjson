@@ -171,6 +171,7 @@ template <typename SchemaDocumentType>
 struct SchemaValidationContext {
     typedef Schema<SchemaDocumentType> SchemaType;
     typedef ISchemaValidatorFactory<SchemaType> SchemaValidatorFactoryType;
+    typedef Hasher<typename SchemaDocumentType::ValueType, typename SchemaDocumentType::AllocatorType> HasherType;
 
     enum PatternValidatorType {
         kPatternValidatorOnly,
@@ -194,6 +195,7 @@ struct SchemaValidationContext {
         factory(f),
         schema(s),
         valueSchema(),
+        hasher(),
         patternPropertiesSchemas(),
         notValidator(),
         refValidator(),
@@ -205,6 +207,7 @@ struct SchemaValidationContext {
     }
 
     ~SchemaValidationContext() {
+        delete hasher;
         delete notValidator;
         delete refValidator;
         delete[] patternPropertiesSchemas;
@@ -214,6 +217,7 @@ struct SchemaValidationContext {
     const SchemaValidatorFactoryType* factory;
     const SchemaType* schema;
     const SchemaType* valueSchema;
+    HasherType* hasher;
     SchemaValidatorArray allOfValidators;
     SchemaValidatorArray anyOfValidators;
     SchemaValidatorArray oneOfValidators;
@@ -244,9 +248,12 @@ public:
     typedef typename EncodingType::Ch Ch;
     typedef SchemaValidationContext<SchemaDocumentType> Context;
     typedef Schema<SchemaDocumentType> SchemaType;
+    typedef Hasher<ValueType, AllocatorType> HasherType;
     friend class GenericSchemaDocument<ValueType, AllocatorType>;
 
     Schema(SchemaDocumentType* document, const PointerType& p, const ValueType& value) :
+        enum_(),
+        enumCount_(),
         not_(),
         ref_(),
         type_((1 << kTotalSchemaType) - 1), // typeless
@@ -295,8 +302,14 @@ public:
         }
 
         if (const ValueType* v = GetMember(value, "enum"))
-            if (v->IsArray() && v->Size() > 0)
-                enum_.CopyFrom(*v, allocator_);
+            if (v->IsArray() && v->Size() > 0) {
+                enum_ = new uint64_t[v->Size()];
+                for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr) {
+                    HasherType h;
+                    itr->Accept(h);
+                    enum_[enumCount_++] = h.GetHashCode();
+                }
+            }
 
         AssigIfExist(allOf_, document, p, value, "allOf");
         AssigIfExist(anyOf_, document, p, value, "anyOf");
@@ -465,6 +478,7 @@ public:
     }
 
     ~Schema() {
+        delete [] enum_;
         delete [] properties_;
         delete [] patternProperties_;
         delete [] itemsTuple_;
@@ -521,6 +535,15 @@ public:
                 return false;
         }
 
+        if (enum_) {
+            const uint64_t h = context.hasher->GetHashCode();
+            for (SizeType i = 0; i < enumCount_; i++)
+                if (enum_[i] == h)
+                    goto foundEnum;
+            return false;
+            foundEnum:;
+        }
+
         if (allOf_.schemas)
             for (SizeType i = 0; i < allOf_.count; i++)
                 if (!context.allOfValidators.validators[i]->IsValid())
@@ -555,56 +578,47 @@ public:
 
     bool Null(Context& context) const { 
         CreateParallelValidator(context);
-        return
-            (type_ & (1 << kNullSchemaType)) &&
-            (!enum_.IsArray() || CheckEnum(ValueType().Move()));
+        return (type_ & (1 << kNullSchemaType));
     }
     
-    bool Bool(Context& context, bool b) const { 
+    bool Bool(Context& context, bool) const { 
         CreateParallelValidator(context);
-        return
-            (type_ & (1 << kBooleanSchemaType)) &&
-            (!enum_.IsArray() || CheckEnum(ValueType(b).Move()));
+        return (type_ & (1 << kBooleanSchemaType));
     }
 
     bool Int(Context& context, int i) const {
         CreateParallelValidator(context);
         if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
             return false;
-
-        return CheckDouble(i) && (!enum_.IsArray() || CheckEnum(ValueType(i).Move()));
+        return CheckDouble(i);
     }
 
     bool Uint(Context& context, unsigned u) const {
         CreateParallelValidator(context);
         if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
             return false;
-
-        return CheckDouble(u) && (!enum_.IsArray() || CheckEnum(ValueType(u).Move()));
+        return CheckDouble(u);
     }
 
     bool Int64(Context& context, int64_t i) const {
         CreateParallelValidator(context);
         if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
             return false;
-
-        return CheckDouble(i) && (!enum_.IsArray() || CheckEnum(ValueType(i).Move()));
+        return CheckDouble(i);
     }
 
     bool Uint64(Context& context, uint64_t u) const {
         CreateParallelValidator(context);
         if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
             return false;
-
-        return CheckDouble(u) && (!enum_.IsArray() || CheckEnum(ValueType(u).Move()));
+        return CheckDouble(u);
     }
 
     bool Double(Context& context, double d) const {
         CreateParallelValidator(context);
         if ((type_ & (1 << kNumberSchemaType)) == 0)
             return false;
-
-        return CheckDouble(d) && (!enum_.IsArray() || CheckEnum(ValueType(d).Move()));
+        return CheckDouble(d);
     }
     
     bool String(Context& context, const Ch* str, SizeType length, bool) const {
@@ -621,10 +635,7 @@ public:
                 return false;
         }
 
-        if (pattern_ && !IsPatternMatch(pattern_, str, length))
-            return false;
-
-        return !enum_.IsArray() || CheckEnum(ValueType(str, length).Move());
+        return !pattern_ || IsPatternMatch(pattern_, str, length);
     }
 
     bool StartObject(Context& context) const { 
@@ -836,14 +847,9 @@ private:
         else if (type == "number" ) type_ |= (1 << kNumberSchemaType) | (1 << kIntegerSchemaType);
     }
 
-    bool CheckEnum(const ValueType& v) const {
-        for (typename ValueType::ConstValueIterator itr = enum_.Begin(); itr != enum_.End(); ++itr)
-            if (v == *itr)
-                return true;
-        return false;
-    }
-
     void CreateParallelValidator(Context& context) const {
+        if (enum_)
+            context.hasher = new HasherType;
         if (allOf_.schemas) CreateSchemaValidators(context, context.allOfValidators, allOf_);
         if (anyOf_.schemas) CreateSchemaValidators(context, context.anyOfValidators, anyOf_);
         if (oneOf_.schemas) CreateSchemaValidators(context, context.oneOfValidators, oneOf_);
@@ -922,7 +928,8 @@ private:
     };
 
     AllocatorType allocator_;
-    ValueType enum_;
+    uint64_t* enum_;
+    SizeType enumCount_;
     SchemaArray allOf_;
     SchemaArray anyOf_;
     SchemaArray oneOf_;
@@ -1163,6 +1170,8 @@ public:
 
 #define RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(method, arg2)\
     for (Context* context = schemaStack_.template Bottom<Context>(); context != schemaStack_.template End<Context>(); context++) {\
+        if (context->hasher)\
+            context->hasher->method arg2;\
         if (context->allOfValidators.validators)\
             for (SizeType i_ = 0; i_ < context->allOfValidators.count; i_++)\
                 static_cast<GenericSchemaValidator*>(context->allOfValidators.validators[i_])->method arg2;\
