@@ -81,7 +81,7 @@ class Hasher {
 public:
     typedef typename ValueType::Ch Ch;
 
-    Hasher() : stack_(0, kDefaultSize) {}
+    Hasher(Allocator* allocator = 0) : stack_(allocator, kDefaultSize) {}
 
     bool Null() { return WriteType(kNullType); }
     bool Bool(bool b) { return WriteType(b ? kTrueType : kFalseType); }
@@ -96,10 +96,12 @@ public:
         n.d = d;
         return WriteNumber(n);
     }
+
     bool String(const Ch* str, SizeType len, bool) {
         WriteBuffer(kStringType, str, len * sizeof(Ch));
         return true;
     }
+
     bool StartObject() { return true; }
     bool Key(const Ch* str, SizeType len, bool copy) { return String(str, len, copy); }
     bool EndObject(SizeType memberCount) { 
@@ -110,6 +112,7 @@ public:
         *stack_.template Push<uint64_t>() = h;
         return true;
     }
+    
     bool StartArray() { return true; }
     bool EndArray(SizeType elementCount) { 
         uint64_t h = Hash(0, kArrayType);
@@ -120,8 +123,10 @@ public:
         return true;
     }
 
+    bool IsValid() const { return stack_.GetSize() == sizeof(uint64_t); }
+
     uint64_t GetHashCode() const {
-        RAPIDJSON_ASSERT(stack_.GetSize() == sizeof(uint64_t));
+        RAPIDJSON_ASSERT(IsValid());
         return *stack_.template Top<uint64_t>();
     }
 
@@ -135,9 +140,11 @@ private:
         double d;
     };
 
-    bool WriteType(unsigned char type) { WriteBuffer(type, 0, 0); return true; }
-    bool WriteNumber(const Number& n) { WriteBuffer(kNumberType, &n, sizeof(n)); return true; }
-    bool WriteBuffer(unsigned char type, const void* data, size_t len) {
+    bool WriteType(Type type) { return WriteBuffer(type, 0, 0); }
+    
+    bool WriteNumber(const Number& n) { return WriteBuffer(kNumberType, &n, sizeof(n)); }
+    
+    bool WriteBuffer(Type type, const void* data, size_t len) {
         // FNV-1a from http://isthe.com/chongo/tech/comp/fnv/
         uint64_t h = Hash(RAPIDJSON_UINT64_C2(0x84222325, 0xcbf29ce4), type);
         const unsigned char* d = static_cast<const unsigned char*>(data);

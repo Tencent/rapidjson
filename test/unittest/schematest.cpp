@@ -27,6 +27,8 @@ using namespace rapidjson;
     internal::Hasher<Value, CrtAllocator> h1, h2;\
     d1.Accept(h1);\
     d2.Accept(h2);\
+    ASSERT_TRUE(h1.IsValid());\
+    ASSERT_TRUE(h2.IsValid());\
     /*printf("%s: 0x%016llx\n%s: 0x%016llx\n\n", json1, h1.GetHashCode(), json2, h2.GetHashCode());*/\
     EXPECT_TRUE(expected == (h1.GetHashCode() == h2.GetHashCode()));\
 }
