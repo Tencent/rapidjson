@@ -846,6 +846,8 @@ public:
     }
 
 private:
+    RemoteSchemaDocumentProvider(const RemoteSchemaDocumentProvider&);
+    
     static const size_t kCount = 4;
     Document* d_[kCount];
     SchemaDocument* sd_[kCount];
