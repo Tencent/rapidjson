@@ -17,6 +17,75 @@
 
 using namespace rapidjson;
 
+#define TEST_HASHER(json1, json2, expected) \
+{\
+    Document d1, d2;\
+    d1.Parse(json1);\
+    ASSERT_FALSE(d1.HasParseError());\
+    d2.Parse(json2);\
+    ASSERT_FALSE(d2.HasParseError());\
+    internal::Hasher<Value, CrtAllocator> h1, h2;\
+    d1.Accept(h1);\
+    d2.Accept(h2);\
+    printf("%s: 0x%016llx\n%s: 0x%016llx\n\n", json1, h1.GetHashCode(), json2, h2.GetHashCode());\
+    EXPECT_TRUE(expected == (h1.GetHashCode() == h2.GetHashCode()));\
+}
+
+TEST(SchemaValidator, Hasher) {
+    TEST_HASHER("null", "null", true);
+
+    TEST_HASHER("true", "true", true);
+    TEST_HASHER("false", "false", true);
+    TEST_HASHER("true", "false", false);
+    TEST_HASHER("false", "true", false);
+    TEST_HASHER("true", "null", false);
+    TEST_HASHER("false", "null", false);
+
+    TEST_HASHER("1", "1", true);
+    TEST_HASHER("1.5", "1.5", true);
+    TEST_HASHER("1", "1.0", true);
+    TEST_HASHER("1", "-1", false);
+    TEST_HASHER("0.0", "-0.0", false);
+    TEST_HASHER("1", "true", false);
+    TEST_HASHER("0", "false", false);
+    TEST_HASHER("0", "null", false);
+
+    TEST_HASHER("\"\"", "\"\"", true);
+    TEST_HASHER("\"\"", "\"\\u0000\"", false);
+    TEST_HASHER("\"Hello\"", "\"Hello\"", true);
+    TEST_HASHER("\"Hello\"", "\"World\"", false);
+    TEST_HASHER("\"Hello\"", "null", false);
+    TEST_HASHER("\"Hello\\u0000\"", "\"Hello\"", false);
+    TEST_HASHER("\"\"", "null", false);
+    TEST_HASHER("\"\"", "true", false);
+    TEST_HASHER("\"\"", "false", false);
+
+    TEST_HASHER("[]", "[ ]", true);
+    TEST_HASHER("[1, true, false]", "[1, true, false]", true);
+    TEST_HASHER("[1, true, false]", "[1, true]", false);
+    TEST_HASHER("[1, 2]", "[2, 1]", false);
+    TEST_HASHER("[[1], 2]", "[[1, 2]]", false);
+    TEST_HASHER("[1, 2]", "[1, [2]]", false);
+    TEST_HASHER("[]", "null", false);
+    TEST_HASHER("[]", "true", false);
+    TEST_HASHER("[]", "false", false);
+    TEST_HASHER("[]", "0", false);
+    TEST_HASHER("[]", "0.0", false);
+    TEST_HASHER("[]", "\"\"", false);
+
+    TEST_HASHER("{}", "{ }", true);
+    TEST_HASHER("{\"a\":1}", "{\"a\":1}", true);
+    TEST_HASHER("{\"a\":1}", "{\"b\":1}", false);
+    TEST_HASHER("{\"a\":1}", "{\"a\":2}", false);
+    TEST_HASHER("{\"a\":1, \"b\":2}", "{\"b\":2, \"a\":1}", true); // Member order insensitive
+    TEST_HASHER("{}", "null", false);
+    TEST_HASHER("{}", "false", false);
+    TEST_HASHER("{}", "true", false);
+    TEST_HASHER("{}", "0", false);
+    TEST_HASHER("{}", "0.0", false);
+    TEST_HASHER("{}", "\"\"", false);
+}
+
 // Test cases following http://spacetelescope.github.io/understanding-json-schema
 
 #define VALIDATE(schema, json, expected) \

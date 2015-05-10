@@ -73,6 +73,91 @@ public:
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+// Hasher
+
+// For comparison of compound value
+template<typename ValueType, typename Allocator>
+class Hasher {
+public:
+    typedef typename ValueType::Ch Ch;
+
+    Hasher() : stack_(0, kDefaultSize) {}
+
+    bool Null() { return WriteType(kNullType); }
+    bool Bool(bool b) { return WriteType(b ? kTrueType : kFalseType); }
+    bool Int(int i) { Number n; n.u.i = i; n.d = static_cast<double>(i); return WriteNumber(n); }
+    bool Uint(unsigned u) { Number n; n.u.u = u; n.d = static_cast<double>(u); return WriteNumber(n); }
+    bool Int64(int64_t i) { Number n; n.u.i = i; n.d = static_cast<double>(i); return WriteNumber(n); }
+    bool Uint64(uint64_t u) { Number n; n.u.u = u; n.d = static_cast<double>(u); return WriteNumber(n); }
+    bool Double(double d) { 
+        Number n; 
+        if (d < 0) n.u.i = static_cast<int64_t>(d);
+        else       n.u.u = static_cast<uint64_t>(d); 
+        n.d = d;
+        return WriteNumber(n);
+    }
+    bool String(const Ch* str, SizeType len, bool) {
+        WriteBuffer(kStringType, str, len * sizeof(Ch));
+        return true;
+    }
+    bool StartObject() { return true; }
+    bool Key(const Ch* str, SizeType len, bool copy) { return String(str, len, copy); }
+    bool EndObject(SizeType memberCount) { 
+        uint64_t h = Hash(0, kObjectType);
+        uint64_t* kv = stack_.template Pop<uint64_t>(memberCount * 2);
+        for (SizeType i = 0; i < memberCount; i++)
+            h ^= Hash(kv[i * 2], kv[i * 2 + 1]);  // Use xor to achieve member order insensitive
+        *stack_.template Push<uint64_t>() = h;
+        return true;
+    }
+    bool StartArray() { return true; }
+    bool EndArray(SizeType elementCount) { 
+        uint64_t h = Hash(0, kArrayType);
+        uint64_t* e = stack_.template Pop<uint64_t>(elementCount);
+        for (SizeType i = 0; i < elementCount; i++)
+            h = Hash(h, e[i]); // Use hash to achieve element order sensitive
+        *stack_.template Push<uint64_t>() = h;
+        return true;
+    }
+
+    uint64_t GetHashCode() const {
+        RAPIDJSON_ASSERT(stack_.GetSize() == sizeof(uint64_t));
+        return *stack_.template Top<uint64_t>();
+    }
+
+private:
+    static const size_t kDefaultSize = 256;
+    struct Number {
+        union U {
+            uint64_t u;
+            int64_t i;
+        }u;
+        double d;
+    };
+
+    bool WriteType(unsigned char type) { WriteBuffer(type, 0, 0); return true; }
+    bool WriteNumber(const Number& n) { WriteBuffer(kNumberType, &n, sizeof(n)); return true; }
+    bool WriteBuffer(unsigned char type, const void* data, size_t len) {
+        // FNV-1a from http://isthe.com/chongo/tech/comp/fnv/
+        uint64_t h = Hash(RAPIDJSON_UINT64_C2(0x84222325, 0xcbf29ce4), type);
+        const unsigned char* d = static_cast<const unsigned char*>(data);
+        for (size_t i = 0; i < len; i++)
+            h = Hash(h, d[i]);
+        *stack_.template Push<uint64_t>() = h;
+        return true;
+    }
+
+    static uint64_t Hash(uint64_t h, uint64_t d) {
+        static const uint64_t kPrime = RAPIDJSON_UINT64_C2(0x00000100, 0x000001b3);
+        h ^= d;
+        h *= kPrime;
+        return h;
+    }
+
+    Stack<Allocator> stack_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
 // SchemaValidationContext
 
 template <typename SchemaDocumentType>
