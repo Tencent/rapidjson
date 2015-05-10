@@ -664,17 +664,15 @@ TEST(SchemaValidator, Array_ItemsRange) {
     VALIDATE(s, "[1, 2, 3, 4]", false);
 }
 
-#if 0
-// TODO
-TEST(SchemaValidator, Array_Uniqueness) {
+TEST(SchemaValidator, Array_UniqueItems) {
     Document sd;
     sd.Parse("{\"type\": \"array\", \"uniqueItems\": true}");
     SchemaDocument s(sd);
 
     VALIDATE(s, "[1, 2, 3, 4, 5]", true);
-    VALIDATE(s, "[1, 2, 3, 4, 5]", false);
+    VALIDATE(s, "[1, 2, 3, 3, 4]", false);
+    VALIDATE(s, "[]", true);
 }
-#endif
 
 TEST(SchemaValidator, Boolean) {
     Document sd;
@@ -885,7 +883,7 @@ TEST(SchemaValidator, TestSuite) {
         "refRemote.json",
         "required.json",
         "type.json",
-        //"uniqueItems.json"
+        "uniqueItems.json"
     };
 
     const char* onlyRunDescription = 0;

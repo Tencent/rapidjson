@@ -171,7 +171,9 @@ template <typename SchemaDocumentType>
 struct SchemaValidationContext {
     typedef Schema<SchemaDocumentType> SchemaType;
     typedef ISchemaValidatorFactory<SchemaType> SchemaValidatorFactoryType;
-    typedef Hasher<typename SchemaDocumentType::ValueType, typename SchemaDocumentType::AllocatorType> HasherType;
+    typedef GenericValue<UTF8<>, CrtAllocator> HashCodeArray;
+    typedef typename SchemaType::ValueType ValueType;
+    typedef Hasher<ValueType, typename SchemaDocumentType::AllocatorType> HasherType;
 
     enum PatternValidatorType {
         kPatternValidatorOnly,
@@ -191,8 +193,9 @@ struct SchemaValidationContext {
         SizeType count;
     };
 
-    SchemaValidationContext(const SchemaValidatorFactoryType* f, const SchemaType* s) :
+    SchemaValidationContext(const SchemaValidatorFactoryType* f, CrtAllocator* a, const SchemaType* s) :
         factory(f),
+        allocator(a),
         schema(s),
         valueSchema(),
         hasher(),
@@ -202,7 +205,9 @@ struct SchemaValidationContext {
         patternPropertiesSchemaCount(),
         valuePatternValidatorType(kPatternValidatorOnly),
         objectDependencies(),
-        inArray(false)
+        inArray(false),
+        valueUniqueness(false),
+        arrayUniqueness(false)
     {
     }
 
@@ -215,6 +220,7 @@ struct SchemaValidationContext {
     }
 
     const SchemaValidatorFactoryType* factory;
+    CrtAllocator* allocator; // For allocating memory for context
     const SchemaType* schema;
     const SchemaType* valueSchema;
     HasherType* hasher;
@@ -229,10 +235,13 @@ struct SchemaValidationContext {
     SizeType patternPropertiesSchemaCount;
     PatternValidatorType valuePatternValidatorType;
     PatternValidatorType objectPatternValidatorType;
+    HashCodeArray arrayElementHashCodes; // array of uint64_t
     SizeType objectRequiredCount;
     SizeType arrayElementIndex;
     bool* objectDependencies;
     bool inArray;
+    bool valueUniqueness;
+    bool arrayUniqueness;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -275,6 +284,7 @@ public:
         minItems_(),
         maxItems_(SizeType(~0)),
         additionalItems_(true),
+        uniqueItems_(false),
         pattern_(),
         minLength_(0),
         maxLength_(~SizeType(0)),
@@ -447,6 +457,8 @@ public:
                 additionalItemsSchema_ = document->CreateSchema(p.Append("additionalItems"), *v);
         }
 
+        AssignIfExist(uniqueItems_, value, "uniqueItems");
+
         // String
         AssignIfExist(minLength_, value, "minLength");
         AssignIfExist(maxLength_, value, "maxLength");
@@ -489,6 +501,9 @@ public:
 
     bool BeginValue(Context& context) const {
         if (context.inArray) {
+            if (uniqueItems_)
+                context.valueUniqueness = true;
+
             if (itemsList_)
                 context.valueSchema = itemsList_;
             else if (itemsTuple_) {
@@ -730,7 +745,10 @@ public:
         CreateParallelValidator(context);
         if ((type_ & (1 << kArraySchemaType)) == 0)
             return false;
-        
+
+        if (uniqueItems_)        
+            context.arrayElementHashCodes.SetArray();
+
         context.arrayElementIndex = 0;
         context.inArray = true;
         return true;
@@ -848,7 +866,7 @@ private:
     }
 
     void CreateParallelValidator(Context& context) const {
-        if (enum_)
+        if (enum_ || context.arrayUniqueness)
             context.hasher = new HasherType;
         if (allOf_.schemas) CreateSchemaValidators(context, context.allOfValidators, allOf_);
         if (anyOf_.schemas) CreateSchemaValidators(context, context.anyOfValidators, anyOf_);
@@ -956,6 +974,7 @@ private:
     SizeType minItems_;
     SizeType maxItems_;
     bool additionalItems_;
+    bool uniqueItems_;
 
     const RegexType* pattern_;
     SizeType minLength_;
@@ -1282,7 +1301,7 @@ private:
             SizeType count = CurrentContext().patternPropertiesSchemaCount;
             const SchemaType** sa = CurrentContext().patternPropertiesSchemas;
             typename Context::PatternValidatorType patternValidatorType = CurrentContext().valuePatternValidatorType;
-
+            bool valueUniqueness = CurrentContext().valueUniqueness;
             if (CurrentContext().valueSchema)
                 PushSchema(*CurrentContext().valueSchema);
 
@@ -1293,6 +1312,8 @@ private:
                 for (SizeType i = 0; i < count; i++)
                     va.validators[va.count++] = CreateSchemaValidator(*sa[i]);
             }
+
+            CurrentContext().arrayUniqueness = valueUniqueness;
         }
         return true;
     }
@@ -1301,11 +1322,24 @@ private:
         if (!CurrentSchema().EndValue(CurrentContext()))
             return false;
 
+        uint64_t h = CurrentContext().arrayUniqueness ? CurrentContext().hasher->GetHashCode() : 0;
+        
         PopSchema();
+
+        if (!schemaStack_.Empty()) {
+            Context& context = CurrentContext();
+            if (context.valueUniqueness) {
+                for (typename Context::HashCodeArray::ConstValueIterator itr = context.arrayElementHashCodes.Begin(); itr != context.arrayElementHashCodes.End(); ++itr)
+                    if (itr->GetUint64() == h)
+                        return false;
+                context.arrayElementHashCodes.PushBack(h, *context.allocator);
+            }
+        }
+
         return true;
     }
 
-    void PushSchema(const SchemaType& schema) { new (schemaStack_.template Push<Context>()) Context(this, &schema); }
+    void PushSchema(const SchemaType& schema) { new (schemaStack_.template Push<Context>()) Context(this, &contextAllocator_, &schema); }
     void PopSchema() { schemaStack_.template Pop<Context>(1)->~Context(); }
     const SchemaType& CurrentSchema() { return *schemaStack_.template Top<Context>()->schema; }
     Context& CurrentContext() { return *schemaStack_.template Top<Context>(); }
@@ -1315,6 +1349,7 @@ private:
     const SchemaType& root_;
     BaseReaderHandler<EncodingType> nullOutputHandler_;
     OutputHandler& outputHandler_;
+    CrtAllocator contextAllocator_;
     internal::Stack<StateAllocator> schemaStack_;    //!< stack to store the current path of schema (BaseSchemaType *)
     //internal::Stack<Allocator> documentStack_;  //!< stack to store the current path of validating document (Value *)
     bool valid_;
