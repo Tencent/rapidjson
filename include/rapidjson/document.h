@@ -1741,7 +1741,7 @@ public:
     template <unsigned parseFlags, typename SourceEncoding, typename InputStream>
     GenericDocument& ParseStream(InputStream& is) {
         ValueType::SetNull(); // Remove existing root if exist
-        GenericReader<SourceEncoding, Encoding, Allocator> reader(&GetAllocator());
+        GenericReader<SourceEncoding, Encoding, StackAllocator> reader(&stack_.GetAllocator());
         ClearStackOnExit scope(*this);
         parseResult_ = reader.template Parse<parseFlags>(is, *this);
         if (parseResult_) {
