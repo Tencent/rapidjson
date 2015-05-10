@@ -806,7 +806,6 @@ public:
         };
 
         for (size_t i = 0; i < kCount; i++) {
-            d_[i] = 0;
             sd_[i] = 0;
 
             size_t length;
@@ -816,19 +815,17 @@ public:
                 ADD_FAILURE();
             }
             else {
-                d_[i] = new Document;
-                d_[i]->Parse(json);
-                sd_[i] = new SchemaDocument(*d_[i]);
+                Document d(&documentAllocator_);
+                d.Parse(json);
+                sd_[i] = new SchemaDocument(d, 0, &schemaAllocator_);
                 free(json);
             }
         };
     }
 
     ~RemoteSchemaDocumentProvider() {
-        for (size_t i = 0; i < kCount; i++) {
-            delete d_[i];
+        for (size_t i = 0; i < kCount; i++)
             delete sd_[i];
-        }
     }
 
     virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
@@ -850,8 +847,9 @@ private:
     RemoteSchemaDocumentProvider& operator=(const RemoteSchemaDocumentProvider&);
 
     static const size_t kCount = 4;
-    Document* d_[kCount];
     SchemaDocument* sd_[kCount];
+    typename Document::AllocatorType documentAllocator_;
+    typename SchemaDocument::AllocatorType schemaAllocator_;
 };
 
 TEST(SchemaValidator, TestSuite) {
@@ -894,6 +892,11 @@ TEST(SchemaValidator, TestSuite) {
 
     RemoteSchemaDocumentProvider provider;
 
+    char documentBuffer[65536];
+    char schemaBuffer[65536];
+    Document::AllocatorType documentAllocator(documentBuffer, sizeof(documentBuffer));
+    SchemaDocument::AllocatorType schemaAllocator(schemaBuffer, sizeof(schemaBuffer));
+
     for (size_t i = 0; i < sizeof(filenames) / sizeof(filenames[0]); i++) {
         char filename[FILENAME_MAX];
         sprintf(filename, "jsonschema/tests/draft4/%s", filenames[i]);
@@ -904,7 +907,7 @@ TEST(SchemaValidator, TestSuite) {
             ADD_FAILURE();
         }
         else {
-            Document d;
+            Document d(&documentAllocator);
             d.Parse(json);
             if (d.HasParseError()) {
                 printf("json test suite file %s has parse error", filename);
@@ -912,27 +915,32 @@ TEST(SchemaValidator, TestSuite) {
             }
             else {
                 for (Value::ConstValueIterator schemaItr = d.Begin(); schemaItr != d.End(); ++schemaItr) {
-                    SchemaDocument schema((*schemaItr)["schema"], &provider);
-                    SchemaValidator validator(schema);
-                    const char* description1 = (*schemaItr)["description"].GetString();
-                    const Value& tests = (*schemaItr)["tests"];
-                    for (Value::ConstValueIterator testItr = tests.Begin(); testItr != tests.End(); ++testItr) {
-                        const char* description2 = (*testItr)["description"].GetString();
-                        if (!onlyRunDescription || strcmp(description2, onlyRunDescription) == 0) {
-                            const Value& data = (*testItr)["data"];
-                            bool expected = (*testItr)["valid"].GetBool();
-                            testCount++;
-                            validator.Reset();
-                            bool actual = data.Accept(validator);
-                            if (expected != actual)
-                                printf("Fail: %30s \"%s\" \"%s\"\n", filename, description1, description2);
-                            else
-                                passCount++;
+                    {
+                        SchemaDocument schema((*schemaItr)["schema"], &provider, &schemaAllocator);
+                        SchemaValidator validator(schema);
+                        const char* description1 = (*schemaItr)["description"].GetString();
+                        const Value& tests = (*schemaItr)["tests"];
+                        for (Value::ConstValueIterator testItr = tests.Begin(); testItr != tests.End(); ++testItr) {
+                            const char* description2 = (*testItr)["description"].GetString();
+                            if (!onlyRunDescription || strcmp(description2, onlyRunDescription) == 0) {
+                                const Value& data = (*testItr)["data"];
+                                bool expected = (*testItr)["valid"].GetBool();
+                                testCount++;
+                                validator.Reset();
+                                bool actual = data.Accept(validator);
+                                if (expected != actual)
+                                    printf("Fail: %30s \"%s\" \"%s\"\n", filename, description1, description2);
+                                else
+                                    passCount++;
+                            }
                         }
+                        //printf("%zu %zu\n", documentAllocator.Size(), schemaAllocator.Size());
                     }
+                    schemaAllocator.Clear();
                 }
             }
         }
+        documentAllocator.Clear();
         free(json);
     }
     printf("%d / %d passed (%2d%%)\n", passCount, testCount, passCount * 100 / testCount);

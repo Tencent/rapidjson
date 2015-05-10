@@ -258,9 +258,11 @@ public:
     typedef SchemaValidationContext<SchemaDocumentType> Context;
     typedef Schema<SchemaDocumentType> SchemaType;
     typedef Hasher<ValueType, AllocatorType> HasherType;
+    typedef GenericValue<EncodingType, AllocatorType> SValue;
     friend class GenericSchemaDocument<ValueType, AllocatorType>;
 
-    Schema(SchemaDocumentType* document, const PointerType& p, const ValueType& value) :
+    Schema(SchemaDocumentType* document, AllocatorType* allocator, const PointerType& p, const ValueType& value) :
+        allocator_(allocator),
         enum_(),
         enumCount_(),
         not_(),
@@ -313,7 +315,7 @@ public:
 
         if (const ValueType* v = GetMember(value, "enum"))
             if (v->IsArray() && v->Size() > 0) {
-                enum_ = new uint64_t[v->Size()];
+                enum_ = static_cast<uint64_t*>(allocator_->Malloc(sizeof(uint64_t) * v->Size()));
                 for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr) {
                     HasherType h;
                     itr->Accept(h);
@@ -338,7 +340,6 @@ public:
         const ValueType* dependencies = GetMember(value, "dependencies");
         {
             // Gather properties from properties/required/dependencies
-            typedef ValueType SValue;
             SValue allProperties(kArrayType);
 
             if (properties && properties->IsObject())
@@ -361,8 +362,9 @@ public:
 
             if (allProperties.Size() > 0) {
                 propertyCount_ = allProperties.Size();
-                properties_ = new Property[propertyCount_];
+                properties_ = static_cast<Property*>(allocator_->Malloc(sizeof(Property) * propertyCount_));
                 for (SizeType i = 0; i < propertyCount_; i++) {
+                    new (&properties_[i]) Property();
                     properties_[i].name = allProperties[i];
                 }
             }
@@ -381,10 +383,11 @@ public:
 
         if (const ValueType* v = GetMember(value, "patternProperties")) {
             PointerType q = p.Append("patternProperties");
-            patternProperties_ = new PatternProperty[v->MemberCount()];
+            patternProperties_ = static_cast<PatternProperty*>(allocator_->Malloc(sizeof(PatternProperty) * v->MemberCount()));
             patternPropertyCount_ = 0;
 
             for (ConstMemberIterator itr = v->MemberBegin(); itr != v->MemberEnd(); ++itr) {
+                new (&patternProperties_[patternPropertyCount_]) PatternProperty();
                 patternProperties_[patternPropertyCount_].pattern = CreatePattern(itr->name);
                 patternProperties_[patternPropertyCount_].schema = document->CreateSchema(q.Append(itr->name), itr->value);
                 patternPropertyCount_++;
@@ -408,7 +411,7 @@ public:
                 SizeType sourceIndex;
                 if (FindPropertyIndex(itr->name, &sourceIndex)) {
                     if (itr->value.IsArray()) {
-                        properties_[sourceIndex].dependencies = new bool[propertyCount_];
+                        properties_[sourceIndex].dependencies = static_cast<bool*>(allocator_->Malloc(sizeof(bool) * propertyCount_));
                         std::memset(properties_[sourceIndex].dependencies, 0, sizeof(bool)* propertyCount_);
                         for (ConstValueIterator targetItr = itr->value.Begin(); targetItr != itr->value.End(); ++targetItr) {
                             SizeType targetIndex;
@@ -440,7 +443,7 @@ public:
                 itemsList_ = document->CreateSchema(p, *v);
             else if (v->IsArray()) { // Tuple validation
                 PointerType q = p.Append("items");
-                itemsTuple_ = new const Schema*[v->Size()];
+                itemsTuple_ = static_cast<const Schema**>(allocator_->Malloc(sizeof(const Schema*) * v->Size()));
                 SizeType index = 0;
                 for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr, index++)
                     itemsTuple_[itemsTupleCount_++] = document->CreateSchema(q.Append(index), *itr);
@@ -490,12 +493,23 @@ public:
     }
 
     ~Schema() {
-        delete [] enum_;
-        delete [] properties_;
-        delete [] patternProperties_;
-        delete [] itemsTuple_;
+        allocator_->Free(enum_);
+        if (properties_) {
+            for (SizeType i = 0; i < propertyCount_; i++)
+                properties_[i].~Property();
+            AllocatorType::Free(properties_);
+        }
+        if (patternProperties_) {
+            for (SizeType i = 0; i < patternPropertyCount_; i++)
+                patternProperties_[i].~PatternProperty();
+            AllocatorType::Free(patternProperties_);
+        }
+        AllocatorType::Free(itemsTuple_);
 #if RAPIDJSON_SCHEMA_USE_STDREGEX
-        delete pattern_;
+        if (pattern_) {
+            pattern_->~RegexType();
+            allocator_->Free(pattern_);
+        }
 #endif
     }
 
@@ -779,13 +793,13 @@ private:
 
     struct SchemaArray {
         SchemaArray() : schemas(), count() {}
-        ~SchemaArray() { delete[] schemas; }
+        ~SchemaArray() { AllocatorType::Free(schemas); }
         const SchemaType** schemas;
         SizeType count;
     };
 
     static const SchemaType* GetTypeless() {
-        static SchemaType typeless(0, Pointer(), Value(kObjectType).Move());
+        static SchemaType typeless(0, 0, PointerType(), Value(kObjectType).Move());
         return &typeless;
     }
 
@@ -794,8 +808,8 @@ private:
         for (typename V1::ConstValueIterator itr = a.Begin(); itr != a.End(); ++itr)
             if (*itr == v)
                 return;
-        V1 c(v, allocator_);
-        a.PushBack(c, allocator_);
+        V1 c(v, *allocator_);
+        a.PushBack(c, *allocator_);
     }
 
     template <typename ValueType>
@@ -819,12 +833,12 @@ private:
     }
 
     template <typename DocumentType, typename ValueType, typename PointerType>
-    static void AssigIfExist(SchemaArray& out, const DocumentType& document, const PointerType& p, const ValueType& value, const char* name) {
+    void AssigIfExist(SchemaArray& out, const DocumentType& document, const PointerType& p, const ValueType& value, const char* name) {
         if (const ValueType* v = GetMember(value, name)) {
             if (v->IsArray() && v->Size() > 0) {
                 PointerType q = p.Append(name);
                 out.count = v->Size();
-                out.schemas = new const Schema*[out.count];
+                out.schemas = static_cast<const Schema**>(allocator_->Malloc(out.count * sizeof(const Schema*)));
                 memset(out.schemas, 0, sizeof(Schema*)* out.count);
                 for (SizeType i = 0; i < out.count; i++)
                     out.schemas[i] = document->CreateSchema(q.Append(i), (*v)[i]);
@@ -834,10 +848,10 @@ private:
 
 #if RAPIDJSON_SCHEMA_USE_STDREGEX
     template <typename ValueType>
-    static RegexType* CreatePattern(const ValueType& value) {
+    RegexType* CreatePattern(const ValueType& value) {
         if (value.IsString())
             try {
-                return new RegexType(value.GetString(), std::size_t(value.GetStringLength()), std::regex_constants::ECMAScript);
+                return new (allocator_->Malloc(sizeof(RegexType))) RegexType(value.GetString(), std::size_t(value.GetStringLength()), std::regex_constants::ECMAScript);
             }
             catch (const std::regex_error&) {
             }
@@ -929,8 +943,8 @@ private:
 
     struct Property {
         Property() : schema(), dependenciesSchema(), dependencies(), required(false), typeless(true) {}
-        ~Property() { delete[] dependencies; }
-        ValueType name;
+        ~Property() { AllocatorType::Free(dependencies); }
+        SValue name;
         const SchemaType* schema;
         const SchemaType* dependenciesSchema;
         bool* dependencies;
@@ -940,12 +954,17 @@ private:
 
     struct PatternProperty {
         PatternProperty() : schema(), pattern() {}
-        ~PatternProperty() { delete pattern; }
+        ~PatternProperty() { 
+            if (pattern) {
+                pattern->~RegexType();
+                AllocatorType::Free(pattern);
+            }
+        }
         const SchemaType* schema;
-        const RegexType* pattern;
+        RegexType* pattern;
     };
 
-    AllocatorType allocator_;
+    AllocatorType* allocator_;
     uint64_t* enum_;
     SizeType enumCount_;
     SchemaArray allOf_;
@@ -976,7 +995,7 @@ private:
     bool additionalItems_;
     bool uniqueItems_;
 
-    const RegexType* pattern_;
+    RegexType* pattern_;
     SizeType minLength_;
     SizeType maxLength_;
 
@@ -993,61 +1012,63 @@ private:
 ///////////////////////////////////////////////////////////////////////////////
 // IGenericRemoteSchemaDocumentProvider
 
-template <typename ValueType, typename Allocator = MemoryPoolAllocator<> >
+template <typename SchemaDocumentType>
 class IGenericRemoteSchemaDocumentProvider {
 public:
-    typedef GenericSchemaDocument<ValueType, Allocator> SchemaDocumentType;
-    typedef typename ValueType::Ch Ch;
+    typedef typename SchemaDocumentType::Ch Ch;
 
     virtual ~IGenericRemoteSchemaDocumentProvider() {}
     virtual const SchemaDocumentType* GetRemoteDocument(const Ch* uri, SizeType length) = 0;
 };
 
-typedef IGenericRemoteSchemaDocumentProvider<Value> IRemoteSchemaDocumentProvider;
-
 ///////////////////////////////////////////////////////////////////////////////
 // GenericSchemaDocument
 
-template <typename ValueT, typename Allocator = MemoryPoolAllocator<> >
+template <typename ValueT, typename Allocator = MemoryPoolAllocator<> > // Temp to use MemoryPoolAllocator now for profiling
 class GenericSchemaDocument {
 public:
     typedef ValueT ValueType;
-    typedef IGenericRemoteSchemaDocumentProvider<ValueType, Allocator> IRemoteSchemaDocumentProviderType;
+    typedef IGenericRemoteSchemaDocumentProvider<GenericSchemaDocument> IRemoteSchemaDocumentProviderType;
     typedef Allocator AllocatorType;
     typedef typename ValueType::EncodingType EncodingType;
     typedef typename EncodingType::Ch Ch;
     typedef internal::Schema<GenericSchemaDocument> SchemaType;
-    typedef GenericPointer<ValueType> PointerType;
+    typedef GenericPointer<ValueType, CrtAllocator> PointerType;
     friend class internal::Schema<GenericSchemaDocument>;
 
     GenericSchemaDocument(const ValueType& document, IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) : 
-        document_(document),
         remoteProvider_(remoteProvider),
+        allocator_(allocator),
+        ownAllocator_(),
         root_(),
         schemaMap_(allocator, kInitialSchemaMapSize),
         schemaRef_(allocator, kInitialSchemaRefSize)
     {
+        if (!allocator_)
+            ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
+
         // Generate root schema, it will call CreateSchema() to create sub-schemas,
         // And call AddRefSchema() if there are $ref.
-        //root_ = CreateSchema(PointerType(), static_cast<const ValueType&>(document));
-        root_ = CreateSchemaRecursive(Pointer(), static_cast<const ValueType&>(document));
+        root_ = CreateSchemaRecursive(PointerType(), static_cast<const ValueType&>(document));
 
         // Resolve $ref
         while (!schemaRef_.Empty()) {
             SchemaEntry* refEntry = schemaRef_.template Pop<SchemaEntry>(1);
-            PointerType p = refEntry->pointer;      // Due to re-entrance,
-            SchemaType* source = refEntry->schema;  // backup the entry first,
-            refEntry->~SchemaEntry();              // and then destruct it.
-            source->ref_ = GetSchema(p);
+            refEntry->schema->ref_ = GetSchema(refEntry->pointer);
+            refEntry->~SchemaEntry();
         }
+        schemaRef_.ShrinkToFit(); // Deallocate all memory for ref
     }
 
     ~GenericSchemaDocument() {
         while (!schemaMap_.Empty()) {
             SchemaEntry* e = schemaMap_.template Pop<SchemaEntry>(1);
-            delete e->schema;
+            e->schema->~SchemaType();
+            Allocator::Free(e->schema);
             e->~SchemaEntry();
         }
+
+        RAPIDJSON_DELETE(ownAllocator_);
     }
 
     const SchemaType& GetRoot() const { return *root_; }
@@ -1076,7 +1097,7 @@ private:
 
     const SchemaType* CreateSchema(const PointerType& pointer, const ValueType& v) {
         RAPIDJSON_ASSERT(pointer.IsValid());
-        SchemaType* schema = new SchemaType(this, pointer, v);
+        SchemaType* schema = new (allocator_->Malloc(sizeof(SchemaType))) SchemaType(this, allocator_, pointer, v);
         new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(pointer, schema);
         return schema;
     }
@@ -1093,14 +1114,14 @@ private:
                 if (i > 0) { // Remote reference, resolve immediately
                     if (remoteProvider_) {
                         if (const GenericSchemaDocument* remoteDocument = remoteProvider_->GetRemoteDocument(s, i - 1)) {
-                            GenericPointer<ValueType> pointer(&s[i], len - i);
+                            PointerType pointer(&s[i], len - i);
                             if (pointer.IsValid())
                                 schema->ref_ = remoteDocument->GetSchema(pointer);
                         }
                     }
                 }
                 else if (s[i] == '#') { // Local reference, defer resolution
-                    GenericPointer<ValueType> pointer(&s[i], len - i);
+                    PointerType pointer(&s[i], len - i);
                     if (pointer.IsValid())
                         new (schemaRef_.template Push<SchemaEntry>()) SchemaEntry(pointer, schema);
                 }
@@ -1115,17 +1136,19 @@ private:
         return 0;
     }
 
-    static const size_t kInitialSchemaMapSize = 1024;
-    static const size_t kInitialSchemaRefSize = 1024;
+    static const size_t kInitialSchemaMapSize = 64;
+    static const size_t kInitialSchemaRefSize = 64;
 
-    const ValueType& document_;
     IRemoteSchemaDocumentProviderType* remoteProvider_;
+    Allocator *allocator_;
+    Allocator *ownAllocator_;
     const SchemaType* root_;                //!< Root schema.
     internal::Stack<Allocator> schemaMap_;  // Stores created Pointer -> Schemas
     internal::Stack<Allocator> schemaRef_;  // Stores Pointer from $ref and schema which holds the $ref
 };
 
 typedef GenericSchemaDocument<Value> SchemaDocument;
+typedef IGenericRemoteSchemaDocumentProvider<SchemaDocument> IRemoteSchemaDocumentProvider;
 
 ///////////////////////////////////////////////////////////////////////////////
 // GenericSchemaValidator
