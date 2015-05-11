@@ -40,6 +40,12 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
+#define RAPIDJSON_INVALID_KEYWORD_RETURN(keyword)\
+    RAPIDJSON_MULTILINEMACRO_BEGIN\
+    context.invalidKeyword = keyword;\
+    return false;\
+    RAPIDJSON_MULTILINEMACRO_END
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -198,6 +204,7 @@ struct SchemaValidationContext {
         allocator(a),
         schema(s),
         valueSchema(),
+        invalidKeyword(),
         hasher(),
         patternPropertiesSchemas(),
         notValidator(),
@@ -223,6 +230,7 @@ struct SchemaValidationContext {
     CrtAllocator* allocator; // For allocating memory for context
     const SchemaType* schema;
     const SchemaType* valueSchema;
+    const char* invalidKeyword;
     HasherType* hasher;
     SchemaValidatorArray allOfValidators;
     SchemaValidatorArray anyOfValidators;
@@ -528,7 +536,7 @@ public:
                 else if (additionalItems_)
                     context.valueSchema = GetTypeless();
                 else
-                    return false;
+                    RAPIDJSON_INVALID_KEYWORD_RETURN("items");
             }
             else
                 context.valueSchema = GetTypeless();
@@ -554,14 +562,14 @@ public:
 
             if (context.objectPatternValidatorType == Context::kPatternValidatorOnly) {
                 if (!patternValid)
-                    return false;
+                    RAPIDJSON_INVALID_KEYWORD_RETURN("patternProperties");
             }
             else if (context.objectPatternValidatorType == Context::kPatternValidatorWithProperty) {
                 if (!patternValid || !otherValid)
-                    return false;
+                    RAPIDJSON_INVALID_KEYWORD_RETURN("patternProperties");
             }
             else if (!patternValid && !otherValid) // kPatternValidatorWithAdditionalProperty)
-                return false;
+                RAPIDJSON_INVALID_KEYWORD_RETURN("patternProperties");
         }
 
         if (enum_) {
@@ -569,20 +577,20 @@ public:
             for (SizeType i = 0; i < enumCount_; i++)
                 if (enum_[i] == h)
                     goto foundEnum;
-            return false;
+            RAPIDJSON_INVALID_KEYWORD_RETURN("enum");
             foundEnum:;
         }
 
         if (allOf_.schemas)
             for (SizeType i = 0; i < allOf_.count; i++)
                 if (!context.allOfValidators.validators[i]->IsValid())
-                    return false;
+                    RAPIDJSON_INVALID_KEYWORD_RETURN("allOf");
         
         if (anyOf_.schemas) {
             for (SizeType i = 0; i < anyOf_.count; i++)
                 if (context.anyOfValidators.validators[i]->IsValid())
                     goto foundAny;
-            return false;
+            RAPIDJSON_INVALID_KEYWORD_RETURN("anyOf");
             foundAny:;
         }
 
@@ -591,86 +599,88 @@ public:
             for (SizeType i = 0; i < oneOf_.count; i++)
                 if (context.oneOfValidators.validators[i]->IsValid()) {
                     if (oneValid)
-                        return false;
+                        RAPIDJSON_INVALID_KEYWORD_RETURN("oneOf");
                     else
                         oneValid = true;
                 }
             if (!oneValid)
-                return false;
+                RAPIDJSON_INVALID_KEYWORD_RETURN("oneOf");
         }
 
         if (not_ && context.notValidator->IsValid())
-            return false;
+            RAPIDJSON_INVALID_KEYWORD_RETURN("not");
 
-        return !ref_ || context.refValidator->IsValid();
+        if (ref_ && !context.refValidator->IsValid())
+            RAPIDJSON_INVALID_KEYWORD_RETURN("$ref");
+
+        return true;
     }
 
     bool Null(Context& context) const { 
-        CreateParallelValidator(context);
-        return (type_ & (1 << kNullSchemaType));
+        if (!(type_ & (1 << kNullSchemaType)))
+            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+        return CreateParallelValidator(context);
     }
     
     bool Bool(Context& context, bool) const { 
-        CreateParallelValidator(context);
-        return (type_ & (1 << kBooleanSchemaType));
+        if (!(type_ & (1 << kBooleanSchemaType)))
+            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+        return CreateParallelValidator(context);
     }
 
     bool Int(Context& context, int i) const {
-        CreateParallelValidator(context);
-        if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
-            return false;
-        return CheckDouble(i);
+        if (!(type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))))
+            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+        return CheckDouble(context, i) && CreateParallelValidator(context);
     }
 
     bool Uint(Context& context, unsigned u) const {
-        CreateParallelValidator(context);
-        if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
-            return false;
-        return CheckDouble(u);
+        if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))))
+            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+        return CheckDouble(context, u) && CreateParallelValidator(context);
     }
 
     bool Int64(Context& context, int64_t i) const {
-        CreateParallelValidator(context);
-        if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
-            return false;
-        return CheckDouble(i);
+        if (!(type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))))
+            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+        return CheckDouble(context, i) && CreateParallelValidator(context);
     }
 
     bool Uint64(Context& context, uint64_t u) const {
-        CreateParallelValidator(context);
-        if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))) == 0)
-            return false;
-        return CheckDouble(u);
+        if (!(type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))))
+            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+        return CheckDouble(context, u) && CreateParallelValidator(context);
     }
 
     bool Double(Context& context, double d) const {
-        CreateParallelValidator(context);
-        if ((type_ & (1 << kNumberSchemaType)) == 0)
-            return false;
-        return CheckDouble(d);
+        if (!(type_ & (1 << kNumberSchemaType)))
+            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+        return CheckDouble(context, d) && CreateParallelValidator(context);
     }
     
     bool String(Context& context, const Ch* str, SizeType length, bool) const {
-        (void)str;
-        CreateParallelValidator(context);
-        if ((type_ & (1 << kStringSchemaType)) == 0)
-            return false;
+        if (!(type_ & (1 << kStringSchemaType)))
+            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
 
-        //if (length < minLength_ || length > maxLength_)
-        //    return false;
         if (minLength_ != 0 || maxLength_ != SizeType(~0)) {
             SizeType count;
-            if (internal::CountStringCodePoint<EncodingType>(str, length, &count) && (count < minLength_ || count > maxLength_))
-                return false;
+            if (internal::CountStringCodePoint<EncodingType>(str, length, &count)) {
+                if (count < minLength_)
+                    RAPIDJSON_INVALID_KEYWORD_RETURN("minLength");
+                if (count > maxLength_)
+                    RAPIDJSON_INVALID_KEYWORD_RETURN("maxLength");
+            }
         }
 
-        return !pattern_ || IsPatternMatch(pattern_, str, length);
+        if (pattern_ && !IsPatternMatch(pattern_, str, length))
+            RAPIDJSON_INVALID_KEYWORD_RETURN("pattern");
+
+        return CreateParallelValidator(context);
     }
 
     bool StartObject(Context& context) const { 
-        CreateParallelValidator(context);
-        if ((type_ & (1 << kObjectSchemaType)) == 0)
-            return false;
+        if (!(type_ & (1 << kObjectSchemaType)))
+            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
 
         context.objectRequiredCount = 0;
         if (hasDependencies_) {
@@ -685,7 +695,7 @@ public:
             std::memset(context.patternPropertiesSchemas, 0, sizeof(SchemaType*) * count);
         }
 
-        return true;
+        return CreateParallelValidator(context);
     }
     
     bool Key(Context& context, const Ch* str, SizeType len, bool) const {
@@ -731,12 +741,21 @@ public:
             return true;
         }
 
-        return context.patternPropertiesSchemaCount != 0; // patternProperties are not additional properties
+        if (context.patternPropertiesSchemaCount == 0) // patternProperties are not additional properties
+            RAPIDJSON_INVALID_KEYWORD_RETURN("additionalProperties");
+
+        return true;
     }
 
     bool EndObject(Context& context, SizeType memberCount) const {
-        if (context.objectRequiredCount != requiredCount_ || memberCount < minProperties_ || memberCount > maxProperties_)
-            return false;
+        if (context.objectRequiredCount != requiredCount_)
+            RAPIDJSON_INVALID_KEYWORD_RETURN("required");
+
+        if (memberCount < minProperties_)
+            RAPIDJSON_INVALID_KEYWORD_RETURN("minProperties");
+
+        if (memberCount > maxProperties_)
+            RAPIDJSON_INVALID_KEYWORD_RETURN("maxProperties");
 
         if (hasDependencies_) {
             for (SizeType sourceIndex = 0; sourceIndex < propertyCount_; sourceIndex++)
@@ -744,11 +763,11 @@ public:
                     if (properties_[sourceIndex].dependencies) {
                         for (SizeType targetIndex = 0; targetIndex < propertyCount_; targetIndex++)
                             if (properties_[sourceIndex].dependencies[targetIndex] && !context.objectDependencies[targetIndex])
-                                return false;
+                                RAPIDJSON_INVALID_KEYWORD_RETURN("dependencies");
                     }
                     else if (properties_[sourceIndex].dependenciesSchema)
                         if (!context.dependencyValidators.validators[sourceIndex]->IsValid())
-                            return false;
+                            RAPIDJSON_INVALID_KEYWORD_RETURN("dependencies");
                 }
         }
 
@@ -756,21 +775,28 @@ public:
     }
 
     bool StartArray(Context& context) const { 
-        CreateParallelValidator(context);
-        if ((type_ & (1 << kArraySchemaType)) == 0)
-            return false;
+        if (!(type_ & (1 << kArraySchemaType)))
+            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
 
-        if (uniqueItems_)        
+        if (uniqueItems_)
             context.arrayElementHashCodes.SetArray();
 
         context.arrayElementIndex = 0;
         context.inArray = true;
-        return true;
+
+        return CreateParallelValidator(context);
     }
 
     bool EndArray(Context& context, SizeType elementCount) const { 
         context.inArray = false;
-        return elementCount >= minItems_ && elementCount <= maxItems_;
+        
+        if (elementCount < minItems_)
+            RAPIDJSON_INVALID_KEYWORD_RETURN("minItems");
+        
+        if (elementCount > maxItems_)
+            RAPIDJSON_INVALID_KEYWORD_RETURN("maxItems");
+
+        return true;
     }
 
 private:
@@ -879,14 +905,22 @@ private:
         else if (type == "number" ) type_ |= (1 << kNumberSchemaType) | (1 << kIntegerSchemaType);
     }
 
-    void CreateParallelValidator(Context& context) const {
+    bool CreateParallelValidator(Context& context) const {
         if (enum_ || context.arrayUniqueness)
             context.hasher = new HasherType;
-        if (allOf_.schemas) CreateSchemaValidators(context, context.allOfValidators, allOf_);
-        if (anyOf_.schemas) CreateSchemaValidators(context, context.anyOfValidators, anyOf_);
-        if (oneOf_.schemas) CreateSchemaValidators(context, context.oneOfValidators, oneOf_);
+
+        if (allOf_.schemas)
+            CreateSchemaValidators(context, context.allOfValidators, allOf_);
+
+        if (anyOf_.schemas)
+            CreateSchemaValidators(context, context.anyOfValidators, anyOf_);
+        
+        if (oneOf_.schemas)
+            CreateSchemaValidators(context, context.oneOfValidators, oneOf_);
+        
         if (not_ && !context.notValidator)
             context.notValidator = context.factory->CreateSchemaValidator(*not_);
+        
         if (ref_ && !context.refValidator)
             context.refValidator = context.factory->CreateSchemaValidator(*ref_);
 
@@ -896,6 +930,7 @@ private:
             for (SizeType i = 0; i < propertyCount_; i++)
                 context.dependencyValidators.validators[i] = properties_[i].dependenciesSchema ? context.factory->CreateSchemaValidator(*properties_[i].dependenciesSchema) : 0;
         }
+        return true;
     }
 
     void CreateSchemaValidators(Context& context, typename Context::SchemaValidatorArray& validators, const SchemaArray& schemas) const {
@@ -928,15 +963,19 @@ private:
         return false;
     }
 
-    bool CheckDouble(double d) const {
-        if (exclusiveMinimum_ ? d <= minimum_ : d < minimum_) return false;
-        if (exclusiveMaximum_ ? d >= maximum_ : d > maximum_) return false;
+    bool CheckDouble(Context& context, double d) const {
+        if (exclusiveMinimum_ ? d <= minimum_ : d < minimum_)
+            RAPIDJSON_INVALID_KEYWORD_RETURN("minimum");
+        
+        if (exclusiveMaximum_ ? d >= maximum_ : d > maximum_)
+            RAPIDJSON_INVALID_KEYWORD_RETURN("maximum");
+
         if (hasMultipleOf_) {
             double a = std::abs(d), b = std::abs(multipleOf_);
             double q = std::floor(a / b);
             double r = a - q * b;
             if (r > 0.0)
-                return false;
+                RAPIDJSON_INVALID_KEYWORD_RETURN("multipleOf");
         }
         return true;
     }
@@ -1222,6 +1261,10 @@ public:
         return schemaStack_.Empty() ? PointerType() : schemaDocument_->GetPointer(&CurrentSchema());
     }
 
+    const char* GetInvalidSchemaKeyword() const {
+        return schemaStack_.Empty() ? 0 : CurrentContext().invalidKeyword;
+    }
+
     PointerType GetInvalidDocumentPointer() const {
         return documentStack_.Empty() ? PointerType() : PointerType(documentStack_.template Bottom<Ch>(), documentStack_.GetSize() / sizeof(Ch));
     }
@@ -1370,12 +1413,6 @@ private:
         if (!CurrentSchema().EndValue(CurrentContext()))
             return false;
 
-        // *documentStack_.template Push<Ch>() = '\0';
-        // documentStack_.template Pop<Ch>(1);
-        // printf("document: %s\n", documentStack_.template Bottom<Ch>());
-        while (!documentStack_.Empty() && *documentStack_.template Pop<Ch>(1) != '/')
-            ;
-
         uint64_t h = CurrentContext().arrayUniqueness ? CurrentContext().hasher->GetHashCode() : 0;
         
         PopSchema();
@@ -1385,10 +1422,16 @@ private:
             if (context.valueUniqueness) {
                 for (typename Context::HashCodeArray::ConstValueIterator itr = context.arrayElementHashCodes.Begin(); itr != context.arrayElementHashCodes.End(); ++itr)
                     if (itr->GetUint64() == h)
-                        return false;
+                        RAPIDJSON_INVALID_KEYWORD_RETURN("uniqueItems");
                 context.arrayElementHashCodes.PushBack(h, *context.allocator);
             }
         }
+
+        // *documentStack_.template Push<Ch>() = '\0';
+        // documentStack_.template Pop<Ch>(1);
+        // printf("document: %s\n", documentStack_.template Bottom<Ch>());
+        while (!documentStack_.Empty() && *documentStack_.template Pop<Ch>(1) != '/')
+            ;
 
         return true;
     }
@@ -1421,6 +1464,7 @@ private:
     void PopSchema() { schemaStack_.template Pop<Context>(1)->~Context(); }
     const SchemaType& CurrentSchema() const { return *schemaStack_.template Top<Context>()->schema; }
     Context& CurrentContext() { return *schemaStack_.template Top<Context>(); }
+    const Context& CurrentContext() const { return *schemaStack_.template Top<Context>(); }
 
     static const size_t kDefaultSchemaStackCapacity = 1024;
     static const size_t kDefaultDocumentStackCapacity = 256;
