@@ -161,10 +161,8 @@ public:
 
     //! Destructor.
     ~GenericPointer() {
-        if (nameBuffer_) {  // If user-supplied tokens constructor is used, nameBuffer_ is nullptr and tokens_ are not deallocated.
-            Allocator::Free(nameBuffer_);
+        if (nameBuffer_)    // If user-supplied tokens constructor is used, nameBuffer_ is nullptr and tokens_ are not deallocated.
             Allocator::Free(tokens_);
-        }
         RAPIDJSON_DELETE(ownAllocator_);
     }
 
@@ -172,10 +170,8 @@ public:
     GenericPointer& operator=(const GenericPointer& rhs) {
         if (this != &rhs) {
             // Do not delete ownAllcator
-            if (nameBuffer_) { 
-                Allocator::Free(nameBuffer_);
+            if (nameBuffer_)
                 Allocator::Free(tokens_);
-            }
 
             tokenCount_ = rhs.tokenCount_;
             parseErrorOffset_ = rhs.parseErrorOffset_;
@@ -735,12 +731,12 @@ private:
         size_t nameBufferSize = rhs.tokenCount_; // null terminators for tokens
         for (Token *t = rhs.tokens_; t != rhs.tokens_ + rhs.tokenCount_; ++t)
             nameBufferSize += t->length;
-        nameBuffer_ = (Ch*)allocator_->Malloc((nameBufferSize + extraNameBufferSize) * sizeof(Ch));
-        std::memcpy(nameBuffer_, rhs.nameBuffer_, nameBufferSize * sizeof(Ch));
 
         tokenCount_ = rhs.tokenCount_ + extraToken;
-        tokens_ = (Token*)allocator_->Malloc(tokenCount_ * sizeof(Token));
+        tokens_ = static_cast<Token *>(allocator_->Malloc(tokenCount_ * sizeof(Token) + (nameBufferSize + extraNameBufferSize) * sizeof(Ch)));
+        nameBuffer_ = reinterpret_cast<Ch *>(tokens_ + tokenCount_);
         std::memcpy(tokens_, rhs.tokens_, rhs.tokenCount_ * sizeof(Token));
+        std::memcpy(nameBuffer_, rhs.nameBuffer_, nameBufferSize * sizeof(Ch));
 
         // Adjust pointers to name buffer
         std::ptrdiff_t diff = nameBuffer_ - rhs.nameBuffer_;
@@ -774,11 +770,14 @@ private:
         if (!allocator_)
             ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
 
-        // Create a buffer as same size of source
-        nameBuffer_ = (Ch*)allocator_->Malloc(length * sizeof(Ch));
-        tokens_ = (Token*)allocator_->Malloc(length * sizeof(Token)); // Maximum possible tokens in the source
+        // Count number of '/' as tokenCount
         tokenCount_ = 0;
-        Ch* name = nameBuffer_;
+        for (const Ch* s = source; s != source + length; s++) 
+            if (*s == '/')
+                tokenCount_++;
+
+        Token* token = tokens_ = static_cast<Token *>(allocator_->Malloc(tokenCount_ * sizeof(Token) + length * sizeof(Ch)));
+        Ch* name = nameBuffer_ = reinterpret_cast<Ch *>(tokens_ + tokenCount_);
         size_t i = 0;
 
         // Detect if it is a URI fragment
@@ -797,8 +796,7 @@ private:
             RAPIDJSON_ASSERT(source[i] == '/');
             i++; // consumes '/'
 
-            Token& token = tokens_[tokenCount_++];
-            token.name = name;
+            token->name = name;
             bool isNumber = true;
 
             while (i < length && source[i] != '/') {
@@ -856,20 +854,20 @@ private:
 
                 *name++ = c;
             }
-            token.length = name - token.name;
-            if (token.length == 0)
+            token->length = name - token->name;
+            if (token->length == 0)
                 isNumber = false;
             *name++ = '\0'; // Null terminator
 
             // Second check for index: more than one digit cannot have leading zero
-            if (isNumber && token.length > 1 && token.name[0] == '0')
+            if (isNumber && token->length > 1 && token->name[0] == '0')
                 isNumber = false;
 
             // String to SizeType conversion
             SizeType n = 0;
             if (isNumber) {
-                for (size_t j = 0; j < token.length; j++) {
-                    SizeType m = n * 10 + static_cast<SizeType>(token.name[j] - '0');
+                for (size_t j = 0; j < token->length; j++) {
+                    SizeType m = n * 10 + static_cast<SizeType>(token->name[j] - '0');
                     if (m < n) {   // overflow detection
                         isNumber = false;
                         break;
@@ -878,16 +876,15 @@ private:
                 }
             }
 
-            token.index = isNumber ? n : kPointerInvalidIndex;
+            token->index = isNumber ? n : kPointerInvalidIndex;
+            token++;
         }
 
         RAPIDJSON_ASSERT(name <= nameBuffer_ + length); // Should not overflow buffer
-        tokens_ = (Token*)allocator_->Realloc(tokens_, length * sizeof(Token), tokenCount_ * sizeof(Token)); // Shrink tokens_
         parseErrorCode_ = kPointerParseErrorNone;
         return;
 
     error:
-        Allocator::Free(nameBuffer_);
         Allocator::Free(tokens_);
         nameBuffer_ = 0;
         tokens_ = 0;
