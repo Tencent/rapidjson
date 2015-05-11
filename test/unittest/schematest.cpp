@@ -848,8 +848,8 @@ private:
 
     static const size_t kCount = 4;
     SchemaDocument* sd_[kCount];
-    typename Document::AllocatorType documentAllocator_;
-    typename SchemaDocument::AllocatorType schemaAllocator_;
+    Document::AllocatorType documentAllocator_;
+    SchemaDocument::AllocatorType schemaAllocator_;
 };
 
 TEST(SchemaValidator, TestSuite) {
