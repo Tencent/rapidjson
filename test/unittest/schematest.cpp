@@ -14,6 +14,7 @@
 
 #include "unittest.h"
 #include "rapidjson/schema.h"
+#include "rapidjson/stringbuffer.h"
 
 using namespace rapidjson;
 
@@ -94,11 +95,41 @@ TEST(SchemaValidator, Hasher) {
 {\
     SchemaValidator validator(schema);\
     Document d;\
-    /*printf("\n%s\n", json);*/\
     d.Parse(json);\
     EXPECT_FALSE(d.HasParseError());\
     EXPECT_TRUE(expected == d.Accept(validator));\
     EXPECT_TRUE(expected == validator.IsValid());\
+    /*if (!validator.IsValid()) {\
+        StringBuffer sb;\
+        validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);\
+        printf("Error schema: %s\n", sb.GetString());\
+        sb.Clear();\
+        validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);\
+        printf("Error document: %s\n", sb.GetString());\
+    }*/\
+}
+
+#define VALIDATE_ERROR(schema, json, invalidSchemaPointer, invalidDocumentPointer) \
+{\
+    SchemaValidator validator(schema);\
+    Document d;\
+    /*printf("\n%s\n", json);*/\
+    d.Parse(json);\
+    EXPECT_FALSE(d.HasParseError());\
+    EXPECT_FALSE(d.Accept(validator));\
+    EXPECT_FALSE(validator.IsValid());\
+    if (validator.GetInvalidSchemaPointer() != Pointer(invalidSchemaPointer)) {\
+        StringBuffer sb;\
+        validator.GetInvalidSchemaPointer().Stringify(sb);\
+        printf("GetInvalidSchemaPointer() Expected: %s Actual: %s\n", invalidSchemaPointer, sb.GetString());\
+        ADD_FAILURE();\
+    }\
+    if (validator.GetInvalidDocumentPointer() != Pointer(invalidDocumentPointer)) {\
+        StringBuffer sb;\
+        validator.GetInvalidDocumentPointer().Stringify(sb);\
+        printf("GetInvalidDocumentPointer() Expected: %s Actual: %s\n", invalidDocumentPointer, sb.GetString());\
+        ADD_FAILURE();\
+    }\
 }
 
 TEST(SchemaValidator, Typeless) {
@@ -118,7 +149,7 @@ TEST(SchemaValidator, MultiType) {
 
     VALIDATE(s, "42", true);
     VALIDATE(s, "\"Life, the universe, and everything\"", true);
-    VALIDATE(s, "[\"Life\", \"the universe\", \"and everything\"]", false);
+    VALIDATE_ERROR(s, "[\"Life\", \"the universe\", \"and everything\"]", "", "");
 }
 
 TEST(SchemaValidator, Enum_Typed) {
@@ -153,10 +184,10 @@ TEST(SchemaValidator, Enum_InvalidType) {
 TEST(SchemaValidator, AllOf) {
     {
         Document sd;
-        sd.Parse("{\"allOf\": [{ \"type\": \"string\" }, { \"type\": \"string\", \"maxLength\": 5 }]}"); // need "type": "string" now
+        sd.Parse("{\"allOf\": [{ \"type\": \"string\" }, { \"type\": \"string\", \"maxLength\": 5 }]}");
         SchemaDocument s(sd);
 
-        //VALIDATE(s, "\"ok\"", true);
+        VALIDATE(s, "\"ok\"", true);
         VALIDATE(s, "\"too long\"", false);
     }
     {
@@ -261,7 +292,7 @@ TEST(SchemaValidator, Ref_AllOf) {
         "}");
     SchemaDocument s(sd);
 
-    VALIDATE(s, "{\"shipping_address\": {\"street_address\": \"1600 Pennsylvania Avenue NW\", \"city\": \"Washington\", \"state\": \"DC\"} }", false);
+    VALIDATE_ERROR(s, "{\"shipping_address\": {\"street_address\": \"1600 Pennsylvania Avenue NW\", \"city\": \"Washington\", \"state\": \"DC\"} }", "/properties/shipping_address", "/shipping_address");
     VALIDATE(s, "{\"shipping_address\": {\"street_address\": \"1600 Pennsylvania Avenue NW\", \"city\": \"Washington\", \"state\": \"DC\", \"type\": \"business\"} }", true);
 }
 

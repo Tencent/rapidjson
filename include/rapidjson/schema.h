@@ -1035,6 +1035,8 @@ public:
     typedef internal::Schema<GenericSchemaDocument> SchemaType;
     typedef GenericPointer<ValueType, CrtAllocator> PointerType;
     friend class internal::Schema<GenericSchemaDocument>;
+    template <typename, typename, typename>
+    friend class GenericSchemaValidator;
 
     GenericSchemaDocument(const ValueType& document, IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) : 
         remoteProvider_(remoteProvider),
@@ -1136,6 +1138,13 @@ private:
         return 0;
     }
 
+    PointerType GetPointer(const SchemaType* schema) const {
+        for (const SchemaEntry* target = schemaMap_.template Bottom<SchemaEntry>(); target != schemaMap_.template End<SchemaEntry>(); ++target)
+            if (schema == target->schema)
+                return target->pointer;
+        return PointerType();
+    }
+
     static const size_t kInitialSchemaMapSize = 64;
     static const size_t kInitialSchemaRefSize = 64;
 
@@ -1160,19 +1169,21 @@ class GenericSchemaValidator :
 {
 public:
     typedef typename SchemaDocumentType::SchemaType SchemaType;
+    typedef typename SchemaDocumentType::PointerType PointerType;
     typedef typename SchemaType::EncodingType EncodingType;
     typedef typename EncodingType::Ch Ch;
 
     GenericSchemaValidator(
         const SchemaDocumentType& schemaDocument,
         StateAllocator* allocator = 0, 
-        size_t schemaStackCapacity = kDefaultSchemaStackCapacity/*,
-        size_t documentStackCapacity = kDefaultDocumentStackCapacity*/)
+        size_t schemaStackCapacity = kDefaultSchemaStackCapacity,
+        size_t documentStackCapacity = kDefaultDocumentStackCapacity)
         :
+        schemaDocument_(&schemaDocument),
         root_(schemaDocument.GetRoot()),
         outputHandler_(nullOutputHandler_),
         schemaStack_(allocator, schemaStackCapacity),
-        // documentStack_(allocator, documentStackCapacity),
+        documentStack_(allocator, documentStackCapacity),
         valid_(true)
     {
     }
@@ -1181,13 +1192,14 @@ public:
         const SchemaDocumentType& schemaDocument,
         OutputHandler& outputHandler,
         StateAllocator* allocator = 0,
-        size_t schemaStackCapacity = kDefaultSchemaStackCapacity/*,
-        size_t documentStackCapacity = kDefaultDocumentStackCapacity*/)
+        size_t schemaStackCapacity = kDefaultSchemaStackCapacity,
+        size_t documentStackCapacity = kDefaultDocumentStackCapacity)
         :
+        schemaDocument_(&schemaDocument),
         root_(schemaDocument.GetRoot()),
         outputHandler_(outputHandler),
         schemaStack_(allocator, schemaStackCapacity),
-        // documentStack_(allocator, documentStackCapacity),
+        documentStack_(allocator, documentStackCapacity),
         valid_(true)
     {
     }
@@ -1205,6 +1217,14 @@ public:
 
     // Implementation of ISchemaValidator
     virtual bool IsValid() const { return valid_; }
+
+    PointerType GetInvalidSchemaPointer() const {
+        return schemaStack_.Empty() ? PointerType() : schemaDocument_->GetPointer(&CurrentSchema());
+    }
+
+    PointerType GetInvalidDocumentPointer() const {
+        return documentStack_.Empty() ? PointerType() : PointerType(documentStack_.template Bottom<Ch>(), documentStack_.GetSize() / sizeof(Ch));
+    }
 
 #define RAPIDJSON_SCHEMA_HANDLE_BEGIN_(method, arg1)\
     if (!valid_) return false; \
@@ -1263,6 +1283,7 @@ public:
     
     bool Key(const Ch* str, SizeType len, bool copy) {
         if (!valid_) return false;
+        AppendToken(str, len);
         if (!CurrentSchema().Key(CurrentContext(), str, len, copy)) return valid_ = false;
         RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(Key, (str, len, copy));
         return valid_ = outputHandler_.Key(str, len, copy);
@@ -1303,13 +1324,14 @@ private:
     GenericSchemaValidator( 
         const SchemaType& root,
         StateAllocator* allocator = 0,
-        size_t schemaStackCapacity = kDefaultSchemaStackCapacity/*,
-        size_t documentStackCapacity = kDefaultDocumentStackCapacity*/)
+        size_t schemaStackCapacity = kDefaultSchemaStackCapacity,
+        size_t documentStackCapacity = kDefaultDocumentStackCapacity)
         :
+        schemaDocument_(),
         root_(root),
         outputHandler_(nullOutputHandler_),
         schemaStack_(allocator, schemaStackCapacity),
-        // documentStack_(allocator, documentStackCapacity),
+        documentStack_(allocator, documentStackCapacity),
         valid_(true)
     {
     }
@@ -1318,6 +1340,9 @@ private:
         if (schemaStack_.Empty())
             PushSchema(root_);
         else {
+            if (CurrentContext().inArray)
+                AppendToken(CurrentContext().arrayElementIndex);
+
             if (!CurrentSchema().BeginValue(CurrentContext()))
                 return false;
 
@@ -1345,6 +1370,12 @@ private:
         if (!CurrentSchema().EndValue(CurrentContext()))
             return false;
 
+        // *documentStack_.template Push<Ch>() = '\0';
+        // documentStack_.template Pop<Ch>(1);
+        // printf("document: %s\n", documentStack_.template Bottom<Ch>());
+        while (!documentStack_.Empty() && *documentStack_.template Pop<Ch>(1) != '/')
+            ;
+
         uint64_t h = CurrentContext().arrayUniqueness ? CurrentContext().hasher->GetHashCode() : 0;
         
         PopSchema();
@@ -1362,19 +1393,44 @@ private:
         return true;
     }
 
+    void AppendToken(const Ch* str, SizeType len) {
+        *documentStack_.template Push<Ch>() = '/';
+        for (SizeType i = 0; i < len; i++) {
+            if (str[i] == '~') {
+                *documentStack_.template Push<Ch>() = '~';
+                *documentStack_.template Push<Ch>() = '0';
+            }
+            else if (str[i] == '/') {
+                *documentStack_.template Push<Ch>() = '~';
+                *documentStack_.template Push<Ch>() = '1';
+            }
+            else
+                *documentStack_.template Push<Ch>() = str[i];
+        }
+    }
+
+    void AppendToken(SizeType index) {
+        *documentStack_.template Push<Ch>() = '/';
+        char buffer[21];
+        SizeType length = (sizeof(SizeType) == 4 ? internal::u32toa(index, buffer): internal::u64toa(index, buffer)) - buffer;
+        for (SizeType i = 0; i < length; i++)
+            *documentStack_.template Push<Ch>() = buffer[i];
+    }
+
     void PushSchema(const SchemaType& schema) { new (schemaStack_.template Push<Context>()) Context(this, &contextAllocator_, &schema); }
     void PopSchema() { schemaStack_.template Pop<Context>(1)->~Context(); }
-    const SchemaType& CurrentSchema() { return *schemaStack_.template Top<Context>()->schema; }
+    const SchemaType& CurrentSchema() const { return *schemaStack_.template Top<Context>()->schema; }
     Context& CurrentContext() { return *schemaStack_.template Top<Context>(); }
 
     static const size_t kDefaultSchemaStackCapacity = 1024;
-    //static const size_t kDefaultDocumentStackCapacity = 256;
+    static const size_t kDefaultDocumentStackCapacity = 256;
+    const SchemaDocument* schemaDocument_;
     const SchemaType& root_;
     BaseReaderHandler<EncodingType> nullOutputHandler_;
     OutputHandler& outputHandler_;
     CrtAllocator contextAllocator_;
     internal::Stack<StateAllocator> schemaStack_;    //!< stack to store the current path of schema (BaseSchemaType *)
-    //internal::Stack<Allocator> documentStack_;  //!< stack to store the current path of validating document (Value *)
+    internal::Stack<StateAllocator> documentStack_;  //!< stack to store the current path of validating document (Ch)
     bool valid_;
 };
 
