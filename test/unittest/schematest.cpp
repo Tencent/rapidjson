@@ -797,7 +797,7 @@ static char* ReadFile(const char* filename, size_t& length) {
 
 class RemoteSchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
 public:
-    RemoteSchemaDocumentProvider() {
+    RemoteSchemaDocumentProvider() : documentAllocator_(), schemaAllocator_() {
         const char* filenames[kCount] = {
             "jsonschema/remotes/integer.json",
             "jsonschema/remotes/subSchemas.json",
