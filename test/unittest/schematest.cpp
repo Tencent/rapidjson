@@ -837,7 +837,7 @@ TEST(SchemaValidator, AllOf_Nested) {
     INVALIDATE(s, "123", "", "allOf", "");
 }
 
-static char* ReadFile(const char* filename, size_t& length) {
+static char* ReadFile(const char* filename) {
     const char *paths[] = {
         "%s",
         "bin/%s",
@@ -858,13 +858,33 @@ static char* ReadFile(const char* filename, size_t& length) {
         return 0;
 
     fseek(fp, 0, SEEK_END);
-    length = (size_t)ftell(fp);
+    size_t length = (size_t)ftell(fp);
     fseek(fp, 0, SEEK_SET);
     char* json = (char*)malloc(length + 1);
     size_t readLength = fread(json, 1, length, fp);
     json[readLength] = '\0';
     fclose(fp);
     return json;
+}
+
+TEST(SchemaValidator, ValidateMetaSchema) {
+    char* json = ReadFile("draft-04/schema");
+    Document d;
+    d.Parse(json);
+    ASSERT_FALSE(d.HasParseError());
+    SchemaDocument sd(d);
+    SchemaValidator validator(sd);
+    if (!d.Accept(validator)) {
+        StringBuffer sb;
+        validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);
+        printf("Invalid schema: %s\n", sb.GetString());
+        printf("Invalid keyword: %s\n", validator.GetInvalidSchemaKeyword());
+        sb.Clear();
+        validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);
+        printf("Invalid document: %s\n", sb.GetString());
+        //ADD_FAILURE();
+    }
+    free(json);
 }
 
 class RemoteSchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
@@ -880,8 +900,7 @@ public:
         for (size_t i = 0; i < kCount; i++) {
             sd_[i] = 0;
 
-            size_t length;
-            char* json = ReadFile(filenames[i], length);
+            char* json = ReadFile(filenames[i]);
             if (!json) {
                 printf("json remote file %s not found", filenames[i]);
                 ADD_FAILURE();
@@ -972,8 +991,7 @@ TEST(SchemaValidator, TestSuite) {
     for (size_t i = 0; i < sizeof(filenames) / sizeof(filenames[0]); i++) {
         char filename[FILENAME_MAX];
         sprintf(filename, "jsonschema/tests/draft4/%s", filenames[i]);
-        size_t length;
-        char* json = ReadFile(filename, length);
+        char* json = ReadFile(filename);
         if (!json) {
             printf("json test suite file %s not found", filename);
             ADD_FAILURE();
