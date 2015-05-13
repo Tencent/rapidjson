@@ -298,10 +298,6 @@ public:
         pattern_(),
         minLength_(0),
         maxLength_(~SizeType(0)),
-        minimum_(-HUGE_VAL),
-        maximum_(HUGE_VAL),
-        multipleOf_(0),
-        hasMultipleOf_(false),
         exclusiveMinimum_(false),
         exclusiveMaximum_(false)
     {
@@ -478,26 +474,20 @@ public:
             pattern_ = CreatePattern(*v);
 
         // Number
-        ConstMemberIterator minimumItr = value.FindMember("minimum");
-        if (minimumItr != value.MemberEnd())
-            if (minimumItr->value.IsNumber())
-                minimum_ = minimumItr->value.GetDouble();
+        if (const ValueType* v = GetMember(value, "minimum"))
+            if (v->IsNumber())
+                minimum_.CopyFrom(*v, *allocator_);
 
-        ConstMemberIterator maximumItr = value.FindMember("maximum");
-        if (maximumItr != value.MemberEnd())
-            if (maximumItr->value.IsNumber())
-                maximum_ = maximumItr->value.GetDouble();
+        if (const ValueType* v = GetMember(value, "maximum"))
+            if (v->IsNumber())
+                maximum_.CopyFrom(*v, *allocator_);
 
         AssignIfExist(exclusiveMinimum_, value, "exclusiveMinimum");
         AssignIfExist(exclusiveMaximum_, value, "exclusiveMaximum");
 
-        ConstMemberIterator multipleOfItr = value.FindMember("multipleOf");
-        if (multipleOfItr != value.MemberEnd()) {
-            if (multipleOfItr->value.IsNumber()) {
-                multipleOf_ = multipleOfItr->value.GetDouble();
-                hasMultipleOf_ = true;
-            }
-        }
+        if (const ValueType* v = GetMember(value, "multipleOf"))
+            if (v->IsNumber() && v->GetDouble() > 0.0)
+                multipleOf_.CopyFrom(*v, *allocator_);
     }
 
     ~Schema() {
@@ -629,33 +619,43 @@ public:
     }
 
     bool Int(Context& context, int i) const {
-        if (!(type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))))
-            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
-        return CheckDouble(context, i) && CreateParallelValidator(context);
+        if (!CheckInt(context, i))
+            return false;
+        return CreateParallelValidator(context);
     }
 
     bool Uint(Context& context, unsigned u) const {
-        if ((type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))))
-            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
-        return CheckDouble(context, u) && CreateParallelValidator(context);
+        if (!CheckUint(context, u))
+            return false;
+        return CreateParallelValidator(context);
     }
 
     bool Int64(Context& context, int64_t i) const {
-        if (!(type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))))
-            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
-        return CheckDouble(context, i) && CreateParallelValidator(context);
+        if (!CheckInt(context, i))
+            return false;
+        return CreateParallelValidator(context);
     }
 
     bool Uint64(Context& context, uint64_t u) const {
-        if (!(type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))))
-            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
-        return CheckDouble(context, u) && CreateParallelValidator(context);
+        if (!CheckUint(context, u))
+            return false;
+        return CreateParallelValidator(context);
     }
 
     bool Double(Context& context, double d) const {
         if (!(type_ & (1 << kNumberSchemaType)))
             RAPIDJSON_INVALID_KEYWORD_RETURN("type");
-        return CheckDouble(context, d) && CreateParallelValidator(context);
+
+        if (!minimum_.IsNull() && !CheckDoubleMinimum(context, d))
+            return false;
+
+        if (!maximum_.IsNull() && !CheckDoubleMaximum(context, d))
+            return false;
+        
+        if (!multipleOf_.IsNull() && !CheckDoubleMultipleOf(context, d))
+            return false;
+        
+        return CreateParallelValidator(context);
     }
     
     bool String(Context& context, const Ch* str, SizeType length, bool) const {
@@ -963,20 +963,92 @@ private:
         return false;
     }
 
-    bool CheckDouble(Context& context, double d) const {
-        if (exclusiveMinimum_ ? d <= minimum_ : d < minimum_)
-            RAPIDJSON_INVALID_KEYWORD_RETURN("minimum");
-        
-        if (exclusiveMaximum_ ? d >= maximum_ : d > maximum_)
-            RAPIDJSON_INVALID_KEYWORD_RETURN("maximum");
+    bool CheckInt(Context& context, int64_t i) const {
+        if (!(type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))))
+            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
 
-        if (hasMultipleOf_) {
-            double a = std::abs(d), b = std::abs(multipleOf_);
-            double q = std::floor(a / b);
-            double r = a - q * b;
-            if (r > 0.0)
-                RAPIDJSON_INVALID_KEYWORD_RETURN("multipleOf");
+        if (!minimum_.IsNull()) {
+            if (minimum_.IsInt64()) {
+                if (exclusiveMinimum_ ? i <= minimum_.GetInt64() : i < minimum_.GetInt64())
+                    RAPIDJSON_INVALID_KEYWORD_RETURN("minimum");
+            }
+            else if (!CheckDoubleMinimum(context, static_cast<double>(i)))
+                return false;
         }
+
+        if (!maximum_.IsNull()) {
+            if (maximum_.IsInt64()) {
+                if (exclusiveMaximum_ ? i >= maximum_.GetInt64() : i > maximum_.GetInt64())
+                    RAPIDJSON_INVALID_KEYWORD_RETURN("maximum");
+            }
+            else if (!CheckDoubleMaximum(context, static_cast<double>(i)))
+                return false;
+        }
+
+        if (!multipleOf_.IsNull()) {
+            if (multipleOf_.IsUint64()) {
+                if (static_cast<uint64_t>(i >= 0 ? i : -i) % multipleOf_.GetUint64() != 0)
+                    RAPIDJSON_INVALID_KEYWORD_RETURN("multipleOf");
+            }
+            else if (!CheckDoubleMultipleOf(context, static_cast<double>(i)))
+                return false;
+        }
+
+        return true;
+    }
+
+    bool CheckUint(Context& context, uint64_t i) const {
+        if (!(type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))))
+            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+
+        if (!minimum_.IsNull()) {
+            if (minimum_.IsUint64()) {
+                if (exclusiveMinimum_ ? i <= minimum_.GetUint64() : i < minimum_.GetUint64())
+                    RAPIDJSON_INVALID_KEYWORD_RETURN("minimum");
+            }
+            else if (!CheckDoubleMinimum(context, static_cast<double>(i)))
+                return false;
+        }
+
+        if (!maximum_.IsNull()) {
+            if (maximum_.IsUint64()) {
+                if (exclusiveMaximum_ ? i >= maximum_.GetUint64() : i > maximum_.GetUint64())
+                    RAPIDJSON_INVALID_KEYWORD_RETURN("maximum");
+            }
+            else if (!CheckDoubleMaximum(context, static_cast<double>(i)))
+                return false;
+        }
+
+        if (!multipleOf_.IsNull()) {
+            if (multipleOf_.IsUint64()) {
+                if (i % multipleOf_.GetUint64() != 0)
+                    RAPIDJSON_INVALID_KEYWORD_RETURN("multipleOf");
+            }
+            else if (!CheckDoubleMultipleOf(context, static_cast<double>(i)))
+                return false;
+        }
+
+        return true;
+    }
+
+    bool CheckDoubleMinimum(Context& context, double d) const {
+        if (exclusiveMinimum_ ? d <= minimum_.GetDouble() : d < minimum_.GetDouble())
+            RAPIDJSON_INVALID_KEYWORD_RETURN("minimum");
+        return true;
+    }
+
+    bool CheckDoubleMaximum(Context& context, double d) const {
+        if (exclusiveMaximum_ ? d >= maximum_.GetDouble() : d > maximum_.GetDouble())
+            RAPIDJSON_INVALID_KEYWORD_RETURN("maximum");
+        return true;
+    }
+
+    bool CheckDoubleMultipleOf(Context& context, double d) const {
+        double a = std::abs(d), b = std::abs(multipleOf_.GetDouble());
+        double q = std::floor(a / b);
+        double r = a - q * b;
+        if (r > 0.0)
+            RAPIDJSON_INVALID_KEYWORD_RETURN("multipleOf");
         return true;
     }
 
@@ -1038,9 +1110,9 @@ private:
     SizeType minLength_;
     SizeType maxLength_;
 
-    double minimum_;
-    double maximum_;
-    double multipleOf_;
+    SValue minimum_;
+    SValue maximum_;
+    SValue multipleOf_;
     bool hasMultipleOf_;
     bool exclusiveMinimum_;
     bool exclusiveMaximum_;

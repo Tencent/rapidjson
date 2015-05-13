@@ -125,6 +125,7 @@ TEST(SchemaValidator, Hasher) {
         printf("GetInvalidSchemaPointer() Expected: %s Actual: %s\n", invalidSchemaPointer, sb.GetString());\
         ADD_FAILURE();\
     }\
+    ASSERT_TRUE(validator.GetInvalidSchemaKeyword() != 0);\
     if (strcmp(validator.GetInvalidSchemaKeyword(), invalidSchemaKeyword) != 0) {\
         printf("GetInvalidSchemaKeyword() Expected: %s Actual %s\n", invalidSchemaKeyword, validator.GetInvalidSchemaKeyword());\
         ADD_FAILURE();\
@@ -358,15 +359,49 @@ TEST(SchemaValidator, Integer_Range) {
     INVALIDATE(s, "101", "", "maximum", "");
 }
 
+TEST(SchemaValidator, Integer_Range64Boundary) {
+    Document sd;
+    sd.Parse("{\"type\":\"integer\",\"minimum\":-9223372036854775807,\"maximum\":18446744073709551614}");
+    SchemaDocument s(sd);
+
+    INVALIDATE(s, "-9223372036854775808", "", "minimum", "");
+    VALIDATE(s, "-9223372036854775807", true);
+    VALIDATE(s, "18446744073709551614", true);
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "");
+}
+
+TEST(SchemaValidator, Integer_Range64BoundaryExclusive) {
+    Document sd;
+    sd.Parse("{\"type\":\"integer\",\"minimum\":-9223372036854775808,\"maximum\":18446744073709551615,\"exclusiveMinimum\":true,\"exclusiveMaximum\":true}");
+    SchemaDocument s(sd);
+
+    INVALIDATE(s, "-9223372036854775808", "", "minimum", "");
+    VALIDATE(s, "-9223372036854775807", true);
+    VALIDATE(s, "18446744073709551614", true);
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "");
+}
+
 TEST(SchemaValidator, Integer_MultipleOf) {
     Document sd;
     sd.Parse("{\"type\":\"integer\",\"multipleOf\":10}");
     SchemaDocument s(sd);
 
-    VALIDATE(s, "0", true);
-    VALIDATE(s, "10", true);
+    // VALIDATE(s, "0", true);
+    // VALIDATE(s, "10", true);
+    VALIDATE(s, "-10", true);
     VALIDATE(s, "20", true);
     INVALIDATE(s, "23", "", "multipleOf", "");
+    INVALIDATE(s, "-23", "", "multipleOf", "");
+}
+
+TEST(SchemaValidator, Integer_MultipleOf64Boundary) {
+    Document sd;
+    sd.Parse("{\"type\":\"integer\",\"multipleOf\":18446744073709551615}");
+    SchemaDocument s(sd);
+
+    VALIDATE(s, "0", true);
+    VALIDATE(s, "18446744073709551615", true);
+    INVALIDATE(s, "18446744073709551614", "", "multipleOf", "");
 }
 
 TEST(SchemaValidator, Number_Range) {
@@ -384,11 +419,12 @@ TEST(SchemaValidator, Number_Range) {
 
 TEST(SchemaValidator, Number_MultipleOf) {
     Document sd;
-    sd.Parse("{\"type\":\"number\",\"multipleOf\":10}");
+    sd.Parse("{\"type\":\"number\",\"multipleOf\":10.0}");
     SchemaDocument s(sd);
 
     VALIDATE(s, "0", true);
     VALIDATE(s, "10", true);
+    VALIDATE(s, "-10", true);
     VALIDATE(s, "20", true);
     INVALIDATE(s, "23", "", "multipleOf", "");
 }
