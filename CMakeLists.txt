@@ -5,7 +5,7 @@ PROJECT(RapidJSON CXX)
 
 set(LIB_MAJOR_VERSION "1")
 set(LIB_MINOR_VERSION "0")
-set(LIB_PATCH_VERSION "1")
+set(LIB_PATCH_VERSION "2")
 set(LIB_VERSION_STRING "${LIB_MAJOR_VERSION}.${LIB_MINOR_VERSION}.${LIB_PATCH_VERSION}")
 
 # compile in release with debug info mode by default

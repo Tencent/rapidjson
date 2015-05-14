@@ -1,6 +1,6 @@
 ![](doc/logo/rapidjson.png)
 
-![](https://img.shields.io/badge/release-v1.0.1-blue.png)
+![](https://img.shields.io/badge/release-v1.0.2-blue.png)
 
 ## 高效的C++ JSON解析／生成器，提供SAX及DOM风格API
 
