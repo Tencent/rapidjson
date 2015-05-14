@@ -1035,7 +1035,7 @@ public:
     template <typename T>
     RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (GenericValue&))
     AddMember(GenericValue& name, T value, Allocator& allocator) {
-        GenericValue v(value);
+        GenericValue v(value, allocator);
         return AddMember(name, v, allocator);
     }
 
