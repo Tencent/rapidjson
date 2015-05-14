@@ -1,5 +1,12 @@
 var NAVTREEINDEX2 =
 {
+"group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html":[10,1],
+"group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a056e5792c1554fbc05b5f1cc168d82ae":[10,1,0,5],
+"group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a0f03679d5fa2736d9e351541e767fac1":[10,1,0,0],
+"group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a11595b2d573f0299422678c5e3695479":[10,1,0,8],
+"group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a17c9f7f81675283393222658d613000f":[10,1,0,2],
+"group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a3d6e37872d7da5f4a4c41e724c8c5c5f":[10,1,0,7],
+"group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a40c0bd4d6c535c57acbb5c2e656bea38":[10,1,0,9],
 "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a51cfd45c07e28aa4fdd78b55d86f0591":[10,1,0,3],
 "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a58c9982e833d1c74686506ac7449200c":[10,1,0,10],
 "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a5ab5548c7a7776f4da20eac09fe57c1b":[10,1,0,4],
@@ -242,12 +249,5 @@ var NAVTREEINDEX2 =
 "structrapidjson_1_1_generic_memory_buffer.html#abcbad3bf8a20a90b6b586e63b07aed40":[12,0,0,16,6],
 "structrapidjson_1_1_generic_memory_buffer.html#af10d96902f7aea2eae23269c11398fbb":[12,0,0,16,9],
 "structrapidjson_1_1_generic_pointer_1_1_token.html":[12,0,0,17,0],
-"structrapidjson_1_1_generic_pointer_1_1_token.html#a50331c9e3dedc34d2c79745b2e58fb2d":[12,0,0,17,0,0],
-"structrapidjson_1_1_generic_pointer_1_1_token.html#aceb59c9796418c20da27b03bf1948fe8":[12,0,0,17,0,2],
-"structrapidjson_1_1_generic_pointer_1_1_token.html#ad866d674dbddf9690ad571b65e968600":[12,0,0,17,0,1],
-"structrapidjson_1_1_generic_string_ref.html":[12,0,0,20],
-"structrapidjson_1_1_generic_string_ref.html#a001276ee57cbcbd3c14449045c71e994":[12,0,0,20,9],
-"structrapidjson_1_1_generic_string_ref.html#a29cf407c6aa2313f13dff78d6ce02687":[12,0,0,20,2],
-"structrapidjson_1_1_generic_string_ref.html#a578c51ab574a50a9c760b9da7c7562f2":[12,0,0,20,6],
-"structrapidjson_1_1_generic_string_ref.html#aa2a8eccae3d7eb14c30bc21afb7d6fba":[12,0,0,20,0]
+"structrapidjson_1_1_generic_pointer_1_1_token.html#a50331c9e3dedc34d2c79745b2e58fb2d":[12,0,0,17,0,0]
 };

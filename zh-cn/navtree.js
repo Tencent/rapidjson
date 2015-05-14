@@ -140,9 +140,9 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "allocators_8h_source.html",
-"classrapidjson_1_1_generic_value.html#a7821da23b34e3509a80469acfa1850f5",
-"group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a51cfd45c07e28aa4fdd78b55d86f0591",
-"structrapidjson_1_1_generic_string_stream.html#a105adc6eec3483f90f6f2cf57aa81c12"
+"classrapidjson_1_1_generic_value.html#a6cd2b09795c48d2892bebc0ae350d51f",
+"group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html",
+"structrapidjson_1_1_generic_string_ref.html#acd4d5ebac2b610ce647356aa52998002"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
