@@ -6,6 +6,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.0.2] - 2015-05-14
 
+### Added
+* Add Value::XXXMember(...) overloads for std::string (#335)
+
 ### Fixed
 * Include rapidjson.h for all internal/error headers.
 * Parsing some numbers incorrectly in full-precision mode (`kFullPrecisionParseFlag`) (#342)
