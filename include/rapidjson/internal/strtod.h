@@ -191,8 +191,13 @@ inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosit
     DiyFp rounded(v.f >> precisionSize, v.e + precisionSize);
     const uint64_t precisionBits = (v.f & ((uint64_t(1) << precisionSize) - 1)) * kUlp;
     const uint64_t halfWay = (uint64_t(1) << (precisionSize - 1)) * kUlp;
-    if (precisionBits >= halfWay + error)
+    if (precisionBits >= halfWay + error) {
         rounded.f++;
+        if (rounded.f & (DiyFp::kDpHiddenBit << 1)) { // rounding overflows mantissa (issue #340)
+            rounded.f >>= 1;
+            rounded.e++;
+        }
+    }
 
     *result = rounded.ToDouble();
 

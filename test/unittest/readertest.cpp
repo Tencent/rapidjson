@@ -193,7 +193,7 @@ static void TestParseDouble() {
             EXPECT_DOUBLE_EQ(x, h.actual_); \
         } \
     }
-    
+
     TEST_DOUBLE(fullPrecision, "0.0", 0.0);
     TEST_DOUBLE(fullPrecision, "-0.0", -0.0); // For checking issue #289
     TEST_DOUBLE(fullPrecision, "1.0", 1.0);
@@ -327,13 +327,42 @@ static void TestParseDouble() {
                 if (fullPrecision) {
                     EXPECT_EQ(d.Uint64Value(), a.Uint64Value());
                     if (d.Uint64Value() != a.Uint64Value())
-                        printf("  String: %sn  Actual: %.17gnExpected: %.17gn", buffer, h.actual_, d.Value());
+                        printf("  String: %s\n  Actual: %.17g\nExpected: %.17g\n", buffer, h.actual_, d.Value());
                 }
                 else {
-                    EXPECT_EQ(d.Sign(), a.Sign()); /* for 0.0 != -0.0 */
+                    EXPECT_EQ(d.Sign(), a.Sign()); // for 0.0 != -0.0
                     EXPECT_DOUBLE_EQ(d.Value(), h.actual_);
                 }
             }
+        }
+    }
+
+    // Issue #340
+    TEST_DOUBLE(fullPrecision, "7.450580596923828e-9", 7.450580596923828e-9);
+    {
+        internal::Double d(1.0);
+        for (int i = 0; i < 324; i++) {
+            char buffer[32];
+            *internal::dtoa(d.Value(), buffer) = '\0';
+
+            StringStream s(buffer);
+            ParseDoubleHandler h;
+            Reader reader;
+            ASSERT_EQ(kParseErrorNone, reader.Parse<fullPrecision ? kParseFullPrecisionFlag : 0>(s, h).Code());
+            EXPECT_EQ(1u, h.step_);
+            internal::Double a(h.actual_);
+            if (fullPrecision) {
+                EXPECT_EQ(d.Uint64Value(), a.Uint64Value());
+                if (d.Uint64Value() != a.Uint64Value())
+                    printf("  String: %s\n  Actual: %.17g\nExpected: %.17g\n", buffer, h.actual_, d.Value());
+            }
+            else {
+                EXPECT_EQ(d.Sign(), a.Sign()); // for 0.0 != -0.0
+                EXPECT_DOUBLE_EQ(d.Value(), h.actual_);
+            }
+
+
+            d = d.Value() * 0.5;
         }
     }
 #undef TEST_DOUBLE
