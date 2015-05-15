@@ -208,7 +208,6 @@ struct SchemaValidationContext {
         hasher(),
         patternPropertiesSchemas(),
         notValidator(),
-        refValidator(),
         patternPropertiesSchemaCount(),
         valuePatternValidatorType(kPatternValidatorOnly),
         objectDependencies(),
@@ -221,7 +220,6 @@ struct SchemaValidationContext {
     ~SchemaValidationContext() {
         delete hasher;
         delete notValidator;
-        delete refValidator;
         delete[] patternPropertiesSchemas;
         delete[] objectDependencies;
     }
@@ -239,7 +237,6 @@ struct SchemaValidationContext {
     SchemaValidatorArray patternPropertiesValidators;
     const SchemaType** patternPropertiesSchemas;
     ISchemaValidator* notValidator;
-    ISchemaValidator* refValidator;
     SizeType patternPropertiesSchemaCount;
     PatternValidatorType valuePatternValidatorType;
     PatternValidatorType objectPatternValidatorType;
@@ -274,7 +271,6 @@ public:
         enum_(),
         enumCount_(),
         not_(),
-        ref_(),
         type_((1 << kTotalSchemaType) - 1), // typeless
         properties_(),
         additionalPropertiesSchema_(),
@@ -332,10 +328,10 @@ public:
         AssigIfExist(oneOf_, document, p, value, "oneOf");
 
         if (const ValueType* v = GetMember(value, "not"))
-            not_ = document->CreateSchema(p.Append("not"), *v);
+            document->CreateSchema(&not_, p.Append("not"), *v);
 
-        if (const ValueType* v = GetMember(value, "$ref"))
-            document->AddRefSchema(this, *v);
+        //if (const ValueType* v = GetMember(value, "$ref"))
+        //    document->AddRefSchema(this, *v);
 
         // Object
 
@@ -379,7 +375,7 @@ public:
             for (ConstMemberIterator itr = properties->MemberBegin(); itr != properties->MemberEnd(); ++itr) {
                 SizeType index;
                 if (FindPropertyIndex(itr->name, &index)) {
-                    properties_[index].schema = document->CreateSchema(q.Append(itr->name), itr->value);
+                    document->CreateSchema(&properties_[index].schema, q.Append(itr->name), itr->value);
                     properties_[index].typeless = false;
                 }
             }
@@ -393,7 +389,7 @@ public:
             for (ConstMemberIterator itr = v->MemberBegin(); itr != v->MemberEnd(); ++itr) {
                 new (&patternProperties_[patternPropertyCount_]) PatternProperty();
                 patternProperties_[patternPropertyCount_].pattern = CreatePattern(itr->name);
-                patternProperties_[patternPropertyCount_].schema = document->CreateSchema(q.Append(itr->name), itr->value);
+                document->CreateSchema(&patternProperties_[patternPropertyCount_].schema, q.Append(itr->name), itr->value);
                 patternPropertyCount_++;
             }
         }
@@ -425,7 +421,7 @@ public:
                     }
                     else if (itr->value.IsObject()) {
                         hasSchemaDependencies_ = true;
-                        properties_[sourceIndex].dependenciesSchema = document->CreateSchema(q.Append(itr->name), itr->value);
+                        document->CreateSchema(&properties_[sourceIndex].dependenciesSchema, q.Append(itr->name), itr->value);
                     }
                 }
             }
@@ -435,7 +431,7 @@ public:
             if (v->IsBool())
                 additionalProperties_ = v->GetBool();
             else if (v->IsObject())
-                additionalPropertiesSchema_ = document->CreateSchema(p.Append("additionalProperties"), *v);
+                document->CreateSchema(&additionalPropertiesSchema_, p.Append("additionalProperties"), *v);
         }
 
         AssignIfExist(minProperties_, value, "minProperties");
@@ -444,13 +440,13 @@ public:
         // Array
         if (const ValueType* v = GetMember(value, "items")) {
             if (v->IsObject()) // List validation
-                itemsList_ = document->CreateSchema(p, *v);
+                document->CreateSchema(&itemsList_, p, *v);
             else if (v->IsArray()) { // Tuple validation
                 PointerType q = p.Append("items");
                 itemsTuple_ = static_cast<const Schema**>(allocator_->Malloc(sizeof(const Schema*) * v->Size()));
                 SizeType index = 0;
                 for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr, index++)
-                    itemsTuple_[itemsTupleCount_++] = document->CreateSchema(q.Append(index), *itr);
+                    document->CreateSchema(&itemsTuple_[itemsTupleCount_++], q.Append(index), *itr);
             }
         }
 
@@ -461,7 +457,7 @@ public:
             if (v->IsBool())
                 additionalItems_ = v->GetBool();
             else if (v->IsObject())
-                additionalItemsSchema_ = document->CreateSchema(p.Append("additionalItems"), *v);
+                document->CreateSchema(&additionalItemsSchema_, p.Append("additionalItems"), *v);
         }
 
         AssignIfExist(uniqueItems_, value, "uniqueItems");
@@ -599,9 +595,6 @@ public:
 
         if (not_ && context.notValidator->IsValid())
             RAPIDJSON_INVALID_KEYWORD_RETURN("not");
-
-        if (ref_ && !context.refValidator->IsValid())
-            RAPIDJSON_INVALID_KEYWORD_RETURN("$ref");
 
         return true;
     }
@@ -867,7 +860,7 @@ private:
                 out.schemas = static_cast<const Schema**>(allocator_->Malloc(out.count * sizeof(const Schema*)));
                 memset(out.schemas, 0, sizeof(Schema*)* out.count);
                 for (SizeType i = 0; i < out.count; i++)
-                    out.schemas[i] = document->CreateSchema(q.Append(i), (*v)[i]);
+                    document->CreateSchema(&out.schemas[i], q.Append(i), (*v)[i]);
             }
         }
     }
@@ -921,9 +914,6 @@ private:
         if (not_ && !context.notValidator)
             context.notValidator = context.factory->CreateSchemaValidator(*not_);
         
-        if (ref_ && !context.refValidator)
-            context.refValidator = context.factory->CreateSchemaValidator(*ref_);
-
         if (hasSchemaDependencies_ && !context.dependencyValidators.validators) {
             context.dependencyValidators.validators = new ISchemaValidator*[propertyCount_];
             context.dependencyValidators.count = propertyCount_;
@@ -1082,7 +1072,6 @@ private:
     SchemaArray anyOf_;
     SchemaArray oneOf_;
     const SchemaType* not_;
-    const SchemaType* ref_;
     unsigned type_; // bitmask of kSchemaType
 
     Property* properties_;
@@ -1150,6 +1139,7 @@ public:
     friend class GenericSchemaValidator;
 
     GenericSchemaDocument(const ValueType& document, IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) : 
+        document_(&document),
         remoteProvider_(remoteProvider),
         allocator_(allocator),
         ownAllocator_(),
@@ -1162,23 +1152,35 @@ public:
 
         // Generate root schema, it will call CreateSchema() to create sub-schemas,
         // And call AddRefSchema() if there are $ref.
-        root_ = CreateSchemaRecursive(PointerType(), static_cast<const ValueType&>(document));
+        CreateSchemaRecursive(&root_, PointerType(), static_cast<const ValueType&>(document));
 
         // Resolve $ref
         while (!schemaRef_.Empty()) {
-            SchemaEntry* refEntry = schemaRef_.template Pop<SchemaEntry>(1);
-            refEntry->schema->ref_ = GetSchema(refEntry->pointer);
-            refEntry->~SchemaEntry();
+            SchemaRefEntry* refEntry = schemaRef_.template Pop<SchemaRefEntry>(1);
+            if (const SchemaType* s = GetSchema(refEntry->target)) {
+                *refEntry->schema = s;
+
+                // Create entry in map if not exist
+                if (!GetSchema(refEntry->source)) {
+                    new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(refEntry->source, const_cast<SchemaType*>(s), false);
+                }
+            }
+            refEntry->~SchemaRefEntry();
         }
+
+        RAPIDJSON_ASSERT(root_ != 0);
+
         schemaRef_.ShrinkToFit(); // Deallocate all memory for ref
     }
 
     ~GenericSchemaDocument() {
         while (!schemaMap_.Empty()) {
             SchemaEntry* e = schemaMap_.template Pop<SchemaEntry>(1);
-            e->schema->~SchemaType();
-            Allocator::Free(e->schema);
-            e->~SchemaEntry();
+            if (e->owned) {
+                e->schema->~SchemaType();
+                Allocator::Free(e->schema);
+                e->~SchemaEntry();
+            }
         }
 
         RAPIDJSON_DELETE(ownAllocator_);
@@ -1187,39 +1189,60 @@ public:
     const SchemaType& GetRoot() const { return *root_; }
 
 private:
-    struct SchemaEntry {
-        SchemaEntry(const PointerType& p, SchemaType* s) : pointer(p), schema(s) {}
-        PointerType pointer;
-        SchemaType* schema;
+    struct SchemaRefEntry {
+        SchemaRefEntry(const PointerType& s, const PointerType& t, const SchemaType** outSchema) : source(s), target(t), schema(outSchema) {}
+        PointerType source;
+        PointerType target;
+        const SchemaType** schema;
     };
 
-    const SchemaType* CreateSchemaRecursive(const PointerType& pointer, const ValueType& v) {
+    struct SchemaEntry {
+        SchemaEntry(const PointerType& p, SchemaType* s, bool o) : pointer(p), schema(s), owned(o) {}
+        PointerType pointer;
+        SchemaType* schema;
+        bool owned;
+    };
+
+    void CreateSchemaRecursive(const SchemaType** schema, const PointerType& pointer, const ValueType& v) {
+        *schema = SchemaType::GetTypeless();
+
         if (v.GetType() == kObjectType) {
             const SchemaType* s = GetSchema(pointer);
             if (!s)
-                s = CreateSchema(pointer, v);
+                CreateSchema(schema, pointer, v);
+            else
+                *schema = s;
+
             for (typename ValueType::ConstMemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr)
-                CreateSchemaRecursive(pointer.Append(itr->name), itr->value);
-            return s;
+                CreateSchemaRecursive(&s, pointer.Append(itr->name), itr->value);
         }
-        else if (v.GetType() == kArrayType)
+        else if (v.GetType() == kArrayType) {
+            const SchemaType* s;
             for (SizeType i = 0; i < v.Size(); i++)
-                CreateSchemaRecursive(pointer.Append(i), v[i]);
-        return 0;
+                CreateSchemaRecursive(&s, pointer.Append(i), v[i]);
+        }
     }
 
-    const SchemaType* CreateSchema(const PointerType& pointer, const ValueType& v) {
+    void CreateSchema(const SchemaType** schema, const PointerType& pointer, const ValueType& v) {
         RAPIDJSON_ASSERT(pointer.IsValid());
-        SchemaType* schema = new (allocator_->Malloc(sizeof(SchemaType))) SchemaType(this, allocator_, pointer, v);
-        new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(pointer, schema);
-        return schema;
+        if (v.IsObject()) {
+            if (!HandleRefSchema(pointer, schema, v)) {
+                SchemaType* s = new (allocator_->Malloc(sizeof(SchemaType))) SchemaType(this, allocator_, pointer, v);
+                new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(pointer, s, true);
+                *schema = s;
+            }
+        }
     }
 
-    void AddRefSchema(SchemaType* schema, const ValueType& v) {
-        if (v.IsString()) {
-            SizeType len = v.GetStringLength();
+    bool HandleRefSchema(const Pointer& source, const SchemaType** schema, const ValueType& v) {
+        typename ValueType::ConstMemberIterator itr = v.FindMember("$ref");
+        if (itr == v.MemberEnd())
+            return false;
+
+        if (itr->value.IsString()) {
+            SizeType len = itr->value.GetStringLength();
             if (len > 0) {
-                const Ch* s = v.GetString();
+                const Ch* s = itr->value.GetString();
                 SizeType i = 0;
                 while (i < len && s[i] != '#') // Find the first #
                     i++;
@@ -1228,18 +1251,29 @@ private:
                     if (remoteProvider_) {
                         if (const GenericSchemaDocument* remoteDocument = remoteProvider_->GetRemoteDocument(s, i - 1)) {
                             PointerType pointer(&s[i], len - i);
-                            if (pointer.IsValid())
-                                schema->ref_ = remoteDocument->GetSchema(pointer);
+                            if (pointer.IsValid()) {
+                                if (const SchemaType* s = remoteDocument->GetSchema(pointer)) {
+                                    *schema = s;
+                                    return true;
+                                }
+                            }
                         }
                     }
                 }
                 else if (s[i] == '#') { // Local reference, defer resolution
                     PointerType pointer(&s[i], len - i);
-                    if (pointer.IsValid())
-                        new (schemaRef_.template Push<SchemaEntry>()) SchemaEntry(pointer, schema);
+                    if (pointer.IsValid()) {
+                        if (const ValueType* nv = pointer.Get(*document_))
+                            if (HandleRefSchema(source, schema, *nv))
+                                return true;
+
+                        new (schemaRef_.template Push<SchemaRefEntry>()) SchemaRefEntry(source, pointer, schema);
+                        return true;
+                    }
                 }
             }
         }
+        return false;
     }
 
     const SchemaType* GetSchema(const PointerType& pointer) const {
@@ -1259,6 +1293,7 @@ private:
     static const size_t kInitialSchemaMapSize = 64;
     static const size_t kInitialSchemaRefSize = 64;
 
+    const ValueType* document_;             //!< Only temporarily for constructor
     IRemoteSchemaDocumentProviderType* remoteProvider_;
     Allocator *allocator_;
     Allocator *ownAllocator_;
@@ -1360,8 +1395,6 @@ public:
                 static_cast<GenericSchemaValidator*>(context->oneOfValidators.validators[i_])->method arg2;\
         if (context->notValidator)\
             static_cast<GenericSchemaValidator*>(context->notValidator)->method arg2;\
-        if (context->refValidator)\
-            static_cast<GenericSchemaValidator*>(context->refValidator)->method arg2;\
         if (context->dependencyValidators.validators)\
             for (SizeType i_ = 0; i_ < context->dependencyValidators.count; i_++)\
                 if (context->dependencyValidators.validators[i_])\
