@@ -1174,14 +1174,8 @@ public:
     }
 
     ~GenericSchemaDocument() {
-        while (!schemaMap_.Empty()) {
-            SchemaEntry* e = schemaMap_.template Pop<SchemaEntry>(1);
-            if (e->owned) {
-                e->schema->~SchemaType();
-                Allocator::Free(e->schema);
-                e->~SchemaEntry();
-            }
-        }
+        while (!schemaMap_.Empty())
+            schemaMap_.template Pop<SchemaEntry>(1)->~SchemaEntry();
 
         RAPIDJSON_DELETE(ownAllocator_);
     }
@@ -1198,43 +1192,48 @@ private:
 
     struct SchemaEntry {
         SchemaEntry(const PointerType& p, SchemaType* s, bool o) : pointer(p), schema(s), owned(o) {}
+        ~SchemaEntry() {
+            if (owned)
+                schema->~SchemaType();
+        }
         PointerType pointer;
         SchemaType* schema;
         bool owned;
     };
 
     void CreateSchemaRecursive(const SchemaType** schema, const PointerType& pointer, const ValueType& v) {
-        *schema = SchemaType::GetTypeless();
+        if (schema)
+            *schema = SchemaType::GetTypeless();
 
         if (v.GetType() == kObjectType) {
             const SchemaType* s = GetSchema(pointer);
             if (!s)
                 CreateSchema(schema, pointer, v);
-            else
+            else if (schema)
                 *schema = s;
 
             for (typename ValueType::ConstMemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr)
-                CreateSchemaRecursive(&s, pointer.Append(itr->name), itr->value);
+                CreateSchemaRecursive(0, pointer.Append(itr->name), itr->value);
         }
-        else if (v.GetType() == kArrayType) {
-            const SchemaType* s;
+        else if (v.GetType() == kArrayType)
             for (SizeType i = 0; i < v.Size(); i++)
-                CreateSchemaRecursive(&s, pointer.Append(i), v[i]);
-        }
+                CreateSchemaRecursive(0, pointer.Append(i), v[i]);
     }
 
     void CreateSchema(const SchemaType** schema, const PointerType& pointer, const ValueType& v) {
         RAPIDJSON_ASSERT(pointer.IsValid());
         if (v.IsObject()) {
-            if (!HandleRefSchema(pointer, schema, v)) {
+            if (!schema || !HandleRefSchema(pointer, schema, v)) {
                 SchemaType* s = new (allocator_->Malloc(sizeof(SchemaType))) SchemaType(this, allocator_, pointer, v);
                 new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(pointer, s, true);
-                *schema = s;
+                if (schema)
+                    *schema = s;
             }
         }
     }
 
     bool HandleRefSchema(const Pointer& source, const SchemaType** schema, const ValueType& v) {
+        RAPIDJSON_ASSERT(schema != 0);
         typename ValueType::ConstMemberIterator itr = v.FindMember("$ref");
         if (itr == v.MemberEnd())
             return false;
