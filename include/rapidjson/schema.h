@@ -35,14 +35,29 @@
 #define RAPIDJSON_SCHEMA_HAS_REGEX 0
 #endif
 
+#ifndef RAPIDJSON_SCHEMA_VERBOSE
+#define RAPIDJSON_SCHEMA_VERBOSE 0
+#endif
+
+#if RAPIDJSON_SCHEMA_VERBOSE
+#include "stringbuffer.h"
+#endif
+
 #if defined(__GNUC__)
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
+#if RAPIDJSON_SCHEMA_VERBOSE
+#define RAPIDJSON_INVALID_KEYWORD_VERBOSE(keyword) printf("Fail: %s\n", keyword)
+#else
+#define RAPIDJSON_INVALID_KEYWORD_VERBOSE(keyword)
+#endif
+
 #define RAPIDJSON_INVALID_KEYWORD_RETURN(keyword)\
     RAPIDJSON_MULTILINEMACRO_BEGIN\
     context.invalidKeyword = keyword;\
+    RAPIDJSON_INVALID_KEYWORD_VERBOSE(keyword);\
     return false;\
     RAPIDJSON_MULTILINEMACRO_END
 
@@ -1330,6 +1345,9 @@ public:
         schemaStack_(allocator, schemaStackCapacity),
         documentStack_(allocator, documentStackCapacity),
         valid_(true)
+#if RAPIDJSON_SCHEMA_VERBOSE
+        , depth_(0)
+#endif
     {
     }
 
@@ -1346,6 +1364,9 @@ public:
         schemaStack_(allocator, schemaStackCapacity),
         documentStack_(allocator, documentStackCapacity),
         valid_(true)
+#if RAPIDJSON_SCHEMA_VERBOSE
+        , depth_(0)
+#endif
     {
     }
 
@@ -1462,24 +1483,35 @@ public:
 
     // Implementation of ISchemaValidatorFactory<SchemaType>
     virtual ISchemaValidator* CreateSchemaValidator(const SchemaType& root) const {
-        return new GenericSchemaValidator(root);
+        return new GenericSchemaValidator(*schemaDocument_, root
+#if RAPIDJSON_SCHEMA_VERBOSE
+        , depth_ + 1
+#endif
+        );
     }
 
 private:
     typedef typename SchemaType::Context Context;
 
     GenericSchemaValidator( 
+        const SchemaDocumentType& schemaDocument,
         const SchemaType& root,
+#if RAPIDJSON_SCHEMA_VERBOSE
+        unsigned depth,
+#endif
         StateAllocator* allocator = 0,
         size_t schemaStackCapacity = kDefaultSchemaStackCapacity,
         size_t documentStackCapacity = kDefaultDocumentStackCapacity)
         :
-        schemaDocument_(),
+        schemaDocument_(&schemaDocument),
         root_(root),
         outputHandler_(nullOutputHandler_),
         schemaStack_(allocator, schemaStackCapacity),
         documentStack_(allocator, documentStackCapacity),
         valid_(true)
+#if RAPIDJSON_SCHEMA_VERBOSE
+        , depth_(depth)
+#endif
     {
     }
 
@@ -1517,6 +1549,16 @@ private:
         if (!CurrentSchema().EndValue(CurrentContext()))
             return false;
 
+#if RAPIDJSON_SCHEMA_VERBOSE
+        StringBuffer sb;
+        const PointerType pointer = schemaDocument_->GetPointer(&CurrentSchema());
+        pointer.Stringify(sb);
+
+        *documentStack_.template Push<Ch>() = '\0';
+        documentStack_.template Pop<Ch>(1);
+        printf("S: %*s%s\nD: %*s%s\n\n", depth_ * 4, " ", sb.GetString(), depth_ * 4, " ", documentStack_.template Bottom<Ch>());
+#endif
+
         uint64_t h = CurrentContext().arrayUniqueness ? CurrentContext().hasher->GetHashCode() : 0;
         
         PopSchema();
@@ -1531,9 +1573,7 @@ private:
             }
         }
 
-        // *documentStack_.template Push<Ch>() = '\0';
-        // documentStack_.template Pop<Ch>(1);
-        // printf("document: %s\n", documentStack_.template Bottom<Ch>());
+        // Remove the last token of document pointer
         while (!documentStack_.Empty() && *documentStack_.template Pop<Ch>(1) != '/')
             ;
 
@@ -1580,6 +1620,9 @@ private:
     internal::Stack<StateAllocator> schemaStack_;    //!< stack to store the current path of schema (BaseSchemaType *)
     internal::Stack<StateAllocator> documentStack_;  //!< stack to store the current path of validating document (Ch)
     bool valid_;
+#if RAPIDJSON_SCHEMA_VERBOSE
+    unsigned depth_;
+#endif
 };
 
 typedef GenericSchemaValidator<SchemaDocument> SchemaValidator;
