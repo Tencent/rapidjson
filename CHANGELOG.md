@@ -4,7 +4,20 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.2] - 2015-05-14
+
+### Added
+* Add Value::XXXMember(...) overloads for std::string (#335)
+
+### Fixed
 * Include rapidjson.h for all internal/error headers.
+* Parsing some numbers incorrectly in full-precision mode (`kFullPrecisionParseFlag`) (#342)
+* Fix alignment of 64bit platforms (#328)
+* Fix MemoryPoolAllocator::Clear() to clear user-buffer (0691502573f1afd3341073dd24b12c3db20fbde4)
+
+### Changed
+* CMakeLists for include as a thirdparty in projects (#334, #337)
+* Change Document::ParseStream() to use stack allocator for Reader (ffbe38614732af8e0b3abdc8b50071f386a4a685) 
 
 ## [1.0.1] - 2015-04-25
 
@@ -60,6 +73,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 0.1 - 2011-11-18
 
-[Unreleased]: https://github.com/miloyip/rapidjson/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/miloyip/rapidjson/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/miloyip/rapidjson/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/miloyip/rapidjson/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/miloyip/rapidjson/compare/v1.0-beta...v1.0.0
