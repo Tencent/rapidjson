@@ -50,11 +50,7 @@ RAPIDJSON_DIAG_OFF(effc++)
 
 #if RAPIDJSON_SCHEMA_VERBOSE
 #define RAPIDJSON_INVALID_KEYWORD_VERBOSE(keyword) \
-RAPIDJSON_MULTILINEMACRO_BEGIN\
-    StringBuffer sb;\
-    context.schema->GetPointer().Stringify(sb);\
-    printf("Fail schema: %s\nFail keyword: %s\n", sb.GetString(), keyword);\
-RAPIDJSON_MULTILINEMACRO_END
+    printf("Fail keyword: %s\n", keyword)
 #else
 #define RAPIDJSON_INVALID_KEYWORD_VERBOSE(keyword)
 #endif
@@ -287,7 +283,6 @@ public:
     friend class GenericSchemaDocument<ValueType, AllocatorType>;
 
     Schema(SchemaDocumentType* document, const PointerType& p, const ValueType& value, AllocatorType* allocator) :
-        pointer_(p),
         allocator_(allocator),
         enum_(),
         enumCount_(),
@@ -527,8 +522,6 @@ public:
         }
 #endif
     }
-
-    const PointerType& GetPointer() const { return pointer_; }
 
     bool BeginValue(Context& context) const {
         if (context.inArray) {
@@ -1088,7 +1081,6 @@ private:
         RegexType* pattern;
     };
 
-    PointerType pointer_;
     AllocatorType* allocator_;
     uint64_t* enum_;
     SizeType enumCount_;
@@ -1181,11 +1173,12 @@ public:
         while (!schemaRef_.Empty()) {
             SchemaRefEntry* refEntry = schemaRef_.template Pop<SchemaRefEntry>(1);
             if (const SchemaType* s = GetSchema(refEntry->target)) {
-                *refEntry->schema = s;
+                if (refEntry->schema)
+                    *refEntry->schema = s;
 
                 // Create entry in map if not exist
                 if (!GetSchema(refEntry->source)) {
-                    new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(const_cast<SchemaType*>(s), false);
+                    new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(refEntry->source, const_cast<SchemaType*>(s), false);
                 }
             }
             refEntry->~SchemaRefEntry();
@@ -1214,11 +1207,12 @@ private:
     };
 
     struct SchemaEntry {
-        SchemaEntry(SchemaType* s, bool o) : schema(s), owned(o) {}
+        SchemaEntry(const PointerType& p, SchemaType* s, bool o) : pointer(p), schema(s), owned(o) {}
         ~SchemaEntry() {
             if (owned)
                 schema->~SchemaType();
         }
+        PointerType pointer;
         SchemaType* schema;
         bool owned;
     };
@@ -1245,9 +1239,9 @@ private:
     void CreateSchema(const SchemaType** schema, const PointerType& pointer, const ValueType& v) {
         RAPIDJSON_ASSERT(pointer.IsValid());
         if (v.IsObject()) {
-            if (!schema || !HandleRefSchema(pointer, schema, v)) {
+            if (!HandleRefSchema(pointer, schema, v)) {
                 SchemaType* s = new (allocator_->Malloc(sizeof(SchemaType))) SchemaType(this, pointer, v, allocator_);
-                new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(s, true);
+                new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(pointer, s, true);
                 if (schema)
                     *schema = s;
             }
@@ -1255,7 +1249,6 @@ private:
     }
 
     bool HandleRefSchema(const Pointer& source, const SchemaType** schema, const ValueType& v) {
-        RAPIDJSON_ASSERT(schema != 0);
         typename ValueType::ConstMemberIterator itr = v.FindMember("$ref");
         if (itr == v.MemberEnd())
             return false;
@@ -1274,7 +1267,8 @@ private:
                             PointerType pointer(&s[i], len - i);
                             if (pointer.IsValid()) {
                                 if (const SchemaType* s = remoteDocument->GetSchema(pointer)) {
-                                    *schema = s;
+                                    if (schema)
+                                        *schema = s;
                                     return true;
                                 }
                             }
@@ -1299,13 +1293,16 @@ private:
 
     const SchemaType* GetSchema(const PointerType& pointer) const {
         for (const SchemaEntry* target = schemaMap_.template Bottom<SchemaEntry>(); target != schemaMap_.template End<SchemaEntry>(); ++target)
-            if (pointer == target->schema->pointer_)
+            if (pointer == target->pointer)
                 return target->schema;
         return 0;
     }
 
     PointerType GetPointer(const SchemaType* schema) const {
-        return schema->pointer_;
+        for (const SchemaEntry* target = schemaMap_.template Bottom<SchemaEntry>(); target != schemaMap_.template End<SchemaEntry>(); ++target)
+            if (schema== target->schema)
+                return target->pointer;
+        return PointerType();
     }
 
     static const size_t kInitialSchemaMapSize = 64;
@@ -1389,7 +1386,7 @@ public:
     virtual bool IsValid() const { return valid_; }
 
     PointerType GetInvalidSchemaPointer() const {
-        return schemaStack_.Empty() ? PointerType() : CurrentSchema().GetPointer();
+        return schemaStack_.Empty() ? PointerType() : schemaDocument_->GetPointer(&CurrentSchema());
     }
 
     const char* GetInvalidSchemaKeyword() const {
@@ -1495,6 +1492,7 @@ RAPIDJSON_MULTILINEMACRO_END
         RAPIDJSON_SCHEMA_HANDLE_END_(EndArray, (elementCount));
     }
 
+#undef RAPIDJSON_SCHEMA_HANDLE_BEGIN_VERBOSE_
 #undef RAPIDJSON_SCHEMA_HANDLE_BEGIN_
 #undef RAPIDJSON_SCHEMA_HANDLE_PARALLEL_
 #undef RAPIDJSON_SCHEMA_HANDLE_VALUE_
@@ -1569,7 +1567,7 @@ private:
 
 #if RAPIDJSON_SCHEMA_VERBOSE
         StringBuffer sb;
-        CurrentSchema().GetPointer().Stringify(sb);
+        schemaDocument_->GetPointer(&CurrentSchema()).Stringify(sb);
 
         *documentStack_.template Push<Ch>() = '\0';
         documentStack_.template Pop<Ch>(1);
