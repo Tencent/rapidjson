@@ -281,7 +281,8 @@ public:
     typedef GenericValue<EncodingType, AllocatorType> SValue;
     friend class GenericSchemaDocument<ValueType, AllocatorType>;
 
-    Schema(SchemaDocumentType* document, AllocatorType* allocator, const PointerType& p, const ValueType& value) :
+    Schema(SchemaDocumentType* document, const PointerType& p, const ValueType& value, AllocatorType* allocator) :
+        pointer_(p),
         allocator_(allocator),
         enum_(),
         enumCount_(),
@@ -521,6 +522,8 @@ public:
         }
 #endif
     }
+
+    const PointerType& GetPointer() const { return pointer_; }
 
     bool BeginValue(Context& context) const {
         if (context.inArray) {
@@ -833,7 +836,7 @@ private:
     };
 
     static const SchemaType* GetTypeless() {
-        static SchemaType typeless(0, 0, PointerType(), Value(kObjectType).Move());
+        static SchemaType typeless(0, PointerType(), Value(kObjectType).Move(), 0);
         return &typeless;
     }
 
@@ -1080,6 +1083,7 @@ private:
         RegexType* pattern;
     };
 
+    PointerType pointer_;
     AllocatorType* allocator_;
     uint64_t* enum_;
     SizeType enumCount_;
@@ -1177,7 +1181,7 @@ public:
 
                 // Create entry in map if not exist
                 if (!GetSchema(refEntry->source)) {
-                    new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(refEntry->source, const_cast<SchemaType*>(s), false);
+                    new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(const_cast<SchemaType*>(s), false);
                 }
             }
             refEntry->~SchemaRefEntry();
@@ -1206,12 +1210,11 @@ private:
     };
 
     struct SchemaEntry {
-        SchemaEntry(const PointerType& p, SchemaType* s, bool o) : pointer(p), schema(s), owned(o) {}
+        SchemaEntry(SchemaType* s, bool o) : schema(s), owned(o) {}
         ~SchemaEntry() {
             if (owned)
                 schema->~SchemaType();
         }
-        PointerType pointer;
         SchemaType* schema;
         bool owned;
     };
@@ -1239,8 +1242,8 @@ private:
         RAPIDJSON_ASSERT(pointer.IsValid());
         if (v.IsObject()) {
             if (!schema || !HandleRefSchema(pointer, schema, v)) {
-                SchemaType* s = new (allocator_->Malloc(sizeof(SchemaType))) SchemaType(this, allocator_, pointer, v);
-                new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(pointer, s, true);
+                SchemaType* s = new (allocator_->Malloc(sizeof(SchemaType))) SchemaType(this, pointer, v, allocator_);
+                new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(s, true);
                 if (schema)
                     *schema = s;
             }
@@ -1292,16 +1295,13 @@ private:
 
     const SchemaType* GetSchema(const PointerType& pointer) const {
         for (const SchemaEntry* target = schemaMap_.template Bottom<SchemaEntry>(); target != schemaMap_.template End<SchemaEntry>(); ++target)
-            if (pointer == target->pointer)
+            if (pointer == target->schema->pointer_)
                 return target->schema;
         return 0;
     }
 
     PointerType GetPointer(const SchemaType* schema) const {
-        for (const SchemaEntry* target = schemaMap_.template Bottom<SchemaEntry>(); target != schemaMap_.template End<SchemaEntry>(); ++target)
-            if (schema == target->schema)
-                return target->pointer;
-        return PointerType();
+        return schema->pointer_;
     }
 
     static const size_t kInitialSchemaMapSize = 64;
@@ -1385,7 +1385,7 @@ public:
     virtual bool IsValid() const { return valid_; }
 
     PointerType GetInvalidSchemaPointer() const {
-        return schemaStack_.Empty() ? PointerType() : schemaDocument_->GetPointer(&CurrentSchema());
+        return schemaStack_.Empty() ? PointerType() : CurrentSchema().GetPointer();
     }
 
     const char* GetInvalidSchemaKeyword() const {
@@ -1551,8 +1551,7 @@ private:
 
 #if RAPIDJSON_SCHEMA_VERBOSE
         StringBuffer sb;
-        const PointerType pointer = schemaDocument_->GetPointer(&CurrentSchema());
-        pointer.Stringify(sb);
+        CurrentSchema().GetPointer().Stringify(sb);
 
         *documentStack_.template Push<Ch>() = '\0';
         documentStack_.template Pop<Ch>(1);
