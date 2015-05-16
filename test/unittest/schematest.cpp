@@ -659,7 +659,7 @@ TEST(SchemaValidator, Array_ItemsList) {
     SchemaDocument s(sd);
 
     VALIDATE(s, "[1, 2, 3, 4, 5]", true);
-    INVALIDATE(s, "[1, 2, \"3\", 4, 5]", "", "type", "/2");
+    INVALIDATE(s, "[1, 2, \"3\", 4, 5]", "/items", "type", "/2");
     VALIDATE(s, "[]", true);
 }
 
@@ -776,8 +776,8 @@ TEST(SchemaValidator, ObjectInArray) {
     SchemaDocument s(sd);
 
     VALIDATE(s, "[\"a\"]", true);
-    INVALIDATE(s, "[1]", "", "type", "/0");
-    INVALIDATE(s, "[{}]", "", "type", "/0");
+    INVALIDATE(s, "[1]", "/items", "type", "/0");
+    INVALIDATE(s, "[{}]", "/items", "type", "/0");
 }
 
 TEST(SchemaValidator, MultiTypeInObject) {

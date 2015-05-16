@@ -60,11 +60,11 @@ RAPIDJSON_MULTILINEMACRO_END
 #endif
 
 #define RAPIDJSON_INVALID_KEYWORD_RETURN(keyword)\
-    RAPIDJSON_MULTILINEMACRO_BEGIN\
+RAPIDJSON_MULTILINEMACRO_BEGIN\
     context.invalidKeyword = keyword;\
     RAPIDJSON_INVALID_KEYWORD_VERBOSE(keyword);\
     return false;\
-    RAPIDJSON_MULTILINEMACRO_END
+RAPIDJSON_MULTILINEMACRO_END
 
 RAPIDJSON_NAMESPACE_BEGIN
 
@@ -460,10 +460,10 @@ public:
 
         // Array
         if (const ValueType* v = GetMember(value, "items")) {
+            PointerType q = p.Append("items");
             if (v->IsObject()) // List validation
-                document->CreateSchema(&itemsList_, p, *v);
+                document->CreateSchema(&itemsList_, q, *v);
             else if (v->IsArray()) { // Tuple validation
-                PointerType q = p.Append("items");
                 itemsTuple_ = static_cast<const Schema**>(allocator_->Malloc(sizeof(const Schema*) * v->Size()));
                 SizeType index = 0;
                 for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr, index++)
@@ -1126,7 +1126,6 @@ private:
     SValue minimum_;
     SValue maximum_;
     SValue multipleOf_;
-    bool hasMultipleOf_;
     bool exclusiveMinimum_;
     bool exclusiveMaximum_;
 };
