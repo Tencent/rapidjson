@@ -49,7 +49,12 @@ RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
 #if RAPIDJSON_SCHEMA_VERBOSE
-#define RAPIDJSON_INVALID_KEYWORD_VERBOSE(keyword) printf("Fail: %s\n", keyword)
+#define RAPIDJSON_INVALID_KEYWORD_VERBOSE(keyword) \
+RAPIDJSON_MULTILINEMACRO_BEGIN\
+    StringBuffer sb;\
+    context.schema->GetPointer().Stringify(sb);\
+    printf("Fail schema: %s\nFail keyword: %s\n", sb.GetString(), keyword);\
+RAPIDJSON_MULTILINEMACRO_END
 #else
 #define RAPIDJSON_INVALID_KEYWORD_VERBOSE(keyword)
 #endif
@@ -1396,9 +1401,23 @@ public:
         return documentStack_.Empty() ? PointerType() : PointerType(documentStack_.template Bottom<Ch>(), documentStack_.GetSize() / sizeof(Ch));
     }
 
+#if RAPIDJSON_SCHEMA_VERBOSE
+#define RAPIDJSON_SCHEMA_HANDLE_BEGIN_VERBOSE_() \
+RAPIDJSON_MULTILINEMACRO_BEGIN\
+    *documentStack_.template Push<Ch>() = '\0';\
+    documentStack_.template Pop<Ch>(1);\
+    printf("Fail document: %s\n\n", documentStack_.template Bottom<Ch>());\
+RAPIDJSON_MULTILINEMACRO_END
+#else
+#define RAPIDJSON_SCHEMA_HANDLE_BEGIN_VERBOSE_()
+#endif
+
 #define RAPIDJSON_SCHEMA_HANDLE_BEGIN_(method, arg1)\
     if (!valid_) return false; \
-    if (!BeginValue() || !CurrentSchema().method arg1) return valid_ = false;
+    if (!BeginValue() || !CurrentSchema().method arg1) {\
+        RAPIDJSON_SCHEMA_HANDLE_BEGIN_VERBOSE_();\
+        return valid_ = false;\
+    }
 
 #define RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(method, arg2)\
     for (Context* context = schemaStack_.template Bottom<Context>(); context != schemaStack_.template End<Context>(); context++) {\
