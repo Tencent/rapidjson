@@ -382,6 +382,7 @@ public:
                 for (SizeType i = 0; i < propertyCount_; i++) {
                     new (&properties_[i]) Property();
                     properties_[i].name = allProperties[i];
+                    properties_[i].schema = GetTypeless();
                 }
             }
         }
@@ -390,10 +391,8 @@ public:
             PointerType q = p.Append("properties");
             for (ConstMemberIterator itr = properties->MemberBegin(); itr != properties->MemberEnd(); ++itr) {
                 SizeType index;
-                if (FindPropertyIndex(itr->name, &index)) {
+                if (FindPropertyIndex(itr->name, &index))
                     document->CreateSchema(&properties_[index].schema, q.Append(itr->name), itr->value);
-                    properties_[index].typeless = false;
-                }
             }
         }
 
@@ -717,14 +716,13 @@ public:
 
         SizeType index;
         if (FindPropertyIndex(str, len, &index)) {
-            const SchemaType* propertySchema = properties_[index].typeless ? GetTypeless() : properties_[index].schema;
             if (context.patternPropertiesSchemaCount > 0) {
-                context.patternPropertiesSchemas[context.patternPropertiesSchemaCount++] = propertySchema;
+                context.patternPropertiesSchemas[context.patternPropertiesSchemaCount++] = properties_[index].schema;
                 context.valueSchema = GetTypeless();
                 context.valuePatternValidatorType = Context::kPatternValidatorWithProperty;
             }
             else
-                context.valueSchema = propertySchema;
+                context.valueSchema = properties_[index].schema;
 
             if (properties_[index].required)
                 context.objectRequiredCount++;
@@ -1059,14 +1057,13 @@ private:
     }
 
     struct Property {
-        Property() : schema(), dependenciesSchema(), dependencies(), required(false), typeless(true) {}
+        Property() : schema(), dependenciesSchema(), dependencies(), required(false) {}
         ~Property() { AllocatorType::Free(dependencies); }
         SValue name;
         const SchemaType* schema;
         const SchemaType* dependenciesSchema;
         bool* dependencies;
         bool required;
-        bool typeless;
     };
 
     struct PatternProperty {
