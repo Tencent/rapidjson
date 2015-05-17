@@ -913,7 +913,8 @@ TEST(SchemaValidator, ValidateMetaSchema_UTF16) {
     free(json);
 }
 
-class RemoteSchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
+template <typename SchemaDocumentType = SchemaDocument>
+class RemoteSchemaDocumentProvider : public IGenericRemoteSchemaDocumentProvider<SchemaDocumentType> {
 public:
     RemoteSchemaDocumentProvider() : documentAllocator_(), schemaAllocator_() {
         const char* filenames[kCount] = {
@@ -932,9 +933,9 @@ public:
                 ADD_FAILURE();
             }
             else {
-                Document d(&documentAllocator_);
+                DocumentType d(&documentAllocator_);
                 d.Parse(json);
-                sd_[i] = new SchemaDocument(d, 0, &schemaAllocator_);
+                sd_[i] = new SchemaDocumentType(d, 0, &schemaAllocator_);
                 free(json);
             }
         };
@@ -945,7 +946,7 @@ public:
             delete sd_[i];
     }
 
-    virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
+    virtual const SchemaDocumentType* GetRemoteDocument(const char* uri, SizeType length) {
         const char* uris[kCount] = {
             "http://localhost:1234/integer.json",
             "http://localhost:1234/subSchemas.json",
@@ -960,13 +961,15 @@ public:
     }
 
 private:
+    typedef GenericDocument<typename SchemaDocumentType::EncodingType, MemoryPoolAllocator<> > DocumentType;
+
     RemoteSchemaDocumentProvider(const RemoteSchemaDocumentProvider&);
     RemoteSchemaDocumentProvider& operator=(const RemoteSchemaDocumentProvider&);
 
     static const size_t kCount = 4;
-    SchemaDocument* sd_[kCount];
-    Document::AllocatorType documentAllocator_;
-    SchemaDocument::AllocatorType schemaAllocator_;
+    SchemaDocumentType* sd_[kCount];
+    typename DocumentType::AllocatorType documentAllocator_;
+    typename SchemaDocumentType::AllocatorType schemaAllocator_;
 };
 
 TEST(SchemaValidator, TestSuite) {
@@ -1007,12 +1010,17 @@ TEST(SchemaValidator, TestSuite) {
     unsigned testCount = 0;
     unsigned passCount = 0;
 
-    RemoteSchemaDocumentProvider provider;
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
 
     char documentBuffer[65536];
+    char documentStackBuffer[65536];
     char schemaBuffer[65536];
-    Document::AllocatorType documentAllocator(documentBuffer, sizeof(documentBuffer));
-    SchemaDocument::AllocatorType schemaAllocator(schemaBuffer, sizeof(schemaBuffer));
+    char validatorBuffer[65536];
+    MemoryPoolAllocator<> documentAllocator(documentBuffer, sizeof(documentBuffer));
+    MemoryPoolAllocator<> documentStackAllocator(documentStackBuffer, sizeof(documentStackBuffer));
+    MemoryPoolAllocator<> schemaAllocator(schemaBuffer, sizeof(schemaBuffer));
+    MemoryPoolAllocator<> validatorAllocator(validatorBuffer, sizeof(validatorBuffer));
 
     for (size_t i = 0; i < sizeof(filenames) / sizeof(filenames[0]); i++) {
         char filename[FILENAME_MAX];
@@ -1023,7 +1031,7 @@ TEST(SchemaValidator, TestSuite) {
             ADD_FAILURE();
         }
         else {
-            Document d(&documentAllocator);
+            GenericDocument<UTF8<>, MemoryPoolAllocator<>, MemoryPoolAllocator<> > d(&documentAllocator, 1024, &documentStackAllocator);
             d.Parse(json);
             if (d.HasParseError()) {
                 printf("json test suite file %s has parse error", filename);
@@ -1032,8 +1040,8 @@ TEST(SchemaValidator, TestSuite) {
             else {
                 for (Value::ConstValueIterator schemaItr = d.Begin(); schemaItr != d.End(); ++schemaItr) {
                     {
-                        SchemaDocument schema((*schemaItr)["schema"], &provider, &schemaAllocator);
-                        SchemaValidator validator(schema);
+                        SchemaDocumentType schema((*schemaItr)["schema"], &provider, &schemaAllocator);
+                        GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > validator(schema, &validatorAllocator);
                         const char* description1 = (*schemaItr)["description"].GetString();
                         const Value& tests = (*schemaItr)["tests"];
                         for (Value::ConstValueIterator testItr = tests.Begin(); testItr != tests.End(); ++testItr) {
@@ -1050,9 +1058,10 @@ TEST(SchemaValidator, TestSuite) {
                                     passCount++;
                             }
                         }
-                        //printf("%zu %zu\n", documentAllocator.Size(), schemaAllocator.Size());
+                        //printf("%zu %zu %zu\n", documentAllocator.Size(), schemaAllocator.Size(), validatorAllocator.Size());
                     }
                     schemaAllocator.Clear();
+                    validatorAllocator.Clear();
                 }
             }
         }
