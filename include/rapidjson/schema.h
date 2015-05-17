@@ -96,8 +96,8 @@ inline void PrintValidatorPointers(unsigned depth, const wchar_t* s, const wchar
 
 #define RAPIDJSON_INVALID_KEYWORD_RETURN(keyword)\
 RAPIDJSON_MULTILINEMACRO_BEGIN\
-    context.invalidKeyword = keyword;\
-    RAPIDJSON_INVALID_KEYWORD_VERBOSE(keyword);\
+    context.invalidKeyword = keyword.GetString();\
+    RAPIDJSON_INVALID_KEYWORD_VERBOSE(keyword.GetString());\
     return false;\
 RAPIDJSON_MULTILINEMACRO_END
 
@@ -843,9 +843,10 @@ public:
 
     // Generate functions for string literal according to Ch
 #define RAPIDJSON_STRING_(name, ...) \
-    static const Ch* Get##name##String() {\
+    static const ValueType& Get##name##String() {\
         static const Ch s[] = { __VA_ARGS__, '\0' };\
-        return s;\
+        static const ValueType v(s, sizeof(s) / sizeof(Ch) - 1);\
+        return v;\
     }
 
     RAPIDJSON_STRING_(Null, 'n', 'u', 'l', 'l');
@@ -924,27 +925,27 @@ private:
     }
 
     template <typename ValueType>
-    static const ValueType* GetMember(const ValueType& value, const Ch* name) {
+    static const ValueType* GetMember(const ValueType& value, const ValueType& name) {
         typename ValueType::ConstMemberIterator itr = value.FindMember(name);
         return itr != value.MemberEnd() ? &(itr->value) : 0;
     }
 
     template <typename ValueType>
-    static void AssignIfExist(bool& out, const ValueType& value, const Ch* name) {
+    static void AssignIfExist(bool& out, const ValueType& value, const ValueType& name) {
         if (const ValueType* v = GetMember(value, name))
             if (v->IsBool())
                 out = v->GetBool();
     }
 
     template <typename ValueType>
-    static void AssignIfExist(SizeType& out, const ValueType& value, const Ch* name) {
+    static void AssignIfExist(SizeType& out, const ValueType& value, const ValueType& name) {
         if (const ValueType* v = GetMember(value, name))
             if (v->IsUint64() && v->GetUint64() <= SizeType(~0))
                 out = static_cast<SizeType>(v->GetUint64());
     }
 
     template <typename DocumentType, typename ValueType, typename PointerType>
-    void AssignIfExist(SchemaArray& out, const DocumentType& document, const PointerType& p, const ValueType& value, const Ch* name) {
+    void AssignIfExist(SchemaArray& out, const DocumentType& document, const PointerType& p, const ValueType& value, const ValueType& name) {
         if (const ValueType* v = GetMember(value, name)) {
             if (v->IsArray() && v->Size() > 0) {
                 PointerType q = p.Append(name);
@@ -1315,8 +1316,9 @@ private:
 
     bool HandleRefSchema(const PointerType& source, const SchemaType** schema, const ValueType& v) {
         static const Ch kRefString[] = { '$', 'r', 'e', 'f', '\0' };
+        static const ValueType kRefValue(kRefString, 4);
 
-        typename ValueType::ConstMemberIterator itr = v.FindMember(kRefString);
+        typename ValueType::ConstMemberIterator itr = v.FindMember(kRefValue);
         if (itr == v.MemberEnd())
             return false;
 
