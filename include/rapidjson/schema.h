@@ -131,6 +131,7 @@ public:
     virtual ISchemaValidator* CreateSchemaValidator(const SchemaType&) = 0;
     virtual void DestroySchemaValidator(ISchemaValidator* validator) = 0;
     virtual void* CreateHasher() = 0;
+    virtual uint64_t GetHashCode(void* hasher) = 0;
     virtual void DestroryHasher(void* hasher) = 0;
     virtual void* MallocState(size_t size) = 0;
     virtual void* ReallocState(void* originalPtr, size_t originalSize, size_t newSize) = 0;
@@ -146,7 +147,7 @@ class Hasher {
 public:
     typedef typename Encoding::Ch Ch;
 
-    Hasher(Allocator* allocator = 0) : stack_(allocator, kDefaultSize) {}
+    Hasher(Allocator* allocator = 0, size_t stackCapacity = kDefaultSize) : stack_(allocator, stackCapacity) {}
 
     bool Null() { return WriteType(kNullType); }
     bool Bool(bool b) { return WriteType(b ? kTrueType : kFalseType); }
@@ -318,7 +319,6 @@ public:
     typedef typename EncodingType::Ch Ch;
     typedef SchemaValidationContext<SchemaDocumentType> Context;
     typedef Schema<SchemaDocumentType> SchemaType;
-    typedef Hasher<EncodingType, AllocatorType> HasherType;
     typedef GenericValue<EncodingType, AllocatorType> SValue;
     friend class GenericSchemaDocument<ValueType, AllocatorType>;
 
@@ -374,7 +374,10 @@ public:
             if (v->IsArray() && v->Size() > 0) {
                 enum_ = static_cast<uint64_t*>(allocator_->Malloc(sizeof(uint64_t) * v->Size()));
                 for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr) {
-                    HasherType h;
+                    typedef Hasher<EncodingType, MemoryPoolAllocator<> > EnumHasherType;
+                    char buffer[256 + 24];
+                    MemoryPoolAllocator<> hasherAllocator(buffer, sizeof(buffer));
+                    EnumHasherType h(&hasherAllocator, 256);
                     itr->Accept(h);
                     enum_[enumCount_++] = h.GetHashCode();
                 }
@@ -385,7 +388,7 @@ public:
         AssignIfExist(oneOf_, document, p, value, GetOneOfString());
 
         if (const ValueType* v = GetMember(value, GetNotString())) {
-            document->CreateSchema(&not_, p.Append(GetNotString()), *v);
+            document->CreateSchema(&not_, p.Append(GetNotString(), allocator_), *v);
             notValidatorIndex_ = validatorCount_;
             validatorCount_++;
         }
@@ -429,23 +432,23 @@ public:
         }
 
         if (properties && properties->IsObject()) {
-            PointerType q = p.Append(GetPropertiesString());
+            PointerType q = p.Append(GetPropertiesString(), allocator_);
             for (ConstMemberIterator itr = properties->MemberBegin(); itr != properties->MemberEnd(); ++itr) {
                 SizeType index;
                 if (FindPropertyIndex(itr->name, &index))
-                    document->CreateSchema(&properties_[index].schema, q.Append(itr->name), itr->value);
+                    document->CreateSchema(&properties_[index].schema, q.Append(itr->name, allocator_), itr->value);
             }
         }
 
         if (const ValueType* v = GetMember(value, GetPatternPropertiesString())) {
-            PointerType q = p.Append(GetPatternPropertiesString());
+            PointerType q = p.Append(GetPatternPropertiesString(), allocator_);
             patternProperties_ = static_cast<PatternProperty*>(allocator_->Malloc(sizeof(PatternProperty) * v->MemberCount()));
             patternPropertyCount_ = 0;
 
             for (ConstMemberIterator itr = v->MemberBegin(); itr != v->MemberEnd(); ++itr) {
                 new (&patternProperties_[patternPropertyCount_]) PatternProperty();
                 patternProperties_[patternPropertyCount_].pattern = CreatePattern(itr->name);
-                document->CreateSchema(&patternProperties_[patternPropertyCount_].schema, q.Append(itr->name), itr->value);
+                document->CreateSchema(&patternProperties_[patternPropertyCount_].schema, q.Append(itr->name, allocator_), itr->value);
                 patternPropertyCount_++;
             }
         }
@@ -461,7 +464,7 @@ public:
                 }
 
         if (dependencies && dependencies->IsObject()) {
-            PointerType q = p.Append(GetDependenciesString());
+            PointerType q = p.Append(GetDependenciesString(), allocator_);
             hasDependencies_ = true;
             for (ConstMemberIterator itr = dependencies->MemberBegin(); itr != dependencies->MemberEnd(); ++itr) {
                 SizeType sourceIndex;
@@ -477,7 +480,7 @@ public:
                     }
                     else if (itr->value.IsObject()) {
                         hasSchemaDependencies_ = true;
-                        document->CreateSchema(&properties_[sourceIndex].dependenciesSchema, q.Append(itr->name), itr->value);
+                        document->CreateSchema(&properties_[sourceIndex].dependenciesSchema, q.Append(itr->name, allocator_), itr->value);
                         properties_[sourceIndex].dependenciesValidatorIndex = validatorCount_;
                         validatorCount_++;
                     }
@@ -489,7 +492,7 @@ public:
             if (v->IsBool())
                 additionalProperties_ = v->GetBool();
             else if (v->IsObject())
-                document->CreateSchema(&additionalPropertiesSchema_, p.Append(GetAdditionalPropertiesString()), *v);
+                document->CreateSchema(&additionalPropertiesSchema_, p.Append(GetAdditionalPropertiesString(), allocator_), *v);
         }
 
         AssignIfExist(minProperties_, value, GetMinPropertiesString());
@@ -497,14 +500,14 @@ public:
 
         // Array
         if (const ValueType* v = GetMember(value, GetItemsString())) {
-            PointerType q = p.Append(GetItemsString());
+            PointerType q = p.Append(GetItemsString(), allocator_);
             if (v->IsObject()) // List validation
                 document->CreateSchema(&itemsList_, q, *v);
             else if (v->IsArray()) { // Tuple validation
                 itemsTuple_ = static_cast<const Schema**>(allocator_->Malloc(sizeof(const Schema*) * v->Size()));
                 SizeType index = 0;
                 for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr, index++)
-                    document->CreateSchema(&itemsTuple_[itemsTupleCount_++], q.Append(index), *itr);
+                    document->CreateSchema(&itemsTuple_[itemsTupleCount_++], q.Append(index, allocator_), *itr);
             }
         }
 
@@ -515,7 +518,7 @@ public:
             if (v->IsBool())
                 additionalItems_ = v->GetBool();
             else if (v->IsObject())
-                document->CreateSchema(&additionalItemsSchema_, p.Append(GetAdditionalItemsString()), *v);
+                document->CreateSchema(&additionalItemsSchema_, p.Append(GetAdditionalItemsString(), allocator_), *v);
         }
 
         AssignIfExist(uniqueItems_, value, GetUniqueItemsString());
@@ -617,7 +620,7 @@ public:
         }
 
         if (enum_) {
-            const uint64_t h = static_cast<HasherType*>(context.hasher)->GetHashCode();
+            const uint64_t h = context.factory.GetHashCode(context.hasher);
             for (SizeType i = 0; i < enumCount_; i++)
                 if (enum_[i] == h)
                     goto foundEnum;
@@ -954,12 +957,12 @@ private:
     void AssignIfExist(SchemaArray& out, const DocumentType& document, const PointerType& p, const ValueType& value, const ValueType& name) {
         if (const ValueType* v = GetMember(value, name)) {
             if (v->IsArray() && v->Size() > 0) {
-                PointerType q = p.Append(name);
+                PointerType q = p.Append(name, allocator_);
                 out.count = v->Size();
                 out.schemas = static_cast<const Schema**>(allocator_->Malloc(out.count * sizeof(const Schema*)));
                 memset(out.schemas, 0, sizeof(Schema*)* out.count);
                 for (SizeType i = 0; i < out.count; i++)
-                    document->CreateSchema(&out.schemas[i], q.Append(i), (*v)[i]);
+                    document->CreateSchema(&out.schemas[i], q.Append(i, allocator_), (*v)[i]);
                 out.begin = validatorCount_;
                 validatorCount_ += out.count;
             }
@@ -1227,7 +1230,7 @@ public:
     typedef typename ValueType::EncodingType EncodingType;
     typedef typename EncodingType::Ch Ch;
     typedef internal::Schema<GenericSchemaDocument> SchemaType;
-    typedef GenericPointer<ValueType, CrtAllocator> PointerType;
+    typedef GenericPointer<ValueType, Allocator> PointerType;
     friend class internal::Schema<GenericSchemaDocument>;
     template <typename, typename, typename>
     friend class GenericSchemaValidator;
@@ -1257,7 +1260,7 @@ public:
 
                 // Create entry in map if not exist
                 if (!GetSchema(refEntry->source)) {
-                    new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(refEntry->source, const_cast<SchemaType*>(s), false);
+                    new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(refEntry->source, const_cast<SchemaType*>(s), false, allocator_);
                 }
             }
             refEntry->~SchemaRefEntry();
@@ -1279,14 +1282,14 @@ public:
 
 private:
     struct SchemaRefEntry {
-        SchemaRefEntry(const PointerType& s, const PointerType& t, const SchemaType** outSchema) : source(s), target(t), schema(outSchema) {}
+        SchemaRefEntry(const PointerType& s, const PointerType& t, const SchemaType** outSchema, Allocator *allocator) : source(s, allocator), target(t, allocator), schema(outSchema) {}
         PointerType source;
         PointerType target;
         const SchemaType** schema;
     };
 
     struct SchemaEntry {
-        SchemaEntry(const PointerType& p, SchemaType* s, bool o) : pointer(p), schema(s), owned(o) {}
+        SchemaEntry(const PointerType& p, SchemaType* s, bool o, Allocator* allocator) : pointer(p, allocator), schema(s), owned(o) {}
         ~SchemaEntry() {
             if (owned) {
                 schema->~SchemaType();
@@ -1310,11 +1313,11 @@ private:
                 *schema = s;
 
             for (typename ValueType::ConstMemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr)
-                CreateSchemaRecursive(0, pointer.Append(itr->name), itr->value);
+                CreateSchemaRecursive(0, pointer.Append(itr->name, allocator_), itr->value);
         }
         else if (v.GetType() == kArrayType)
             for (SizeType i = 0; i < v.Size(); i++)
-                CreateSchemaRecursive(0, pointer.Append(i), v[i]);
+                CreateSchemaRecursive(0, pointer.Append(i, allocator_), v[i]);
     }
 
     void CreateSchema(const SchemaType** schema, const PointerType& pointer, const ValueType& v) {
@@ -1322,7 +1325,7 @@ private:
         if (v.IsObject()) {
             if (!HandleRefSchema(pointer, schema, v)) {
                 SchemaType* s = new (allocator_->Malloc(sizeof(SchemaType))) SchemaType(this, pointer, v, allocator_);
-                new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(pointer, s, true);
+                new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(pointer, s, true, allocator_);
                 if (schema)
                     *schema = s;
             }
@@ -1348,7 +1351,7 @@ private:
                 if (i > 0) { // Remote reference, resolve immediately
                     if (remoteProvider_) {
                         if (const GenericSchemaDocument* remoteDocument = remoteProvider_->GetRemoteDocument(s, i - 1)) {
-                            PointerType pointer(&s[i], len - i);
+                            PointerType pointer(&s[i], len - i, allocator_);
                             if (pointer.IsValid()) {
                                 if (const SchemaType* s = remoteDocument->GetSchema(pointer)) {
                                     if (schema)
@@ -1360,13 +1363,13 @@ private:
                     }
                 }
                 else if (s[i] == '#') { // Local reference, defer resolution
-                    PointerType pointer(&s[i], len - i);
+                    PointerType pointer(&s[i], len - i, allocator_);
                     if (pointer.IsValid()) {
                         if (const ValueType* nv = pointer.Get(*document_))
                             if (HandleRefSchema(source, schema, *nv))
                                 return true;
 
-                        new (schemaRef_.template Push<SchemaRefEntry>()) SchemaRefEntry(source, pointer, schema);
+                        new (schemaRef_.template Push<SchemaRefEntry>()) SchemaRefEntry(source, pointer, schema, allocator_);
                         return true;
                     }
                 }
@@ -1555,11 +1558,11 @@ RAPIDJSON_MULTILINEMACRO_END
 
     // Implementation of ISchemaStateFactory<SchemaType>
     virtual ISchemaValidator* CreateSchemaValidator(const SchemaType& root) {
-        return new (GetStateAllocator().Malloc(sizeof(GenericSchemaValidator))) GenericSchemaValidator(*schemaDocument_, root
+        return new (GetStateAllocator().Malloc(sizeof(GenericSchemaValidator))) GenericSchemaValidator(*schemaDocument_, root,
 #if RAPIDJSON_SCHEMA_VERBOSE
-        , depth_ + 1
+        depth_ + 1,
 #endif
-        );
+        &GetStateAllocator());
     }
 
     virtual void DestroySchemaValidator(ISchemaValidator* validator) {
@@ -1570,6 +1573,10 @@ RAPIDJSON_MULTILINEMACRO_END
 
     virtual void* CreateHasher() {
         return new (GetStateAllocator().Malloc(sizeof(HasherType))) HasherType(&GetStateAllocator());
+    }
+
+    virtual uint64_t GetHashCode(void* hasher) {
+        return static_cast<HasherType*>(hasher)->GetHashCode();
     }
 
     virtual void DestroryHasher(void* hasher) {

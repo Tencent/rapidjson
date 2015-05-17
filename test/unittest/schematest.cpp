@@ -837,7 +837,8 @@ TEST(SchemaValidator, AllOf_Nested) {
     INVALIDATE(s, "123", "", "allOf", "");
 }
 
-static char* ReadFile(const char* filename) {
+template <typename Allocator = CrtAllocator>
+static char* ReadFile(const char* filename, Allocator& allocator) {
     const char *paths[] = {
         "%s",
         "bin/%s",
@@ -860,7 +861,7 @@ static char* ReadFile(const char* filename) {
     fseek(fp, 0, SEEK_END);
     size_t length = (size_t)ftell(fp);
     fseek(fp, 0, SEEK_SET);
-    char* json = (char*)malloc(length + 1);
+    char* json = (char*)allocator.Malloc(length + 1);
     size_t readLength = fread(json, 1, length, fp);
     json[readLength] = '\0';
     fclose(fp);
@@ -868,7 +869,8 @@ static char* ReadFile(const char* filename) {
 }
 
 TEST(SchemaValidator, ValidateMetaSchema) {
-    char* json = ReadFile("draft-04/schema");
+    CrtAllocator allocator;
+    char* json = ReadFile("draft-04/schema", allocator);
     Document d;
     d.Parse(json);
     ASSERT_FALSE(d.HasParseError());
@@ -884,7 +886,7 @@ TEST(SchemaValidator, ValidateMetaSchema) {
         printf("Invalid document: %s\n", sb.GetString());
         ADD_FAILURE();
     }
-    free(json);
+    CrtAllocator::Free(json);
 }
 
 TEST(SchemaValidator, ValidateMetaSchema_UTF16) {
@@ -892,7 +894,8 @@ TEST(SchemaValidator, ValidateMetaSchema_UTF16) {
     typedef GenericSchemaDocument<D::ValueType> SD;
     typedef GenericSchemaValidator<SD> SV;
 
-    char* json = ReadFile("draft-04/schema");
+    CrtAllocator allocator;
+    char* json = ReadFile("draft-04/schema", allocator);
 
     D d;
     StringStream ss(json);
@@ -910,13 +913,16 @@ TEST(SchemaValidator, ValidateMetaSchema_UTF16) {
         wprintf(L"Invalid document: %ls\n", sb.GetString());
         ADD_FAILURE();
     }
-    free(json);
+    CrtAllocator::Free(json);
 }
 
 template <typename SchemaDocumentType = SchemaDocument>
 class RemoteSchemaDocumentProvider : public IGenericRemoteSchemaDocumentProvider<SchemaDocumentType> {
 public:
-    RemoteSchemaDocumentProvider() : documentAllocator_(), schemaAllocator_() {
+    RemoteSchemaDocumentProvider() : 
+        documentAllocator_(documentBuffer_, sizeof(documentBuffer_)), 
+        schemaAllocator_(schemaBuffer_, sizeof(schemaBuffer_)) 
+    {
         const char* filenames[kCount] = {
             "jsonschema/remotes/integer.json",
             "jsonschema/remotes/subSchemas.json",
@@ -927,16 +933,20 @@ public:
         for (size_t i = 0; i < kCount; i++) {
             sd_[i] = 0;
 
-            char* json = ReadFile(filenames[i]);
+            char jsonBuffer[8192];
+            MemoryPoolAllocator<> jsonAllocator(jsonBuffer, sizeof(jsonBuffer));
+            char* json = ReadFile(filenames[i], jsonAllocator);
             if (!json) {
                 printf("json remote file %s not found", filenames[i]);
                 ADD_FAILURE();
             }
             else {
-                DocumentType d(&documentAllocator_);
+                char stackBuffer[4096];
+                MemoryPoolAllocator<> stackAllocator(stackBuffer, sizeof(stackBuffer));
+                DocumentType d(&documentAllocator_, 1024, &stackAllocator);
                 d.Parse(json);
                 sd_[i] = new SchemaDocumentType(d, 0, &schemaAllocator_);
-                free(json);
+                MemoryPoolAllocator<>::Free(json);
             }
         };
     }
@@ -961,7 +971,7 @@ public:
     }
 
 private:
-    typedef GenericDocument<typename SchemaDocumentType::EncodingType, MemoryPoolAllocator<> > DocumentType;
+    typedef GenericDocument<typename SchemaDocumentType::EncodingType, MemoryPoolAllocator<>, MemoryPoolAllocator<> > DocumentType;
 
     RemoteSchemaDocumentProvider(const RemoteSchemaDocumentProvider&);
     RemoteSchemaDocumentProvider& operator=(const RemoteSchemaDocumentProvider&);
@@ -970,6 +980,8 @@ private:
     SchemaDocumentType* sd_[kCount];
     typename DocumentType::AllocatorType documentAllocator_;
     typename SchemaDocumentType::AllocatorType schemaAllocator_;
+    char documentBuffer_[16384];
+    char schemaBuffer_[128 * 1024];
 };
 
 TEST(SchemaValidator, TestSuite) {
@@ -1013,10 +1025,12 @@ TEST(SchemaValidator, TestSuite) {
     typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
     RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
 
+    char jsonBuffer[65536];
     char documentBuffer[65536];
     char documentStackBuffer[65536];
     char schemaBuffer[65536];
     char validatorBuffer[65536];
+    MemoryPoolAllocator<> jsonAllocator(jsonBuffer, sizeof(jsonBuffer));
     MemoryPoolAllocator<> documentAllocator(documentBuffer, sizeof(documentBuffer));
     MemoryPoolAllocator<> documentStackAllocator(documentStackBuffer, sizeof(documentStackBuffer));
     MemoryPoolAllocator<> schemaAllocator(schemaBuffer, sizeof(schemaBuffer));
@@ -1025,7 +1039,7 @@ TEST(SchemaValidator, TestSuite) {
     for (size_t i = 0; i < sizeof(filenames) / sizeof(filenames[0]); i++) {
         char filename[FILENAME_MAX];
         sprintf(filename, "jsonschema/tests/draft4/%s", filenames[i]);
-        char* json = ReadFile(filename);
+        char* json = ReadFile(filename, jsonAllocator);
         if (!json) {
             printf("json test suite file %s not found", filename);
             ADD_FAILURE();
@@ -1066,7 +1080,8 @@ TEST(SchemaValidator, TestSuite) {
             }
         }
         documentAllocator.Clear();
-        free(json);
+        MemoryPoolAllocator<>::Free(json);
+        jsonAllocator.Clear();
     }
     printf("%d / %d passed (%2d%%)\n", passCount, testCount, passCount * 100 / testCount);
     // if (passCount != testCount)
