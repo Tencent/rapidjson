@@ -130,16 +130,19 @@ public:
     virtual ~ISchemaStateFactory() {}
     virtual ISchemaValidator* CreateSchemaValidator(const SchemaType&) = 0;
     virtual void DestroySchemaValidator(ISchemaValidator* validator) = 0;
+    virtual void* MallocState(size_t size) = 0;
+    virtual void* ReallocState(void* originalPtr, size_t originalSize, size_t newSize) = 0;
+    virtual void FreeState(void* p) = 0;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 // Hasher
 
 // For comparison of compound value
-template<typename ValueType, typename Allocator>
+template<typename Encoding, typename Allocator>
 class Hasher {
 public:
-    typedef typename ValueType::Ch Ch;
+    typedef typename Encoding::Ch Ch;
 
     Hasher(Allocator* allocator = 0) : stack_(allocator, kDefaultSize) {}
 
@@ -231,10 +234,8 @@ template <typename SchemaDocumentType>
 struct SchemaValidationContext {
     typedef Schema<SchemaDocumentType> SchemaType;
     typedef ISchemaStateFactory<SchemaType> SchemaValidatorFactoryType;
-    typedef GenericValue<UTF8<>, CrtAllocator> HashCodeArray;
     typedef typename SchemaType::ValueType ValueType;
     typedef typename ValueType::Ch Ch;
-    typedef Hasher<ValueType, typename SchemaDocumentType::AllocatorType> HasherType;
 
     enum PatternValidatorType {
         kPatternValidatorOnly,
@@ -242,7 +243,7 @@ struct SchemaValidationContext {
         kPatternValidatorWithAdditionalProperty
     };
 
-    SchemaValidationContext(SchemaValidatorFactoryType* f, const SchemaType* s) :
+    SchemaValidationContext(SchemaValidatorFactoryType& f, const SchemaType* s) :
         factory(f),
         schema(s),
         valueSchema(),
@@ -255,6 +256,7 @@ struct SchemaValidationContext {
         patternPropertiesSchemas(),
         patternPropertiesSchemaCount(),
         valuePatternValidatorType(kPatternValidatorOnly),
+        arrayElementHashCodes(),
         objectDependencies(),
         inArray(false),
         valueUniqueness(false),
@@ -263,26 +265,25 @@ struct SchemaValidationContext {
     }
 
     ~SchemaValidationContext() {
-        delete hasher;
         if (validators) {
             for (SizeType i = 0; i < validatorCount; i++)
-                factory->DestroySchemaValidator(validators[i]);
-            delete [] validators;
+                factory.DestroySchemaValidator(validators[i]);
+            factory.FreeState(validators);
         }
         if (patternPropertiesValidators) {
             for (SizeType i = 0; i < patternPropertiesValidatorCount; i++)
-                factory->DestroySchemaValidator(patternPropertiesValidators[i]);
-            delete [] patternPropertiesValidators;
+                factory.DestroySchemaValidator(patternPropertiesValidators[i]);
+            factory.FreeState(patternPropertiesValidators);
         }
-        delete[] patternPropertiesSchemas;
-        delete[] objectDependencies;
+        factory.FreeState(patternPropertiesSchemas);
+        factory.FreeState(objectDependencies);
     }
 
-    SchemaValidatorFactoryType* factory;
+    SchemaValidatorFactoryType& factory;
     const SchemaType* schema;
     const SchemaType* valueSchema;
     const Ch* invalidKeyword;
-    HasherType* hasher;
+    void* hasher; // Only calidator access
     ISchemaValidator** validators;
     SizeType validatorCount;
     ISchemaValidator** patternPropertiesValidators;
@@ -291,7 +292,7 @@ struct SchemaValidationContext {
     SizeType patternPropertiesSchemaCount;
     PatternValidatorType valuePatternValidatorType;
     PatternValidatorType objectPatternValidatorType;
-    HashCodeArray arrayElementHashCodes; // array of uint64_t
+    void* arrayElementHashCodes; // Only validator access this
     SizeType objectRequiredCount;
     SizeType arrayElementIndex;
     bool* objectDependencies;
@@ -313,7 +314,7 @@ public:
     typedef typename EncodingType::Ch Ch;
     typedef SchemaValidationContext<SchemaDocumentType> Context;
     typedef Schema<SchemaDocumentType> SchemaType;
-    typedef Hasher<ValueType, AllocatorType> HasherType;
+    typedef Hasher<EncodingType, AllocatorType> HasherType;
     typedef GenericValue<EncodingType, AllocatorType> SValue;
     friend class GenericSchemaDocument<ValueType, AllocatorType>;
 
@@ -612,7 +613,7 @@ public:
         }
 
         if (enum_) {
-            const uint64_t h = context.hasher->GetHashCode();
+            const uint64_t h = static_cast<HasherType*>(context.hasher)->GetHashCode();
             for (SizeType i = 0; i < enumCount_; i++)
                 if (enum_[i] == h)
                     goto foundEnum;
@@ -730,13 +731,13 @@ public:
 
         context.objectRequiredCount = 0;
         if (hasDependencies_) {
-            context.objectDependencies = new bool[propertyCount_];
+            context.objectDependencies = static_cast<bool*>(context.factory.MallocState(sizeof(bool) * propertyCount_));
             std::memset(context.objectDependencies, 0, sizeof(bool) * propertyCount_);
         }
 
         if (patternProperties_) { // pre-allocate schema array
             SizeType count = patternPropertyCount_ + 1; // extra for valuePatternValidatorType
-            context.patternPropertiesSchemas = new const SchemaType*[count];
+            context.patternPropertiesSchemas = static_cast<const SchemaType**>(context.factory.MallocState(sizeof(const SchemaType*) * count));
             context.patternPropertiesSchemaCount = 0;
             std::memset(context.patternPropertiesSchemas, 0, sizeof(SchemaType*) * count);
         }
@@ -822,9 +823,6 @@ public:
     bool StartArray(Context& context) const { 
         if (!(type_ & (1 << kArraySchemaType)))
             RAPIDJSON_INVALID_KEYWORD_RETURN(GetTypeString());
-
-        if (uniqueItems_)
-            context.arrayElementHashCodes.SetArray();
 
         context.arrayElementIndex = 0;
         context.inArray = true;
@@ -999,12 +997,13 @@ private:
 
     bool CreateParallelValidator(Context& context) const {
         if (enum_ || context.arrayUniqueness)
-            context.hasher = new HasherType;
+            context.hasher = new (context.factory.MallocState(sizeof(HasherType))) HasherType;
 
         if (validatorCount_) {
             RAPIDJSON_ASSERT(context.validators == 0);
-            context.validators = new ISchemaValidator*[validatorCount_];
+            context.validators = static_cast<ISchemaValidator**>(context.factory.MallocState(sizeof(ISchemaValidator*) * validatorCount_));
             context.validatorCount = validatorCount_;
+
             if (allOf_.schemas)
                 CreateSchemaValidators(context, allOf_);
 
@@ -1015,12 +1014,12 @@ private:
                 CreateSchemaValidators(context, oneOf_);
             
             if (not_)
-                context.validators[notValidatorIndex_] = context.factory->CreateSchemaValidator(*not_);
+                context.validators[notValidatorIndex_] = context.factory.CreateSchemaValidator(*not_);
             
             if (hasSchemaDependencies_) {
                 for (SizeType i = 0; i < propertyCount_; i++)
                     if (properties_[i].dependenciesSchema)
-                        context.validators[properties_[i].dependenciesValidatorIndex] = context.factory->CreateSchemaValidator(*properties_[i].dependenciesSchema);
+                        context.validators[properties_[i].dependenciesValidatorIndex] = context.factory.CreateSchemaValidator(*properties_[i].dependenciesSchema);
             }
         }
 
@@ -1029,7 +1028,7 @@ private:
 
     void CreateSchemaValidators(Context& context, const SchemaArray& schemas) const {
         for (SizeType i = 0; i < schemas.count; i++)
-            context.validators[schemas.begin + i] = context.factory->CreateSchemaValidator(*schemas.schemas[i]);
+            context.validators[schemas.begin + i] = context.factory.CreateSchemaValidator(*schemas.schemas[i]);
     }
 
     // O(n)
@@ -1484,7 +1483,7 @@ RAPIDJSON_MULTILINEMACRO_END
 #define RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(method, arg2)\
     for (Context* context = schemaStack_.template Bottom<Context>(); context != schemaStack_.template End<Context>(); context++) {\
         if (context->hasher)\
-            context->hasher->method arg2;\
+            static_cast<HasherType*>(context->hasher)->method arg2;\
         if (context->validators)\
             for (SizeType i_ = 0; i_ < context->validatorCount; i_++)\
                 static_cast<GenericSchemaValidator*>(context->validators[i_])->method arg2;\
@@ -1565,8 +1564,22 @@ RAPIDJSON_MULTILINEMACRO_END
         StateAllocator::Free(v);
     }
 
+    virtual void* MallocState(size_t size) {
+        return GetStateAllocator().Malloc(size);
+    }
+
+    virtual void* ReallocState(void* originalPtr, size_t originalSize, size_t newSize) {
+        return GetStateAllocator().Realloc(originalPtr, originalSize, newSize);
+    }
+
+    virtual void FreeState(void* p) {
+        return StateAllocator::Free(p);
+    }
+
 private:
     typedef typename SchemaType::Context Context;
+    typedef GenericValue<UTF8<>, StateAllocator> HashCodeArray;
+    typedef internal::Hasher<EncodingType, StateAllocator> HasherType;
 
     GenericSchemaValidator( 
         const SchemaDocumentType& schemaDocument,
@@ -1611,7 +1624,7 @@ private:
                 CurrentContext().objectPatternValidatorType = patternValidatorType;
                 ISchemaValidator**& va = CurrentContext().patternPropertiesValidators;
                 SizeType& validatorCount = CurrentContext().patternPropertiesValidatorCount;
-                va = new ISchemaValidator*[count];
+                va = static_cast<ISchemaValidator**>(MallocState(sizeof(ISchemaValidator*) * count));
                 for (SizeType i = 0; i < count; i++)
                     va[validatorCount++] = CreateSchemaValidator(*sa[i]);
             }
@@ -1634,17 +1647,20 @@ private:
         internal::PrintValidatorPointers(depth_, sb.GetString(), documentStack_.template Bottom<Ch>());
 #endif
 
-        uint64_t h = CurrentContext().arrayUniqueness ? CurrentContext().hasher->GetHashCode() : 0;
+        uint64_t h = CurrentContext().arrayUniqueness ? static_cast<HasherType*>(CurrentContext().hasher)->GetHashCode() : 0;
         
         PopSchema();
 
         if (!schemaStack_.Empty()) {
             Context& context = CurrentContext();
             if (context.valueUniqueness) {
-                for (typename Context::HashCodeArray::ConstValueIterator itr = context.arrayElementHashCodes.Begin(); itr != context.arrayElementHashCodes.End(); ++itr)
+                HashCodeArray* a = static_cast<HashCodeArray*>(context.arrayElementHashCodes);
+                if (!a)
+                    CurrentContext().arrayElementHashCodes = a = new (GetStateAllocator().Malloc(sizeof(HashCodeArray))) HashCodeArray(kArrayType);
+                for (typename HashCodeArray::ConstValueIterator itr = a->Begin(); itr != a->End(); ++itr)
                     if (itr->GetUint64() == h)
                         RAPIDJSON_INVALID_KEYWORD_RETURN(SchemaType::GetUniqueItemsString());
-                context.arrayElementHashCodes.PushBack(h, GetStateAllocator());
+                a->PushBack(h, GetStateAllocator());
             }
         }
 
@@ -1679,8 +1695,21 @@ private:
             *documentStack_.template Push<Ch>() = buffer[i];
     }
 
-    void PushSchema(const SchemaType& schema) { new (schemaStack_.template Push<Context>()) Context(this, &schema); }
-    void PopSchema() { schemaStack_.template Pop<Context>(1)->~Context(); }
+    void PushSchema(const SchemaType& schema) { new (schemaStack_.template Push<Context>()) Context(*this, &schema); }
+    
+    void PopSchema() {
+        Context* c = schemaStack_.template Pop<Context>(1);
+        if (HashCodeArray* a = static_cast<HashCodeArray*>(c->arrayElementHashCodes)) {
+            a->~HashCodeArray();
+            StateAllocator::Free(a);
+        }
+        if (HasherType* h = static_cast<HasherType*>(c->hasher)) {
+            h->~HasherType();
+            StateAllocator::Free(h);
+        }
+        c->~Context();
+    }
+
     const SchemaType& CurrentSchema() const { return *schemaStack_.template Top<Context>()->schema; }
     Context& CurrentContext() { return *schemaStack_.template Top<Context>(); }
     const Context& CurrentContext() const { return *schemaStack_.template Top<Context>(); }
