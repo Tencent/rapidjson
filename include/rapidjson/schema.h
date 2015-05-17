@@ -130,6 +130,8 @@ public:
     virtual ~ISchemaStateFactory() {}
     virtual ISchemaValidator* CreateSchemaValidator(const SchemaType&) = 0;
     virtual void DestroySchemaValidator(ISchemaValidator* validator) = 0;
+    virtual void* CreateHasher() = 0;
+    virtual void DestroryHasher(void* hasher) = 0;
     virtual void* MallocState(size_t size) = 0;
     virtual void* ReallocState(void* originalPtr, size_t originalSize, size_t newSize) = 0;
     virtual void FreeState(void* p) = 0;
@@ -249,6 +251,7 @@ struct SchemaValidationContext {
         valueSchema(),
         invalidKeyword(),
         hasher(),
+        arrayElementHashCodes(),
         validators(),
         validatorCount(),
         patternPropertiesValidators(),
@@ -256,7 +259,6 @@ struct SchemaValidationContext {
         patternPropertiesSchemas(),
         patternPropertiesSchemaCount(),
         valuePatternValidatorType(kPatternValidatorOnly),
-        arrayElementHashCodes(),
         objectDependencies(),
         inArray(false),
         valueUniqueness(false),
@@ -265,6 +267,8 @@ struct SchemaValidationContext {
     }
 
     ~SchemaValidationContext() {
+        if (hasher)
+            factory.DestroryHasher(hasher);
         if (validators) {
             for (SizeType i = 0; i < validatorCount; i++)
                 factory.DestroySchemaValidator(validators[i]);
@@ -284,6 +288,7 @@ struct SchemaValidationContext {
     const SchemaType* valueSchema;
     const Ch* invalidKeyword;
     void* hasher; // Only calidator access
+    void* arrayElementHashCodes; // Only validator access this
     ISchemaValidator** validators;
     SizeType validatorCount;
     ISchemaValidator** patternPropertiesValidators;
@@ -292,7 +297,6 @@ struct SchemaValidationContext {
     SizeType patternPropertiesSchemaCount;
     PatternValidatorType valuePatternValidatorType;
     PatternValidatorType objectPatternValidatorType;
-    void* arrayElementHashCodes; // Only validator access this
     SizeType objectRequiredCount;
     SizeType arrayElementIndex;
     bool* objectDependencies;
@@ -997,7 +1001,7 @@ private:
 
     bool CreateParallelValidator(Context& context) const {
         if (enum_ || context.arrayUniqueness)
-            context.hasher = new (context.factory.MallocState(sizeof(HasherType))) HasherType;
+            context.hasher = context.factory.CreateHasher();
 
         if (validatorCount_) {
             RAPIDJSON_ASSERT(context.validators == 0);
@@ -1214,7 +1218,7 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 // GenericSchemaDocument
 
-template <typename ValueT, typename Allocator = MemoryPoolAllocator<> > // Temp to use MemoryPoolAllocator now for profiling
+template <typename ValueT, typename Allocator = CrtAllocator>
 class GenericSchemaDocument {
 public:
     typedef ValueT ValueType;
@@ -1564,6 +1568,16 @@ RAPIDJSON_MULTILINEMACRO_END
         StateAllocator::Free(v);
     }
 
+    virtual void* CreateHasher() {
+        return new (GetStateAllocator().Malloc(sizeof(HasherType))) HasherType(&GetStateAllocator());
+    }
+
+    virtual void DestroryHasher(void* hasher) {
+        HasherType* h = static_cast<HasherType*>(hasher);
+        h->~HasherType();
+        StateAllocator::Free(h);
+    }
+
     virtual void* MallocState(size_t size) {
         return GetStateAllocator().Malloc(size);
     }
@@ -1702,10 +1716,6 @@ private:
         if (HashCodeArray* a = static_cast<HashCodeArray*>(c->arrayElementHashCodes)) {
             a->~HashCodeArray();
             StateAllocator::Free(a);
-        }
-        if (HasherType* h = static_cast<HasherType*>(c->hasher)) {
-            h->~HasherType();
-            StateAllocator::Free(h);
         }
         c->~Context();
     }
