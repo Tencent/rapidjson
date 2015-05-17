@@ -288,7 +288,6 @@ struct SchemaValidationContext {
     ISchemaValidator** patternPropertiesValidators;
     SizeType patternPropertiesValidatorCount;
     const SchemaType** patternPropertiesSchemas;
-    //ISchemaValidator* notValidator;
     SizeType patternPropertiesSchemaCount;
     PatternValidatorType valuePatternValidatorType;
     PatternValidatorType objectPatternValidatorType;
@@ -1286,8 +1285,10 @@ private:
     struct SchemaEntry {
         SchemaEntry(const PointerType& p, SchemaType* s, bool o) : pointer(p), schema(s), owned(o) {}
         ~SchemaEntry() {
-            if (owned)
+            if (owned) {
                 schema->~SchemaType();
+                Allocator::Free(schema);
+            }
         }
         PointerType pointer;
         SchemaType* schema;
@@ -1551,25 +1552,17 @@ RAPIDJSON_MULTILINEMACRO_END
 
     // Implementation of ISchemaStateFactory<SchemaType>
     virtual ISchemaValidator* CreateSchemaValidator(const SchemaType& root) {
-        return new GenericSchemaValidator(*schemaDocument_, root
+        return new (GetStateAllocator().Malloc(sizeof(GenericSchemaValidator))) GenericSchemaValidator(*schemaDocument_, root
 #if RAPIDJSON_SCHEMA_VERBOSE
         , depth_ + 1
 #endif
         );
-
-//         GenericSchemaValidator *validator = GetStateAllocator().Malloc(sizeof(GenericSchemaValidator));
-//         new (validator) GenericSchemaValidator(*schemaDocument_, root
-// #if RAPIDJSON_SCHEMA_VERBOSE
-//         , depth_ + 1
-// #endif
-//         );
-//         return validator;
     }
 
     virtual void DestroySchemaValidator(ISchemaValidator* validator) {
-        delete validator;
-        // validator->~ISchemaValidator();
-        // StateAllocator::Free(validator);
+        GenericSchemaValidator* v = static_cast<GenericSchemaValidator*>(validator);
+        v->~GenericSchemaValidator();
+        StateAllocator::Free(v);
     }
 
 private:
