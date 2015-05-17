@@ -386,8 +386,8 @@ TEST(SchemaValidator, Integer_MultipleOf) {
     sd.Parse("{\"type\":\"integer\",\"multipleOf\":10}");
     SchemaDocument s(sd);
 
-    // VALIDATE(s, "0", true);
-    // VALIDATE(s, "10", true);
+    VALIDATE(s, "0", true);
+    VALIDATE(s, "10", true);
     VALIDATE(s, "-10", true);
     VALIDATE(s, "20", true);
     INVALIDATE(s, "23", "", "multipleOf", "");
@@ -882,7 +882,33 @@ TEST(SchemaValidator, ValidateMetaSchema) {
         sb.Clear();
         validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);
         printf("Invalid document: %s\n", sb.GetString());
-        //ADD_FAILURE();
+        ADD_FAILURE();
+    }
+    free(json);
+}
+
+TEST(SchemaValidator, ValidateMetaSchema_UTF16) {
+    typedef GenericDocument<UTF16<> > D;
+    typedef GenericSchemaDocument<D::ValueType> SD;
+    typedef GenericSchemaValidator<SD> SV;
+
+    char* json = ReadFile("draft-04/schema");
+
+    D d;
+    StringStream ss(json);
+    d.ParseStream<0, UTF8<> >(ss);
+    ASSERT_FALSE(d.HasParseError());
+    SD sd(d);
+    SV validator(sd);
+    if (!d.Accept(validator)) {
+        GenericStringBuffer<UTF16<> > sb;
+        validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);
+        wprintf(L"Invalid schema: %ls\n", sb.GetString());
+        wprintf(L"Invalid keyword: %ls\n", validator.GetInvalidSchemaKeyword());
+        sb.Clear();
+        validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);
+        wprintf(L"Invalid document: %ls\n", sb.GetString());
+        ADD_FAILURE();
     }
     free(json);
 }

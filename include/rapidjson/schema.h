@@ -48,9 +48,48 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
+RAPIDJSON_NAMESPACE_BEGIN
+
+///////////////////////////////////////////////////////////////////////////////
+// Verbose Utilities
+
 #if RAPIDJSON_SCHEMA_VERBOSE
-#define RAPIDJSON_INVALID_KEYWORD_VERBOSE(keyword) \
-    printf("Fail keyword: %s\n", keyword)
+
+namespace internal {
+
+inline void PrintInvalidKeyword(const char* keyword) {
+    printf("Fail keyword: %s\n", keyword);
+}
+
+inline void PrintInvalidKeyword(const wchar_t* keyword) {
+    wprintf(L"Fail keyword: %ls\n", keyword);
+}
+
+inline void PrintInvalidDocument(const char* document) {
+    printf("Fail document: %s\n\n", document);
+}
+
+inline void PrintInvalidDocument(const wchar_t* document) {
+    wprintf(L"Fail document: %ls\n\n", document);
+}
+
+inline void PrintValidatorPointers(unsigned depth, const char* s, const char* d) {
+    printf("S: %*s%s\nD: %*s%s\n\n", depth * 4, " ", s, depth * 4, " ", d);
+}
+
+inline void PrintValidatorPointers(unsigned depth, const wchar_t* s, const wchar_t* d) {
+    wprintf(L"S: %*ls%ls\nD: %*ls%ls\n\n", depth * 4, L" ", s, depth * 4, L" ", d);
+}
+
+} // namespace internal
+
+#endif // RAPIDJSON_SCHEMA_VERBOSE
+
+///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_INVALID_KEYWORD_RETURN
+
+#if RAPIDJSON_SCHEMA_VERBOSE
+#define RAPIDJSON_INVALID_KEYWORD_VERBOSE(keyword) internal::PrintInvalidKeyword(keyword)
 #else
 #define RAPIDJSON_INVALID_KEYWORD_VERBOSE(keyword)
 #endif
@@ -61,8 +100,6 @@ RAPIDJSON_MULTILINEMACRO_BEGIN\
     RAPIDJSON_INVALID_KEYWORD_VERBOSE(keyword);\
     return false;\
 RAPIDJSON_MULTILINEMACRO_END
-
-RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
 // Forward declarations
@@ -195,6 +232,7 @@ struct SchemaValidationContext {
     typedef ISchemaValidatorFactory<SchemaType> SchemaValidatorFactoryType;
     typedef GenericValue<UTF8<>, CrtAllocator> HashCodeArray;
     typedef typename SchemaType::ValueType ValueType;
+    typedef typename ValueType::Ch Ch;
     typedef Hasher<ValueType, typename SchemaDocumentType::AllocatorType> HasherType;
 
     enum PatternValidatorType {
@@ -244,7 +282,7 @@ struct SchemaValidationContext {
     CrtAllocator* allocator; // For allocating memory for context
     const SchemaType* schema;
     const SchemaType* valueSchema;
-    const char* invalidKeyword;
+    const Ch* invalidKeyword;
     HasherType* hasher;
     SchemaValidatorArray allOfValidators;
     SchemaValidatorArray anyOfValidators;
@@ -320,7 +358,7 @@ public:
         if (!value.IsObject())
             return;
 
-        if (const ValueType* v = GetMember(value, "type")) {
+        if (const ValueType* v = GetMember(value, GetTypeString())) {
             type_ = 0;
             if (v->IsString())
                 AddType(*v);
@@ -329,7 +367,7 @@ public:
                     AddType(*itr);
         }
 
-        if (const ValueType* v = GetMember(value, "enum"))
+        if (const ValueType* v = GetMember(value, GetEnumString()))
             if (v->IsArray() && v->Size() > 0) {
                 enum_ = static_cast<uint64_t*>(allocator_->Malloc(sizeof(uint64_t) * v->Size()));
                 for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr) {
@@ -339,21 +377,18 @@ public:
                 }
             }
 
-        AssigIfExist(allOf_, document, p, value, "allOf");
-        AssigIfExist(anyOf_, document, p, value, "anyOf");
-        AssigIfExist(oneOf_, document, p, value, "oneOf");
+        AssignIfExist(allOf_, document, p, value, GetAllOfString());
+        AssignIfExist(anyOf_, document, p, value, GetAnyOfString());
+        AssignIfExist(oneOf_, document, p, value, GetOneOfString());
 
-        if (const ValueType* v = GetMember(value, "not"))
-            document->CreateSchema(&not_, p.Append("not"), *v);
-
-        //if (const ValueType* v = GetMember(value, "$ref"))
-        //    document->AddRefSchema(this, *v);
+        if (const ValueType* v = GetMember(value, GetNotString()))
+            document->CreateSchema(&not_, p.Append(GetNotString()), *v);
 
         // Object
 
-        const ValueType* properties = GetMember(value, "properties");
-        const ValueType* required = GetMember(value, "required");
-        const ValueType* dependencies = GetMember(value, "dependencies");
+        const ValueType* properties = GetMember(value, GetPropertiesString());
+        const ValueType* required = GetMember(value, GetRequiredString());
+        const ValueType* dependencies = GetMember(value, GetDependenciesString());
         {
             // Gather properties from properties/required/dependencies
             SValue allProperties(kArrayType);
@@ -388,7 +423,7 @@ public:
         }
 
         if (properties && properties->IsObject()) {
-            PointerType q = p.Append("properties");
+            PointerType q = p.Append(GetPropertiesString());
             for (ConstMemberIterator itr = properties->MemberBegin(); itr != properties->MemberEnd(); ++itr) {
                 SizeType index;
                 if (FindPropertyIndex(itr->name, &index))
@@ -396,8 +431,8 @@ public:
             }
         }
 
-        if (const ValueType* v = GetMember(value, "patternProperties")) {
-            PointerType q = p.Append("patternProperties");
+        if (const ValueType* v = GetMember(value, GetPatternPropertiesString())) {
+            PointerType q = p.Append(GetPatternPropertiesString());
             patternProperties_ = static_cast<PatternProperty*>(allocator_->Malloc(sizeof(PatternProperty) * v->MemberCount()));
             patternPropertyCount_ = 0;
 
@@ -420,7 +455,7 @@ public:
                 }
 
         if (dependencies && dependencies->IsObject()) {
-            PointerType q = p.Append("dependencies");
+            PointerType q = p.Append(GetDependenciesString());
             hasDependencies_ = true;
             for (ConstMemberIterator itr = dependencies->MemberBegin(); itr != dependencies->MemberEnd(); ++itr) {
                 SizeType sourceIndex;
@@ -442,19 +477,19 @@ public:
             }
         }
 
-        if (const ValueType* v = GetMember(value, "additionalProperties")) {
+        if (const ValueType* v = GetMember(value, GetAdditionalPropertiesString())) {
             if (v->IsBool())
                 additionalProperties_ = v->GetBool();
             else if (v->IsObject())
-                document->CreateSchema(&additionalPropertiesSchema_, p.Append("additionalProperties"), *v);
+                document->CreateSchema(&additionalPropertiesSchema_, p.Append(GetAdditionalPropertiesString()), *v);
         }
 
-        AssignIfExist(minProperties_, value, "minProperties");
-        AssignIfExist(maxProperties_, value, "maxProperties");
+        AssignIfExist(minProperties_, value, GetMinPropertiesString());
+        AssignIfExist(maxProperties_, value, GetMaxPropertiesString());
 
         // Array
-        if (const ValueType* v = GetMember(value, "items")) {
-            PointerType q = p.Append("items");
+        if (const ValueType* v = GetMember(value, GetItemsString())) {
+            PointerType q = p.Append(GetItemsString());
             if (v->IsObject()) // List validation
                 document->CreateSchema(&itemsList_, q, *v);
             else if (v->IsArray()) { // Tuple validation
@@ -465,38 +500,38 @@ public:
             }
         }
 
-        AssignIfExist(minItems_, value, "minItems");
-        AssignIfExist(maxItems_, value, "maxItems");
+        AssignIfExist(minItems_, value, GetMinItemsString());
+        AssignIfExist(maxItems_, value, GetMaxItemsString());
 
-        if (const ValueType* v = GetMember(value, "additionalItems")) {
+        if (const ValueType* v = GetMember(value, GetAdditionalItemsString())) {
             if (v->IsBool())
                 additionalItems_ = v->GetBool();
             else if (v->IsObject())
-                document->CreateSchema(&additionalItemsSchema_, p.Append("additionalItems"), *v);
+                document->CreateSchema(&additionalItemsSchema_, p.Append(GetAdditionalItemsString()), *v);
         }
 
-        AssignIfExist(uniqueItems_, value, "uniqueItems");
+        AssignIfExist(uniqueItems_, value, GetUniqueItemsString());
 
         // String
-        AssignIfExist(minLength_, value, "minLength");
-        AssignIfExist(maxLength_, value, "maxLength");
+        AssignIfExist(minLength_, value, GetMinLengthString());
+        AssignIfExist(maxLength_, value, GetMaxLengthString());
 
-        if (const ValueType* v = GetMember(value, "pattern"))
+        if (const ValueType* v = GetMember(value, GetPatternString()))
             pattern_ = CreatePattern(*v);
 
         // Number
-        if (const ValueType* v = GetMember(value, "minimum"))
+        if (const ValueType* v = GetMember(value, GetMinimumString()))
             if (v->IsNumber())
                 minimum_.CopyFrom(*v, *allocator_);
 
-        if (const ValueType* v = GetMember(value, "maximum"))
+        if (const ValueType* v = GetMember(value, GetMaximumString()))
             if (v->IsNumber())
                 maximum_.CopyFrom(*v, *allocator_);
 
-        AssignIfExist(exclusiveMinimum_, value, "exclusiveMinimum");
-        AssignIfExist(exclusiveMaximum_, value, "exclusiveMaximum");
+        AssignIfExist(exclusiveMinimum_, value, GetExclusiveMinimumString());
+        AssignIfExist(exclusiveMaximum_, value, GetExclusiveMaximumString());
 
-        if (const ValueType* v = GetMember(value, "multipleOf"))
+        if (const ValueType* v = GetMember(value, GetMultipleOfString()))
             if (v->IsNumber() && v->GetDouble() > 0.0)
                 multipleOf_.CopyFrom(*v, *allocator_);
     }
@@ -537,7 +572,7 @@ public:
                 else if (additionalItems_)
                     context.valueSchema = GetTypeless();
                 else
-                    RAPIDJSON_INVALID_KEYWORD_RETURN("items");
+                    RAPIDJSON_INVALID_KEYWORD_RETURN(GetItemsString());
             }
             else
                 context.valueSchema = GetTypeless();
@@ -563,14 +598,14 @@ public:
 
             if (context.objectPatternValidatorType == Context::kPatternValidatorOnly) {
                 if (!patternValid)
-                    RAPIDJSON_INVALID_KEYWORD_RETURN("patternProperties");
+                    RAPIDJSON_INVALID_KEYWORD_RETURN(GetPatternPropertiesString());
             }
             else if (context.objectPatternValidatorType == Context::kPatternValidatorWithProperty) {
                 if (!patternValid || !otherValid)
-                    RAPIDJSON_INVALID_KEYWORD_RETURN("patternProperties");
+                    RAPIDJSON_INVALID_KEYWORD_RETURN(GetPatternPropertiesString());
             }
             else if (!patternValid && !otherValid) // kPatternValidatorWithAdditionalProperty)
-                RAPIDJSON_INVALID_KEYWORD_RETURN("patternProperties");
+                RAPIDJSON_INVALID_KEYWORD_RETURN(GetPatternPropertiesString());
         }
 
         if (enum_) {
@@ -578,20 +613,20 @@ public:
             for (SizeType i = 0; i < enumCount_; i++)
                 if (enum_[i] == h)
                     goto foundEnum;
-            RAPIDJSON_INVALID_KEYWORD_RETURN("enum");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetEnumString());
             foundEnum:;
         }
 
         if (allOf_.schemas)
             for (SizeType i = 0; i < allOf_.count; i++)
                 if (!context.allOfValidators.validators[i]->IsValid())
-                    RAPIDJSON_INVALID_KEYWORD_RETURN("allOf");
+                    RAPIDJSON_INVALID_KEYWORD_RETURN(GetAllOfString());
         
         if (anyOf_.schemas) {
             for (SizeType i = 0; i < anyOf_.count; i++)
                 if (context.anyOfValidators.validators[i]->IsValid())
                     goto foundAny;
-            RAPIDJSON_INVALID_KEYWORD_RETURN("anyOf");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetAnyOfString());
             foundAny:;
         }
 
@@ -600,29 +635,29 @@ public:
             for (SizeType i = 0; i < oneOf_.count; i++)
                 if (context.oneOfValidators.validators[i]->IsValid()) {
                     if (oneValid)
-                        RAPIDJSON_INVALID_KEYWORD_RETURN("oneOf");
+                        RAPIDJSON_INVALID_KEYWORD_RETURN(GetOneOfString());
                     else
                         oneValid = true;
                 }
             if (!oneValid)
-                RAPIDJSON_INVALID_KEYWORD_RETURN("oneOf");
+                RAPIDJSON_INVALID_KEYWORD_RETURN(GetOneOfString());
         }
 
         if (not_ && context.notValidator->IsValid())
-            RAPIDJSON_INVALID_KEYWORD_RETURN("not");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetNotString());
 
         return true;
     }
 
     bool Null(Context& context) const { 
         if (!(type_ & (1 << kNullSchemaType)))
-            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetTypeString());
         return CreateParallelValidator(context);
     }
     
     bool Bool(Context& context, bool) const { 
         if (!(type_ & (1 << kBooleanSchemaType)))
-            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetTypeString());
         return CreateParallelValidator(context);
     }
 
@@ -652,7 +687,7 @@ public:
 
     bool Double(Context& context, double d) const {
         if (!(type_ & (1 << kNumberSchemaType)))
-            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetTypeString());
 
         if (!minimum_.IsNull() && !CheckDoubleMinimum(context, d))
             return false;
@@ -668,27 +703,27 @@ public:
     
     bool String(Context& context, const Ch* str, SizeType length, bool) const {
         if (!(type_ & (1 << kStringSchemaType)))
-            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetTypeString());
 
         if (minLength_ != 0 || maxLength_ != SizeType(~0)) {
             SizeType count;
             if (internal::CountStringCodePoint<EncodingType>(str, length, &count)) {
                 if (count < minLength_)
-                    RAPIDJSON_INVALID_KEYWORD_RETURN("minLength");
+                    RAPIDJSON_INVALID_KEYWORD_RETURN(GetMinLengthString());
                 if (count > maxLength_)
-                    RAPIDJSON_INVALID_KEYWORD_RETURN("maxLength");
+                    RAPIDJSON_INVALID_KEYWORD_RETURN(GetMaxLengthString());
             }
         }
 
         if (pattern_ && !IsPatternMatch(pattern_, str, length))
-            RAPIDJSON_INVALID_KEYWORD_RETURN("pattern");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetPatternString());
 
         return CreateParallelValidator(context);
     }
 
     bool StartObject(Context& context) const { 
         if (!(type_ & (1 << kObjectSchemaType)))
-            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetTypeString());
 
         context.objectRequiredCount = 0;
         if (hasDependencies_) {
@@ -715,7 +750,7 @@ public:
         }
 
         SizeType index;
-        if (FindPropertyIndex(str, len, &index)) {
+        if (FindPropertyIndex(ValueType(str, len).Move(), &index)) {
             if (context.patternPropertiesSchemaCount > 0) {
                 context.patternPropertiesSchemas[context.patternPropertiesSchemaCount++] = properties_[index].schema;
                 context.valueSchema = GetTypeless();
@@ -749,20 +784,20 @@ public:
         }
 
         if (context.patternPropertiesSchemaCount == 0) // patternProperties are not additional properties
-            RAPIDJSON_INVALID_KEYWORD_RETURN("additionalProperties");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetAdditionalPropertiesString());
 
         return true;
     }
 
     bool EndObject(Context& context, SizeType memberCount) const {
         if (context.objectRequiredCount != requiredCount_)
-            RAPIDJSON_INVALID_KEYWORD_RETURN("required");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetRequiredString());
 
         if (memberCount < minProperties_)
-            RAPIDJSON_INVALID_KEYWORD_RETURN("minProperties");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetMinPropertiesString());
 
         if (memberCount > maxProperties_)
-            RAPIDJSON_INVALID_KEYWORD_RETURN("maxProperties");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetMaxPropertiesString());
 
         if (hasDependencies_) {
             for (SizeType sourceIndex = 0; sourceIndex < propertyCount_; sourceIndex++)
@@ -770,11 +805,11 @@ public:
                     if (properties_[sourceIndex].dependencies) {
                         for (SizeType targetIndex = 0; targetIndex < propertyCount_; targetIndex++)
                             if (properties_[sourceIndex].dependencies[targetIndex] && !context.objectDependencies[targetIndex])
-                                RAPIDJSON_INVALID_KEYWORD_RETURN("dependencies");
+                                RAPIDJSON_INVALID_KEYWORD_RETURN(GetDependenciesString());
                     }
                     else if (properties_[sourceIndex].dependenciesSchema)
                         if (!context.dependencyValidators.validators[sourceIndex]->IsValid())
-                            RAPIDJSON_INVALID_KEYWORD_RETURN("dependencies");
+                            RAPIDJSON_INVALID_KEYWORD_RETURN(GetDependenciesString());
                 }
         }
 
@@ -783,7 +818,7 @@ public:
 
     bool StartArray(Context& context) const { 
         if (!(type_ & (1 << kArraySchemaType)))
-            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetTypeString());
 
         if (uniqueItems_)
             context.arrayElementHashCodes.SetArray();
@@ -798,13 +833,56 @@ public:
         context.inArray = false;
         
         if (elementCount < minItems_)
-            RAPIDJSON_INVALID_KEYWORD_RETURN("minItems");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetMinItemsString());
         
         if (elementCount > maxItems_)
-            RAPIDJSON_INVALID_KEYWORD_RETURN("maxItems");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetMaxItemsString());
 
         return true;
     }
+
+    // Generate functions for string literal according to Ch
+#define RAPIDJSON_STRING_(name, ...) \
+    static const Ch* Get##name##String() {\
+        static const Ch s[] = { __VA_ARGS__, '\0' };\
+        return s;\
+    }
+
+    RAPIDJSON_STRING_(Null, 'n', 'u', 'l', 'l');
+    RAPIDJSON_STRING_(Boolean, 'b', 'o', 'o', 'l', 'e', 'a', 'n');
+    RAPIDJSON_STRING_(Object, 'o', 'b', 'j', 'e', 'c', 't');
+    RAPIDJSON_STRING_(Array, 'a', 'r', 'r', 'a', 'y');
+    RAPIDJSON_STRING_(String, 's', 't', 'r', 'i', 'n', 'g');
+    RAPIDJSON_STRING_(Number, 'n', 'u', 'm', 'b', 'e', 'r');
+    RAPIDJSON_STRING_(Integer, 'i', 'n', 't', 'e', 'g', 'e', 'r');
+    RAPIDJSON_STRING_(Type, 't', 'y', 'p', 'e');
+    RAPIDJSON_STRING_(Enum, 'e', 'n', 'u', 'm');
+    RAPIDJSON_STRING_(AllOf, 'a', 'l', 'l', 'O', 'f');
+    RAPIDJSON_STRING_(AnyOf, 'a', 'n', 'y', 'O', 'f');
+    RAPIDJSON_STRING_(OneOf, 'o', 'n', 'e', 'O', 'f');
+    RAPIDJSON_STRING_(Not, 'n', 'o', 't');
+    RAPIDJSON_STRING_(Properties, 'p', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's');
+    RAPIDJSON_STRING_(Required, 'r', 'e', 'q', 'u', 'i', 'r', 'e', 'd');
+    RAPIDJSON_STRING_(Dependencies, 'd', 'e', 'p', 'e', 'n', 'd', 'e', 'n', 'c', 'i', 'e', 's');
+    RAPIDJSON_STRING_(PatternProperties, 'p', 'a', 't', 't', 'e', 'r', 'n', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's');
+    RAPIDJSON_STRING_(AdditionalProperties, 'a', 'd', 'd', 'i', 't', 'i', 'o', 'n', 'a', 'l', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's');
+    RAPIDJSON_STRING_(MinProperties, 'm', 'i', 'n', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's');
+    RAPIDJSON_STRING_(MaxProperties, 'm', 'a', 'x', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's');
+    RAPIDJSON_STRING_(Items, 'i', 't', 'e', 'm', 's');
+    RAPIDJSON_STRING_(MinItems, 'm', 'i', 'n', 'I', 't', 'e', 'm', 's');
+    RAPIDJSON_STRING_(MaxItems, 'm', 'a', 'x', 'I', 't', 'e', 'm', 's');
+    RAPIDJSON_STRING_(AdditionalItems, 'a', 'd', 'd', 'i', 't', 'i', 'o', 'n', 'a', 'l', 'I', 't', 'e', 'm', 's');
+    RAPIDJSON_STRING_(UniqueItems, 'u', 'n', 'i', 'q', 'u', 'e', 'I', 't', 'e', 'm', 's');
+    RAPIDJSON_STRING_(MinLength, 'm', 'i', 'n', 'L', 'e', 'n', 'g', 't', 'h');
+    RAPIDJSON_STRING_(MaxLength, 'm', 'a', 'x', 'L', 'e', 'n', 'g', 't', 'h');
+    RAPIDJSON_STRING_(Pattern, 'p', 'a', 't', 't', 'e', 'r', 'n');
+    RAPIDJSON_STRING_(Minimum, 'm', 'i', 'n', 'i', 'm', 'u', 'm');
+    RAPIDJSON_STRING_(Maximum, 'm', 'a', 'x', 'i', 'm', 'u', 'm');
+    RAPIDJSON_STRING_(ExclusiveMinimum, 'e', 'x', 'c', 'l', 'u', 's', 'i', 'v', 'e', 'M', 'i', 'n', 'i', 'm', 'u', 'm');
+    RAPIDJSON_STRING_(ExclusiveMaximum, 'e', 'x', 'c', 'l', 'u', 's', 'i', 'v', 'e', 'M', 'a', 'x', 'i', 'm', 'u', 'm');
+    RAPIDJSON_STRING_(MultipleOf, 'm', 'u', 'l', 't', 'i', 'p', 'l', 'e', 'O', 'f');
+
+#undef RAPIDJSON_STRING_
 
 private:
     enum SchemaValueType {
@@ -832,7 +910,7 @@ private:
     };
 
     static const SchemaType* GetTypeless() {
-        static SchemaType typeless(0, PointerType(), Value(kObjectType).Move(), 0);
+        static SchemaType typeless(0, PointerType(), ValueType(kObjectType).Move(), 0);
         return &typeless;
     }
 
@@ -846,27 +924,27 @@ private:
     }
 
     template <typename ValueType>
-    static const ValueType* GetMember(const ValueType& value, const char* name) {
+    static const ValueType* GetMember(const ValueType& value, const Ch* name) {
         typename ValueType::ConstMemberIterator itr = value.FindMember(name);
         return itr != value.MemberEnd() ? &(itr->value) : 0;
     }
 
     template <typename ValueType>
-    static void AssignIfExist(bool& out, const ValueType& value, const char* name) {
+    static void AssignIfExist(bool& out, const ValueType& value, const Ch* name) {
         if (const ValueType* v = GetMember(value, name))
             if (v->IsBool())
                 out = v->GetBool();
     }
 
     template <typename ValueType>
-    static void AssignIfExist(SizeType& out, const ValueType& value, const char* name) {
+    static void AssignIfExist(SizeType& out, const ValueType& value, const Ch* name) {
         if (const ValueType* v = GetMember(value, name))
             if (v->IsUint64() && v->GetUint64() <= SizeType(~0))
                 out = static_cast<SizeType>(v->GetUint64());
     }
 
     template <typename DocumentType, typename ValueType, typename PointerType>
-    void AssigIfExist(SchemaArray& out, const DocumentType& document, const PointerType& p, const ValueType& value, const char* name) {
+    void AssignIfExist(SchemaArray& out, const DocumentType& document, const PointerType& p, const ValueType& value, const Ch* name) {
         if (const ValueType* v = GetMember(value, name)) {
             if (v->IsArray() && v->Size() > 0) {
                 PointerType q = p.Append(name);
@@ -902,14 +980,14 @@ private:
     static bool IsPatternMatch(const RegexType*, const Ch *, SizeType) { return true; }
 #endif // RAPIDJSON_SCHEMA_USE_STDREGEX
 
-    void AddType(const Value& type) {
-        if      (type == "null"   ) type_ |= 1 << kNullSchemaType;
-        else if (type == "boolean") type_ |= 1 << kBooleanSchemaType;
-        else if (type == "object" ) type_ |= 1 << kObjectSchemaType;
-        else if (type == "array"  ) type_ |= 1 << kArraySchemaType;
-        else if (type == "string" ) type_ |= 1 << kStringSchemaType;
-        else if (type == "integer") type_ |= 1 << kIntegerSchemaType;
-        else if (type == "number" ) type_ |= (1 << kNumberSchemaType) | (1 << kIntegerSchemaType);
+    void AddType(const ValueType& type) {
+        if      (type == GetNullString()   ) type_ |= 1 << kNullSchemaType;
+        else if (type == GetBooleanString()) type_ |= 1 << kBooleanSchemaType;
+        else if (type == GetObjectString() ) type_ |= 1 << kObjectSchemaType;
+        else if (type == GetArrayString()  ) type_ |= 1 << kArraySchemaType;
+        else if (type == GetStringString() ) type_ |= 1 << kStringSchemaType;
+        else if (type == GetIntegerString()) type_ |= 1 << kIntegerSchemaType;
+        else if (type == GetNumberString() ) type_ |= (1 << kNumberSchemaType) | (1 << kIntegerSchemaType);
     }
 
     bool CreateParallelValidator(Context& context) const {
@@ -957,24 +1035,14 @@ private:
         return false;
     }
 
-    // O(n)
-    bool FindPropertyIndex(const Ch* str, SizeType length, SizeType* outIndex) const {
-        for (SizeType index = 0; index < propertyCount_; index++)
-            if (properties_[index].name.GetStringLength() == length && std::memcmp(properties_[index].name.GetString(), str, length) == 0) {
-                *outIndex = index;
-                return true;
-            }
-        return false;
-    }
-
     bool CheckInt(Context& context, int64_t i) const {
         if (!(type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))))
-            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetTypeString());
 
         if (!minimum_.IsNull()) {
             if (minimum_.IsInt64()) {
                 if (exclusiveMinimum_ ? i <= minimum_.GetInt64() : i < minimum_.GetInt64())
-                    RAPIDJSON_INVALID_KEYWORD_RETURN("minimum");
+                    RAPIDJSON_INVALID_KEYWORD_RETURN(GetMinimumString());
             }
             else if (!CheckDoubleMinimum(context, static_cast<double>(i)))
                 return false;
@@ -983,7 +1051,7 @@ private:
         if (!maximum_.IsNull()) {
             if (maximum_.IsInt64()) {
                 if (exclusiveMaximum_ ? i >= maximum_.GetInt64() : i > maximum_.GetInt64())
-                    RAPIDJSON_INVALID_KEYWORD_RETURN("maximum");
+                    RAPIDJSON_INVALID_KEYWORD_RETURN(GetMaximumString());
             }
             else if (!CheckDoubleMaximum(context, static_cast<double>(i)))
                 return false;
@@ -992,7 +1060,7 @@ private:
         if (!multipleOf_.IsNull()) {
             if (multipleOf_.IsUint64()) {
                 if (static_cast<uint64_t>(i >= 0 ? i : -i) % multipleOf_.GetUint64() != 0)
-                    RAPIDJSON_INVALID_KEYWORD_RETURN("multipleOf");
+                    RAPIDJSON_INVALID_KEYWORD_RETURN(GetMultipleOfString());
             }
             else if (!CheckDoubleMultipleOf(context, static_cast<double>(i)))
                 return false;
@@ -1003,12 +1071,12 @@ private:
 
     bool CheckUint(Context& context, uint64_t i) const {
         if (!(type_ & ((1 << kIntegerSchemaType) | (1 << kNumberSchemaType))))
-            RAPIDJSON_INVALID_KEYWORD_RETURN("type");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetTypeString());
 
         if (!minimum_.IsNull()) {
             if (minimum_.IsUint64()) {
                 if (exclusiveMinimum_ ? i <= minimum_.GetUint64() : i < minimum_.GetUint64())
-                    RAPIDJSON_INVALID_KEYWORD_RETURN("minimum");
+                    RAPIDJSON_INVALID_KEYWORD_RETURN(GetMinimumString());
             }
             else if (!CheckDoubleMinimum(context, static_cast<double>(i)))
                 return false;
@@ -1017,7 +1085,7 @@ private:
         if (!maximum_.IsNull()) {
             if (maximum_.IsUint64()) {
                 if (exclusiveMaximum_ ? i >= maximum_.GetUint64() : i > maximum_.GetUint64())
-                    RAPIDJSON_INVALID_KEYWORD_RETURN("maximum");
+                    RAPIDJSON_INVALID_KEYWORD_RETURN(GetMaximumString());
             }
             else if (!CheckDoubleMaximum(context, static_cast<double>(i)))
                 return false;
@@ -1026,7 +1094,7 @@ private:
         if (!multipleOf_.IsNull()) {
             if (multipleOf_.IsUint64()) {
                 if (i % multipleOf_.GetUint64() != 0)
-                    RAPIDJSON_INVALID_KEYWORD_RETURN("multipleOf");
+                    RAPIDJSON_INVALID_KEYWORD_RETURN(GetMultipleOfString());
             }
             else if (!CheckDoubleMultipleOf(context, static_cast<double>(i)))
                 return false;
@@ -1037,13 +1105,13 @@ private:
 
     bool CheckDoubleMinimum(Context& context, double d) const {
         if (exclusiveMinimum_ ? d <= minimum_.GetDouble() : d < minimum_.GetDouble())
-            RAPIDJSON_INVALID_KEYWORD_RETURN("minimum");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetMinimumString());
         return true;
     }
 
     bool CheckDoubleMaximum(Context& context, double d) const {
         if (exclusiveMaximum_ ? d >= maximum_.GetDouble() : d > maximum_.GetDouble())
-            RAPIDJSON_INVALID_KEYWORD_RETURN("maximum");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetMaximumString());
         return true;
     }
 
@@ -1052,7 +1120,7 @@ private:
         double q = std::floor(a / b);
         double r = a - q * b;
         if (r > 0.0)
-            RAPIDJSON_INVALID_KEYWORD_RETURN("multipleOf");
+            RAPIDJSON_INVALID_KEYWORD_RETURN(GetMultipleOfString());
         return true;
     }
 
@@ -1245,8 +1313,10 @@ private:
         }
     }
 
-    bool HandleRefSchema(const Pointer& source, const SchemaType** schema, const ValueType& v) {
-        typename ValueType::ConstMemberIterator itr = v.FindMember("$ref");
+    bool HandleRefSchema(const PointerType& source, const SchemaType** schema, const ValueType& v) {
+        static const Ch kRefString[] = { '$', 'r', 'e', 'f', '\0' };
+
+        typename ValueType::ConstMemberIterator itr = v.FindMember(kRefString);
         if (itr == v.MemberEnd())
             return false;
 
@@ -1386,7 +1456,7 @@ public:
         return schemaStack_.Empty() ? PointerType() : schemaDocument_->GetPointer(&CurrentSchema());
     }
 
-    const char* GetInvalidSchemaKeyword() const {
+    const Ch* GetInvalidSchemaKeyword() const {
         return schemaStack_.Empty() ? 0 : CurrentContext().invalidKeyword;
     }
 
@@ -1399,7 +1469,7 @@ public:
 RAPIDJSON_MULTILINEMACRO_BEGIN\
     *documentStack_.template Push<Ch>() = '\0';\
     documentStack_.template Pop<Ch>(1);\
-    printf("Fail document: %s\n\n", documentStack_.template Bottom<Ch>());\
+    internal::PrintInvalidDocument(documentStack_.template Bottom<Ch>());\
 RAPIDJSON_MULTILINEMACRO_END
 #else
 #define RAPIDJSON_SCHEMA_HANDLE_BEGIN_VERBOSE_()
@@ -1563,12 +1633,12 @@ private:
             return false;
 
 #if RAPIDJSON_SCHEMA_VERBOSE
-        StringBuffer sb;
+        GenericStringBuffer<EncodingType> sb;
         schemaDocument_->GetPointer(&CurrentSchema()).Stringify(sb);
 
         *documentStack_.template Push<Ch>() = '\0';
         documentStack_.template Pop<Ch>(1);
-        printf("S: %*s%s\nD: %*s%s\n\n", depth_ * 4, " ", sb.GetString(), depth_ * 4, " ", documentStack_.template Bottom<Ch>());
+        internal::PrintValidatorPointers(depth_, sb.GetString(), documentStack_.template Bottom<Ch>());
 #endif
 
         uint64_t h = CurrentContext().arrayUniqueness ? CurrentContext().hasher->GetHashCode() : 0;
@@ -1580,7 +1650,7 @@ private:
             if (context.valueUniqueness) {
                 for (typename Context::HashCodeArray::ConstValueIterator itr = context.arrayElementHashCodes.Begin(); itr != context.arrayElementHashCodes.End(); ++itr)
                     if (itr->GetUint64() == h)
-                        RAPIDJSON_INVALID_KEYWORD_RETURN("uniqueItems");
+                        RAPIDJSON_INVALID_KEYWORD_RETURN(SchemaType::GetUniqueItemsString());
                 context.arrayElementHashCodes.PushBack(h, *context.allocator);
             }
         }
@@ -1624,7 +1694,7 @@ private:
 
     static const size_t kDefaultSchemaStackCapacity = 1024;
     static const size_t kDefaultDocumentStackCapacity = 256;
-    const SchemaDocument* schemaDocument_;
+    const SchemaDocumentType* schemaDocument_;
     const SchemaType& root_;
     BaseReaderHandler<EncodingType> nullOutputHandler_;
     OutputHandler& outputHandler_;
