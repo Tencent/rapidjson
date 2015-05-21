@@ -874,6 +874,7 @@ TEST(Pointer, Erase) {
 
     EXPECT_FALSE(Pointer("").Erase(d));
     EXPECT_FALSE(Pointer("/nonexist").Erase(d));
+    EXPECT_FALSE(Pointer("/nonexist/nonexist").Erase(d));
     EXPECT_FALSE(Pointer("/foo/nonexist").Erase(d));
     EXPECT_FALSE(Pointer("/foo/nonexist/nonexist").Erase(d));
     EXPECT_FALSE(Pointer("/foo/0/nonexist").Erase(d));
