@@ -875,7 +875,10 @@ TEST(Pointer, Erase) {
     EXPECT_FALSE(Pointer("").Erase(d));
     EXPECT_FALSE(Pointer("/nonexist").Erase(d));
     EXPECT_FALSE(Pointer("/foo/nonexist").Erase(d));
+    EXPECT_FALSE(Pointer("/foo/nonexist/nonexist").Erase(d));
     EXPECT_FALSE(Pointer("/foo/0/nonexist").Erase(d));
+    EXPECT_FALSE(Pointer("/foo/0/nonexist/nonexist").Erase(d));
+    EXPECT_FALSE(Pointer("/foo/2/nonexist").Erase(d));
     EXPECT_TRUE(Pointer("/foo/0").Erase(d));
     EXPECT_EQ(1u, d["foo"].Size());
     EXPECT_STREQ("baz", d["foo"][0].GetString());
