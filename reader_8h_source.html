@@ -1049,13 +1049,13 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l00967"></a><span class="lineno">  967</span>&#160;        <span class="keywordflow">else</span> {</div>
 <div class="line"><a name="l00968"></a><span class="lineno">  968</span>&#160;            <span class="keywordflow">if</span> (use64bit) {</div>
 <div class="line"><a name="l00969"></a><span class="lineno">  969</span>&#160;                <span class="keywordflow">if</span> (minus)</div>
-<div class="line"><a name="l00970"></a><span class="lineno">  970</span>&#160;                    cont = handler.Int64(-(int64_t)i64);</div>
+<div class="line"><a name="l00970"></a><span class="lineno">  970</span>&#160;                    cont = handler.Int64(static_cast&lt;int64_t&gt;(~i64 + 1));</div>
 <div class="line"><a name="l00971"></a><span class="lineno">  971</span>&#160;                <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00972"></a><span class="lineno">  972</span>&#160;                    cont = handler.Uint64(i64);</div>
 <div class="line"><a name="l00973"></a><span class="lineno">  973</span>&#160;            }</div>
 <div class="line"><a name="l00974"></a><span class="lineno">  974</span>&#160;            <span class="keywordflow">else</span> {</div>
 <div class="line"><a name="l00975"></a><span class="lineno">  975</span>&#160;                <span class="keywordflow">if</span> (minus)</div>
-<div class="line"><a name="l00976"></a><span class="lineno">  976</span>&#160;                    cont = handler.Int(-(<span class="keywordtype">int</span>)i);</div>
+<div class="line"><a name="l00976"></a><span class="lineno">  976</span>&#160;                    cont = handler.Int(static_cast&lt;int32_t&gt;(~i + 1));</div>
 <div class="line"><a name="l00977"></a><span class="lineno">  977</span>&#160;                <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00978"></a><span class="lineno">  978</span>&#160;                    cont = handler.Uint(i);</div>
 <div class="line"><a name="l00979"></a><span class="lineno">  979</span>&#160;            }</div>
