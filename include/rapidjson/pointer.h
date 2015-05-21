@@ -686,34 +686,37 @@ public:
 
         ValueType* v = &root;
         const Token* last = tokens_ + (tokenCount_ - 1);
-        for (const Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
+        for (const Token *t = tokens_; t != last; ++t) {
             switch (v->GetType()) {
             case kObjectType:
                 {
                     typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
                     if (m == v->MemberEnd())
                         return false;
-                    if (t == last) {
-                        v->EraseMember(m);
-                        return true;
-                    }
                     v = &m->value;
                 }
                 break;
             case kArrayType:
                 if (t->index == kPointerInvalidIndex || t->index >= v->Size())
                     return false;
-                if (t == last) {
-                    v->Erase(v->Begin() + t->index);
-                    return true;
-                }
                 v = &((*v)[t->index]);
                 break;
             default:
                 return false;
             }
         }
-        return false;
+
+        switch (v->GetType()) {
+        case kObjectType:
+            return v->EraseMember(GenericStringRef<Ch>(last->name, last->length));
+        case kArrayType:
+            if (last->index == kPointerInvalidIndex || last->index >= v->Size())
+                return false;
+            v->Erase(v->Begin() + last->index);
+            return true;
+        default:
+            return false;
+        }
     }
 
 private:
