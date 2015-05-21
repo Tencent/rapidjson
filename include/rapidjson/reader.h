@@ -967,13 +967,13 @@ private:
         else {
             if (use64bit) {
                 if (minus)
-                    cont = handler.Int64(-(int64_t)i64);
+                    cont = handler.Int64(static_cast<int64_t>(~i64 + 1));
                 else
                     cont = handler.Uint64(i64);
             }
             else {
                 if (minus)
-                    cont = handler.Int(-(int)i);
+                    cont = handler.Int(static_cast<int32_t>(~i + 1));
                 else
                     cont = handler.Uint(i);
             }
