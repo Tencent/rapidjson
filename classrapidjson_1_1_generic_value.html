@@ -353,6 +353,16 @@ template&lt;typename SourceAllocator &gt; </td></tr>
 <tr class="memitem:a121e40b5944be337189eb63b98b7e6ce"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_value.html#aca5596987335016c1a7c2a9467baf80b">MemberIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#a121e40b5944be337189eb63b98b7e6ce">EraseMember</a> (<a class="el" href="classrapidjson_1_1_generic_value.html#a6cd2b09795c48d2892bebc0ae350d51f">ConstMemberIterator</a> first, <a class="el" href="classrapidjson_1_1_generic_value.html#a6cd2b09795c48d2892bebc0ae350d51f">ConstMemberIterator</a> last)</td></tr>
 <tr class="memdesc:a121e40b5944be337189eb63b98b7e6ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove members in the range [first, last) from an object.  <a href="#a121e40b5944be337189eb63b98b7e6ce">More...</a><br /></td></tr>
 <tr class="separator:a121e40b5944be337189eb63b98b7e6ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac51a3b3046aaa12aa1d88ac876a28cec"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#ac51a3b3046aaa12aa1d88ac876a28cec">EraseMember</a> (const <a class="el" href="classrapidjson_1_1_generic_value.html#adcdbc7fa85a9a41b78966d7e0dcc2ac4">Ch</a> *name)</td></tr>
+<tr class="memdesc:ac51a3b3046aaa12aa1d88ac876a28cec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erase a member in object by its name.  <a href="#ac51a3b3046aaa12aa1d88ac876a28cec">More...</a><br /></td></tr>
+<tr class="separator:ac51a3b3046aaa12aa1d88ac876a28cec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af930563f804086df25f70bb5f1de8e6a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af930563f804086df25f70bb5f1de8e6a"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>EraseMember</b> (const std::basic_string&lt; <a class="el" href="classrapidjson_1_1_generic_value.html#adcdbc7fa85a9a41b78966d7e0dcc2ac4">Ch</a> &gt; &amp;name)</td></tr>
+<tr class="separator:af930563f804086df25f70bb5f1de8e6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27db22089fc69aacda8309c593ed9812"><td class="memTemplParams" colspan="2"><a class="anchor" id="a27db22089fc69aacda8309c593ed9812"></a>
+template&lt;typename SourceAllocator &gt; </td></tr>
+<tr class="memitem:a27db22089fc69aacda8309c593ed9812"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>EraseMember</b> (const <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, SourceAllocator &gt; &amp;name)</td></tr>
+<tr class="separator:a27db22089fc69aacda8309c593ed9812"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Array</div></td></tr>
 <tr class="memitem:a25069c76d045b058e54835d8c467c789"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#a25069c76d045b058e54835d8c467c789">SetArray</a> ()</td></tr>
 <tr class="memdesc:a25069c76d045b058e54835d8c467c789"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set this value as an empty array.  <a href="#a25069c76d045b058e54835d8c467c789">More...</a><br /></td></tr>
@@ -1602,6 +1612,42 @@ template&lt;typename Encoding, typename Allocator&gt; </div>
 <dl class="section note"><dt>Note</dt><dd>This function preserves the relative order of the remaining object members. </dd>
 <dd>
 Linear time complexity. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ac51a3b3046aaa12aa1d88ac876a28cec"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Encoding, typename Allocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classrapidjson_1_1_generic_value.html">rapidjson::GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::EraseMember </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classrapidjson_1_1_generic_value.html#adcdbc7fa85a9a41b78966d7e0dcc2ac4">Ch</a> *&#160;</td>
+          <td class="paramname"><em>name</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Erase a member in object by its name. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>Name of member to be removed. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether the member existed. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Linear time complexity. </dd></dl>
 
 </div>
 </div>
