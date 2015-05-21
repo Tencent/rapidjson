@@ -837,7 +837,7 @@ TEST(SchemaValidator, AllOf_Nested) {
     INVALIDATE(s, "123", "", "allOf", "");
 }
 
-template <typename Allocator = CrtAllocator>
+template <typename Allocator>
 static char* ReadFile(const char* filename, Allocator& allocator) {
     const char *paths[] = {
         "%s",
