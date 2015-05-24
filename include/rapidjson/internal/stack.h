@@ -122,7 +122,22 @@ public:
     }
 
     template<typename T>
+    const T* Top() const {
+        RAPIDJSON_ASSERT(GetSize() >= sizeof(T));
+        return reinterpret_cast<T*>(stackTop_ - sizeof(T));
+    }
+
+    template<typename T>
+    T* End() { return reinterpret_cast<T*>(stackTop_); }
+
+    template<typename T>
+    const T* End() const { return reinterpret_cast<T*>(stackTop_); }
+
+    template<typename T>
     T* Bottom() { return (T*)stack_; }
+
+    template<typename T>
+    const T* Bottom() const { return (T*)stack_; }
 
     Allocator& GetAllocator() { return *allocator_; }
     bool Empty() const { return stackTop_ == stack_; }

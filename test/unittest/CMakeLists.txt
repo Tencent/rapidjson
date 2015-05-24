@@ -11,6 +11,7 @@ set(UNITTEST_SOURCES
     pointertest.cpp
     prettywritertest.cpp
     readertest.cpp
+    regextest.cpp
 	simdtest.cpp
     stringbuffertest.cpp
     strtodtest.cpp
