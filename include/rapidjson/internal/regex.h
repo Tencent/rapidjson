@@ -76,7 +76,7 @@ public:
             next->Clear();
             for (const SizeType* s = current->template Bottom<SizeType>(); s != current->template End<SizeType>(); ++s) {
                 const State& sr = GetState(*s);
-                if (sr.codepoint == codepoint)
+                if (sr.codepoint == kAnyCharacterClass || sr.codepoint == codepoint)
                     AddState(stateSet, *next, sr.out);
             }
             Stack<Allocator>* temp = current;
@@ -107,6 +107,8 @@ private:
         kAlternation,
         kLeftParenthesis
     };
+
+    static const unsigned kAnyCharacterClass = 0xFFFFFFFF;   //!< For '.'
 
     struct State {
         SizeType out;     //!< Equals to kInvalid for matching state
@@ -168,6 +170,11 @@ private:
         }
     }
 
+    void PushOperand(Stack<Allocator>& operandStack, unsigned codepoint) {
+        SizeType s = NewState(kRegexInvalidState, kRegexInvalidState, codepoint);
+        *operandStack.template Push<Frag>() = Frag(s, s);
+    }
+    
     template <typename InputStream>
     void Parse(InputStream& is) {
         Allocator allocator;
@@ -219,9 +226,13 @@ private:
                         return;
                     break;
 
+                case '.':
+                    PushOperand(operandStack, kAnyCharacterClass);
+                    ImplicitConcatenation(atomCountStack, operatorStack);
+                    break;
+
                 default:
-                    SizeType s = NewState(kRegexInvalidState, kRegexInvalidState, codepoint);
-                    *operandStack.template Push<Frag>() = Frag(s, s);
+                    PushOperand(operandStack, codepoint);
                     ImplicitConcatenation(atomCountStack, operatorStack);
             }
         }
