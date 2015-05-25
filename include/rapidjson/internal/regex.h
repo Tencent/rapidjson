@@ -90,6 +90,12 @@ public:
     }
 
 private:
+    enum Operator {
+        kConcatenation,
+        kAlternation,
+        kLeftParenthesis,
+    };
+
     struct State {
         SizeType out;     //!< Equals to kInvalid for match
         SizeType out1;    //!< Equals to non-kInvalid for split
@@ -155,50 +161,94 @@ private:
     void Parse(InputStream& is) {
         Allocator allocator;
         Stack<Allocator> operandStack(&allocator, 256);     // Frag
-        Stack<Allocator> operatorStack(&allocator, 256);    // char
+        Stack<Allocator> operatorStack(&allocator, 256);    // Operator
+        Stack<Allocator> atomCountStack(&allocator, 256);   // unsigned (Atom per parenthesis)
+
+        *atomCountStack.template Push<unsigned>() = 0;
 
         unsigned codepoint;
-        bool previousOperand = false;
         while (Encoding::Decode(is, &codepoint) && codepoint != 0) {
             switch (codepoint) {
                 case '|':
-                    *operatorStack.template Push<char>() = '|';
-                    previousOperand = false;
+                    while (!operatorStack.Empty() && *operatorStack.template Top<Operator>() < kAlternation)
+                        if (!Eval(operandStack, operatorStack))
+                            return;
+                    *operatorStack.template Push<Operator>() = kAlternation;
+                    *atomCountStack.template Top<unsigned>() = 0;
+                    break;
+
+                case '(':
+                    *operatorStack.template Push<Operator>() = kLeftParenthesis;
+                    *atomCountStack.template Push<unsigned>() = 0;
+                    break;
+
+                case ')':
+                    while (!operatorStack.Empty() && *operatorStack.template Top<Operator>() != kLeftParenthesis)
+                        if (!Eval(operandStack, operatorStack))
+                            return;
+                    if (operatorStack.Empty())
+                        return;
+                    operatorStack.template Pop<Operator>(1);
+                    atomCountStack.template Pop<unsigned>(1);
+                    ImplicitConcatenation(atomCountStack, operatorStack);
                     break;
 
                 default:
                     SizeType s = NewState(kRegexInvalidState, kRegexInvalidState, codepoint);
-                    // concatenation with previous operand 
-                    if (previousOperand) {
-                        Frag* e = operandStack.template Top<Frag>();
-                        Patch(e->out, s);
-                        e->out = s;
-                    }
-                    else
-                        *operandStack.template Push<Frag>() = Frag(s, s);
-                    previousOperand = true;
+                    *operandStack.template Push<Frag>() = Frag(s, s);
+                    ImplicitConcatenation(atomCountStack, operatorStack);
             }
         }
 
-        while (!operatorStack.Empty()) {
-            switch (*operatorStack.template Pop<char>(1)) {
-                case '|':
-                {
-                    Frag e2 = *operandStack.template Pop<Frag>(1);
-                    Frag e1 = *operandStack.template Pop<Frag>(1);
-                    SizeType s = NewState(e1.start, e2.start, 0);
-                    *operandStack.template Push<Frag>() = Frag(s, Append(e1.out, e2.out));
-                }
-                break;
-            }
-        }
+        while (!operatorStack.Empty())
+            if (!Eval(operandStack, operatorStack))
+                return;
 
         // Link the operand to matching state.
         if (operandStack.GetSize() == sizeof(Frag)) {
             Frag* e = operandStack.template Pop<Frag>(1);
             Patch(e->out, NewState(kRegexInvalidState, kRegexInvalidState, 0));
             root_ = e->start;
+            // printf("root: %d\n", root_);
+            // for (SizeType i = 0; i < stateCount_ ; i++) {
+            //     State& s = GetState(i);
+            //     printf("[%2d] out: %2d out1: %2d c: '%c'\n", i, s.out, s.out1, (char)s.codepoint);
+            // }
+            // printf("\n");
         }
+    }
+
+    bool Eval(Stack<Allocator>& operandStack, Stack<Allocator>& operatorStack) {
+        switch (*operatorStack.template Pop<Operator>(1)) {
+            case kConcatenation:
+                if (operandStack.GetSize() >= sizeof(Frag) * 2) {
+                    Frag e2 = *operandStack.template Pop<Frag>(1);
+                    Frag e1 = *operandStack.template Pop<Frag>(1);
+                    Patch(e1.out, e2.start);
+                    *operandStack.template Push<Frag>() = Frag(e1.start, e2.out);
+                    return true;
+                }
+                return false;
+
+            case kAlternation:
+                if (operandStack.GetSize() >= sizeof(Frag) * 2) {
+                    Frag e2 = *operandStack.template Pop<Frag>(1);
+                    Frag e1 = *operandStack.template Pop<Frag>(1);
+                    SizeType s = NewState(e1.start, e2.start, 0);
+                    *operandStack.template Push<Frag>() = Frag(s, Append(e1.out, e2.out));
+                    return true;
+                }
+                return false;
+
+            default:
+                return false;
+        }
+    }
+
+    void ImplicitConcatenation(Stack<Allocator>& atomCountStack, Stack<Allocator>& operatorStack) {
+        if (*atomCountStack.template Top<unsigned>())
+            *operatorStack.template Push<Operator>() = kConcatenation;
+        (*atomCountStack.template Top<unsigned>())++;
     }
 
     Stack<Allocator> states_;

@@ -19,6 +19,7 @@ using namespace rapidjson::internal;
 
 TEST(Regex, concatenation) {
     Regex re("abc");
+    ASSERT_TRUE(re.IsValid());
     EXPECT_TRUE(re.Match("abc"));
     EXPECT_FALSE(re.Match(""));
     EXPECT_FALSE(re.Match("a"));
@@ -27,24 +28,59 @@ TEST(Regex, concatenation) {
     EXPECT_FALSE(re.Match("abcd"));
 }
 
-TEST(Regex, split) {
-    {
-        Regex re("abab|abbb");
-        EXPECT_TRUE(re.Match("abab"));
-        EXPECT_TRUE(re.Match("abbb"));
-        EXPECT_FALSE(re.Match(""));
-        EXPECT_FALSE(re.Match("ab"));
-        EXPECT_FALSE(re.Match("ababa"));
-        EXPECT_FALSE(re.Match("abb"));
-        EXPECT_FALSE(re.Match("abbbb"));
-    }
-    {
-        Regex re("a|b|c");
-        EXPECT_TRUE(re.Match("a"));
-        EXPECT_TRUE(re.Match("b"));
-        EXPECT_TRUE(re.Match("c"));
-        EXPECT_FALSE(re.Match(""));
-        EXPECT_FALSE(re.Match("aa"));
-        EXPECT_FALSE(re.Match("ab"));
-    }
+TEST(Regex, split1) {
+    Regex re("abab|abbb");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("abab"));
+    EXPECT_TRUE(re.Match("abbb"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("ab"));
+    EXPECT_FALSE(re.Match("ababa"));
+    EXPECT_FALSE(re.Match("abb"));
+    EXPECT_FALSE(re.Match("abbbb"));
+}
+
+TEST(Regex, split2) {
+    Regex re("a|b|c");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("a"));
+    EXPECT_TRUE(re.Match("b"));
+    EXPECT_TRUE(re.Match("c"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("aa"));
+    EXPECT_FALSE(re.Match("ab"));
+}
+
+TEST(Regex, parenthesis1) {
+    Regex re("(ab)c");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("abc"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("a"));
+    EXPECT_FALSE(re.Match("b"));
+    EXPECT_FALSE(re.Match("ab"));
+    EXPECT_FALSE(re.Match("abcd"));
+}
+
+TEST(Regex, parenthesis2) {
+    Regex re("a(bc)");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("abc"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("a"));
+    EXPECT_FALSE(re.Match("b"));
+    EXPECT_FALSE(re.Match("ab"));
+    EXPECT_FALSE(re.Match("abcd"));
+}
+
+TEST(Regex, parenthesis3) {
+    Regex re("(a|b)(c|d)");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("ac"));
+    EXPECT_TRUE(re.Match("ad"));
+    EXPECT_TRUE(re.Match("bc"));
+    EXPECT_TRUE(re.Match("bd"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("ab"));
+    EXPECT_FALSE(re.Match("cd"));
 }
