@@ -29,23 +29,30 @@ namespace internal {
 // GenericRegex
 
 static const SizeType kRegexInvalidState = ~SizeType(0);  //!< Represents an invalid index in GenericRegex::State::out, out1
+static const SizeType kRegexInvalidRange = ~SizeType(0);
 
-//! Regular expression engine.
+//! Regular expression engine with subset of ECMAscript grammar.
 /*!
     Supported regular expression syntax:
-    - \c ab  Concatenation
-    - \c a|b   Alternation
-    - \c a?    Zero or one
-    - \c a*    Zero or more
-    - \c a+    One or more
-    - \c (ab)* Parenthesis grouping
+    - \c ab     Concatenation
+    - \c a|b    Alternation
+    - \c a?     Zero or one
+    - \c a*     Zero or more
+    - \c a+     One or more
+    - \c (ab)*  Grouping
+    - \c .      Any character
+    - \c [abc]  Character classes
+    - \c [a-c]  Character class range
+    - \c [a-z0-9_] Character class combination
+    - \c [^abc] Negated character classes
+    - \c [^a-c] Negated character class range
 */
 template <typename Encoding, typename Allocator = CrtAllocator>
 class GenericRegex {
 public:
     typedef typename Encoding::Ch Ch;
 
-    GenericRegex(const Ch* source, Allocator* allocator = 0) : states_(allocator, 256), root_(kRegexInvalidState), stateCount_() {
+    GenericRegex(const Ch* source, Allocator* allocator = 0) : states_(allocator, 256), ranges_(allocator, 256), root_(kRegexInvalidState), stateCount_(),rangeCount_() {
         StringStream is(source);
         Parse(is);
     }
@@ -76,8 +83,12 @@ public:
             next->Clear();
             for (const SizeType* s = current->template Bottom<SizeType>(); s != current->template End<SizeType>(); ++s) {
                 const State& sr = GetState(*s);
-                if (sr.codepoint == kAnyCharacterClass || sr.codepoint == codepoint)
+                if (sr.codepoint == codepoint ||
+                    sr.codepoint == kAnyCharacterClass || 
+                    (sr.codepoint == kRangeCharacterClass && MatchRange(sr.rangeStart, codepoint)))
+                {
                     AddState(stateSet, *next, sr.out);
+                }
             }
             Stack<Allocator>* temp = current;
             current = next;
@@ -109,10 +120,19 @@ private:
     };
 
     static const unsigned kAnyCharacterClass = 0xFFFFFFFF;   //!< For '.'
+    static const unsigned kRangeCharacterClass = 0xFFFFFFFE;
+    static const unsigned kRangeNegationFlag = 0x80000000;
+
+    struct Range {
+        unsigned start; // 
+        unsigned end;
+        SizeType next;
+    };
 
     struct State {
         SizeType out;     //!< Equals to kInvalid for matching state
         SizeType out1;    //!< Equals to non-kInvalid for split
+        SizeType rangeStart;
         unsigned codepoint;
     };
 
@@ -132,6 +152,16 @@ private:
         return states_.template Bottom<State>()[index];
     }
 
+    Range& GetRange(SizeType index) {
+        RAPIDJSON_ASSERT(index < rangeCount_);
+        return ranges_.template Bottom<Range>()[index];
+    }
+
+    const Range& GetRange(SizeType index) const {
+        RAPIDJSON_ASSERT(index < rangeCount_);
+        return ranges_.template Bottom<Range>()[index];
+    }
+
     void AddState(unsigned* stateSet, Stack<Allocator>& l, SizeType index) const {
         if (index == kRegexInvalidState)
             return;
@@ -147,34 +177,17 @@ private:
         }
     }
 
-    SizeType NewState(SizeType out, SizeType out1, unsigned codepoint) {
-        State* s = states_.template Push<State>();
-        s->out = out;
-        s->out1 = out1;
-        s->codepoint = codepoint;
-        return stateCount_++;
-    }
-
-    SizeType Append(SizeType l1, SizeType l2) {
-        SizeType old = l1;
-        while (GetState(l1).out != kRegexInvalidState)
-            l1 = GetState(l1).out;
-        GetState(l1).out = l2;
-        return old;
-    }
-
-    void Patch(SizeType l, SizeType s) {
-        for (SizeType next; l != kRegexInvalidState; l = next) {
-            next = GetState(l).out;
-            GetState(l).out = s;
+    bool MatchRange(SizeType rangeIndex, unsigned codepoint) const {
+        bool yes = (GetRange(rangeIndex).start & kRangeNegationFlag) == 0;
+        while (rangeIndex != kRegexInvalidRange) {
+            const Range& r = GetRange(rangeIndex);
+            if (codepoint >= (r.start & ~kRangeNegationFlag) && codepoint <= r.end)
+                return yes;
+            rangeIndex = r.next;
         }
+        return !yes;
     }
 
-    void PushOperand(Stack<Allocator>& operandStack, unsigned codepoint) {
-        SizeType s = NewState(kRegexInvalidState, kRegexInvalidState, codepoint);
-        *operandStack.template Push<Frag>() = Frag(s, s);
-    }
-    
     template <typename InputStream>
     void Parse(InputStream& is) {
         Allocator allocator;
@@ -231,6 +244,18 @@ private:
                     ImplicitConcatenation(atomCountStack, operatorStack);
                     break;
 
+                case '[':
+                    {
+                        SizeType range;
+                        if (!ParseRange(is, &range))
+                            return;
+                        SizeType s = NewState(kRegexInvalidState, kRegexInvalidState, kRangeCharacterClass);
+                        GetState(s).rangeStart = range;
+                        *operandStack.template Push<Frag>() = Frag(s, s);
+                    }
+                    ImplicitConcatenation(atomCountStack, operatorStack);
+                    break;
+
                 default:
                     PushOperand(operandStack, codepoint);
                     ImplicitConcatenation(atomCountStack, operatorStack);
@@ -255,6 +280,41 @@ private:
             }
             printf("\n");
 #endif
+        }
+    }
+
+    SizeType NewState(SizeType out, SizeType out1, unsigned codepoint) {
+        State* s = states_.template Push<State>();
+        s->out = out;
+        s->out1 = out1;
+        s->codepoint = codepoint;
+        s->rangeStart = kRegexInvalidRange;
+        return stateCount_++;
+    }
+
+    void PushOperand(Stack<Allocator>& operandStack, unsigned codepoint) {
+        SizeType s = NewState(kRegexInvalidState, kRegexInvalidState, codepoint);
+        *operandStack.template Push<Frag>() = Frag(s, s);
+    }
+
+    void ImplicitConcatenation(Stack<Allocator>& atomCountStack, Stack<Allocator>& operatorStack) {
+        if (*atomCountStack.template Top<unsigned>())
+            *operatorStack.template Push<Operator>() = kConcatenation;
+        (*atomCountStack.template Top<unsigned>())++;
+    }
+
+    SizeType Append(SizeType l1, SizeType l2) {
+        SizeType old = l1;
+        while (GetState(l1).out != kRegexInvalidState)
+            l1 = GetState(l1).out;
+        GetState(l1).out = l2;
+        return old;
+    }
+
+    void Patch(SizeType l, SizeType s) {
+        for (SizeType next; l != kRegexInvalidState; l = next) {
+            next = GetState(l).out;
+            GetState(l).out = s;
         }
     }
 
@@ -314,15 +374,72 @@ private:
         }
     }
 
-    void ImplicitConcatenation(Stack<Allocator>& atomCountStack, Stack<Allocator>& operatorStack) {
-        if (*atomCountStack.template Top<unsigned>())
-            *operatorStack.template Push<Operator>() = kConcatenation;
-        (*atomCountStack.template Top<unsigned>())++;
+    template <typename InputStream>
+    bool ParseRange(InputStream& is, SizeType* range) {
+        bool isBegin = true;
+        bool negate = false;
+        int step = 0;
+        SizeType start = kRegexInvalidRange;
+        SizeType current = kRegexInvalidRange;
+        unsigned codepoint;
+        while (Encoding::Decode(is, &codepoint) && codepoint != 0) {
+            if (isBegin && codepoint == '^')
+                negate = true;
+            else if (codepoint == ']') {
+                if (step == 2) { // Add trailing '-'
+                    SizeType r = NewRange('-');
+                    RAPIDJSON_ASSERT(current != kRegexInvalidRange);
+                    GetRange(current).next = r;
+                }
+                if (negate)
+                    GetRange(start).start |= kRangeNegationFlag;
+                *range = start;
+                return true;
+            }
+            else {
+                switch (step) {
+                case 1:
+                    if (codepoint == '-') {
+                        step++;
+                        break;
+                    }
+                    // fall through to step 0 for other characters
+
+                case 0:
+                    {
+                        SizeType r = NewRange(codepoint);
+                        if (current != kRegexInvalidRange)
+                            GetRange(current).next = r;
+                        if (start == kRegexInvalidRange)
+                            start = r;
+                        current = r;
+                    }
+                    step = 1;
+                    break;
+
+                default:
+                    RAPIDJSON_ASSERT(step == 2);
+                    GetRange(current).end = codepoint;
+                    step = 0;
+                }
+            }
+            isBegin = false;
+        }
+        return false;
+    }
+    
+    SizeType NewRange(unsigned codepoint) {
+        Range* r = ranges_.template Push<Range>();
+        r->start = r->end = codepoint;
+        r->next = kRegexInvalidRange;
+        return rangeCount_++;
     }
 
     Stack<Allocator> states_;
+    Stack<Allocator> ranges_;
     SizeType root_;
     SizeType stateCount_;
+    SizeType rangeCount_;
 };
 
 typedef GenericRegex<UTF8<> > Regex;

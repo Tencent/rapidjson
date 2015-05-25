@@ -241,4 +241,90 @@ TEST(Regex, AnyCharacter) {
     EXPECT_FALSE(re.Match("aa"));
 }
 
+TEST(Regex, CharacterRange1) {
+    Regex re("[abc]");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("a"));
+    EXPECT_TRUE(re.Match("b"));
+    EXPECT_TRUE(re.Match("c"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("`"));
+    EXPECT_FALSE(re.Match("d"));
+    EXPECT_FALSE(re.Match("aa"));
+}
+
+TEST(Regex, CharacterRange2) {
+    Regex re("[^abc]");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("`"));
+    EXPECT_TRUE(re.Match("d"));
+    EXPECT_FALSE(re.Match("a"));
+    EXPECT_FALSE(re.Match("b"));
+    EXPECT_FALSE(re.Match("c"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("aa"));
+}
+
+TEST(Regex, CharacterRange3) {
+    Regex re("[a-c]");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("a"));
+    EXPECT_TRUE(re.Match("b"));
+    EXPECT_TRUE(re.Match("c"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("`"));
+    EXPECT_FALSE(re.Match("d"));
+    EXPECT_FALSE(re.Match("aa"));
+}
+
+TEST(Regex, CharacterRange4) {
+    Regex re("[^a-c]");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("`"));
+    EXPECT_TRUE(re.Match("d"));
+    EXPECT_FALSE(re.Match("a"));
+    EXPECT_FALSE(re.Match("b"));
+    EXPECT_FALSE(re.Match("c"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("aa"));
+}
+
+TEST(Regex, CharacterRange5) {
+    Regex re("[-]");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("-"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("a"));
+}
+
+TEST(Regex, CharacterRange6) {
+    Regex re("[a-]");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("a"));
+    EXPECT_TRUE(re.Match("-"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("`"));
+    EXPECT_FALSE(re.Match("b"));
+}
+
+TEST(Regex, CharacterRange7) {
+    Regex re("[-a]");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("a"));
+    EXPECT_TRUE(re.Match("-"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("`"));
+    EXPECT_FALSE(re.Match("b"));
+}
+
+TEST(Regex, CharacterRange8) {
+    Regex re("[a-zA-Z0-9]*");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("Milo"));
+    EXPECT_TRUE(re.Match("MT19937"));
+    EXPECT_TRUE(re.Match("43"));
+    EXPECT_FALSE(re.Match("a_b"));
+    EXPECT_FALSE(re.Match("!"));
+}
+
 #undef EURO
