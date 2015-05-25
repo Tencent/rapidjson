@@ -152,8 +152,7 @@ private:
     }
 
     void Patch(SizeType l, SizeType s) {
-        SizeType next;
-        for (; l != kRegexInvalidState; l = next) {
+        for (SizeType next; l != kRegexInvalidState; l = next) {
             next = GetState(l).out;
             GetState(l).out = s;
         }
@@ -173,7 +172,7 @@ private:
             switch (codepoint) {
                 case '|':
                     while (!operatorStack.Empty() && *operatorStack.template Top<Operator>() < kAlternation)
-                        if (!Eval(operandStack, operatorStack))
+                        if (!Eval(operandStack, *operatorStack.template Pop<Operator>(1)))
                             return;
                     *operatorStack.template Push<Operator>() = kAlternation;
                     *atomCountStack.template Top<unsigned>() = 0;
@@ -186,7 +185,7 @@ private:
 
                 case ')':
                     while (!operatorStack.Empty() && *operatorStack.template Top<Operator>() != kLeftParenthesis)
-                        if (!Eval(operandStack, operatorStack))
+                        if (!Eval(operandStack, *operatorStack.template Pop<Operator>(1)))
                             return;
                     if (operatorStack.Empty())
                         return;
@@ -196,20 +195,17 @@ private:
                     break;
 
                 case '?':
-                    *operatorStack.template Push<Operator>() = kZeroOrOne;
-                    if (!Eval(operandStack, operatorStack))
+                    if (!Eval(operandStack, kZeroOrOne))
                         return;
                     break;
 
                 case '*':
-                    *operatorStack.template Push<Operator>() = kZeroOrMore;
-                    if (!Eval(operandStack, operatorStack))
+                    if (!Eval(operandStack, kZeroOrMore))
                         return;
                     break;
 
                 case '+':
-                    *operatorStack.template Push<Operator>() = kOneOrMore;
-                    if (!Eval(operandStack, operatorStack))
+                    if (!Eval(operandStack, kOneOrMore))
                         return;
                     break;
 
@@ -221,7 +217,7 @@ private:
         }
 
         while (!operatorStack.Empty())
-            if (!Eval(operandStack, operatorStack))
+            if (!Eval(operandStack, *operatorStack.template Pop<Operator>(1)))
                 return;
 
         // Link the operand to matching state.
@@ -229,6 +225,7 @@ private:
             Frag* e = operandStack.template Pop<Frag>(1);
             Patch(e->out, NewState(kRegexInvalidState, kRegexInvalidState, 0));
             root_ = e->start;
+
 #if RAPIDJSON_REGEX_VERBOSE
             printf("root: %d\n", root_);
             for (SizeType i = 0; i < stateCount_ ; i++) {
@@ -240,9 +237,8 @@ private:
         }
     }
 
-    bool Eval(Stack<Allocator>& operandStack, Stack<Allocator>& operatorStack) {
-        // printf("Eval %c\n", "?*+.|("[*operatorStack.template Top<Operator>()]);
-        switch (*operatorStack.template Pop<Operator>(1)) {
+    bool Eval(Stack<Allocator>& operandStack, Operator op) {
+        switch (op) {
             case kConcatenation:
                 if (operandStack.GetSize() >= sizeof(Frag) * 2) {
                     Frag e2 = *operandStack.template Pop<Frag>(1);
