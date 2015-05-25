@@ -18,6 +18,10 @@
 #include "../rapidjson.h"
 #include "stack.h"
 
+#ifndef RAPIDJSON_REGEX_VERBOSE
+#define RAPIDJSON_REGEX_VERBOSE 0
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
@@ -62,16 +66,12 @@ public:
             next->Clear();
             for (const SizeType* s = current->template Bottom<SizeType>(); s != current->template End<SizeType>(); ++s) {
                 const State& sr = GetState(*s);
-                // if (sr.out != kRegexInvalidState)
-                //     printf("%c matches %c\n", (char)sr.codepoint, (char)codepoint);
-
-                if (sr.out != kRegexInvalidState && sr.codepoint == codepoint)
+                if (sr.codepoint == codepoint)
                     AddState(stateSet, *next, sr.out);
             }
             Stack<Allocator>* temp = current;
             current = next;
             next = temp;
-            // printf("\n");
         }
 
         Allocator::Free(stateSet);
@@ -99,7 +99,7 @@ private:
     };
 
     struct State {
-        SizeType out;     //!< Equals to kInvalid for match
+        SizeType out;     //!< Equals to kInvalid for matching state
         SizeType out1;    //!< Equals to non-kInvalid for split
         unsigned codepoint;
     };
@@ -229,7 +229,7 @@ private:
             Frag* e = operandStack.template Pop<Frag>(1);
             Patch(e->out, NewState(kRegexInvalidState, kRegexInvalidState, 0));
             root_ = e->start;
-#if 0
+#if RAPIDJSON_REGEX_VERBOSE
             printf("root: %d\n", root_);
             for (SizeType i = 0; i < stateCount_ ; i++) {
                 State& s = GetState(i);
