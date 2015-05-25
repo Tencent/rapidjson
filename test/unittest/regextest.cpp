@@ -219,3 +219,14 @@ TEST(Regex, OneOrMore4) {
     EXPECT_FALSE(re.Match(""));
     EXPECT_FALSE(re.Match("ab"));
 }
+
+TEST(Regex, Unicode) {
+#define EURO "\xE2\x82\xAC" // "\xE2\x82\xAC" is UTF-8 sequence of Euro sign U+20AC
+    Regex re("a" EURO "+b"); 
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("a" EURO "b"));
+    EXPECT_TRUE(re.Match("a" EURO EURO "b"));
+    EXPECT_FALSE(re.Match("a?b"));
+    EXPECT_FALSE(re.Match("a" EURO "\xAC" "b")); // unaware of UTF-8 will match
+#undef EURO
+}
