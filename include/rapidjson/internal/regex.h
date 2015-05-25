@@ -30,6 +30,16 @@ namespace internal {
 
 static const SizeType kRegexInvalidState = ~SizeType(0);  //!< Represents an invalid index in GenericRegex::State::out, out1
 
+//! Regular expression engine.
+/*!
+    Supported regular expression syntax:
+    - \c ab  Concatenation
+    - \c a|b   Alternation
+    - \c a?    Zero or one
+    - \c a*    Zero or more
+    - \c a+    One or more
+    - \c (ab)* Parenthesis grouping
+*/
 template <typename Encoding, typename Allocator = CrtAllocator>
 class GenericRegex {
 public:
