@@ -54,11 +54,12 @@ public:
         const size_t stateSetSize = (stateCount_ + 31) / 32 * 4;
         unsigned* stateSet = static_cast<unsigned*>(allocator.Malloc(stateSetSize));
         std::memset(stateSet, 0, stateSetSize);
-
         AddState(stateSet, *current, root_);
 
         unsigned codepoint;
         while (!current->Empty() && Encoding::Decode(is, &codepoint) && codepoint != 0) {
+            std::memset(stateSet, 0, stateSetSize);
+            next->Clear();
             for (const SizeType* s = current->template Bottom<SizeType>(); s != current->template End<SizeType>(); ++s) {
                 const State& sr = GetState(*s);
                 // if (sr.out != kRegexInvalidState)
@@ -70,8 +71,6 @@ public:
             Stack<Allocator>* temp = current;
             current = next;
             next = temp;
-            std::memset(stateSet, 0, stateSetSize);
-            next->Clear();
             // printf("\n");
         }
 
@@ -91,9 +90,12 @@ public:
 
 private:
     enum Operator {
+        kZeroOrOne,
+        kZeroOrMore,
+        kOneOrMore,
         kConcatenation,
         kAlternation,
-        kLeftParenthesis,
+        kLeftParenthesis
     };
 
     struct State {
@@ -193,6 +195,24 @@ private:
                     ImplicitConcatenation(atomCountStack, operatorStack);
                     break;
 
+                case '?':
+                    *operatorStack.template Push<Operator>() = kZeroOrOne;
+                    if (!Eval(operandStack, operatorStack))
+                        return;
+                    break;
+
+                case '*':
+                    *operatorStack.template Push<Operator>() = kZeroOrMore;
+                    if (!Eval(operandStack, operatorStack))
+                        return;
+                    break;
+
+                case '+':
+                    *operatorStack.template Push<Operator>() = kOneOrMore;
+                    if (!Eval(operandStack, operatorStack))
+                        return;
+                    break;
+
                 default:
                     SizeType s = NewState(kRegexInvalidState, kRegexInvalidState, codepoint);
                     *operandStack.template Push<Frag>() = Frag(s, s);
@@ -209,16 +229,19 @@ private:
             Frag* e = operandStack.template Pop<Frag>(1);
             Patch(e->out, NewState(kRegexInvalidState, kRegexInvalidState, 0));
             root_ = e->start;
-            // printf("root: %d\n", root_);
-            // for (SizeType i = 0; i < stateCount_ ; i++) {
-            //     State& s = GetState(i);
-            //     printf("[%2d] out: %2d out1: %2d c: '%c'\n", i, s.out, s.out1, (char)s.codepoint);
-            // }
-            // printf("\n");
+#if 0
+            printf("root: %d\n", root_);
+            for (SizeType i = 0; i < stateCount_ ; i++) {
+                State& s = GetState(i);
+                printf("[%2d] out: %2d out1: %2d c: '%c'\n", i, s.out, s.out1, (char)s.codepoint);
+            }
+            printf("\n");
+#endif
         }
     }
 
     bool Eval(Stack<Allocator>& operandStack, Stack<Allocator>& operatorStack) {
+        // printf("Eval %c\n", "?*+.|("[*operatorStack.template Top<Operator>()]);
         switch (*operatorStack.template Pop<Operator>(1)) {
             case kConcatenation:
                 if (operandStack.GetSize() >= sizeof(Frag) * 2) {
@@ -236,6 +259,35 @@ private:
                     Frag e1 = *operandStack.template Pop<Frag>(1);
                     SizeType s = NewState(e1.start, e2.start, 0);
                     *operandStack.template Push<Frag>() = Frag(s, Append(e1.out, e2.out));
+                    return true;
+                }
+                return false;
+
+            case kZeroOrOne:
+                if (operandStack.GetSize() >= sizeof(Frag)) {
+                    Frag e = *operandStack.template Pop<Frag>(1);
+                    SizeType s = NewState(kRegexInvalidState, e.start, 0);
+                    *operandStack.template Push<Frag>() = Frag(s, Append(e.out, s));
+                    return true;
+                }
+                return false;
+
+            case kZeroOrMore:
+                if (operandStack.GetSize() >= sizeof(Frag)) {
+                    Frag e = *operandStack.template Pop<Frag>(1);
+                    SizeType s = NewState(kRegexInvalidState, e.start, 0);
+                    Patch(e.out, s);
+                    *operandStack.template Push<Frag>() = Frag(s, s);
+                    return true;
+                }
+                return false;
+
+            case kOneOrMore:
+                if (operandStack.GetSize() >= sizeof(Frag)) {
+                    Frag e = *operandStack.template Pop<Frag>(1);
+                    SizeType s = NewState(kRegexInvalidState, e.start, 0);
+                    Patch(e.out, s);
+                    *operandStack.template Push<Frag>() = Frag(e.start, s);
                     return true;
                 }
                 return false;

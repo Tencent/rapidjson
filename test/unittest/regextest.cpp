@@ -17,7 +17,7 @@
 
 using namespace rapidjson::internal;
 
-TEST(Regex, concatenation) {
+TEST(Regex, Concatenation) {
     Regex re("abc");
     ASSERT_TRUE(re.IsValid());
     EXPECT_TRUE(re.Match("abc"));
@@ -28,7 +28,7 @@ TEST(Regex, concatenation) {
     EXPECT_FALSE(re.Match("abcd"));
 }
 
-TEST(Regex, split1) {
+TEST(Regex, Alternation1) {
     Regex re("abab|abbb");
     ASSERT_TRUE(re.IsValid());
     EXPECT_TRUE(re.Match("abab"));
@@ -40,7 +40,7 @@ TEST(Regex, split1) {
     EXPECT_FALSE(re.Match("abbbb"));
 }
 
-TEST(Regex, split2) {
+TEST(Regex, Alternation2) {
     Regex re("a|b|c");
     ASSERT_TRUE(re.IsValid());
     EXPECT_TRUE(re.Match("a"));
@@ -51,7 +51,7 @@ TEST(Regex, split2) {
     EXPECT_FALSE(re.Match("ab"));
 }
 
-TEST(Regex, parenthesis1) {
+TEST(Regex, Parenthesis1) {
     Regex re("(ab)c");
     ASSERT_TRUE(re.IsValid());
     EXPECT_TRUE(re.Match("abc"));
@@ -62,7 +62,7 @@ TEST(Regex, parenthesis1) {
     EXPECT_FALSE(re.Match("abcd"));
 }
 
-TEST(Regex, parenthesis2) {
+TEST(Regex, Parenthesis2) {
     Regex re("a(bc)");
     ASSERT_TRUE(re.IsValid());
     EXPECT_TRUE(re.Match("abc"));
@@ -73,7 +73,7 @@ TEST(Regex, parenthesis2) {
     EXPECT_FALSE(re.Match("abcd"));
 }
 
-TEST(Regex, parenthesis3) {
+TEST(Regex, Parenthesis3) {
     Regex re("(a|b)(c|d)");
     ASSERT_TRUE(re.IsValid());
     EXPECT_TRUE(re.Match("ac"));
@@ -83,4 +83,139 @@ TEST(Regex, parenthesis3) {
     EXPECT_FALSE(re.Match(""));
     EXPECT_FALSE(re.Match("ab"));
     EXPECT_FALSE(re.Match("cd"));
+}
+
+TEST(Regex, ZeroOrOne1) {
+    Regex re("a?");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match(""));
+    EXPECT_TRUE(re.Match("a"));
+    EXPECT_FALSE(re.Match("aa"));
+}
+
+TEST(Regex, ZeroOrOne2) {
+    Regex re("a?b");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("b"));
+    EXPECT_TRUE(re.Match("ab"));
+    EXPECT_FALSE(re.Match("a"));
+    EXPECT_FALSE(re.Match("aa"));
+    EXPECT_FALSE(re.Match("bb"));
+    EXPECT_FALSE(re.Match("ba"));
+}
+
+TEST(Regex, ZeroOrOne3) {
+    Regex re("ab?");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("a"));
+    EXPECT_TRUE(re.Match("ab"));
+    EXPECT_FALSE(re.Match("b"));
+    EXPECT_FALSE(re.Match("aa"));
+    EXPECT_FALSE(re.Match("bb"));
+    EXPECT_FALSE(re.Match("ba"));
+}
+
+TEST(Regex, ZeroOrOne4) {
+    Regex re("a?b?");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match(""));
+    EXPECT_TRUE(re.Match("a"));
+    EXPECT_TRUE(re.Match("b"));
+    EXPECT_TRUE(re.Match("ab"));
+    EXPECT_FALSE(re.Match("aa"));
+    EXPECT_FALSE(re.Match("bb"));
+    EXPECT_FALSE(re.Match("ba"));
+    EXPECT_FALSE(re.Match("abc"));
+}
+
+TEST(Regex, ZeroOrOne5) {
+    Regex re("a(ab)?b");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("ab"));
+    EXPECT_TRUE(re.Match("aabb"));
+    EXPECT_FALSE(re.Match("aab"));
+    EXPECT_FALSE(re.Match("abb"));
+}
+
+TEST(Regex, ZeroOrMore1) {
+    Regex re("a*");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match(""));
+    EXPECT_TRUE(re.Match("a"));
+    EXPECT_TRUE(re.Match("aa"));
+    EXPECT_FALSE(re.Match("b"));
+    EXPECT_FALSE(re.Match("ab"));
+}
+
+TEST(Regex, ZeroOrMore2) {
+    Regex re("a*b");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("b"));
+    EXPECT_TRUE(re.Match("ab"));
+    EXPECT_TRUE(re.Match("aab"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("bb"));
+}
+
+TEST(Regex, ZeroOrMore3) {
+    Regex re("a*b*");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match(""));
+    EXPECT_TRUE(re.Match("a"));
+    EXPECT_TRUE(re.Match("aa"));
+    EXPECT_TRUE(re.Match("b"));
+    EXPECT_TRUE(re.Match("bb"));
+    EXPECT_TRUE(re.Match("ab"));
+    EXPECT_TRUE(re.Match("aabb"));
+    EXPECT_FALSE(re.Match("ba"));
+}
+
+TEST(Regex, ZeroOrMore4) {
+    Regex re("a(ab)*b");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("ab"));
+    EXPECT_TRUE(re.Match("aabb"));
+    EXPECT_TRUE(re.Match("aababb"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("aa"));
+}
+
+TEST(Regex, OneOrMore1) {
+    Regex re("a+");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("a"));
+    EXPECT_TRUE(re.Match("aa"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("b"));
+    EXPECT_FALSE(re.Match("ab"));
+}
+
+TEST(Regex, OneOrMore2) {
+    Regex re("a+b");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("ab"));
+    EXPECT_TRUE(re.Match("aab"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("b"));
+}
+
+TEST(Regex, OneOrMore3) {
+    Regex re("a+b+");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("ab"));
+    EXPECT_TRUE(re.Match("aab"));
+    EXPECT_TRUE(re.Match("abb"));
+    EXPECT_TRUE(re.Match("aabb"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("b"));
+    EXPECT_FALSE(re.Match("ba"));
+}
+
+TEST(Regex, OneOrMore4) {
+    Regex re("a(ab)+b");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("aabb"));
+    EXPECT_TRUE(re.Match("aababb"));
+    EXPECT_FALSE(re.Match(""));
+    EXPECT_FALSE(re.Match("ab"));
 }
