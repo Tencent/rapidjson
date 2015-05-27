@@ -150,9 +150,10 @@ private:
     };
 
     struct Frag {
-        Frag(SizeType s, SizeType o) : start(s), out(o) {}
+        Frag(SizeType s, SizeType o, SizeType m) : start(s), out(o), minIndex(m) {}
         SizeType start;
         SizeType out; //!< link-list of all output states
+        SizeType minIndex;
     };
 
     template <typename SourceStream>
@@ -303,7 +304,7 @@ private:
                             return;
                         SizeType s = NewState(kRegexInvalidState, kRegexInvalidState, kRangeCharacterClass);
                         GetState(s).rangeStart = range;
-                        *operandStack.template Push<Frag>() = Frag(s, s);
+                        *operandStack.template Push<Frag>() = Frag(s, s, s);
                     }
                     ImplicitConcatenation(atomCountStack, operatorStack);
                     break;
@@ -351,7 +352,7 @@ private:
 
     void PushOperand(Stack<Allocator>& operandStack, unsigned codepoint) {
         SizeType s = NewState(kRegexInvalidState, kRegexInvalidState, codepoint);
-        *operandStack.template Push<Frag>() = Frag(s, s);
+        *operandStack.template Push<Frag>() = Frag(s, s, s);
     }
 
     void ImplicitConcatenation(Stack<Allocator>& atomCountStack, Stack<Allocator>& operatorStack) {
@@ -382,7 +383,7 @@ private:
                     Frag e2 = *operandStack.template Pop<Frag>(1);
                     Frag e1 = *operandStack.template Pop<Frag>(1);
                     Patch(e1.out, e2.start);
-                    *operandStack.template Push<Frag>() = Frag(e1.start, e2.out);
+                    *operandStack.template Push<Frag>() = Frag(e1.start, e2.out, Min(e1.minIndex, e2.minIndex));
                     return true;
                 }
                 return false;
@@ -392,7 +393,7 @@ private:
                     Frag e2 = *operandStack.template Pop<Frag>(1);
                     Frag e1 = *operandStack.template Pop<Frag>(1);
                     SizeType s = NewState(e1.start, e2.start, 0);
-                    *operandStack.template Push<Frag>() = Frag(s, Append(e1.out, e2.out));
+                    *operandStack.template Push<Frag>() = Frag(s, Append(e1.out, e2.out), Min(e1.minIndex, e2.minIndex));
                     return true;
                 }
                 return false;
@@ -401,7 +402,7 @@ private:
                 if (operandStack.GetSize() >= sizeof(Frag)) {
                     Frag e = *operandStack.template Pop<Frag>(1);
                     SizeType s = NewState(kRegexInvalidState, e.start, 0);
-                    *operandStack.template Push<Frag>() = Frag(s, Append(e.out, s));
+                    *operandStack.template Push<Frag>() = Frag(s, Append(e.out, s), e.minIndex);
                     return true;
                 }
                 return false;
@@ -411,7 +412,7 @@ private:
                     Frag e = *operandStack.template Pop<Frag>(1);
                     SizeType s = NewState(kRegexInvalidState, e.start, 0);
                     Patch(e.out, s);
-                    *operandStack.template Push<Frag>() = Frag(s, s);
+                    *operandStack.template Push<Frag>() = Frag(s, s, e.minIndex);
                     return true;
                 }
                 return false;
@@ -421,7 +422,7 @@ private:
                     Frag e = *operandStack.template Pop<Frag>(1);
                     SizeType s = NewState(kRegexInvalidState, e.start, 0);
                     Patch(e.out, s);
-                    *operandStack.template Push<Frag>() = Frag(e.start, s);
+                    *operandStack.template Push<Frag>() = Frag(e.start, s, e.minIndex);
                     return true;
                 }
                 return false;
@@ -459,28 +460,19 @@ private:
 
     static SizeType Min(SizeType a, SizeType b) { return a < b ? a : b; }
 
-    SizeType GetMinStateIndex(SizeType index) {
-        State& s = GetState(index);
-        if (s.out != kRegexInvalidState && s.out < index)
-            index = Min(index, GetMinStateIndex(s.out));
-        if (s.out1 != kRegexInvalidState && s.out1 < index)
-            index = Min(index, GetMinStateIndex(s.out1));
-        return index;
-    }
-
     void CloneTopOperand(Stack<Allocator>& operandStack) {
         const Frag *src = operandStack.template Top<Frag>();
-        SizeType minIndex = GetMinStateIndex(src->start);
-        SizeType count = stateCount_ - minIndex; // Assumes top operand contains states in [min, stateCount_)
+        SizeType minIndex = minIndex;
+        SizeType count = stateCount_ - src->minIndex; // Assumes top operand contains states in [src->minIndex, stateCount_)
         State* s = states_.template Push<State>(count);
-        memcpy(s, &GetState(minIndex), count * sizeof(State));
+        memcpy(s, &GetState(src->minIndex), count * sizeof(State));
         for (SizeType j = 0; j < count; j++) {
             if (s[j].out != kRegexInvalidState)
                 s[j].out += count;
             if (s[j].out1 != kRegexInvalidState)
                 s[j].out1 += count;
         }
-        *operandStack.template Push<Frag>() = Frag(src->start + count, src->out + count);
+        *operandStack.template Push<Frag>() = Frag(src->start + count, src->out + count, src->minIndex + count);
         stateCount_ += count;
     }
 
