@@ -60,8 +60,9 @@ public:
     typedef typename Encoding::Ch Ch;
 
     GenericRegex(const Ch* source, Allocator* allocator = 0) : states_(allocator, 256), ranges_(allocator, 256), root_(kRegexInvalidState), stateCount_(),rangeCount_() {
-        StringStream is(source);
-        Parse(is);
+        StringStream ss(source);
+        DecodedStream<StringStream> ds(ss);
+        Parse(ds);
     }
 
     ~GenericRegex() {
@@ -74,6 +75,8 @@ public:
     template <typename InputStream>
     bool Match(InputStream& is) const {
         RAPIDJSON_ASSERT(IsValid());
+        DecodedStream<InputStream> ds(is);
+
         Allocator allocator;
         Stack<Allocator> state0(&allocator, stateCount_ * sizeof(SizeType));
         Stack<Allocator> state1(&allocator, stateCount_ * sizeof(SizeType));
@@ -85,7 +88,7 @@ public:
         AddState(stateSet, *current, root_);
 
         unsigned codepoint;
-        while (!current->Empty() && Encoding::Decode(is, &codepoint) && codepoint != 0) {
+        while (!current->Empty() && (codepoint = ds.Take()) != 0) {
             std::memset(stateSet, 0, stateSetSize);
             next->Clear();
             for (const SizeType* s = current->template Bottom<SizeType>(); s != current->template End<SizeType>(); ++s) {
@@ -149,6 +152,23 @@ private:
         SizeType out; //!< link-list of all output states
     };
 
+    template <typename SourceStream>
+    class DecodedStream {
+    public:
+        DecodedStream(SourceStream& ss) : ss_(ss) { Decode(); }
+        unsigned Peek() { return codepoint_; }
+        unsigned Take() { unsigned c = codepoint_; Decode(); return c; }
+
+    private:
+        void Decode() {
+            if (!Encoding::Decode(ss_, &codepoint_))
+                codepoint_ = 0;
+        }
+
+        SourceStream& ss_;
+        unsigned codepoint_;
+    };
+
     State& GetState(SizeType index) {
         RAPIDJSON_ASSERT(index < stateCount_);
         return states_.template Bottom<State>()[index];
@@ -196,7 +216,7 @@ private:
     }
 
     template <typename InputStream>
-    void Parse(InputStream& is) {
+    void Parse(DecodedStream<InputStream>& ds) {
         Allocator allocator;
         Stack<Allocator> operandStack(&allocator, 256);     // Frag
         Stack<Allocator> operatorStack(&allocator, 256);    // Operator
@@ -205,8 +225,8 @@ private:
         *atomCountStack.template Push<unsigned>() = 0;
 
         unsigned codepoint;
-        while (Encoding::Decode(is, &codepoint) && codepoint != 0) {
-            switch (codepoint) {
+        while (ds.Peek() != 0) {
+            switch (codepoint = ds.Take()) {
                 case '|':
                     while (!operatorStack.Empty() && *operatorStack.template Top<Operator>() < kAlternation)
                         if (!Eval(operandStack, *operatorStack.template Pop<Operator>(1)))
@@ -254,7 +274,7 @@ private:
                 case '[':
                     {
                         SizeType range;
-                        if (!ParseRange(is, &range))
+                        if (!ParseRange(ds, &range))
                             return;
                         SizeType s = NewState(kRegexInvalidState, kRegexInvalidState, kRangeCharacterClass);
                         GetState(s).rangeStart = range;
@@ -264,9 +284,7 @@ private:
                     break;
 
                 case '\\': // Escape character
-                    if (!Encoding::Decode(is, &codepoint) || codepoint == 0)
-                        return; // Expect an escape character
-                    if (!CharacterEscape(codepoint, &codepoint))
+                    if (!CharacterEscape(ds, &codepoint))
                         return; // Unsupported escape character
                     // fall through to default
 
@@ -389,14 +407,14 @@ private:
     }
 
     template <typename InputStream>
-    bool ParseRange(InputStream& is, SizeType* range) {
+    bool ParseRange(DecodedStream<InputStream>& ds, SizeType* range) {
         bool isBegin = true;
         bool negate = false;
         int step = 0;
         SizeType start = kRegexInvalidRange;
         SizeType current = kRegexInvalidRange;
         unsigned codepoint;
-        while (Encoding::Decode(is, &codepoint) && codepoint != 0) {
+        while ((codepoint = ds.Take()) != 0) {
             if (isBegin) {
                 isBegin = false;
                 if (codepoint == '^') {
@@ -418,11 +436,11 @@ private:
                 return true;
 
             case '\\':
-                if (!Encoding::Decode(is, &codepoint) || codepoint == 0)
-                    return false; // Expect an escape character
-                if (codepoint == 'b')
+                if (ds.Peek() == 'b') {
+                    ds.Take();
                     codepoint = 0x0008; // Escape backspace character
-                else if (!CharacterEscape(codepoint, &codepoint))
+                }
+                else if (!CharacterEscape(ds, &codepoint))
                     return false;
                 // fall through to default
 
@@ -464,8 +482,10 @@ private:
         return rangeCount_++;
     }
 
-    bool CharacterEscape(unsigned codepoint, unsigned* escapedCodepoint) {
-        switch (codepoint) {
+    template <typename InputStream>
+    bool CharacterEscape(DecodedStream<InputStream>& ds, unsigned* escapedCodepoint) {
+        unsigned codepoint;
+        switch (codepoint = ds.Take()) {
             case '|':
             case '(':
             case ')':
