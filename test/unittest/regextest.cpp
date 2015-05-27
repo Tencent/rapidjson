@@ -328,10 +328,10 @@ TEST(Regex, CharacterRange8) {
 }
 
 TEST(Regex, Escape) {
-    const char* s = "\\|\\(\\)\\?\\*\\+\\.\\[\\]\\\\\\f\\n\\r\\t\\v";
+    const char* s = "\\|\\(\\)\\?\\*\\+\\.\\[\\]\\\\\\f\\n\\r\\t\\v[\\b][\\[][\\]]";
     Regex re(s);
     ASSERT_TRUE(re.IsValid());
-    EXPECT_TRUE(re.Match("|()?*+.[]\\\x0C\n\r\t\x0B"));
+    EXPECT_TRUE(re.Match("|()?*+.[]\\\x0C\n\r\t\x0B\b[]"));
     EXPECT_FALSE(re.Match(s)); // Not escaping
 }
 

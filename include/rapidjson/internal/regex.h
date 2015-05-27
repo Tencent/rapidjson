@@ -46,6 +46,7 @@ static const SizeType kRegexInvalidRange = ~SizeType(0);
     - \c [a-z0-9_] Character class combination
     - \c [^abc] Negated character classes
     - \c [^a-c] Negated character class range
+    - \c [\b]   Backspace (U+0008)
     - \c \\| \\\\ ...  Escape characters
     - \c \\f Form feed (U+000C)
     - \c \\n Line feed (U+000A)
@@ -265,26 +266,8 @@ private:
                 case '\\': // Escape character
                     if (!Encoding::Decode(is, &codepoint) || codepoint == 0)
                         return; // Expect an escape character
-                    switch (codepoint) {
-                        case '|':
-                        case '(':
-                        case ')':
-                        case '?':
-                        case '*':
-                        case '+':
-                        case '.':
-                        case '[':
-                        case ']':
-                        case '\\':
-                            break; // use the codepoint as is
-                        case 'f': codepoint = 0x000C; break;
-                        case 'n': codepoint = 0x000A; break;
-                        case 'r': codepoint = 0x000D; break;
-                        case 't': codepoint = 0x0009; break;
-                        case 'v': codepoint = 0x000B; break;
-                        default:
-                            return; // Unsupported escape character
-                    }
+                    if (!CharacterEscape(codepoint, &codepoint))
+                        return; // Unsupported escape character
                     // fall through to default
 
                 default: // Pattern character
@@ -414,9 +397,16 @@ private:
         SizeType current = kRegexInvalidRange;
         unsigned codepoint;
         while (Encoding::Decode(is, &codepoint) && codepoint != 0) {
-            if (isBegin && codepoint == '^')
-                negate = true;
-            else if (codepoint == ']') {
+            if (isBegin) {
+                isBegin = false;
+                if (codepoint == '^') {
+                    negate = true;
+                    continue;
+                }
+            }
+
+            switch (codepoint) {
+            case ']':
                 if (step == 2) { // Add trailing '-'
                     SizeType r = NewRange('-');
                     RAPIDJSON_ASSERT(current != kRegexInvalidRange);
@@ -426,8 +416,17 @@ private:
                     GetRange(start).start |= kRangeNegationFlag;
                 *range = start;
                 return true;
-            }
-            else {
+
+            case '\\':
+                if (!Encoding::Decode(is, &codepoint) || codepoint == 0)
+                    return false; // Expect an escape character
+                if (codepoint == 'b')
+                    codepoint = 0x0008; // Escape backspace character
+                else if (!CharacterEscape(codepoint, &codepoint))
+                    return false;
+                // fall through to default
+
+            default:
                 switch (step) {
                 case 1:
                     if (codepoint == '-') {
@@ -454,7 +453,6 @@ private:
                     step = 0;
                 }
             }
-            isBegin = false;
         }
         return false;
     }
@@ -464,6 +462,29 @@ private:
         r->start = r->end = codepoint;
         r->next = kRegexInvalidRange;
         return rangeCount_++;
+    }
+
+    bool CharacterEscape(unsigned codepoint, unsigned* escapedCodepoint) {
+        switch (codepoint) {
+            case '|':
+            case '(':
+            case ')':
+            case '?':
+            case '*':
+            case '+':
+            case '.':
+            case '[':
+            case ']':
+            case '\\':
+                *escapedCodepoint = codepoint; return true;
+            case 'f': *escapedCodepoint = 0x000C; return true;
+            case 'n': *escapedCodepoint = 0x000A; return true;
+            case 'r': *escapedCodepoint = 0x000D; return true;
+            case 't': *escapedCodepoint = 0x0009; return true;
+            case 'v': *escapedCodepoint = 0x000B; return true;
+            default:
+                return false; // Unsupported escape character
+        }
     }
 
     Stack<Allocator> states_;
