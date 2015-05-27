@@ -46,6 +46,12 @@ static const SizeType kRegexInvalidRange = ~SizeType(0);
     - \c [a-z0-9_] Character class combination
     - \c [^abc] Negated character classes
     - \c [^a-c] Negated character class range
+    - \c \\| \\\\ ...  Escape characters
+    - \c \\f Form feed (U+000C)
+    - \c \\n Line feed (U+000A)
+    - \c \\r Carriage return (U+000D)
+    - \c \\t Tab (U+0009)
+    - \c \\v Vertical tab (U+000B)
 */
 template <typename Encoding, typename Allocator = CrtAllocator>
 class GenericRegex {
@@ -256,7 +262,32 @@ private:
                     ImplicitConcatenation(atomCountStack, operatorStack);
                     break;
 
-                default:
+                case '\\': // Escape character
+                    if (!Encoding::Decode(is, &codepoint) || codepoint == 0)
+                        return; // Expect an escape character
+                    switch (codepoint) {
+                        case '|':
+                        case '(':
+                        case ')':
+                        case '?':
+                        case '*':
+                        case '+':
+                        case '.':
+                        case '[':
+                        case ']':
+                        case '\\':
+                            break; // use the codepoint as is
+                        case 'f': codepoint = 0x000C; break;
+                        case 'n': codepoint = 0x000A; break;
+                        case 'r': codepoint = 0x000D; break;
+                        case 't': codepoint = 0x0009; break;
+                        case 'v': codepoint = 0x000B; break;
+                        default:
+                            return; // Unsupported escape character
+                    }
+                    // fall through to default
+
+                default: // Pattern character
                     PushOperand(operandStack, codepoint);
                     ImplicitConcatenation(atomCountStack, operatorStack);
             }

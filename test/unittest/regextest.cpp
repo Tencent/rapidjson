@@ -327,4 +327,12 @@ TEST(Regex, CharacterRange8) {
     EXPECT_FALSE(re.Match("!"));
 }
 
+TEST(Regex, Escape) {
+    const char* s = "\\|\\(\\)\\?\\*\\+\\.\\[\\]\\\\\\f\\n\\r\\t\\v";
+    Regex re(s);
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("|()?*+.[]\\\x0C\n\r\t\x0B"));
+    EXPECT_FALSE(re.Match(s)); // Not escaping
+}
+
 #undef EURO
