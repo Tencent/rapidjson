@@ -39,6 +39,9 @@ static const SizeType kRegexInvalidRange = ~SizeType(0);
     - \c a?     Zero or one
     - \c a*     Zero or more
     - \c a+     One or more
+    - \c a{3}   Exactly 3 times
+    - \c a{3,}  At least 3 times
+    - \c a{3,5} 3 to 5 times
     - \c (ab)*  Grouping
     - \c .      Any character
     - \c [abc]  Character classes
@@ -266,6 +269,28 @@ private:
                         return;
                     break;
 
+                case '{':
+                    {
+                        unsigned n, m;
+                        if (!ParseUnsigned(ds, &n) || n == 0)
+                            return;
+
+                        if (ds.Peek() == ',') {
+                            ds.Take();
+                            if (ds.Peek() == '}')
+                                m = 0;
+                            else if (!ParseUnsigned(ds, &m) || m < n)
+                                return;
+                        }
+                        else
+                            m = n;
+
+                        if (!EvalQuantifier(operandStack, n, m) || ds.Peek() != '}')
+                            return;
+                        ds.Take();
+                    }
+                    break;
+
                 case '.':
                     PushOperand(operandStack, kAnyCharacterClass);
                     ImplicitConcatenation(atomCountStack, operatorStack);
@@ -406,6 +431,71 @@ private:
         }
     }
 
+    bool EvalQuantifier(Stack<Allocator>& operandStack, unsigned n, unsigned m) {
+        RAPIDJSON_ASSERT(n > 0);
+        RAPIDJSON_ASSERT(m == 0 || n <= m);         // m == 0 means infinity
+        if (operandStack.GetSize() < sizeof(Frag))
+            return false;
+
+        for (unsigned i = 0; i < n - 1; i++)        // a{3} -> a a a
+            CloneTopOperand(operandStack);
+
+        if (m == 0)
+            Eval(operandStack, kOneOrMore);         // a{3,} -> a a a+
+        else if (m > n) {
+            CloneTopOperand(operandStack);          // a{3,5} -> a a a a
+            Eval(operandStack, kZeroOrOne);         // a{3,5} -> a a a a?
+            for (unsigned i = n; i < m - 1; i++)
+                CloneTopOperand(operandStack);      // a{3,5} -> a a a a? a?
+            for (unsigned i = n; i < m; i++)
+                Eval(operandStack, kConcatenation); // a{3,5} -> a a aa?a?
+        }
+
+        for (unsigned i = 0; i < n - 1; i++)
+            Eval(operandStack, kConcatenation);     // a{3} -> aaa, a{3,} -> aaa+, a{3.5} -> aaaa?a?
+
+        return true;
+    }
+
+    static SizeType Min(SizeType a, SizeType b) { return a < b ? a : b; }
+
+    SizeType GetMinStateIndex(SizeType index) {
+        State& s = GetState(index);
+        if (s.out != kRegexInvalidState && s.out < index)
+            index = Min(index, GetMinStateIndex(s.out));
+        if (s.out1 != kRegexInvalidState && s.out1 < index)
+            index = Min(index, GetMinStateIndex(s.out1));
+        return index;
+    }
+
+    void CloneTopOperand(Stack<Allocator>& operandStack) {
+        const Frag *src = operandStack.template Top<Frag>();
+        SizeType minIndex = GetMinStateIndex(src->start);
+        SizeType count = stateCount_ - minIndex; // Assumes top operand contains states in [min, stateCount_)
+        State* s = states_.template Push<State>(count);
+        memcpy(s, &GetState(minIndex), count * sizeof(State));
+        for (SizeType j = 0; j < count; j++) {
+            if (s[j].out != kRegexInvalidState)
+                s[j].out += count;
+            if (s[j].out1 != kRegexInvalidState)
+                s[j].out1 += count;
+        }
+        *operandStack.template Push<Frag>() = Frag(src->start + count, src->out + count);
+        stateCount_ += count;
+    }
+
+    template <typename InputStream>
+    bool ParseUnsigned(DecodedStream<InputStream>& ds, unsigned* u) {
+        unsigned r = 0;
+        while (ds.Peek() >= '0' && ds.Peek() <= '9') {
+            if (r >= 429496729 && ds.Peek() > '5') // 2^32 - 1 = 4294967295
+                return false; // overflow
+            r = r * 10 + (ds.Take() - '0');
+        }
+        *u = r;
+        return true;
+    }
+
     template <typename InputStream>
     bool ParseRange(DecodedStream<InputStream>& ds, SizeType* range) {
         bool isBegin = true;
@@ -495,6 +585,8 @@ private:
             case '.':
             case '[':
             case ']':
+            case '{':
+            case '}':
             case '\\':
                 *escapedCodepoint = codepoint; return true;
             case 'f': *escapedCodepoint = 0x000C; return true;

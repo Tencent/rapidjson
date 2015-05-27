@@ -220,6 +220,111 @@ TEST(Regex, OneOrMore4) {
     EXPECT_FALSE(re.Match("ab"));
 }
 
+TEST(Regex, QuantifierExact1) {
+    Regex re("ab{3}c");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("abbbc"));
+    EXPECT_FALSE(re.Match("ac"));
+    EXPECT_FALSE(re.Match("abc"));
+    EXPECT_FALSE(re.Match("abbc"));
+    EXPECT_FALSE(re.Match("abbbbc"));
+}
+
+TEST(Regex, QuantifierExact2) {
+    Regex re("a(bc){3}d");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("abcbcbcd"));
+    EXPECT_FALSE(re.Match("ad"));
+    EXPECT_FALSE(re.Match("abcd"));
+    EXPECT_FALSE(re.Match("abcbcd"));
+    EXPECT_FALSE(re.Match("abcbcbcbcd"));
+}
+
+TEST(Regex, QuantifierExact3) {
+    Regex re("a(b|c){3}d");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("abbbd"));
+    EXPECT_TRUE(re.Match("acccd"));
+    EXPECT_TRUE(re.Match("abcbd"));
+    EXPECT_FALSE(re.Match("ad"));
+    EXPECT_FALSE(re.Match("abbd"));
+    EXPECT_FALSE(re.Match("accccd"));
+    EXPECT_FALSE(re.Match("abbbbd"));
+}
+
+TEST(Regex, QuantifierMin1) {
+    Regex re("ab{3,}c");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("abbbc"));
+    EXPECT_TRUE(re.Match("abbbbc"));
+    EXPECT_TRUE(re.Match("abbbbbc"));
+    EXPECT_FALSE(re.Match("ac"));
+    EXPECT_FALSE(re.Match("abc"));
+    EXPECT_FALSE(re.Match("abbc"));
+}
+
+TEST(Regex, QuantifierMin2) {
+    Regex re("a(bc){3,}d");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("abcbcbcd"));
+    EXPECT_TRUE(re.Match("abcbcbcbcd"));
+    EXPECT_FALSE(re.Match("ad"));
+    EXPECT_FALSE(re.Match("abcd"));
+    EXPECT_FALSE(re.Match("abcbcd"));
+}
+
+TEST(Regex, QuantifierMin3) {
+    Regex re("a(b|c){3,}d");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("abbbd"));
+    EXPECT_TRUE(re.Match("acccd"));
+    EXPECT_TRUE(re.Match("abcbd"));
+    EXPECT_TRUE(re.Match("accccd"));
+    EXPECT_TRUE(re.Match("abbbbd"));
+    EXPECT_FALSE(re.Match("ad"));
+    EXPECT_FALSE(re.Match("abbd"));
+}
+
+TEST(Regex, QuantifierMinMax1) {
+    Regex re("ab{3,5}c");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("abbbc"));
+    EXPECT_TRUE(re.Match("abbbbc"));
+    EXPECT_TRUE(re.Match("abbbbbc"));
+    EXPECT_FALSE(re.Match("ac"));
+    EXPECT_FALSE(re.Match("abc"));
+    EXPECT_FALSE(re.Match("abbc"));
+    EXPECT_FALSE(re.Match("abbbbbbc"));
+}
+
+TEST(Regex, QuantifierMinMax2) {
+    Regex re("a(bc){3,5}d");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("abcbcbcd"));
+    EXPECT_TRUE(re.Match("abcbcbcbcd"));
+    EXPECT_TRUE(re.Match("abcbcbcbcbcd"));
+    EXPECT_FALSE(re.Match("ad"));
+    EXPECT_FALSE(re.Match("abcd"));
+    EXPECT_FALSE(re.Match("abcbcd"));
+    EXPECT_FALSE(re.Match("abcbcbcbcbcbcd"));
+}
+
+TEST(Regex, QuantifierMinMax3) {
+    Regex re("a(b|c){3,5}d");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("abbbd"));
+    EXPECT_TRUE(re.Match("acccd"));
+    EXPECT_TRUE(re.Match("abcbd"));
+    EXPECT_TRUE(re.Match("accccd"));
+    EXPECT_TRUE(re.Match("abbbbd"));
+    EXPECT_TRUE(re.Match("acccccd"));
+    EXPECT_TRUE(re.Match("abbbbbd"));
+    EXPECT_FALSE(re.Match("ad"));
+    EXPECT_FALSE(re.Match("abbd"));
+    EXPECT_FALSE(re.Match("accccccd"));
+    EXPECT_FALSE(re.Match("abbbbbbd"));
+}
+
 #define EURO "\xE2\x82\xAC" // "\xE2\x82\xAC" is UTF-8 sequence of Euro sign U+20AC
 
 TEST(Regex, Unicode) {
@@ -328,10 +433,10 @@ TEST(Regex, CharacterRange8) {
 }
 
 TEST(Regex, Escape) {
-    const char* s = "\\|\\(\\)\\?\\*\\+\\.\\[\\]\\\\\\f\\n\\r\\t\\v[\\b][\\[][\\]]";
+    const char* s = "\\|\\(\\)\\?\\*\\+\\.\\[\\]\\{\\}\\\\\\f\\n\\r\\t\\v[\\b][\\[][\\]]";
     Regex re(s);
     ASSERT_TRUE(re.IsValid());
-    EXPECT_TRUE(re.Match("|()?*+.[]\\\x0C\n\r\t\x0B\b[]"));
+    EXPECT_TRUE(re.Match("|()?*+.[]{}\\\x0C\n\r\t\x0B\b[]"));
     EXPECT_FALSE(re.Match(s)); // Not escaping
 }
 
