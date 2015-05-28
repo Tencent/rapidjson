@@ -159,7 +159,7 @@ private:
     template <typename SourceStream>
     class DecodedStream {
     public:
-        DecodedStream(SourceStream& ss) : ss_(ss) { Decode(); }
+        DecodedStream(SourceStream& ss) : ss_(ss), codepoint_() { Decode(); }
         unsigned Peek() { return codepoint_; }
         unsigned Take() { unsigned c = codepoint_; Decode(); return c; }
 
