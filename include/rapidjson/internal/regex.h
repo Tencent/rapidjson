@@ -462,7 +462,6 @@ private:
 
     void CloneTopOperand(Stack<Allocator>& operandStack) {
         const Frag *src = operandStack.template Top<Frag>();
-        SizeType minIndex = minIndex;
         SizeType count = stateCount_ - src->minIndex; // Assumes top operand contains states in [src->minIndex, stateCount_)
         State* s = states_.template Push<State>(count);
         memcpy(s, &GetState(src->minIndex), count * sizeof(State));
