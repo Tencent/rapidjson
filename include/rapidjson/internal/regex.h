@@ -42,7 +42,9 @@ static const SizeType kRegexInvalidRange = ~SizeType(0);
     - \c a{3}   Exactly 3 times
     - \c a{3,}  At least 3 times
     - \c a{3,5} 3 to 5 times
-    - \c (ab)*  Grouping
+    - \c (ab)   Grouping
+    - \c ^a     At the beginning
+    - \c a$     At the end
     - \c .      Any character
     - \c [abc]  Character classes
     - \c [a-c]  Character class range
@@ -606,8 +608,8 @@ private:
         else if (!(stateSet[index >> 5] & (1 << (index & 31)))) {
             stateSet[index >> 5] |= (1 << (index & 31));
             *l.template Push<SizeType>() = index;
-            return GetState(index).out == kRegexInvalidState;
         }
+        return GetState(index).out == kRegexInvalidState;
     }
 
     bool MatchRange(SizeType rangeIndex, unsigned codepoint) const {
