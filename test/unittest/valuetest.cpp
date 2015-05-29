@@ -1182,6 +1182,24 @@ TEST(Value, Object) {
     EXPECT_TRUE(z.IsObject());
 }
 
+TEST(Value, EraseMember_String) {
+    Value::AllocatorType allocator;
+    Value x(kObjectType);
+    x.AddMember("A", "Apple", allocator);
+    x.AddMember("B", "Banana", allocator);
+
+    EXPECT_TRUE(x.EraseMember("B"));
+    EXPECT_FALSE(x.HasMember("B"));
+
+    EXPECT_FALSE(x.EraseMember("nonexist"));
+
+    GenericValue<UTF8<>, CrtAllocator> othername("A");
+    EXPECT_TRUE(x.EraseMember(othername));
+    EXPECT_FALSE(x.HasMember("A"));
+
+    EXPECT_TRUE(x.MemberBegin() == x.MemberEnd());
+}
+
 TEST(Value, BigNestedArray) {
     MemoryPoolAllocator<> allocator;
     Value x(kArrayType);

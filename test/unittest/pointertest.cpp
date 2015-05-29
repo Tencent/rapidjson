@@ -879,7 +879,13 @@ TEST(Pointer, Erase) {
     d.Parse(kJson);
 
     EXPECT_FALSE(Pointer("").Erase(d));
+    EXPECT_FALSE(Pointer("/nonexist").Erase(d));
+    EXPECT_FALSE(Pointer("/nonexist/nonexist").Erase(d));
     EXPECT_FALSE(Pointer("/foo/nonexist").Erase(d));
+    EXPECT_FALSE(Pointer("/foo/nonexist/nonexist").Erase(d));
+    EXPECT_FALSE(Pointer("/foo/0/nonexist").Erase(d));
+    EXPECT_FALSE(Pointer("/foo/0/nonexist/nonexist").Erase(d));
+    EXPECT_FALSE(Pointer("/foo/2/nonexist").Erase(d));
     EXPECT_TRUE(Pointer("/foo/0").Erase(d));
     EXPECT_EQ(1u, d["foo"].Size());
     EXPECT_STREQ("baz", d["foo"][0].GetString());
@@ -887,6 +893,24 @@ TEST(Pointer, Erase) {
     EXPECT_TRUE(d["foo"].Empty());
     EXPECT_TRUE(Pointer("/foo").Erase(d));
     EXPECT_TRUE(Pointer("/foo").Get(d) == 0);
+
+    Pointer("/a/0/b/0").Create(d);
+
+    EXPECT_TRUE(Pointer("/a/0/b/0").Get(d) != 0);
+    EXPECT_TRUE(Pointer("/a/0/b/0").Erase(d));
+    EXPECT_TRUE(Pointer("/a/0/b/0").Get(d) == 0);
+
+    EXPECT_TRUE(Pointer("/a/0/b").Get(d) != 0);
+    EXPECT_TRUE(Pointer("/a/0/b").Erase(d));
+    EXPECT_TRUE(Pointer("/a/0/b").Get(d) == 0);
+
+    EXPECT_TRUE(Pointer("/a/0").Get(d) != 0);
+    EXPECT_TRUE(Pointer("/a/0").Erase(d));
+    EXPECT_TRUE(Pointer("/a/0").Get(d) == 0);
+
+    EXPECT_TRUE(Pointer("/a").Get(d) != 0);
+    EXPECT_TRUE(Pointer("/a").Erase(d));
+    EXPECT_TRUE(Pointer("/a").Get(d) == 0);
 }
 
 TEST(Pointer, CreateValueByPointer) {
