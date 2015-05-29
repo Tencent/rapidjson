@@ -65,8 +65,8 @@ public:
     typedef typename Encoding::Ch Ch;
 
     GenericRegex(const Ch* source, Allocator* allocator = 0) : states_(allocator, 256), ranges_(allocator, 256), root_(kRegexInvalidState), stateCount_(), rangeCount_(), anchorBegin_(), anchorEnd_() {
-        StringStream ss(source);
-        DecodedStream<StringStream> ds(ss);
+        GenericStringStream<Encoding> ss(source);
+        DecodedStream<GenericStringStream<Encoding> > ds(ss);
         Parse(ds);
     }
 
@@ -83,7 +83,7 @@ public:
     }
 
     bool Match(const Ch* s) const {
-        StringStream is(s);
+        GenericStringStream<Encoding> is(s);
         return Match(is);
     }
 
@@ -93,7 +93,7 @@ public:
     }
 
     bool Search(const Ch* s) const {
-        StringStream is(s);
+        GenericStringStream<Encoding> is(s);
         return Search(is);
     }
 

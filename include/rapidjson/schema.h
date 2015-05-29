@@ -19,17 +19,25 @@
 #include "pointer.h"
 #include <cmath> // HUGE_VAL, abs, floor
 
-#if !defined(RAPIDJSON_SCHEMA_USE_STDREGEX) && (__cplusplus >=201103L || (defined(_MSC_VER) && _MSC_VER >= 1800))
+#if !defined(RAPIDJSON_SCHEMA_USE_INTERNALREGEX)
+#define RAPIDJSON_SCHEMA_USE_INTERNALREGEX 1
+#else
+#define RAPIDJSON_SCHEMA_USE_INTERNALREGEX 0
+#endif
+
+#if !RAPIDJSON_SCHEMA_USE_INTERNALREGEX && !defined(RAPIDJSON_SCHEMA_USE_STDREGEX) && (__cplusplus >=201103L || (defined(_MSC_VER) && _MSC_VER >= 1800))
 #define RAPIDJSON_SCHEMA_USE_STDREGEX 1
 #else
 #define RAPIDJSON_SCHEMA_USE_STDREGEX 0
 #endif
 
-#if RAPIDJSON_SCHEMA_USE_STDREGEX
+#if RAPIDJSON_SCHEMA_USE_INTERNALREGEX
+#include "internal/regex.h"
+#elif RAPIDJSON_SCHEMA_USE_STDREGEX
 #include <regex>
 #endif
 
-#if RAPIDJSON_SCHEMA_USE_STDREGEX
+#if RAPIDJSON_SCHEMA_USE_INTERNALREGEX || RAPIDJSON_SCHEMA_USE_STDREGEX
 #define RAPIDJSON_SCHEMA_HAS_REGEX 1
 #else
 #define RAPIDJSON_SCHEMA_HAS_REGEX 0
@@ -560,7 +568,7 @@ public:
             AllocatorType::Free(patternProperties_);
         }
         AllocatorType::Free(itemsTuple_);
-#if RAPIDJSON_SCHEMA_USE_STDREGEX
+#if RAPIDJSON_SCHEMA_HAS_REGEX
         if (pattern_) {
             pattern_->~RegexType();
             allocator_->Free(pattern_);
@@ -905,7 +913,9 @@ private:
         kTotalSchemaType
     };
 
-#if RAPIDJSON_SCHEMA_USE_STDREGEX
+#if RAPIDJSON_SCHEMA_USE_INTERNALREGEX
+        typedef internal::GenericRegex<EncodingType> RegexType;
+#elif RAPIDJSON_SCHEMA_USE_STDREGEX
         typedef std::basic_regex<Ch> RegexType;
 #else
         typedef char RegexType;
@@ -969,7 +979,24 @@ private:
         }
     }
 
-#if RAPIDJSON_SCHEMA_USE_STDREGEX
+#if RAPIDJSON_SCHEMA_USE_INTERNALREGEX
+    template <typename ValueType>
+    RegexType* CreatePattern(const ValueType& value) {
+        if (value.IsString()) {
+            RegexType* r = new (allocator_->Malloc(sizeof(RegexType))) RegexType(value.GetString());
+            if (!r->IsValid()) {
+                r->~RegexType();
+                r = 0;
+            }
+            return r;
+        }
+        return 0;
+    }
+
+    static bool IsPatternMatch(const RegexType* pattern, const Ch *str, SizeType) {
+        return pattern->Search(str);
+    }
+#elif RAPIDJSON_SCHEMA_USE_STDREGEX
     template <typename ValueType>
     RegexType* CreatePattern(const ValueType& value) {
         if (value.IsString())
