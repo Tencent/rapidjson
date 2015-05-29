@@ -463,6 +463,8 @@ private:
 
             switch (codepoint) {
             case ']':
+                if (start == kRegexInvalidRange)
+                    return false;   // Error: nothing inside []
                 if (step == 2) { // Add trailing '-'
                     SizeType r = NewRange('-');
                     RAPIDJSON_ASSERT(current != kRegexInvalidRange);

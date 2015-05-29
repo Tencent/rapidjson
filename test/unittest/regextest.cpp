@@ -494,4 +494,40 @@ TEST(Regex, Escape) {
     EXPECT_FALSE(re.Match(s)); // Not escaping
 }
 
+TEST(Regex, Invalid) {
+#define TEST_INVALID(s) \
+    {\
+        Regex re(s);\
+        EXPECT_FALSE(re.IsValid());\
+    }
+
+    TEST_INVALID("a|");
+    TEST_INVALID("()");
+    TEST_INVALID(")");
+    TEST_INVALID("(a))");
+    TEST_INVALID("(a|)");
+    TEST_INVALID("(a||b)");
+    TEST_INVALID("(|b)");
+    TEST_INVALID("?");
+    TEST_INVALID("*");
+    TEST_INVALID("+");
+    TEST_INVALID("{");
+    TEST_INVALID("{}");
+    TEST_INVALID("a{a}");
+    TEST_INVALID("a{0}");
+    TEST_INVALID("a{-1}");
+    TEST_INVALID("a{}");
+    TEST_INVALID("a{0,}");
+    TEST_INVALID("a{,0}");
+    TEST_INVALID("a{1,0}");
+    TEST_INVALID("a{-1,0}");
+    TEST_INVALID("a{-1,1}");
+    TEST_INVALID("[]");
+    TEST_INVALID("[^]");
+    TEST_INVALID("[\\a]");
+    TEST_INVALID("\\a");
+
+#undef TEST_INVALID
+}
+
 #undef EURO
