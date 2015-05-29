@@ -62,7 +62,7 @@ class GenericRegex {
 public:
     typedef typename Encoding::Ch Ch;
 
-    GenericRegex(const Ch* source, Allocator* allocator = 0) : states_(allocator, 256), ranges_(allocator, 256), root_(kRegexInvalidState), stateCount_(),rangeCount_() {
+    GenericRegex(const Ch* source, Allocator* allocator = 0) : states_(allocator, 256), ranges_(allocator, 256), root_(kRegexInvalidState), stateCount_(), rangeCount_(), anchorBegin_(), anchorEnd_() {
         StringStream ss(source);
         DecodedStream<StringStream> ds(ss);
         Parse(ds);
@@ -77,49 +77,22 @@ public:
 
     template <typename InputStream>
     bool Match(InputStream& is) const {
-        RAPIDJSON_ASSERT(IsValid());
-        DecodedStream<InputStream> ds(is);
-
-        Allocator allocator;
-        Stack<Allocator> state0(&allocator, stateCount_ * sizeof(SizeType));
-        Stack<Allocator> state1(&allocator, stateCount_ * sizeof(SizeType));
-        Stack<Allocator> *current = &state0, *next = &state1;
-
-        const size_t stateSetSize = (stateCount_ + 31) / 32 * 4;
-        unsigned* stateSet = static_cast<unsigned*>(allocator.Malloc(stateSetSize));
-        std::memset(stateSet, 0, stateSetSize);
-        AddState(stateSet, *current, root_);
-
-        unsigned codepoint;
-        while (!current->Empty() && (codepoint = ds.Take()) != 0) {
-            std::memset(stateSet, 0, stateSetSize);
-            next->Clear();
-            for (const SizeType* s = current->template Bottom<SizeType>(); s != current->template End<SizeType>(); ++s) {
-                const State& sr = GetState(*s);
-                if (sr.codepoint == codepoint ||
-                    sr.codepoint == kAnyCharacterClass || 
-                    (sr.codepoint == kRangeCharacterClass && MatchRange(sr.rangeStart, codepoint)))
-                {
-                    AddState(stateSet, *next, sr.out);
-                }
-            }
-            Stack<Allocator>* temp = current;
-            current = next;
-            next = temp;
-        }
-
-        Allocator::Free(stateSet);
-
-        for (const SizeType* s = current->template Bottom<SizeType>(); s != current->template End<SizeType>(); ++s)
-            if (GetState(*s).out == kRegexInvalidState)
-                return true;
-
-        return false;
+        return SearchWithAnchoring(is, true, true);
     }
 
-    bool Match(const Ch* s) {
+    bool Match(const Ch* s) const {
         StringStream is(s);
         return Match(is);
+    }
+
+    template <typename InputStream>
+    bool Search(InputStream& is) const {
+        return SearchWithAnchoring(is, anchorBegin_, anchorEnd_);
+    }
+
+    bool Search(const Ch* s) const {
+        StringStream is(s);
+        return Search(is);
     }
 
 private:
@@ -193,32 +166,6 @@ private:
         return ranges_.template Bottom<Range>()[index];
     }
 
-    void AddState(unsigned* stateSet, Stack<Allocator>& l, SizeType index) const {
-        if (index == kRegexInvalidState)
-            return;
-
-        const State& s = GetState(index);
-        if (s.out1 != kRegexInvalidState) { // Split
-            AddState(stateSet, l, s.out);
-            AddState(stateSet, l, s.out1);
-        }
-        else if (!(stateSet[index >> 5] & (1 << (index & 31)))) {
-            stateSet[index >> 5] |= (1 << (index & 31));
-            *l.template Push<SizeType>() = index;
-        }
-    }
-
-    bool MatchRange(SizeType rangeIndex, unsigned codepoint) const {
-        bool yes = (GetRange(rangeIndex).start & kRangeNegationFlag) == 0;
-        while (rangeIndex != kRegexInvalidRange) {
-            const Range& r = GetRange(rangeIndex);
-            if (codepoint >= (r.start & ~kRangeNegationFlag) && codepoint <= r.end)
-                return yes;
-            rangeIndex = r.next;
-        }
-        return !yes;
-    }
-
     template <typename InputStream>
     void Parse(DecodedStream<InputStream>& ds) {
         Allocator allocator;
@@ -231,6 +178,14 @@ private:
         unsigned codepoint;
         while (ds.Peek() != 0) {
             switch (codepoint = ds.Take()) {
+                case '^':
+                    anchorBegin_ = true;
+                    break;
+
+                case '$':
+                    anchorEnd_ = true;
+                    break;
+
                 case '|':
                     while (!operatorStack.Empty() && *operatorStack.template Top<Operator>() < kAlternation)
                         if (!Eval(operandStack, *operatorStack.template Pop<Operator>(1)))
@@ -567,6 +522,8 @@ private:
     bool CharacterEscape(DecodedStream<InputStream>& ds, unsigned* escapedCodepoint) {
         unsigned codepoint;
         switch (codepoint = ds.Take()) {
+            case '^':
+            case '$':
             case '|':
             case '(':
             case ')':
@@ -590,11 +547,87 @@ private:
         }
     }
 
+    template <typename InputStream>
+    bool SearchWithAnchoring(InputStream& is, bool anchorBegin, bool anchorEnd) const {
+        RAPIDJSON_ASSERT(IsValid());
+        DecodedStream<InputStream> ds(is);
+
+        Allocator allocator;
+        Stack<Allocator> state0(&allocator, stateCount_ * sizeof(SizeType));
+        Stack<Allocator> state1(&allocator, stateCount_ * sizeof(SizeType));
+        Stack<Allocator> *current = &state0, *next = &state1;
+
+        const size_t stateSetSize = (stateCount_ + 31) / 32 * 4;
+        unsigned* stateSet = static_cast<unsigned*>(allocator.Malloc(stateSetSize));
+        std::memset(stateSet, 0, stateSetSize);
+
+        bool matched = false;
+        matched = AddState(stateSet, *current, root_);
+
+        unsigned codepoint;
+        while (!current->Empty() && (codepoint = ds.Take()) != 0) {
+            std::memset(stateSet, 0, stateSetSize);
+            next->Clear();
+            matched = false;
+            for (const SizeType* s = current->template Bottom<SizeType>(); s != current->template End<SizeType>(); ++s) {
+                const State& sr = GetState(*s);
+                if (sr.codepoint == codepoint ||
+                    sr.codepoint == kAnyCharacterClass || 
+                    (sr.codepoint == kRangeCharacterClass && MatchRange(sr.rangeStart, codepoint)))
+                {
+                    matched = AddState(stateSet, *next, sr.out) || matched;
+                    if (!anchorEnd && matched)
+                        goto exit;
+                }
+                if (!anchorBegin)
+                    AddState(stateSet, *next, root_);
+            }
+            Stack<Allocator>* temp = current;
+            current = next;
+            next = temp;
+        }
+
+    exit:
+        Allocator::Free(stateSet);
+        return matched;
+    }
+
+    // Return whether the added states is a match state
+    bool AddState(unsigned* stateSet, Stack<Allocator>& l, SizeType index) const {
+        if (index == kRegexInvalidState)
+            return true;
+
+        const State& s = GetState(index);
+        if (s.out1 != kRegexInvalidState) { // Split
+            bool matched = AddState(stateSet, l, s.out);
+            matched = AddState(stateSet, l, s.out1) || matched;
+            return matched;
+        }
+        else if (!(stateSet[index >> 5] & (1 << (index & 31)))) {
+            stateSet[index >> 5] |= (1 << (index & 31));
+            *l.template Push<SizeType>() = index;
+            return GetState(index).out == kRegexInvalidState;
+        }
+    }
+
+    bool MatchRange(SizeType rangeIndex, unsigned codepoint) const {
+        bool yes = (GetRange(rangeIndex).start & kRangeNegationFlag) == 0;
+        while (rangeIndex != kRegexInvalidRange) {
+            const Range& r = GetRange(rangeIndex);
+            if (codepoint >= (r.start & ~kRangeNegationFlag) && codepoint <= r.end)
+                return yes;
+            rangeIndex = r.next;
+        }
+        return !yes;
+    }
+
     Stack<Allocator> states_;
     Stack<Allocator> ranges_;
     SizeType root_;
     SizeType stateCount_;
     SizeType rangeCount_;
+    bool anchorBegin_;
+    bool anchorEnd_;
 };
 
 typedef GenericRegex<UTF8<> > Regex;

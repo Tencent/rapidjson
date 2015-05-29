@@ -432,11 +432,65 @@ TEST(Regex, CharacterRange8) {
     EXPECT_FALSE(re.Match("!"));
 }
 
+TEST(Regex, Search) {
+    Regex re("abc");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Search("abc"));
+    EXPECT_TRUE(re.Search("_abc"));
+    EXPECT_TRUE(re.Search("abc_"));
+    EXPECT_TRUE(re.Search("_abc_"));
+    EXPECT_TRUE(re.Search("__abc__"));
+    EXPECT_TRUE(re.Search("abcabc"));
+    EXPECT_FALSE(re.Search("a"));
+    EXPECT_FALSE(re.Search("ab"));
+    EXPECT_FALSE(re.Search("bc"));
+    EXPECT_FALSE(re.Search("cba"));
+}
+
+TEST(Regex, Search_BeginAnchor) {
+    Regex re("^abc");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Search("abc"));
+    EXPECT_TRUE(re.Search("abc_"));
+    EXPECT_TRUE(re.Search("abcabc"));
+    EXPECT_FALSE(re.Search("_abc"));
+    EXPECT_FALSE(re.Search("_abc_"));
+    EXPECT_FALSE(re.Search("a"));
+    EXPECT_FALSE(re.Search("ab"));
+    EXPECT_FALSE(re.Search("bc"));
+    EXPECT_FALSE(re.Search("cba"));
+}
+
+TEST(Regex, Search_EndAnchor) {
+    Regex re("abc$");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Search("abc"));
+    EXPECT_TRUE(re.Search("_abc"));
+    EXPECT_TRUE(re.Search("abcabc"));
+    EXPECT_FALSE(re.Search("abc_"));
+    EXPECT_FALSE(re.Search("_abc_"));
+    EXPECT_FALSE(re.Search("a"));
+    EXPECT_FALSE(re.Search("ab"));
+    EXPECT_FALSE(re.Search("bc"));
+    EXPECT_FALSE(re.Search("cba"));
+}
+
+TEST(Regex, Search_BothAnchor) {
+    Regex re("^abc$");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Search("abc"));
+    EXPECT_FALSE(re.Search(""));
+    EXPECT_FALSE(re.Search("a"));
+    EXPECT_FALSE(re.Search("b"));
+    EXPECT_FALSE(re.Search("ab"));
+    EXPECT_FALSE(re.Search("abcd"));
+}
+
 TEST(Regex, Escape) {
-    const char* s = "\\|\\(\\)\\?\\*\\+\\.\\[\\]\\{\\}\\\\\\f\\n\\r\\t\\v[\\b][\\[][\\]]";
+    const char* s = "\\^\\$\\|\\(\\)\\?\\*\\+\\.\\[\\]\\{\\}\\\\\\f\\n\\r\\t\\v[\\b][\\[][\\]]";
     Regex re(s);
     ASSERT_TRUE(re.IsValid());
-    EXPECT_TRUE(re.Match("|()?*+.[]{}\\\x0C\n\r\t\x0B\b[]"));
+    EXPECT_TRUE(re.Match("^$|()?*+.[]{}\\\x0C\n\r\t\x0B\b[]"));
     EXPECT_FALSE(re.Match(s)); // Not escaping
 }
 
