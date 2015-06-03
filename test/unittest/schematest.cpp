@@ -95,6 +95,7 @@ TEST(SchemaValidator, Hasher) {
 {\
     SchemaValidator validator(schema);\
     Document d;\
+    printf("\n%s\n", json);\
     d.Parse(json);\
     EXPECT_FALSE(d.HasParseError());\
     EXPECT_TRUE(expected == d.Accept(validator));\
@@ -114,7 +115,7 @@ TEST(SchemaValidator, Hasher) {
 {\
     SchemaValidator validator(schema);\
     Document d;\
-    /*printf("\n%s\n", json);*/\
+    printf("\n%s\n", json);\
     d.Parse(json);\
     EXPECT_FALSE(d.HasParseError());\
     EXPECT_FALSE(d.Accept(validator));\
