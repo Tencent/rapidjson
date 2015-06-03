@@ -191,7 +191,7 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gae3689840fa6e89a241313f33b602f865">  109</a></span>&#160;<span class="preprocessor">#define RAPIDJSON_PARSE_ERROR(parseErrorCode, offset) \</span></div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="preprocessor">    RAPIDJSON_MULTILINEMACRO_BEGIN \</span></div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor">    RAPIDJSON_PARSE_ERROR_NORETURN(parseErrorCode, offset); \</span></div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">    RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID; \</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">    return RAPIDJSON_NOTHING; \</span></div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="preprocessor">    RAPIDJSON_MULTILINEMACRO_END</span></div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
