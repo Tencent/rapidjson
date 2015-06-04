@@ -263,7 +263,7 @@ $(document).ready(function(){initNavTree('allocators_8h_source.html','');});
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        <span class="keywordflow">if</span> (chunkHead_ == 0 || chunkHead_-&gt;size + size &gt; chunkHead_-&gt;capacity)</div>
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;            AddChunk(chunk_capacity_ &gt; size ? chunk_capacity_ : size);</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        <span class="keywordtype">void</span> *buffer = <span class="keyword">reinterpret_cast&lt;</span><span class="keywordtype">char</span> *<span class="keyword">&gt;</span>(chunkHead_ + 1) + chunkHead_-&gt;size;</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        <span class="keywordtype">void</span> *buffer = <span class="keyword">reinterpret_cast&lt;</span><span class="keywordtype">char</span> *<span class="keyword">&gt;</span>(chunkHead_) + <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a>(<span class="keyword">sizeof</span>(ChunkHeader)) + chunkHead_-&gt;size;</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        chunkHead_-&gt;size += size;</div>
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;        <span class="keywordflow">return</span> buffer;</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    }</div>
@@ -281,7 +281,7 @@ $(document).ready(function(){initNavTree('allocators_8h_source.html','');});
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;            <span class="keywordflow">return</span> originalPtr;</div>
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;        <span class="comment">// Simply expand it if it is the last allocation and there is sufficient space</span></div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        <span class="keywordflow">if</span> (originalPtr == (<span class="keywordtype">char</span> *)(chunkHead_ + 1) + chunkHead_-&gt;size - originalSize) {</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        <span class="keywordflow">if</span> (originalPtr == (<span class="keywordtype">char</span> *)(chunkHead_) + <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a>(<span class="keyword">sizeof</span>(ChunkHeader)) + chunkHead_-&gt;size - originalSize) {</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;            <span class="keywordtype">size_t</span> increment = <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(newSize - originalSize);</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;            increment = <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a>(increment);</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;            <span class="keywordflow">if</span> (chunkHead_-&gt;size + increment &lt;= chunkHead_-&gt;capacity) {</div>
@@ -313,7 +313,7 @@ $(document).ready(function(){initNavTree('allocators_8h_source.html','');});
 <div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keywordtype">void</span> AddChunk(<span class="keywordtype">size_t</span> capacity) {</div>
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        <span class="keywordflow">if</span> (!baseAllocator_)</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;            ownBaseAllocator_ = baseAllocator_ = <a class="code" href="rapidjson_8h.html#ab9e102fa2f1a0ae4914d4dac21f690a2">RAPIDJSON_NEW</a>(BaseAllocator());</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        ChunkHeader* chunk = <span class="keyword">reinterpret_cast&lt;</span>ChunkHeader*<span class="keyword">&gt;</span>(baseAllocator_-&gt;Malloc(<span class="keyword">sizeof</span>(ChunkHeader) + capacity));</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;        ChunkHeader* chunk = <span class="keyword">reinterpret_cast&lt;</span>ChunkHeader*<span class="keyword">&gt;</span>(baseAllocator_-&gt;Malloc(<a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a>(<span class="keyword">sizeof</span>(ChunkHeader)) + capacity));</div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;        chunk-&gt;capacity = capacity;</div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;        chunk-&gt;size = 0;</div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        chunk-&gt;next = chunkHead_;</div>
