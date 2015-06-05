@@ -10,8 +10,8 @@ Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights 
 
 * [RapidJSON GitHub](https://github.com/miloyip/rapidjson/)
 * RapidJSON 文档
-  * [English](http://miloyip.github.io/rapidjson/)
-  * [简体中文](http://miloyip.github.io/rapidjson/zh-cn/)
+  * [English](http://www.rapidjson.org/)
+  * [简体中文](http://www.rapidjson.org/zh-cn/)
   * [GitBook](https://www.gitbook.com/book/miloyip/rapidjson/)可下载PDF/EPUB/MOBI，但不含API参考手册。
 
 ## Build 状态
