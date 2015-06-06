@@ -78,7 +78,7 @@ gh_pages_prepare()
 
 gh_pages_commit() {
 	cd "${TRAVIS_BUILD_DIR}/build/doc/html";
-	echo "www.rapidjson.org" > CNAME
+	echo "rapidjson.org" > CNAME
 	git add --all;
 	git diff-index --quiet HEAD || git commit -m "Automatic doxygen build";
 }
