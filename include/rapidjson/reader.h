@@ -271,7 +271,7 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
 
     // The rest of string using SIMD
     static const char whitespace[16] = " \n\r\t";
-    const __m128i w = _mm_load_si128((const __m128i *)&whitespace[0]);
+    const __m128i w = _mm_loadu_si128((const __m128i *)&whitespace[0]);
 
     for (;; p += 16) {
         const __m128i s = _mm_load_si128((const __m128i *)p);
