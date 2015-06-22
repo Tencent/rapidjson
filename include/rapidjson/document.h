@@ -844,6 +844,12 @@ public:
     template <typename SourceAllocator>
     const GenericValue& operator[](const GenericValue<Encoding, SourceAllocator>& name) const { return const_cast<GenericValue&>(*this)[name]; }
 
+#if RAPIDJSON_HAS_STDSTRING
+    //! Get a value from an object associated with name (string object).
+    GenericValue& operator[](const std::basic_string<Ch>& name) { return (*this)[GenericValue(StringRef(name))]; }
+    const GenericValue& operator[](const std::basic_string<Ch>& name) const { return (*this)[GenericValue(StringRef(name))]; }
+#endif
+
     //! Const member iterator
     /*! \pre IsObject() == true */
     ConstMemberIterator MemberBegin() const { RAPIDJSON_ASSERT(IsObject()); return ConstMemberIterator(data_.o.members); }
@@ -866,6 +872,18 @@ public:
         \note Linear time complexity.
     */
     bool HasMember(const Ch* name) const { return FindMember(name) != MemberEnd(); }
+
+#if RAPIDJSON_HAS_STDSTRING
+    //! Check whether a member exists in the object with string object.
+    /*!
+        \param name Member name to be searched.
+        \pre IsObject() == true
+        \return Whether a member with that name exists.
+        \note It is better to use FindMember() directly if you need the obtain the value as well.
+        \note Linear time complexity.
+    */
+    bool HasMember(const std::basic_string<Ch>& name) const { return FindMember(name) != MemberEnd(); }
+#endif
 
     //! Check whether a member exists in the object with GenericValue name.
     /*!
@@ -923,6 +941,18 @@ public:
     }
     template <typename SourceAllocator> ConstMemberIterator FindMember(const GenericValue<Encoding, SourceAllocator>& name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
 
+#if RAPIDJSON_HAS_STDSTRING
+    //! Find member by string object name.
+    /*!
+        \param name Member name to be searched.
+        \pre IsObject() == true
+        \return Iterator to member, if it exists.
+            Otherwise returns \ref MemberEnd().
+    */
+    MemberIterator FindMember(const std::basic_string<Ch>& name) { return FindMember(StringRef(name)); }
+    ConstMemberIterator FindMember(const std::basic_string<Ch>& name) const { return FindMember(StringRef(name)); }
+#endif
+
     //! Add a member (name-value pair) to the object.
     /*! \param name A string value as name of member.
         \param value Value of any type.
@@ -968,6 +998,22 @@ public:
         GenericValue v(value);
         return AddMember(name, v, allocator);
     }
+
+#if RAPIDJSON_HAS_STDSTRING
+    //! Add a string object as member (name-value pair) to the object.
+    /*! \param name A string value as name of member.
+        \param value constant string reference as value of member.
+        \param allocator    Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
+        \return The value itself for fluent API.
+        \pre  IsObject()
+        \note This overload is needed to avoid clashes with the generic primitive type AddMember(GenericValue&,T,Allocator&) overload below.
+        \note Amortized Constant time complexity.
+    */
+    GenericValue& AddMember(GenericValue& name, std::basic_string<Ch>& value, Allocator& allocator) {
+        GenericValue v(value, allocator);
+        return AddMember(name, v, allocator);
+    }
+#endif
 
     //! Add any primitive value as member (name-value pair) to the object.
     /*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t
@@ -1087,6 +1133,10 @@ public:
         return RemoveMember(n);
     }
 
+#if RAPIDJSON_HAS_STDSTRING
+    bool RemoveMember(const std::basic_string<Ch>& name) { return RemoveMember(GenericValue(StringRef(name))); }
+#endif
+
     template <typename SourceAllocator>
     bool RemoveMember(const GenericValue<Encoding, SourceAllocator>& name) {
         MemberIterator m = FindMember(name);
@@ -1161,6 +1211,31 @@ public:
         std::memmove(&*pos, &*last, (MemberEnd() - last) * sizeof(Member));
         data_.o.size -= (last - first);
         return pos;
+    }
+
+    //! Erase a member in object by its name.
+    /*! \param name Name of member to be removed.
+        \return Whether the member existed.
+        \note Linear time complexity.
+    */
+    bool EraseMember(const Ch* name) {
+        GenericValue n(StringRef(name));
+        return EraseMember(n);
+    }
+
+#if RAPIDJSON_HAS_STDSTRING
+    bool EraseMember(const std::basic_string<Ch>& name) { return EraseMember(GenericValue(StringRef(name))); }
+#endif
+
+    template <typename SourceAllocator>
+    bool EraseMember(const GenericValue<Encoding, SourceAllocator>& name) {
+        MemberIterator m = FindMember(name);
+        if (m != MemberEnd()) {
+            EraseMember(m);
+            return true;
+        }
+        else
+            return false;
     }
 
     //@}
@@ -1741,7 +1816,7 @@ public:
     template <unsigned parseFlags, typename SourceEncoding, typename InputStream>
     GenericDocument& ParseStream(InputStream& is) {
         ValueType::SetNull(); // Remove existing root if exist
-        GenericReader<SourceEncoding, Encoding, Allocator> reader(&GetAllocator());
+        GenericReader<SourceEncoding, Encoding, StackAllocator> reader(&stack_.GetAllocator());
         ClearStackOnExit scope(*this);
         parseResult_ = reader.template Parse<parseFlags>(is, *this);
         if (parseResult_) {

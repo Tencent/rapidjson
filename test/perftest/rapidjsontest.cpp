@@ -298,11 +298,28 @@ TEST_F(RapidJson, internal_Pow10) {
     EXPECT_GT(sum, 0.0);
 }
 
-TEST_F(RapidJson, SIMD_SUFFIX(Whitespace)) {
+TEST_F(RapidJson, SkipWhitespace_Basic) {
     for (size_t i = 0; i < kTrialCount; i++) {
-        Document doc;
-        ASSERT_TRUE(doc.Parse(whitespace_).IsArray());
-    }       
+        rapidjson::StringStream s(whitespace_);
+        while (s.Peek() == ' ' || s.Peek() == '\n' || s.Peek() == '\r' || s.Peek() == '\t')
+            s.Take();
+        ASSERT_EQ('[', s.Peek());
+    }
+}
+
+TEST_F(RapidJson, SIMD_SUFFIX(SkipWhitespace)) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        rapidjson::StringStream s(whitespace_);
+        rapidjson::SkipWhitespace(s);
+        ASSERT_EQ('[', s.Peek());
+    }
+}
+
+TEST_F(RapidJson, SkipWhitespace_strspn) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        const char* s = whitespace_ + std::strspn(whitespace_, " \t\r\n");
+        ASSERT_EQ('[', *s);
+    }
 }
 
 TEST_F(RapidJson, UTF8_Validate) {

@@ -1,6 +1,6 @@
 ![](doc/logo/rapidjson.png)
 
-![](https://img.shields.io/badge/release-v1.0.1-blue.png)
+![](https://img.shields.io/badge/release-v1.0.2-blue.png)
 
 ## 高效的C++ JSON解析／生成器，提供SAX及DOM风格API
 
@@ -10,8 +10,8 @@ Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights 
 
 * [RapidJSON GitHub](https://github.com/miloyip/rapidjson/)
 * RapidJSON 文档
-  * [English](http://miloyip.github.io/rapidjson/)
-  * [简体中文](http://miloyip.github.io/rapidjson/zh-cn/)
+  * [English](http://rapidjson.org/)
+  * [简体中文](http://rapidjson.org/zh-cn/)
   * [GitBook](https://www.gitbook.com/book/miloyip/rapidjson/)可下载PDF/EPUB/MOBI，但不含API参考手册。
 
 ## Build 状态

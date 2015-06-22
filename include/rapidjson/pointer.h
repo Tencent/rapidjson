@@ -16,6 +16,7 @@
 #define RAPIDJSON_POINTER_H_
 
 #include "document.h"
+#include "internal/itoa.h"
 
 RAPIDJSON_NAMESPACE_BEGIN
 
@@ -160,46 +161,129 @@ public:
 
     //! Destructor.
     ~GenericPointer() {
-        if (nameBuffer_) {  // If user-supplied tokens constructor is used, nameBuffer_ is nullptr and tokens_ are not deallocated.
-            Allocator::Free(nameBuffer_);
+        if (nameBuffer_)    // If user-supplied tokens constructor is used, nameBuffer_ is nullptr and tokens_ are not deallocated.
             Allocator::Free(tokens_);
-        }
         RAPIDJSON_DELETE(ownAllocator_);
     }
 
     //! Assignment operator.
     GenericPointer& operator=(const GenericPointer& rhs) {
-        this->~GenericPointer();
+        if (this != &rhs) {
+            // Do not delete ownAllcator
+            if (nameBuffer_)
+                Allocator::Free(tokens_);
 
-        tokenCount_ = rhs.tokenCount_;
-        parseErrorOffset_ = rhs.parseErrorOffset_;
-        parseErrorCode_ = rhs.parseErrorCode_;
+            tokenCount_ = rhs.tokenCount_;
+            parseErrorOffset_ = rhs.parseErrorOffset_;
+            parseErrorCode_ = rhs.parseErrorCode_;
 
-        if (rhs.nameBuffer_) { // Normally parsed tokens.
-            if (!allocator_) // allocator is independently owned.
-                ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
-
-            size_t nameBufferSize = tokenCount_; // null terminators for tokens
-            for (Token *t = rhs.tokens_; t != rhs.tokens_ + tokenCount_; ++t)
-                nameBufferSize += t->length;
-            nameBuffer_ = (Ch*)allocator_->Malloc(nameBufferSize * sizeof(Ch));
-            std::memcpy(nameBuffer_, rhs.nameBuffer_, nameBufferSize * sizeof(Ch));
-
-            tokens_ = (Token*)allocator_->Malloc(tokenCount_ * sizeof(Token));
-            std::memcpy(tokens_, rhs.tokens_, tokenCount_ * sizeof(Token));
-
-            // Adjust pointers to name buffer
-            std::ptrdiff_t diff = nameBuffer_ - rhs.nameBuffer_;
-            for (Token *t = rhs.tokens_; t != rhs.tokens_ + tokenCount_; ++t)
-                t->name += diff;
+            if (rhs.nameBuffer_)
+                CopyFromRaw(rhs); // Normally parsed tokens.
+            else {
+                tokens_ = rhs.tokens_; // User supplied const tokens.
+                nameBuffer_ = 0;
+            }
         }
-        else
-            tokens_ = rhs.tokens_; // User supplied const tokens.
-
         return *this;
     }
 
     //@}
+
+    //!@name Append token
+    //@{
+
+    //! Append a token and return a new Pointer
+    /*!
+        \param token Token to be appended.
+        \param allocator Allocator for the newly return Pointer.
+        \return A new Pointer with appended token.
+    */
+    GenericPointer Append(const Token& token, Allocator* allocator = 0) const {
+        GenericPointer r;
+        r.allocator_ = allocator;
+        Ch *p = r.CopyFromRaw(*this, 1, token.length + 1);
+        std::memcpy(p, token.name, (token.length + 1) * sizeof(Ch));
+        r.tokens_[tokenCount_].name = p;
+        r.tokens_[tokenCount_].length = token.length;
+        r.tokens_[tokenCount_].index = token.index;
+        return r;
+    }
+
+    //! Append a name token with length, and return a new Pointer
+    /*!
+        \param name Name to be appended.
+        \param length Length of name.
+        \param allocator Allocator for the newly return Pointer.
+        \return A new Pointer with appended token.
+    */
+    GenericPointer Append(const Ch* name, SizeType length, Allocator* allocator = 0) const {
+        Token token = { name, length, kPointerInvalidIndex };
+        return Append(token, allocator);
+    }
+
+    //! Append a name token without length, and return a new Pointer
+    /*!
+        \param name Name (const Ch*) to be appended.
+        \param allocator Allocator for the newly return Pointer.
+        \return A new Pointer with appended token.
+    */
+    template <typename T>
+    RAPIDJSON_DISABLEIF_RETURN((internal::NotExpr<internal::IsSame<typename internal::RemoveConst<T>::Type, Ch> >), (GenericPointer))
+    Append(T* name, Allocator* allocator = 0) const {
+        return Append(name, StrLen(name), allocator);
+    }
+
+#if RAPIDJSON_HAS_STDSTRING
+    //! Append a name token, and return a new Pointer
+    /*!
+        \param name Name to be appended.
+        \param allocator Allocator for the newly return Pointer.
+        \return A new Pointer with appended token.
+    */
+    GenericPointer Append(const std::basic_string<Ch>& name, Allocator* allocator = 0) const {
+        return Append(name.c_str(), static_cast<SizeType>(name.size()), allocator);
+    }
+#endif
+
+    //! Append a index token, and return a new Pointer
+    /*!
+        \param index Index to be appended.
+        \param allocator Allocator for the newly return Pointer.
+        \return A new Pointer with appended token.
+    */
+    GenericPointer Append(SizeType index, Allocator* allocator = 0) const {
+        char buffer[21];
+        SizeType length = (sizeof(SizeType) == 4 ? internal::u32toa(index, buffer): internal::u64toa(index, buffer)) - buffer;
+        buffer[length] = '\0';
+
+        if (sizeof(Ch) == 1) {
+            Token token = { (Ch*)buffer, length, index };
+            return Append(token, allocator);
+        }
+        else {
+            Ch name[21];
+            for (size_t i = 0; i <= length; i++)
+                name[i] = buffer[i];
+            Token token = { name, length, index };
+            return Append(token, allocator);
+        }
+    }
+
+    //! Append a token by value, and return a new Pointer
+    /*!
+        \param value Value (either Uint or String) to be appended.
+        \param allocator Allocator for the newly return Pointer.
+        \return A new Pointer with appended token.
+    */
+    GenericPointer Append(const ValueType& token, Allocator* allocator = 0) const {
+        if (token.IsString())
+            return Append(token.GetString(), token.GetStringLength(), allocator);
+        else {
+            RAPIDJSON_ASSERT(token.IsUint64());
+            RAPIDJSON_ASSERT(token.GetUint64() <= SizeType(~0));
+            return Append(static_cast<SizeType>(token.GetUint64()), allocator);
+        }
+    }
 
     //!@name Handling Parse Error
     //@{
@@ -240,7 +324,7 @@ public:
         for (size_t i = 0; i < tokenCount_; i++) {
             if (tokens_[i].index != rhs.tokens_[i].index ||
                 tokens_[i].length != rhs.tokens_[i].length || 
-                std::memcmp(tokens_[i].name, rhs.tokens_[i].name, sizeof(Ch) * tokens_[i].length) != 0)
+                (tokens_[i].length != 0 && std::memcmp(tokens_[i].name, rhs.tokens_[i].name, sizeof(Ch)* tokens_[i].length) != 0))
             {
                 return false;
             }
@@ -602,37 +686,69 @@ public:
 
         ValueType* v = &root;
         const Token* last = tokens_ + (tokenCount_ - 1);
-        for (const Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
+        for (const Token *t = tokens_; t != last; ++t) {
             switch (v->GetType()) {
             case kObjectType:
                 {
                     typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
                     if (m == v->MemberEnd())
                         return false;
-                    if (t == last) {
-                        v->EraseMember(m);
-                        return true;
-                    }
                     v = &m->value;
                 }
                 break;
             case kArrayType:
                 if (t->index == kPointerInvalidIndex || t->index >= v->Size())
                     return false;
-                if (t == last) {
-                    v->Erase(v->Begin() + t->index);
-                    return true;
-                }
                 v = &((*v)[t->index]);
                 break;
             default:
                 return false;
             }
         }
-        return false;
+
+        switch (v->GetType()) {
+        case kObjectType:
+            return v->EraseMember(GenericStringRef<Ch>(last->name, last->length));
+        case kArrayType:
+            if (last->index == kPointerInvalidIndex || last->index >= v->Size())
+                return false;
+            v->Erase(v->Begin() + last->index);
+            return true;
+        default:
+            return false;
+        }
     }
 
 private:
+    //! Clone the content from rhs to this.
+    /*!
+        \param rhs Source pointer.
+        \param extraToken Extra tokens to be allocated.
+        \param extraNameBufferSize Extra name buffer size (in number of Ch) to be allocated.
+        \return Start of non-occupied name buffer, for storing extra names.
+    */
+    Ch* CopyFromRaw(const GenericPointer& rhs, size_t extraToken = 0, size_t extraNameBufferSize = 0) {
+        if (!allocator_) // allocator is independently owned.
+            ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
+
+        size_t nameBufferSize = rhs.tokenCount_; // null terminators for tokens
+        for (Token *t = rhs.tokens_; t != rhs.tokens_ + rhs.tokenCount_; ++t)
+            nameBufferSize += t->length;
+
+        tokenCount_ = rhs.tokenCount_ + extraToken;
+        tokens_ = static_cast<Token *>(allocator_->Malloc(tokenCount_ * sizeof(Token) + (nameBufferSize + extraNameBufferSize) * sizeof(Ch)));
+        nameBuffer_ = reinterpret_cast<Ch *>(tokens_ + tokenCount_);
+        std::memcpy(tokens_, rhs.tokens_, rhs.tokenCount_ * sizeof(Token));
+        std::memcpy(nameBuffer_, rhs.nameBuffer_, nameBufferSize * sizeof(Ch));
+
+        // Adjust pointers to name buffer
+        std::ptrdiff_t diff = nameBuffer_ - rhs.nameBuffer_;
+        for (Token *t = tokens_; t != tokens_ + rhs.tokenCount_; ++t)
+            t->name += diff;
+
+        return nameBuffer_ + nameBufferSize;
+    }
+
     //! Check whether a character should be percent-encoded.
     /*!
         According to RFC 3986 2.3 Unreserved Characters.
@@ -657,11 +773,14 @@ private:
         if (!allocator_)
             ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
 
-        // Create a buffer as same size of source
-        nameBuffer_ = (Ch*)allocator_->Malloc(length * sizeof(Ch));
-        tokens_ = (Token*)allocator_->Malloc(length * sizeof(Token)); // Maximum possible tokens in the source
+        // Count number of '/' as tokenCount
         tokenCount_ = 0;
-        Ch* name = nameBuffer_;
+        for (const Ch* s = source; s != source + length; s++) 
+            if (*s == '/')
+                tokenCount_++;
+
+        Token* token = tokens_ = static_cast<Token *>(allocator_->Malloc(tokenCount_ * sizeof(Token) + length * sizeof(Ch)));
+        Ch* name = nameBuffer_ = reinterpret_cast<Ch *>(tokens_ + tokenCount_);
         size_t i = 0;
 
         // Detect if it is a URI fragment
@@ -680,8 +799,7 @@ private:
             RAPIDJSON_ASSERT(source[i] == '/');
             i++; // consumes '/'
 
-            Token& token = tokens_[tokenCount_++];
-            token.name = name;
+            token->name = name;
             bool isNumber = true;
 
             while (i < length && source[i] != '/') {
@@ -739,18 +857,20 @@ private:
 
                 *name++ = c;
             }
-            token.length = name - token.name;
+            token->length = name - token->name;
+            if (token->length == 0)
+                isNumber = false;
             *name++ = '\0'; // Null terminator
 
             // Second check for index: more than one digit cannot have leading zero
-            if (isNumber && token.length > 1 && token.name[0] == '0')
+            if (isNumber && token->length > 1 && token->name[0] == '0')
                 isNumber = false;
 
             // String to SizeType conversion
             SizeType n = 0;
             if (isNumber) {
-                for (size_t j = 0; j < token.length; j++) {
-                    SizeType m = n * 10 + static_cast<SizeType>(token.name[j] - '0');
+                for (size_t j = 0; j < token->length; j++) {
+                    SizeType m = n * 10 + static_cast<SizeType>(token->name[j] - '0');
                     if (m < n) {   // overflow detection
                         isNumber = false;
                         break;
@@ -759,16 +879,15 @@ private:
                 }
             }
 
-            token.index = isNumber ? n : kPointerInvalidIndex;
+            token->index = isNumber ? n : kPointerInvalidIndex;
+            token++;
         }
 
         RAPIDJSON_ASSERT(name <= nameBuffer_ + length); // Should not overflow buffer
-        tokens_ = (Token*)allocator_->Realloc(tokens_, length * sizeof(Token), tokenCount_ * sizeof(Token)); // Shrink tokens_
         parseErrorCode_ = kPointerParseErrorNone;
         return;
 
     error:
-        Allocator::Free(nameBuffer_);
         Allocator::Free(tokens_);
         nameBuffer_ = 0;
         tokens_ = 0;

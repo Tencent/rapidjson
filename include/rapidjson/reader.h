@@ -271,7 +271,7 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
 
     // The rest of string using SIMD
     static const char whitespace[16] = " \n\r\t";
-    const __m128i w = _mm_load_si128((const __m128i *)&whitespace[0]);
+    const __m128i w = _mm_loadu_si128((const __m128i *)&whitespace[0]);
 
     for (;; p += 16) {
         const __m128i s = _mm_load_si128((const __m128i *)p);
@@ -967,13 +967,13 @@ private:
         else {
             if (use64bit) {
                 if (minus)
-                    cont = handler.Int64(-(int64_t)i64);
+                    cont = handler.Int64(static_cast<int64_t>(~i64 + 1));
                 else
                     cont = handler.Uint64(i64);
             }
             else {
                 if (minus)
-                    cont = handler.Int(-(int)i);
+                    cont = handler.Int(static_cast<int32_t>(~i + 1));
                 else
                     cont = handler.Uint(i);
             }
@@ -1387,13 +1387,13 @@ private:
         }
         
         switch (src) {
-        case IterativeParsingStartState:            RAPIDJSON_PARSE_ERROR(kParseErrorDocumentEmpty, is.Tell());
-        case IterativeParsingFinishState:           RAPIDJSON_PARSE_ERROR(kParseErrorDocumentRootNotSingular, is.Tell());
+        case IterativeParsingStartState:            RAPIDJSON_PARSE_ERROR(kParseErrorDocumentEmpty, is.Tell()); return;
+        case IterativeParsingFinishState:           RAPIDJSON_PARSE_ERROR(kParseErrorDocumentRootNotSingular, is.Tell()); return;
         case IterativeParsingObjectInitialState:
-        case IterativeParsingMemberDelimiterState:  RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
-        case IterativeParsingMemberKeyState:        RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissColon, is.Tell());
-        case IterativeParsingMemberValueState:      RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell());
-        case IterativeParsingElementState:          RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell());
+        case IterativeParsingMemberDelimiterState:  RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell()); return;
+        case IterativeParsingMemberKeyState:        RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissColon, is.Tell()); return;
+        case IterativeParsingMemberValueState:      RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell()); return;
+        case IterativeParsingElementState:          RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell()); return;
         default:                                    RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell());
         }       
     }

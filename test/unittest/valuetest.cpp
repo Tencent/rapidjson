@@ -957,6 +957,19 @@ TEST(Value, Object) {
         EXPECT_EQ(2u, o.MemberCount());
     }
 
+#if RAPIDJSON_HAS_STDSTRING
+    {
+        // AddMember(StringRefType, const std::string&, Allocator)
+        Value o(kObjectType);
+        o.AddMember("b", std::string("Banana"), allocator);
+        EXPECT_STREQ("Banana", o["b"].GetString());
+
+        // RemoveMember(const std::string&)
+        o.RemoveMember(std::string("b"));
+        EXPECT_TRUE(o.ObjectEmpty());
+    }
+#endif
+
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     // AddMember(GenericValue&&, ...) variants
     {
@@ -986,6 +999,10 @@ TEST(Value, Object) {
     EXPECT_TRUE(y.HasMember("A"));
     EXPECT_TRUE(y.HasMember("B"));
 
+#if RAPIDJSON_HAS_STDSTRING
+    EXPECT_TRUE(x.HasMember(std::string("A")));
+#endif
+
     name.SetString("C\0D");
     EXPECT_TRUE(x.HasMember(name));
     EXPECT_TRUE(y.HasMember(name));
@@ -1008,6 +1025,11 @@ TEST(Value, Object) {
     EXPECT_STREQ("Apple", y["A"].GetString());
     EXPECT_STREQ("Banana", y["B"].GetString());
     EXPECT_STREQ("CherryD", y[C0D].GetString());
+
+#if RAPIDJSON_HAS_STDSTRING
+    EXPECT_STREQ("Apple", x["A"].GetString());
+    EXPECT_STREQ("Apple", y[std::string("A")].GetString());
+#endif
 
     // member iterator
     Value::MemberIterator itr = x.MemberBegin(); 
@@ -1158,6 +1180,24 @@ TEST(Value, Object) {
     Value z;
     z.SetObject();
     EXPECT_TRUE(z.IsObject());
+}
+
+TEST(Value, EraseMember_String) {
+    Value::AllocatorType allocator;
+    Value x(kObjectType);
+    x.AddMember("A", "Apple", allocator);
+    x.AddMember("B", "Banana", allocator);
+
+    EXPECT_TRUE(x.EraseMember("B"));
+    EXPECT_FALSE(x.HasMember("B"));
+
+    EXPECT_FALSE(x.EraseMember("nonexist"));
+
+    GenericValue<UTF8<>, CrtAllocator> othername("A");
+    EXPECT_TRUE(x.EraseMember(othername));
+    EXPECT_FALSE(x.HasMember("A"));
+
+    EXPECT_TRUE(x.MemberBegin() == x.MemberEnd());
 }
 
 TEST(Value, BigNestedArray) {
