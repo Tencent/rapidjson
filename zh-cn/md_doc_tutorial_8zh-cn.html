@@ -304,7 +304,7 @@ Value 及 Document</h1>
 <div class="line">    <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> contacts(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
 <div class="line">    <span class="comment">// 把元素加进contacts数组。</span></div>
 <div class="line">    <span class="comment">// ...</span></div>
-<div class="line">    o.AddMember(<span class="stringliteral">&quot;contacts&quot;</span>, contacts);  <span class="comment">// 深度复制contacts （可能有大量内存分配）</span></div>
+<div class="line">    o.AddMember(<span class="stringliteral">&quot;contacts&quot;</span>, contacts, d.GetAllocator());  <span class="comment">// 深度复制contacts （可能有大量内存分配）</span></div>
 <div class="line">    <span class="comment">// 析构contacts。</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><div class="image">
@@ -319,7 +319,7 @@ Value 及 Document</h1>
 <div class="line">{</div>
 <div class="line">    <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> contacts(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
 <div class="line">    <span class="comment">// adding elements to contacts array.</span></div>
-<div class="line">    o.AddMember(<span class="stringliteral">&quot;contacts&quot;</span>, contacts);  <span class="comment">// 只需 memcpy() contacts本身至新成员的Value（16字节）</span></div>
+<div class="line">    o.AddMember(<span class="stringliteral">&quot;contacts&quot;</span>, contacts, d.GetAllocator());  <span class="comment">// 只需 memcpy() contacts本身至新成员的Value（16字节）</span></div>
 <div class="line">    <span class="comment">// contacts在这里变成Null。它的析构是平凡的。</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><div class="image">
