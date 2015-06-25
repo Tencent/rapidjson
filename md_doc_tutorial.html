@@ -299,12 +299,13 @@ Assignment with move semantics.</div></div>
 <p> Why? What is the advantage of this semantics?</p>
 <p>The simple answer is performance. For fixed size JSON types (Number, True, False, Null), copying them is fast and easy. However, For variable size JSON types (String, Array, Object), copying them will incur a lot of overheads. And these overheads are often unnoticed. Especially when we need to create temporary object, copy it to another variable, and then destruct it.</p>
 <p>For example, if normal <em>copy</em> semantics was used:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
 <div class="line">{</div>
 <div class="line">    <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> contacts(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
 <div class="line">    <span class="comment">// adding elements to contacts array.</span></div>
 <div class="line">    <span class="comment">// ...</span></div>
-<div class="line">    o.AddMember(<span class="stringliteral">&quot;contacts&quot;</span>, contacts);  <span class="comment">// deep clone contacts (may be with lots of allocations)</span></div>
+<div class="line">    o.AddMember(<span class="stringliteral">&quot;contacts&quot;</span>, contacts, d.GetAllocator());  <span class="comment">// deep clone contacts (may be with lots of allocations)</span></div>
 <div class="line">    <span class="comment">// destruct contacts.</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><div class="image">
@@ -315,11 +316,12 @@ Copy semantics makes a lots of copy operations.</div></div>
 <p>There are solutions to prevent actual copying these data, such as reference counting and garbage collection(GC).</p>
 <p>To make RapidJSON simple and fast, we chose to use <em>move</em> semantics for assignment. It is similar to <code>std::auto_ptr</code> which transfer ownership during assignment. Move is much faster and simpler, it just destructs the original value, <code>memcpy()</code> the source to destination, and finally sets the source as Null type.</p>
 <p>So, with move semantics, the above example becomes:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
 <div class="line">{</div>
 <div class="line">    <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> contacts(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
 <div class="line">    <span class="comment">// adding elements to contacts array.</span></div>
-<div class="line">    o.AddMember(<span class="stringliteral">&quot;contacts&quot;</span>, contacts);  <span class="comment">// just memcpy() of contacts itself to the value of new member (16 bytes)</span></div>
+<div class="line">    o.AddMember(<span class="stringliteral">&quot;contacts&quot;</span>, contacts, d.GetAllocator());  <span class="comment">// just memcpy() of contacts itself to the value of new member (16 bytes)</span></div>
 <div class="line">    <span class="comment">// contacts became Null here. Its destruction is trivial.</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><div class="image">
