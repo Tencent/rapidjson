@@ -297,7 +297,7 @@ Value o(kObjectType);
     Value contacts(kArrayType);
     // 把元素加进contacts数组。
     // ...
-    o.AddMember("contacts", contacts);  // 深度复制contacts （可能有大量内存分配）
+    o.AddMember("contacts", contacts, d.GetAllocator());  // 深度复制contacts （可能有大量内存分配）
     // 析构contacts。
 }
 ~~~~~~~~~~
@@ -317,7 +317,7 @@ Value o(kObjectType);
 {
     Value contacts(kArrayType);
     // adding elements to contacts array.
-    o.AddMember("contacts", contacts);  // 只需 memcpy() contacts本身至新成员的Value（16字节）
+    o.AddMember("contacts", contacts, d.GetAllocator());  // 只需 memcpy() contacts本身至新成员的Value（16字节）
     // contacts在这里变成Null。它的析构是平凡的。
 }
 ~~~~~~~~~~
