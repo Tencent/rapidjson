@@ -1748,6 +1748,13 @@ public:
     typedef GenericValue<Encoding, Allocator> ValueType;    //!< Value type of the document.
     typedef Allocator AllocatorType;                        //!< Allocator type from template parameter.
 
+    GenericDocument(Type type, Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity, StackAllocator* stackAllocator = 0) :
+        GenericValue<Encoding, Allocator>(type),  allocator_(allocator), ownAllocator_(0), stack_(stackAllocator, stackCapacity), parseResult_()
+    {
+        if (!allocator_)
+            ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
+    }
+
     //! Constructor
     /*! \param allocator        Optional allocator for allocating memory.
         \param stackCapacity    Optional initial capacity of stack in bytes.
