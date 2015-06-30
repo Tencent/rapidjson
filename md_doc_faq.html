@@ -168,7 +168,14 @@ $(document).ready(function(){initNavTree('md_doc_faq.html','');});
 <li><p class="startli">Why not just using <code>double</code> to represent JSON number?</p>
 <p class="startli">Some applications use 64-bit unsigned/signed integers. And these integers cannot be converted into <code>double</code> without loss of precision. So the parsers detects whether a JSON number is convertible to different types of integers and/or <code>double</code>.</p>
 </li>
+<li>How to clear-and-minimize a document or value?</li>
 </ol>
+<ul>
+<li><p class="startli">Call one of the <code>SetXXX()</code> methods - they call destructor which deallocates DOM data:</p>
+<p class="startli">``` Document d; ... d.SetObject(); // clear and minimize ```</p>
+</li>
+<li>Alternatively, use equivalent of the <a href="https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Clear-and-minimize">C++ swap with temporary idiom</a>: ``` d.Swap(Value(kObjectType).Move()) ```</li>
+</ul>
 <h2>Document/Value (DOM)</h2>
 <ol type="1">
 <li><p class="startli">What is move semantics? Why?</p>
