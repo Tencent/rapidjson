@@ -102,6 +102,21 @@
 
    Some applications use 64-bit unsigned/signed integers. And these integers cannot be converted into `double` without loss of precision. So the parsers detects whether a JSON number is convertible to different types of integers and/or `double`.
 
+8. How to clear-and-minimize a document or value?
+
+* Call one of the `SetXXX()` methods - they call destructor which deallocates DOM data:
+
+   ```
+   Document d;
+   ...
+   d.SetObject();  // clear and minimize
+   ```
+
+* Alternatively, use equivalent of the [C++ swap with temporary idiom](https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Clear-and-minimize):
+   ```
+   d.Swap(Value(kObjectType).Move()) 
+   ```
+
 ## Document/Value (DOM)
 
 1. What is move semantics? Why?
