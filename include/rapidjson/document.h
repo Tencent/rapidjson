@@ -1755,7 +1755,7 @@ public:
         \param stackCapacity    Optional initial capacity of stack in bytes.
         \param stackAllocator   Optional allocator for allocating memory for stack.
     */
-    GenericDocument(Type type, Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity, StackAllocator* stackAllocator = 0) :
+    explicit GenericDocument(Type type, Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity, StackAllocator* stackAllocator = 0) :
         GenericValue<Encoding, Allocator>(type),  allocator_(allocator), ownAllocator_(0), stack_(stackAllocator, stackCapacity), parseResult_()
     {
         if (!allocator_)
