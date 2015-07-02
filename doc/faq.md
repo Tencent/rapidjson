@@ -117,6 +117,45 @@
    d.Swap(Value(kObjectType).Move()) 
    ```
 
+9. How to insert a document node into another document?
+
+Let's take the following two DOM trees represented as JSON documents:
+   ```
+   Document person;
+   person.Parse("{\"person\":{\"name\":{\"first\":\"Adam\",\"last\":\"Thomas\"}}}");
+   
+   Document address;
+   address.Parse("{\"address\":{\"city\":\"Moscow\",\"street\":\"Quiet\"}}");
+   ```
+Let's assume we want to merge them in such way that the whole `address` document becomes a node of the `person`:
+   ```
+   { "person": {
+      "name": { "first": "Adam", "last": "Thomas" },
+      "address": { "city": "Moscow", "street": "Quiet" }
+      }
+   }
+   ```
+
+The most important requirement to take care of document and value life-cycle as well as consistent memory managent using the right allocator during the value transfer.
+   
+* Simple yet most efficient way to achieve that is to modify the `address` definition above to initialize it with allocator of the `person` document, then we just add the root nenber of the value:
+   ```
+   Documnet address(person.GetAllocator());
+   ...
+   person["person"].AddMember("address", address["address"], person.GetAllocator());
+   ```
+Alternatively, if we don't want to explicitly refer to the root value of `address` by name, we can refer to it via iterator:
+   ```
+   auto addressRoot = address.MemberBegin();
+   person["person"].AddMember(addressRoot->name, addressRoot->value, person.GetAllocator());
+   ```  
+   
+* Second way is to deep-clone the value from the address document:
+   ```
+   Value addressValue = Value(address["address"], person.GetAllocator());
+   person["person"].AddMember("address", addressValue, person.GetAllocator());
+   ```
+
 ## Document/Value (DOM)
 
 1. What is move semantics? Why?
