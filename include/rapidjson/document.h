@@ -1803,6 +1803,22 @@ public:
     }
 #endif
 
+    //! Exchange the contents of this document with those of another.
+    /*!
+        \param other Another document.
+        \note Constant complexity.
+        \see GenericValue::Swap
+    */
+    GenericDocument& Swap(GenericDocument& rhs) RAPIDJSON_NOEXCEPT {
+        using std::swap;
+        ValueType::Swap(rhs);
+        stack_.Swap(rhs.stack_);
+        swap(allocator_, rhs.allocator_);
+        swap(ownAllocator_, rhs.ownAllocator_);
+        swap(parseResult_, rhs.parseResult_);
+        return *this;
+    }
+
     //!@name Parse from stream
     //!@{
 

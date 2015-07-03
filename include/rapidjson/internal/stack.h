@@ -15,6 +15,8 @@
 #ifndef RAPIDJSON_INTERNAL_STACK_H_
 #define RAPIDJSON_INTERNAL_STACK_H_
 
+#include <algorithm> // std::swap
+
 #include "../rapidjson.h"
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -80,6 +82,17 @@ public:
         return *this;
     }
 #endif
+
+    void Swap(Stack& rhs) RAPIDJSON_NOEXCEPT {
+        using std::swap;
+
+        swap(allocator_, rhs.allocator_);
+        swap(ownAllocator_, rhs.ownAllocator_);
+        swap(stack_, rhs.stack_);
+        swap(stackTop_, rhs.stackTop_);
+        swap(stackEnd_, rhs.stackEnd_);
+        swap(initialCapacity_, rhs.initialCapacity_);
+    }
 
     void Clear() { stackTop_ = stack_; }
 
