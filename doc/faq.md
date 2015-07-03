@@ -114,7 +114,11 @@
 
 * Alternatively, use equivalent of the [C++ swap with temporary idiom](https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Clear-and-minimize):
    ```
-   d.Swap(Value(kObjectType).Move()) 
+   Value(kObjectType).Swap(d);
+   ```
+   or equivalent, but sightly longer to type:
+   ```
+   d.Swap(Value(kObjectType).Move()); 
    ```
 
 ## Document/Value (DOM)
