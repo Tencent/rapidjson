@@ -174,7 +174,7 @@ $(document).ready(function(){initNavTree('md_doc_faq.html','');});
 <li><p class="startli">Call one of the <code>SetXXX()</code> methods - they call destructor which deallocates DOM data:</p>
 <p class="startli">``` Document d; ... d.SetObject(); // clear and minimize ```</p>
 </li>
-<li>Alternatively, use equivalent of the <a href="https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Clear-and-minimize">C++ swap with temporary idiom</a>: ``` d.Swap(Value(kObjectType).Move()) ```</li>
+<li>Alternatively, use equivalent of the <a href="https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Clear-and-minimize">C++ swap with temporary idiom</a>: ``` Value(kObjectType).Swap(d); ``` or equivalent, but sightly longer to type: ``` d.Swap(Value(kObjectType).Move()); ```</li>
 </ul>
 <h2>Document/Value (DOM)</h2>
 <ol type="1">
