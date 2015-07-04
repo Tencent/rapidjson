@@ -174,6 +174,9 @@ typedef <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue<
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
+<tr class="memitem:aa52c3016961f25ecd989d82839bce4e5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_document.html#aa52c3016961f25ecd989d82839bce4e5">GenericDocument</a> (<a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> type, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> *allocator=0, size_t stackCapacity=kDefaultStackCapacity, StackAllocator *stackAllocator=0)</td></tr>
+<tr class="memdesc:aa52c3016961f25ecd989d82839bce4e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#aa52c3016961f25ecd989d82839bce4e5">更多...</a><br /></td></tr>
+<tr class="separator:aa52c3016961f25ecd989d82839bce4e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a82b27e7b228eb46a23f99720063ab4fb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_document.html#a82b27e7b228eb46a23f99720063ab4fb">GenericDocument</a> (<a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> *allocator=0, size_t stackCapacity=kDefaultStackCapacity, StackAllocator *stackAllocator=0)</td></tr>
 <tr class="memdesc:a82b27e7b228eb46a23f99720063ab4fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a82b27e7b228eb46a23f99720063ab4fb">更多...</a><br /></td></tr>
 <tr class="separator:a82b27e7b228eb46a23f99720063ab4fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -658,6 +661,65 @@ class rapidjson::GenericDocument&lt; Encoding, Allocator, StackAllocator &gt;</h
 </dl>
 <dl class="section warning"><dt>警告</dt><dd>Although <a class="el" href="classrapidjson_1_1_generic_document.html" title="A document for parsing JSON text as DOM. ">GenericDocument</a> inherits from <a class="el" href="classrapidjson_1_1_generic_value.html" title="Represents a JSON value. Use Value for UTF8 encoding and default allocator. ">GenericValue</a>, the API does <b>not</b> provide any virtual functions, especially no virtual destructor. To avoid memory leaks, do not <code>delete</code> a <a class="el" href="classrapidjson_1_1_generic_document.html" title="A document for parsing JSON text as DOM. ">GenericDocument</a> object via a pointer to a <a class="el" href="classrapidjson_1_1_generic_value.html" title="Represents a JSON value. Use Value for UTF8 encoding and default allocator. ">GenericValue</a>. </dd></dl>
 </div><h2 class="groupheader">构造及析构函数说明</h2>
+<a class="anchor" id="aa52c3016961f25ecd989d82839bce4e5"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Encoding, typename Allocator = MemoryPoolAllocator&lt;&gt;, typename StackAllocator = CrtAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrapidjson_1_1_generic_document.html">rapidjson::GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a>, StackAllocator &gt;::<a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>&#160;</td>
+          <td class="paramname"><em>type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> *&#160;</td>
+          <td class="paramname"><em>allocator</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>stackCapacity</em> = <code>kDefaultStackCapacity</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">StackAllocator *&#160;</td>
+          <td class="paramname"><em>stackAllocator</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor. </p>
+<p>Creates an empty document of specified type. </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">type</td><td>Mandatory type of object to create. </td></tr>
+    <tr><td class="paramname">allocator</td><td>Optional allocator for allocating memory. </td></tr>
+    <tr><td class="paramname">stackCapacity</td><td>Optional initial capacity of stack in bytes. </td></tr>
+    <tr><td class="paramname">stackAllocator</td><td>Optional allocator for allocating memory for stack. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a82b27e7b228eb46a23f99720063ab4fb"></a>
 <div class="memitem">
 <div class="memproto">
@@ -699,7 +761,7 @@ template&lt;typename Encoding, typename Allocator = MemoryPoolAllocator&lt;&gt;,
 </div><div class="memdoc">
 
 <p>Constructor. </p>
-<dl class="params"><dt>参数</dt><dd>
+<p>Creates an empty document which type is Null. </p><dl class="params"><dt>参数</dt><dd>
   <table class="params">
     <tr><td class="paramname">allocator</td><td>Optional allocator for allocating memory. </td></tr>
     <tr><td class="paramname">stackCapacity</td><td>Optional initial capacity of stack in bytes. </td></tr>

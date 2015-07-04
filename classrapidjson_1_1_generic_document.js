@@ -3,6 +3,7 @@ var classrapidjson_1_1_generic_document =
     [ "AllocatorType", "classrapidjson_1_1_generic_document.html#a4c85243a28c9dcf2d1357da00fcaa773", null ],
     [ "Ch", "classrapidjson_1_1_generic_document.html#a8367a827588dd91d02e21ef945bec9f5", null ],
     [ "ValueType", "classrapidjson_1_1_generic_document.html#a41bbec044c421e870a9d355075d741bc", null ],
+    [ "GenericDocument", "classrapidjson_1_1_generic_document.html#aa52c3016961f25ecd989d82839bce4e5", null ],
     [ "GenericDocument", "classrapidjson_1_1_generic_document.html#a82b27e7b228eb46a23f99720063ab4fb", null ],
     [ "~GenericDocument", "classrapidjson_1_1_generic_document.html#a09b1953e1610e182ddcf050b346957b2", null ],
     [ "GetAllocator", "classrapidjson_1_1_generic_document.html#ad92c6cd025d411258d1f2ad890e2ee3f", null ],

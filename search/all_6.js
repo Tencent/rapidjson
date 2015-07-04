@@ -1,7 +1,7 @@
 var searchData=
 [
   ['genericdocument',['GenericDocument',['../classrapidjson_1_1_generic_document.html',1,'rapidjson']]],
-  ['genericdocument',['GenericDocument',['../classrapidjson_1_1_generic_document.html#a82b27e7b228eb46a23f99720063ab4fb',1,'rapidjson::GenericDocument']]],
+  ['genericdocument',['GenericDocument',['../classrapidjson_1_1_generic_document.html#aa52c3016961f25ecd989d82839bce4e5',1,'rapidjson::GenericDocument::GenericDocument(Type type, Allocator *allocator=0, size_t stackCapacity=kDefaultStackCapacity, StackAllocator *stackAllocator=0)'],['../classrapidjson_1_1_generic_document.html#a82b27e7b228eb46a23f99720063ab4fb',1,'rapidjson::GenericDocument::GenericDocument(Allocator *allocator=0, size_t stackCapacity=kDefaultStackCapacity, StackAllocator *stackAllocator=0)']]],
   ['genericinsitustringstream',['GenericInsituStringStream',['../structrapidjson_1_1_generic_insitu_string_stream.html',1,'rapidjson']]],
   ['genericmember',['GenericMember',['../structrapidjson_1_1_generic_member.html',1,'rapidjson']]],
   ['genericmemberiterator',['GenericMemberIterator',['../classrapidjson_1_1_generic_member_iterator.html',1,'rapidjson']]],
