@@ -188,15 +188,15 @@ protected:
     static const size_t kDefaultLevelDepth = 32;
 
     bool WriteNull()  {
-        os_->Put('n'); os_->Put('u'); os_->Put('l'); os_->Put('l'); return true;
+        os_->Reserve(4); os_->Put('n'); os_->Put('u'); os_->Put('l'); os_->Put('l'); return true;
     }
 
     bool WriteBool(bool b)  {
         if (b) {
-            os_->Put('t'); os_->Put('r'); os_->Put('u'); os_->Put('e');
+            os_->Reserve(4); os_->Put('t'); os_->Put('r'); os_->Put('u'); os_->Put('e');
         }
         else {
-            os_->Put('f'); os_->Put('a'); os_->Put('l'); os_->Put('s'); os_->Put('e');
+            os_->Reserve(5); os_->Put('f'); os_->Put('a'); os_->Put('l'); os_->Put('s'); os_->Put('e');
         }
         return true;
     }
@@ -204,6 +204,7 @@ protected:
     bool WriteInt(int i) {
         char buffer[11];
         const char* end = internal::i32toa(i, buffer);
+        os_->Reserve(end - buffer);
         for (const char* p = buffer; p != end; ++p)
             os_->Put(*p);
         return true;
@@ -212,6 +213,7 @@ protected:
     bool WriteUint(unsigned u) {
         char buffer[10];
         const char* end = internal::u32toa(u, buffer);
+        os_->Reserve(end - buffer);
         for (const char* p = buffer; p != end; ++p)
             os_->Put(*p);
         return true;
@@ -220,6 +222,7 @@ protected:
     bool WriteInt64(int64_t i64) {
         char buffer[21];
         const char* end = internal::i64toa(i64, buffer);
+        os_->Reserve(end - buffer);
         for (const char* p = buffer; p != end; ++p)
             os_->Put(*p);
         return true;
@@ -228,6 +231,7 @@ protected:
     bool WriteUint64(uint64_t u64) {
         char buffer[20];
         char* end = internal::u64toa(u64, buffer);
+        os_->Reserve(end - buffer);
         for (char* p = buffer; p != end; ++p)
             os_->Put(*p);
         return true;
@@ -236,6 +240,7 @@ protected:
     bool WriteDouble(double d) {
         char buffer[25];
         char* end = internal::dtoa(d, buffer);
+        os_->Reserve(end - buffer);
         for (char* p = buffer; p != end; ++p)
             os_->Put(*p);
         return true;
@@ -255,6 +260,7 @@ protected:
 #undef Z16
         };
 
+        os_->Reserve(length + 2);
         os_->Put('\"');
         GenericStringStream<SourceEncoding> is(str);
         while (is.Tell() < length) {

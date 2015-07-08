@@ -218,6 +218,7 @@ TEST(Document, Swap) {
 struct OutputStringStream : public std::ostringstream {
     typedef char Ch;
 
+    void Reserve(size_t) { }
     void Put(char c) {
         put(c);
     }

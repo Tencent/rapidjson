@@ -524,6 +524,9 @@ concept Stream {
     //! \return The begin writer pointer.
     Ch* PutBegin();
 
+    //! Prepare for writing 'size' characters.
+    void Reserve(size_t size);
+
     //! Write a character.
     void Put(Ch c);
 
@@ -577,6 +580,7 @@ struct GenericStringStream {
     Ch Take() { return *src_++; }
     size_t Tell() const { return static_cast<size_t>(src_ - head_); }
 
+    void Reserve(size_t) { }
     Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
     void Put(Ch) { RAPIDJSON_ASSERT(false); }
     void Flush() { RAPIDJSON_ASSERT(false); }
@@ -613,6 +617,7 @@ struct GenericInsituStringStream {
     size_t Tell() { return static_cast<size_t>(src_ - head_); }
 
     // Write
+    void Reserve(size_t) { }
     void Put(Ch c) { RAPIDJSON_ASSERT(dst_ != 0); *dst_++ = c; }
 
     Ch* PutBegin() { return dst_ = src_; }

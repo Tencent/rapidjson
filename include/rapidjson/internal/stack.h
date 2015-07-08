@@ -129,7 +129,6 @@ public:
     size_t GetSize() const { return static_cast<size_t>(stackTop_ - stack_); }
     size_t GetCapacity() const { return static_cast<size_t>(stackEnd_ - stack_); }
 
-private:
     template<typename T>
     void Expand(size_t count) {
         // Only expand the capacity if the current stack exists. Otherwise just create a stack with initial capacity.
@@ -149,6 +148,7 @@ private:
         Resize(newCapacity);
     }
 
+private:
     void Resize(size_t newCapacity) {
         const size_t size = GetSize();  // Backup the current size
         stack_ = (char*)allocator_->Realloc(stack_, GetCapacity(), newCapacity);

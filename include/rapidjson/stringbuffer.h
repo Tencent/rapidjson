@@ -47,6 +47,7 @@ public:
     }
 #endif
 
+    void Reserve(size_t) { }
     void Put(Ch c) { *stack_.template Push<Ch>() = c; }
     void Flush() {}
 

@@ -39,6 +39,7 @@ struct GenericMemoryBuffer {
 
     GenericMemoryBuffer(Allocator* allocator = 0, size_t capacity = kDefaultCapacity) : stack_(allocator, capacity) {}
 
+	void Reserve(size_t size) { stack_.Expand(size); }
     void Put(Ch c) { *stack_.template Push<Ch>() = c; }
     void Flush() {}
 
