@@ -24,6 +24,7 @@
 #if defined(_MSC_VER) && defined(_M_AMD64)
 #include <intrin.h>
 #pragma intrinsic(_BitScanReverse64)
+#pragma intrinsic(_umul128)
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
