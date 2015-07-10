@@ -1810,12 +1810,11 @@ public:
         \see GenericValue::Swap
     */
     GenericDocument& Swap(GenericDocument& rhs) RAPIDJSON_NOEXCEPT {
-        using std::swap;
         ValueType::Swap(rhs);
         stack_.Swap(rhs.stack_);
-        swap(allocator_, rhs.allocator_);
-        swap(ownAllocator_, rhs.ownAllocator_);
-        swap(parseResult_, rhs.parseResult_);
+        internal::Swap(allocator_, rhs.allocator_);
+        internal::Swap(ownAllocator_, rhs.ownAllocator_);
+        internal::Swap(parseResult_, rhs.parseResult_);
         return *this;
     }
 
