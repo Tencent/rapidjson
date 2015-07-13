@@ -272,6 +272,12 @@ TEST(Value, Swap) {
     EXPECT_TRUE(v1.IsObject());
     EXPECT_TRUE(v2.IsInt());
     EXPECT_EQ(1234, v2.GetInt());
+
+    // testing std::swap compatibility
+    using std::swap;
+    swap(v1, v2);
+    EXPECT_TRUE(v1.IsInt());
+    EXPECT_TRUE(v2.IsObject());
 }
 
 TEST(Value, Null) {

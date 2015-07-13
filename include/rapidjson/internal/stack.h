@@ -16,6 +16,7 @@
 #define RAPIDJSON_INTERNAL_STACK_H_
 
 #include "../rapidjson.h"
+#include "swap.h"
 
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
@@ -80,6 +81,15 @@ public:
         return *this;
     }
 #endif
+
+    void Swap(Stack& rhs) RAPIDJSON_NOEXCEPT {
+        internal::Swap(allocator_, rhs.allocator_);
+        internal::Swap(ownAllocator_, rhs.ownAllocator_);
+        internal::Swap(stack_, rhs.stack_);
+        internal::Swap(stackTop_, rhs.stackTop_);
+        internal::Swap(stackEnd_, rhs.stackEnd_);
+        internal::Swap(initialCapacity_, rhs.initialCapacity_);
+    }
 
     void Clear() { stackTop_ = stack_; }
 

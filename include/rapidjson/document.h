@@ -660,6 +660,20 @@ public:
         return *this;
     }
 
+    //! free-standing swap function helper
+    /*!
+        Helper function to enable support for common swap implementation pattern based on \c std::swap:
+        \code
+        void swap(MyClass& a, MyClass& b) {
+            using std::swap;
+            swap(a.value, b.value);
+            // ...
+        }
+        \endcode
+        \see Swap()
+     */
+    friend inline void swap(GenericValue& a, GenericValue& b) RAPIDJSON_NOEXCEPT { a.Swap(b); }
+
     //! Prepare Value for move semantics
     /*! \return *this */
     GenericValue& Move() RAPIDJSON_NOEXCEPT { return *this; }
@@ -1817,6 +1831,35 @@ public:
         return *this;
     }
 #endif
+
+    //! Exchange the contents of this document with those of another.
+    /*!
+        \param other Another document.
+        \note Constant complexity.
+        \see GenericValue::Swap
+    */
+    GenericDocument& Swap(GenericDocument& rhs) RAPIDJSON_NOEXCEPT {
+        ValueType::Swap(rhs);
+        stack_.Swap(rhs.stack_);
+        internal::Swap(allocator_, rhs.allocator_);
+        internal::Swap(ownAllocator_, rhs.ownAllocator_);
+        internal::Swap(parseResult_, rhs.parseResult_);
+        return *this;
+    }
+
+    //! free-standing swap function helper
+    /*!
+        Helper function to enable support for common swap implementation pattern based on \c std::swap:
+        \code
+        void swap(MyClass& a, MyClass& b) {
+            using std::swap;
+            swap(a.doc, b.doc);
+            // ...
+        }
+        \endcode
+        \see Swap()
+     */
+    friend inline void swap(GenericDocument& a, GenericDocument& b) RAPIDJSON_NOEXCEPT { a.Swap(b); }
 
     //!@name Parse from stream
     //!@{
