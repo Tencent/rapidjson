@@ -1,5 +1,8 @@
 var NAVTREEINDEX3 =
 {
+"structrapidjson_1_1_generic_pointer_1_1_token.html#ad866d674dbddf9690ad571b65e968600":[11,0,0,17,0,1],
+"structrapidjson_1_1_generic_string_ref.html":[11,0,0,20],
+"structrapidjson_1_1_generic_string_ref.html#a001276ee57cbcbd3c14449045c71e994":[11,0,0,20,9],
 "structrapidjson_1_1_generic_string_ref.html#a29cf407c6aa2313f13dff78d6ce02687":[11,0,0,20,2],
 "structrapidjson_1_1_generic_string_ref.html#a578c51ab574a50a9c760b9da7c7562f2":[11,0,0,20,6],
 "structrapidjson_1_1_generic_string_ref.html#aa2a8eccae3d7eb14c30bc21afb7d6fba":[11,0,0,20,0],
@@ -63,5 +66,6 @@ var NAVTREEINDEX3 =
 "structrapidjson_1_1_writer_1_1_level.html#a5920547a092cb88db486d75064ffe50e":[11,0,0,41,0,1],
 "structrapidjson_1_1_writer_1_1_level.html#a8e478a154f4230449e441ce986c49970":[11,0,0,41,0,2],
 "structrapidjson_1_1_writer_1_1_level.html#ac557fb8846daeb3415eb54d4a43cb43f":[11,0,0,41,0,0],
+"swap_8h_source.html":[12,0,0,0,1,10],
 "writer_8h_source.html":[12,0,0,0,15]
 };

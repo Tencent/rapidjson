@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.7"/>
-<title>RapidJSON: include/rapidjson/internal 目录参考</title>
+<title>RapidJSON: include/rapidjson/internal/swap.h 源文件</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -66,7 +66,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('dir_5167ae66a3a40cb9e5e46c75b7477e81.html','');});
+$(document).ready(function(){initNavTree('swap_8h_source.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -85,42 +85,53 @@ $(document).ready(function(){initNavTree('dir_5167ae66a3a40cb9e5e46c75b7477e81.h
 
 <div class="header">
   <div class="headertitle">
-<div class="title">internal 目录参考</div>  </div>
+<div class="title">swap.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="files"></a>
-文件</h2></td></tr>
-<tr class="memitem:biginteger_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><b>biginteger.h</b> <a href="biginteger_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:diyfp_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><b>diyfp.h</b> <a href="diyfp_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:dtoa_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><b>dtoa.h</b> <a href="dtoa_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ieee754_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><b>ieee754.h</b> <a href="ieee754_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:itoa_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><b>itoa.h</b> <a href="itoa_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:meta_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><b>meta.h</b> <a href="meta_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:pow10_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><b>pow10.h</b> <a href="pow10_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:stack_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><b>stack.h</b> <a href="stack_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:strfunc_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><b>strfunc.h</b> <a href="strfunc_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:strtod_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><b>strtod.h</b> <a href="strtod_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:swap_8h"><td class="memItemLeft" align="right" valign="top">文件 &#160;</td><td class="memItemRight" valign="bottom"><b>swap.h</b> <a href="swap_8h_source.html">[代码]</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
-</div><!-- contents -->
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Tencent is pleased to support the open source community by making RapidJSON available.</span></div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.</span></div>
+<div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">// Licensed under the MIT License (the &quot;License&quot;); you may not use this file except</span></div>
+<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="comment">// in compliance with the License. You may obtain a copy of the License at</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="comment">// http://opensource.org/licenses/MIT</span></div>
+<div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="comment">//</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment">// Unless required by applicable law or agreed to in writing, software distributed</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment">// under the License is distributed on an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="comment">// CONDITIONS OF ANY KIND, either express or implied. See the License for the</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="comment">// specific language governing permissions and limitations under the License.</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#ifndef RAPIDJSON_INTERNAL_SWAP_H_</span></div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="preprocessor">#define RAPIDJSON_INTERNAL_SWAP_H_</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &quot;../rapidjson.h&quot;</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;RAPIDJSON_NAMESPACE_BEGIN</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">namespace </span>internal {</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="comment">//! Custom swap() to avoid dependency on C++ &lt;algorith&gt; header</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="comment"></span><span class="comment">/*! \tparam T Type of the arguments to swap, should be instantiated with primitive C++ types only.</span></div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="comment">    \note This has the same semantics as std::swap().</span></div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="comment">*/</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> Swap(T&amp; a, T&amp; b) RAPIDJSON_NOEXCEPT {</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    T tmp = a;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        a = b;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;        b = tmp;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;}</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;} <span class="comment">// namespace internal</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;RAPIDJSON_NAMESPACE_END</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_INTERNAL_SWAP_H_</span></div>
+</div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="dir_2e777bb85672ca91d8484c1593fb1d89.html">include</a></li><li class="navelem"><a class="el" href="dir_0b07344794a20f8375311f92e90cd9a3.html">rapidjson</a></li><li class="navelem"><a class="el" href="dir_5167ae66a3a40cb9e5e46c75b7477e81.html">internal</a></li>
+    <li class="navelem"><a class="el" href="dir_2e777bb85672ca91d8484c1593fb1d89.html">include</a></li><li class="navelem"><a class="el" href="dir_0b07344794a20f8375311f92e90cd9a3.html">rapidjson</a></li><li class="navelem"><a class="el" href="dir_5167ae66a3a40cb9e5e46c75b7477e81.html">internal</a></li><li class="navelem"><b>swap.h</b></li>
   </ul>
 </div>
 <script type="text/javascript">

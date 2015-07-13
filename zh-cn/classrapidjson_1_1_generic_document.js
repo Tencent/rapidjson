@@ -19,6 +19,8 @@ var classrapidjson_1_1_generic_document =
     [ "ParseStream", "classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85", null ],
     [ "ParseStream", "classrapidjson_1_1_generic_document.html#ae4ee7d86b8c906c83dbe15e57eb6ac6a", null ],
     [ "ParseStream", "classrapidjson_1_1_generic_document.html#acf96a3c7fd61486d049c701b1fe5d414", null ],
+    [ "Swap", "classrapidjson_1_1_generic_document.html#abf1cbab989b856f9d260787b2575750b", null ],
     [ "GenericReader", "classrapidjson_1_1_generic_document.html#a22b985b0f7f78ef254a566655ee0550f", null ],
-    [ "GenericValue", "classrapidjson_1_1_generic_document.html#a899449e1a645b5e377af059fb61113d8", null ]
+    [ "GenericValue", "classrapidjson_1_1_generic_document.html#a899449e1a645b5e377af059fb61113d8", null ],
+    [ "swap", "classrapidjson_1_1_generic_document.html#a0d63efcc43758ac3aed77e868233369d", null ]
 ];

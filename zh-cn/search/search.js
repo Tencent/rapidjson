@@ -16,7 +16,7 @@ var indexSectionsWithContent =
   6: "acdegimnprsv",
   7: "ptu",
   8: "k",
-  9: "o",
+  9: "os",
   10: "r",
   11: "r",
   12: "disåæç"

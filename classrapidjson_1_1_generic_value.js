@@ -133,5 +133,6 @@ var classrapidjson_1_1_generic_value =
     [ "GenericDocument", "classrapidjson_1_1_generic_value.html#ab05bc9e52e201a2867ea5bac141ee1ae", null ],
     [ "GenericValue", "classrapidjson_1_1_generic_value.html#a899449e1a645b5e377af059fb61113d8", null ],
     [ "operator!=", "classrapidjson_1_1_generic_value.html#ae08898bef949f217f0e5d28e19f05992", null ],
-    [ "operator==", "classrapidjson_1_1_generic_value.html#aaa465706fda1e1ef4513ce877e0b4b69", null ]
+    [ "operator==", "classrapidjson_1_1_generic_value.html#aaa465706fda1e1ef4513ce877e0b4b69", null ],
+    [ "swap", "classrapidjson_1_1_generic_value.html#a58ecce8a34fc029039b8079de246bdaa", null ]
 ];
