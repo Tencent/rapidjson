@@ -19,6 +19,7 @@
 #include "rapidjson/encodedstream.h"
 #include "rapidjson/stringbuffer.h"
 #include <sstream>
+#include <algorithm>
 
 using namespace rapidjson;
 
@@ -223,6 +224,17 @@ TEST(Document, Swap) {
     Document().Swap(d2);
     EXPECT_TRUE(d2.IsNull());
     EXPECT_NE(&d2.GetAllocator(), &a);
+
+    // testing std::swap compatibility
+    d1.SetBool(true);
+    using std::swap;
+    swap(d1, d2);
+    EXPECT_TRUE(d1.IsNull());
+    EXPECT_TRUE(d2.IsTrue());
+
+    swap(o, d2);
+    EXPECT_TRUE(o.IsTrue());
+    EXPECT_TRUE(d2.IsArray());
 }
 
 

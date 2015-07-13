@@ -660,6 +660,8 @@ public:
         return *this;
     }
 
+    friend inline void swap(GenericValue& a, GenericValue& b) RAPIDJSON_NOEXCEPT { a.Swap(b); }
+
     //! Prepare Value for move semantics
     /*! \return *this */
     GenericValue& Move() RAPIDJSON_NOEXCEPT { return *this; }
@@ -1817,6 +1819,8 @@ public:
         internal::Swap(parseResult_, rhs.parseResult_);
         return *this;
     }
+
+    friend inline void swap(GenericDocument& a, GenericDocument& b) RAPIDJSON_NOEXCEPT { a.Swap(b); }
 
     //!@name Parse from stream
     //!@{
