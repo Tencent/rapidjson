@@ -69,6 +69,9 @@ RAPIDJSON_NAMESPACE_BEGIN
 template <typename Encoding, typename Allocator>
 class GenericValue;
 
+template <typename Encoding, typename Allocator, typename StackAllocator>
+class GenericDocument;
+
 //! Name-value pair in a JSON object value.
 /*!
     This class was internal to GenericValue. It used to be a inner struct.
@@ -445,6 +448,16 @@ public:
 private:
     //! Copy constructor is not permitted.
     GenericValue(const GenericValue& rhs);
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    //! Moving from a GenericDocument is not permitted.
+    template <typename StackAllocator>
+    GenericValue(GenericDocument<Encoding,Allocator,StackAllocator>&& rhs);
+
+    //! Move assignment from a GenericDocument is not permitted.
+    template <typename StackAllocator>
+    GenericValue& operator=(GenericDocument<Encoding,Allocator,StackAllocator>&& rhs);
+#endif
 
 public:
 
@@ -1792,7 +1805,7 @@ public:
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     //! Move constructor in C++11
     GenericDocument(GenericDocument&& rhs) RAPIDJSON_NOEXCEPT
-        : ValueType(std::move(rhs)),
+        : ValueType(std::forward<ValueType>(rhs)), // explicit cast to avoid prohibited move from Document
           allocator_(rhs.allocator_),
           ownAllocator_(rhs.ownAllocator_),
           stack_(std::move(rhs.stack_)),
