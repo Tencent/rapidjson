@@ -470,7 +470,7 @@ For removing members, there are several choices:
 `MemberIterator RemoveMember(MemberIterator)` uses a "move-last" trick to achieve constant time complexity. Basically the member at iterator is destructed, and then the last element is moved to that position. So the order of the remaining members are changed.
 
 ## Deep Copy Value {#DeepCopyValue}
-If we really need to copy a DOM tree, we can use two APIs for deep copy: constructor with allocator, and `CopyFrom()`.
+If we really need to copy a DOM tree, we can use two APIs for deep copy: constructor with allocator, and `CopyFrom()`.The value object was allocated memory from the allocator of the docment. So it is only valid in the scope where the document object is available.
 
 ~~~~~~~~~~cpp
 Document d;
