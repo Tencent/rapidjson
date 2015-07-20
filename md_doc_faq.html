@@ -168,14 +168,19 @@ $(document).ready(function(){initNavTree('md_doc_faq.html','');});
 <li><p class="startli">Why not just using <code>double</code> to represent JSON number?</p>
 <p class="startli">Some applications use 64-bit unsigned/signed integers. And these integers cannot be converted into <code>double</code> without loss of precision. So the parsers detects whether a JSON number is convertible to different types of integers and/or <code>double</code>.</p>
 </li>
-<li>How to clear-and-minimize a document or value?</li>
-</ol>
-<ul>
-<li><p class="startli">Call one of the <code>SetXXX()</code> methods - they call destructor which deallocates DOM data:</p>
+<li><p class="startli">How to clear-and-minimize a document or value?</p>
+<p class="startli">Call one of the <code>SetXXX()</code> methods - they call destructor which deallocates DOM data:</p>
 <p class="startli">``` Document d; ... d.SetObject(); // clear and minimize ```</p>
+<p class="startli">Alternatively, use equivalent of the <a href="https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Clear-and-minimize">C++ swap with temporary idiom</a>: ``` Value(kObjectType).Swap(d); ``` or equivalent, but sightly longer to type: ``` d.Swap(Value(kObjectType).Move()); ```</p>
 </li>
-<li>Alternatively, use equivalent of the <a href="https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Clear-and-minimize">C++ swap with temporary idiom</a>: ``` Value(kObjectType).Swap(d); ``` or equivalent, but sightly longer to type: ``` d.Swap(Value(kObjectType).Move()); ```</li>
-</ul>
+<li><p class="startli">How to insert a document node into another document?</p>
+<p class="startli">Let's take the following two DOM trees represented as JSON documents: ``` Document person; person.Parse("{\"person":{"name":{"first":"Adam","last":"Thomas"}}}");</p>
+<p class="startli">Document address; address.Parse("{\"address":{"city":"Moscow","street":"Quiet"}}"); ``<code> Let's assume we want to merge them in such way that the whole</code>address<code>document becomes a node of the</code>person<code>: </code>`` { "person": { "name": { "first": "Adam", "last": "Thomas" }, "address": { "city": "Moscow", "street": "Quiet" } } } ```</p>
+<p class="startli">The most important requirement to take care of document and value life-cycle as well as consistent memory managent using the right allocator during the value transfer.</p>
+<p class="startli">Simple yet most efficient way to achieve that is to modify the <code>address</code> definition above to initialize it with allocator of the <code>person</code> document, then we just add the root nenber of the value: ``` Documnet address(person.GetAllocator()); ... person["person"].AddMember("address", address["address"], person.GetAllocator()); ``<code> Alternatively, if we don't want to explicitly refer to the root value of</code>address<code>by name, we can refer to it via iterator: </code>`` auto addressRoot = address.MemberBegin(); person["person"].AddMember(addressRoot-&gt;name, addressRoot-&gt;value, person.GetAllocator()); ```</p>
+<p class="startli">Second way is to deep-clone the value from the address document: ``` Value addressValue = Value(address["address"], person.GetAllocator()); person["person"].AddMember("address", addressValue, person.GetAllocator()); ```</p>
+</li>
+</ol>
 <h2>Document/Value (DOM)</h2>
 <ol type="1">
 <li><p class="startli">What is move semantics? Why?</p>
