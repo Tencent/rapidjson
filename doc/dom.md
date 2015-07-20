@@ -124,7 +124,7 @@ And the `InputStream` is type of input stream.
 
 ## Parse Error {#ParseError}
 
-When the parse processing succeeded, the `Document` contains the parse results. When there is an error, the original DOM is *unchanged*. And the error state of parsing can be obtained by `bool HasParseError()`,  `ParseErrorCode GetParseError()` and `size_t GetParseOffet()`.
+When the parse processing succeeded, the `Document` contains the parse results. When there is an error, the original DOM is *unchanged*. And the error state of parsing can be obtained by `bool HasParseError()`,  `ParseErrorCode GetParseError()` and `size_t GetParseOffset()`.
 
 Parse Error Code                            | Description
 --------------------------------------------|---------------------------------------------------
@@ -159,8 +159,8 @@ Here shows an example of parse error handling.
 Document d;
 if (d.Parse(json).HasParseError()) {
     fprintf(stderr, "\nError(offset %u): %s\n", 
-        (unsigned)reader.GetErrorOffset(),
-        GetParseError_En(reader.GetParseErrorCode()));
+        (unsigned)d.GetErrorOffset(),
+        GetParseError_En(d.GetParseErrorCode()));
     // ...
 }
 ~~~~~~~~~~
