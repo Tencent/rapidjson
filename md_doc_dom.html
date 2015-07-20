@@ -210,7 +210,7 @@ Parsing</h1>
 <p>And the <code>InputStream</code> is type of input stream.</p>
 <h2><a class="anchor" id="ParseError"></a>
 Parse Error</h2>
-<p>When the parse processing succeeded, the <code>Document</code> contains the parse results. When there is an error, the original DOM is <em>unchanged</em>. And the error state of parsing can be obtained by <code>bool HasParseError()</code>, <code>ParseErrorCode GetParseError()</code> and <code>size_t GetParseOffet()</code>.</p>
+<p>When the parse processing succeeded, the <code>Document</code> contains the parse results. When there is an error, the original DOM is <em>unchanged</em>. And the error state of parsing can be obtained by <code>bool HasParseError()</code>, <code>ParseErrorCode GetParseError()</code> and <code>size_t GetParseOffset()</code>.</p>
 <table class="doxtable">
 <tr>
 <th>Parse Error Code </th><th>Description  </th></tr>
@@ -257,8 +257,8 @@ Parse Error</h2>
 <div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
 <div class="line"><span class="keywordflow">if</span> (d.Parse(json).HasParseError()) {</div>
 <div class="line">    fprintf(stderr, <span class="stringliteral">&quot;\nError(offset %u): %s\n&quot;</span>, </div>
-<div class="line">        (<span class="keywordtype">unsigned</span>)reader.GetErrorOffset(),</div>
-<div class="line">        <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(reader.GetParseErrorCode()));</div>
+<div class="line">        (<span class="keywordtype">unsigned</span>)d.GetErrorOffset(),</div>
+<div class="line">        <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(d.GetParseErrorCode()));</div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><h2><a class="anchor" id="InSituParsing"></a>
