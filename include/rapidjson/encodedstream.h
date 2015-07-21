@@ -146,7 +146,7 @@ private:
         if (!c)
             return;
 
-        unsigned bom = c[0] | (c[1] << 8) | (c[2] << 16) | (c[3] << 24);
+        unsigned bom = static_cast<unsigned>(c[0] | (c[1] << 8) | (c[2] << 16) | (c[3] << 24));
         hasBOM_ = false;
         if (bom == 0xFFFE0000)                  { type_ = kUTF32BE; hasBOM_ = true; is_->Take(); is_->Take(); is_->Take(); is_->Take(); }
         else if (bom == 0x0000FEFF)             { type_ = kUTF32LE; hasBOM_ = true; is_->Take(); is_->Take(); is_->Take(); is_->Take(); }
