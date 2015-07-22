@@ -233,8 +233,8 @@ inline DiyFp GetCachedPower(int e, int* K) {
 }
 
 inline DiyFp GetCachedPower10(int exp, int *outExp) {
-     unsigned index = (exp + 348) / 8;
-     *outExp = -348 + index * 8;
+     unsigned index = (static_cast<unsigned>(exp) + 348u) / 8u;
+     *outExp = -348 + static_cast<int>(index) * 8;
      return GetCachedPowerByIndex(index);
  }
 

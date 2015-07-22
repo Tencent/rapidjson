@@ -95,13 +95,13 @@ inline int CheckWithinHalfULP(double b, const BigInteger& d, int dExp) {
     hS_Exp2 -= common_Exp2;
 
     BigInteger dS = d;
-    dS.MultiplyPow5(dS_Exp5) <<= dS_Exp2;
+    dS.MultiplyPow5(static_cast<unsigned>(dS_Exp5)) <<= static_cast<unsigned>(dS_Exp2);
 
     BigInteger bS(bInt);
-    bS.MultiplyPow5(bS_Exp5) <<= bS_Exp2;
+    bS.MultiplyPow5(static_cast<unsigned>(bS_Exp5)) <<= static_cast<unsigned>(bS_Exp2);
 
     BigInteger hS(1);
-    hS.MultiplyPow5(hS_Exp5) <<= hS_Exp2;
+    hS.MultiplyPow5(static_cast<unsigned>(hS_Exp5)) <<= static_cast<unsigned>(hS_Exp2);
 
     BigInteger delta(0);
     dS.Difference(bS, &delta);
@@ -134,7 +134,7 @@ inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosit
         if (significand  >  RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) ||
             (significand == RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) && decimals[i] > '5'))
             break;
-        significand = significand * 10 + (decimals[i] - '0');
+        significand = significand * 10u + static_cast<unsigned>(decimals[i] - '0');
     }
     
     if (i < length && decimals[i] >= '5') // Rounding
@@ -163,10 +163,10 @@ inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosit
             DiyFp(RAPIDJSON_UINT64_C2(0xf4240000, 00000000), -44),  // 10^6
             DiyFp(RAPIDJSON_UINT64_C2(0x98968000, 00000000), -40)   // 10^7
         };
-        int adjustment = dExp - actualExp - 1;
+        int  adjustment = dExp - actualExp - 1;
         RAPIDJSON_ASSERT(adjustment >= 0 && adjustment < 7);
         v = v * kPow10[adjustment];
-        if (length + adjustment > 19) // has more digits than decimal digits in 64-bit
+        if (length + static_cast<unsigned>(adjustment)> 19u) // has more digits than decimal digits in 64-bit
             error += kUlp / 2;
     }
 
@@ -184,14 +184,14 @@ inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosit
         unsigned scaleExp = (precisionSize + kUlpShift) - 63;
         v.f >>= scaleExp;
         v.e += scaleExp; 
-        error = (error >> scaleExp) + 1 + kUlp;
+        error = (error >> scaleExp) + 1 + static_cast<int>(kUlp);
         precisionSize -= scaleExp;
     }
 
-    DiyFp rounded(v.f >> precisionSize, v.e + precisionSize);
+    DiyFp rounded(v.f >> precisionSize, v.e + static_cast<int>(precisionSize));
     const uint64_t precisionBits = (v.f & ((uint64_t(1) << precisionSize) - 1)) * kUlp;
     const uint64_t halfWay = (uint64_t(1) << (precisionSize - 1)) * kUlp;
-    if (precisionBits >= halfWay + error) {
+    if (precisionBits >= halfWay + static_cast<unsigned>(error)) {
         rounded.f++;
         if (rounded.f & (DiyFp::kDpHiddenBit << 1)) { // rounding overflows mantissa (issue #340)
             rounded.f >>= 1;
@@ -201,7 +201,7 @@ inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosit
 
     *result = rounded.ToDouble();
 
-    return halfWay - error >= precisionBits || precisionBits >= halfWay + error;
+    return halfWay - static_cast<unsigned>(error) >= precisionBits || precisionBits >= halfWay + static_cast<unsigned>(error);
 }
 
 inline double StrtodBigInteger(double approx, const char* decimals, size_t length, size_t decimalPosition, int exp) {
@@ -249,7 +249,7 @@ inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t 
     if ((int)length > kMaxDecimalDigit) {
         int delta = (int(length) - kMaxDecimalDigit);
         exp += delta;
-        decimalPosition -= delta;
+        decimalPosition -= static_cast<unsigned>(delta);
         length = kMaxDecimalDigit;
     }
 

@@ -231,7 +231,7 @@ private:
         uint64_t r = 0;
         for (const char* p = begin; p != end; ++p) {
             RAPIDJSON_ASSERT(*p >= '0' && *p <= '9');
-            r = r * 10 + (*p - '0');
+            r = r * 10u + (unsigned)(*p - '0');
         }
         return r;
     }
