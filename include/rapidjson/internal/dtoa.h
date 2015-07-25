@@ -101,7 +101,7 @@ inline void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buff
         kappa--;
         if (p2 < delta) {
             *K += kappa;
-            GrisuRound(buffer, *len, delta, p2, one.f, wp_w.f * kPow10[-kappa]);
+            GrisuRound(buffer, *len, delta, p2, one.f, wp_w.f * kPow10[-static_cast<int>(kappa)]);
             return;
         }
     }
