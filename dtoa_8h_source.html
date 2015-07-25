@@ -191,7 +191,7 @@ $(document).ready(function(){initNavTree('dtoa_8h_source.html','');});
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        kappa--;</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <span class="keywordflow">if</span> (p2 &lt; delta) {</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;            *K += kappa;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;            GrisuRound(buffer, *len, delta, p2, one.f, wp_w.f * kPow10[-kappa]);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;            GrisuRound(buffer, *len, delta, p2, one.f, wp_w.f * kPow10[-static_cast&lt;int&gt;(kappa)]);</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;            <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;        }</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    }</div>
