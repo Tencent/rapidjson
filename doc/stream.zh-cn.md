@@ -320,7 +320,7 @@ std::stringstream ss(json);
 IStreamWrapper is(ss);
 
 Document d;
-d.Parse(is);
+d.ParseStream(is);
 ~~~~~~~~~~
 
 但要注意，由于标准库的内部开销问，此实现的性能可能不如RapidJSON的内存／文件流。
