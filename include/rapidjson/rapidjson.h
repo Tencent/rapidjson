@@ -566,12 +566,12 @@ inline void PutN(Stream& stream, Ch c, size_t n) {
 
 //! Read-only string stream.
 /*! \note implements Stream concept
- */
+*/
 template <typename Encoding>
 struct GenericStringStream {
     typedef typename Encoding::Ch Ch;
 
-GenericStringStream(const Ch *src) : src_(src), head_(src) {}
+    GenericStringStream(const Ch *src) : src_(src), head_(src) {}
 
     Ch Peek() const { return *src_; }
     Ch Take() { return *src_++; }
