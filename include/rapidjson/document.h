@@ -1972,6 +1972,37 @@ public:
     GenericDocument& Parse(const Ch* str) {
         return Parse<kParseDefaultFlags>(str);
     }
+
+    //! Parse JSON text from a read-only string (with Encoding conversion)
+    /*! \tparam parseFlags Combination of \ref ParseFlag (must not contain \ref kParseInsituFlag).
+        \tparam SourceEncoding Transcoding from input Encoding
+        \param str Read-only string to be parsed.
+        \param len The length of the string.
+    */
+    template <unsigned parseFlags, typename SourceEncoding>
+    GenericDocument& Parse(const Ch* str, size_t len) {
+        RAPIDJSON_ASSERT(!(parseFlags & kParseInsituFlag));
+        GenericStringStream<SourceEncoding> s(str, len);
+        return ParseStream<parseFlags, SourceEncoding>(s);
+    }
+
+    //! Parse JSON text from a read-only string with length
+    /*! \tparam parseFlags Combination of \ref ParseFlag (must not contain \ref kParseInsituFlag).
+        \param str Read-only string to be parsed.
+        \param len The length of the string.
+    */
+    template <unsigned parseFlags>
+    GenericDocument& Parse(const Ch* str, size_t len) {
+        return Parse<parseFlags, Encoding>(str, len);
+    }
+
+    //! Parse JSON text from a read-only string with length (with \ref kParseDefaultFlags)
+    /*! \param str Read-only string to be parsed.
+        \param len The length of the string.
+    */
+    GenericDocument& Parse(const Ch* str, size_t len) {
+        return Parse<kParseDefaultFlags>(str, len);
+    }
     //!@}
 
     //!@name Handling parse errors
