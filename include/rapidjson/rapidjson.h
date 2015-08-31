@@ -566,12 +566,12 @@ inline void PutN(Stream& stream, Ch c, size_t n) {
 
 //! Read-only string stream.
 /*! \note implements Stream concept
-*/
+ */
 template <typename Encoding>
 struct GenericStringStream {
     typedef typename Encoding::Ch Ch;
 
-    GenericStringStream(const Ch *src) : src_(src), head_(src) {}
+GenericStringStream(const Ch *src) : src_(src), head_(src) {}
 
     Ch Peek() const { return *src_; }
     Ch Take() { return *src_++; }
@@ -593,6 +593,45 @@ struct StreamTraits<GenericStringStream<Encoding> > {
 
 //! String stream with UTF8 encoding.
 typedef GenericStringStream<UTF8<> > StringStream;
+
+///////////////////////////////////////////////////////////////////////////////
+// BufferStream
+
+//! Read-only buffer stream.
+/*! \note implements Stream concept
+*/
+template <typename Encoding>
+struct GenericBufferStream {
+    typedef typename Encoding::Ch Ch;
+
+    GenericBufferStream(const Ch *src, size_t len) : 
+        src_(src), length_(len), idx_(0) {}
+
+    Ch Peek() const { return src_[idx_]; }
+    Ch Take() {
+        if (idx_ != length_) return src_[idx_++];
+        else return '\0';
+    }
+    size_t Tell() const { return idx_; }
+
+    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
+    void Put(Ch) { RAPIDJSON_ASSERT(false); }
+    void Flush() { RAPIDJSON_ASSERT(false); }
+    size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
+
+    const Ch* src_;     //!< Original buffer pointer.
+    size_t length_;     //!< The length of buffer.
+    size_t idx_;        //!< Current read position.
+};
+
+template <typename Encoding>
+struct StreamTraits<GenericBufferStream<Encoding> > {
+    enum { copyOptimization = 1 };
+};
+
+//! Buffer stream with UTF8 encoding.
+typedef GenericBufferStream<UTF8<> > BufferStream;
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // InsituStringStream
