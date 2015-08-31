@@ -1982,7 +1982,7 @@ public:
     template <unsigned parseFlags, typename SourceEncoding>
     GenericDocument& Parse(const Ch* str, size_t len) {
         RAPIDJSON_ASSERT(!(parseFlags & kParseInsituFlag));
-        GenericStringStream<SourceEncoding> s(str, len);
+        GenericBufferStream<SourceEncoding> s(str, len);
         return ParseStream<parseFlags, SourceEncoding>(s);
     }
 
