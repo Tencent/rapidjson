@@ -121,7 +121,7 @@ $(document).ready(function(){initNavTree('group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_
 <tr class="memitem:gaba2445f582142cf918e74c2d22d1aa07"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaba2445f582142cf918e74c2d22d1aa07">RAPIDJSON_ENDIAN</a></td></tr>
 <tr class="memdesc:gaba2445f582142cf918e74c2d22d1aa07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Endianness of the machine.  <a href="#gaba2445f582142cf918e74c2d22d1aa07">更多...</a><br /></td></tr>
 <tr class="separator:gaba2445f582142cf918e74c2d22d1aa07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga583915242504c7fdb36e826f02f76242"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a>(x)&#160;&#160;&#160;((x + 3u) &amp; ~3u)</td></tr>
+<tr class="memitem:ga583915242504c7fdb36e826f02f76242"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a>(x)&#160;&#160;&#160;(((x) + 3u) &amp; ~3u)</td></tr>
 <tr class="memdesc:ga583915242504c7fdb36e826f02f76242"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data alignment of the machine.  <a href="#ga583915242504c7fdb36e826f02f76242">更多...</a><br /></td></tr>
 <tr class="separator:ga583915242504c7fdb36e826f02f76242"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0ccf72f3ebc4b3306ab669f95ca5c64b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga0ccf72f3ebc4b3306ab669f95ca5c64b">RAPIDJSON_SIMD</a></td></tr>
@@ -155,7 +155,7 @@ $(document).ready(function(){initNavTree('group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">x</td><td>)</td>
-          <td>&#160;&#160;&#160;((x + 3u) &amp; ~3u)</td>
+          <td>&#160;&#160;&#160;(((x) + 3u) &amp; ~3u)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -167,7 +167,7 @@ $(document).ready(function(){initNavTree('group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_
   </table>
   </dd>
 </dl>
-<p>Some machines require strict data alignment. Currently the default uses 4 bytes alignment. User can customize by defining the RAPIDJSON_ALIGN function macro., </p>
+<p>Some machines require strict data alignment. Currently the default uses 4 bytes alignment. User can customize by defining the RAPIDJSON_ALIGN function macro. </p>
 
 </div>
 </div>

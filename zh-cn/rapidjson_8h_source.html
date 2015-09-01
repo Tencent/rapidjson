@@ -328,13 +328,13 @@ $(document).ready(function(){initNavTree('rapidjson_8h_source.html','');});
 <div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;<span class="comment">    \param x pointer to align</span></div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;<span class="comment">    Some machines require strict data alignment. Currently the default uses 4 bytes</span></div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;<span class="comment">    alignment. User can customize by defining the RAPIDJSON_ALIGN function macro.,</span></div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;<span class="comment">    alignment. User can customize by defining the RAPIDJSON_ALIGN function macro.</span></div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;<span class="preprocessor">#ifndef RAPIDJSON_ALIGN</span></div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;<span class="preprocessor">#if RAPIDJSON_64BIT == 1</span></div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;<span class="preprocessor">#define RAPIDJSON_ALIGN(x) ((x + 7u) &amp; ~7u)</span></div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;<span class="preprocessor">#define RAPIDJSON_ALIGN(x) (((x) + static_cast&lt;uint64_t&gt;(7u)) &amp; ~static_cast&lt;uint64_t&gt;(7u))</span></div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00247"></a><span class="lineno"><a class="line" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">  247</a></span>&#160;<span class="preprocessor">#define RAPIDJSON_ALIGN(x) ((x + 3u) &amp; ~3u)</span></div>
+<div class="line"><a name="l00247"></a><span class="lineno"><a class="line" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">  247</a></span>&#160;<span class="preprocessor">#define RAPIDJSON_ALIGN(x) (((x) + 3u) &amp; ~3u)</span></div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;<span class="comment"></span></div>
