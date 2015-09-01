@@ -19,6 +19,7 @@
 #include "rapidjson/encodedstream.h"
 #include "rapidjson/stringbuffer.h"
 #include <sstream>
+#include <algorithm>
 
 using namespace rapidjson;
 
@@ -202,7 +203,8 @@ TEST(Document, Swap) {
     o.SetObject().AddMember("a", 1, a);
 
     // Swap between Document and Value
-    d1.Swap(o);
+    // d1.Swap(o); // doesn't compile
+    o.Swap(d1);
     EXPECT_TRUE(d1.IsObject());
     EXPECT_TRUE(o.IsArray());
 
@@ -212,7 +214,29 @@ TEST(Document, Swap) {
     d1.Swap(d2);
     EXPECT_TRUE(d1.IsArray());
     EXPECT_TRUE(d2.IsObject());
+    EXPECT_EQ(&d2.GetAllocator(), &a);
+
+    // reset value
+    Value().Swap(d1);
+    EXPECT_TRUE(d1.IsNull());
+
+    // reset document, including allocator
+    Document().Swap(d2);
+    EXPECT_TRUE(d2.IsNull());
+    EXPECT_NE(&d2.GetAllocator(), &a);
+
+    // testing std::swap compatibility
+    d1.SetBool(true);
+    using std::swap;
+    swap(d1, d2);
+    EXPECT_TRUE(d1.IsNull());
+    EXPECT_TRUE(d2.IsTrue());
+
+    swap(o, d2);
+    EXPECT_TRUE(o.IsTrue());
+    EXPECT_TRUE(d2.IsArray());
 }
+
 
 // This should be slow due to assignment in inner-loop.
 struct OutputStringStream : public std::ostringstream {

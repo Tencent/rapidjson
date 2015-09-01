@@ -62,7 +62,7 @@ inline void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buff
     const DiyFp wp_w = Mp - W;
     uint32_t p1 = static_cast<uint32_t>(Mp.f >> -one.e);
     uint64_t p2 = Mp.f & (one.f - 1);
-    int kappa = CountDecimalDigit32(p1); // kappa in [0, 9]
+    unsigned kappa = CountDecimalDigit32(p1); // kappa in [0, 9]
     *len = 0;
 
     while (kappa > 0) {
@@ -101,7 +101,7 @@ inline void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buff
         kappa--;
         if (p2 < delta) {
             *K += kappa;
-            GrisuRound(buffer, *len, delta, p2, one.f, wp_w.f * kPow10[-kappa]);
+            GrisuRound(buffer, *len, delta, p2, one.f, wp_w.f * kPow10[-static_cast<int>(kappa)]);
             return;
         }
     }
@@ -158,14 +158,14 @@ inline char* Prettify(char* buffer, int length, int k) {
     }
     else if (0 < kk && kk <= 21) {
         // 1234e-2 -> 12.34
-        std::memmove(&buffer[kk + 1], &buffer[kk], length - kk);
+        std::memmove(&buffer[kk + 1], &buffer[kk], static_cast<size_t>(length - kk));
         buffer[kk] = '.';
         return &buffer[length + 1];
     }
     else if (-6 < kk && kk <= 0) {
         // 1234e-6 -> 0.001234
         const int offset = 2 - kk;
-        std::memmove(&buffer[offset], &buffer[0], length);
+        std::memmove(&buffer[offset], &buffer[0], static_cast<size_t>(length));
         buffer[0] = '0';
         buffer[1] = '.';
         for (int i = 2; i < offset; i++)
@@ -179,7 +179,7 @@ inline char* Prettify(char* buffer, int length, int k) {
     }
     else {
         // 1234e30 -> 1.234e33
-        std::memmove(&buffer[2], &buffer[1], length - 1);
+        std::memmove(&buffer[2], &buffer[1], static_cast<size_t>(length - 1));
         buffer[1] = '.';
         buffer[length + 1] = 'e';
         return WriteExponent(kk - 1, &buffer[0 + length + 2]);

@@ -124,7 +124,7 @@ GenericDocument& GenericDocument::Parse(const Ch* str);
 
 ## 解析错误 {#ParseError}
 
-当解析过程顺利完成，`Document`便会含有解析结果。当过程出现错误，原来的DOM会*维持不便*。可使用`bool HasParseError()`、`ParseErrorCode GetParseError()`及`size_t GetParseOffet()`获取解析的错误状态。
+当解析过程顺利完成，`Document`便会含有解析结果。当过程出现错误，原来的DOM会*维持不便*。可使用`bool HasParseError()`、`ParseErrorCode GetParseError()`及`size_t GetParseOffset()`获取解析的错误状态。
 
 解析错误代号                                | 描述
 --------------------------------------------|---------------------------------------------------
@@ -159,8 +159,8 @@ GenericDocument& GenericDocument::Parse(const Ch* str);
 Document d;
 if (d.Parse(json).HasParseError()) {
     fprintf(stderr, "\nError(offset %u): %s\n", 
-        (unsigned)reader.GetErrorOffset(),
-        GetParseError_En(reader.GetParseErrorCode()));
+        (unsigned)d.GetErrorOffset(),
+        GetParseError_En(d.GetParseErrorCode()));
     // ...
 }
 ~~~~~~~~~~
