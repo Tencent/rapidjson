@@ -57,7 +57,11 @@ public:
 
     void Flush() {
         if (current_ != buffer_) {
-            fwrite(buffer_, 1, static_cast<size_t>(current_ - buffer_), fp_);
+            size_t result = fwrite(buffer_, 1, static_cast<size_t>(current_ - buffer_), fp_);
+            if (result < static_cast<size_t>(current_ - buffer_)) {
+                // failure deliberately ignored at this time
+                // added to avoid warn_unused_result build errors
+            }
             current_ = buffer_;
         }
     }
