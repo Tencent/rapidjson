@@ -1989,7 +1989,10 @@ public:
     //!@}
 
     //! Get the allocator of this document.
-    Allocator& GetAllocator() { return *allocator_; }
+    Allocator& GetAllocator() {
+        RAPIDJSON_ASSERT(allocator_);
+        return *allocator_;
+    }
 
     //! Get the capacity of stack in bytes.
     size_t GetStackCapacity() const { return stack_.GetCapacity(); }
