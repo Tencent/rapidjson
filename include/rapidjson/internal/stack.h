@@ -134,6 +134,10 @@ public:
     template<typename T>
     T* Bottom() { return (T*)stack_; }
 
+    bool HasAllocator() const {
+        return allocator_ != 0;
+    }
+
     Allocator& GetAllocator() {
         RAPIDJSON_ASSERT(allocator_);
         return *allocator_;
