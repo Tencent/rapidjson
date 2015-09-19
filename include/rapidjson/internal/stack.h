@@ -134,7 +134,14 @@ public:
     template<typename T>
     T* Bottom() { return (T*)stack_; }
 
-    Allocator& GetAllocator() { return *allocator_; }
+    bool HasAllocator() const {
+        return allocator_ != 0;
+    }
+
+    Allocator& GetAllocator() {
+        RAPIDJSON_ASSERT(allocator_);
+        return *allocator_;
+    }
     bool Empty() const { return stackTop_ == stack_; }
     size_t GetSize() const { return static_cast<size_t>(stackTop_ - stack_); }
     size_t GetCapacity() const { return static_cast<size_t>(stackEnd_ - stack_); }

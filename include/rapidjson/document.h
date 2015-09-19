@@ -1887,7 +1887,8 @@ public:
     template <unsigned parseFlags, typename SourceEncoding, typename InputStream>
     GenericDocument& ParseStream(InputStream& is) {
         ValueType::SetNull(); // Remove existing root if exist
-        GenericReader<SourceEncoding, Encoding, StackAllocator> reader(&stack_.GetAllocator());
+        GenericReader<SourceEncoding, Encoding, StackAllocator> reader(
+            stack_.HasAllocator() ? &stack_.GetAllocator() : 0);
         ClearStackOnExit scope(*this);
         parseResult_ = reader.template Parse<parseFlags>(is, *this);
         if (parseResult_) {
@@ -1989,7 +1990,10 @@ public:
     //!@}
 
     //! Get the allocator of this document.
-    Allocator& GetAllocator() { return *allocator_; }
+    Allocator& GetAllocator() {
+        RAPIDJSON_ASSERT(allocator_);
+        return *allocator_;
+    }
 
     //! Get the capacity of stack in bytes.
     size_t GetStackCapacity() const { return stack_.GetCapacity(); }
