@@ -1,5 +1,5 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
-// 
+//
 // Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
@@ -7,9 +7,9 @@
 //
 // http://opensource.org/licenses/MIT
 //
-// Unless required by applicable law or agreed to in writing, software distributed 
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// Unless required by applicable law or agreed to in writing, software distributed
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
 #ifndef UNITTEST_H_
@@ -62,6 +62,22 @@ inline Ch* StrDup(const Ch* str) {
     return buffer;
 }
 
+inline char* TempFileName(char *filename) {
+#if _MSC_VER
+    filename = tmpnam(filename);
+    // For Visual Studio, tmpnam() adds a backslash in front. Remove it.
+    if (filename[0] == '\\')
+        for (int i = 0; filename[i] != '\0'; i++)
+            filename[i] = filename[i + 1];
+#else
+    // turn off this warning because there are no alternatives
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    filename = tmpnam(filename);
+#pragma GCC diagnostic error "-Wdeprecated-declarations"
+#endif
+    return filename;
+}
+
 inline FILE* TempFile(char *filename) {
 #if _MSC_VER
     filename = tmpnam(filename);
@@ -70,7 +86,7 @@ inline FILE* TempFile(char *filename) {
     if (filename[0] == '\\')
         for (int i = 0; filename[i] != '\0'; i++)
             filename[i] = filename[i + 1];
-        
+
     return fopen(filename, "wb");
 #else
     strcpy(filename, "/tmp/fileXXXXXX");
