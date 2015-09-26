@@ -13,7 +13,6 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
-
 #ifndef RAPIDJSON_WRITERBASE_H_
 #define RAPIDJSON_WRITERBASE_H_
 
@@ -23,6 +22,11 @@
 #include "internal/dtoa.h"
 #include "internal/itoa.h"
 #include "stringbuffer.h"
+
+#if __cplusplus >= 201103
+#include "autoblocks.h"
+#endif
+
 #include <new>      // placement new
 
 #if RAPIDJSON_HAS_STDSTRING
@@ -302,6 +306,30 @@ public:
         return ret;
     }
 
+#if __cplusplus >= 201103
+    /// \brief Start a JSON object and return an automatic scoper for this writer.
+    ///
+    /// When the returned value goes out of scope the
+    /// object will be closed.
+    ObjectBlock<Derived> Object()
+    {
+      return std::move(ObjectBlock<Derived>(*DerivedThis()));
+    }
+
+    /// \brief Write a key then start a JSON object and return an automatic scoper for this writer.
+    ///
+    /// \param key - the key to give the Object
+    ///
+    /// When the returned value goes out of scope the
+    /// object will be closed.
+    template<class STRING>
+    ObjectBlock<Derived> Object(const String &key)
+    {
+      Key(key);
+      return std::move(ObjectBlock<Derived>(*DerivedThis()));
+    }
+#endif
+
     /// \brief Start a JSON array on the stream.
     ///
     ///  \return Whether it is succeed.
@@ -326,51 +354,75 @@ public:
         return ret;
     }
 
+#if __cplusplus >= 201103
+    /// \brief Start a JSON array and return an automatic scoper for this writer.
+    ///
+    /// When the returned value goes out of scope the
+    /// array will be closed.
+    ArrayBlock<Derived> Array()
+    {
+      return std::move(ArrayBlock<Derived>(*DerivedThis()));
+    }
+
+    /// \brief Write a key then start a JSON array and return an automatic scoper for this writer.
+    ///
+    /// \param key - the key to give the Array
+    ///
+    /// When the returned value goes out of scope the
+    /// array will be closed.
+    template<class STRING>
+    ArrayBlock<Derived> Array(const String &key)
+    {
+      Key(key);
+      return std::move(ArrayBlock<Derived>(*DerivedThis()));
+    }
+#endif
+
     /// Functor to output the given key with a bool value
     template<typename STRING>
-    bool operator()(STRING &key, bool b)
+    bool operator()(const STRING &key, bool b)
     {
       return Key(key) and Bool(b);
     }
 
     /// Functor to output the given key with an int value
     template<typename STRING>
-    bool operator()(STRING &key, int i)
+    bool operator()(const STRING &key, int i)
     {
       return Key(key) and Int(i);
     }
 
     /// Functor to output the given key with an unsigned int value
     template<typename STRING>
-    bool operator()(STRING &key, unsigned u)
+    bool operator()(const STRING &key, unsigned u)
     {
       return Key(key) and Uint(u);
     }
 
     /// Functor to output the given key with an 64 bit int value
     template<typename STRING>
-    bool operator()(STRING &key, int64_t i64)
+    bool operator()(const STRING &key, int64_t i64)
     {
       return Key(key) and Int64(i64);
     }
 
     /// Functor to output the given key with an 64 bit int value.
     template<typename STRING>
-    bool operator()(STRING &key, uint64_t u64)
+    bool operator()(const STRING &key, uint64_t u64)
     {
       return Key(key) and Uint64(u64);
     }
 
     /// Functor to output the given key with an double value.
     template<typename STRING>
-    bool operator()(STRING &key, double d)
+    bool operator()(const STRING &key, double d)
     {
       return Key(key) and Double(d);
     }
 
     /// Functor to output the given key with a string.
     template<typename STRING1, typename STRING2>
-    bool operator()(STRING1 &key, STRING2 &s)
+    bool operator()(const STRING1 &key, const STRING2 &s)
     {
       return Key(key) and String(s);
     }
@@ -519,16 +571,22 @@ protected:
     bool WriteStartArray()  { os_->Put('['); return true; }
     bool WriteEndArray()    { os_->Put(']'); return true; }
 
+    /// Downcast this to derived
+    Derived *DerivedThis()
+    {
+      return static_cast<Derived *>(this);
+    }
+
     // Calls the Prefix function in derived version of this.
     void DerivedPrefix(Type type)
     {
-      static_cast<Derived *>(this)->Prefix(type);
+      DerivedThis()->Prefix(type);
     }
 
     // Calls the Prefix function in derived version of this.
     void DerivedCloseBlock()
     {
-      static_cast<Derived *>(this)->CloseBlock();
+      DerivedThis()->CloseBlock();
     }
 
     OutputStream* os_;
