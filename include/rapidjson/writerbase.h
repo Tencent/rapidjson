@@ -72,12 +72,24 @@ public:
         \param levelDepth Initial capacity of stack.
     */
     explicit
-    WriterBase(OutputStream& os, StackAllocator* stackAllocator = 0, size_t levelDepth = kDefaultLevelDepth) :
-        os_(&os), level_stack_(stackAllocator, levelDepth * sizeof(Level)), hasRoot_(false) {}
+    WriterBase(OutputStream& os, StackAllocator* stackAllocator = 0, size_t levelDepth = kDefaultLevelDepth)
+      : os_(&os)
+      , level_stack_(stackAllocator, levelDepth * sizeof(Level))
+      , hasRoot_(false)
+#ifdef RAPIDJSON_UNIT_TEST_STRING_LITERALS
+      , lastStringCallWasToStringLiteralVersion_(false)
+#endif
+  {}
 
     explicit
-    WriterBase(StackAllocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) :
-        os_(0), level_stack_(allocator, levelDepth * sizeof(Level)), hasRoot_(false) {}
+    WriterBase(StackAllocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth)
+      : os_(0)
+      , level_stack_(allocator, levelDepth * sizeof(Level))
+      , hasRoot_(false)
+#ifdef RAPIDJSON_UNIT_TEST_STRING_LITERALS
+      , lastStringCallWasToStringLiteralVersion_(false)
+#endif
+  {}
 
     //! Reset the writer with a new stream.
     /*!
@@ -175,18 +187,39 @@ public:
     /// \brief Output the given value string of the given length value to the JSON stream.
     ///
     ///  \return Whether it is succeed.
-    bool String(const Ch* str, SizeType length, bool copy = false)
+    inline bool String(const Ch* str, SizeType length, bool copy = false)
     {
       (void)copy;
       DerivedPrefix(kStringType);
       return WriteString(str, length);
     }
 
-    /// \brief Output the given string to the JSON stream. The length is determined by strlen.
+    /// \brief Output the given string literal as a key to the JSON stream.
+    ///
+    /// This overload will capture string literals, which have thier length known at
+    /// compile time.
     ///
     ///  \return Whether it is succeed.
-    bool String(const Ch* str)
+    template<typename CHAR, int N>
+    inline bool String(const CHAR(&str)[N])
     {
+#ifdef RAPIDJSON_UNIT_TEST_STRING_LITERALS
+      lastStringCallWasToStringLiteralVersion_ = true;
+#endif
+      return String(str, N-1);
+    }
+
+    /// \brief Output the given string as a key to the JSON stream. The length is determined by strlen.
+    ///
+    /// The template magic is needed to differentiate it from the string literal version.
+    ///
+    ///  \return Whether it is succeed.
+    template<typename CHAR>
+    inline bool String(const CHAR* const& str)
+    {
+#ifdef RAPIDJSON_UNIT_TEST_STRING_LITERALS
+      lastStringCallWasToStringLiteralVersion_ = false;
+#endif
       return String(str, internal::StrLen(str));
     }
 
@@ -194,8 +227,11 @@ public:
     /// \brief Output the given string to the JSON stream. The length is determined by strlen.
     ///
     ///  \return Whether it is succeed.
-    bool String(const std::string &str)
+    inline bool String(const std::string &str)
     {
+#ifdef RAPIDJSON_UNIT_TEST_STRING_LITERALS
+      lastStringCallWasToStringLiteralVersion_ = false;
+#endif
       return String(str.data(), str.size());
     }
 #endif
@@ -208,13 +244,38 @@ public:
       return String(str, length, copy);
     }
 
-    /// \brief Output the given key to the JSON stream. The length is determined by strlen.
+    /// \brief Output the given string literal as a key to the JSON stream.
+    ///
+    /// This overload will capture string literals, which have thier length known at
+    /// compile time.
     ///
     ///  \return Whether it is succeed.
-    bool Key(const Ch* str)
+    template<typename T, int N>
+    bool Key(const T(&str)[N])
+    {
+      return String(str, N-1);
+    }
+
+    /// \brief Output the given string as a key to the JSON stream. The length is determined by strlen.
+    ///
+    /// The template magic is needed to differentiate it from the string literal version.
+    ///
+    ///  \return Whether it is succeed.
+    template<typename T>
+    bool Key(const T* const& str)
     {
       return Key(str, internal::StrLen(str));
     }
+
+#if RAPIDJSON_HAS_STDSTRING
+    /// \brief Output the given string as a key to the JSON stream. The length is determined by strlen.
+    ///
+    ///  \return Whether it is succeed.
+    bool Key(const std::string &str)
+    {
+      return String(str.data(), str.size());
+    }
+#endif
 
     /// \brief Start a JSON compound object on the stream.
     ///
@@ -264,6 +325,62 @@ public:
             os_->Flush();
         return ret;
     }
+
+    /// Functor to output the given key with a bool value
+    template<typename STRING>
+    bool operator()(STRING &key, bool b)
+    {
+      return Key(key) and Bool(b);
+    }
+
+    /// Functor to output the given key with an int value
+    template<typename STRING>
+    bool operator()(STRING &key, int i)
+    {
+      return Key(key) and Int(i);
+    }
+
+    /// Functor to output the given key with an unsigned int value
+    template<typename STRING>
+    bool operator()(STRING &key, unsigned u)
+    {
+      return Key(key) and Uint(u);
+    }
+
+    /// Functor to output the given key with an 64 bit int value
+    template<typename STRING>
+    bool operator()(STRING &key, int64_t i64)
+    {
+      return Key(key) and Int64(i64);
+    }
+
+    /// Functor to output the given key with an 64 bit int value.
+    template<typename STRING>
+    bool operator()(STRING &key, uint64_t u64)
+    {
+      return Key(key) and Uint64(u64);
+    }
+
+    /// Functor to output the given key with an double value.
+    template<typename STRING>
+    bool operator()(STRING &key, double d)
+    {
+      return Key(key) and Double(d);
+    }
+
+    /// Functor to output the given key with a string.
+    template<typename STRING1, typename STRING2>
+    bool operator()(STRING1 &key, STRING2 &s)
+    {
+      return Key(key) and String(s);
+    }
+
+#ifdef RAPIDJSON_UNIT_TEST_STRING_LITERALS
+    bool lastStringCallWasToStringLiteralVersion() const
+    {
+      return lastStringCallWasToStringLiteralVersion_;
+    }
+#endif
 
 protected:
     //! Information for each nested level
@@ -402,10 +519,6 @@ protected:
     bool WriteStartArray()  { os_->Put('['); return true; }
     bool WriteEndArray()    { os_->Put(']'); return true; }
 
-    OutputStream* os_;
-    internal::Stack<StackAllocator> level_stack_;
-    bool hasRoot_;
-
     // Calls the Prefix function in derived version of this.
     void DerivedPrefix(Type type)
     {
@@ -417,6 +530,14 @@ protected:
     {
       static_cast<Derived *>(this)->CloseBlock();
     }
+
+    OutputStream* os_;
+    internal::Stack<StackAllocator> level_stack_;
+    bool hasRoot_;
+
+#ifdef RAPIDJSON_UNIT_TEST_STRING_LITERALS
+    bool lastStringCallWasToStringLiteralVersion_;
+#endif
 
 private:
     // Prohibit copy constructor & assignment operator.

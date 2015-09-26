@@ -1,5 +1,5 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
-// 
+//
 // Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
@@ -7,9 +7,9 @@
 //
 // http://opensource.org/licenses/MIT
 //
-// Unless required by applicable law or agreed to in writing, software distributed 
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// Unless required by applicable law or agreed to in writing, software distributed
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
 #include "unittest.h"
@@ -164,15 +164,15 @@ private:
 
 TEST(Writer, OStreamWrapper) {
     StringStream s("{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3], \"u64\": 1234567890123456789, \"i64\":-1234567890123456789 } ");
-    
+
     std::stringstream ss;
     OStreamWrapper os(ss);
-    
+
     Writer<OStreamWrapper> writer(os);
 
     Reader reader;
     reader.Parse<0>(s, writer);
-    
+
     std::string actual = ss.str();
     EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3],\"u64\":1234567890123456789,\"i64\":-1234567890123456789}", actual.c_str());
 }
@@ -366,7 +366,7 @@ TEST(Writer, InvalidEventSequence) {
         EXPECT_FALSE(writer.IsComplete());
     }
 
-    // { 1: 
+    // { 1:
     {
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
@@ -374,4 +374,29 @@ TEST(Writer, InvalidEventSequence) {
         EXPECT_THROW(writer.Int(1), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
+}
+
+template<class T>
+void TestKeyValueFunctorType(const T &value, const char *expectedValue)
+{
+  StringBuffer buffer;
+  Writer<StringBuffer> writer(buffer);
+  writer.StartObject();
+  writer("Key", value);
+  writer.EndObject();
+  EXPECT_TRUE(writer.IsComplete());
+  EXPECT_STREQ(expectedValue, buffer.GetString());
+}
+
+TEST(Writer, KeyValueFunctors) {
+  TestKeyValueFunctorType(false, "{\"Key\":false}");
+  TestKeyValueFunctorType(true, "{\"Key\":true}");
+  TestKeyValueFunctorType(-2, "{\"Key\":-2}");
+  TestKeyValueFunctorType(200u, "{\"Key\":200}");
+  TestKeyValueFunctorType(int64_t(-1234567890123456789), "{\"Key\":-1234567890123456789}");
+  TestKeyValueFunctorType(uint64_t(1234567890123456789), "{\"Key\":1234567890123456789}");
+  TestKeyValueFunctorType("banana", "{\"Key\":\"banana\"}");
+  const char *pomegranate = "pomegranate";
+  TestKeyValueFunctorType(pomegranate, "{\"Key\":\"pomegranate\"}");
+  TestKeyValueFunctorType(1.7976931348623157e308, "{\"Key\":1.7976931348623157e308}");
 }

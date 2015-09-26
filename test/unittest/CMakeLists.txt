@@ -1,5 +1,5 @@
 set(UNITTEST_SOURCES
-	allocatorstest.cpp
+  allocatorstest.cpp
     bigintegertest.cpp
     documenttest.cpp
     encodedstreamtest.cpp
@@ -11,12 +11,13 @@ set(UNITTEST_SOURCES
     pointertest.cpp
     prettywritertest.cpp
     readertest.cpp
-	simdtest.cpp
+  simdtest.cpp
     stringbuffertest.cpp
     strtodtest.cpp
     unittest.cpp
     valuetest.cpp
-    writertest.cpp)
+    writertest.cpp
+    writerstringliteraltest.cpp)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default -Wfloat-equal")
