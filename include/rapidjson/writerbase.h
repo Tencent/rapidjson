@@ -325,8 +325,7 @@ public:
     template<class STRING>
     ObjectBlock<Derived> Object(const String &key)
     {
-      Key(key);
-      return std::move(ObjectBlock<Derived>(*DerivedThis()));
+      return std::move(ObjectBlock<Derived>(*DerivedThis(), key));
     }
 #endif
 
@@ -373,8 +372,7 @@ public:
     template<class STRING>
     ArrayBlock<Derived> Array(const String &key)
     {
-      Key(key);
-      return std::move(ArrayBlock<Derived>(*DerivedThis()));
+      return std::move(ArrayBlock<Derived>(*DerivedThis(), key));
     }
 #endif
 
