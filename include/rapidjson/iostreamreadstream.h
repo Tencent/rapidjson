@@ -41,14 +41,17 @@ public:
   {
     // given the Reader Concept, we need to explicitly check for eof and return '\0'
     int v = istream_.peek();
-    if(v == std::char_traits<wchar_t>::eof()) return '\0';
+    if(v == std::char_traits<Ch>::eof()) return '\0';
     return v;
   }
 
   //! Extract the next character in the stream.
   Ch Take()
   {
-    return (istream_.eof()) ? '\0' : istream_.get();
+    // given the Reader Concept, we need to explicitly check for eof and return '\0'
+    int v = istream_.get();
+    if(v == std::char_traits<Ch>::eof()) return '\0';
+    return v;
   }
 
   //! Where are we in the stream.
