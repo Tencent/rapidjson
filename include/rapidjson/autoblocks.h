@@ -32,6 +32,19 @@ public :
     writer_->StartObject();
   }
 
+  /// \brief Constructor,
+  ///
+  /// \param writer the writer to open the object on and eventually close.
+  /// \param key the key to give this object
+  template <class T>
+  ObjectBlock(WRITER &writer,
+              const T &key)
+    : writer_(&w)
+  {
+    writer.Key(key);
+    writer_->StartObject();
+  }
+
 #if __cplusplus >= 201103
   /// \brief Move copy constructor, used by helper function in BaseWriter
   ///
@@ -69,6 +82,19 @@ public :
   ArrayBlock(WRITER &w)
     : writer_(&w)
   {
+    writer_->StartArray();
+  }
+
+  /// \brief Constructor,
+  ///
+  /// \param writer the writer to open the array on and eventually close.
+  /// \param key the key to give this object
+  template <class T>
+  ArrayBlock(WRITER &writer,
+             const T &key)
+    : writer_(&w)
+  {
+    writer.Key(key);
     writer_->StartArray();
   }
 
