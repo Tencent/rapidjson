@@ -71,8 +71,8 @@ public:
   //! For encoding detection only, called at the start on openning a stream.
   const Ch* Peek4() const {
     istream_.get(peekBuffer_, 4);
-    int n = istream_.gcount() - 1;
-    for(int i = 0; i <= n; ++i) {
+    std::streamsize n = istream_.gcount() - 1;
+    for(std::streamsize i = 0; i <= n; ++i) {
       istream_.putback(peekBuffer_[n - i]);
     }
     return peekBuffer_;
