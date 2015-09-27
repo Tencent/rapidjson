@@ -66,6 +66,10 @@ public :
   }
 protected :
   WRITER *writer_;
+
+private :
+  ObjectBlock(const ObjectBlock&);
+  ObjectBlock& operator=(const ObjectBlock&);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -120,6 +124,11 @@ public :
 
 protected :
   WRITER *writer_;
+
+private :
+  // disable copy constructor and assignment
+  ArrayBlock(const ArrayBlock&);
+  ArrayBlock& operator=(const ArrayBlock&);
 };
 
 RAPIDJSON_NAMESPACE_END
