@@ -2,11 +2,13 @@
 
 ![](https://img.shields.io/badge/release-v1.0.2-blue.png)
 
-## A fast JSON parser/generator for C++ with both SAX/DOM style API 
+## A fast JSON parser/generator for C++ with both SAX/DOM style API
 
 Tencent is pleased to support the open source community by making RapidJSON available.
 
 Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+
+Some contributions are additionally Copyright (C) 2015 Bruno Nicoletti. All rights reserved. See individual files for details.
 
 * [RapidJSON GitHub](https://github.com/miloyip/rapidjson/)
 * RapidJSON Documentation
