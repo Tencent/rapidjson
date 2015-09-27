@@ -33,6 +33,11 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 #endif
 
+#ifdef __GNUC__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(effc++)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 //! JSON writer
@@ -177,6 +182,10 @@ inline bool WriterBase<Writer<StringBuffer>, StringBuffer>::WriteDouble(double d
 RAPIDJSON_NAMESPACE_END
 
 #ifdef _MSC_VER
+RAPIDJSON_DIAG_POP
+#endif
+
+#ifdef __GNUC__
 RAPIDJSON_DIAG_POP
 #endif
 

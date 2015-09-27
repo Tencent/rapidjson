@@ -21,7 +21,6 @@
 #include "internal/strfunc.h"
 #include "internal/dtoa.h"
 #include "internal/itoa.h"
-#include "stringbuffer.h"
 
 #if __cplusplus >= 201103
 #include "autoblocks.h"
