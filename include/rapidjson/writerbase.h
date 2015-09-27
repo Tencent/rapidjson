@@ -375,6 +375,49 @@ public:
     }
 #endif
 
+  /// Functor to output the given bool value
+    bool operator()(bool b)
+    {
+      return Bool(b);
+    }
+
+    /// Functor to output the given int value
+    bool operator()(int i)
+    {
+      return Int(i);
+    }
+
+    /// Functor to output the given unsigned int value
+    bool operator()(unsigned u)
+    {
+      return Uint(u);
+    }
+
+    /// Functor to output the given 64 bit int value
+    bool operator()(int64_t i64)
+    {
+      return Int64(i64);
+    }
+
+    /// Functor to output the given 64 bit int value.
+    bool operator()(uint64_t u64)
+    {
+      return Uint64(u64);
+    }
+
+    /// Functor to output the given double value.
+    bool operator()(double d)
+    {
+      return Double(d);
+    }
+
+    /// Functor to output the given string.
+    template<typename STRING>
+    bool operator()(STRING &s)
+    {
+      return String(s);
+    }
+
     /// Functor to output the given key with a bool value
     template<typename STRING>
     bool operator()(const STRING &key, bool b)
