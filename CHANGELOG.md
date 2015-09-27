@@ -3,6 +3,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+  * new classes IOStreamReadStream and IOStreamWriterStream that supports std::iostream
 
 ## [1.0.2] - 2015-05-14
 
@@ -17,7 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 * CMakeLists for include as a thirdparty in projects (#334, #337)
-* Change Document::ParseStream() to use stack allocator for Reader (ffbe38614732af8e0b3abdc8b50071f386a4a685) 
+* Change Document::ParseStream() to use stack allocator for Reader (ffbe38614732af8e0b3abdc8b50071f386a4a685)
 
 ## [1.0.1] - 2015-04-25
 
