@@ -27,7 +27,7 @@ public :
   ///
   /// \param the writer to open the object on and eventually close.
   ObjectBlock(WRITER &writer)
-    : writer_(&w)
+    : writer_(&writer)
   {
     writer_->StartObject();
   }
@@ -39,7 +39,7 @@ public :
   template <class T>
   ObjectBlock(WRITER &writer,
               const T &key)
-    : writer_(&w)
+    : writer_(&writer)
   {
     writer.Key(key);
     writer_->StartObject();
@@ -79,8 +79,8 @@ public :
   /// \brief Constructor,
   ///
   /// \param the writer to open the object on and eventually close.
-  ArrayBlock(WRITER &w)
-    : writer_(&w)
+  ArrayBlock(WRITER &writer)
+    : writer_(&writer)
   {
     writer_->StartArray();
   }
@@ -92,7 +92,7 @@ public :
   template <class T>
   ArrayBlock(WRITER &writer,
              const T &key)
-    : writer_(&w)
+    : writer_(&writer)
   {
     writer.Key(key);
     writer_->StartArray();

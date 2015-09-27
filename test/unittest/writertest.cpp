@@ -18,6 +18,7 @@
 #include "rapidjson/reader.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/autoblocks.h"
 
 using namespace rapidjson;
 
@@ -376,9 +377,25 @@ TEST(Writer, InvalidEventSequence) {
     }
 }
 
+TEST(Writer, Functors) {
+  StringBuffer buffer;
+  Writer<StringBuffer> writer(buffer);
+  writer.StartArray();
+  writer(true);
+  writer(false);
+  writer(-1);
+  writer(200u);
+  writer(int64_t(-1234567890123456789));
+  writer(uint64_t(1234567890123456789));
+  writer("banana");
+  const char *pomegranate = "pomegranate";
+  writer(pomegranate);
+  writer.EndArray();
+  EXPECT_STREQ("[true,false,-1,200,-1234567890123456789,1234567890123456789,\"banana\",\"pomegranate\"]", buffer.GetString());
+}
+
 template<class T>
-void TestKeyValueFunctorType(const T &value, const char *expectedValue)
-{
+void TestKeyValueFunctorType(const T &value, const char *expectedValue) {
   StringBuffer buffer;
   Writer<StringBuffer> writer(buffer);
   writer.StartObject();
@@ -399,4 +416,69 @@ TEST(Writer, KeyValueFunctors) {
   const char *pomegranate = "pomegranate";
   TestKeyValueFunctorType(pomegranate, "{\"Key\":\"pomegranate\"}");
   TestKeyValueFunctorType(1.7976931348623157e308, "{\"Key\":1.7976931348623157e308}");
+}
+
+TEST(Writer, AutoBlocks) {
+  typedef Writer<StringBuffer> WriterType;
+
+  {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    {
+    // start an anonymous block
+      ObjectBlock<WriterType> block(writer);
+      writer("Key", 10);
+    }
+    EXPECT_STREQ("{\"Key\":10}", buffer.GetString());
+  }
+
+  {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    {
+      // start an anonymous outer block
+      ObjectBlock<WriterType> block(writer);
+      {
+        ObjectBlock<WriterType> block(writer, "thing");
+        writer("Key", 10);
+      }
+    }
+    EXPECT_STREQ("{\"thing\":{\"Key\":10}}", buffer.GetString());
+  }
+
+  {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    {
+      // start an anonymous outer array
+      ArrayBlock<WriterType> block(writer);
+      {
+        writer(1);
+        writer(2);
+        writer(3);
+        writer(4);
+        writer(5);
+      }
+    }
+    EXPECT_STREQ("[1,2,3,4,5]", buffer.GetString());
+  }
+
+  {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    {
+      // start an anonymous outer block
+      ObjectBlock<WriterType> block(writer);
+      {
+        // start a named array
+        ArrayBlock<WriterType> block(writer, "thing");
+        writer(1);
+        writer(2);
+        writer(3);
+        writer(4);
+        writer(5);
+      }
+    }
+    EXPECT_STREQ("{\"thing\":[1,2,3,4,5]}", buffer.GetString());
+  }
 }
