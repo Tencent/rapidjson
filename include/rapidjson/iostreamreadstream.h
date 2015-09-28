@@ -22,67 +22,65 @@ RAPIDJSON_NAMESPACE_BEGIN
 
 //! File byte stream for input using fread().
 /*!
-    \note implements Stream concept
+        \note implements Stream concept
 */
 class IOStreamReadStream {
 public:
-  typedef char Ch;    //!< Character type (byte).
+    typedef char Ch;    //!< Character type (byte).
 
-  //! Constructor.
-  /*!
-    \param An open istream to read from.
-  */
-  IOStreamReadStream(std::istream &stream)
-    : istream_(stream)
-  {
-    peekBuffer_[0] = peekBuffer_[1] = peekBuffer_[2] = peekBuffer_[3] = 0;
-  }
-
-  //! Look at the next character in the stream without consuming it. Returns '\0' on eof.
-  Ch Peek() const
-  {
-    // given the Reader Concept, we need to explicitly check for eof and return '\0'
-    int v = istream_.peek();
-    if(v == std::char_traits<Ch>::eof()) return '\0';
-    return v;
-  }
-
-  //! Extract the next character in the stream.
-  Ch Take()
-  {
-    // given the Reader Concept, we need to explicitly check for eof and return '\0'
-    int v = istream_.get();
-    if(v == std::char_traits<Ch>::eof()) return '\0';
-    return v;
-  }
-
-  //! Where are we in the stream.
-  size_t Tell() const
-  {
-    return istream_.tellg();
-  }
-
-  // Not implemented
-  void Put(Ch) { RAPIDJSON_ASSERT(false); }
-  void Flush() { RAPIDJSON_ASSERT(false); }
-  Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
-  size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
-
-  //! Get a pointer to the next four characters in the stream.
-  //!
-  //! For encoding detection only, called at the start on openning a stream.
-  const Ch* Peek4() const {
-    istream_.get(peekBuffer_, 4);
-    std::streamsize n = istream_.gcount() - 1;
-    for(std::streamsize i = 0; i <= n; ++i) {
-      istream_.putback(peekBuffer_[n - i]);
+    //! Constructor.
+    /*!
+        \param An open istream to read from.
+    */
+    IOStreamReadStream(std::istream &stream)
+        : istream_(stream) {
+        peekBuffer_[0] = peekBuffer_[1] = peekBuffer_[2] = peekBuffer_[3] = 0;
     }
-    return peekBuffer_;
-  }
+
+    //! Look at the next character in the stream without consuming it. Returns '\0' on eof.
+    Ch Peek() const {
+        int v = istream_.peek();
+        if(!istream_ || v == std::char_traits<char>::eof()) return Ch('\0');
+        return Ch(v);
+    }
+
+    //! Extract the next character in the stream.
+    Ch Take() {
+        char ch;
+        if(istream_.get(ch)) {
+            return Ch(ch);
+        }
+        else {
+            return Ch('\0');
+        }
+    }
+
+    //! Where are we in the stream.
+    size_t Tell() const {
+        return istream_.tellg();
+    }
+
+    // Not implemented
+    void Put(Ch) { RAPIDJSON_ASSERT(false); }
+    void Flush() { RAPIDJSON_ASSERT(false); }
+    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
+    size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
+
+    //! Get a pointer to the next four characters in the stream.
+    //!
+    //! For encoding detection only, called at the start on openning a stream.
+    const Ch* Peek4() const {
+        istream_.get(peekBuffer_, 4);
+        std::streamsize n = istream_.gcount() - 1;
+        for(std::streamsize i = 0; i <= n; ++i) {
+            istream_.putback(peekBuffer_[n - i]);
+        }
+        return peekBuffer_;
+    }
 
 private:
-  std::istream& istream_;
-  mutable Ch peekBuffer_[4]; ///< need for the Peek4 nastyness
+    std::istream& istream_;
+    mutable Ch peekBuffer_[4]; ///< need for the Peek4 nastyness
 };
 
 RAPIDJSON_NAMESPACE_END

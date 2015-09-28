@@ -70,18 +70,18 @@ protected:
 
 TEST_F(IOStreamStreamTest, IOStreamReadStream) {
 
-  //#if _MSC_VER
+//#if _MSC_VER
     std::ifstream stream(filename_, std::ios_base::in | std::ios_base::binary);
-    //#else
+//#else
     //std::ifstream stream(filename_);
-    //#endif
+//#endif
 
     ASSERT_TRUE(stream.good());
     IOStreamReadStream s(stream);
 
     for (size_t i = 0; i < length_; i++) {
         EXPECT_EQ(json_[i], s.Peek());
-        EXPECT_EQ(json_[i], s.Peek());  // 2nd time should be the same
+        EXPECT_EQ(json_[i], s.Peek());    // 2nd time should be the same
         EXPECT_EQ(json_[i], s.Take());
     }
 
@@ -93,18 +93,18 @@ TEST_F(IOStreamStreamTest, IOStreamWriteStream) {
     char filename[L_tmpnam];
     TempFileName(filename);
     {
-      // scope the stream so it shut at the end of the block
+        // scope the std::ofstream so it shuts at the end of the block
 #if _MSC_VER
-      std::ofstream stream(filename, std::ios_base::out | std::ios_base::binary);
+        std::ofstream stream(filename, std::ios_base::out | std::ios_base::binary);
 #else
-      std::ofstream stream(filename, std::ios_base::out);
+        std::ofstream stream(filename, std::ios_base::out);
 #endif
-      ASSERT_TRUE(stream.good());
+        ASSERT_TRUE(stream.good());
 
-      IOStreamWriteStream os(stream);
-      for (size_t i = 0; i < length_; i++)
-        os.Put(json_[i]);
-      os.Flush();
+        IOStreamWriteStream os(stream);
+        for (size_t i = 0; i < length_; i++)
+            os.Put(json_[i]);
+        os.Flush();
     }
 
     // Read it back to verify

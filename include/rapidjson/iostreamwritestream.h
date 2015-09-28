@@ -22,42 +22,41 @@ RAPIDJSON_NAMESPACE_BEGIN
 
 //! File byte stream for output using a std::ostream.
 /*!
-  \note implements Stream concept
+    \note implements Stream concept
 */
 
 class IOStreamWriteStream {
 public:
-  typedef char Ch;    //!< Character type. Only support char.
+    typedef char Ch;    //!< Character type. Only support char.
 
-  //! Constructor, takes a reference to an std::ostream
-  IOStreamWriteStream(std::ostream &stream)
-    : ostream_(stream)
-  {
-  }
+    //! Constructor, takes a reference to an std::ostream
+    IOStreamWriteStream(std::ostream &stream)
+        : ostream_(stream) {
+    }
 
-  //! Put a character out to the ostream.
-  void Put(char c) {
-    ostream_.put(c);
-  }
+    //! Put a character out to the ostream.
+    void Put(char c) {
+        ostream_.put(c);
+    }
 
-  //! Flush the ostream.
-  void Flush() {
-    ostream_.flush();
-  }
+    //! Flush the ostream.
+    void Flush() {
+        ostream_.flush();
+    }
 
-  // Not implemented
-  char Peek() const { RAPIDJSON_ASSERT(false); return 0; }
-  char Take() { RAPIDJSON_ASSERT(false); return 0; }
-  size_t Tell() const { RAPIDJSON_ASSERT(false); return 0; }
-  char* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
-  size_t PutEnd(char*) { RAPIDJSON_ASSERT(false); return 0; }
+    // Not implemented
+    char Peek() const { RAPIDJSON_ASSERT(false); return 0; }
+    char Take() { RAPIDJSON_ASSERT(false); return 0; }
+    size_t Tell() const { RAPIDJSON_ASSERT(false); return 0; }
+    char* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
+    size_t PutEnd(char*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:
-  // Prohibit copy constructor & assignment operator.
-  IOStreamWriteStream(const IOStreamWriteStream&);
-  IOStreamWriteStream& operator=(const IOStreamWriteStream&);
+    // Prohibit copy constructor & assignment operator.
+    IOStreamWriteStream(const IOStreamWriteStream&);
+    IOStreamWriteStream& operator=(const IOStreamWriteStream&);
 
-  std::ostream &ostream_;
+    std::ostream &ostream_;
 };
 
 RAPIDJSON_NAMESPACE_END
