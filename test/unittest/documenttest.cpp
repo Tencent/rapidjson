@@ -95,6 +95,21 @@ TEST(Document, Parse) {
     ParseTest<CrtAllocator, CrtAllocator>();
 }
 
+TEST(Document, UnchangedOnParseError) {
+    Document doc;
+    doc.SetArray().PushBack(0, doc.GetAllocator());
+
+    doc.Parse("{]");
+    EXPECT_TRUE(doc.HasParseError());
+    EXPECT_TRUE(doc.IsArray());
+    EXPECT_EQ(doc.Size(), 1u);
+
+    doc.Parse("{}");
+    EXPECT_FALSE(doc.HasParseError());
+    EXPECT_TRUE(doc.IsObject());
+    EXPECT_EQ(doc.MemberCount(), 0u);
+}
+
 static FILE* OpenEncodedFile(const char* filename) {
     const char *paths[] = {
         "encodings/%s",
