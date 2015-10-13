@@ -400,6 +400,7 @@ public:
         ClearStackOnExit scope(*this);
 
         SkipWhitespaceAndComments<parseFlags>(is);
+        RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
 
         if (is.Peek() == '\0') {
             RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentEmpty, is.Tell());
@@ -411,6 +412,7 @@ public:
 
             if (!(parseFlags & kParseStopWhenDoneFlag)) {
                 SkipWhitespaceAndComments<parseFlags>(is);
+                RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
 
                 if (is.Peek() != '\0') {
                     RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotSingular, is.Tell());
@@ -473,10 +475,21 @@ private:
 
                 if (is.Peek() == '*') {
                     is.Take();
-                    while (is.Take() != '*' || is.Take() != '/') { }
+                    while (true) {
+                        if (is.Peek() == '\0')
+                            RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell());
+
+                        if (is.Take() == '*') {
+                            if (is.Peek() == '\0')
+                                RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell());
+
+                            if (is.Take() == '/')
+                                break;
+                        }
+                    }
                 } else if (is.Peek() == '/') {
                     is.Take();
-                    while (is.Take() != '\n') { }
+                    while (is.Peek() != '\0' && is.Take() != '\n') { }
                 } else {
                     RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell());
                 }
@@ -496,6 +509,7 @@ private:
             RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
 
         SkipWhitespaceAndComments<parseFlags>(is);
+        RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
         if (is.Peek() == '}') {
             is.Take();
@@ -512,21 +526,27 @@ private:
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
             SkipWhitespaceAndComments<parseFlags>(is);
+            RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
             if (is.Take() != ':')
                 RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissColon, is.Tell());
 
             SkipWhitespaceAndComments<parseFlags>(is);
+            RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
             ParseValue<parseFlags>(is, handler);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
             SkipWhitespaceAndComments<parseFlags>(is);
+            RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
             ++memberCount;
 
             switch (is.Take()) {
-                case ',': SkipWhitespaceAndComments<parseFlags>(is); break;
+                case ',':
+                    SkipWhitespaceAndComments<parseFlags>(is);
+                    RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
+                    break;
                 case '}': 
                     if (!handler.EndObject(memberCount))
                         RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
@@ -546,6 +566,7 @@ private:
             RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
         
         SkipWhitespaceAndComments<parseFlags>(is);
+        RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
         if (is.Peek() == ']') {
             is.Take();
@@ -560,9 +581,13 @@ private:
 
             ++elementCount;
             SkipWhitespaceAndComments<parseFlags>(is);
+            RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
             switch (is.Take()) {
-                case ',': SkipWhitespaceAndComments<parseFlags>(is); break;
+                case ',':
+                    SkipWhitespaceAndComments<parseFlags>(is);
+                    RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
+                    break;
                 case ']': 
                     if (!handler.EndArray(elementCount))
                         RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
@@ -1429,6 +1454,7 @@ private:
         IterativeParsingState state = IterativeParsingStartState;
 
         SkipWhitespaceAndComments<parseFlags>(is);
+        RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
         while (is.Peek() != '\0') {
             Token t = Tokenize(is.Peek());
             IterativeParsingState n = Predict(state, t);
@@ -1446,6 +1472,7 @@ private:
                 break;
 
             SkipWhitespaceAndComments<parseFlags>(is);
+            RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
         }
 
         // Handle the end of file.

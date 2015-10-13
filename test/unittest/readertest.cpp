@@ -1387,6 +1387,19 @@ TEST(Reader, ParseEmptyOnelineComment) {
     EXPECT_EQ(20u, h.step_);
 }
 
+TEST(Reader, ParseMultipleCommentsInARow) {
+    const char* json = 
+    "{/* first comment *//* second */\n"
+    "/* third */ /*fourth*/// last one\n"
+    "\"hello\" : \"world\", \"t\" : true, \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] }";
+
+    StringStream s(json);
+    ParseObjectHandler h;
+    Reader reader;
+    EXPECT_TRUE(reader.Parse<kParseCommentsFlag>(s, h));
+    EXPECT_EQ(20u, h.step_);
+}
+
 TEST(Reader, InlineCommentsAreDisabledByDefault) {
     {
         const char* json = "{/* Inline comment. */\"hello\" : \"world\", \"t\" : true, \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] }";
@@ -1417,6 +1430,26 @@ TEST(Reader, OnelineCommentsAreDisabledByDefault) {
     ParseObjectHandler h;
     Reader reader;
     EXPECT_FALSE(reader.Parse<kParseDefaultFlags>(s, h));
+}
+
+TEST(Reader, EofAfterOneLineComment) {
+    const char* json = "{\"hello\" : \"world\" // EOF is here -->\0 \n}";
+
+    StringStream s(json);
+    ParseObjectHandler h;
+    Reader reader;
+    EXPECT_FALSE(reader.Parse<kParseCommentsFlag>(s, h));
+    EXPECT_EQ(kParseErrorObjectMissCommaOrCurlyBracket, reader.GetParseErrorCode());
+}
+
+TEST(Reader, IncompleteMultilineComment) {
+    const char* json = "{\"hello\" : \"world\" /* EOF is here -->\0 */}";
+
+    StringStream s(json);
+    ParseObjectHandler h;
+    Reader reader;
+    EXPECT_FALSE(reader.Parse<kParseCommentsFlag>(s, h));
+    EXPECT_EQ(kParseErrorUnspecificSyntaxError, reader.GetParseErrorCode());
 }
 
 #ifdef __GNUC__
