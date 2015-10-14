@@ -2101,6 +2101,7 @@ GenericValue<Encoding,Allocator>::GenericValue(const GenericValue<Encoding,Sourc
     default: // kNumberType, kTrueType, kFalseType, kNullType
         flags_ = rhs.flags_;
         data_  = *reinterpret_cast<const Data*>(&rhs.data_);
+        break;
     }
 }
 
