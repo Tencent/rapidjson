@@ -5,6 +5,7 @@ var searchData=
   ['knulltype',['kNullType',['../namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a952871e4326b527154fc8aac1ac1f6ff',1,'rapidjson']]],
   ['knumbertype',['kNumberType',['../namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a',1,'rapidjson']]],
   ['kobjecttype',['kObjectType',['../namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9',1,'rapidjson']]],
+  ['kparsecommentsflag',['kParseCommentsFlag',['../namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9ab5d719b36aac626135d5d622d0d837c1',1,'rapidjson']]],
   ['kparsedefaultflags',['kParseDefaultFlags',['../namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835',1,'rapidjson']]],
   ['kparseerrorarraymisscommaorsquarebracket',['kParseErrorArrayMissCommaOrSquareBracket',['../group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a1a4ac97731f997e9591b40f98ecd9f93',1,'rapidjson']]],
   ['kparseerrordocumentempty',['kParseErrorDocumentEmpty',['../group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a06183076357ebd9eca228666f614c286',1,'rapidjson']]],

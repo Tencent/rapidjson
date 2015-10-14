@@ -13,6 +13,7 @@ var reader_8h =
       [ "kParseIterativeFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a7923686c8bdb7614699f1fb1bb615bb2", null ],
       [ "kParseStopWhenDoneFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9af84c60868704433b80aa51a62e042bb1", null ],
       [ "kParseFullPrecisionFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9adf80892cdfa076b2d1a7dd9530e15cb0", null ],
+      [ "kParseCommentsFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9ab5d719b36aac626135d5d622d0d837c1", null ],
       [ "kParseDefaultFlags", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835", null ]
     ] ],
     [ "SkipWhitespace", "reader_8h.html#a6efb0f4d2a6f81477a59718d42e9464a", null ],
