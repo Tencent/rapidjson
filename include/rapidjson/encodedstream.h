@@ -77,8 +77,8 @@ public:
     void Flush() { os_.Flush(); }
 
     // Not implemented
-    Ch Peek() const { RAPIDJSON_ASSERT(false); }
-    Ch Take() { RAPIDJSON_ASSERT(false);  }
+    Ch Peek() const { RAPIDJSON_ASSERT(false); return 0;}
+    Ch Take() { RAPIDJSON_ASSERT(false); return 0;}
     size_t Tell() const { RAPIDJSON_ASSERT(false);  return 0; }
     Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
     size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
@@ -227,8 +227,8 @@ public:
     void Flush() { os_->Flush(); } 
 
     // Not implemented
-    Ch Peek() const { RAPIDJSON_ASSERT(false); }
-    Ch Take() { RAPIDJSON_ASSERT(false); }
+    Ch Peek() const { RAPIDJSON_ASSERT(false); return 0;}
+    Ch Take() { RAPIDJSON_ASSERT(false); return 0;}
     size_t Tell() const { RAPIDJSON_ASSERT(false); return 0; }
     Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
     size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
