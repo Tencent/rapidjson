@@ -20,7 +20,7 @@
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
-//! Custom swap() to avoid dependency on C++ <algorith> header
+//! Custom swap() to avoid dependency on C++ <algorithm> header
 /*! \tparam T Type of the arguments to swap, should be instantiated with primitive C++ types only.
     \note This has the same semantics as std::swap().
 */
