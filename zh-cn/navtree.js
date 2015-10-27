@@ -23,6 +23,15 @@ var NAVTREE =
       ] ],
       [ "下一部分", "md_doc_tutorial_8zh-cn.html#WhatsNext", null ]
     ] ],
+    [ "Pointer", "md_doc_pointer.html", [
+      [ "JSON Pointer", "md_doc_pointer.html#JsonPointer", null ],
+      [ "Basic Usage", "md_doc_pointer.html#BasicUsage", null ],
+      [ "Helper Functions", "md_doc_pointer.html#HelperFunctions", null ],
+      [ "Resolving Pointer", "md_doc_pointer.html#ResolvingPointer", null ],
+      [ "Error Handling", "md_doc_pointer.html#ErrorHandling", null ],
+      [ "URI Fragment Representation", "md_doc_pointer.html#URIFragment", null ],
+      [ "User-Supplied Tokens", "md_doc_pointer.html#UserSuppliedTokens", null ]
+    ] ],
     [ "流", "md_doc_stream_8zh-cn.html", [
       [ "内存流", "md_doc_stream_8zh-cn.html#MemoryStreams", [
         [ "StringStream（输入）", "md_doc_stream_8zh-cn.html#StringStream", null ],
@@ -142,7 +151,7 @@ var NAVTREEINDEX =
 "allocators_8h_source.html",
 "classrapidjson_1_1_generic_value.html#a65bfc3073fa80ee5eba8e985abe2f941",
 "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gad283cfde97d9a32b7d8e8107b11f70a6",
-"structrapidjson_1_1_generic_pointer_1_1_token.html#aceb59c9796418c20da27b03bf1948fe8"
+"structrapidjson_1_1_generic_memory_buffer.html#a80a159ebb64cee80b5e7fc37f971d5a5"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
