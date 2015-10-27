@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['pointer',['Pointer',['../md_doc_pointer.html',1,'']]]
+  ['pointer',['Pointer',['../md_doc_pointer_8zh-cn.html',1,'']]]
 ];

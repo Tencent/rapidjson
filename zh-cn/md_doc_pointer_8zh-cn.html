@@ -66,7 +66,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('md_doc_pointer.html','');});
+$(document).ready(function(){initNavTree('md_doc_pointer_8zh-cn.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -90,77 +90,77 @@ $(document).ready(function(){initNavTree('md_doc_pointer.html','');});
 <div class="contents">
 <div class="toc"><h3>目录</h3>
 <ul><li class="level1"><a href="#JsonPointer">JSON Pointer</a></li>
-<li class="level1"><a href="#BasicUsage">Basic Usage</a></li>
-<li class="level1"><a href="#HelperFunctions">Helper Functions</a></li>
-<li class="level1"><a href="#ResolvingPointer">Resolving Pointer</a></li>
-<li class="level1"><a href="#ErrorHandling">Error Handling</a></li>
-<li class="level1"><a href="#URIFragment">URI Fragment Representation</a></li>
-<li class="level1"><a href="#UserSuppliedTokens">User-Supplied Tokens</a></li>
+<li class="level1"><a href="#BasicUsage">基本使用方法</a></li>
+<li class="level1"><a href="#HelperFunctions">辅助函数</a></li>
+<li class="level1"><a href="#ResolvingPointer">解析 Pointer</a></li>
+<li class="level1"><a href="#ErrorHandling">错误处理</a></li>
+<li class="level1"><a href="#URIFragment">URI 片段表示方式</a></li>
+<li class="level1"><a href="#UserSuppliedTokens">使用者提供的 tokens</a></li>
 </ul>
 </div>
-<div class="textblock"><h2>Status: experimental, shall be included in v1.1</h2>
-<p>JSON Pointer is a standardized (<a href="https://tools.ietf.org/html/rfc6901">RFC6901</a>) way to select a value inside a JSON Document (DOM). This can be analogous to XPath for XML document. However, JSON Pointer is much simpler, and a single JSON Pointer only pointed to a single value.</p>
-<p>Using RapidJSON's implementation of JSON Pointer can simplify some manipulations of the DOM.</p>
+<div class="textblock"><h2>状态: 实验性，应该会合进 v1.1</h2>
+<p>JSON Pointer 是一个标准化（<a href="https://tools.ietf.org/html/rfc6901">RFC6901</a>）的方式去选取一个 JSON Document（DOM）中的值。这类似于 XML 的 XPath。然而，JSON Pointer 简单得多，而且每个 JSON Pointer 仅指向单个值。</p>
+<p>使用 RapidJSON　的 JSON Pointer 实现能简化一些 DOM 的操作。</p>
 <h1><a class="anchor" id="JsonPointer"></a>
 JSON Pointer</h1>
-<p>A JSON Pointer is a list of zero-to-many tokens, each prefixed by <code>/</code>. Each token can be a string or a number. For example, given a JSON: </p><div class="fragment"><div class="line">{</div>
+<p>一个 JSON Pointer 由一串（零至多个）token 所组成，每个 token 都有 <code>/</code> 前缀。每个 token 可以是一个字符串或数字。例如，给定一个 JSON： </p><div class="fragment"><div class="line">{</div>
 <div class="line">    <span class="stringliteral">&quot;foo&quot;</span> : [<span class="stringliteral">&quot;bar&quot;</span>, <span class="stringliteral">&quot;baz&quot;</span>],</div>
 <div class="line">    <span class="stringliteral">&quot;pi&quot;</span> : 3.1416</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>The following JSON Pointers resolve this JSON as:</p>
+</div><!-- fragment --><p>以下的 JSON Pointer 解析为：</p>
 <ol type="1">
 <li><code>"/foo"</code> → <code>[ "bar", "baz" ]</code></li>
 <li><code>"/foo/0"</code> → <code>"bar"</code></li>
 <li><code>"/foo/1"</code> → <code>"baz"</code></li>
 <li><code>"/pi"</code> → <code>3.1416</code></li>
 </ol>
-<p>Note that, an empty JSON Pointer <code>""</code> (zero token) resolves to the whole JSON.</p>
+<p>要注意，一个空 JSON Pointer <code>""</code> （零个token）解析为整个 JSON。</p>
 <h1><a class="anchor" id="BasicUsage"></a>
-Basic Usage</h1>
-<p>The following example code is self-explanatory.</p>
+基本使用方法</h1>
+<p>以下的代码范例不解自明。</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/pointer.h&quot;</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
 <div class="line"></div>
-<div class="line"><span class="comment">// Create DOM by Set()</span></div>
+<div class="line"><span class="comment">// 使用 Set() 创建 DOM</span></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/project&quot;</span>).Set(d, <span class="stringliteral">&quot;RapidJSON&quot;</span>);</div>
 <div class="line"><a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/stars&quot;</span>).Set(d, 10);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 10 }</span></div>
 <div class="line"></div>
-<div class="line"><span class="comment">// Access DOM by Get(). It return nullptr if the value does not exist.</span></div>
+<div class="line"><span class="comment">// 使用 Get() 访问 DOM。若该值不存在则返回 nullptr。</span></div>
 <div class="line"><span class="keywordflow">if</span> (<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>* stars = <a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/stars&quot;</span>).Get(d))</div>
 <div class="line">    stars-&gt;SetInt(stars-&gt;GetInt() + 1);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11 }</span></div>
 <div class="line"></div>
-<div class="line"><span class="comment">// Set() and Create() automatically generate parents if not exist.</span></div>
+<div class="line"><span class="comment">// Set() 和 Create() 自动生成父值（如果它们不存在）。</span></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/a/b/0&quot;</span>).Create(d);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11, &quot;a&quot; : { &quot;b&quot; : [ null ] } }</span></div>
 <div class="line"></div>
-<div class="line"><span class="comment">// GetWithDefault() returns reference. And it deep clones the default value.</span></div>
+<div class="line"><span class="comment">// GetWithDefault() 返回引用。若该值不存在则会深拷贝缺省值。</span></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>&amp; hello = <a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/hello&quot;</span>).GetWithDefault(d, <span class="stringliteral">&quot;world&quot;</span>);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11, &quot;a&quot; : { &quot;b&quot; : [ null ] }, &quot;hello&quot; : &quot;world&quot; }</span></div>
 <div class="line"></div>
-<div class="line"><span class="comment">// Swap() is similar to Set()</span></div>
+<div class="line"><span class="comment">// Swap() 和 Set() 相似</span></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> x(<span class="stringliteral">&quot;C++&quot;</span>);</div>
 <div class="line"><a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/hello&quot;</span>).Swap(d, x);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11, &quot;a&quot; : { &quot;b&quot; : [ null ] }, &quot;hello&quot; : &quot;C++&quot; }</span></div>
-<div class="line"><span class="comment">// x becomes &quot;world&quot;</span></div>
+<div class="line"><span class="comment">// x 变成 &quot;world&quot;</span></div>
 <div class="line"></div>
-<div class="line"><span class="comment">// Erase a member or element, return true if the value exists</span></div>
+<div class="line"><span class="comment">// 删去一个成员或元素，若值存在返回 true</span></div>
 <div class="line"><span class="keywordtype">bool</span> success = <a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/a&quot;</span>).Erase(d);</div>
 <div class="line">assert(success);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 10 }</span></div>
 </div><!-- fragment --><h1><a class="anchor" id="HelperFunctions"></a>
-Helper Functions</h1>
-<p>Since object-oriented calling convention may be non-intuitive, RapidJSON also provides helper functions, which just wrap the member functions with free-functions.</p>
-<p>The following example does exactly the same as the above one.</p>
+辅助函数</h1>
+<p>由于面向对象的调用习惯可能不符直觉，RapidJSON 也提供了一些辅助函数，它们把成员函数包装成自由函数。</p>
+<p>以下的例子与上面例子所做的事情完全相同。</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
 <div class="line"></div>
 <div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;/project&quot;</span>, <span class="stringliteral">&quot;RapidJSON&quot;</span>);</div>
@@ -178,16 +178,16 @@ Helper Functions</h1>
 <div class="line"></div>
 <div class="line"><span class="keywordtype">bool</span> success = EraseValueByPointer(d, <span class="stringliteral">&quot;/a&quot;</span>);</div>
 <div class="line">assert(success);</div>
-</div><!-- fragment --><p>The conventions are shown here for comparison:</p>
+</div><!-- fragment --><p>以下对比 3 种调用方式：</p>
 <ol type="1">
 <li><code>Pointer(source).&lt;Method&gt;(root, ...)</code></li>
 <li><code>&lt;Method&gt;ValueByPointer(root, Pointer(source), ...)</code></li>
 <li><code>&lt;Method&gt;ValueByPointer(root, source, ...)</code></li>
 </ol>
 <h1><a class="anchor" id="ResolvingPointer"></a>
-Resolving Pointer</h1>
-<p><code>Pointer::Get()</code> or <code>GetValueByPointer()</code> function does not modify the DOM. If the tokens cannot match a value in the DOM, it returns <code>nullptr</code>. User can use this to check whether a value exists.</p>
-<p>Note that, numerical tokens can represent an array index or member name. The resolving process will match the values according to the types of value.</p>
+解析 Pointer</h1>
+<p><code>Pointer::Get()</code> 或 <code>GetValueByPointer()</code> 函数并不修改 DOM。若那些 token 不能匹配 DOM 里的值，这些函数便返回 <code>nullptr</code>。使用者可利用这个方法来检查一个值是否存在。</p>
+<p>注意，数值 token 可表示数组索引或成员名字。解析过程中会按值的类型来匹配。</p>
 <div class="fragment"><div class="line">{</div>
 <div class="line">    <span class="stringliteral">&quot;0&quot;</span> : 123,</div>
 <div class="line">    <span class="stringliteral">&quot;1&quot;</span> : [456]</div>
@@ -196,20 +196,20 @@ Resolving Pointer</h1>
 <li><code>"/0"</code> → <code>123</code></li>
 <li><code>"/1/0"</code> → <code>456</code></li>
 </ol>
-<p>The token <code>"0"</code> is treated as member name in the first pointer. It is treated as an array index in the second pointer.</p>
-<p>The other functions, including <code>Create()</code>, <code>GetWithDefault()</code>, <code>Set()</code> and <code>Swap()</code>, will change the DOM. These functions will always succeed. They will create the parent values if they do not exist. If the parent values do not match the tokens, they will also be forced to change their type. Changing the type also mean fully removal of that DOM subtree.</p>
-<p>Parsing the above JSON into <code>d</code>,</p>
+<p>Token <code>"0"</code> 在第一个 pointer 中被当作成员名字。它在第二个 pointer 中被当作成数组索引。</p>
+<p>其他函数会改变 DOM，包括<code>Create()</code>、<code>GetWithDefault()</code>、<code>Set()</code>、<code>Swap()</code>。这些函数总是成功的。若一些父值不存在，就会创建它们。若父值类型不匹配 token，也会强行改变其类型。改变类型也意味着完全移除其 DOM 子树的内容。</p>
+<p>例如，把上面的 JSON 解译至 <code>d</code> 之后，</p>
 <div class="fragment"><div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;1/a&quot;</span>, 789); <span class="comment">// { &quot;0&quot; : 123, &quot;1&quot; : { &quot;a&quot; : 789 } }</span></div>
-</div><!-- fragment --><h2>Resolving Minus Sign Token</h2>
-<p>Besides, <a href="https://tools.ietf.org/html/rfc6901">RFC6901</a> defines a special token <code>-</code> (single minus sign), which represents the pass-the-end element of an array. <code>Get()</code> only treats this token as a member name '"-"'. Yet the other functions can resolve this for array, equivalent to calling <code>Value::PushBack()</code> to the array.</p>
+</div><!-- fragment --><h2>解析负号 token</h2>
+<p>另外，<a href="https://tools.ietf.org/html/rfc6901">RFC6901</a> 定义了一个特殊 token <code>-</code> （单个负号），用于表示数组最后元素的下一个元素。 <code>Get()</code> 只会把此 token 当作成员名字 '"-"'。而其他函数则会以此解析数组，等同于对数组调用 <code>Value::PushBack()</code> 。</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
 <div class="line">d.Parse(<span class="stringliteral">&quot;{\&quot;foo\&quot;:[123]}&quot;</span>);</div>
 <div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;/foo/-&quot;</span>, 456); <span class="comment">// { &quot;foo&quot; : [123, 456] }</span></div>
 <div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;/-&quot;</span>, 789);    <span class="comment">// { &quot;foo&quot; : [123, 456], &quot;-&quot; : 789 }</span></div>
-</div><!-- fragment --><h2>Resolving Document and Value</h2>
-<p>When using <code>p.Get(root)</code> or <code>GetValueByPointer(root, p)</code>, <code>root</code> is a (const) <code>Value&amp;</code>. That means, it can be a subtree of the DOM.</p>
-<p>The other functions have two groups of signature. One group uses <code>Document&amp; document</code> as parameter, another one uses <code>Value&amp; root</code>. The first group uses <code>document.GetAllocator()</code> for creating values. And the second group needs user to supply an allocator, like the functions in DOM.</p>
-<p>All examples above do not require an allocator parameter, because the first parameter is a <code>Document&amp;</code>. But if you want to resolve a pointer to a subtree, you need to supply the allocator as in the following example:</p>
+</div><!-- fragment --><h2>解析 Document 及 Value</h2>
+<p>当使用 <code>p.Get(root)</code> 或 <code>GetValueByPointer(root, p)</code>，<code>root</code> 是一个（常数） <code>Value&amp;</code>。这意味着，它也可以是 DOM 里的一个子树。</p>
+<p>其他函数有两组签名。一组使用　<code>Document&amp; document</code>　作为参数，另一组使用 <code>Value&amp; root</code>。第一组使用 <code>document.GetAllocator()</code> 去创建值，而第二组则需要使用者提供一个 allocator，如同 DOM 里的函数。</p>
+<p>以上例子都不需要 allocator 参数，因为它的第一个参数是 <code>Document&amp;</code>。但如果你需要对一个子树进行解析，就需要如下面的例子般提供 allocator：</p>
 <div class="fragment"><div class="line"><span class="keyword">class </span>Person {</div>
 <div class="line"><span class="keyword">public</span>:</div>
 <div class="line">    Person() {</div>
@@ -232,18 +232,18 @@ Resolving Pointer</h1>
 <div class="line"></div>
 <div class="line">    <a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a>* document_;</div>
 <div class="line">};</div>
-</div><!-- fragment --><p><code>Erase()</code> or <code>EraseValueByPointer()</code> does not need allocator. And they return <code>true</code> if the value is erased successfully.</p>
+</div><!-- fragment --><p><code>Erase()</code> 或 <code>EraseValueByPointer()</code> 不需要 allocator。而且它们成功删除值之后会返回 <code>true</code>。</p>
 <h1><a class="anchor" id="ErrorHandling"></a>
-Error Handling</h1>
-<p>A <code>Pointer</code> parses a source string in its constructor. If there is parsing error, <code>Pointer::IsValid()</code> returns <code>false</code>. And you can use <code>Pointer::GetParseErrorCode()</code> and <code>GetParseErrorOffset()</code> to retrieve the error information.</p>
-<p>Note that, all resolving functions assumes valid pointer. Resolving with an invalid pointer causes assertion failure.</p>
+错误处理</h1>
+<p><code>Pointer</code> 在其建构函数里会解译源字符串。若有解析错误，<code>Pointer::IsValid()</code> 返回 <code>false</code>。你可使用 <code>Pointer::GetParseErrorCode()</code> 和 <code>GetParseErrorOffset()</code> 去获取错信息。</p>
+<p>要注意的是，所有解析函数都假设 pointer 是合法的。对一个非法 pointer 解析会做成断言失败。</p>
 <h1><a class="anchor" id="URIFragment"></a>
-URI Fragment Representation</h1>
-<p>In addition to the string representation of JSON pointer that we are using till now, <a href="https://tools.ietf.org/html/rfc6901">RFC6901</a> also defines the URI fragment representation of JSON pointer. URI fragment is specified in <a href="https://tools.ietf.org/html/rfc3986">RFC3986</a> "Uniform Resource Identifier (URI): Generic Syntax".</p>
-<p>The main differences are that a the URI fragment always has a <code>#</code> (pound sign) in the beginning, and some characters are encoded by percent-encoding in UTF-8 sequence. For example, the following table shows different C/C++ string literals of different representations.</p>
+URI 片段表示方式</h1>
+<p>除了我们一直在使用的字符串方式表示 JSON pointer，<a href="https://tools.ietf.org/html/rfc6901">RFC6901</a>也定义了一个 JSON Pointer 的 URI 片段（fragment）表示方式。URI 片段是定义于 <a href="https://tools.ietf.org/html/rfc3986">RFC3986</a> "Uniform Resource Identifier (URI): Generic Syntax"。</p>
+<p>URI 片段的主要分别是必然以 <code>#</code> （pound sign）开头，而一些字符也会以百分比编码成 UTF-8 序列。例如，以下的表展示了不同表示法下的 C/C++ 字符串常数。</p>
 <table class="doxtable">
 <tr>
-<th>String Representation </th><th>URI Fragment Representation </th><th>Pointer Tokens (UTF-8)  </th></tr>
+<th>字符串表示方式 </th><th>URI 片段表示方式 </th><th>Pointer Tokens （UTF-8）  </th></tr>
 <tr>
 <td><code>"/foo/0"</code> </td><td><code>"#/foo/0"</code> </td><td><code>{"foo", 0}</code> </td></tr>
 <tr>
@@ -257,25 +257,25 @@ URI Fragment Representation</h1>
 <tr>
 <td><code>"/€"</code> </td><td><code>"#/%E2%82%AC"</code> </td><td><code>{"€"}</code> </td></tr>
 </table>
-<p>RapidJSON fully support URI fragment representation. It automatically detects the pound sign during parsing.</p>
-<h1>Stringify</h1>
-<p>You may also stringify a <code>Pointer</code> to a string or other output streams. This can be done by:</p>
+<p>RapidJSON 完全支持 URI 片段表示方式。它在解译时会自动检测 <code>#</code> 号。</p>
+<h1>字符串化</h1>
+<p>你也可以把一个 <code>Pointer</code> 字符串化，储存于字符串或其他输出流。例如：</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a> p(...);</div>
 <div class="line"><a class="code" href="namespacerapidjson.html#a51a6c35028b76e354bbb9e25d7125641">StringBuffer</a> sb;</div>
 <div class="line">p.Stringify(sb);</div>
 <div class="line">std::cout &lt;&lt; sb.GetString() &lt;&lt; std::endl;</div>
-</div><!-- fragment --><p>It can also stringify to URI fragment reprsentation by <code>StringifyUriFragment()</code>.</p>
+</div><!-- fragment --><p>使用 <code>StringifyUriFragment()</code> 可以把 pointer 字符串化为 URI 片段表示法。</p>
 <h1><a class="anchor" id="UserSuppliedTokens"></a>
-User-Supplied Tokens</h1>
-<p>If a pointer will be resolved multiple times, it should be constructed once, and then apply it to different DOMs or in different times. This reduce time and memory allocation for constructing <code>Pointer</code> multiple times.</p>
-<p>We can go one step further, to completely eliminate the parsing process and dynamic memory allocation, we can establish the token array directly:</p>
+使用者提供的 tokens</h1>
+<p>若一个 pointer 会用于多次解析，它应该只被创建一次，然后再施于不同的 DOM ，或在不同时间做解析。这样可以避免多次创键 <code>Pointer</code>，节省时间和内存分配。</p>
+<p>我们甚至可以再更进一步，完全消去解析过程及动态内存分配。我们可以直接生成 token 数组：</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define NAME(s) { s, sizeof(s) / sizeof(s[0]) - 1, kPointerInvalidIndex }</span></div>
 <div class="line"><span class="preprocessor">#define INDEX(i) { #i, sizeof(#i) - 1, i }</span></div>
 <div class="line"></div>
 <div class="line"><span class="keyword">static</span> <span class="keyword">const</span> Pointer::Token kTokens[] = { NAME(<span class="stringliteral">&quot;foo&quot;</span>), INDEX(123) };</div>
 <div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a> p(kTokens, <span class="keyword">sizeof</span>(kTokens) / <span class="keyword">sizeof</span>(kTokens[0]));</div>
 <div class="line"><span class="comment">// Equivalent to static const Pointer p(&quot;/foo/123&quot;);</span></div>
-</div><!-- fragment --><p>This may be useful for memory constrained systems. </p>
+</div><!-- fragment --><p>这种做法可能适合内存受限的系统。 </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->

@@ -23,14 +23,14 @@ var NAVTREE =
       ] ],
       [ "下一部分", "md_doc_tutorial_8zh-cn.html#WhatsNext", null ]
     ] ],
-    [ "Pointer", "md_doc_pointer.html", [
-      [ "JSON Pointer", "md_doc_pointer.html#JsonPointer", null ],
-      [ "Basic Usage", "md_doc_pointer.html#BasicUsage", null ],
-      [ "Helper Functions", "md_doc_pointer.html#HelperFunctions", null ],
-      [ "Resolving Pointer", "md_doc_pointer.html#ResolvingPointer", null ],
-      [ "Error Handling", "md_doc_pointer.html#ErrorHandling", null ],
-      [ "URI Fragment Representation", "md_doc_pointer.html#URIFragment", null ],
-      [ "User-Supplied Tokens", "md_doc_pointer.html#UserSuppliedTokens", null ]
+    [ "Pointer", "md_doc_pointer_8zh-cn.html", [
+      [ "JSON Pointer", "md_doc_pointer_8zh-cn.html#JsonPointer", null ],
+      [ "基本使用方法", "md_doc_pointer_8zh-cn.html#BasicUsage", null ],
+      [ "辅助函数", "md_doc_pointer_8zh-cn.html#HelperFunctions", null ],
+      [ "解析 Pointer", "md_doc_pointer_8zh-cn.html#ResolvingPointer", null ],
+      [ "错误处理", "md_doc_pointer_8zh-cn.html#ErrorHandling", null ],
+      [ "URI 片段表示方式", "md_doc_pointer_8zh-cn.html#URIFragment", null ],
+      [ "使用者提供的 tokens", "md_doc_pointer_8zh-cn.html#UserSuppliedTokens", null ]
     ] ],
     [ "流", "md_doc_stream_8zh-cn.html", [
       [ "内存流", "md_doc_stream_8zh-cn.html#MemoryStreams", [
