@@ -209,7 +209,7 @@ Resolving Pointer</h1>
 </div><!-- fragment --><h2>Resolving Document and Value</h2>
 <p>When using <code>p.Get(root)</code> or <code>GetValueByPointer(root, p)</code>, <code>root</code> is a (const) <code>Value&amp;</code>. That means, it can be a subtree of the DOM.</p>
 <p>The other functions have two groups of signature. One group uses <code>Document&amp; document</code> as parameter, another one uses <code>Value&amp; root</code>. The first group uses <code>document.GetAllocator()</code> for creating values. And the second group needs user to supply an allocator, like the functions in DOM.</p>
-<p>All examples above do not require an allocator parameter, because the parameter is a <code>Document&amp;</code>. But if you want to resolve a pointer to a subtree. You need to supply it as in the following example:</p>
+<p>All examples above do not require an allocator parameter, because the first parameter is a <code>Document&amp;</code>. But if you want to resolve a pointer to a subtree, you need to supply the allocator as in the following example:</p>
 <div class="fragment"><div class="line"><span class="keyword">class </span>Person {</div>
 <div class="line"><span class="keyword">public</span>:</div>
 <div class="line">    Person() {</div>
@@ -235,7 +235,7 @@ Resolving Pointer</h1>
 </div><!-- fragment --><p><code>Erase()</code> or <code>EraseValueByPointer()</code> does not need allocator. And they return <code>true</code> if the value is erased successfully.</p>
 <h1><a class="anchor" id="ErrorHandling"></a>
 Error Handling</h1>
-<p>A <code>Pointer</code> parses a source string in its constructor. If there is parsing error, <code>Pointer::IsValid()</code> returns false. And you can use <code>Pointer::GetParseErrorCode()</code> and <code>GetParseErrorOffset()</code> to retrieve the error information.</p>
+<p>A <code>Pointer</code> parses a source string in its constructor. If there is parsing error, <code>Pointer::IsValid()</code> returns <code>false</code>. And you can use <code>Pointer::GetParseErrorCode()</code> and <code>GetParseErrorOffset()</code> to retrieve the error information.</p>
 <p>Note that, all resolving functions assumes valid pointer. Resolving with an invalid pointer causes assertion failure.</p>
 <h1><a class="anchor" id="URIFragment"></a>
 URI Fragment Representation</h1>
@@ -267,7 +267,7 @@ URI Fragment Representation</h1>
 </div><!-- fragment --><p>It can also stringify to URI fragment reprsentation by <code>StringifyUriFragment()</code>.</p>
 <h1><a class="anchor" id="UserSuppliedTokens"></a>
 User-Supplied Tokens</h1>
-<p>If a pointer will be resolved multiple times, it should be construct once, and then apply it to different DOMs or in different times. This reduce time and memory allocation for constructing <code>Pointer</code> multiple times.</p>
+<p>If a pointer will be resolved multiple times, it should be constructed once, and then apply it to different DOMs or in different times. This reduce time and memory allocation for constructing <code>Pointer</code> multiple times.</p>
 <p>We can go one step further, to completely eliminate the parsing process and dynamic memory allocation, we can establish the token array directly:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#define NAME(s) { s, sizeof(s) / sizeof(s[0]) - 1, kPointerInvalidIndex }</span></div>
 <div class="line"><span class="preprocessor">#define INDEX(i) { #i, sizeof(#i) - 1, i }</span></div>
