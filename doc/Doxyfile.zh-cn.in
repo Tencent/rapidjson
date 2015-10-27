@@ -769,7 +769,7 @@ INPUT                  = readme.zh-cn.md \
                          include/ \
                          doc/features.zh-cn.md \
                          doc/tutorial.zh-cn.md \
-                         doc/pointer.md \
+                         doc/pointer.zh-cn.md \
                          doc/stream.zh-cn.md \
                          doc/encoding.zh-cn.md \
                          doc/dom.zh-cn.md \
