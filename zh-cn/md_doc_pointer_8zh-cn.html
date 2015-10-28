@@ -100,7 +100,7 @@ $(document).ready(function(){initNavTree('md_doc_pointer_8zh-cn.html','');});
 </div>
 <div class="textblock"><h2>状态: 实验性，应该会合进 v1.1</h2>
 <p>JSON Pointer 是一个标准化（<a href="https://tools.ietf.org/html/rfc6901">RFC6901</a>）的方式去选取一个 JSON Document（DOM）中的值。这类似于 XML 的 XPath。然而，JSON Pointer 简单得多，而且每个 JSON Pointer 仅指向单个值。</p>
-<p>使用 RapidJSON　的 JSON Pointer 实现能简化一些 DOM 的操作。</p>
+<p>使用 RapidJSON 的 JSON Pointer 实现能简化一些 DOM 的操作。</p>
 <h1><a class="anchor" id="JsonPointer"></a>
 JSON Pointer</h1>
 <p>一个 JSON Pointer 由一串（零至多个）token 所组成，每个 token 都有 <code>/</code> 前缀。每个 token 可以是一个字符串或数字。例如，给定一个 JSON： </p><div class="fragment"><div class="line">{</div>
@@ -208,7 +208,7 @@ JSON Pointer</h1>
 <div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;/-&quot;</span>, 789);    <span class="comment">// { &quot;foo&quot; : [123, 456], &quot;-&quot; : 789 }</span></div>
 </div><!-- fragment --><h2>解析 Document 及 Value</h2>
 <p>当使用 <code>p.Get(root)</code> 或 <code>GetValueByPointer(root, p)</code>，<code>root</code> 是一个（常数） <code>Value&amp;</code>。这意味着，它也可以是 DOM 里的一个子树。</p>
-<p>其他函数有两组签名。一组使用　<code>Document&amp; document</code>　作为参数，另一组使用 <code>Value&amp; root</code>。第一组使用 <code>document.GetAllocator()</code> 去创建值，而第二组则需要使用者提供一个 allocator，如同 DOM 里的函数。</p>
+<p>其他函数有两组签名。一组使用 <code>Document&amp; document</code> 作为参数，另一组使用 <code>Value&amp; root</code>。第一组使用 <code>document.GetAllocator()</code> 去创建值，而第二组则需要使用者提供一个 allocator，如同 DOM 里的函数。</p>
 <p>以上例子都不需要 allocator 参数，因为它的第一个参数是 <code>Document&amp;</code>。但如果你需要对一个子树进行解析，就需要如下面的例子般提供 allocator：</p>
 <div class="fragment"><div class="line"><span class="keyword">class </span>Person {</div>
 <div class="line"><span class="keyword">public</span>:</div>
