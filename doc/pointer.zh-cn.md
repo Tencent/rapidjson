@@ -4,7 +4,7 @@
 
 JSON Pointer 是一个标准化（[RFC6901]）的方式去选取一个 JSON Document（DOM）中的值。这类似于 XML 的 XPath。然而，JSON Pointer 简单得多，而且每个 JSON Pointer 仅指向单个值。
 
-使用 RapidJSON　的 JSON Pointer 实现能简化一些 DOM 的操作。
+使用 RapidJSON 的 JSON Pointer 实现能简化一些 DOM 的操作。
 
 [TOC]
 
@@ -146,7 +146,7 @@ SetValueByPointer(d, "/-", 789);    // { "foo" : [123, 456], "-" : 789 }
 
 当使用 `p.Get(root)` 或 `GetValueByPointer(root, p)`，`root` 是一个（常数） `Value&`。这意味着，它也可以是 DOM 里的一个子树。
 
-其他函数有两组签名。一组使用　`Document& document`　作为参数，另一组使用 `Value& root`。第一组使用 `document.GetAllocator()` 去创建值，而第二组则需要使用者提供一个 allocator，如同 DOM 里的函数。
+其他函数有两组签名。一组使用 `Document& document` 作为参数，另一组使用 `Value& root`。第一组使用 `document.GetAllocator()` 去创建值，而第二组则需要使用者提供一个 allocator，如同 DOM 里的函数。
 
 以上例子都不需要 allocator 参数，因为它的第一个参数是 `Document&`。但如果你需要对一个子树进行解析，就需要如下面的例子般提供 allocator：
 
