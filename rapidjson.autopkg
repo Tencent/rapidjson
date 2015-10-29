@@ -1,4 +1,6 @@
 nuget {
+	//Usage:  Write-NuGetPackage rapidjson.autopkg -defines:MYVERSION=1.0.2
+	//Be sure you are running Powershell 3.0 and have the CoApp powershell extensions installed properly.
 	nuspec {
 		id = rapidjson;
 		version : ${MYVERSION};
