@@ -20,3 +20,4 @@ Testing
 install_manifest.txt
 Doxyfile
 DartConfiguration.tcl
+*.nupkg
