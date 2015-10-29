@@ -5,7 +5,7 @@ nuget {
 		title: "rapidjson";
 		authors: {"https://github.com/miloyip/rapidjson/releases/tag/v1.0.2"};
 		owners: {"@lsantos (github)"};
-		licenseUrl: "http://www.opensource.org/licenses/mit-license.php";
+		licenseUrl: "https://github.com/miloyip/rapidjson/blob/master/license.txt";
 		projectUrl: "https://github.com/miloyip/rapidjson/";
 		iconUrl: "https://cdn1.iconfinder.com/data/icons/fatcow/32x32/json.png";
 		requireLicenseAcceptance:false;
