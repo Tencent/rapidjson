@@ -39,6 +39,19 @@ static const char kPrettyJson[] =
 "    \"i64\": -1234567890123456789\n"
 "}";
 
+static const char kPrettyJson_FormatOptions_SLA[] =
+"{\n"
+"    \"hello\": \"world\",\n"
+"    \"t\": true,\n"
+"    \"f\": false,\n"
+"    \"n\": null,\n"
+"    \"i\": 123,\n"
+"    \"pi\": 3.1416,\n"
+"    \"a\": [1, 2, 3, -1],\n"
+"    \"u64\": 1234567890123456789,\n"
+"    \"i64\": -1234567890123456789\n"
+"}";
+
 TEST(PrettyWriter, Basic) {
     StringBuffer buffer;
     PrettyWriter<StringBuffer> writer(buffer);
@@ -46,6 +59,16 @@ TEST(PrettyWriter, Basic) {
     StringStream s(kJson);
     reader.Parse(s, writer);
     EXPECT_STREQ(kPrettyJson, buffer.GetString());
+}
+
+TEST(PrettyWriter, FormatOptions) {
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    writer.SetFormatOptions(kFormatSingleLineArray);
+    Reader reader;
+    StringStream s(kJson);
+    reader.Parse(s, writer);
+    EXPECT_STREQ(kPrettyJson_FormatOptions_SLA, buffer.GetString());
 }
 
 TEST(PrettyWriter, SetIndent) {
