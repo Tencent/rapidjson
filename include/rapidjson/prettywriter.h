@@ -24,6 +24,14 @@ RAPIDJSON_DIAG_OFF(effc++)
 
 RAPIDJSON_NAMESPACE_BEGIN
 
+//! Combination of PrettyWriter format flags.
+/*! \see PrettyWriter::SetFormatOptions
+ */
+enum PrettyFormatOptions {
+    kFormatDefault = 0,         //!< Default pretty formatting.
+    kFormatSingleLineArray = 1  //!< Format arrays on a single line.
+};
+
 //! Writer with indentation and spacing.
 /*!
     \tparam OutputStream Type of ouptut os.
@@ -43,7 +51,7 @@ public:
         \param levelDepth Initial capacity of stack.
     */
     PrettyWriter(OutputStream& os, StackAllocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
-        Base(os, allocator, levelDepth), indentChar_(' '), indentCharCount_(4) {}
+        Base(os, allocator, levelDepth), indentChar_(' '), indentCharCount_(4), formatOptions_(kFormatDefault) {}
 
     //! Set custom indentation.
     /*! \param indentChar       Character for indentation. Must be whitespace character (' ', '\\t', '\\n', '\\r').
@@ -54,6 +62,14 @@ public:
         RAPIDJSON_ASSERT(indentChar == ' ' || indentChar == '\t' || indentChar == '\n' || indentChar == '\r');
         indentChar_ = indentChar;
         indentCharCount_ = indentCharCount;
+        return *this;
+    }
+
+    //! Set pretty writer formatting options.
+    /*! \param options Formatting options.
+    */
+    PrettyWriter& SetFormatOptions(PrettyFormatOptions options) {
+        formatOptions_ = options;
         return *this;
     }
 
@@ -120,7 +136,7 @@ public:
         RAPIDJSON_ASSERT(Base::level_stack_.template Top<typename Base::Level>()->inArray);
         bool empty = Base::level_stack_.template Pop<typename Base::Level>(1)->valueCount == 0;
 
-        if (!empty) {
+        if (!empty && !(formatOptions_ & kFormatSingleLineArray)) {
             Base::os_->Put('\n');
             WriteIndent();
         }
@@ -151,11 +167,14 @@ protected:
             if (level->inArray) {
                 if (level->valueCount > 0) {
                     Base::os_->Put(','); // add comma if it is not the first element in array
+                    if (formatOptions_ & kFormatSingleLineArray)
+                        Base::os_->Put(' ');
+                } 
+
+                if (!(formatOptions_ && kFormatSingleLineArray)) {
                     Base::os_->Put('\n');
+                    WriteIndent();
                 }
-                else
-                    Base::os_->Put('\n');
-                WriteIndent();
             }
             else {  // in object
                 if (level->valueCount > 0) {
@@ -191,6 +210,7 @@ protected:
 
     Ch indentChar_;
     unsigned indentCharCount_;
+    PrettyFormatOptions formatOptions_;
 
 private:
     // Prohibit copy constructor & assignment operator.
