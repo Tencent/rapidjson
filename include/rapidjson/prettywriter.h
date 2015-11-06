@@ -171,7 +171,7 @@ protected:
                         Base::os_->Put(' ');
                 } 
 
-                if (!(formatOptions_ && kFormatSingleLineArray)) {
+                if (!(formatOptions_ & kFormatSingleLineArray)) {
                     Base::os_->Put('\n');
                     WriteIndent();
                 }
