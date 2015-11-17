@@ -381,7 +381,7 @@ TYPED_TEST(DocumentMove, MoveConstructor) {
     EXPECT_TRUE(a.IsNull());
     EXPECT_TRUE(b.IsArray());
     EXPECT_EQ(3u, b.Size());
-    EXPECT_EQ(&a.GetAllocator(), (void*)0);
+    EXPECT_THROW(a.GetAllocator(), AssertException);
     EXPECT_EQ(&b.GetAllocator(), &allocator);
 
     b.Parse("{\"Foo\": \"Bar\", \"Baz\": 42}");
@@ -394,7 +394,7 @@ TYPED_TEST(DocumentMove, MoveConstructor) {
     EXPECT_TRUE(b.IsNull());
     EXPECT_TRUE(c.IsObject());
     EXPECT_EQ(2u, c.MemberCount());
-    EXPECT_EQ(&b.GetAllocator(), (void*)0);
+    EXPECT_THROW(b.GetAllocator(), AssertException);
     EXPECT_EQ(&c.GetAllocator(), &allocator);
 }
 
@@ -475,7 +475,7 @@ TYPED_TEST(DocumentMove, MoveAssignment) {
     EXPECT_TRUE(a.IsNull());
     EXPECT_TRUE(b.IsArray());
     EXPECT_EQ(3u, b.Size());
-    EXPECT_EQ(&a.GetAllocator(), (void*)0);
+    EXPECT_THROW(a.GetAllocator(), AssertException);
     EXPECT_EQ(&b.GetAllocator(), &allocator);
 
     b.Parse("{\"Foo\": \"Bar\", \"Baz\": 42}");
@@ -489,7 +489,7 @@ TYPED_TEST(DocumentMove, MoveAssignment) {
     EXPECT_TRUE(b.IsNull());
     EXPECT_TRUE(c.IsObject());
     EXPECT_EQ(2u, c.MemberCount());
-    EXPECT_EQ(&b.GetAllocator(), (void*)0);
+    EXPECT_THROW(b.GetAllocator(), AssertException);
     EXPECT_EQ(&c.GetAllocator(), &allocator);
 }
 
