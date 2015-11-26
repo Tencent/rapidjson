@@ -1986,6 +1986,17 @@ public:
     //! Get the position of last parsing error in input, 0 otherwise.
     size_t GetErrorOffset() const { return parseResult_.Offset(); }
 
+    //! Implicit conversion to get the last parse result
+    /*! \return \ref ParseResult of the last parse operation
+
+        \code
+          Document doc;
+          ParseResult ok = doc.Parse(json);
+          if (!ok)
+            printf( "JSON parse error: %s (%u)\n", GetParseError_En(ok.Code()), ok.Offset());
+        \endcode
+     */
+    operator ParseResult() const { return parseResult_; }
     //!@}
 
     //! Get the allocator of this document.
