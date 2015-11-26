@@ -213,10 +213,10 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 <tr class="memdesc:af061c039a990c2970dc31e5626149367"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse JSON text from a mutable string (with <a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835">kParseDefaultFlags</a>)  <a href="#af061c039a990c2970dc31e5626149367">更多...</a><br /></td></tr>
 <tr class="separator:af061c039a990c2970dc31e5626149367"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Parse from read-only string</div></td></tr>
-<tr class="memitem:a5bb026ab42705b2c2cfbbf904108b3f5"><td class="memTemplParams" colspan="2">template&lt;unsigned parseFlags, typename SourceEncoding &gt; </td></tr>
-<tr class="memitem:a5bb026ab42705b2c2cfbbf904108b3f5"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_document.html#a5bb026ab42705b2c2cfbbf904108b3f5">Parse</a> (const <a class="el" href="classrapidjson_1_1_generic_value.html#adcdbc7fa85a9a41b78966d7e0dcc2ac4">Ch</a> *str)</td></tr>
-<tr class="memdesc:a5bb026ab42705b2c2cfbbf904108b3f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse JSON text from a read-only string (with <a class="el" href="classrapidjson_1_1_encoding.html" title="Concept for encoding of Unicode characters. ">Encoding</a> conversion)  <a href="#a5bb026ab42705b2c2cfbbf904108b3f5">更多...</a><br /></td></tr>
-<tr class="separator:a5bb026ab42705b2c2cfbbf904108b3f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea842b533a858c9a3861451ad9e8642c"><td class="memTemplParams" colspan="2">template&lt;unsigned parseFlags, typename SourceEncoding &gt; </td></tr>
+<tr class="memitem:aea842b533a858c9a3861451ad9e8642c"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c">Parse</a> (const typename SourceEncoding::Ch *str)</td></tr>
+<tr class="memdesc:aea842b533a858c9a3861451ad9e8642c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse JSON text from a read-only string (with <a class="el" href="classrapidjson_1_1_encoding.html" title="Concept for encoding of Unicode characters. ">Encoding</a> conversion)  <a href="#aea842b533a858c9a3861451ad9e8642c">更多...</a><br /></td></tr>
+<tr class="separator:aea842b533a858c9a3861451ad9e8642c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42c35e2f64c288f14b74fec2792500c8"><td class="memTemplParams" colspan="2">template&lt;unsigned parseFlags&gt; </td></tr>
 <tr class="memitem:a42c35e2f64c288f14b74fec2792500c8"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_document.html#a42c35e2f64c288f14b74fec2792500c8">Parse</a> (const <a class="el" href="classrapidjson_1_1_generic_value.html#adcdbc7fa85a9a41b78966d7e0dcc2ac4">Ch</a> *str)</td></tr>
 <tr class="memdesc:a42c35e2f64c288f14b74fec2792500c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse JSON text from a read-only string.  <a href="#a42c35e2f64c288f14b74fec2792500c8">更多...</a><br /></td></tr>
@@ -779,7 +779,7 @@ template&lt;typename Encoding, typename Allocator, typename StackAllocator&gt; <
 </div>
 </div>
 <h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a5bb026ab42705b2c2cfbbf904108b3f5"></a>
+<a class="anchor" id="aea842b533a858c9a3861451ad9e8642c"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -793,7 +793,7 @@ template&lt;unsigned parseFlags, typename SourceEncoding &gt; </div>
         <tr>
           <td class="memname"><a class="el" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="el" href="classrapidjson_1_1_generic_document.html">rapidjson::GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a>, StackAllocator &gt;::Parse </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classrapidjson_1_1_generic_value.html#adcdbc7fa85a9a41b78966d7e0dcc2ac4">Ch</a> *&#160;</td>
+          <td class="paramtype">const typename SourceEncoding::Ch *&#160;</td>
           <td class="paramname"><em>str</em></td><td>)</td>
           <td></td>
         </tr>
