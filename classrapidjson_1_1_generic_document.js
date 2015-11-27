@@ -11,6 +11,7 @@ var classrapidjson_1_1_generic_document =
     [ "GetParseError", "classrapidjson_1_1_generic_document.html#ad97e64c123ec1e07ea62ab0a9ce80c00", null ],
     [ "GetStackCapacity", "classrapidjson_1_1_generic_document.html#ac785c064649dea6cfa67207b6bda748e", null ],
     [ "HasParseError", "classrapidjson_1_1_generic_document.html#a2ab17089bd6249bf2a7959d56d35cb68", null ],
+    [ "operator ParseResult", "classrapidjson_1_1_generic_document.html#a0de48f0c884423b6fcfabc2e93942968", null ],
     [ "Parse", "classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c", null ],
     [ "Parse", "classrapidjson_1_1_generic_document.html#a42c35e2f64c288f14b74fec2792500c8", null ],
     [ "Parse", "classrapidjson_1_1_generic_document.html#ab031375318d133f83a114314b75703de", null ],

@@ -237,6 +237,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_document.html#ab791c05727d83f6834a1b916783dbc06">GetErrorOffset</a> () const </td></tr>
 <tr class="memdesc:ab791c05727d83f6834a1b916783dbc06"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the position of last parsing error in input, 0 otherwise. <br /></td></tr>
 <tr class="separator:ab791c05727d83f6834a1b916783dbc06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0de48f0c884423b6fcfabc2e93942968"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_document.html#a0de48f0c884423b6fcfabc2e93942968">operator ParseResult</a> () const </td></tr>
+<tr class="memdesc:a0de48f0c884423b6fcfabc2e93942968"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implicit conversion to get the last parse result.  <a href="#a0de48f0c884423b6fcfabc2e93942968">更多...</a><br /></td></tr>
+<tr class="separator:a0de48f0c884423b6fcfabc2e93942968"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classrapidjson_1_1_generic_value"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classrapidjson_1_1_generic_value')"><img src="closed.png" alt="-"/>&#160;Public 成员函数 继承自 <a class="el" href="classrapidjson_1_1_generic_value.html">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a></td></tr>
 <tr class="memitem:aeef0506cd1f8d703db4833c503f0657e inherit pub_methods_classrapidjson_1_1_generic_value"><td class="memTemplParams" colspan="2">template&lt;typename Handler &gt; </td></tr>
 <tr class="memitem:aeef0506cd1f8d703db4833c503f0657e inherit pub_methods_classrapidjson_1_1_generic_value"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#aeef0506cd1f8d703db4833c503f0657e">Accept</a> (<a class="el" href="classrapidjson_1_1_handler.html">Handler</a> &amp;handler) const </td></tr>
@@ -779,6 +782,38 @@ template&lt;typename Encoding, typename Allocator, typename StackAllocator&gt; <
 </div>
 </div>
 <h2 class="groupheader">成员函数说明</h2>
+<a class="anchor" id="a0de48f0c884423b6fcfabc2e93942968"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Encoding, typename Allocator, typename StackAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrapidjson_1_1_generic_document.html">rapidjson::GenericDocument</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a>, StackAllocator &gt;::operator <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result">ParseResult</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implicit conversion to get the last parse result. </p>
+<dl class="section return"><dt>返回</dt><dd><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html">ParseResult</a> of the last parse operation</dd></dl>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> doc;</div>
+<div class="line">ParseResult ok = doc.Parse(json);</div>
+<div class="line"><span class="keywordflow">if</span> (!ok)</div>
+<div class="line">  printf( <span class="stringliteral">&quot;JSON parse error: %s (%u)\n&quot;</span>, <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(ok.Code()), ok.Offset());</div>
+</div><!-- fragment --> 
+</div>
+</div>
 <a class="anchor" id="aea842b533a858c9a3861451ad9e8642c"></a>
 <div class="memitem">
 <div class="memproto">
