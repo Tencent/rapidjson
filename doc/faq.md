@@ -142,7 +142,7 @@
 
    The most important requirement to take care of document and value life-cycle as well as consistent memory managent using the right allocator during the value transfer.
    
-   Simple yet most efficient way to achieve that is to modify the `address` definition above to initialize it with allocator of the `person` document, then we just add the root nenber of the value:
+   Simple yet most efficient way to achieve that is to modify the `address` definition above to initialize it with allocator of the `person` document, then we just add the root member of the value:
    ~~~~~~~~~~cpp
    Documnet address(person.GetAllocator());
    ...

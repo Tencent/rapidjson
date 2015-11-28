@@ -28,7 +28,7 @@
 
 6. 怎样安装RapidJSON？
 
-   见[安装一节](readme.zh-cn.md)。
+   见[安装一节](../readme.zh-cn.md#安装)。
 
 7. RapidJSON能否运行于我的平台？
 
@@ -52,7 +52,7 @@
 
 12. 有没有其他替代品？
 
-   有许多替代品。例如nativejson-benchmark](https://github.com/miloyip/nativejson-benchmark)列出了一些开源的C/C++ JSON库。[json.org](http://www.json.org/)也有一个列表。
+   有许多替代品。例如[nativejson-benchmark](https://github.com/miloyip/nativejson-benchmark)列出了一些开源的C/C++ JSON库。[json.org](http://www.json.org/)也有一个列表。
 
 ## JSON
 
@@ -98,9 +98,68 @@
 
    错误信息存储在`ParseResult`，它包含错误代号及偏移值（从JSON开始至错误处的字符数目）。可以把错误代号翻译为人类可读的错误讯息。
 
-7. 为可不只使用`double`去表示JSON number？
+7. 为何不只使用`double`去表示JSON number？
 
    一些应用需要使用64位无号／有号整数。这些整数不能无损地转换成`double`。因此解析器会检测一个JSON number是否能转换至各种整数类型及`double`。
+
+8. 如何清空并最小化`document`或`value`的容量？
+
+   调用 `SetXXX()` 方法 - 这些方法会调用析构函数，并重建空的Object或Array:
+
+   ~~~~~~~~~~cpp
+   Document d;
+   ...
+   d.SetObject();  // clear and minimize
+   ~~~~~~~~~~
+
+   另外，也可以参考在 [C++ swap with temporary idiom](https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Clear-and-minimize)中的一种等价的方法:
+   ~~~~~~~~~~cpp
+   Value(kObjectType).Swap(d);
+   ~~~~~~~~~~
+   或者，使用这个稍微长一点的代码也能完成同样的事情:
+   ~~~~~~~~~~cpp
+   d.Swap(Value(kObjectType).Move()); 
+   ~~~~~~~~~~
+
+9. 如何将一个`document`节点插入到另一个`document`中？
+
+   比如有以下两个document(DOM):
+   ~~~~~~~~~~cpp
+   Document person;
+   person.Parse("{\"person\":{\"name\":{\"first\":\"Adam\",\"last\":\"Thomas\"}}}");
+   
+   Document address;
+   address.Parse("{\"address\":{\"city\":\"Moscow\",\"street\":\"Quiet\"}}");
+   ~~~~~~~~~~
+   假设我们希望将整个 `address` 插入到`person`中，作为其的一个子节点:
+   ~~~~~~~~~~js
+   { "person": {
+      "name": { "first": "Adam", "last": "Thomas" },
+      "address": { "city": "Moscow", "street": "Quiet" }
+      }
+   }
+   ~~~~~~~~~~
+
+   在插入节点的过程中需要注意`document`和`value`的生命周期并且正确地使用allocator进行内存分配和管理。
+
+   一个简单有效的方法就是修改上述`address`变量的定义，让其使用`person`的allocator初始化，然后将其添加到根节点。
+
+   ~~~~~~~~~~cpp
+   Documnet address(person.GetAllocator());
+   ...
+   person["person"].AddMember("address", address["address"], person.GetAllocator());
+   ~~~~~~~~~~
+   当然，如果你不想通过显式地写出`address`的key来得到其值，可以使用迭代器来实现:
+   ~~~~~~~~~~cpp
+   auto addressRoot = address.MemberBegin();
+   person["person"].AddMember(addressRoot->name, addressRoot->value, person.GetAllocator());
+   ~~~~~~~~~~
+   
+   此外，还可以通过深拷贝address document来实现:
+   ~~~~~~~~~~cpp
+   Value addressValue = Value(address["address"], person.GetAllocator());
+   person["person"].AddMember("address", addressValue, person.GetAllocator());
+   ~~~~~~~~~~
 
 ## Document/Value (DOM)
 
