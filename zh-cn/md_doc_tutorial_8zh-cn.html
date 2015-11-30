@@ -111,7 +111,7 @@ $(document).ready(function(){initNavTree('md_doc_tutorial_8zh-cn.html','');});
 </ul>
 </div>
 <div class="textblock"><p>本教程简介文件对象模型（Document Object Model, DOM）API。</p>
-<p>如用法一览中所示，可以解析一个JSON至DOM，然后就可以轻松查询及修改DOM，并最终转换回JSON。</p>
+<p>如<a href="../readme.zh-cn.md#用法一览">用法一览</a>中所示，可以解析一个JSON至DOM，然后就可以轻松查询及修改DOM，并最终转换回JSON。</p>
 <h1><a class="anchor" id="ValueDocument"></a>
 Value 及 Document</h1>
 <p>每个JSON值都储存为<code>Value</code>类，而<code>Document</code>类则表示整个DOM，它存储了一个DOM树的根<code>Value</code>。RapidJSON的所有公开类型及函数都在<code>rapidjson</code>命名空间中。</p>
@@ -177,7 +177,7 @@ Value 及 Document</h1>
 查询Array</h2>
 <p>缺省情况下，<code>SizeType</code>是<code>unsigned</code>的typedef。在多数系统中，Array最多能存储2^32-1个元素。</p>
 <p>你可以用整数字面量访问元素，如<code>a[0]</code>、<code>a[1]</code>、<code>a[2]</code>。</p>
-<p>Array与<code>std::vector</code>相似，除了使用索引，也可使用迭待器来访问所有元素。 </p><div class="fragment"><div class="line"><span class="keywordflow">for</span> (Value::ConstValueIterator itr = a.Begin(); itr != a.End(); ++itr)</div>
+<p>Array与<code>std::vector</code>相似，除了使用索引，也可使用迭代器来访问所有元素。 </p><div class="fragment"><div class="line"><span class="keywordflow">for</span> (Value::ConstValueIterator itr = a.Begin(); itr != a.End(); ++itr)</div>
 <div class="line">    printf(<span class="stringliteral">&quot;%d &quot;</span>, itr-&gt;GetInt());</div>
 </div><!-- fragment --><p>还有一些熟悉的查询函数：</p><ul>
 <li><code>SizeType Capacity() const</code></li>
@@ -425,7 +425,7 @@ Value 及 Document</h1>
 <ul>
 <li><code>bool RemoveMember(const Ch* name)</code>：使用键名来移除成员（线性时间复杂度）。</li>
 <li><code>bool RemoveMember(const Value&amp; name)</code>：除了<code>name</code>是一个Value，和上一行相同。</li>
-<li><code>MemberIterator RemoveMember(MemberIterator)</code>：使用迭待器移除成员（_常数_时间复杂度）。</li>
+<li><code>MemberIterator RemoveMember(MemberIterator)</code>：使用迭代器移除成员（_常数_时间复杂度）。</li>
 <li><code>MemberIterator EraseMember(MemberIterator)</code>：和上行相似但维持成员次序（线性时间复杂度）。</li>
 <li><code>MemberIterator EraseMember(MemberIterator first, MemberIterator last)</code>：移除一个范围内的成员，维持次序（线性时间复杂度）。</li>
 </ul>

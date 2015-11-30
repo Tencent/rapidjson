@@ -231,7 +231,7 @@ GenericReader</h2>
 </div><!-- fragment --><p>若在解析中出现错误，它会返回<code>false</code>。使用者可调用<code>bool HasParseEror()</code>, <code>ParseErrorCode GetParseErrorCode()</code>及<code>size_t GetErrorOffset()</code>获取错误状态。实际上<code>Document</code>使用这些<code>Reader</code>函数去获取解析错误。请参考DOM去了解有关解析错误的细节。</p>
 <h1><a class="anchor" id="Writer"></a>
 Writer</h1>
-<p><code>Reader</code>把JSON转换（解析）成为事件。<code>Writer</code>完全做相反的事情。它把事件转换成JSON。</p>
+<p><code>Reader</code>把JSON转换（解析）成为事件。<code>Writer</code>做完全相反的事情。它把事件转换成JSON。</p>
 <p><code>Writer</code>是非常容易使用的。若你的应用程序只需把一些数据转换成JSON，可能直接使用<code>Writer</code>，会比建立一个<code>Document</code>然后用<code>Writer</code>把它转换成JSON更加方便。</p>
 <p>在<code>simplewriter</code>例子里，我们做<code>simplereader</code>完全相反的事情。</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/writer.h&quot;</span></div>
@@ -299,7 +299,7 @@ Writer</h1>
 <p>此外，<code>Writer</code>的构造函数有一<code>levelDepth</code>参数。存储每层阶信息的初始内存分配量受此参数影响。</p>
 <h2><a class="anchor" id="PrettyWriter"></a>
 PrettyWriter</h2>
-<p><code>Writer</code>所输出的是没有空格字符的最紧凑JSON，适合网络传输或储存，但就适合人类阅读。</p>
+<p><code>Writer</code>所输出的是没有空格字符的最紧凑JSON，适合网络传输或储存，但不适合人类阅读。</p>
 <p>因此，RapidJSON提供了一个<code>PrettyWriter</code>，它在输出中加入缩进及换行。</p>
 <p><code>PrettyWriter</code>的用法与<code>Writer</code>几乎一样，不同之处是<code>PrettyWriter</code>提供了一个<code>SetIndent(Ch indentChar, unsigned indentCharCount)</code>函数。缺省的缩进是4个空格。</p>
 <h2><a class="anchor" id="CompletenessReset"></a>
@@ -406,11 +406,11 @@ PrettyWriter</h2>
 <div class="line">{ <span class="stringliteral">&quot;greeting&quot;</span> : <span class="stringliteral">&quot;Hello!&quot;</span>, <span class="stringliteral">&quot;farewell&quot;</span> : <span class="stringliteral">&quot;bye-bye!&quot;</span>, <span class="stringliteral">&quot;foo&quot;</span> : {} }</div>
 <div class="line">Error: Terminate parsing due to Handler error.</div>
 <div class="line"> at offset 59 near <span class="stringliteral">&#39;} }...&#39;</span></div>
-</div><!-- fragment --><p>第一个JSON（<code>json1</code>）被成功地解析至<code>MessageMap</code>。由于<code>MessageMap</code>是一个<code>std::map</code>，列印次序按键值排序。此次序与JSON中的次序不同。</p>
-<p>在第二个JSON（<code>json2</code>）中，<code>foo</code>的值是一个空object。由于它是一个object，<code>MessageHandler::StartObject()</code>会被调用。然而，在<code>state_ = kExpectValue</code>的情况下，该函数会返回<code>false</code>，并令到解析过程终止。错误代码是<code>kParseErrorTermination</code>。</p>
+</div><!-- fragment --><p>第一个JSON（<code>json1</code>）被成功地解析至<code>MessageMap</code>。由于<code>MessageMap</code>是一个<code>std::map</code>，打印次序按键值排序。此次序与JSON中的次序不同。</p>
+<p>在第二个JSON（<code>json2</code>）中，<code>foo</code>的值是一个空object。由于它是一个object，<code>MessageHandler::StartObject()</code>会被调用。然而，在<code>state_ = kExpectValue</code>的情况下，该函数会返回<code>false</code>，并导致解析过程终止。错误代码是<code>kParseErrorTermination</code>。</p>
 <h2><a class="anchor" id="Filtering"></a>
 过滤JSON</h2>
-<p>如前面提及过，<code>Writer</code>可处理<code>Reader</code>发出的事件。<code>condense</code>例子简单地设置<code>Writer</code>作为一个<code>Reader</code>的处理器，因此它能移除JSON中的所有空白字符。<code>pretty</code>例子使用同样的关系，只是以<code>PrettyWriter</code>取代<code>Writer</code>。因此<code>pretty</code>能够重新格式化JSON，加入缩进及换行。</p>
+<p>如前面提及过，<code>Writer</code>可处理<code>Reader</code>发出的事件。<code>example/condense/condense.cpp</code>例子简单地设置<code>Writer</code>作为一个<code>Reader</code>的处理器，因此它能移除JSON中的所有空白字符。<code>example/pretty/pretty.cpp</code>例子使用同样的关系，只是以<code>PrettyWriter</code>取代<code>Writer</code>。因此<code>pretty</code>能够重新格式化JSON，加入缩进及换行。</p>
 <p>实际上，我们可以使用SAX风格API去加入（多个）中间层去过滤JSON的内容。例如<code>capitalize</code>例子可以把所有JSON string改为大写。</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="reader_8h.html">rapidjson/reader.h</a>&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/writer.h&quot;</span></div>
@@ -473,7 +473,7 @@ PrettyWriter</h2>
 </div><!-- fragment --><p>注意到，不可简单地把JSON当作字符串去改为大写。例如： </p><div class="fragment"><div class="line">[<span class="stringliteral">&quot;Hello\nWorld&quot;</span>]</div>
 </div><!-- fragment --><p>简单地把整个JSON转为大写的话会产生错误的转义符： </p><div class="fragment"><div class="line">[<span class="stringliteral">&quot;HELLO\NWORLD&quot;</span>]</div>
 </div><!-- fragment --><p>而<code>capitalize</code>就会产生正确的结果： </p><div class="fragment"><div class="line">[<span class="stringliteral">&quot;HELLO\nWORLD&quot;</span>]</div>
-</div><!-- fragment --><p>我们还可以开发更复杂的过滤器。然而，由于SAX风格API在某一时间点只能提供单一事件的信息，使用者需要自行记录一些上下文信息（例如从根节点起的路径、储存其他相关值）。对些一些处理情况，用DOM会比SAX更容易实现。 </p>
+</div><!-- fragment --><p>我们还可以开发更复杂的过滤器。然而，由于SAX风格API在某一时间点只能提供单一事件的信息，使用者需要自行记录一些上下文信息（例如从根节点起的路径、储存其他相关值）。对于处理某些情况，用DOM会比SAX更容易实现。 </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->

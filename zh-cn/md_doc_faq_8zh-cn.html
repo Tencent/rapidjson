@@ -107,7 +107,7 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <p class="startli">RapidJSON仅依赖于C++标准库。</p>
 </li>
 <li><p class="startli">怎样安装RapidJSON？</p>
-<p class="startli">见安装一节。</p>
+<p class="startli">见<a href="../readme.zh-cn.md#安装">安装一节</a>。</p>
 </li>
 <li><p class="startli">RapidJSON能否运行于我的平台？</p>
 <p class="startli">社区已在多个操作系统／编译器／CPU架构的组合上测试RapidJSON。但我们无法确保它能运行于你特定的平台上。只需要生成及执行单元测试便能获取答案。</p>
@@ -125,7 +125,7 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <p class="startli">RapidJSON提供了使用手册及API说明文档。</p>
 </li>
 <li><p class="startli">有没有其他替代品？</p>
-<p class="startli">有许多替代品。例如nativejson-benchmark](<a href="https://github.com/miloyip/nativejson-benchmark">https://github.com/miloyip/nativejson-benchmark</a>)列出了一些开源的C/C++ JSON库。<a href="http://www.json.org/">json.org</a>也有一个列表。</p>
+<p class="startli">有许多替代品。例如<a href="https://github.com/miloyip/nativejson-benchmark">nativejson-benchmark</a>列出了一些开源的C/C++ JSON库。<a href="http://www.json.org/">json.org</a>也有一个列表。</p>
 </li>
 </ol>
 <h2>JSON</h2>
@@ -165,11 +165,42 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <li><p class="startli">有什么错误信息？</p>
 <p class="startli">错误信息存储在<code>ParseResult</code>，它包含错误代号及偏移值（从JSON开始至错误处的字符数目）。可以把错误代号翻译为人类可读的错误讯息。</p>
 </li>
-<li><p class="startli">为可不只使用<code>double</code>去表示JSON number？</p>
+<li><p class="startli">为何不只使用<code>double</code>去表示JSON number？</p>
 <p class="startli">一些应用需要使用64位无号／有号整数。这些整数不能无损地转换成<code>double</code>。因此解析器会检测一个JSON number是否能转换至各种整数类型及<code>double</code>。</p>
 </li>
+<li><p class="startli">如何清空并最小化<code>document</code>或<code>value</code>的容量？</p>
+<p class="startli">调用 <code>SetXXX()</code> 方法 - 这些方法会调用析构函数，并重建空的Object或Array:</p>
+</li>
 </ol>
-<h2>Document/Value (DOM)</h2>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="line">...</div>
+<div class="line">d.SetObject();  <span class="comment">// clear and minimize</span></div>
+</div><!-- fragment --><p>另外，也可以参考在 <a href="https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Clear-and-minimize">C++ swap with temporary idiom</a>中的一种等价的方法: </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>).Swap(d);</div>
+</div><!-- fragment --><p> 或者，使用这个稍微长一点的代码也能完成同样的事情: </p><div class="fragment"><div class="line">d.Swap(<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>).Move()); </div>
+</div><!-- fragment --><ol type="1">
+<li><p class="startli">如何将一个<code>document</code>节点插入到另一个<code>document</code>中？</p>
+<p class="startli">比如有以下两个document(DOM): </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> person;</div>
+<div class="line">person.Parse(<span class="stringliteral">&quot;{\&quot;person\&quot;:{\&quot;name\&quot;:{\&quot;first\&quot;:\&quot;Adam\&quot;,\&quot;last\&quot;:\&quot;Thomas\&quot;}}}&quot;</span>);</div>
+<div class="line"></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> address;</div>
+<div class="line">address.Parse(<span class="stringliteral">&quot;{\&quot;address\&quot;:{\&quot;city\&quot;:\&quot;Moscow\&quot;,\&quot;street\&quot;:\&quot;Quiet\&quot;}}&quot;</span>);</div>
+</div><!-- fragment --><p> 假设我们希望将整个 <code>address</code> 插入到<code>person</code>中，作为其的一个子节点: </p><div class="fragment"><div class="line">{ <span class="stringliteral">&quot;person&quot;</span>: {</div>
+<div class="line">   <span class="stringliteral">&quot;name&quot;</span>: { <span class="stringliteral">&quot;first&quot;</span>: <span class="stringliteral">&quot;Adam&quot;</span>, <span class="stringliteral">&quot;last&quot;</span>: <span class="stringliteral">&quot;Thomas&quot;</span> },</div>
+<div class="line">   <span class="stringliteral">&quot;address&quot;</span>: { <span class="stringliteral">&quot;city&quot;</span>: <span class="stringliteral">&quot;Moscow&quot;</span>, <span class="stringliteral">&quot;street&quot;</span>: <span class="stringliteral">&quot;Quiet&quot;</span> }</div>
+<div class="line">   }</div>
+<div class="line">}</div>
+</div><!-- fragment --><p class="startli">在插入节点的过程中需要注意<code>document</code>和<code>value</code>的生命周期并且正确地使用allocator进行内存分配和管理。</p>
+<p class="startli">一个简单有效的方法就是修改上述<code>address</code>变量的定义，让其使用<code>person</code>的allocator初始化，然后将其添加到根节点。</p>
+</li>
+</ol>
+<div class="fragment"><div class="line">Documnet address(person.GetAllocator());</div>
+<div class="line">...</div>
+<div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(<span class="stringliteral">&quot;address&quot;</span>, address[<span class="stringliteral">&quot;address&quot;</span>], person.GetAllocator());</div>
+</div><!-- fragment --><p> 当然，如果你不想通过显式地写出<code>address</code>的key来得到其值，可以使用迭代器来实现: </p><div class="fragment"><div class="line"><span class="keyword">auto</span> addressRoot = address.MemberBegin();</div>
+<div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(addressRoot-&gt;name, addressRoot-&gt;value, person.GetAllocator());</div>
+</div><!-- fragment --><p>此外，还可以通过深拷贝address document来实现: </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> addressValue = <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>(address[<span class="stringliteral">&quot;address&quot;</span>], person.GetAllocator());</div>
+<div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(<span class="stringliteral">&quot;address&quot;</span>, addressValue, person.GetAllocator());</div>
+</div><!-- fragment --><h2>Document/Value (DOM)</h2>
 <ol type="1">
 <li><p class="startli">什么是转移语意？为什么？</p>
 <p class="startli"><code>Value</code>不用复制语意，而使用了转移语意。这是指，当把来源值赋值于目标值时，来源值的所有权会转移至目标值。</p>
