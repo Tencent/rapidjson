@@ -1456,3 +1456,38 @@ TEST(Pointer, Ambiguity) {
         EXPECT_EQ(456, Pointer("/0/1").Get(d)->GetInt());
     }
 }
+
+// https://github.com/miloyip/rapidjson/issues/483
+namespace myjson {
+
+class MyAllocator
+{
+public:
+    static const bool kNeedFree = true;
+    void * Malloc(size_t _size) { return malloc(_size); }
+    void * Realloc(void *_org_p, size_t _org_size, size_t _new_size) { (void)_org_size; return realloc(_org_p, _new_size); }
+    static void Free(void *_p) { return free(_p); }
+};
+
+typedef rapidjson::GenericDocument<
+            rapidjson::UTF8<>,
+            rapidjson::MemoryPoolAllocator< MyAllocator >,
+            MyAllocator
+        > Document;
+
+typedef rapidjson::GenericPointer<
+            ::myjson::Document::ValueType,
+            MyAllocator
+        > Pointer;
+
+typedef ::myjson::Document::ValueType Value;
+
+}
+
+TEST(Pointer, Issue483) {
+    std::string mystr, path;
+    myjson::Document document;
+    myjson::Value value(rapidjson::kStringType);
+    value.SetString(mystr.c_str(), mystr.length(), document.GetAllocator());
+    myjson::Pointer(path.c_str()).Set(document, value, document.GetAllocator());
+}
