@@ -73,6 +73,7 @@ public:
             Encoding::PutBOM(os_);
     }
 
+    void Reserve(size_t size) { os_.Reserve(size); }
     void Put(Ch c) { Encoding::Put(os_, c);  }
     void Flush() { os_.Flush(); }
 
@@ -223,6 +224,7 @@ public:
 
     UTFType GetType() const { return type_; }
 
+    void Reserve(size_t size) { os_->Reserve(size); }
     void Put(Ch c) { putFunc_(*os_, c); }
     void Flush() { os_->Flush(); } 
 

@@ -254,6 +254,9 @@ concept Stream {
     //! \return Number of characters read from start.
     size_t Tell();
 
+    //! Prepare for writing 'size' characters.
+    void Reserve(size_t size);
+
     //! Begin writing operation at the current read pointer.
     //! \return The begin writer pointer.
     Ch* PutBegin();
@@ -272,7 +275,7 @@ concept Stream {
 ~~~~~~~~~~
 
 For input stream, they must implement `Peek()`, `Take()` and `Tell()`.
-For output stream, they must implement `Put()` and `Flush()`. 
+For output stream, they must implement `Reserve()`, `Put()` and `Flush()`. 
 There are two special interface, `PutBegin()` and `PutEnd()`, which are only for *in situ* parsing. Normal streams do not implement them. However, if the interface is not needed for a particular stream, it is still need to a dummy implementation, otherwise will generate compilation error.
 
 ## Example: istream wrapper {#ExampleIStreamWrapper}
@@ -300,6 +303,7 @@ public:
     size_t Tell() const { return (size_t)is_.tellg(); } // 3
 
     Ch* PutBegin() { assert(false); return 0; }
+    void Reserve(size_t) { assert(false); }
     void Put(Ch) { assert(false); }
     void Flush() { assert(false); }
     size_t PutEnd(Ch*) { assert(false); return 0; }
@@ -342,6 +346,7 @@ public:
     size_t Tell() const {  }
 
     Ch* PutBegin() { assert(false); return 0; }
+    void Reserve(size_t) { }
     void Put(Ch c) { os_.put(c); }                  // 1
     void Flush() { os_.flush(); }                   // 2
     size_t PutEnd(Ch*) { assert(false); return 0; }

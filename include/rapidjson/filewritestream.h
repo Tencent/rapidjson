@@ -32,6 +32,8 @@ public:
         RAPIDJSON_ASSERT(fp_ != 0);
     }
 
+    void Reserve(size_t) { }
+
     void Put(char c) { 
         if (current_ >= bufferEnd_)
             Flush();
