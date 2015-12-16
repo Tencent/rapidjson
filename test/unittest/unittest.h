@@ -1,5 +1,5 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
-// 
+//
 // Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
@@ -7,14 +7,17 @@
 //
 // http://opensource.org/licenses/MIT
 //
-// Unless required by applicable law or agreed to in writing, software distributed 
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// Unless required by applicable law or agreed to in writing, software distributed
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
 #ifndef UNITTEST_H_
 #define UNITTEST_H_
 
+// Can't get the writer string literal unit test to work unless this is enabled across
+// all compilation units. Bruno Nicoletti
+#define RAPIDJSON_UNIT_TEST_STRING_LITERALS
 
 // gtest indirectly included inttypes.h, without __STDC_CONSTANT_MACROS.
 #ifndef __STDC_CONSTANT_MACROS
@@ -70,7 +73,7 @@ inline FILE* TempFile(char *filename) {
     if (filename[0] == '\\')
         for (int i = 0; filename[i] != '\0'; i++)
             filename[i] = filename[i + 1];
-        
+
     return fopen(filename, "wb");
 #else
     strcpy(filename, "/tmp/fileXXXXXX");

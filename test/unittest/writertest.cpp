@@ -1,15 +1,15 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
-// 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+//
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, Milo Yip and Bruno Nicoletti. All rights reserved.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
 //
 // http://opensource.org/licenses/MIT
 //
-// Unless required by applicable law or agreed to in writing, software distributed 
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// Unless required by applicable law or agreed to in writing, software distributed
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
 #include "unittest.h"
@@ -18,6 +18,7 @@
 #include "rapidjson/reader.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/autoblocks.h"
 
 using namespace rapidjson;
 
@@ -164,15 +165,15 @@ private:
 
 TEST(Writer, OStreamWrapper) {
     StringStream s("{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3], \"u64\": 1234567890123456789, \"i64\":-1234567890123456789 } ");
-    
+
     std::stringstream ss;
     OStreamWrapper os(ss);
-    
+
     Writer<OStreamWrapper> writer(os);
 
     Reader reader;
     reader.Parse<0>(s, writer);
-    
+
     std::string actual = ss.str();
     EXPECT_STREQ("{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3],\"u64\":1234567890123456789,\"i64\":-1234567890123456789}", actual.c_str());
 }
@@ -366,7 +367,7 @@ TEST(Writer, InvalidEventSequence) {
         EXPECT_FALSE(writer.IsComplete());
     }
 
-    // { 1: 
+    // { 1:
     {
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
@@ -374,4 +375,110 @@ TEST(Writer, InvalidEventSequence) {
         EXPECT_THROW(writer.Int(1), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
+}
+
+TEST(Writer, Functors) {
+  StringBuffer buffer;
+  Writer<StringBuffer> writer(buffer);
+  writer.StartArray();
+  writer(true);
+  writer(false);
+  writer(-1);
+  writer(200u);
+  writer(int64_t(-1234567890123456789));
+  writer(uint64_t(1234567890123456789));
+  writer("banana");
+  const char *pomegranate = "pomegranate";
+  writer(pomegranate);
+  writer.EndArray();
+  EXPECT_STREQ("[true,false,-1,200,-1234567890123456789,1234567890123456789,\"banana\",\"pomegranate\"]", buffer.GetString());
+}
+
+template<class T>
+void TestKeyValueFunctorType(const T &value, const char *expectedValue) {
+  StringBuffer buffer;
+  Writer<StringBuffer> writer(buffer);
+  writer.StartObject();
+  writer("Key", value);
+  writer.EndObject();
+  EXPECT_TRUE(writer.IsComplete());
+  EXPECT_STREQ(expectedValue, buffer.GetString());
+}
+
+TEST(Writer, KeyValueFunctors) {
+  TestKeyValueFunctorType(false, "{\"Key\":false}");
+  TestKeyValueFunctorType(true, "{\"Key\":true}");
+  TestKeyValueFunctorType(-2, "{\"Key\":-2}");
+  TestKeyValueFunctorType(200u, "{\"Key\":200}");
+  TestKeyValueFunctorType(int64_t(-1234567890123456789), "{\"Key\":-1234567890123456789}");
+  TestKeyValueFunctorType(uint64_t(1234567890123456789), "{\"Key\":1234567890123456789}");
+  TestKeyValueFunctorType("banana", "{\"Key\":\"banana\"}");
+  const char *pomegranate = "pomegranate";
+  TestKeyValueFunctorType(pomegranate, "{\"Key\":\"pomegranate\"}");
+  TestKeyValueFunctorType(1.7976931348623157e308, "{\"Key\":1.7976931348623157e308}");
+}
+
+TEST(Writer, AutoBlocks) {
+  typedef Writer<StringBuffer> WriterType;
+
+  {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    {
+    // start an anonymous block
+      ObjectBlock<WriterType> block(writer);
+      writer("Key", 10);
+    }
+    EXPECT_STREQ("{\"Key\":10}", buffer.GetString());
+  }
+
+  {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    {
+      // start an anonymous outer block
+      ObjectBlock<WriterType> block(writer);
+      {
+        ObjectBlock<WriterType> block(writer, "thing");
+        writer("Key", 10);
+      }
+    }
+    EXPECT_STREQ("{\"thing\":{\"Key\":10}}", buffer.GetString());
+  }
+
+  {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    {
+      // start an anonymous outer array
+      ArrayBlock<WriterType> block(writer);
+      {
+        writer(1);
+        writer(2);
+        writer(3);
+        writer(4);
+        writer(5);
+      }
+    }
+    EXPECT_STREQ("[1,2,3,4,5]", buffer.GetString());
+  }
+
+  {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    {
+      // start an anonymous outer block
+      ObjectBlock<WriterType> block(writer);
+      {
+        // start a named array
+        ArrayBlock<WriterType> block(writer, "thing");
+        writer(1);
+        writer(2);
+        writer(3);
+        writer(4);
+        writer(5);
+      }
+    }
+    EXPECT_STREQ("{\"thing\":[1,2,3,4,5]}", buffer.GetString());
+  }
 }

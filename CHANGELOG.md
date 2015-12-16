@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+* Refactored Writer and PrettyWriter to both directly inherit from new class WriterBase and moved all common code into WriterBase. Much less code.
+* WriterBase extends Writer and PrettyWriter by adding overloaded functor methods that write values, ie: bool operator()(TYPE value) where TYPE is one of the types you can write to JSON.
+* WriterBase extends Writer and PrettyWriter by adding overloaded functor methods that write key/value pair. ie bool operator()(char *key, TYPE value) where TYPE is one of the types you can write to JSON.
+* WriterBase has overloaded all functions that take a string as a parameter in such a way that it can differentiate between string literals and char * variables. It avoids a redundant strlen call for string literals as the length is known at compile time.
+* Added new classes ObjectBlock and ArrayBlock. On construction they will start and Object/Array and on destruction close and Object/Array automatically. Reduces bugs and complexity of code by removing the need to remember to close and open Object/Array.
 
 ## [1.0.2] - 2015-05-14
 
@@ -17,7 +22,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 * CMakeLists for include as a thirdparty in projects (#334, #337)
-* Change Document::ParseStream() to use stack allocator for Reader (ffbe38614732af8e0b3abdc8b50071f386a4a685) 
+* Change Document::ParseStream() to use stack allocator for Reader (ffbe38614732af8e0b3abdc8b50071f386a4a685)
 
 ## [1.0.1] - 2015-04-25
 
