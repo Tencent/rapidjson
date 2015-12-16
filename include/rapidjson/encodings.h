@@ -618,7 +618,7 @@ struct Transcoder<Encoding, Encoding> {
 
 RAPIDJSON_NAMESPACE_END
 
-#if defined(__GNUC__) || defined(_MSV_VER)
+#if defined(__GNUC__) || defined(_MSC_VER)
 RAPIDJSON_DIAG_POP
 #endif
 
