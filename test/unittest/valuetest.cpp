@@ -1162,11 +1162,11 @@ TEST(Value, Object) {
             for (unsigned i = 0; i < n; i++)
                 x.AddMember(keys[i], Value(kArrayType).PushBack(i, allocator), allocator);
 
-            itr = x.EraseMember(x.MemberBegin() + first, x.MemberBegin() + last);
+            itr = x.EraseMember(x.MemberBegin() + static_cast<int>(first), x.MemberBegin() + static_cast<int>(last));
             if (last == n)
                 EXPECT_EQ(x.MemberEnd(), itr);
             else
-                EXPECT_EQ(x.MemberBegin() + first, itr);
+                EXPECT_EQ(x.MemberBegin() + static_cast<int>(first), itr);
 
             size_t removeCount = last - first;
             EXPECT_EQ(n - removeCount, x.MemberCount());
