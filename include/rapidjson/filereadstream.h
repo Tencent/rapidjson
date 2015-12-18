@@ -22,6 +22,7 @@
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(padded)
 RAPIDJSON_DIAG_OFF(unreachable-code)
+RAPIDJSON_DIAG_OFF(missing-noreturn)
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -51,8 +52,8 @@ public:
     size_t Tell() const { return count_ + static_cast<size_t>(current_ - buffer_); }
 
     // Not implemented
-    void Put(Ch)  RAPIDJSON_NORETURN_SUFFIX { RAPIDJSON_ASSERT(false); }
-    void Flush()  RAPIDJSON_NORETURN_SUFFIX { RAPIDJSON_ASSERT(false); } 
+    void Put(Ch) { RAPIDJSON_ASSERT(false); }
+    void Flush() { RAPIDJSON_ASSERT(false); } 
     Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
     size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 

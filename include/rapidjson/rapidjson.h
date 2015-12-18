@@ -465,15 +465,6 @@ RAPIDJSON_NAMESPACE_END
 #endif // RAPIDJSON_DIAG_*
 
 ///////////////////////////////////////////////////////////////////////////////
-// RAPIDJSON_NORETURN_SUFFIX
-
-#if defined(__clang__) && !defined(NDEBUG)
-#define RAPIDJSON_NORETURN_SUFFIX __attribute__ ((noreturn))
-#else
-#define RAPIDJSON_NORETURN_SUFFIX
-#endif
-
-///////////////////////////////////////////////////////////////////////////////
 // C++11 features
 
 #ifndef RAPIDJSON_HAS_CXX11_RVALUE_REFS
