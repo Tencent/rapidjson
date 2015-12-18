@@ -26,13 +26,16 @@ struct MessageHandler
         case kExpectObjectStart:
             state_ = kExpectNameOrObjectEnd;
             return true;
-        default:
+        case kExpectNameOrObjectEnd:
+        case kExpectValue:
             return false;
         }
     }
 
     bool String(const char* str, SizeType length, bool) {
         switch (state_) {
+        case kExpectObjectStart:
+            return false;
         case kExpectNameOrObjectEnd:
             name_ = string(str, length);
             state_ = kExpectValue;
@@ -41,8 +44,6 @@ struct MessageHandler
             messages_.insert(MessageMap::value_type(name_, string(str, length)));
             state_ = kExpectNameOrObjectEnd;
             return true;
-        default:
-            return false;
         }
     }
 
@@ -63,7 +64,7 @@ struct MessageHandler
 RAPIDJSON_DIAG_POP
 #endif
 
-void ParseMessages(const char* json, MessageMap& messages) {
+static void ParseMessages(const char* json, MessageMap& messages) {
     Reader reader;
     MessageHandler handler;
     StringStream ss(json);

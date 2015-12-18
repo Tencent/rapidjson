@@ -30,28 +30,28 @@ template <>
 struct Traits<uint32_t> {
     enum { kBufferSize = 11 };
     enum { kMaxDigit = 10 };
-    static uint32_t Negate(uint32_t x) { return x; };
+    static uint32_t Negate(uint32_t x) { return x; }
 };
 
 template <>
 struct Traits<int32_t> {
     enum { kBufferSize = 12 };
     enum { kMaxDigit = 10 };
-    static int32_t Negate(int32_t x) { return -x; };
+    static int32_t Negate(int32_t x) { return -x; }
 };
 
 template <>
 struct Traits<uint64_t> {
     enum { kBufferSize = 21 };
     enum { kMaxDigit = 20 };
-    static uint64_t Negate(uint64_t x) { return x; };
+    static uint64_t Negate(uint64_t x) { return x; }
 };
 
 template <>
 struct Traits<int64_t> {
     enum { kBufferSize = 22 };
     enum { kMaxDigit = 20 };
-    static int64_t Negate(int64_t x) { return -x; };
+    static int64_t Negate(int64_t x) { return -x; }
 };
 
 template <typename T>

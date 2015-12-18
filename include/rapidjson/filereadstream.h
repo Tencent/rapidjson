@@ -18,6 +18,11 @@
 #include "rapidjson.h"
 #include <cstdio>
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(padded)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 //! File byte stream for input using fread().
@@ -45,8 +50,8 @@ public:
     size_t Tell() const { return count_ + static_cast<size_t>(current_ - buffer_); }
 
     // Not implemented
-    void Put(Ch) { RAPIDJSON_ASSERT(false); }
-    void Flush() { RAPIDJSON_ASSERT(false); } 
+    void Put(Ch)  RAPIDJSON_NORETURN_SUFFIX { RAPIDJSON_ASSERT(false); }
+    void Flush()  RAPIDJSON_NORETURN_SUFFIX { RAPIDJSON_ASSERT(false); } 
     Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
     size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
@@ -84,5 +89,9 @@ private:
 };
 
 RAPIDJSON_NAMESPACE_END
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif
 
 #endif // RAPIDJSON_FILESTREAM_H_

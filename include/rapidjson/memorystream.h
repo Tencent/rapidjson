@@ -41,8 +41,8 @@ struct MemoryStream {
     size_t Tell() const { return static_cast<size_t>(src_ - begin_); }
 
     Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
-    void Put(Ch) { RAPIDJSON_ASSERT(false); }
-    void Flush() { RAPIDJSON_ASSERT(false); }
+    void Put(Ch) RAPIDJSON_NORETURN_SUFFIX { RAPIDJSON_ASSERT(false); }
+    void Flush() RAPIDJSON_NORETURN_SUFFIX { RAPIDJSON_ASSERT(false); }
     size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
     // For encoding detection only.

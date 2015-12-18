@@ -27,7 +27,7 @@ struct CapitalizeFilter {
     bool String(const char* str, SizeType length, bool) { 
         buffer_.clear();
         for (SizeType i = 0; i < length; i++)
-            buffer_.push_back(std::toupper(str[i]));
+            buffer_.push_back(static_cast<char>(std::toupper(str[i])));
         return out_.String(&buffer_.front(), length, true); // true = output handler need to copy the string
     }
     bool StartObject() { return out_.StartObject(); }
@@ -58,7 +58,7 @@ int main(int, char*[]) {
     // JSON reader parse from the input stream and let writer generate the output.
     CapitalizeFilter<Writer<FileWriteStream> > filter(writer);
     if (!reader.Parse(is, filter)) {
-        fprintf(stderr, "\nError(%u): %s\n", (unsigned)reader.GetErrorOffset(), GetParseError_En(reader.GetParseErrorCode()));
+        fprintf(stderr, "\nError(%u): %s\n", static_cast<unsigned>(reader.GetErrorOffset()), GetParseError_En(reader.GetParseErrorCode()));
         return 1;
     }
 

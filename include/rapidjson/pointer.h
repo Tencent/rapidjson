@@ -253,11 +253,12 @@ public:
     */
     GenericPointer Append(SizeType index, Allocator* allocator = 0) const {
         char buffer[21];
-        SizeType length = (sizeof(SizeType) == 4 ? internal::u32toa(index, buffer): internal::u64toa(index, buffer)) - buffer;
+        char* end = sizeof(SizeType) == 4 ? internal::u32toa(index, buffer) : internal::u64toa(index, buffer);
+        SizeType length = static_cast<SizeType>(end - buffer);
         buffer[length] = '\0';
 
         if (sizeof(Ch) == 1) {
-            Token token = { (Ch*)buffer, length, index };
+            Token token = { reinterpret_cast<Ch*>(buffer), length, index };
             return Append(token, allocator);
         }
         else {
@@ -271,7 +272,7 @@ public:
 
     //! Append a token by value, and return a new Pointer
     /*!
-        \param value Value (either Uint or String) to be appended.
+        \param token token to be appended.
         \param allocator Allocator for the newly return Pointer.
         \return A new Pointer with appended token.
     */
@@ -435,7 +436,6 @@ public:
     //! Creates a value in a document.
     /*!
         \param document A document to be resolved.
-        \param allocator Allocator for creating the values if the specified value or its parents are not exist.
         \param alreadyExist If non-null, it stores whether the resolved value is already exist.
         \return The resolved newly created, or already exists value.
     */
@@ -472,7 +472,11 @@ public:
                     return 0;
                 v = &((*v)[t->index]);
                 break;
-            default:
+            case kNullType:
+            case kFalseType:
+            case kTrueType:
+            case kStringType:
+            case kNumberType:
                 return 0;
             }
         }
@@ -525,7 +529,7 @@ public:
 
     //! Query a value in a subtree with default primitive value.
     /*!
-        \tparam T \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c bool
+        \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c bool
     */
     template <typename T>
     RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&))
@@ -555,7 +559,7 @@ public:
 
     //! Query a value in a document with default primitive value.
     /*!
-        \tparam T \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c bool
+        \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c bool
     */
     template <typename T, typename stackAllocator>
     RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&))
@@ -601,7 +605,7 @@ public:
 
     //! Set a primitive value in a subtree.
     /*!
-        \tparam T \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c bool
+        \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c bool
     */
     template <typename T>
     RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&))
@@ -637,7 +641,7 @@ public:
 
     //! Set a primitive value in a document.
     /*!
-    \tparam T \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c bool
+    \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c bool
     */
     template <typename T, typename stackAllocator>
     RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&))
@@ -701,7 +705,11 @@ public:
                     return false;
                 v = &((*v)[t->index]);
                 break;
-            default:
+            case kNullType:
+            case kFalseType:
+            case kTrueType:
+            case kStringType:
+            case kNumberType:
                 return false;
             }
         }
@@ -714,7 +722,11 @@ public:
                 return false;
             v->Erase(v->Begin() + last->index);
             return true;
-        default:
+            case kNullType:
+            case kFalseType:
+            case kTrueType:
+            case kStringType:
+            case kNumberType:
             return false;
         }
     }
@@ -759,11 +771,13 @@ private:
     }
 
     //! Parse a JSON String or its URI fragment representation into tokens.
+#ifndef __clang__ // -Wdocumentation
     /*!
         \param source Either a JSON Pointer string, or its URI fragment representation. Not need to be null terminated.
         \param length Length of the source string.
         \note Source cannot be JSON String Representation of JSON Pointer, e.g. In "/\u0000", \u0000 will not be unescaped.
     */
+#endif
     void Parse(const Ch* source, size_t length) {
         RAPIDJSON_ASSERT(source != NULL);
         RAPIDJSON_ASSERT(nameBuffer_ == 0);
@@ -857,7 +871,7 @@ private:
 
                 *name++ = c;
             }
-            token->length = name - token->name;
+            token->length = static_cast<SizeType>(name - token->name);
             if (token->length == 0)
                 isNumber = false;
             *name++ = '\0'; // Null terminator
@@ -944,6 +958,8 @@ private:
     */
     class PercentDecodeStream {
     public:
+        typedef Ch Ch;
+
         //! Constructor
         /*!
             \param source Start of the stream
@@ -973,7 +989,7 @@ private:
             return c;
         }
 
-        size_t Tell() const { return src_ - head_; }
+        size_t Tell() const { return static_cast<size_t>(src_ - head_); }
         bool IsValid() const { return valid_; }
 
     private:
