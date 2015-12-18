@@ -16,6 +16,11 @@
 
 #include "rapidjson/internal/strtod.h"
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(unreachable-code)
+#endif
+
 #define BIGINTEGER_LITERAL(s) BigInteger(s, sizeof(s) - 1)
 
 using namespace rapidjson::internal;
@@ -121,3 +126,7 @@ TEST(Strtod, CheckApproximationCase) {
 
     EXPECT_EQ(-1, delta.Compare(hS));
 }
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif
