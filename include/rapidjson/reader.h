@@ -321,9 +321,9 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
         "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"};
 
         const __m128i w0 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[0][0]));
-        const __m128i w1 = _mm_loadu_si128((const __m128i *)&whitespaces[1][0]);
-        const __m128i w2 = _mm_loadu_si128((const __m128i *)&whitespaces[2][0]);
-        const __m128i w3 = _mm_loadu_si128((const __m128i *)&whitespaces[3][0]);
+        const __m128i w1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[1][0]));
+        const __m128i w2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[2][0]));
+        const __m128i w3 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[3][0]));
 
     for (;; p += 16) {
         const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
