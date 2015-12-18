@@ -21,6 +21,7 @@
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(padded)
+RAPIDJSON_DIAG_OFF(unreachable-code)
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN

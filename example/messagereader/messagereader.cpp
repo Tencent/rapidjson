@@ -17,6 +17,11 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(switch-enum)
+#endif
+
 struct MessageHandler
     : public BaseReaderHandler<UTF8<>, MessageHandler> {
     MessageHandler() : messages_(), state_(kExpectObjectStart), name_() {}
@@ -26,16 +31,13 @@ struct MessageHandler
         case kExpectObjectStart:
             state_ = kExpectNameOrObjectEnd;
             return true;
-        case kExpectNameOrObjectEnd:
-        case kExpectValue:
+        default:
             return false;
         }
     }
 
     bool String(const char* str, SizeType length, bool) {
         switch (state_) {
-        case kExpectObjectStart:
-            return false;
         case kExpectNameOrObjectEnd:
             name_ = string(str, length);
             state_ = kExpectValue;
@@ -44,6 +46,8 @@ struct MessageHandler
             messages_.insert(MessageMap::value_type(name_, string(str, length)));
             state_ = kExpectNameOrObjectEnd;
             return true;
+        default:
+            return false;
         }
     }
 
@@ -61,6 +65,10 @@ struct MessageHandler
 };
 
 #if defined(__GNUC__)
+RAPIDJSON_DIAG_POP
+#endif
+
+#ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
 

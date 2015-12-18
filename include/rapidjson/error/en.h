@@ -17,6 +17,12 @@
 
 #include "error.h"
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(switch-enum)
+RAPIDJSON_DIAG_OFF(covered-switch-default)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 //! Maps error code of parsing into error message.
@@ -54,10 +60,15 @@ inline const RAPIDJSON_ERROR_CHARTYPE* GetParseError_En(ParseErrorCode parseErro
 
         case kParseErrorTermination:                    return RAPIDJSON_ERROR_STRING("Terminate parsing due to Handler error.");
         case kParseErrorUnspecificSyntaxError:          return RAPIDJSON_ERROR_STRING("Unspecific syntax error.");
+
+        default:                                        return RAPIDJSON_ERROR_STRING("Unknown error.");
     }
-    return RAPIDJSON_ERROR_STRING("Unknown error.");
 }
 
 RAPIDJSON_NAMESPACE_END
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif
 
 #endif // RAPIDJSON_ERROR_EN_H_

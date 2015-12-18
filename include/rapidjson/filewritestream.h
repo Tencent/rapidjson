@@ -18,6 +18,11 @@
 #include "rapidjson.h"
 #include <cstdio>
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(unreachable-code)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 //! Wrapper of C file stream for input using fread().
@@ -91,5 +96,9 @@ inline void PutN(FileWriteStream& stream, char c, size_t n) {
 }
 
 RAPIDJSON_NAMESPACE_END
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif
 
 #endif // RAPIDJSON_FILESTREAM_H_
