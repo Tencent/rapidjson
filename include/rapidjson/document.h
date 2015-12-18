@@ -1231,7 +1231,7 @@ public:
         for (MemberIterator itr = pos; itr != last; ++itr)
             itr->~Member();
         std::memmove(&*pos, &*last, static_cast<size_t>(MemberEnd() - last) * sizeof(Member));
-        data_.o.size -= (last - first);
+        data_.o.size -= static_cast<SizeType>(last - first);
         return pos;
     }
 
@@ -1431,7 +1431,7 @@ public:
         for (ValueIterator itr = pos; itr != last; ++itr)
             itr->~GenericValue();       
         std::memmove(pos, last, static_cast<size_t>(End() - last) * sizeof(GenericValue));
-        data_.a.size -= (last - first);
+        data_.a.size -= static_cast<SizeType>(last - first);
         return pos;
     }
 

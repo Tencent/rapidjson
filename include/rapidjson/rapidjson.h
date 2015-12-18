@@ -467,7 +467,7 @@ RAPIDJSON_NAMESPACE_END
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NORETURN_SUFFIX
 
-#if defined(__clang__)
+#if defined(__clang__) && !defined(NDEBUG)
 #define RAPIDJSON_NORETURN_SUFFIX __attribute__ ((noreturn))
 #else
 #define RAPIDJSON_NORETURN_SUFFIX

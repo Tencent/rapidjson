@@ -492,7 +492,7 @@ TEST(Value, Int64) {
     EXPECT_FALSE(z.IsUint());
     EXPECT_NEAR(4294967296.0, z.GetDouble(), 0.0);
 
-    z.SetInt64(int64_t(-2147483648) - 1);   // -2^31-1, cannot cast as int
+    z.SetInt64(-int64_t(2147483648u) - 1);   // -2^31-1, cannot cast as int
     EXPECT_FALSE(z.IsInt());
     EXPECT_NEAR(-2147483649.0, z.GetDouble(), 0.0);
 
