@@ -482,12 +482,12 @@ TEST(Value, Int64) {
     z.SetInt64(1234);
     EXPECT_EQ(1234, z.GetInt64());
 
-    z.SetInt64(2147483648);   // 2^31, cannot cast as int
+    z.SetInt64(2147483648u);   // 2^31, cannot cast as int
     EXPECT_FALSE(z.IsInt());
     EXPECT_TRUE(z.IsUint());
     EXPECT_NEAR(2147483648.0, z.GetDouble(), 0.0);
 
-    z.SetInt64(4294967296);   // 2^32, cannot cast as uint
+    z.SetInt64(int64_t(4294967298u) + 1);   // 2^32, cannot cast as uint
     EXPECT_FALSE(z.IsInt());
     EXPECT_FALSE(z.IsUint());
     EXPECT_NEAR(4294967296.0, z.GetDouble(), 0.0);
@@ -528,12 +528,12 @@ TEST(Value, Uint64) {
     z.SetUint64(1234);
     EXPECT_EQ(1234u, z.GetUint64());
 
-    z.SetUint64(uint64_t(2147483648));  // 2^31, cannot cast as int
+    z.SetUint64(uint64_t(2147483648u));  // 2^31, cannot cast as int
     EXPECT_FALSE(z.IsInt());
     EXPECT_TRUE(z.IsUint());
     EXPECT_TRUE(z.IsInt64());
 
-    z.SetUint64(uint64_t(4294967295) + 1);  // 2^32, cannot cast as uint
+    z.SetUint64(uint64_t(4294967295u) + 1);  // 2^32, cannot cast as uint
     EXPECT_FALSE(z.IsInt());
     EXPECT_FALSE(z.IsUint());
     EXPECT_TRUE(z.IsInt64());

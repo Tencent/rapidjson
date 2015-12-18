@@ -1040,8 +1040,8 @@ public:
     size_t Tell() const { return static_cast<size_t>(is_.tellg()); }
 
     Ch* PutBegin() { assert(false); return 0; }
-    void Put(Ch) RAPIDJSON_NORETURN_SUFFIX { assert(false); }
-    void Flush() RAPIDJSON_NORETURN_SUFFIX { assert(false); }
+    void Put(Ch) { assert(false); }
+    void Flush() { assert(false); }
     size_t PutEnd(Ch*) { assert(false); return 0; }
 
 private:
