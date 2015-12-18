@@ -306,7 +306,7 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
         return p;
 
     // 16-byte align to the next boundary
-    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & ~15);
+    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
     while (p != nextAligned)
         if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
             ++p;
@@ -320,18 +320,18 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
         "\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r",
         "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"};
 
-        const __m128i w0 = _mm_loadu_si128((const __m128i *)&whitespaces[0][0]);
+        const __m128i w0 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[0][0]));
         const __m128i w1 = _mm_loadu_si128((const __m128i *)&whitespaces[1][0]);
         const __m128i w2 = _mm_loadu_si128((const __m128i *)&whitespaces[2][0]);
         const __m128i w3 = _mm_loadu_si128((const __m128i *)&whitespaces[3][0]);
 
     for (;; p += 16) {
-        const __m128i s = _mm_load_si128((const __m128i *)p);
+        const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
         __m128i x = _mm_cmpeq_epi8(s, w0);
         x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w1));
         x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w2));
         x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w3));
-        unsigned short r = (unsigned short)~_mm_movemask_epi8(x);
+        unsigned short r = static_cast<unsigned short>(~_mm_movemask_epi8(x));
         if (r != 0) {   // some of characters may be non-whitespace
 #ifdef _MSC_VER         // Find the index of first non-whitespace
             unsigned long offset;
