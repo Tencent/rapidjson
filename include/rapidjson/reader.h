@@ -42,6 +42,7 @@ RAPIDJSON_DIAG_OFF(4702)  // unreachable code
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(padded)
+RAPIDJSON_DIAG_OFF(switch-enum)
 #endif
 
 #ifdef __GNUC__
@@ -1417,9 +1418,7 @@ private:
             }
         }
 
-        case IterativeParsingStartState:
-        case IterativeParsingFinishState:
-        case IterativeParsingValueState:
+        default:
             // This branch is for IterativeParsingValueState actually.
             // Use `default:` rather than
             // `case IterativeParsingValueState:` is for code coverage.
@@ -1456,13 +1455,7 @@ private:
         case IterativeParsingMemberKeyState:        RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissColon, is.Tell()); return;
         case IterativeParsingMemberValueState:      RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell()); return;
         case IterativeParsingElementState:          RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell()); return;
-        case IterativeParsingErrorState:
-        case IterativeParsingKeyValueDelimiterState:
-        case IterativeParsingObjectFinishState:
-        case IterativeParsingArrayInitialState:
-        case IterativeParsingElementDelimiterState:
-        case IterativeParsingArrayFinishState:
-        case IterativeParsingValueState:            RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell()); return;
+        default:                                    RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell()); return;
         }       
     }
 

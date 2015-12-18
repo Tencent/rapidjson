@@ -30,6 +30,7 @@ RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(padded)
+RAPIDJSON_DIAG_OFF(switch-enum)
 #endif
 
 #ifdef __GNUC__
@@ -724,9 +725,7 @@ public:
             else
                 return data_.n.u64 == rhs.data_.n.u64;
 
-        case kNullType:
-        case kFalseType:
-        case kTrueType:
+        default:
             return true;
         }
     }
@@ -2106,10 +2105,7 @@ GenericValue<Encoding,Allocator>::GenericValue(const GenericValue<Encoding,Sourc
             SetStringRaw(StringRef(rhs.GetString(), rhs.GetStringLength()), allocator);
         }
         break;
-    case kNullType:
-    case kFalseType:
-    case kTrueType:
-    case kNumberType:
+    default:
         flags_ = rhs.flags_;
         data_  = *reinterpret_cast<const Data*>(&rhs.data_);
         break;

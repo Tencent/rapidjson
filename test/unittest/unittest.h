@@ -19,7 +19,9 @@
 #ifndef __STDC_CONSTANT_MACROS
 #ifdef __clang__
 #pragma GCC diagnostic push
+#if __has_warning("-Wreserved-id-macro")
 #pragma GCC diagnostic ignored "-Wreserved-id-macro"
+#endif
 #endif
 
 #  define __STDC_CONSTANT_MACROS 1 // required by C++ standard
