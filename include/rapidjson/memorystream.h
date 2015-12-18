@@ -17,6 +17,11 @@
 
 #include "rapidjson.h"
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(unreachable-code)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 //! Represents an in-memory input byte stream.
@@ -57,5 +62,9 @@ struct MemoryStream {
 };
 
 RAPIDJSON_NAMESPACE_END
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif
 
 #endif // RAPIDJSON_MEMORYBUFFER_H_

@@ -18,6 +18,11 @@
 #include "document.h"
 #include "internal/itoa.h"
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(switch-enum)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 static const SizeType kPointerInvalidIndex = ~SizeType(0);  //!< Represents an invalid index in GenericPointer::Token
@@ -71,7 +76,7 @@ template <typename ValueType, typename Allocator = CrtAllocator>
 class GenericPointer {
 public:
     typedef typename ValueType::EncodingType EncodingType;  //!< Encoding type from Value
-    typedef typename EncodingType::Ch Ch;                   //!< Character type from Value
+    typedef typename ValueType::Ch Ch;                      //!< Character type from Value
 
     //! A token is the basic units of internal representation.
     /*!
@@ -472,11 +477,7 @@ public:
                     return 0;
                 v = &((*v)[t->index]);
                 break;
-            case kNullType:
-            case kFalseType:
-            case kTrueType:
-            case kStringType:
-            case kNumberType:
+            default:
                 return 0;
             }
         }
@@ -705,11 +706,7 @@ public:
                     return false;
                 v = &((*v)[t->index]);
                 break;
-            case kNullType:
-            case kFalseType:
-            case kTrueType:
-            case kStringType:
-            case kNumberType:
+            default:
                 return false;
             }
         }
@@ -722,11 +719,7 @@ public:
                 return false;
             v->Erase(v->Begin() + last->index);
             return true;
-            case kNullType:
-            case kFalseType:
-            case kTrueType:
-            case kStringType:
-            case kNumberType:
+        default:
             return false;
         }
     }
@@ -958,7 +951,7 @@ private:
     */
     class PercentDecodeStream {
     public:
-        typedef Ch Ch;
+        typedef typename ValueType::Ch Ch;
 
         //! Constructor
         /*!
@@ -1325,5 +1318,9 @@ bool EraseValueByPointer(T& root, const CharType(&source)[N]) {
 //@}
 
 RAPIDJSON_NAMESPACE_END
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif
 
 #endif // RAPIDJSON_POINTER_H_
