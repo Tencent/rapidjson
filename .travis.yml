@@ -46,6 +46,7 @@ matrix:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
+    # coverage report
     - env: CONF=debug ARCH=x86 GCOV_FLAGS='--coverage'
       compiler: gcc
       addons:
