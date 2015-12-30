@@ -81,6 +81,7 @@ matrix:
 before_script:
     #   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
     #   exposed by merging PR#163 (using -march=native)
+    - ccache -s
     - sed -i "s/-march=native//" CMakeLists.txt
     - mkdir build
     - >
