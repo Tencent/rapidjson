@@ -42,8 +42,8 @@ before_script:
 
 script:
   - cd build
-  - make tests
-  - make examples
+  - make tests -j2
+  - make examples -j2
   - ctest -V `[ "$CONF" = "release" ] || echo "-E perftest"`
   - make travis_doc
 
