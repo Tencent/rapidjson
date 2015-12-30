@@ -55,7 +55,7 @@ matrix:
             - g++-multilib
             - libc6-dbg:i386
       after_success:
-        - ./travis-coveralls.sh
+        - ../travis-coveralls.sh
     - env: CONF=debug   ARCH=x86_64 GCOV_FLAGS='--coverage'
       compiler: gcc
       addons:
@@ -65,7 +65,7 @@ matrix:
             - g++-multilib
             - libc6-dbg:i386
       after_success:
-        - ./travis-coveralls.sh
+        - ../travis-coveralls.sh
   # These jobs report code coverage so they need extra environment variables
   # and commands
   exclude:
