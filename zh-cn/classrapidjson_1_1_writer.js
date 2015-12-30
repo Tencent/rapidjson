@@ -19,6 +19,7 @@ var classrapidjson_1_1_writer =
     [ "StartArray", "classrapidjson_1_1_writer.html#aeff814774909144ab40eba83514a9b78", null ],
     [ "StartObject", "classrapidjson_1_1_writer.html#a8a9c136d5a1806bea935c05d342f0523", null ],
     [ "String", "classrapidjson_1_1_writer.html#a1ed3229a44d9aeac14fb9cb347ac0c5d", null ],
+    [ "String", "classrapidjson_1_1_writer.html#a112a371079604318b3bee65cdaedab2b", null ],
     [ "String", "classrapidjson_1_1_writer.html#a2efd8a54a3cb86f8adedfd6bb692d0d9", null ],
     [ "Uint", "classrapidjson_1_1_writer.html#a20063f3ba0a6a9eb9a817d2f38064240", null ],
     [ "Uint64", "classrapidjson_1_1_writer.html#a5272254699604c79d08b16365550c9d7", null ],

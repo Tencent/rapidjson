@@ -1,5 +1,7 @@
 var NAVTREEINDEX3 =
 {
+"structrapidjson_1_1_generic_memory_buffer.html#a56c70223d8897e245df31e22a1fea60f":[12,0,0,16,1],
+"structrapidjson_1_1_generic_memory_buffer.html#a66a3e80663d94506cab0117777486a06":[12,0,0,16,3],
 "structrapidjson_1_1_generic_memory_buffer.html#a7c2ccd0d38df6d3cb3abd5aed9e100f8":[12,0,0,16,0],
 "structrapidjson_1_1_generic_memory_buffer.html#a80a159ebb64cee80b5e7fc37f971d5a5":[12,0,0,16,10],
 "structrapidjson_1_1_generic_memory_buffer.html#a882b45865eb98aa84241ef8b87bae96d":[12,0,0,16,8],

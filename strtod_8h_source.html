@@ -239,7 +239,7 @@ $(document).ready(function(){initNavTree('strtod_8h_source.html','');});
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    v = v.Normalize();</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    error &lt;&lt;= -v.e;</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> dExp = (int)decimalPosition - (<span class="keywordtype">int</span>)i + exp;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> dExp = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(decimalPosition) - static_cast&lt;int&gt;(i) + exp;</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keywordtype">int</span> actualExp;</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    DiyFp cachedPower = GetCachedPower10(dExp, &amp;actualExp);</div>
@@ -296,7 +296,7 @@ $(document).ready(function(){initNavTree('strtod_8h_source.html','');});
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">double</span> StrtodBigInteger(<span class="keywordtype">double</span> approx, <span class="keyword">const</span> <span class="keywordtype">char</span>* decimals, <span class="keywordtype">size_t</span> length, <span class="keywordtype">size_t</span> decimalPosition, <span class="keywordtype">int</span> exp) {</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="keyword">const</span> BigInteger dInt(decimals, length);</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> dExp = (int)decimalPosition - (<span class="keywordtype">int</span>)length + exp;</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> dExp = <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(decimalPosition) - static_cast&lt;int&gt;(length) + exp;</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    Double a(approx);</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="keywordtype">int</span> cmp = CheckWithinHalfULP(a.Value(), dInt, dExp);</div>
 <div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="keywordflow">if</span> (cmp &lt; 0)</div>
@@ -336,8 +336,8 @@ $(document).ready(function(){initNavTree('strtod_8h_source.html','');});
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;</div>
 <div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="comment">// Trim right-most digits</span></div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">int</span> kMaxDecimalDigit = 780;</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    <span class="keywordflow">if</span> ((<span class="keywordtype">int</span>)length &gt; kMaxDecimalDigit) {</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="keywordtype">int</span> delta = (int(length) - kMaxDecimalDigit);</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    <span class="keywordflow">if</span> (static_cast&lt;int&gt;(length) &gt; kMaxDecimalDigit) {</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        <span class="keywordtype">int</span> delta = (<span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(length) - kMaxDecimalDigit);</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        exp += delta;</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        decimalPosition -= <span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span><span class="keyword">&gt;</span>(delta);</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;        length = kMaxDecimalDigit;</div>
@@ -358,8 +358,8 @@ $(document).ready(function(){initNavTree('strtod_8h_source.html','');});
 <div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;RAPIDJSON_NAMESPACE_END</div>
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;</div>
 <div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_STRTOD_</span></div>
-<div class="ttc" id="rapidjson_8h_html_aaee1245f375a71be1ac9b8a07ba5fb8f"><div class="ttname"><a href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a></div><div class="ttdeci">#define RAPIDJSON_UINT64_C2(high32, low32)</div><div class="ttdoc">Construct a 64-bit literal by a pair of 32-bit integer. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:263</div></div>
-<div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:346</div></div>
+<div class="ttc" id="rapidjson_8h_html_aaee1245f375a71be1ac9b8a07ba5fb8f"><div class="ttname"><a href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a></div><div class="ttdeci">#define RAPIDJSON_UINT64_C2(high32, low32)</div><div class="ttdoc">Construct a 64-bit literal by a pair of 32-bit integer. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:288</div></div>
+<div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:371</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->

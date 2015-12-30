@@ -1,7 +1,7 @@
 var classrapidjson_1_1_generic_pointer =
 [
     [ "Token", "structrapidjson_1_1_generic_pointer_1_1_token.html", "structrapidjson_1_1_generic_pointer_1_1_token" ],
-    [ "Ch", "classrapidjson_1_1_generic_pointer.html#ae057be4befe709b07ca474e938449601", null ],
+    [ "Ch", "classrapidjson_1_1_generic_pointer.html#a850f78846c5548565f8395be5f3427b7", null ],
     [ "EncodingType", "classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e", null ],
     [ "GenericPointer", "classrapidjson_1_1_generic_pointer.html#a1e62d3874c00e68c11388503c00eebac", null ],
     [ "GenericPointer", "classrapidjson_1_1_generic_pointer.html#a8f831aae14afc493a82b5fb6aa9c3c43", null ],

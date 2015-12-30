@@ -222,7 +222,7 @@ $(document).ready(function(){initNavTree('stack_8h_source.html','');});
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    }</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    T* Bottom() { <span class="keywordflow">return</span> (T*)stack_; }</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    T* Bottom() { <span class="keywordflow">return</span> <span class="keyword">reinterpret_cast&lt;</span>T*<span class="keyword">&gt;</span>(stack_); }</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="keywordtype">bool</span> HasAllocator()<span class="keyword"> const </span>{</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        <span class="keywordflow">return</span> allocator_ != 0;</div>
@@ -258,7 +258,7 @@ $(document).ready(function(){initNavTree('stack_8h_source.html','');});
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordtype">void</span> Resize(<span class="keywordtype">size_t</span> newCapacity) {</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">size_t</span> size = GetSize();  <span class="comment">// Backup the current size</span></div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        stack_ = (<span class="keywordtype">char</span>*)allocator_-&gt;Realloc(stack_, GetCapacity(), newCapacity);</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        stack_ = <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span>*<span class="keyword">&gt;</span>(allocator_-&gt;Realloc(stack_, GetCapacity(), newCapacity));</div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        stackTop_ = stack_ + size;</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        stackEnd_ = stack_ + newCapacity;</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    }</div>
@@ -284,9 +284,9 @@ $(document).ready(function(){initNavTree('stack_8h_source.html','');});
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;RAPIDJSON_NAMESPACE_END</div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;</div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_STACK_H_</span></div>
-<div class="ttc" id="rapidjson_8h_html_ab9e102fa2f1a0ae4914d4dac21f690a2"><div class="ttname"><a href="rapidjson_8h.html#ab9e102fa2f1a0ae4914d4dac21f690a2">RAPIDJSON_NEW</a></div><div class="ttdeci">#define RAPIDJSON_NEW(x)</div><div class="ttdoc">! customization point for global new </div><div class="ttdef"><b>Definition:</b> rapidjson.h:482</div></div>
-<div class="ttc" id="rapidjson_8h_html_a52c941c3fdd646527cdcd42aa846a28a"><div class="ttname"><a href="rapidjson_8h.html#a52c941c3fdd646527cdcd42aa846a28a">RAPIDJSON_DELETE</a></div><div class="ttdeci">#define RAPIDJSON_DELETE(x)</div><div class="ttdoc">! customization point for global delete </div><div class="ttdef"><b>Definition:</b> rapidjson.h:486</div></div>
-<div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:346</div></div>
+<div class="ttc" id="rapidjson_8h_html_ab9e102fa2f1a0ae4914d4dac21f690a2"><div class="ttname"><a href="rapidjson_8h.html#ab9e102fa2f1a0ae4914d4dac21f690a2">RAPIDJSON_NEW</a></div><div class="ttdeci">#define RAPIDJSON_NEW(x)</div><div class="ttdoc">! customization point for global new </div><div class="ttdef"><b>Definition:</b> rapidjson.h:511</div></div>
+<div class="ttc" id="rapidjson_8h_html_a52c941c3fdd646527cdcd42aa846a28a"><div class="ttname"><a href="rapidjson_8h.html#a52c941c3fdd646527cdcd42aa846a28a">RAPIDJSON_DELETE</a></div><div class="ttdeci">#define RAPIDJSON_DELETE(x)</div><div class="ttdoc">! customization point for global delete </div><div class="ttdef"><b>Definition:</b> rapidjson.h:515</div></div>
+<div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:371</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->
