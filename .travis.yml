@@ -64,7 +64,8 @@ matrix:
             - g++-multilib
             - libc6-dbg:i386
       after_success:
-        - ../travis-coveralls.sh
+        - pip install --user cpp-coveralls
+        - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
     - env: CONF=debug   ARCH=x86_64 GCOV_FLAGS='--coverage'
       compiler: gcc
       addons:
@@ -74,7 +75,8 @@ matrix:
             - g++-multilib
             - libc6-dbg:i386
       after_success:
-        - ../travis-coveralls.sh
+        - pip install --user cpp-coveralls
+        - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
 
 before_script:
     #   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
