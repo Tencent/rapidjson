@@ -6,7 +6,13 @@ compiler:
  - clang
  - gcc
 
-addons: {apt: {packages: &default_packages [cmake, valgrind, doxygen]}}
+addons:
+  apt:
+    packages: &default_packages
+      - cmake
+      - valgrind
+      - doxygen
+
 env:
   matrix:
     - CONF=debug   ARCH=x86_64
@@ -26,10 +32,20 @@ env:
 matrix:
   include:
     env: CONF=debug   ARCH=x86
-    addons: {apt: {packages: [*default_packages, g++-multilib, libc6-dbg:i386]}}
+    addons:
+      apt:
+        packages:
+          - *default_packages
+          - g++-multilib
+          - libc6-dbg:i386
   include:
     env: CONF=release ARCH=x86
-    addons: {apt: {packages: [*default_packages, g++-multilib, libc6-dbg:i386]}}
+    addons:
+      apt:
+        packages:
+          - *default_packages
+          - g++-multilib
+          - libc6-dbg:i386
 
 before_script:
 #   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
