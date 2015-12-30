@@ -31,26 +31,51 @@ env:
 
 matrix:
   include:
-    env: CONF=debug   ARCH=x86
-    addons:
-      apt:
-        packages:
-          - *default_packages
-          - g++-multilib
-          - libc6-dbg:i386
-  include:
-    env: CONF=release ARCH=x86
-    addons:
-      apt:
-        packages:
-          - *default_packages
-          - g++-multilib
-          - libc6-dbg:i386
+    - env: CONF=debug   ARCH=x86
+      addons:
+        apt:
+          packages:
+            - *default_packages
+            - g++-multilib
+            - libc6-dbg:i386
+    - env: CONF=release ARCH=x86
+      addons:
+        apt:
+          packages:
+            - *default_packages
+            - g++-multilib
+            - libc6-dbg:i386
+    - env: CONF=debug ARCH=x86 GCOV_FLAGS='--coverage'
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - *default_packages
+            - g++-multilib
+            - libc6-dbg:i386
+      after_success:
+        - ./travis-coveralls.sh
+    - env: CONF=debug   ARCH=x86_64 GCOV_FLAGS='--coverage'
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - *default_packages
+            - g++-multilib
+            - libc6-dbg:i386
+      after_success:
+        - ./travis-coveralls.sh
+  # These jobs report code coverage so they need extra environment variables
+  # and commands
+  exclude:
+    - env: CONF=debug   ARCH=x86_64
+      compiler: gcc
+    - env: CONF=debug ARCH=x86
+      compiler: gcc
 
 before_script:
-#   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
-#   exposed by merging PR#163 (using -march=native)
-    - if [ "$CC" = "gcc" ] && [ "$CONF" = "debug" ]; then export GCOV_FLAGS='--coverage'; fi
+    #   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
+    #   exposed by merging PR#163 (using -march=native)
     - sed -i "s/-march=native//" CMakeLists.txt
     - mkdir build
     - >
@@ -69,7 +94,4 @@ script:
   - make examples
   - ctest -V `[ "$CONF" = "release" ] || echo "-E perftest"`
   - make travis_doc
-
-after_success:
-  - if [ "$CC" = "gcc" ] && [ "$CONF" = "debug" ]; then pip install --user cpp-coveralls; fi
-  - if [ "$CC" = "gcc" ] && [ "$CONF" = "debug" ]; then coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h; fi
+  
