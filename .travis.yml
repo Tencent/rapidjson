@@ -3,9 +3,6 @@ sudo: false
 cache:
   - ccache
   - pip
-compiler:
- - clang
- - gcc
 
 addons:
   apt:
@@ -15,11 +12,6 @@ addons:
       - doxygen
 
 env:
-  matrix:
-    - CONF=debug   ARCH=x86_64
-    - CONF=release ARCH=x86_64
-    - CONF=debug   ARCH=x86
-    - CONF=release ARCH=x86
   global:
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
@@ -32,22 +24,6 @@ env:
 
 matrix:
   include:
-    - env: CONF=debug   ARCH=x86
-      compiler: gcc
-      addons:
-        apt:
-          packages:
-            - *default_packages
-            - g++-multilib
-            - libc6-dbg:i386
-    - env: CONF=debug   ARCH=x86
-      compiler: clang
-      addons:
-        apt:
-          packages:
-            - *default_packages
-            - g++-multilib
-            - libc6-dbg:i386
     - env: CONF=release ARCH=x86
       compiler: gcc
       addons:
@@ -56,6 +32,18 @@ matrix:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
+    - env: CONF=release ARCH=x86_64
+      compiler: gcc
+    - env: CONF=debug   ARCH=x86
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - *default_packages
+            - g++-multilib
+            - libc6-dbg:i386
+    - env: CONF=debug ARCH=x86_64
+      compiler: clang
     - env: CONF=release ARCH=x86
       compiler: clang
       addons:
@@ -64,6 +52,8 @@ matrix:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
+    - env: CONF=release ARCH=x86_64
+      compiler: clang
     # coverage report
     - env: CONF=debug ARCH=x86 GCOV_FLAGS='--coverage'
       compiler: gcc
@@ -85,13 +75,6 @@ matrix:
             - libc6-dbg:i386
       after_success:
         - ../travis-coveralls.sh
-  # These jobs report code coverage so they need extra environment variables
-  # and commands
-  exclude:
-    - env: CONF=debug   ARCH=x86_64
-      compiler: gcc
-    - env: CONF=debug ARCH=x86
-      compiler: gcc
 
 before_script:
     #   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
