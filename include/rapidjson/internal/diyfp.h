@@ -35,6 +35,11 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(padded)
+#endif
+
 struct DiyFp {
     DiyFp() {}
 
@@ -240,6 +245,11 @@ inline DiyFp GetCachedPower10(int exp, int *outExp) {
 
 #ifdef __GNUC__
 RAPIDJSON_DIAG_POP
+#endif
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+RAPIDJSON_DIAG_OFF(padded)
 #endif
 
 } // namespace internal

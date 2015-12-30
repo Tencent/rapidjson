@@ -25,35 +25,18 @@
 #ifdef _MSC_VER
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
-#elif defined(__GNUC__)
+#endif
+
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(padded)
+RAPIDJSON_DIAG_OFF(switch-enum)
+#endif
+
+#ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
-
-///////////////////////////////////////////////////////////////////////////////
-// RAPIDJSON_HAS_STDSTRING
-
-#ifndef RAPIDJSON_HAS_STDSTRING
-#ifdef RAPIDJSON_DOXYGEN_RUNNING
-#define RAPIDJSON_HAS_STDSTRING 1 // force generation of documentation
-#else
-#define RAPIDJSON_HAS_STDSTRING 0 // no std::string support by default
-#endif
-/*! \def RAPIDJSON_HAS_STDSTRING
-    \ingroup RAPIDJSON_CONFIG
-    \brief Enable RapidJSON support for \c std::string
-
-    By defining this preprocessor symbol to \c 1, several convenience functions for using
-    \ref rapidjson::GenericValue with \c std::string are enabled, especially
-    for construction and comparison.
-
-    \hideinitializer
-*/
-#endif // !defined(RAPIDJSON_HAS_STDSTRING)
-
-#if RAPIDJSON_HAS_STDSTRING
-#include <string>
-#endif // RAPIDJSON_HAS_STDSTRING
 
 #ifndef RAPIDJSON_NOMEMBERITERATORCLASS
 #include <iterator> // std::iterator, std::random_access_iterator_tag
@@ -260,6 +243,7 @@ struct GenericStringRef {
     typedef CharType Ch; //!< character type of the string
 
     //! Create string reference from \c const character array
+#ifndef __clang__ // -Wdocumentation
     /*!
         This constructor implicitly creates a constant string reference from
         a \c const character array.  It has better performance than
@@ -282,11 +266,13 @@ struct GenericStringRef {
             In such cases, the referenced string should be \b copied to the
             GenericValue instead.
      */
+#endif
     template<SizeType N>
     GenericStringRef(const CharType (&str)[N]) RAPIDJSON_NOEXCEPT
         : s(str), length(N-1) {}
 
     //! Explicitly create string reference from \c const character pointer
+#ifndef __clang__ // -Wdocumentation
     /*!
         This constructor can be used to \b explicitly  create a reference to
         a constant string pointer.
@@ -305,16 +291,19 @@ struct GenericStringRef {
             In such cases, the referenced string should be \b copied to the
             GenericValue instead.
      */
+#endif
     explicit GenericStringRef(const CharType* str)
         : s(str), length(internal::StrLen(str)){ RAPIDJSON_ASSERT(s != NULL); }
 
     //! Create constant string reference from pointer and length
+#ifndef __clang__ // -Wdocumentation
     /*! \param str constant string, lifetime assumed to be longer than the use of the string in e.g. a GenericValue
         \param len length of the string, excluding the trailing NULL terminator
 
         \post \ref s == str && \ref length == len
         \note Constant complexity.
      */
+#endif
     GenericStringRef(const CharType* str, SizeType len)
         : s(str), length(len) { RAPIDJSON_ASSERT(s != NULL); }
 
@@ -654,7 +643,7 @@ public:
      */
     template <typename SourceAllocator>
     GenericValue& CopyFrom(const GenericValue<Encoding, SourceAllocator>& rhs, Allocator& allocator) {
-        RAPIDJSON_ASSERT((void*)this != (void const*)&rhs);
+        RAPIDJSON_ASSERT(static_cast<void*>(this) != static_cast<void const*>(&rhs));
         this->~GenericValue();
         new (this) GenericValue(rhs, allocator);
         return *this;
@@ -736,7 +725,7 @@ public:
             else
                 return data_.n.u64 == rhs.data_.n.u64;
 
-        default: // kTrueType, kFalseType, kNullType
+        default:
             return true;
         }
     }
@@ -864,8 +853,14 @@ public:
             return member->value;
         else {
             RAPIDJSON_ASSERT(false);    // see above note
-            static GenericValue NullValue;
-            return NullValue;
+
+            // This will generate -Wexit-time-destructors in clang
+            // static GenericValue NullValue;
+            // return NullValue;
+
+            // Use static buffer and placement-new to prevent destruction
+            static char buffer[sizeof(GenericValue)];
+            return *new (buffer) GenericValue();
         }
     }
     template <typename SourceAllocator>
@@ -1235,8 +1230,8 @@ public:
         MemberIterator pos = MemberBegin() + (first - MemberBegin());
         for (MemberIterator itr = pos; itr != last; ++itr)
             itr->~Member();
-        std::memmove(&*pos, &*last, (MemberEnd() - last) * sizeof(Member));
-        data_.o.size -= (last - first);
+        std::memmove(&*pos, &*last, static_cast<size_t>(MemberEnd() - last) * sizeof(Member));
+        data_.o.size -= static_cast<SizeType>(last - first);
         return pos;
     }
 
@@ -1328,7 +1323,7 @@ public:
     GenericValue& Reserve(SizeType newCapacity, Allocator &allocator) {
         RAPIDJSON_ASSERT(IsArray());
         if (newCapacity > data_.a.capacity) {
-            data_.a.elements = (GenericValue*)allocator.Realloc(data_.a.elements, data_.a.capacity * sizeof(GenericValue), newCapacity * sizeof(GenericValue));
+            data_.a.elements = static_cast<GenericValue*>(allocator.Realloc(data_.a.elements, data_.a.capacity * sizeof(GenericValue), newCapacity * sizeof(GenericValue)));
             data_.a.capacity = newCapacity;
         }
         return *this;
@@ -1435,8 +1430,8 @@ public:
         ValueIterator pos = Begin() + (first - Begin());
         for (ValueIterator itr = pos; itr != last; ++itr)
             itr->~GenericValue();       
-        std::memmove(pos, last, (End() - last) * sizeof(GenericValue));
-        data_.a.size -= (last - first);
+        std::memmove(pos, last, static_cast<size_t>(End() - last) * sizeof(GenericValue));
+        data_.a.size -= static_cast<SizeType>(last - first);
         return pos;
     }
 
@@ -1455,8 +1450,8 @@ public:
         if ((flags_ & kDoubleFlag) != 0)                return data_.n.d;   // exact type, no conversion.
         if ((flags_ & kIntFlag) != 0)                   return data_.n.i.i; // int -> double
         if ((flags_ & kUintFlag) != 0)                  return data_.n.u.u; // unsigned -> double
-        if ((flags_ & kInt64Flag) != 0)                 return (double)data_.n.i64; // int64_t -> double (may lose precision)
-        RAPIDJSON_ASSERT((flags_ & kUint64Flag) != 0);  return (double)data_.n.u64; // uint64_t -> double (may lose precision)
+        if ((flags_ & kInt64Flag) != 0)                 return static_cast<double>(data_.n.i64); // int64_t -> double (may lose precision)
+        RAPIDJSON_ASSERT((flags_ & kUint64Flag) != 0);  return static_cast<double>(data_.n.u64); // uint64_t -> double (may lose precision)
     }
 
     GenericValue& SetInt(int i)             { this->~GenericValue(); new (this) GenericValue(i);    return *this; }
@@ -1628,9 +1623,9 @@ private:
         enum { MaxChars = sizeof(String) / sizeof(Ch), MaxSize = MaxChars - 1, LenPos = MaxSize };
         Ch str[MaxChars];
 
-        inline static bool Usable(SizeType len) { return            (MaxSize >= len); }
-        inline void     SetLength(SizeType len) { str[LenPos] = (Ch)(MaxSize -  len); }
-        inline SizeType GetLength() const       { return  (SizeType)(MaxSize -  str[LenPos]); }
+        inline static bool Usable(SizeType len) { return                       (MaxSize >= len); }
+        inline void     SetLength(SizeType len) { str[LenPos] = static_cast<Ch>(MaxSize -  len); }
+        inline SizeType GetLength() const       { return  static_cast<SizeType>(MaxSize -  str[LenPos]); }
     };  // at most as many bytes as "String" above => 12 bytes in 32-bit mode, 16 bytes in 64-bit mode
 
     // By using proper binary layout, retrieval of different integer types do not need conversions.
@@ -1683,7 +1678,7 @@ private:
     void SetArrayRaw(GenericValue* values, SizeType count, Allocator& allocator) {
         flags_ = kArrayFlag;
         if (count) {
-            data_.a.elements = (GenericValue*)allocator.Malloc(count * sizeof(GenericValue));
+            data_.a.elements = static_cast<GenericValue*>(allocator.Malloc(count * sizeof(GenericValue)));
             std::memcpy(data_.a.elements, values, count * sizeof(GenericValue));
         }
         else
@@ -1695,7 +1690,7 @@ private:
     void SetObjectRaw(Member* members, SizeType count, Allocator& allocator) {
         flags_ = kObjectFlag;
         if (count) {
-            data_.o.members = (Member*)allocator.Malloc(count * sizeof(Member));
+            data_.o.members = static_cast<Member*>(allocator.Malloc(count * sizeof(Member)));
             std::memcpy(data_.o.members, members, count * sizeof(Member));
         }
         else
@@ -1720,7 +1715,7 @@ private:
         } else {
             flags_ = kCopyStringFlag;
             data_.s.length = s.length;
-            str = (Ch *)allocator.Malloc((s.length + 1) * sizeof(Ch));
+            str = static_cast<Ch *>(allocator.Malloc((s.length + 1) * sizeof(Ch)));
             data_.s.str = str;
         }
         std::memcpy(str, s, s.length * sizeof(Ch));
@@ -1847,7 +1842,7 @@ public:
 
     //! Exchange the contents of this document with those of another.
     /*!
-        \param other Another document.
+        \param rhs Another document.
         \note Constant complexity.
         \see GenericValue::Swap
     */
@@ -1987,6 +1982,7 @@ public:
     size_t GetErrorOffset() const { return parseResult_.Offset(); }
 
     //! Implicit conversion to get the last parse result
+#ifndef __clang // -Wdocumentation
     /*! \return \ref ParseResult of the last parse operation
 
         \code
@@ -1996,6 +1992,7 @@ public:
             printf( "JSON parse error: %s (%u)\n", GetParseError_En(ok.Code()), ok.Offset());
         \endcode
      */
+#endif
     operator ParseResult() const { return parseResult_; }
     //!@}
 
@@ -2046,7 +2043,7 @@ private:
 
     bool EndObject(SizeType memberCount) {
         typename ValueType::Member* members = stack_.template Pop<typename ValueType::Member>(memberCount);
-        stack_.template Top<ValueType>()->SetObjectRaw(members, (SizeType)memberCount, GetAllocator());
+        stack_.template Top<ValueType>()->SetObjectRaw(members, memberCount, GetAllocator());
         return true;
     }
 
@@ -2109,7 +2106,7 @@ GenericValue<Encoding,Allocator>::GenericValue(const GenericValue<Encoding,Sourc
             SetStringRaw(StringRef(rhs.GetString(), rhs.GetStringLength()), allocator);
         }
         break;
-    default: // kNumberType, kTrueType, kFalseType, kNullType
+    default:
         flags_ = rhs.flags_;
         data_  = *reinterpret_cast<const Data*>(&rhs.data_);
         break;
@@ -2118,7 +2115,15 @@ GenericValue<Encoding,Allocator>::GenericValue(const GenericValue<Encoding,Sourc
 
 RAPIDJSON_NAMESPACE_END
 
-#if defined(_MSC_VER) || defined(__GNUC__)
+#ifdef _MSC_VER
+RAPIDJSON_DIAG_POP
+#endif
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif
+
+#ifdef __GNUC__
 RAPIDJSON_DIAG_POP
 #endif
 

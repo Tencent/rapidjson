@@ -15,12 +15,14 @@
 #include "unittest.h"
 #include "rapidjson/rapidjson.h"
 
+AssertException::~AssertException() throw() {}
+
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
 
     std::cout << "RapidJSON v" << RAPIDJSON_VERSION_STRING << std::endl;
 
-#if _MSC_VER
+#ifdef _MSC_VER
     _CrtMemState memoryState = { 0 };
     _CrtMemCheckpoint(&memoryState);
     //_CrtSetBreakAlloc(X);
@@ -29,7 +31,7 @@ int main(int argc, char **argv) {
 
     int ret = RUN_ALL_TESTS();
 
-#if _MSC_VER
+#ifdef _MSC_VER
     // Current gtest constantly leak 2 blocks at exit
     _CrtMemDumpAllObjectsSince(&memoryState);
 #endif

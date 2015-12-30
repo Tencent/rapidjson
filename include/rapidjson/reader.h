@@ -39,6 +39,12 @@ RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
 RAPIDJSON_DIAG_OFF(4702)  // unreachable code
 #endif
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(padded)
+RAPIDJSON_DIAG_OFF(switch-enum)
+#endif
+
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
@@ -263,7 +269,7 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
         return p;
 
     // 16-byte align to the next boundary
-    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & ~15);
+    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
     while (p != nextAligned)
         if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
             ++p;
@@ -272,11 +278,11 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
 
     // The rest of string using SIMD
     static const char whitespace[16] = " \n\r\t";
-    const __m128i w = _mm_loadu_si128((const __m128i *)&whitespace[0]);
+    const __m128i w = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespace[0]));
 
     for (;; p += 16) {
-        const __m128i s = _mm_load_si128((const __m128i *)p);
-        const unsigned r = _mm_cvtsi128_si32(_mm_cmpistrm(w, s, _SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_BIT_MASK | _SIDD_NEGATIVE_POLARITY));
+        const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
+        const int r = _mm_cvtsi128_si32(_mm_cmpistrm(w, s, _SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_BIT_MASK | _SIDD_NEGATIVE_POLARITY));
         if (r != 0) {   // some of characters is non-whitespace
 #ifdef _MSC_VER         // Find the index of first non-whitespace
             unsigned long offset;
@@ -300,7 +306,7 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
         return p;
 
     // 16-byte align to the next boundary
-    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & ~15);
+    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
     while (p != nextAligned)
         if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
             ++p;
@@ -314,18 +320,18 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
         "\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r",
         "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"};
 
-        const __m128i w0 = _mm_loadu_si128((const __m128i *)&whitespaces[0][0]);
-        const __m128i w1 = _mm_loadu_si128((const __m128i *)&whitespaces[1][0]);
-        const __m128i w2 = _mm_loadu_si128((const __m128i *)&whitespaces[2][0]);
-        const __m128i w3 = _mm_loadu_si128((const __m128i *)&whitespaces[3][0]);
+        const __m128i w0 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[0][0]));
+        const __m128i w1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[1][0]));
+        const __m128i w2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[2][0]));
+        const __m128i w3 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[3][0]));
 
     for (;; p += 16) {
-        const __m128i s = _mm_load_si128((const __m128i *)p);
+        const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
         __m128i x = _mm_cmpeq_epi8(s, w0);
         x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w1));
         x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w2));
         x = _mm_or_si128(x, _mm_cmpeq_epi8(s, w3));
-        unsigned short r = (unsigned short)~_mm_movemask_epi8(x);
+        unsigned short r = static_cast<unsigned short>(~_mm_movemask_epi8(x));
         if (r != 0) {   // some of characters may be non-whitespace
 #ifdef _MSC_VER         // Find the index of first non-whitespace
             unsigned long offset;
@@ -698,7 +704,7 @@ private:
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
             size_t length = s.PutEnd(head) - 1;
             RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
-            const typename TargetEncoding::Ch* const str = (typename TargetEncoding::Ch*)head;
+            const typename TargetEncoding::Ch* const str = reinterpret_cast<typename TargetEncoding::Ch*>(head);
             success = (isKey ? handler.Key(str, SizeType(length), false) : handler.String(str, SizeType(length), false));
         }
         else {
@@ -737,9 +743,8 @@ private:
             if (c == '\\') {    // Escape
                 is.Take();
                 Ch e = is.Take();
-                if ((sizeof(Ch) == 1 || unsigned(e) < 256) && escape[(unsigned char)e]) {
-                    os.Put(escape[(unsigned char)e]);
-                }
+                if ((sizeof(Ch) == 1 || unsigned(e) < 256) && escape[static_cast<unsigned char>(e)])
+                    os.Put(static_cast<typename TEncoding::Ch>(escape[static_cast<unsigned char>(e)]));
                 else if (e == 'u') {    // Unicode
                     unsigned codepoint = ParseHex4(is);
                     RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
@@ -765,7 +770,7 @@ private:
             }
             else if (c == '\0')
                 RAPIDJSON_PARSE_ERROR(kParseErrorStringMissQuotationMark, is.Tell() - 1);
-            else if ((unsigned)c < 0x20) // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
+            else if (static_cast<unsigned>(c) < 0x20) // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
                 RAPIDJSON_PARSE_ERROR(kParseErrorStringEscapeInvalid, is.Tell() - 1);
             else {
                 if (parseFlags & kParseValidateEncodingFlag ? 
@@ -806,7 +811,7 @@ private:
         ~NumberStream() {}
 
         RAPIDJSON_FORCEINLINE Ch TakePush() {
-            stackStream.Put((char)Base::is.Peek());
+            stackStream.Put(static_cast<char>(Base::is.Peek()));
             return Base::is.Take();
         }
 
@@ -937,10 +942,10 @@ private:
                     }
                 }
 
-                d = (double)i64;
+                d = static_cast<double>(i64);
 #else
                 // Use double to store significand in 32-bit architecture
-                d = use64bit ? (double)i64 : (double)i;
+                d = static_cast<double>(use64bit ? i64 : i);
 #endif
                 useDouble = true;
             }
@@ -977,10 +982,10 @@ private:
             }
 
             if (s.Peek() >= '0' && s.Peek() <= '9') {
-                exp = s.Take() - '0';
+                exp = static_cast<int>(s.Take() - '0');
                 if (expMinus) {
                     while (s.Peek() >= '0' && s.Peek() <= '9') {
-                        exp = exp * 10 + (s.Take() - '0');
+                        exp = exp * 10 + static_cast<int>(s.Take() - '0');
                         if (exp >= 214748364) {                         // Issue #313: prevent overflow exponent
                             while (s.Peek() >= '0' && s.Peek() <= '9')  // Consume the rest of exponent
                                 s.Take();
@@ -990,7 +995,7 @@ private:
                 else {  // positive exp
                     int maxExp = 308 - expFrac;
                     while (s.Peek() >= '0' && s.Peek() <= '9') {
-                        exp = exp * 10 + (s.Take() - '0');
+                        exp = exp * 10 + static_cast<int>(s.Take() - '0');
                         if (exp > maxExp)
                             RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
                     }
@@ -1075,10 +1080,10 @@ private:
         IterativeParsingArrayFinishState,
 
         // Single value state
-        IterativeParsingValueState,
-
-        cIterativeParsingStateCount
+        IterativeParsingValueState
     };
+
+    enum { cIterativeParsingStateCount = IterativeParsingValueState + 1 };
 
     // Tokens
     enum Token {
@@ -1121,8 +1126,8 @@ private:
 #undef N16
 //!@endcond
         
-        if (sizeof(Ch) == 1 || unsigned(c) < 256)
-            return (Token)tokenMap[(unsigned char)c];
+        if (sizeof(Ch) == 1 || static_cast<unsigned>(c) < 256)
+            return static_cast<Token>(tokenMap[static_cast<unsigned char>(c)]);
         else
             return NumberToken;
     }
@@ -1288,7 +1293,7 @@ private:
             }
         }; // End of G
 
-        return (IterativeParsingState)G[state][token];
+        return static_cast<IterativeParsingState>(G[state][token]);
     }
 
     // Make an advance in the token stream and state based on the candidate destination state which was returned by Transit().
@@ -1498,6 +1503,11 @@ private:
 typedef GenericReader<UTF8<>, UTF8<> > Reader;
 
 RAPIDJSON_NAMESPACE_END
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif
+
 
 #ifdef __GNUC__
 RAPIDJSON_DIAG_POP

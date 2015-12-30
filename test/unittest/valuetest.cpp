@@ -448,7 +448,7 @@ TEST(Value, Uint) {
 
 TEST(Value, Int64) {
     // Constructor with int
-    Value x(int64_t(1234LL));
+    Value x(int64_t(1234));
     EXPECT_EQ(kNumberType, x.GetType());
     EXPECT_EQ(1234, x.GetInt());
     EXPECT_EQ(1234u, x.GetUint());
@@ -469,7 +469,7 @@ TEST(Value, Int64) {
     EXPECT_FALSE(x.IsObject());
     EXPECT_FALSE(x.IsArray());
 
-    Value nx(int64_t(-1234LL));
+    Value nx(int64_t(-1234));
     EXPECT_EQ(-1234, nx.GetInt());
     EXPECT_EQ(-1234, nx.GetInt64());
     EXPECT_TRUE(nx.IsInt());
@@ -482,17 +482,17 @@ TEST(Value, Int64) {
     z.SetInt64(1234);
     EXPECT_EQ(1234, z.GetInt64());
 
-    z.SetInt64(2147483648LL);   // 2^31, cannot cast as int
+    z.SetInt64(2147483648u);   // 2^31, cannot cast as int
     EXPECT_FALSE(z.IsInt());
     EXPECT_TRUE(z.IsUint());
     EXPECT_NEAR(2147483648.0, z.GetDouble(), 0.0);
 
-    z.SetInt64(4294967296LL);   // 2^32, cannot cast as uint
+    z.SetInt64(int64_t(4294967295u) + 1);   // 2^32, cannot cast as uint
     EXPECT_FALSE(z.IsInt());
     EXPECT_FALSE(z.IsUint());
     EXPECT_NEAR(4294967296.0, z.GetDouble(), 0.0);
 
-    z.SetInt64(-2147483649LL);   // -2^31-1, cannot cast as int
+    z.SetInt64(-int64_t(2147483648u) - 1);   // -2^31-1, cannot cast as int
     EXPECT_FALSE(z.IsInt());
     EXPECT_NEAR(-2147483649.0, z.GetDouble(), 0.0);
 
@@ -502,7 +502,7 @@ TEST(Value, Int64) {
 
 TEST(Value, Uint64) {
     // Constructor with int
-    Value x(uint64_t(1234LL));
+    Value x(uint64_t(1234));
     EXPECT_EQ(kNumberType, x.GetType());
     EXPECT_EQ(1234, x.GetInt());
     EXPECT_EQ(1234u, x.GetUint());
@@ -528,19 +528,19 @@ TEST(Value, Uint64) {
     z.SetUint64(1234);
     EXPECT_EQ(1234u, z.GetUint64());
 
-    z.SetUint64(2147483648LL);  // 2^31, cannot cast as int
+    z.SetUint64(uint64_t(2147483648u));  // 2^31, cannot cast as int
     EXPECT_FALSE(z.IsInt());
     EXPECT_TRUE(z.IsUint());
     EXPECT_TRUE(z.IsInt64());
 
-    z.SetUint64(4294967296LL);  // 2^32, cannot cast as uint
+    z.SetUint64(uint64_t(4294967295u) + 1);  // 2^32, cannot cast as uint
     EXPECT_FALSE(z.IsInt());
     EXPECT_FALSE(z.IsUint());
     EXPECT_TRUE(z.IsInt64());
 
-    z.SetUint64(9223372036854775808uLL);    // 2^63 cannot cast as int64
+    z.SetUint64(RAPIDJSON_UINT64_C2(0x80000000, 0x00000000));    // 2^63 cannot cast as int64
     EXPECT_FALSE(z.IsInt64());
-    EXPECT_EQ(9223372036854775808uLL, z.GetUint64()); // Issue 48
+    EXPECT_EQ(RAPIDJSON_UINT64_C2(0x80000000, 0x00000000), z.GetUint64()); // Issue 48
     EXPECT_DOUBLE_EQ(9223372036854775808.0, z.GetDouble());
 }
 
@@ -662,7 +662,7 @@ TEST(Value, String) {
     // SetString()
     char s[] = "World";
     Value w;
-    w.SetString(s, (SizeType)strlen(s), allocator);
+    w.SetString(s, static_cast<SizeType>(strlen(s)), allocator);
     s[0] = '\0';
     EXPECT_STREQ("World", w.GetString());
     EXPECT_EQ(5u, w.GetStringLength());
@@ -841,23 +841,23 @@ TEST(Value, Array) {
     EXPECT_EQ(x.Begin(), itr);
     EXPECT_EQ(9u, x.Size());
     for (int i = 0; i < 9; i++)
-        EXPECT_EQ(i + 1, x[i][0].GetInt());
+        EXPECT_EQ(i + 1, x[static_cast<SizeType>(i)][0].GetInt());
 
     // Ease the last
     itr = x.Erase(x.End() - 1);
     EXPECT_EQ(x.End(), itr);
     EXPECT_EQ(8u, x.Size());
     for (int i = 0; i < 8; i++)
-        EXPECT_EQ(i + 1, x[i][0].GetInt());
+        EXPECT_EQ(i + 1, x[static_cast<SizeType>(i)][0].GetInt());
 
     // Erase the middle
     itr = x.Erase(x.Begin() + 4);
     EXPECT_EQ(x.Begin() + 4, itr);
     EXPECT_EQ(7u, x.Size());
     for (int i = 0; i < 4; i++)
-        EXPECT_EQ(i + 1, x[i][0].GetInt());
+        EXPECT_EQ(i + 1, x[static_cast<SizeType>(i)][0].GetInt());
     for (int i = 4; i < 7; i++)
-        EXPECT_EQ(i + 2, x[i][0].GetInt());
+        EXPECT_EQ(i + 2, x[static_cast<SizeType>(i)][0].GetInt());
 
     // Erase(ValueIterator, ValueIterator)
     // Exhaustive test with all 0 <= first < n, first <= last <= n cases
@@ -879,7 +879,7 @@ TEST(Value, Array) {
             for (unsigned i = 0; i < first; i++)
                 EXPECT_EQ(i, x[i][0].GetUint());
             for (unsigned i = first; i < n - removeCount; i++)
-                EXPECT_EQ(i + removeCount, x[i][0].GetUint());
+                EXPECT_EQ(i + removeCount, x[static_cast<SizeType>(i)][0].GetUint());
         }
     }
 
@@ -896,7 +896,7 @@ TEST(Value, Array) {
     x.Erase(std::remove(x.Begin(), x.End(), null), x.End());
     EXPECT_EQ(5u, x.Size());
     for (int i = 0; i < 5; i++)
-        EXPECT_EQ(i * 2, x[i]);
+        EXPECT_EQ(i * 2, x[static_cast<SizeType>(i)]);
 
     // SetArray()
     Value z;
@@ -935,8 +935,8 @@ TEST(Value, Object) {
         o.AddMember("false", false, allocator);
         o.AddMember("int", -1, allocator);
         o.AddMember("uint", 1u, allocator);
-        o.AddMember("int64", INT64_C(-4294967296), allocator);
-        o.AddMember("uint64", UINT64_C(4294967296), allocator);
+        o.AddMember("int64", int64_t(-4294967296), allocator);
+        o.AddMember("uint64", uint64_t(4294967296), allocator);
         o.AddMember("double", 3.14, allocator);
         o.AddMember("string", "Jelly", allocator);
 
@@ -944,8 +944,8 @@ TEST(Value, Object) {
         EXPECT_FALSE(o["false"].GetBool());
         EXPECT_EQ(-1, o["int"].GetInt());
         EXPECT_EQ(1u, o["uint"].GetUint());
-        EXPECT_EQ(INT64_C(-4294967296), o["int64"].GetInt64());
-        EXPECT_EQ(UINT64_C(4294967296), o["uint64"].GetUint64());
+        EXPECT_EQ(int64_t(-4294967296), o["int64"].GetInt64());
+        EXPECT_EQ(uint64_t(4294967296), o["uint64"].GetUint64());
         EXPECT_STREQ("Jelly",o["string"].GetString());
         EXPECT_EQ(8u, o.MemberCount());
     }
@@ -1125,7 +1125,7 @@ TEST(Value, Object) {
     EXPECT_EQ(x.MemberBegin(), itr);
     EXPECT_EQ(9u, x.MemberCount());
     for (; itr != x.MemberEnd(); ++itr) {
-        int i = (itr - x.MemberBegin()) + 1;
+        size_t i = static_cast<size_t>((itr - x.MemberBegin())) + 1;
         EXPECT_STREQ(itr->name.GetString(), keys[i]);
         EXPECT_EQ(i, itr->value[0].GetInt());
     }
@@ -1136,7 +1136,7 @@ TEST(Value, Object) {
     EXPECT_EQ(x.MemberEnd(), itr);
     EXPECT_EQ(8u, x.MemberCount());
     for (; itr != x.MemberEnd(); ++itr) {
-        int i = (itr - x.MemberBegin()) + 1;
+        size_t i = static_cast<size_t>(itr - x.MemberBegin()) + 1;
         EXPECT_STREQ(itr->name.GetString(), keys[i]);
         EXPECT_EQ(i, itr->value[0].GetInt());
     }
@@ -1147,8 +1147,8 @@ TEST(Value, Object) {
     EXPECT_EQ(x.MemberBegin() + 4, itr);
     EXPECT_EQ(7u, x.MemberCount());
     for (; itr != x.MemberEnd(); ++itr) {
-        int i = (itr - x.MemberBegin());
-        i += (i<4) ? 1 : 2;
+        size_t i = static_cast<size_t>(itr - x.MemberBegin());
+        i += (i < 4) ? 1 : 2;
         EXPECT_STREQ(itr->name.GetString(), keys[i]);
         EXPECT_EQ(i, itr->value[0].GetInt());
     }
@@ -1162,11 +1162,11 @@ TEST(Value, Object) {
             for (unsigned i = 0; i < n; i++)
                 x.AddMember(keys[i], Value(kArrayType).PushBack(i, allocator), allocator);
 
-            itr = x.EraseMember(x.MemberBegin() + first, x.MemberBegin() + last);
+            itr = x.EraseMember(x.MemberBegin() + static_cast<int>(first), x.MemberBegin() + static_cast<int>(last));
             if (last == n)
                 EXPECT_EQ(x.MemberEnd(), itr);
             else
-                EXPECT_EQ(x.MemberBegin() + first, itr);
+                EXPECT_EQ(x.MemberBegin() + static_cast<int>(first), itr);
 
             size_t removeCount = last - first;
             EXPECT_EQ(n - removeCount, x.MemberCount());
@@ -1214,7 +1214,7 @@ TEST(Value, BigNestedArray) {
     for (SizeType i = 0; i < n; i++) {
         Value y(kArrayType);
         for (SizeType  j = 0; j < n; j++) {
-            Value number((int)(i * n + j));
+            Value number(static_cast<int>(i * n + j));
             y.PushBack(number, allocator);
         }
         x.PushBack(y, allocator);
@@ -1223,7 +1223,7 @@ TEST(Value, BigNestedArray) {
     for (SizeType i = 0; i < n; i++)
         for (SizeType j = 0; j < n; j++) {
             EXPECT_TRUE(x[i][j].IsInt());
-            EXPECT_EQ((int)(i * n + j), x[i][j].GetInt());
+            EXPECT_EQ(static_cast<int>(i * n + j), x[i][j].GetInt());
         }
 }
 
@@ -1237,16 +1237,16 @@ TEST(Value, BigNestedObject) {
         sprintf(name1, "%d", i);
 
         // Value name(name1); // should not compile
-        Value name(name1, (SizeType)strlen(name1), allocator);
+        Value name(name1, static_cast<SizeType>(strlen(name1)), allocator);
         Value object(kObjectType);
 
         for (SizeType j = 0; j < n; j++) {
             char name2[10];
             sprintf(name2, "%d", j);
 
-            Value name(name2, (SizeType)strlen(name2), allocator);
-            Value number((int)(i * n + j));
-            object.AddMember(name, number, allocator);
+            Value name3(name2, static_cast<SizeType>(strlen(name2)), allocator);
+            Value number(static_cast<int>(i * n + j));
+            object.AddMember(name3, number, allocator);
         }
 
         // x.AddMember(name1, object, allocator); // should not compile
@@ -1261,7 +1261,7 @@ TEST(Value, BigNestedObject) {
             char name2[10];
             sprintf(name2, "%d", j);
             x[name1];
-            EXPECT_EQ((int)(i * n + j), x[name1][name2].GetInt());
+            EXPECT_EQ(static_cast<int>(i * n + j), x[name1][name2].GetInt());
         }
     }
 }
@@ -1293,7 +1293,7 @@ TEST(Document, CrtAllocator) {
 }
 
 static void TestShortStringOptimization(const char* str) {
-    const rapidjson::SizeType len = (rapidjson::SizeType)strlen(str);
+    const rapidjson::SizeType len = static_cast<rapidjson::SizeType>(strlen(str));
 	
     rapidjson::Document doc;
     rapidjson::Value val;

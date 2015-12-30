@@ -23,13 +23,14 @@
 #include "stringbuffer.h"
 #include <new>      // placement new
 
-#if RAPIDJSON_HAS_STDSTRING
-#include <string>
-#endif
-
 #ifdef _MSC_VER
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
+#endif
+
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(padded)
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -205,7 +206,7 @@ protected:
         char buffer[11];
         const char* end = internal::i32toa(i, buffer);
         for (const char* p = buffer; p != end; ++p)
-            os_->Put(*p);
+            os_->Put(static_cast<typename TargetEncoding::Ch>(*p));
         return true;
     }
 
@@ -213,7 +214,7 @@ protected:
         char buffer[10];
         const char* end = internal::u32toa(u, buffer);
         for (const char* p = buffer; p != end; ++p)
-            os_->Put(*p);
+            os_->Put(static_cast<typename TargetEncoding::Ch>(*p));
         return true;
     }
 
@@ -221,7 +222,7 @@ protected:
         char buffer[21];
         const char* end = internal::i64toa(i64, buffer);
         for (const char* p = buffer; p != end; ++p)
-            os_->Put(*p);
+            os_->Put(static_cast<typename TargetEncoding::Ch>(*p));
         return true;
     }
 
@@ -229,7 +230,7 @@ protected:
         char buffer[20];
         char* end = internal::u64toa(u64, buffer);
         for (char* p = buffer; p != end; ++p)
-            os_->Put(*p);
+            os_->Put(static_cast<typename TargetEncoding::Ch>(*p));
         return true;
     }
 
@@ -237,12 +238,12 @@ protected:
         char buffer[25];
         char* end = internal::dtoa(d, buffer);
         for (char* p = buffer; p != end; ++p)
-            os_->Put(*p);
+            os_->Put(static_cast<typename TargetEncoding::Ch>(*p));
         return true;
     }
 
     bool WriteString(const Ch* str, SizeType length)  {
-        static const char hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+        static const typename TargetEncoding::Ch hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
         static const char escape[256] = {
 #define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
             //0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
@@ -259,7 +260,7 @@ protected:
         GenericStringStream<SourceEncoding> is(str);
         while (is.Tell() < length) {
             const Ch c = is.Peek();
-            if (!TargetEncoding::supportUnicode && (unsigned)c >= 0x80) {
+            if (!TargetEncoding::supportUnicode && static_cast<unsigned>(c) >= 0x80) {
                 // Unicode escaping
                 unsigned codepoint;
                 if (!SourceEncoding::Decode(is, &codepoint))
@@ -290,15 +291,15 @@ protected:
                     os_->Put(hexDigits[(trail      ) & 15]);                    
                 }
             }
-            else if ((sizeof(Ch) == 1 || (unsigned)c < 256) && escape[(unsigned char)c])  {
+            else if ((sizeof(Ch) == 1 || static_cast<unsigned>(c) < 256) && escape[static_cast<unsigned char>(c)])  {
                 is.Take();
                 os_->Put('\\');
-                os_->Put(escape[(unsigned char)c]);
-                if (escape[(unsigned char)c] == 'u') {
+                os_->Put(static_cast<typename TargetEncoding::Ch>(escape[static_cast<unsigned char>(c)]));
+                if (escape[static_cast<unsigned char>(c)] == 'u') {
                     os_->Put('0');
                     os_->Put('0');
-                    os_->Put(hexDigits[(unsigned char)c >> 4]);
-                    os_->Put(hexDigits[(unsigned char)c & 0xF]);
+                    os_->Put(hexDigits[static_cast<unsigned char>(c) >> 4]);
+                    os_->Put(hexDigits[static_cast<unsigned char>(c) & 0xF]);
                 }
             }
             else
@@ -389,6 +390,10 @@ inline bool Writer<StringBuffer>::WriteDouble(double d) {
 RAPIDJSON_NAMESPACE_END
 
 #ifdef _MSC_VER
+RAPIDJSON_DIAG_POP
+#endif
+
+#ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
 

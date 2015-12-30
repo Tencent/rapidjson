@@ -120,6 +120,31 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_HAS_STDSTRING
+
+#ifndef RAPIDJSON_HAS_STDSTRING
+#ifdef RAPIDJSON_DOXYGEN_RUNNING
+#define RAPIDJSON_HAS_STDSTRING 1 // force generation of documentation
+#else
+#define RAPIDJSON_HAS_STDSTRING 0 // no std::string support by default
+#endif
+/*! \def RAPIDJSON_HAS_STDSTRING
+    \ingroup RAPIDJSON_CONFIG
+    \brief Enable RapidJSON support for \c std::string
+
+    By defining this preprocessor symbol to \c 1, several convenience functions for using
+    \ref rapidjson::GenericValue with \c std::string are enabled, especially
+    for construction and comparison.
+
+    \hideinitializer
+*/
+#endif // !defined(RAPIDJSON_HAS_STDSTRING)
+
+#if RAPIDJSON_HAS_STDSTRING
+#include <string>
+#endif // RAPIDJSON_HAS_STDSTRING
+
+///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NO_INT64DEFINE
 
 /*! \def RAPIDJSON_NO_INT64DEFINE
@@ -351,7 +376,9 @@ RAPIDJSON_NAMESPACE_END
 
 // Adopt from boost
 #ifndef RAPIDJSON_STATIC_ASSERT
+#ifndef __clang__
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
+#endif
 RAPIDJSON_NAMESPACE_BEGIN
 template <bool x> struct STATIC_ASSERTION_FAILURE;
 template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
@@ -367,7 +394,9 @@ RAPIDJSON_NAMESPACE_END
 #else
 #define RAPIDJSON_STATIC_ASSERT_UNUSED_ATTRIBUTE 
 #endif
+#ifndef __clang__
 //!@endcond
+#endif
 
 /*! \def RAPIDJSON_STATIC_ASSERT
     \brief (Internal) macro to check for conditions at compile-time

@@ -15,10 +15,20 @@
 #ifndef UNITTEST_H_
 #define UNITTEST_H_
 
-
 // gtest indirectly included inttypes.h, without __STDC_CONSTANT_MACROS.
 #ifndef __STDC_CONSTANT_MACROS
+#ifdef __clang__
+#pragma GCC diagnostic push
+#if __has_warning("-Wreserved-id-macro")
+#pragma GCC diagnostic ignored "-Wreserved-id-macro"
+#endif
+#endif
+
 #  define __STDC_CONSTANT_MACROS 1 // required by C++ standard
+
+#ifdef __clang__
+#pragma GCC diagnostic pop
+#endif
 #endif
 
 #ifdef _MSC_VER
@@ -41,6 +51,11 @@
 #pragma GCC diagnostic pop
 #endif
 
+#ifdef __clang__
+// All TEST() macro generated this warning, disable globally
+#pragma GCC diagnostic ignored "-Wglobal-constructors"
+#endif
+
 template <typename Ch>
 inline unsigned StrLen(const Ch* s) {
     const Ch* p = s;
@@ -51,19 +66,19 @@ inline unsigned StrLen(const Ch* s) {
 template<typename Ch>
 inline int StrCmp(const Ch* s1, const Ch* s2) {
     while(*s1 && (*s1 == *s2)) { s1++; s2++; }
-    return (unsigned)*s1 < (unsigned)*s2 ? -1 : (unsigned)*s1 > (unsigned)*s2;
+    return static_cast<unsigned>(*s1) < static_cast<unsigned>(*s2) ? -1 : static_cast<unsigned>(*s1) > static_cast<unsigned>(*s2);
 }
 
 template <typename Ch>
 inline Ch* StrDup(const Ch* str) {
     size_t bufferSize = sizeof(Ch) * (StrLen(str) + 1);
-    Ch* buffer = (Ch*)malloc(bufferSize);
+    Ch* buffer = static_cast<Ch*>(malloc(bufferSize));
     memcpy(buffer, str, bufferSize);
     return buffer;
 }
 
 inline FILE* TempFile(char *filename) {
-#if _MSC_VER
+#ifdef _MSC_VER
     filename = tmpnam(filename);
 
     // For Visual Studio, tmpnam() adds a backslash in front. Remove it.
@@ -80,13 +95,14 @@ inline FILE* TempFile(char *filename) {
 }
 
 // Use exception for catching assert
-#if _MSC_VER
+#ifdef _MSC_VER
 #pragma warning(disable : 4127)
 #endif
 
 class AssertException : public std::logic_error {
 public:
     AssertException(const char* w) : std::logic_error(w) {}
+    virtual ~AssertException() throw();
 };
 
 #define RAPIDJSON_ASSERT(x) if (!(x)) throw AssertException(RAPIDJSON_STRINGIFY(x))

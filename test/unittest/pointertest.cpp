@@ -306,7 +306,7 @@ TEST(Pointer, Parse_URIFragment) {
         GenericPointer<GenericValue<UTF16<> > > p(L"#/%C2%A2");
         EXPECT_TRUE(p.IsValid());
         EXPECT_EQ(1u, p.GetTokenCount());
-        EXPECT_EQ((UTF16<>::Ch)0x00A2, p.GetTokens()[0].name[0]);
+        EXPECT_EQ(static_cast<UTF16<>::Ch>(0x00A2), p.GetTokens()[0].name[0]);
         EXPECT_EQ(1u, p.GetTokens()[0].length);
     }
 
@@ -315,7 +315,7 @@ TEST(Pointer, Parse_URIFragment) {
         GenericPointer<GenericValue<UTF16<> > > p(L"#/%E2%82%AC");
         EXPECT_TRUE(p.IsValid());
         EXPECT_EQ(1u, p.GetTokenCount());
-        EXPECT_EQ((UTF16<>::Ch)0x20AC, p.GetTokens()[0].name[0]);
+        EXPECT_EQ(static_cast<UTF16<>::Ch>(0x20AC), p.GetTokens()[0].name[0]);
         EXPECT_EQ(1u, p.GetTokens()[0].length);
     }
 
@@ -1488,6 +1488,6 @@ TEST(Pointer, Issue483) {
     std::string mystr, path;
     myjson::Document document;
     myjson::Value value(rapidjson::kStringType);
-    value.SetString(mystr.c_str(), mystr.length(), document.GetAllocator());
+    value.SetString(mystr.c_str(), static_cast<SizeType>(mystr.length()), document.GetAllocator());
     myjson::Pointer(path.c_str()).Set(document, value, document.GetAllocator());
 }

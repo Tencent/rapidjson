@@ -22,6 +22,11 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(padded)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 //! Input byte stream wrapper with a statically bound encoding.
@@ -60,7 +65,7 @@ private:
 //! Output byte stream wrapper with statically bound encoding.
 /*!
     \tparam Encoding The interpretation of encoding of the stream. Either UTF8, UTF16LE, UTF16BE, UTF32LE, UTF32BE.
-    \tparam InputByteStream Type of input byte stream. For example, FileWriteStream.
+    \tparam OutputByteStream Type of input byte stream. For example, FileWriteStream.
 */
 template <typename Encoding, typename OutputByteStream>
 class EncodedOutputStream {
@@ -142,7 +147,7 @@ private:
         // FF FE        UTF-16LE
         // EF BB BF     UTF-8
 
-        const unsigned char* c = (const unsigned char *)is_->Peek4();
+        const unsigned char* c = reinterpret_cast<const unsigned char *>(is_->Peek4());
         if (!c)
             return;
 
@@ -193,7 +198,7 @@ private:
 //! Output stream wrapper with dynamically bound encoding and automatic encoding detection.
 /*!
     \tparam CharType Type of character for writing.
-    \tparam InputByteStream type of output byte stream to be wrapped.
+    \tparam OutputByteStream type of output byte stream to be wrapped.
 */
 template <typename CharType, typename OutputByteStream>
 class AutoUTFOutputStream {
@@ -253,6 +258,10 @@ private:
 #undef RAPIDJSON_ENCODINGS_FUNC
 
 RAPIDJSON_NAMESPACE_END
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif
 
 #ifdef __GNUC__
 RAPIDJSON_DIAG_POP

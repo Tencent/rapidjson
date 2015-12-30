@@ -41,7 +41,7 @@ using namespace rapidjson_simd;
 
 template <typename StreamType>
 void TestSkipWhitespace() {
-    for (int step = 1; step < 32; step++) {
+    for (size_t step = 1; step < 32; step++) {
         char buffer[1025];
         for (size_t i = 0; i < 1024; i++)
             buffer[i] = " \t\r\n"[i % 4];

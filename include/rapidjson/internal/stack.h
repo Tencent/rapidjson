@@ -132,7 +132,7 @@ public:
     }
 
     template<typename T>
-    T* Bottom() { return (T*)stack_; }
+    T* Bottom() { return reinterpret_cast<T*>(stack_); }
 
     bool HasAllocator() const {
         return allocator_ != 0;
@@ -168,7 +168,7 @@ private:
 
     void Resize(size_t newCapacity) {
         const size_t size = GetSize();  // Backup the current size
-        stack_ = (char*)allocator_->Realloc(stack_, GetCapacity(), newCapacity);
+        stack_ = static_cast<char*>(allocator_->Realloc(stack_, GetCapacity(), newCapacity));
         stackTop_ = stack_ + size;
         stackEnd_ = stack_ + newCapacity;
     }

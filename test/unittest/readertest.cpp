@@ -25,6 +25,12 @@ using namespace rapidjson;
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 RAPIDJSON_DIAG_OFF(float-equal)
+RAPIDJSON_DIAG_OFF(missing-noreturn)
+#endif
+
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(variadic-macros)
 #endif
 
 template<bool expect>
@@ -159,12 +165,12 @@ TEST(Reader, ParseNumber_Integer) {
             u.u |= r();
 
             char buffer[32];
-            if (u.u >= 4294967296ULL) {
+            if (u.u > uint64_t(4294967295u)) {
                 *internal::u64toa(u.u, buffer) = '\0';
                 TEST_INTEGER(ParseUint64Handler, buffer, u.u);
             }
 
-            if (u.i <= -2147483649LL) {
+            if (u.i < -int64_t(2147483648u)) {
                 *internal::i64toa(u.i, buffer) = '\0';
                 TEST_INTEGER(ParseInt64Handler, buffer, u.i);
             }
@@ -456,7 +462,7 @@ struct ParseStringHandler : BaseReaderHandler<Encoding, ParseStringHandler<Encod
     bool String(const typename Encoding::Ch* str, size_t length, bool copy) { 
         EXPECT_EQ(0, str_);
         if (copy) {
-            str_ = (typename Encoding::Ch*)malloc((length + 1) * sizeof(typename Encoding::Ch));
+            str_ = static_cast<typename Encoding::Ch*>(malloc((length + 1) * sizeof(typename Encoding::Ch)));
             memcpy(const_cast<typename Encoding::Ch*>(str_), str, (length + 1) * sizeof(typename Encoding::Ch));
         }
         else
@@ -639,11 +645,11 @@ TEST(Reader, ParseString_Error) {
     {
          char e[] = { '[', '\"', 0, '\"', ']', '\0' };
          for (unsigned char c = 0x80u; c <= 0xBFu; c++) {
-            e[2] = c;
+            e[2] = static_cast<char>(c);
             ParseErrorCode error = TestString<UTF8<> >(e);
             EXPECT_EQ(kParseErrorStringInvalidEncoding, error);
             if (error != kParseErrorStringInvalidEncoding)
-                std::cout << (unsigned)(unsigned char)c << std::endl;
+                std::cout << static_cast<unsigned>(c) << std::endl;
          }
     }
 
@@ -651,7 +657,7 @@ TEST(Reader, ParseString_Error) {
     {
         char e[] = { '[', '\"', 0, ' ', '\"', ']', '\0' };
         for (unsigned c = 0xC0u; c <= 0xFFu; c++) {
-            e[2] = (char)c;
+            e[2] = static_cast<char>(c);
             TEST_STRING_ERROR(kParseErrorStringInvalidEncoding, e);
         }
     }
@@ -771,7 +777,7 @@ struct ParseObjectHandler : BaseReaderHandler<UTF8<>, ParseObjectHandler> {
             default: ADD_FAILURE(); return false;
         }
     }
-    bool Uint(unsigned i) { return Int(i); }
+    bool Uint(unsigned i) { return Int(static_cast<int>(i)); }
     bool Double(double d) { EXPECT_EQ(12u, step_); EXPECT_DOUBLE_EQ(3.1416, d); step_++; return true; }
     bool String(const char* str, size_t, bool) { 
         switch(step_) {
@@ -1024,15 +1030,15 @@ public:
 
     Ch Peek() const {
         int c = is_.peek();
-        return c == std::char_traits<char>::eof() ? '\0' : (Ch)c;
+        return c == std::char_traits<char>::eof() ? '\0' : static_cast<Ch>(c);
     }
 
     Ch Take() { 
         int c = is_.get();
-        return c == std::char_traits<char>::eof() ? '\0' : (Ch)c;
+        return c == std::char_traits<char>::eof() ? '\0' : static_cast<Ch>(c);
     }
 
-    size_t Tell() const { return (size_t)is_.tellg(); }
+    size_t Tell() const { return static_cast<size_t>(is_.tellg()); }
 
     Ch* PutBegin() { assert(false); return 0; }
     void Put(Ch) { assert(false); }
@@ -1143,7 +1149,7 @@ struct IterativeParsingReaderHandler {
     bool EndObject(SizeType c) {
         RAPIDJSON_ASSERT(LogCount < LogCapacity);
         Logs[LogCount++] = LOG_ENDOBJECT;
-        Logs[LogCount++] = (int)c;
+        Logs[LogCount++] = static_cast<int>(c);
         return true;
     }
 
@@ -1152,7 +1158,7 @@ struct IterativeParsingReaderHandler {
     bool EndArray(SizeType c) {
         RAPIDJSON_ASSERT(LogCount < LogCapacity);
         Logs[LogCount++] = LOG_ENDARRAY;
-        Logs[LogCount++] = (int)c;
+        Logs[LogCount++] = static_cast<int>(c);
         return true;
     }
 };
@@ -1453,5 +1459,9 @@ TEST(Reader, IncompleteMultilineComment) {
 }
 
 #ifdef __GNUC__
+RAPIDJSON_DIAG_POP
+#endif
+
+#ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif

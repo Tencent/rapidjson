@@ -240,7 +240,6 @@ static const unsigned kCodepointRanges[] = {
 // See http://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.
 
 #define UTF8_ACCEPT 0u
-#define UTF8_REJECT 12u
 
 static const unsigned char utf8d[] = {
     // The first part of the table maps bytes to character classes that
@@ -298,7 +297,7 @@ TEST(EncodingsTest, UTF8) {
 
                 unsigned decodedCount = 0;
                 for (const char* s = encodedStr; *s; ++s)
-                    if (!decode(&state, &decodedCodepoint, (unsigned char)*s)) {
+                    if (!decode(&state, &decodedCodepoint, static_cast<unsigned char>(*s))) {
                         EXPECT_EQ(codepoint, decodedCodepoint);
                         decodedCount++;
                     }
@@ -355,7 +354,7 @@ TEST(EncodingsTest, UTF16) {
                 unsigned state = 0;
                 UTF16<>::Ch buffer[3], *p = &buffer[0];
                 for (const char* s = utf8os.GetString(); *s; ++s) {
-                    if (!decode(&state, &decodedCodepoint, (unsigned char)*s))
+                    if (!decode(&state, &decodedCodepoint, static_cast<unsigned char>(*s)))
                         break;
                 }
 

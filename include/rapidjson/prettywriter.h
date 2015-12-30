@@ -186,7 +186,7 @@ protected:
 
     void WriteIndent()  {
         size_t count = (Base::level_stack_.GetSize() / sizeof(typename Base::Level)) * indentCharCount_;
-        PutN(*Base::os_, indentChar_, count);
+        PutN(*Base::os_, static_cast<typename TargetEncoding::Ch>(indentChar_), count);
     }
 
     Ch indentChar_;

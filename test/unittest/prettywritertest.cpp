@@ -149,9 +149,9 @@ TEST(PrettyWriter, FileWriteStream) {
 
     fp = fopen(filename, "rb");
     fseek(fp, 0, SEEK_END);
-    size_t size = (size_t)ftell(fp);
+    size_t size = static_cast<size_t>(ftell(fp));
     fseek(fp, 0, SEEK_SET);
-    char* json = (char*)malloc(size + 1);
+    char* json = static_cast<char*>(malloc(size + 1));
     size_t readLength = fread(json, 1, size, fp);
     json[readLength] = '\0';
     fclose(fp);
