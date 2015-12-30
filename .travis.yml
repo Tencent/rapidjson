@@ -33,6 +33,15 @@ env:
 matrix:
   include:
     - env: CONF=debug   ARCH=x86
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - *default_packages
+            - g++-multilib
+            - libc6-dbg:i386
+    - env: CONF=debug   ARCH=x86
+      compiler: clang
       addons:
         apt:
           packages:
@@ -40,6 +49,15 @@ matrix:
             - g++-multilib
             - libc6-dbg:i386
     - env: CONF=release ARCH=x86
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - *default_packages
+            - g++-multilib
+            - libc6-dbg:i386
+    - env: CONF=release ARCH=x86
+      compiler: clang
       addons:
         apt:
           packages:
