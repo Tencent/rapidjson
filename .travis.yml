@@ -2,6 +2,7 @@ language: cpp
 sudo: false
 cache:
   - ccache
+  - pip
 compiler:
  - clang
  - gcc
@@ -94,4 +95,3 @@ script:
   - make examples
   - ctest -V `[ "$CONF" = "release" ] || echo "-E perftest"`
   - make travis_doc
-  
