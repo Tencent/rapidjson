@@ -73,13 +73,17 @@ matrix:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
-            - doxygen
-      script: # Generate and push documentation
-        - *default_script
-        - make travis_doc
       after_success:
         - pip install --user cpp-coveralls
         - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
+    - script:
+      - cd build
+      - cmake -DRAPIDJSON_HAS_STDSTRING=ON -DCMAKE_VERBOSE_MAKEFILE=ON
+      - make travis_doc
+      addons:
+        apt:
+          packages:
+            - doxygen
 
 before_script:
     #   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
@@ -88,7 +92,7 @@ before_script:
     - sed -i "s/-march=native//" CMakeLists.txt
     - mkdir build
 
-script: &default_script
+script:
   - >
       eval "ARCH_FLAGS=\${ARCH_FLAGS_${ARCH}}" ;
       (cd build && cmake
@@ -102,4 +106,3 @@ script: &default_script
   - make tests -j 2
   - make examples -j 2
   - ctest -j 2 -V `[ "$CONF" = "release" ] || echo "-E perftest"`
-  
