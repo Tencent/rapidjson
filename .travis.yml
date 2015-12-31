@@ -96,7 +96,7 @@ script:
       -DCMAKE_EXE_LINKER_FLAGS=$GCOV_FLAGS
       ..)
   - cd build
-  - make tests
-  - make examples
-  - ctest -V `[ "$CONF" = "release" ] || echo "-E perftest"`
+  - make tests -j 2
+  - make examples -j 2
+  - ctest -j 2 -V `[ "$CONF" = "release" ] || echo "-E perftest"`
   - make travis_doc
