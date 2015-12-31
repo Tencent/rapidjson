@@ -1,22 +1,16 @@
-// Copyright (C) 2011 Milo Yip
+// Tencent is pleased to support the open source community by making RapidJSON available.
+// 
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// Licensed under the MIT License (the "License"); you may not use this file except
+// in compliance with the License. You may obtain a copy of the License at
 //
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
+// http://opensource.org/licenses/MIT
 //
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// Unless required by applicable law or agreed to in writing, software distributed 
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// specific language governing permissions and limitations under the License.
 
 #include "unittest.h"
 
@@ -31,6 +25,12 @@ using namespace rapidjson;
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 RAPIDJSON_DIAG_OFF(float-equal)
+RAPIDJSON_DIAG_OFF(missing-noreturn)
+#endif
+
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(variadic-macros)
 #endif
 
 template<bool expect>
@@ -165,12 +165,12 @@ TEST(Reader, ParseNumber_Integer) {
             u.u |= r();
 
             char buffer[32];
-            if (u.u >= 4294967296ULL) {
+            if (u.u > uint64_t(4294967295u)) {
                 *internal::u64toa(u.u, buffer) = '\0';
                 TEST_INTEGER(ParseUint64Handler, buffer, u.u);
             }
 
-            if (u.i <= -2147483649LL) {
+            if (u.i < -int64_t(2147483648u)) {
                 *internal::i64toa(u.i, buffer) = '\0';
                 TEST_INTEGER(ParseInt64Handler, buffer, u.i);
             }
@@ -199,7 +199,7 @@ static void TestParseDouble() {
             EXPECT_DOUBLE_EQ(x, h.actual_); \
         } \
     }
-    
+
     TEST_DOUBLE(fullPrecision, "0.0", 0.0);
     TEST_DOUBLE(fullPrecision, "-0.0", -0.0); // For checking issue #289
     TEST_DOUBLE(fullPrecision, "1.0", 1.0);
@@ -225,13 +225,19 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "2.2250738585072009e-308", 2.2250738585072009e-308); // Max subnormal double
     TEST_DOUBLE(fullPrecision, "2.2250738585072014e-308", 2.2250738585072014e-308); // Min normal positive double
     TEST_DOUBLE(fullPrecision, "1.7976931348623157e+308", 1.7976931348623157e+308); // Max double
-    TEST_DOUBLE(fullPrecision, "1e-10000", 0.0);                                   // must underflow
-    TEST_DOUBLE(fullPrecision, "18446744073709551616", 18446744073709551616.0);    // 2^64 (max of uint64_t + 1, force to use double)
-    TEST_DOUBLE(fullPrecision, "-9223372036854775809", -9223372036854775809.0);    // -2^63 - 1(min of int64_t + 1, force to use double)
-    TEST_DOUBLE(fullPrecision, "0.9868011474609375", 0.9868011474609375);          // https://github.com/miloyip/rapidjson/issues/120
-    TEST_DOUBLE(fullPrecision, "123e34", 123e34);                                  // Fast Path Cases In Disguise
+    TEST_DOUBLE(fullPrecision, "1e-10000", 0.0);                                    // must underflow
+    TEST_DOUBLE(fullPrecision, "18446744073709551616", 18446744073709551616.0);     // 2^64 (max of uint64_t + 1, force to use double)
+    TEST_DOUBLE(fullPrecision, "-9223372036854775809", -9223372036854775809.0);     // -2^63 - 1(min of int64_t + 1, force to use double)
+    TEST_DOUBLE(fullPrecision, "0.9868011474609375", 0.9868011474609375);           // https://github.com/miloyip/rapidjson/issues/120
+    TEST_DOUBLE(fullPrecision, "123e34", 123e34);                                   // Fast Path Cases In Disguise
     TEST_DOUBLE(fullPrecision, "45913141877270640000.0", 45913141877270640000.0);
     TEST_DOUBLE(fullPrecision, "2.2250738585072011e-308", 2.2250738585072011e-308); // http://www.exploringbinary.com/php-hangs-on-numeric-value-2-2250738585072011e-308/
+    TEST_DOUBLE(fullPrecision, "1e-00011111111111", 0.0);                           // Issue #313
+    TEST_DOUBLE(fullPrecision, "-1e-00011111111111", -0.0);
+    TEST_DOUBLE(fullPrecision, "1e-214748363", 0.0);                                  // Maximum supported negative exponent
+    TEST_DOUBLE(fullPrecision, "1e-214748364", 0.0);
+    TEST_DOUBLE(fullPrecision, "1e-21474836311", 0.0);
+    TEST_DOUBLE(fullPrecision, "0.017976931348623157e+310", 1.7976931348623157e+308); // Max double in another form
 
     // Since
     // abs((2^-1022 - 2^-1074) - 2.2250738585072012e-308) = 3.109754131239141401123495768877590405345064751974375599... ¡Á 10^-324
@@ -327,13 +333,42 @@ static void TestParseDouble() {
                 if (fullPrecision) {
                     EXPECT_EQ(d.Uint64Value(), a.Uint64Value());
                     if (d.Uint64Value() != a.Uint64Value())
-                        printf("  String: %sn  Actual: %.17gnExpected: %.17gn", buffer, h.actual_, d.Value());
+                        printf("  String: %s\n  Actual: %.17g\nExpected: %.17g\n", buffer, h.actual_, d.Value());
                 }
                 else {
-                    EXPECT_EQ(d.Sign(), a.Sign()); /* for 0.0 != -0.0 */
+                    EXPECT_EQ(d.Sign(), a.Sign()); // for 0.0 != -0.0
                     EXPECT_DOUBLE_EQ(d.Value(), h.actual_);
                 }
             }
+        }
+    }
+
+    // Issue #340
+    TEST_DOUBLE(fullPrecision, "7.450580596923828e-9", 7.450580596923828e-9);
+    {
+        internal::Double d(1.0);
+        for (int i = 0; i < 324; i++) {
+            char buffer[32];
+            *internal::dtoa(d.Value(), buffer) = '\0';
+
+            StringStream s(buffer);
+            ParseDoubleHandler h;
+            Reader reader;
+            ASSERT_EQ(kParseErrorNone, reader.Parse<fullPrecision ? kParseFullPrecisionFlag : 0>(s, h).Code());
+            EXPECT_EQ(1u, h.step_);
+            internal::Double a(h.actual_);
+            if (fullPrecision) {
+                EXPECT_EQ(d.Uint64Value(), a.Uint64Value());
+                if (d.Uint64Value() != a.Uint64Value())
+                    printf("  String: %s\n  Actual: %.17g\nExpected: %.17g\n", buffer, h.actual_, d.Value());
+            }
+            else {
+                EXPECT_EQ(d.Sign(), a.Sign()); // for 0.0 != -0.0
+                EXPECT_DOUBLE_EQ(d.Value(), h.actual_);
+            }
+
+
+            d = d.Value() * 0.5;
         }
     }
 #undef TEST_DOUBLE
@@ -427,7 +462,7 @@ struct ParseStringHandler : BaseReaderHandler<Encoding, ParseStringHandler<Encod
     bool String(const typename Encoding::Ch* str, size_t length, bool copy) { 
         EXPECT_EQ(0, str_);
         if (copy) {
-            str_ = (typename Encoding::Ch*)malloc((length + 1) * sizeof(typename Encoding::Ch));
+            str_ = static_cast<typename Encoding::Ch*>(malloc((length + 1) * sizeof(typename Encoding::Ch)));
             memcpy(const_cast<typename Encoding::Ch*>(str_), str, (length + 1) * sizeof(typename Encoding::Ch));
         }
         else
@@ -610,11 +645,11 @@ TEST(Reader, ParseString_Error) {
     {
          char e[] = { '[', '\"', 0, '\"', ']', '\0' };
          for (unsigned char c = 0x80u; c <= 0xBFu; c++) {
-            e[2] = c;
+            e[2] = static_cast<char>(c);
             ParseErrorCode error = TestString<UTF8<> >(e);
             EXPECT_EQ(kParseErrorStringInvalidEncoding, error);
             if (error != kParseErrorStringInvalidEncoding)
-                std::cout << (unsigned)(unsigned char)c << std::endl;
+                std::cout << static_cast<unsigned>(c) << std::endl;
          }
     }
 
@@ -622,7 +657,7 @@ TEST(Reader, ParseString_Error) {
     {
         char e[] = { '[', '\"', 0, ' ', '\"', ']', '\0' };
         for (unsigned c = 0xC0u; c <= 0xFFu; c++) {
-            e[2] = (char)c;
+            e[2] = static_cast<char>(c);
             TEST_STRING_ERROR(kParseErrorStringInvalidEncoding, e);
         }
     }
@@ -742,7 +777,7 @@ struct ParseObjectHandler : BaseReaderHandler<UTF8<>, ParseObjectHandler> {
             default: ADD_FAILURE(); return false;
         }
     }
-    bool Uint(unsigned i) { return Int(i); }
+    bool Uint(unsigned i) { return Int(static_cast<int>(i)); }
     bool Double(double d) { EXPECT_EQ(12u, step_); EXPECT_DOUBLE_EQ(3.1416, d); step_++; return true; }
     bool String(const char* str, size_t, bool) { 
         switch(step_) {
@@ -995,15 +1030,15 @@ public:
 
     Ch Peek() const {
         int c = is_.peek();
-        return c == std::char_traits<char>::eof() ? '\0' : (Ch)c;
+        return c == std::char_traits<char>::eof() ? '\0' : static_cast<Ch>(c);
     }
 
     Ch Take() { 
         int c = is_.get();
-        return c == std::char_traits<char>::eof() ? '\0' : (Ch)c;
+        return c == std::char_traits<char>::eof() ? '\0' : static_cast<Ch>(c);
     }
 
-    size_t Tell() const { return (size_t)is_.tellg(); }
+    size_t Tell() const { return static_cast<size_t>(is_.tellg()); }
 
     Ch* PutBegin() { assert(false); return 0; }
     void Put(Ch) { assert(false); }
@@ -1114,7 +1149,7 @@ struct IterativeParsingReaderHandler {
     bool EndObject(SizeType c) {
         RAPIDJSON_ASSERT(LogCount < LogCapacity);
         Logs[LogCount++] = LOG_ENDOBJECT;
-        Logs[LogCount++] = (int)c;
+        Logs[LogCount++] = static_cast<int>(c);
         return true;
     }
 
@@ -1123,7 +1158,7 @@ struct IterativeParsingReaderHandler {
     bool EndArray(SizeType c) {
         RAPIDJSON_ASSERT(LogCount < LogCapacity);
         Logs[LogCount++] = LOG_ENDARRAY;
-        Logs[LogCount++] = (int)c;
+        Logs[LogCount++] = static_cast<int>(c);
         return true;
     }
 };
@@ -1320,6 +1355,113 @@ TEST(Reader, ParseTerminationByHandler) {
     TEST_TERMINATION(12, "{\"a\":[1]"); // non-empty array
 }
 
+TEST(Reader, ParseComments) {
+    const char* json =
+    "// Here is a one-line comment.\n"
+    "{// And here's another one\n"
+    "   /*And here's an in-line one.*/\"hello\" : \"world\","
+    "   \"t\" :/* And one with '*' symbol*/true ,"
+    "/* A multiline comment\n"
+    "   goes here*/"
+    "   \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3]"
+    "}/*And the last one to be sure */";
+
+    StringStream s(json);
+    ParseObjectHandler h;
+    Reader reader;
+    EXPECT_TRUE(reader.Parse<kParseCommentsFlag>(s, h));
+    EXPECT_EQ(20u, h.step_);
+}
+
+TEST(Reader, ParseEmptyInlineComment) {
+    const char* json = "{/**/\"hello\" : \"world\", \"t\" : true, \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] }";
+
+    StringStream s(json);
+    ParseObjectHandler h;
+    Reader reader;
+    EXPECT_TRUE(reader.Parse<kParseCommentsFlag>(s, h));
+    EXPECT_EQ(20u, h.step_);
+}
+
+TEST(Reader, ParseEmptyOnelineComment) {
+    const char* json = "{//\n\"hello\" : \"world\", \"t\" : true, \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] }";
+
+    StringStream s(json);
+    ParseObjectHandler h;
+    Reader reader;
+    EXPECT_TRUE(reader.Parse<kParseCommentsFlag>(s, h));
+    EXPECT_EQ(20u, h.step_);
+}
+
+TEST(Reader, ParseMultipleCommentsInARow) {
+    const char* json = 
+    "{/* first comment *//* second */\n"
+    "/* third */ /*fourth*/// last one\n"
+    "\"hello\" : \"world\", \"t\" : true, \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] }";
+
+    StringStream s(json);
+    ParseObjectHandler h;
+    Reader reader;
+    EXPECT_TRUE(reader.Parse<kParseCommentsFlag>(s, h));
+    EXPECT_EQ(20u, h.step_);
+}
+
+TEST(Reader, InlineCommentsAreDisabledByDefault) {
+    {
+        const char* json = "{/* Inline comment. */\"hello\" : \"world\", \"t\" : true, \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] }";
+
+        StringStream s(json);
+        ParseObjectHandler h;
+        Reader reader;
+        EXPECT_FALSE(reader.Parse<kParseDefaultFlags>(s, h));
+    }
+
+    {
+        const char* json =
+        "{\"hello\" : /* Multiline comment starts here\n"
+        " continues here\n"
+        " and ends here */\"world\", \"t\" :true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] }";
+
+        StringStream s(json);
+        ParseObjectHandler h;
+        Reader reader;
+        EXPECT_FALSE(reader.Parse<kParseDefaultFlags>(s, h));
+    }
+}
+
+TEST(Reader, OnelineCommentsAreDisabledByDefault) {
+    const char* json = "{// One-line comment\n\"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] }";
+
+    StringStream s(json);
+    ParseObjectHandler h;
+    Reader reader;
+    EXPECT_FALSE(reader.Parse<kParseDefaultFlags>(s, h));
+}
+
+TEST(Reader, EofAfterOneLineComment) {
+    const char* json = "{\"hello\" : \"world\" // EOF is here -->\0 \n}";
+
+    StringStream s(json);
+    ParseObjectHandler h;
+    Reader reader;
+    EXPECT_FALSE(reader.Parse<kParseCommentsFlag>(s, h));
+    EXPECT_EQ(kParseErrorObjectMissCommaOrCurlyBracket, reader.GetParseErrorCode());
+}
+
+TEST(Reader, IncompleteMultilineComment) {
+    const char* json = "{\"hello\" : \"world\" /* EOF is here -->\0 */}";
+
+    StringStream s(json);
+    ParseObjectHandler h;
+    Reader reader;
+    EXPECT_FALSE(reader.Parse<kParseCommentsFlag>(s, h));
+    EXPECT_EQ(kParseErrorUnspecificSyntaxError, reader.GetParseErrorCode());
+}
+
 #ifdef __GNUC__
+RAPIDJSON_DIAG_POP
+#endif
+
+#ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif

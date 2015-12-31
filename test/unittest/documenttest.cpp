@@ -1,22 +1,16 @@
-// Copyright (C) 2011 Milo Yip
+// Tencent is pleased to support the open source community by making RapidJSON available.
+// 
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
+// Licensed under the MIT License (the "License"); you may not use this file except
+// in compliance with the License. You may obtain a copy of the License at
 //
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
+// http://opensource.org/licenses/MIT
 //
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+// Unless required by applicable law or agreed to in writing, software distributed 
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// specific language governing permissions and limitations under the License.
 
 #include "unittest.h"
 #include "rapidjson/document.h"
@@ -25,6 +19,7 @@
 #include "rapidjson/encodedstream.h"
 #include "rapidjson/stringbuffer.h"
 #include <sstream>
+#include <algorithm>
 
 using namespace rapidjson;
 
@@ -33,6 +28,7 @@ void ParseCheck(DocumentType& doc) {
     typedef typename DocumentType::ValueType ValueType;
 
     EXPECT_FALSE(doc.HasParseError());
+    EXPECT_TRUE(static_cast<ParseResult>(doc));
 
     EXPECT_TRUE(doc.IsObject());
 
@@ -67,8 +63,8 @@ void ParseCheck(DocumentType& doc) {
     const ValueType& a = doc["a"];
     EXPECT_TRUE(a.IsArray());
     EXPECT_EQ(4u, a.Size());
-    for (SizeType i = 0; i < 4; i++)
-        EXPECT_EQ(i + 1, a[i].GetUint());
+    for (SizeType j = 0; j < 4; j++)
+        EXPECT_EQ(j + 1, a[j].GetUint());
 }
 
 template <typename Allocator, typename StackAllocator>
@@ -100,17 +96,37 @@ TEST(Document, Parse) {
     ParseTest<CrtAllocator, CrtAllocator>();
 }
 
+TEST(Document, UnchangedOnParseError) {
+    Document doc;
+    doc.SetArray().PushBack(0, doc.GetAllocator());
+
+    ParseResult err = doc.Parse("{]");
+    EXPECT_TRUE(doc.HasParseError());
+    EXPECT_EQ(err.Code(), doc.GetParseError());
+    EXPECT_EQ(err.Offset(), doc.GetErrorOffset());
+    EXPECT_TRUE(doc.IsArray());
+    EXPECT_EQ(doc.Size(), 1u);
+
+    err = doc.Parse("{}");
+    EXPECT_FALSE(doc.HasParseError());
+    EXPECT_FALSE(err.IsError());
+    EXPECT_EQ(err.Code(), doc.GetParseError());
+    EXPECT_EQ(err.Offset(), doc.GetErrorOffset());
+    EXPECT_TRUE(doc.IsObject());
+    EXPECT_EQ(doc.MemberCount(), 0u);
+}
+
 static FILE* OpenEncodedFile(const char* filename) {
     const char *paths[] = {
-        "encodings/%s",
-        "bin/encodings/%s",
-        "../bin/encodings/%s",
-        "../../bin/encodings/%s",
-        "../../../bin/encodings/%s"
+        "encodings",
+        "bin/encodings",
+        "../bin/encodings",
+        "../../bin/encodings",
+        "../../../bin/encodings"
     };
     char buffer[1024];
     for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
-        sprintf(buffer, paths[i], filename);
+        sprintf(buffer, "%s/%s", paths[i], filename);
         FILE *fp = fopen(buffer, "rb");
         if (fp)
             return fp;
@@ -141,21 +157,22 @@ TEST(Document, ParseStream_EncodedInputStream) {
     StringBuffer bos;
     typedef EncodedOutputStream<UTF8<>, StringBuffer> OutputStream;
     OutputStream eos(bos, false);   // Not writing BOM
-    Writer<OutputStream, UTF16<>, UTF8<> > writer(eos);
-    d.Accept(writer);
-
     {
-        // Condense the original file and compare.
-        FILE *fp = OpenEncodedFile("utf8.json");
-        FileReadStream is(fp, buffer, sizeof(buffer));
-        Reader reader;
-        StringBuffer bos2;
-        Writer<StringBuffer> writer(bos2);
-        reader.Parse(is, writer);
-
-        EXPECT_EQ(bos.GetSize(), bos2.GetSize());
-        EXPECT_EQ(0, memcmp(bos.GetString(), bos2.GetString(), bos2.GetSize()));
+        Writer<OutputStream, UTF16<>, UTF8<> > writer(eos);
+        d.Accept(writer);
     }
+
+    // Condense the original file and compare.
+    fp = OpenEncodedFile("utf8.json");
+    FileReadStream is(fp, buffer, sizeof(buffer));
+    Reader reader;
+    StringBuffer bos2;
+    Writer<StringBuffer> writer2(bos2);
+    reader.Parse(is, writer2);
+    fclose(fp);
+
+    EXPECT_EQ(bos.GetSize(), bos2.GetSize());
+    EXPECT_EQ(0, memcmp(bos.GetString(), bos2.GetString(), bos2.GetSize()));
 }
 
 TEST(Document, ParseStream_AutoUTFInputStream) {
@@ -182,18 +199,17 @@ TEST(Document, ParseStream_AutoUTFInputStream) {
     Writer<StringBuffer> writer(bos);
     d.Accept(writer);
 
-    {
-        // Condense the original file and compare.
-        FILE *fp = OpenEncodedFile("utf8.json");
-        FileReadStream is(fp, buffer, sizeof(buffer));
-        Reader reader;
-        StringBuffer bos2;
-        Writer<StringBuffer> writer(bos2);
-        reader.Parse(is, writer);
+    // Condense the original file and compare.
+    fp = OpenEncodedFile("utf8.json");
+    FileReadStream is(fp, buffer, sizeof(buffer));
+    Reader reader;
+    StringBuffer bos2;
+    Writer<StringBuffer> writer2(bos2);
+    reader.Parse(is, writer2);
+    fclose(fp);
 
-        EXPECT_EQ(bos.GetSize(), bos2.GetSize());
-        EXPECT_EQ(0, memcmp(bos.GetString(), bos2.GetString(), bos2.GetSize()));
-    }
+    EXPECT_EQ(bos.GetSize(), bos2.GetSize());
+    EXPECT_EQ(0, memcmp(bos.GetString(), bos2.GetString(), bos2.GetSize()));
 }
 
 TEST(Document, Swap) {
@@ -206,7 +222,8 @@ TEST(Document, Swap) {
     o.SetObject().AddMember("a", 1, a);
 
     // Swap between Document and Value
-    d1.Swap(o);
+    // d1.Swap(o); // doesn't compile
+    o.Swap(d1);
     EXPECT_TRUE(d1.IsObject());
     EXPECT_TRUE(o.IsArray());
 
@@ -216,17 +233,43 @@ TEST(Document, Swap) {
     d1.Swap(d2);
     EXPECT_TRUE(d1.IsArray());
     EXPECT_TRUE(d2.IsObject());
+    EXPECT_EQ(&d2.GetAllocator(), &a);
+
+    // reset value
+    Value().Swap(d1);
+    EXPECT_TRUE(d1.IsNull());
+
+    // reset document, including allocator
+    Document().Swap(d2);
+    EXPECT_TRUE(d2.IsNull());
+    EXPECT_NE(&d2.GetAllocator(), &a);
+
+    // testing std::swap compatibility
+    d1.SetBool(true);
+    using std::swap;
+    swap(d1, d2);
+    EXPECT_TRUE(d1.IsNull());
+    EXPECT_TRUE(d2.IsTrue());
+
+    swap(o, d2);
+    EXPECT_TRUE(o.IsTrue());
+    EXPECT_TRUE(d2.IsArray());
 }
+
 
 // This should be slow due to assignment in inner-loop.
 struct OutputStringStream : public std::ostringstream {
     typedef char Ch;
+
+    virtual ~OutputStringStream();
 
     void Put(char c) {
         put(c);
     }
     void Flush() {}
 };
+
+OutputStringStream::~OutputStringStream() {}
 
 TEST(Document, AcceptWriter) {
     Document doc;
@@ -245,7 +288,7 @@ TEST(Document, UserBuffer) {
     char parseBuffer[1024];
     MemoryPoolAllocator<> valueAllocator(valueBuffer, sizeof(valueBuffer));
     MemoryPoolAllocator<> parseAllocator(parseBuffer, sizeof(parseBuffer));
-    DocumentType doc(&valueAllocator, sizeof(parseBuffer), &parseAllocator);
+    DocumentType doc(&valueAllocator, sizeof(parseBuffer) / 2, &parseAllocator);
     doc.Parse(" { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3, 4] } ");
     EXPECT_FALSE(doc.HasParseError());
     EXPECT_LE(valueAllocator.Size(), sizeof(valueBuffer));
@@ -280,7 +323,7 @@ TEST(Document, UTF16_Document) {
     GenericValue< UTF16<> >& s = v[L"created_at"];
     ASSERT_TRUE(s.IsString());
 
-    EXPECT_EQ(0, wcscmp(L"Wed Oct 30 17:13:20 +0000 2012", s.GetString()));
+    EXPECT_EQ(0, memcmp(L"Wed Oct 30 17:13:20 +0000 2012", s.GetString(), (s.GetStringLength() + 1) * sizeof(wchar_t)));
 }
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
@@ -346,7 +389,7 @@ TYPED_TEST(DocumentMove, MoveConstructor) {
     EXPECT_TRUE(a.IsNull());
     EXPECT_TRUE(b.IsArray());
     EXPECT_EQ(3u, b.Size());
-    EXPECT_EQ(&a.GetAllocator(), (void*)0);
+    EXPECT_THROW(a.GetAllocator(), AssertException);
     EXPECT_EQ(&b.GetAllocator(), &allocator);
 
     b.Parse("{\"Foo\": \"Bar\", \"Baz\": 42}");
@@ -359,7 +402,7 @@ TYPED_TEST(DocumentMove, MoveConstructor) {
     EXPECT_TRUE(b.IsNull());
     EXPECT_TRUE(c.IsObject());
     EXPECT_EQ(2u, c.MemberCount());
-    EXPECT_EQ(&b.GetAllocator(), (void*)0);
+    EXPECT_THROW(b.GetAllocator(), AssertException);
     EXPECT_EQ(&c.GetAllocator(), &allocator);
 }
 
@@ -440,7 +483,7 @@ TYPED_TEST(DocumentMove, MoveAssignment) {
     EXPECT_TRUE(a.IsNull());
     EXPECT_TRUE(b.IsArray());
     EXPECT_EQ(3u, b.Size());
-    EXPECT_EQ(&a.GetAllocator(), (void*)0);
+    EXPECT_THROW(a.GetAllocator(), AssertException);
     EXPECT_EQ(&b.GetAllocator(), &allocator);
 
     b.Parse("{\"Foo\": \"Bar\", \"Baz\": 42}");
@@ -454,7 +497,7 @@ TYPED_TEST(DocumentMove, MoveAssignment) {
     EXPECT_TRUE(b.IsNull());
     EXPECT_TRUE(c.IsObject());
     EXPECT_EQ(2u, c.MemberCount());
-    EXPECT_EQ(&b.GetAllocator(), (void*)0);
+    EXPECT_THROW(b.GetAllocator(), AssertException);
     EXPECT_EQ(&c.GetAllocator(), &allocator);
 }
 

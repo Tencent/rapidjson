@@ -19,11 +19,12 @@
 #ifndef RAPIDJSON_DIYFP_H_
 #define RAPIDJSON_DIYFP_H_
 
-#if defined(_MSC_VER)
+#include "../rapidjson.h"
+
+#if defined(_MSC_VER) && defined(_M_AMD64)
 #include <intrin.h>
-#if defined(_M_AMD64)
 #pragma intrinsic(_BitScanReverse64)
-#endif
+#pragma intrinsic(_umul128)
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -32,6 +33,11 @@ namespace internal {
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
+#endif
+
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(padded)
 #endif
 
 struct DiyFp {
@@ -45,7 +51,7 @@ struct DiyFp {
             uint64_t u64;
         } u = { d };
 
-        int biased_e = (u.u64 & kDpExponentMask) >> kDpSignificandSize;
+        int biased_e = static_cast<int>((u.u64 & kDpExponentMask) >> kDpSignificandSize);
         uint64_t significand = (u.u64 & kDpSignificandMask);
         if (biased_e != 0) {
             f = significand + kDpHiddenBit;
@@ -71,7 +77,7 @@ struct DiyFp {
 #elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) && defined(__x86_64__)
         __extension__ typedef unsigned __int128 uint128;
         uint128 p = static_cast<uint128>(f) * static_cast<uint128>(rhs.f);
-        uint64_t h = p >> 64;
+        uint64_t h = static_cast<uint64_t>(p >> 64);
         uint64_t l = static_cast<uint64_t>(p);
         if (l & (uint64_t(1) << 63)) // rounding
             h++;
@@ -232,13 +238,18 @@ inline DiyFp GetCachedPower(int e, int* K) {
 }
 
 inline DiyFp GetCachedPower10(int exp, int *outExp) {
-     unsigned index = (exp + 348) / 8;
-     *outExp = -348 + index * 8;
+     unsigned index = (static_cast<unsigned>(exp) + 348u) / 8u;
+     *outExp = -348 + static_cast<int>(index) * 8;
      return GetCachedPowerByIndex(index);
  }
 
 #ifdef __GNUC__
 RAPIDJSON_DIAG_POP
+#endif
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+RAPIDJSON_DIAG_OFF(padded)
 #endif
 
 } // namespace internal

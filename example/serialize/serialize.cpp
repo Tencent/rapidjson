@@ -18,10 +18,10 @@ protected:
     void Serialize(Writer& writer) const {
         // This base class just write out name-value pairs, without wrapping within an object.
         writer.String("name");
-#ifdef RAPIDJSON_HAS_STDSTRING
+#if RAPIDJSON_HAS_STDSTRING
         writer.String(name_);
 #else
-        writer.String(name_.c_str(), (SizeType)name_.length()); // Supplying length of string is faster.
+        writer.String(name_.c_str(), static_cast<SizeType>(name_.length())); // Supplying length of string is faster.
 #endif
         writer.String("age");
         writer.Uint(age_);
@@ -44,10 +44,10 @@ public:
         writer.StartObject();
         
         writer.String("school");
-#ifdef RAPIDJSON_HAS_STDSTRING
+#if RAPIDJSON_HAS_STDSTRING
         writer.String(school_);
 #else
-        writer.String(school_.c_str(), (SizeType)school_.length());
+        writer.String(school_.c_str(), static_cast<SizeType>(school_.length()));
 #endif
 
         writer.String("GPA");

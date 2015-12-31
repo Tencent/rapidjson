@@ -764,18 +764,19 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ./readme.zh-cn.md \
-                         ./include/rapidjson/rapidjson.h \
-                         ./include/ \
-                         ./doc/features.zh-cn.md \
-                         ./doc/tutorial.zh-cn.md \
-                         ./doc/stream.zh-cn.md \
-                         ./doc/encoding.zh-cn.md \
-                         ./doc/dom.zh-cn.md \
-                         ./doc/sax.zh-cn.md \
-                         ./doc/performance.zh-cn.md \
-                         ./doc/internals.md \
-                         ./doc/faq.zh-cn.md
+INPUT                  = readme.zh-cn.md \
+                         include/rapidjson/rapidjson.h \
+                         include/ \
+                         doc/features.zh-cn.md \
+                         doc/tutorial.zh-cn.md \
+                         doc/pointer.zh-cn.md \
+                         doc/stream.zh-cn.md \
+                         doc/encoding.zh-cn.md \
+                         doc/dom.zh-cn.md \
+                         doc/sax.zh-cn.md \
+                         doc/performance.zh-cn.md \
+                         doc/internals.md \
+                         doc/faq.zh-cn.md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

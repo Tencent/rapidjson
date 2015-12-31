@@ -12,10 +12,16 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
-#ifndef RAPIDJSON_ERROR_EN_H__
-#define RAPIDJSON_ERROR_EN_H__
+#ifndef RAPIDJSON_ERROR_EN_H_
+#define RAPIDJSON_ERROR_EN_H_
 
 #include "error.h"
+
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(switch-enum)
+RAPIDJSON_DIAG_OFF(covered-switch-default)
+#endif
 
 RAPIDJSON_NAMESPACE_BEGIN
 
@@ -55,11 +61,14 @@ inline const RAPIDJSON_ERROR_CHARTYPE* GetParseError_En(ParseErrorCode parseErro
         case kParseErrorTermination:                    return RAPIDJSON_ERROR_STRING("Terminate parsing due to Handler error.");
         case kParseErrorUnspecificSyntaxError:          return RAPIDJSON_ERROR_STRING("Unspecific syntax error.");
 
-        default:
-            return RAPIDJSON_ERROR_STRING("Unknown error.");
+        default:                                        return RAPIDJSON_ERROR_STRING("Unknown error.");
     }
 }
 
 RAPIDJSON_NAMESPACE_END
 
-#endif // RAPIDJSON_ERROR_EN_H__
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif
+
+#endif // RAPIDJSON_ERROR_EN_H_

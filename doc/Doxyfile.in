@@ -769,6 +769,7 @@ INPUT                  = readme.md \
                          include/ \
                          doc/features.md \
                          doc/tutorial.md \
+                         doc/pointer.md \
                          doc/stream.md \
                          doc/encoding.md \
                          doc/dom.md \

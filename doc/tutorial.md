@@ -192,7 +192,7 @@ Checking          | Obtaining
 `bool IsNumber()` | N/A
 `bool IsUint()`   | `unsigned GetUint()`
 `bool IsInt()`    | `int GetInt()`
-`bool IsUint64()` | `uint64_t GetUint()`
+`bool IsUint64()` | `uint64_t GetUint64()`
 `bool IsInt64()`  | `int64_t GetInt64()`
 `bool IsDouble()` | `double GetDouble()`
 
@@ -292,12 +292,13 @@ The simple answer is performance. For fixed size JSON types (Number, True, False
 For example, if normal *copy* semantics was used:
 
 ~~~~~~~~~~cpp
+Document d;
 Value o(kObjectType);
 {
     Value contacts(kArrayType);
     // adding elements to contacts array.
     // ...
-    o.AddMember("contacts", contacts);  // deep clone contacts (may be with lots of allocations)
+    o.AddMember("contacts", contacts, d.GetAllocator());  // deep clone contacts (may be with lots of allocations)
     // destruct contacts.
 }
 ~~~~~~~~~~
@@ -313,11 +314,12 @@ To make RapidJSON simple and fast, we chose to use *move* semantics for assignme
 So, with move semantics, the above example becomes:
 
 ~~~~~~~~~~cpp
+Document d;
 Value o(kObjectType);
 {
     Value contacts(kArrayType);
     // adding elements to contacts array.
-    o.AddMember("contacts", contacts);  // just memcpy() of contacts itself to the value of new member (16 bytes)
+    o.AddMember("contacts", contacts, d.GetAllocator());  // just memcpy() of contacts itself to the value of new member (16 bytes)
     // contacts became Null here. Its destruction is trivial.
 }
 ~~~~~~~~~~

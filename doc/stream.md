@@ -320,7 +320,7 @@ std::stringstream ss(json);
 IStreamWrapper is(ss);
 
 Document d;
-d.Parse(is);
+d.ParseStream(is);
 ~~~~~~~~~~
 
 Note that, this implementation may not be as efficient as RapidJSON's memory or file streams, due to internal overheads of the standard library.

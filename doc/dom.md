@@ -115,6 +115,7 @@ Parse flags                   | Meaning
 `kParseIterativeFlag`         | Iterative(constant complexity in terms of function call stack size) parsing.
 `kParseStopWhenDoneFlag`      | After parsing a complete JSON root from stream, stop further processing the rest of stream. When this flag is used, parser will not generate `kParseErrorDocumentRootNotSingular` error. Using this flag for parsing multiple JSONs in the same stream.
 `kParseFullPrecisionFlag`     | Parse number in full precision (slower). If this flag is not set, the normal precision (faster) is used. Normal precision has maximum 3 [ULP](http://en.wikipedia.org/wiki/Unit_in_the_last_place) error.
+`kParseCommentsFlag`          | Allow one-line `// ...` and multi-line `/* ... */` comments (relaxed JSON syntax).
 
 By using a non-type template parameter, instead of a function parameter, C++ compiler can generate code which is optimized for specified combinations, improving speed, and reducing code size (if only using a single specialization). The downside is the flags needed to be determined in compile-time.
 
@@ -124,7 +125,7 @@ And the `InputStream` is type of input stream.
 
 ## Parse Error {#ParseError}
 
-When the parse processing succeeded, the `Document` contains the parse results. When there is an error, the original DOM is *unchanged*. And the error state of parsing can be obtained by `bool HasParseError()`,  `ParseErrorCode GetParseError()` and `size_t GetParseOffet()`.
+When the parse processing succeeded, the `Document` contains the parse results. When there is an error, the original DOM is *unchanged*. And the error state of parsing can be obtained by `bool HasParseError()`,  `ParseErrorCode GetParseError()` and `size_t GetParseOffset()`.
 
 Parse Error Code                            | Description
 --------------------------------------------|---------------------------------------------------
@@ -159,8 +160,8 @@ Here shows an example of parse error handling.
 Document d;
 if (d.Parse(json).HasParseError()) {
     fprintf(stderr, "\nError(offset %u): %s\n", 
-        (unsigned)reader.GetErrorOffset(),
-        GetParseError_En(reader.GetParseErrorCode()));
+        (unsigned)d.GetErrorOffset(),
+        GetParseError_En(d.GetParseErrorCode()));
     // ...
 }
 ~~~~~~~~~~

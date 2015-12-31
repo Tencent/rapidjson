@@ -66,7 +66,7 @@ gh_pages_prepare()
 	[ ! -d "html" ] || \
 		abort "Doxygen target directory already exists."
 	git --version
-	git clone --single-branch -b gh-pages "${GITHUB_CLONE}" html
+	git clone -b gh-pages "${GITHUB_CLONE}" html
 	cd html
 	# setup git config (with defaults)
 	git config user.name "${GIT_NAME-travis}"
@@ -78,6 +78,7 @@ gh_pages_prepare()
 
 gh_pages_commit() {
 	cd "${TRAVIS_BUILD_DIR}/build/doc/html";
+	echo "rapidjson.org" > CNAME
 	git add --all;
 	git diff-index --quiet HEAD || git commit -m "Automatic doxygen build";
 }

@@ -15,12 +15,9 @@
 #ifndef RAPIDJSON_RAPIDJSON_H_
 #define RAPIDJSON_RAPIDJSON_H_
 
-// Copyright (c) 2011 Milo Yip (miloyip@gmail.com)
-// Version 0.1
-
 /*!\file rapidjson.h
     \brief common definitions and configuration
-
+    
     \see RAPIDJSON_CONFIG
  */
 
@@ -41,6 +38,40 @@
 
 #include <cstdlib>  // malloc(), realloc(), free(), size_t
 #include <cstring>  // memset(), memcpy(), memmove(), memcmp()
+
+///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_VERSION_STRING
+//
+// ALWAYS synchronize the following 3 macros with corresponding variables in /CMakeLists.txt.
+//
+
+//!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
+// token stringification
+#define RAPIDJSON_STRINGIFY(x) RAPIDJSON_DO_STRINGIFY(x)
+#define RAPIDJSON_DO_STRINGIFY(x) #x
+//!@endcond
+
+/*! \def RAPIDJSON_MAJOR_VERSION
+    \ingroup RAPIDJSON_CONFIG
+    \brief Major version of RapidJSON in integer.
+*/
+/*! \def RAPIDJSON_MINOR_VERSION
+    \ingroup RAPIDJSON_CONFIG
+    \brief Minor version of RapidJSON in integer.
+*/
+/*! \def RAPIDJSON_PATCH_VERSION
+    \ingroup RAPIDJSON_CONFIG
+    \brief Patch version of RapidJSON in integer.
+*/
+/*! \def RAPIDJSON_VERSION_STRING
+    \ingroup RAPIDJSON_CONFIG
+    \brief Version of RapidJSON in "<major>.<minor>.<patch>" string format.
+*/
+#define RAPIDJSON_MAJOR_VERSION 1
+#define RAPIDJSON_MINOR_VERSION 0
+#define RAPIDJSON_PATCH_VERSION 2
+#define RAPIDJSON_VERSION_STRING \
+    RAPIDJSON_STRINGIFY(RAPIDJSON_MAJOR_VERSION.RAPIDJSON_MINOR_VERSION.RAPIDJSON_PATCH_VERSION)
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NAMESPACE_(BEGIN|END)
@@ -87,6 +118,31 @@
 #ifndef RAPIDJSON_NAMESPACE_END
 #define RAPIDJSON_NAMESPACE_END }
 #endif
+
+///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_HAS_STDSTRING
+
+#ifndef RAPIDJSON_HAS_STDSTRING
+#ifdef RAPIDJSON_DOXYGEN_RUNNING
+#define RAPIDJSON_HAS_STDSTRING 1 // force generation of documentation
+#else
+#define RAPIDJSON_HAS_STDSTRING 0 // no std::string support by default
+#endif
+/*! \def RAPIDJSON_HAS_STDSTRING
+    \ingroup RAPIDJSON_CONFIG
+    \brief Enable RapidJSON support for \c std::string
+
+    By defining this preprocessor symbol to \c 1, several convenience functions for using
+    \ref rapidjson::GenericValue with \c std::string are enabled, especially
+    for construction and comparison.
+
+    \hideinitializer
+*/
+#endif // !defined(RAPIDJSON_HAS_STDSTRING)
+
+#if RAPIDJSON_HAS_STDSTRING
+#include <string>
+#endif // RAPIDJSON_HAS_STDSTRING
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NO_INT64DEFINE
@@ -180,6 +236,8 @@
 #    define RAPIDJSON_ENDIAN RAPIDJSON_BIGENDIAN
 #  elif defined(__i386__) || defined(__alpha__) || defined(__ia64) || defined(__ia64__) || defined(_M_IX86) || defined(_M_IA64) || defined(_M_ALPHA) || defined(__amd64) || defined(__amd64__) || defined(_M_AMD64) || defined(__x86_64) || defined(__x86_64__) || defined(_M_X64) || defined(__bfin__)
 #    define RAPIDJSON_ENDIAN RAPIDJSON_LITTLEENDIAN
+#  elif defined(_MSC_VER) && defined(_M_ARM)
+#    define RAPIDJSON_ENDIAN RAPIDJSON_LITTLEENDIAN
 #  elif defined(RAPIDJSON_DOXYGEN_RUNNING)
 #    define RAPIDJSON_ENDIAN
 #  else
@@ -192,7 +250,7 @@
 
 //! Whether using 64-bit architecture
 #ifndef RAPIDJSON_64BIT
-#if defined(__LP64__) || defined(_WIN64)
+#if defined(__LP64__) || defined(_WIN64) || defined(__EMSCRIPTEN__)
 #define RAPIDJSON_64BIT 1
 #else
 #define RAPIDJSON_64BIT 0
@@ -207,10 +265,14 @@
     \param x pointer to align
 
     Some machines require strict data alignment. Currently the default uses 4 bytes
-    alignment. User can customize by defining the RAPIDJSON_ALIGN function macro.,
+    alignment. User can customize by defining the RAPIDJSON_ALIGN function macro.
 */
 #ifndef RAPIDJSON_ALIGN
-#define RAPIDJSON_ALIGN(x) ((x + 3u) & ~3u)
+#if RAPIDJSON_64BIT == 1
+#define RAPIDJSON_ALIGN(x) (((x) + static_cast<uint64_t>(7u)) & ~static_cast<uint64_t>(7u))
+#else
+#define RAPIDJSON_ALIGN(x) (((x) + 3u) & ~3u)
+#endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -314,7 +376,9 @@ RAPIDJSON_NAMESPACE_END
 
 // Adopt from boost
 #ifndef RAPIDJSON_STATIC_ASSERT
+#ifndef __clang__
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
+#endif
 RAPIDJSON_NAMESPACE_BEGIN
 template <bool x> struct STATIC_ASSERTION_FAILURE;
 template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
@@ -330,7 +394,9 @@ RAPIDJSON_NAMESPACE_END
 #else
 #define RAPIDJSON_STATIC_ASSERT_UNUSED_ATTRIBUTE 
 #endif
+#ifndef __clang__
 //!@endcond
+#endif
 
 /*! \def RAPIDJSON_STATIC_ASSERT
     \brief (Internal) macro to check for conditions at compile-time
@@ -384,10 +450,6 @@ RAPIDJSON_NAMESPACE_END
 // adopted from Boost
 #define RAPIDJSON_VERSION_CODE(x,y,z) \
   (((x)*100000) + ((y)*100) + (z))
-
-// token stringification
-#define RAPIDJSON_STRINGIFY(x) RAPIDJSON_DO_STRINGIFY(x)
-#define RAPIDJSON_DO_STRINGIFY(x) #x
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_DIAG_PUSH/POP, RAPIDJSON_DIAG_OFF

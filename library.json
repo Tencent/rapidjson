@@ -1,0 +1,12 @@
+{
+  "name": "RapidJSON",
+  "keywords": "json, sax, dom, parser, generator",
+  "description": "A fast JSON parser/generator for C++ with both SAX/DOM style API",
+  "include": "include",
+  "examples": "example/*/*.cpp",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/miloyip/rapidjson"
+  }
+}

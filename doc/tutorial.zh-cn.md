@@ -2,7 +2,7 @@
 
 本教程简介文件对象模型（Document Object Model, DOM）API。
 
-如[用法一览](readme.zh-cn.md)中所示，可以解析一个JSON至DOM，然后就可以轻松查询及修改DOM，并最终转换回JSON。
+如[用法一览](../readme.zh-cn.md#用法一览)中所示，可以解析一个JSON至DOM，然后就可以轻松查询及修改DOM，并最终转换回JSON。
 
 [TOC]
 
@@ -123,7 +123,7 @@ a[3] = 4
 
 你可以用整数字面量访问元素，如`a[0]`、`a[1]`、`a[2]`。
 
-Array与`std::vector`相似，除了使用索引，也可使用迭待器来访问所有元素。
+Array与`std::vector`相似，除了使用索引，也可使用迭代器来访问所有元素。
 ~~~~~~~~~~cpp
 for (Value::ConstValueIterator itr = a.Begin(); itr != a.End(); ++itr)
     printf("%d ", itr->GetInt());
@@ -192,7 +192,7 @@ JSON只提供一种数值类型──Number。数字可以是整数或实数。R
 `bool IsNumber()` | 不适用
 `bool IsUint()`   | `unsigned GetUint()`
 `bool IsInt()`    | `int GetInt()`
-`bool IsUint64()` | `uint64_t GetUint()`
+`bool IsUint64()` | `uint64_t GetUint64()`
 `bool IsInt64()`  | `int64_t GetInt64()`
 `bool IsDouble()` | `double GetDouble()`
 
@@ -297,7 +297,7 @@ Value o(kObjectType);
     Value contacts(kArrayType);
     // 把元素加进contacts数组。
     // ...
-    o.AddMember("contacts", contacts);  // 深度复制contacts （可能有大量内存分配）
+    o.AddMember("contacts", contacts, d.GetAllocator());  // 深度复制contacts （可能有大量内存分配）
     // 析构contacts。
 }
 ~~~~~~~~~~
@@ -317,7 +317,7 @@ Value o(kObjectType);
 {
     Value contacts(kArrayType);
     // adding elements to contacts array.
-    o.AddMember("contacts", contacts);  // 只需 memcpy() contacts本身至新成员的Value（16字节）
+    o.AddMember("contacts", contacts, d.GetAllocator());  // 只需 memcpy() contacts本身至新成员的Value（16字节）
     // contacts在这里变成Null。它的析构是平凡的。
 }
 ~~~~~~~~~~
@@ -461,7 +461,7 @@ contact.AddMember(key, val, document.GetAllocator());
 
 * `bool RemoveMember(const Ch* name)`：使用键名来移除成员（线性时间复杂度）。
 * `bool RemoveMember(const Value& name)`：除了`name`是一个Value，和上一行相同。
-* `MemberIterator RemoveMember(MemberIterator)`：使用迭待器移除成员（_常数_时间复杂度）。
+* `MemberIterator RemoveMember(MemberIterator)`：使用迭代器移除成员（_常数_时间复杂度）。
 * `MemberIterator EraseMember(MemberIterator)`：和上行相似但维持成员次序（线性时间复杂度）。
 * `MemberIterator EraseMember(MemberIterator first, MemberIterator last)`：移除一个范围内的成员，维持次序（线性时间复杂度）。
 
