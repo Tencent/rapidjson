@@ -9,7 +9,6 @@ addons:
     packages: &default_packages
       - cmake
       - valgrind
-      - doxygen
 
 env:
   global:
@@ -74,6 +73,10 @@ matrix:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
+            - doxygen
+      script: # Generate and push documentation
+        - *default_script
+        - make travis_doc
       after_success:
         - pip install --user cpp-coveralls
         - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
@@ -85,7 +88,7 @@ before_script:
     - sed -i "s/-march=native//" CMakeLists.txt
     - mkdir build
 
-script:
+script: &default_script
   - >
       eval "ARCH_FLAGS=\${ARCH_FLAGS_${ARCH}}" ;
       (cd build && cmake
@@ -99,4 +102,4 @@ script:
   - make tests -j 2
   - make examples -j 2
   - ctest -j 2 -V `[ "$CONF" = "release" ] || echo "-E perftest"`
-  - make travis_doc
+  
