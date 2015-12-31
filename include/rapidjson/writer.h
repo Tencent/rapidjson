@@ -146,7 +146,7 @@ public:
         RAPIDJSON_ASSERT(!level_stack_.template Top<Level>()->inArray);
         level_stack_.template Pop<Level>(1);
         bool ret = WriteEndObject();
-        if (level_stack_.Empty())   // end of json text
+        if (RAPIDJSON_UNLIKELY(level_stack_.Empty()))   // end of json text
             os_->Flush();
         return ret;
     }
@@ -163,7 +163,7 @@ public:
         RAPIDJSON_ASSERT(level_stack_.template Top<Level>()->inArray);
         level_stack_.template Pop<Level>(1);
         bool ret = WriteEndArray();
-        if (level_stack_.Empty())   // end of json text
+        if (RAPIDJSON_UNLIKELY(level_stack_.Empty()))   // end of json text
             os_->Flush();
         return ret;
     }
@@ -271,12 +271,12 @@ protected:
 
         PutUnsafe(*os_, '\"');
         GenericStringStream<SourceEncoding> is(str);
-        while (is.Tell() < length) {
+        while (RAPIDJSON_LIKELY(is.Tell() < length)) {
             const Ch c = is.Peek();
             if (!TargetEncoding::supportUnicode && static_cast<unsigned>(c) >= 0x80) {
                 // Unicode escaping
                 unsigned codepoint;
-                if (!SourceEncoding::Decode(is, &codepoint))
+                if (RAPIDJSON_UNLIKELY(!SourceEncoding::Decode(is, &codepoint)))
                     return false;
                 PutUnsafe(*os_, '\\');
                 PutUnsafe(*os_, 'u');
@@ -304,7 +304,7 @@ protected:
                     PutUnsafe(*os_, hexDigits[(trail      ) & 15]);                    
                 }
             }
-            else if ((sizeof(Ch) == 1 || static_cast<unsigned>(c) < 256) && escape[static_cast<unsigned char>(c)])  {
+            else if ((sizeof(Ch) == 1 || static_cast<unsigned>(c) < 256) && RAPIDJSON_UNLIKELY(escape[static_cast<unsigned char>(c)]))  {
                 is.Take();
                 PutUnsafe(*os_, '\\');
                 PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(escape[static_cast<unsigned char>(c)]));
@@ -316,7 +316,7 @@ protected:
                 }
             }
             else
-                if (!Transcoder<SourceEncoding, TargetEncoding>::TranscodeUnsafe(is, *os_))
+                if (RAPIDJSON_UNLIKELY(!(Transcoder<SourceEncoding, TargetEncoding>::TranscodeUnsafe(is, *os_))))
                     return false;
         }
         PutUnsafe(*os_, '\"');
@@ -330,7 +330,7 @@ protected:
 
     void Prefix(Type type) {
         (void)type;
-        if (level_stack_.GetSize() != 0) { // this value is not at root
+        if (RAPIDJSON_LIKELY(level_stack_.GetSize() != 0)) { // this value is not at root
             Level* level = level_stack_.template Top<Level>();
             if (level->valueCount > 0) {
                 if (level->inArray) 
