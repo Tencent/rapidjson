@@ -55,7 +55,7 @@ RAPIDJSON_DIAG_OFF(effc++)
 #ifndef RAPIDJSON_PARSE_ERROR_EARLY_RETURN
 #define RAPIDJSON_PARSE_ERROR_EARLY_RETURN(value) \
     RAPIDJSON_MULTILINEMACRO_BEGIN \
-    if (HasParseError()) { return value; } \
+    if (RAPIDJSON_UNLIKELY(HasParseError())) { return value; } \
     RAPIDJSON_MULTILINEMACRO_END
 #endif
 #define RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID \
@@ -408,7 +408,7 @@ public:
         SkipWhitespaceAndComments<parseFlags>(is);
         RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
 
-        if (is.Peek() == '\0') {
+        if (RAPIDJSON_UNLIKELY(is.Peek() == '\0')) {
             RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentEmpty, is.Tell());
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
         }
@@ -420,7 +420,7 @@ public:
                 SkipWhitespaceAndComments<parseFlags>(is);
                 RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
 
-                if (is.Peek() != '\0') {
+                if (RAPIDJSON_UNLIKELY(is.Peek() != '\0')) {
                     RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorDocumentRootNotSingular, is.Tell());
                     RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
                 }
@@ -476,29 +476,30 @@ private:
         SkipWhitespace(is);
 
         if (parseFlags & kParseCommentsFlag) {
-            while (is.Peek() == '/') {
+            while (RAPIDJSON_UNLIKELY(is.Peek() == '/')) {
                 is.Take();
 
                 if (is.Peek() == '*') {
                     is.Take();
                     while (true) {
-                        if (is.Peek() == '\0')
+                        if (RAPIDJSON_UNLIKELY(is.Peek() == '\0'))
                             RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell());
 
                         if (is.Take() == '*') {
-                            if (is.Peek() == '\0')
+                            if (RAPIDJSON_UNLIKELY(is.Peek() == '\0'))
                                 RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell());
 
                             if (is.Take() == '/')
                                 break;
                         }
                     }
-                } else if (is.Peek() == '/') {
+                }
+                else if (RAPIDJSON_LIKELY(is.Peek() == '/')) {
                     is.Take();
                     while (is.Peek() != '\0' && is.Take() != '\n') { }
-                } else {
-                    RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell());
                 }
+                else
+                    RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell());
 
                 SkipWhitespace(is);
             }
@@ -511,7 +512,7 @@ private:
         RAPIDJSON_ASSERT(is.Peek() == '{');
         is.Take();  // Skip '{'
         
-        if (!handler.StartObject())
+        if (RAPIDJSON_UNLIKELY(!handler.StartObject()))
             RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
 
         SkipWhitespaceAndComments<parseFlags>(is);
@@ -519,13 +520,13 @@ private:
 
         if (is.Peek() == '}') {
             is.Take();
-            if (!handler.EndObject(0))  // empty object
+            if (RAPIDJSON_UNLIKELY(!handler.EndObject(0)))  // empty object
                 RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
             return;
         }
 
         for (SizeType memberCount = 0;;) {
-            if (is.Peek() != '"')
+            if (RAPIDJSON_UNLIKELY(is.Peek() != '"'))
                 RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
 
             ParseString<parseFlags>(is, handler, true);
@@ -534,7 +535,7 @@ private:
             SkipWhitespaceAndComments<parseFlags>(is);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
-            if (is.Take() != ':')
+            if (RAPIDJSON_UNLIKELY(is.Take() != ':'))
                 RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissColon, is.Tell());
 
             SkipWhitespaceAndComments<parseFlags>(is);
@@ -554,7 +555,7 @@ private:
                     RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
                     break;
                 case '}': 
-                    if (!handler.EndObject(memberCount))
+                    if (RAPIDJSON_UNLIKELY(!handler.EndObject(memberCount)))
                         RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
                     return;
                 default:  
@@ -570,7 +571,7 @@ private:
         RAPIDJSON_ASSERT(is.Peek() == '[');
         is.Take();  // Skip '['
         
-        if (!handler.StartArray())
+        if (RAPIDJSON_UNLIKELY(!handler.StartArray()))
             RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
         
         SkipWhitespaceAndComments<parseFlags>(is);
@@ -578,7 +579,7 @@ private:
 
         if (is.Peek() == ']') {
             is.Take();
-            if (!handler.EndArray(0)) // empty array
+            if (RAPIDJSON_UNLIKELY(!handler.EndArray(0))) // empty array
                 RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
             return;
         }
@@ -597,7 +598,7 @@ private:
                     RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
                     break;
                 case ']': 
-                    if (!handler.EndArray(elementCount))
+                    if (RAPIDJSON_UNLIKELY(!handler.EndArray(elementCount)))
                         RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
                     return;
                 default:  
@@ -612,8 +613,8 @@ private:
         RAPIDJSON_ASSERT(is.Peek() == 'n');
         is.Take();
 
-        if (is.Take() == 'u' && is.Take() == 'l' && is.Take() == 'l') {
-            if (!handler.Null())
+        if (RAPIDJSON_LIKELY(is.Take() == 'u' && is.Take() == 'l' && is.Take() == 'l')) {
+            if (RAPIDJSON_UNLIKELY(!handler.Null()))
                 RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
         }
         else
@@ -625,8 +626,8 @@ private:
         RAPIDJSON_ASSERT(is.Peek() == 't');
         is.Take();
 
-        if (is.Take() == 'r' && is.Take() == 'u' && is.Take() == 'e') {
-            if (!handler.Bool(true))
+        if (RAPIDJSON_LIKELY(is.Take() == 'r' && is.Take() == 'u' && is.Take() == 'e')) {
+            if (RAPIDJSON_UNLIKELY(!handler.Bool(true)))
                 RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
         }
         else
@@ -638,8 +639,8 @@ private:
         RAPIDJSON_ASSERT(is.Peek() == 'f');
         is.Take();
 
-        if (is.Take() == 'a' && is.Take() == 'l' && is.Take() == 's' && is.Take() == 'e') {
-            if (!handler.Bool(false))
+        if (RAPIDJSON_LIKELY(is.Take() == 'a' && is.Take() == 'l' && is.Take() == 's' && is.Take() == 'e')) {
+            if (RAPIDJSON_UNLIKELY(!handler.Bool(false)))
                 RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
         }
         else
@@ -715,7 +716,7 @@ private:
             const typename TargetEncoding::Ch* const str = stackStream.Pop();
             success = (isKey ? handler.Key(str, length, true) : handler.String(str, length, true));
         }
-        if (!success)
+        if (RAPIDJSON_UNLIKELY(!success))
             RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
     }
 
@@ -740,21 +741,21 @@ private:
 
         for (;;) {
             Ch c = is.Peek();
-            if (c == '\\') {    // Escape
+            if (RAPIDJSON_UNLIKELY(c == '\\')) {    // Escape
                 is.Take();
                 Ch e = is.Take();
-                if ((sizeof(Ch) == 1 || unsigned(e) < 256) && escape[static_cast<unsigned char>(e)])
+                if ((sizeof(Ch) == 1 || unsigned(e) < 256) && RAPIDJSON_LIKELY(escape[static_cast<unsigned char>(e)]))
                     os.Put(static_cast<typename TEncoding::Ch>(escape[static_cast<unsigned char>(e)]));
-                else if (e == 'u') {    // Unicode
+                else if (RAPIDJSON_LIKELY(e == 'u')) {    // Unicode
                     unsigned codepoint = ParseHex4(is);
                     RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
-                    if (codepoint >= 0xD800 && codepoint <= 0xDBFF) {
+                    if (RAPIDJSON_UNLIKELY(codepoint >= 0xD800 && codepoint <= 0xDBFF)) {
                         // Handle UTF-16 surrogate pair
-                        if (is.Take() != '\\' || is.Take() != 'u')
+                        if (RAPIDJSON_UNLIKELY(is.Take() != '\\' || is.Take() != 'u'))
                             RAPIDJSON_PARSE_ERROR(kParseErrorStringUnicodeSurrogateInvalid, is.Tell() - 2);
                         unsigned codepoint2 = ParseHex4(is);
                         RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
-                        if (codepoint2 < 0xDC00 || codepoint2 > 0xDFFF)
+                        if (RAPIDJSON_UNLIKELY(codepoint2 < 0xDC00 || codepoint2 > 0xDFFF))
                             RAPIDJSON_PARSE_ERROR(kParseErrorStringUnicodeSurrogateInvalid, is.Tell() - 2);
                         codepoint = (((codepoint - 0xD800) << 10) | (codepoint2 - 0xDC00)) + 0x10000;
                     }
@@ -763,19 +764,19 @@ private:
                 else
                     RAPIDJSON_PARSE_ERROR(kParseErrorStringEscapeInvalid, is.Tell() - 1);
             }
-            else if (c == '"') {    // Closing double quote
+            else if (RAPIDJSON_UNLIKELY(c == '"')) {    // Closing double quote
                 is.Take();
                 os.Put('\0');   // null-terminate the string
                 return;
             }
-            else if (c == '\0')
+            else if (RAPIDJSON_UNLIKELY(c == '\0'))
                 RAPIDJSON_PARSE_ERROR(kParseErrorStringMissQuotationMark, is.Tell() - 1);
-            else if (static_cast<unsigned>(c) < 0x20) // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
+            else if (RAPIDJSON_UNLIKELY(static_cast<unsigned>(c) < 0x20)) // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
                 RAPIDJSON_PARSE_ERROR(kParseErrorStringEscapeInvalid, is.Tell() - 1);
             else {
-                if (parseFlags & kParseValidateEncodingFlag ? 
+                if (RAPIDJSON_UNLIKELY((parseFlags & kParseValidateEncodingFlag ? 
                     !Transcoder<SEncoding, TEncoding>::Validate(is, os) : 
-                    !Transcoder<SEncoding, TEncoding>::Transcode(is, os))
+                    !Transcoder<SEncoding, TEncoding>::Transcode(is, os))))
                     RAPIDJSON_PARSE_ERROR(kParseErrorStringInvalidEncoding, is.Tell());
             }
         }
@@ -843,17 +844,17 @@ private:
         uint64_t i64 = 0;
         bool use64bit = false;
         int significandDigit = 0;
-        if (s.Peek() == '0') {
+        if (RAPIDJSON_UNLIKELY(s.Peek() == '0')) {
             i = 0;
             s.TakePush();
         }
-        else if (s.Peek() >= '1' && s.Peek() <= '9') {
+        else if (RAPIDJSON_LIKELY(s.Peek() >= '1' && s.Peek() <= '9')) {
             i = static_cast<unsigned>(s.TakePush() - '0');
 
             if (minus)
-                while (s.Peek() >= '0' && s.Peek() <= '9') {
-                    if (i >= 214748364) { // 2^31 = 2147483648
-                        if (i != 214748364 || s.Peek() > '8') {
+                while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
+                    if (RAPIDJSON_UNLIKELY(i >= 214748364)) { // 2^31 = 2147483648
+                        if (RAPIDJSON_LIKELY(i != 214748364 || s.Peek() > '8')) {
                             i64 = i;
                             use64bit = true;
                             break;
@@ -863,9 +864,9 @@ private:
                     significandDigit++;
                 }
             else
-                while (s.Peek() >= '0' && s.Peek() <= '9') {
-                    if (i >= 429496729) { // 2^32 - 1 = 4294967295
-                        if (i != 429496729 || s.Peek() > '5') {
+                while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
+                    if (RAPIDJSON_UNLIKELY(i >= 429496729)) { // 2^32 - 1 = 4294967295
+                        if (RAPIDJSON_LIKELY(i != 429496729 || s.Peek() > '5')) {
                             i64 = i;
                             use64bit = true;
                             break;
@@ -883,9 +884,9 @@ private:
         double d = 0.0;
         if (use64bit) {
             if (minus) 
-                while (s.Peek() >= '0' && s.Peek() <= '9') {                    
-                     if (i64 >= RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC)) // 2^63 = 9223372036854775808
-                        if (i64 != RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC) || s.Peek() > '8') {
+                while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
+                     if (RAPIDJSON_UNLIKELY(i64 >= RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC))) // 2^63 = 9223372036854775808
+                        if (RAPIDJSON_LIKELY(i64 != RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC) || s.Peek() > '8')) {
                             d = i64;
                             useDouble = true;
                             break;
@@ -894,9 +895,9 @@ private:
                     significandDigit++;
                 }
             else
-                while (s.Peek() >= '0' && s.Peek() <= '9') {                    
-                    if (i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999)) // 2^64 - 1 = 18446744073709551615
-                        if (i64 != RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) || s.Peek() > '5') {
+                while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
+                    if (RAPIDJSON_UNLIKELY(i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999))) // 2^64 - 1 = 18446744073709551615
+                        if (RAPIDJSON_LIKELY(i64 != RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) || s.Peek() > '5')) {
                             d = i64;
                             useDouble = true;
                             break;
@@ -908,8 +909,8 @@ private:
 
         // Force double for big integer
         if (useDouble) {
-            while (s.Peek() >= '0' && s.Peek() <= '9') {
-                if (d >= 1.7976931348623157e307) // DBL_MAX / 10.0
+            while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
+                if (RAPIDJSON_UNLIKELY(d >= 1.7976931348623157e307)) // DBL_MAX / 10.0
                     RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
                 d = d * 10 + (s.TakePush() - '0');
             }
@@ -922,7 +923,7 @@ private:
             s.Take();
             decimalPosition = s.Length();
 
-            if (!(s.Peek() >= '0' && s.Peek() <= '9'))
+            if (RAPIDJSON_UNLIKELY(!(s.Peek() >= '0' && s.Peek() <= '9')))
                 RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, s.Tell());
 
             if (!useDouble) {
@@ -931,7 +932,7 @@ private:
                 if (!use64bit)
                     i64 = i;
         
-                while (s.Peek() >= '0' && s.Peek() <= '9') {
+                while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
                     if (i64 > RAPIDJSON_UINT64_C2(0x1FFFFF, 0xFFFFFFFF)) // 2^53 - 1 for fast path
                         break;
                     else {
@@ -950,11 +951,11 @@ private:
                 useDouble = true;
             }
 
-            while (s.Peek() >= '0' && s.Peek() <= '9') {
+            while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
                 if (significandDigit < 17) {
                     d = d * 10.0 + (s.TakePush() - '0');
                     --expFrac;
-                    if (d > 0.0)
+                    if (RAPIDJSON_LIKELY(d > 0.0))
                         significandDigit++;
                 }
                 else
@@ -981,22 +982,22 @@ private:
                 expMinus = true;
             }
 
-            if (s.Peek() >= '0' && s.Peek() <= '9') {
+            if (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
                 exp = static_cast<int>(s.Take() - '0');
                 if (expMinus) {
-                    while (s.Peek() >= '0' && s.Peek() <= '9') {
+                    while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
                         exp = exp * 10 + static_cast<int>(s.Take() - '0');
                         if (exp >= 214748364) {                         // Issue #313: prevent overflow exponent
-                            while (s.Peek() >= '0' && s.Peek() <= '9')  // Consume the rest of exponent
+                            while (RAPIDJSON_UNLIKELY(s.Peek() >= '0' && s.Peek() <= '9'))  // Consume the rest of exponent
                                 s.Take();
                         }
                     }
                 }
                 else {  // positive exp
                     int maxExp = 308 - expFrac;
-                    while (s.Peek() >= '0' && s.Peek() <= '9') {
+                    while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
                         exp = exp * 10 + static_cast<int>(s.Take() - '0');
-                        if (exp > maxExp)
+                        if (RAPIDJSON_UNLIKELY(exp > maxExp))
                             RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
                     }
                 }
@@ -1036,7 +1037,7 @@ private:
                     cont = handler.Uint(i);
             }
         }
-        if (!cont)
+        if (RAPIDJSON_UNLIKELY(!cont))
             RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
     }
 
