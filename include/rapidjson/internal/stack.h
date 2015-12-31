@@ -108,11 +108,21 @@ public:
     // Optimization note: try to minimize the size of this function for force inline.
     // Expansion is run very infrequently, so it is moved to another (probably non-inline) function.
     template<typename T>
-    RAPIDJSON_FORCEINLINE T* Push(size_t count = 1) {
+    RAPIDJSON_FORCEINLINE void Reserve(size_t count = 1) {
          // Expand the stack if needed
         if (RAPIDJSON_UNLIKELY(stackTop_ + sizeof(T) * count >= stackEnd_))
             Expand<T>(count);
+    }
 
+    template<typename T>
+    RAPIDJSON_FORCEINLINE T* Push(size_t count = 1) {
+        Reserve<T>(count);
+        return PushUnsafe<T>(count);
+    }
+
+    template<typename T>
+    RAPIDJSON_FORCEINLINE T* PushUnsafe(size_t count = 1) {
+        RAPIDJSON_ASSERT(stackTop_ + sizeof(T) * count < stackEnd_);
         T* ret = reinterpret_cast<T*>(stackTop_);
         stackTop_ += sizeof(T) * count;
         return ret;

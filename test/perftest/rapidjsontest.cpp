@@ -45,7 +45,10 @@ public:
         temp_ = (char *)malloc(length_ + 1);
 
         // Parse as a document
-        EXPECT_FALSE(doc_.Parse(json_).IsNull());
+        EXPECT_FALSE(doc_.Parse(json_).HasParseError());
+
+        for (size_t i = 0; i < 7; i++)
+            EXPECT_FALSE(typesDoc_[i].Parse(types_[i]).HasParseError());
     }
 
     virtual void TearDown() {
@@ -60,6 +63,7 @@ private:
 protected:
     char *temp_;
     Document doc_;
+    Document typesDoc_[7];
 };
 
 TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseInsitu_DummyHandler)) {
@@ -250,8 +254,10 @@ TEST_F(RapidJson, DocumentAccept) {
 }
 
 struct NullStream {
+    typedef char Ch;
+
     NullStream() /*: length_(0)*/ {}
-    void Put(char) { /*++length_;*/ }
+    void Put(Ch) { /*++length_;*/ }
     void Flush() {}
     //size_t length_;
 };
@@ -277,6 +283,25 @@ TEST_F(RapidJson, Writer_StringBuffer) {
         //  std::cout << strlen(str) << std::endl;
     }
 }
+
+#define TEST_TYPED(index, Name)\
+TEST_F(RapidJson, Writer_StringBuffer_##Name) {\
+    for (size_t i = 0; i < kTrialCount * 10; i++) {\
+        StringBuffer s(0, 1024 * 1024);\
+        Writer<StringBuffer> writer(s);\
+        typesDoc_[index].Accept(writer);\
+        const char* str = s.GetString();\
+        (void)str;\
+    }\
+}\
+
+TEST_TYPED(0, Booleans)
+TEST_TYPED(1, Floats)
+TEST_TYPED(2, Guids)
+TEST_TYPED(3, Integers)
+TEST_TYPED(4, Mixed)
+TEST_TYPED(5, Nulls)
+TEST_TYPED(6, Paragraphs)
 
 TEST_F(RapidJson, PrettyWriter_StringBuffer) {
     for (size_t i = 0; i < kTrialCount; i++) {
