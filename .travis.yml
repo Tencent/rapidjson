@@ -2,7 +2,6 @@ language: cpp
 sudo: false
 cache:
   - ccache
-  - pip
 
 addons:
   apt:
@@ -56,6 +55,9 @@ matrix:
     # coverage report
     - env: CONF=debug ARCH=x86 GCOV_FLAGS='--coverage'
       compiler: gcc
+      cache:
+        - ccache
+        - pip
       addons:
         apt:
           packages:
@@ -67,6 +69,9 @@ matrix:
         - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
     - env: CONF=debug   ARCH=x86_64 GCOV_FLAGS='--coverage'
       compiler: gcc
+      cache:
+        - ccache
+        - pip
       addons:
         apt:
           packages:
