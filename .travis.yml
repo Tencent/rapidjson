@@ -80,6 +80,7 @@ matrix:
       - cd build
       - cmake .. -DRAPIDJSON_HAS_STDSTRING=ON -DCMAKE_VERBOSE_MAKEFILE=ON
       - make travis_doc
+      cache: false
       addons:
         apt:
           packages:
