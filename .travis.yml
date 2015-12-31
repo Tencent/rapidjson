@@ -42,9 +42,9 @@ matrix:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
-    - env: CONF=debug ARCH=x86_64
+    - env: CONF=debug ARCH=x86_64 CCACHE_CPP2=yes
       compiler: clang
-    - env: CONF=release ARCH=x86
+    - env: CONF=release ARCH=x86 CCACHE_CPP2=yes
       compiler: clang
       addons:
         apt:
@@ -52,7 +52,7 @@ matrix:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
-    - env: CONF=release ARCH=x86_64
+    - env: CONF=release ARCH=x86_64 CCACHE_CPP2=yes
       compiler: clang
     # coverage report
     - env: CONF=debug ARCH=x86 GCOV_FLAGS='--coverage'
