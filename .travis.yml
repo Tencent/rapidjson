@@ -34,7 +34,7 @@ matrix:
             - libc6-dbg:i386
     - env: CONF=release ARCH=x86_64
       compiler: gcc
-    - env: CONF=debug   ARCH=x86
+    - env: CONF=debug   ARCH=x86 CCACHE_CPP2=yes
       compiler: clang
       addons:
         apt:
