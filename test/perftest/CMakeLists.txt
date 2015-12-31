@@ -9,6 +9,12 @@ target_link_libraries(perftest ${TEST_LIBRARIES})
 
 add_dependencies(tests perftest)
 
+find_program(CCACHE_FOUND ccache)
+if(CCACHE_FOUND)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+endif(CCACHE_FOUND)
+
 IF(NOT (CMAKE_BUILD_TYPE STREQUAL "Debug"))
 add_test(NAME perftest
     COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/perftest
