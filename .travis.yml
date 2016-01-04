@@ -1,51 +1,115 @@
 language: cpp
+sudo: false
+cache:
+  - ccache
 
-compiler:
- - clang
- - gcc
+addons:
+  apt:
+    packages: &default_packages
+      - cmake
+      - valgrind
 
 env:
-  matrix:
-    - CONF=debug   ARCH=x86_64
-    - CONF=release ARCH=x86_64
-    - CONF=debug   ARCH=x86
-    - CONF=release ARCH=x86
   global:
+    - USE_CCACHE=1
+    - CCACHE_SLOPPINESS=pch_defines,time_macros
+    - CCACHE_COMPRESS=1
+    - CCACHE_MAXSIZE=100M
     - ARCH_FLAGS_x86='-m32'        # #266: don't use SSE on 32-bit
     - ARCH_FLAGS_x86_64='-msse4.2' #       use SSE4.2 on 64-bit
     - GITHUB_REPO='miloyip/rapidjson'
     - secure: "HrsaCb+N66EG1HR+LWH1u51SjaJyRwJEDzqJGYMB7LJ/bfqb9mWKF1fLvZGk46W5t7TVaXRDD5KHFx9DPWvKn4gRUVkwTHEy262ah5ORh8M6n/6VVVajeV/AYt2C0sswdkDBDO4Xq+xy5gdw3G8s1A4Inbm73pUh+6vx+7ltBbk="
 
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq cmake valgrind
-  - sudo apt-get --no-install-recommends install doxygen # Don't install LaTeX stuffs
-  - if [ "$ARCH" = "x86" ]; then sudo apt-get install -qq g++-multilib libc6-dbg:i386; fi
-  - if [ "$CC" = "gcc" ] && [ "$CONF" = "debug" ]; then sudo pip install cpp-coveralls; export GCOV_FLAGS='--coverage'; fi
-
-install: true
+matrix:
+  include:
+    - env: CONF=release ARCH=x86
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - *default_packages
+            - g++-multilib
+            - libc6-dbg:i386
+    - env: CONF=release ARCH=x86_64
+      compiler: gcc
+    - env: CONF=debug   ARCH=x86 CCACHE_CPP2=yes
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - *default_packages
+            - g++-multilib
+            - libc6-dbg:i386
+    - env: CONF=debug ARCH=x86_64 CCACHE_CPP2=yes
+      compiler: clang
+    - env: CONF=release ARCH=x86 CCACHE_CPP2=yes
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - *default_packages
+            - g++-multilib
+            - libc6-dbg:i386
+    - env: CONF=release ARCH=x86_64 CCACHE_CPP2=yes
+      compiler: clang
+    # coverage report
+    - env: CONF=debug ARCH=x86 GCOV_FLAGS='--coverage'
+      compiler: gcc
+      cache:
+        - ccache
+        - pip
+      addons:
+        apt:
+          packages:
+            - *default_packages
+            - g++-multilib
+            - libc6-dbg:i386
+      after_success:
+        - pip install --user cpp-coveralls
+        - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
+    - env: CONF=debug   ARCH=x86_64 GCOV_FLAGS='--coverage'
+      compiler: gcc
+      cache:
+        - ccache
+        - pip
+      addons:
+        apt:
+          packages:
+            - *default_packages
+            - g++-multilib
+            - libc6-dbg:i386
+      after_success:
+        - pip install --user cpp-coveralls
+        - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
+    - script: # Documentation task
+      - cd build
+      - cmake .. -DRAPIDJSON_HAS_STDSTRING=ON -DCMAKE_VERBOSE_MAKEFILE=ON
+      - make travis_doc
+      cache: false
+      addons:
+        apt:
+          packages:
+            - doxygen
 
 before_script:
-#   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
-#   exposed by merging PR#163 (using -march=native)
+    - ccache -s
+      #   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
+      #   exposed by merging PR#163 (using -march=native)
+      #   TODO: Since this bug is already fixed. Remove this when valgrind can be upgraded.
     - sed -i "s/-march=native//" CMakeLists.txt
-    - mkdir build 
-    - >
-        eval "ARCH_FLAGS=\${ARCH_FLAGS_${ARCH}}" ;
-        (cd build && cmake 
-        -DRAPIDJSON_HAS_STDSTRING=ON
-        -DCMAKE_VERBOSE_MAKEFILE=ON 
-        -DCMAKE_BUILD_TYPE=$CONF 
-        -DCMAKE_CXX_FLAGS="$ARCH_FLAGS $GCOV_FLAGS"
-        -DCMAKE_EXE_LINKER_FLAGS=$GCOV_FLAGS
-        ..)
+    - mkdir build
 
 script:
+  - >
+      eval "ARCH_FLAGS=\${ARCH_FLAGS_${ARCH}}" ;
+      (cd build && cmake
+      -DRAPIDJSON_HAS_STDSTRING=ON
+      -DCMAKE_VERBOSE_MAKEFILE=ON
+      -DCMAKE_BUILD_TYPE=$CONF
+      -DCMAKE_CXX_FLAGS="$ARCH_FLAGS $GCOV_FLAGS"
+      -DCMAKE_EXE_LINKER_FLAGS=$GCOV_FLAGS
+      ..)
   - cd build
-  - make tests
-  - make examples
-  - ctest -V `[ "$CONF" = "release" ] || echo "-E perftest"`
-  - make travis_doc
-
-after_success:
-  - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
+  - make tests -j 2
+  - make examples -j 2
+  - ctest -j 2 -V `[ "$CONF" = "release" ] || echo "-E perftest"`
