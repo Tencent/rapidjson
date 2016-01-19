@@ -139,7 +139,7 @@ public:
     }
 
     bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy); }
-	
+
     bool EndObject(SizeType memberCount = 0) {
         (void)memberCount;
         RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level));
@@ -235,6 +235,9 @@ protected:
     }
 
     bool WriteDouble(double d) {
+        if (internal::Double(d).IsNanOrInf())
+            return false;
+        
         char buffer[25];
         char* end = internal::dtoa(d, buffer);
         for (char* p = buffer; p != end; ++p)
@@ -381,6 +384,9 @@ inline bool Writer<StringBuffer>::WriteUint64(uint64_t u) {
 
 template<>
 inline bool Writer<StringBuffer>::WriteDouble(double d) {
+    if (internal::Double(d).IsNanOrInf())
+        return false;
+    
     char *buffer = os_->Push(25);
     char* end = internal::dtoa(d, buffer);
     os_->Pop(static_cast<size_t>(25 - (end - buffer)));
