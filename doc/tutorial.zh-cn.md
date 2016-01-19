@@ -280,7 +280,7 @@ Value a(kArrayType);
 ~~~~~~~~~~cpp
 Value a(123);
 Value b(456);
-b = a;         // a变成Null，b变成数字123。
+a = b;         // a变成数字456，b变成Null。
 ~~~~~~~~~~
 
 ![使用移动语意赋值。](diagram/move1.png)
@@ -304,7 +304,7 @@ Value o(kObjectType);
 
 ![复制语意产生大量的复制操作。](diagram/move2.png)
 
-那个`o` Object需要分配一个和contacts相同大小的缓冲区，对conacts做深度复制，并最终要析构contacts。这样会产生大量无必要的内存分配／释放，以及内存复制。
+那个`o` Object需要分配一个和contacts相同大小的缓冲区，对`contacts`做深度复制，并最终要析构`contacts`。这样会产生大量无必要的内存分配／释放，以及内存复制。
 
 有一些方案可避免实质地复制这些数据，例如引用计数（reference counting）、垃圾回收（garbage collection, GC）。
 

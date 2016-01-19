@@ -280,7 +280,7 @@ A very special decision during design of RapidJSON is that, assignment of value 
 ~~~~~~~~~~cpp
 Value a(123);
 Value b(456);
-b = a;         // a becomes a Null value, b becomes number 123.
+a = b;         // a becomes number 456, b becomes a Null value.
 ~~~~~~~~~~
 
 ![Assignment with move semantics.](diagram/move1.png)
@@ -305,7 +305,7 @@ Value o(kObjectType);
 
 ![Copy semantics makes a lots of copy operations.](diagram/move2.png)
 
-The object `o` needs to allocate a buffer of same size as contacts, makes a deep clone of it, and then finally contacts is destructed. This will incur a lot of unnecessary allocations/deallocations and memory copying.
+The object `o` needs to allocate a buffer of same size as `contacts`, makes a deep clone of it, and then finally `contacts` is destructed. This will incur a lot of unnecessary allocations/deallocations and memory copying.
 
 There are solutions to prevent actual copying these data, such as reference counting and garbage collection(GC).
 
