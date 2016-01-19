@@ -376,6 +376,7 @@ TEST(Writer, InvalidEventSequence) {
     }
 }
 
+extern double zero; // clang -Wmissing-variable-declarations
 double zero = 0.0;	// Use global variable to prevent compiler warning
 
 TEST(Writer, NaN) {
