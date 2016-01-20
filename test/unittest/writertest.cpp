@@ -375,3 +375,28 @@ TEST(Writer, InvalidEventSequence) {
         EXPECT_FALSE(writer.IsComplete());
     }
 }
+
+extern double zero; // clang -Wmissing-variable-declarations
+double zero = 0.0;	// Use global variable to prevent compiler warning
+
+TEST(Writer, NaN) {
+    double nan = zero / zero;
+    EXPECT_TRUE(internal::Double(nan).IsNan());
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    EXPECT_FALSE(writer.Double(nan));
+}
+
+TEST(Writer, Inf) {
+    double inf = 1.0 / zero;
+    EXPECT_TRUE(internal::Double(inf).IsInf());
+    StringBuffer buffer;
+    {
+        Writer<StringBuffer> writer(buffer);
+        EXPECT_FALSE(writer.Double(inf));
+    }
+    {
+        Writer<StringBuffer> writer(buffer);
+        EXPECT_FALSE(writer.Double(-inf));
+    }
+}

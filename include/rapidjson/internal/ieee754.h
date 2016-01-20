@@ -40,6 +40,7 @@ public:
 
     bool IsNan() const { return (u_ & kExponentMask) == kExponentMask && Significand() != 0; }
     bool IsInf() const { return (u_ & kExponentMask) == kExponentMask && Significand() == 0; }
+    bool IsNanOrInf() const { return (u_ & kExponentMask) == kExponentMask; }
     bool IsNormal() const { return (u_ & kExponentMask) != 0 || Significand() == 0; }
     bool IsZero() const { return (u_ & (kExponentMask | kSignificandMask)) == 0; }
 
