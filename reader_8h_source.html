@@ -976,7 +976,7 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;                <span class="keywordflow">while</span> (s.Peek() &gt;= <span class="charliteral">&#39;0&#39;</span> &amp;&amp; s.Peek() &lt;= <span class="charliteral">&#39;9&#39;</span>) {                    </div>
 <div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;                     <span class="keywordflow">if</span> (i64 &gt;= <a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0x0CCCCCCC, 0xCCCCCCCC)) <span class="comment">// 2^63 = 9223372036854775808</span></div>
 <div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;                        <span class="keywordflow">if</span> (i64 != <a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0x0CCCCCCC, 0xCCCCCCCC) || s.Peek() &gt; <span class="charliteral">&#39;8&#39;</span>) {</div>
-<div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;                            d = i64;</div>
+<div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;                            d = <span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(i64);</div>
 <div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;                            useDouble = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;                            <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;                        }</div>
@@ -987,7 +987,7 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160;                <span class="keywordflow">while</span> (s.Peek() &gt;= <span class="charliteral">&#39;0&#39;</span> &amp;&amp; s.Peek() &lt;= <span class="charliteral">&#39;9&#39;</span>) {                    </div>
 <div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;                    <span class="keywordflow">if</span> (i64 &gt;= <a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0x19999999, 0x99999999)) <span class="comment">// 2^64 - 1 = 18446744073709551615</span></div>
 <div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;                        <span class="keywordflow">if</span> (i64 != <a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0x19999999, 0x99999999) || s.Peek() &gt; <span class="charliteral">&#39;5&#39;</span>) {</div>
-<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;                            d = i64;</div>
+<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;                            d = <span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(i64);</div>
 <div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160;                            useDouble = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;                            <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160;                        }</div>
@@ -1058,7 +1058,7 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l00968"></a><span class="lineno">  968</span>&#160;        <span class="keywordtype">int</span> exp = 0;</div>
 <div class="line"><a name="l00969"></a><span class="lineno">  969</span>&#160;        <span class="keywordflow">if</span> (s.Peek() == <span class="charliteral">&#39;e&#39;</span> || s.Peek() == <span class="charliteral">&#39;E&#39;</span>) {</div>
 <div class="line"><a name="l00970"></a><span class="lineno">  970</span>&#160;            <span class="keywordflow">if</span> (!useDouble) {</div>
-<div class="line"><a name="l00971"></a><span class="lineno">  971</span>&#160;                d = use64bit ? i64 : i;</div>
+<div class="line"><a name="l00971"></a><span class="lineno">  971</span>&#160;                d = <span class="keyword">static_cast&lt;</span><span class="keywordtype">double</span><span class="keyword">&gt;</span>(use64bit ? i64 : i);</div>
 <div class="line"><a name="l00972"></a><span class="lineno">  972</span>&#160;                useDouble = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00973"></a><span class="lineno">  973</span>&#160;            }</div>
 <div class="line"><a name="l00974"></a><span class="lineno">  974</span>&#160;            s.Take();</div>
