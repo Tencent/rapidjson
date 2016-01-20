@@ -130,41 +130,42 @@ $(document).ready(function(){initNavTree('ieee754_8h_source.html','');});
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">bool</span> IsNan()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u_ &amp; kExponentMask) == kExponentMask &amp;&amp; Significand() != 0; }</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordtype">bool</span> IsInf()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u_ &amp; kExponentMask) == kExponentMask &amp;&amp; Significand() == 0; }</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">bool</span> IsNormal()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u_ &amp; kExponentMask) != 0 || Significand() == 0; }</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">bool</span> IsZero()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u_ &amp; (kExponentMask | kSignificandMask)) == 0; }</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    uint64_t IntegerSignificand()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> IsNormal() ? Significand() | kHiddenBit : Significand(); }</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordtype">int</span> IntegerExponent()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (IsNormal() ? Exponent() : kDenormalExponent) - kSignificandSize; }</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    uint64_t ToBias()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u_ &amp; kSignMask) ? ~u_ + 1 : u_ | kSignMask; }</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">unsigned</span> EffectiveSignificandSize(<span class="keywordtype">int</span> order) {</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <span class="keywordflow">if</span> (order &gt;= -1021)</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;            <span class="keywordflow">return</span> 53;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (order &lt;= -1074)</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;            <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span><span class="keyword">&gt;</span>(order) + 1074;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    }</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> kSignificandSize = 52;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> kExponentBias = 0x3FF;</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> kDenormalExponent = 1 - kExponentBias;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> uint64_t kSignMask = <a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0x80000000, 0x00000000);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> uint64_t kExponentMask = <a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0x7FF00000, 0x00000000);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> uint64_t kSignificandMask = <a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0x000FFFFF, 0xFFFFFFFF);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> uint64_t kHiddenBit = <a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0x00100000, 0x00000000);</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">union </span>{</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="keywordtype">double</span> d_;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        uint64_t u_;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    };</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;};</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;} <span class="comment">// namespace internal</span></div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;RAPIDJSON_NAMESPACE_END</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_IEEE754_</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">bool</span> IsNanOrInf()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u_ &amp; kExponentMask) == kExponentMask; }</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">bool</span> IsNormal()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u_ &amp; kExponentMask) != 0 || Significand() == 0; }</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">bool</span> IsZero()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u_ &amp; (kExponentMask | kSignificandMask)) == 0; }</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    uint64_t IntegerSignificand()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> IsNormal() ? Significand() | kHiddenBit : Significand(); }</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordtype">int</span> IntegerExponent()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (IsNormal() ? Exponent() : kDenormalExponent) - kSignificandSize; }</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    uint64_t ToBias()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> (u_ &amp; kSignMask) ? ~u_ + 1 : u_ | kSignMask; }</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">unsigned</span> EffectiveSignificandSize(<span class="keywordtype">int</span> order) {</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <span class="keywordflow">if</span> (order &gt;= -1021)</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;            <span class="keywordflow">return</span> 53;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (order &lt;= -1074)</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;            <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span><span class="keyword">&gt;</span>(order) + 1074;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    }</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> kSignificandSize = 52;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> kExponentBias = 0x3FF;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">int</span> kDenormalExponent = 1 - kExponentBias;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> uint64_t kSignMask = <a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0x80000000, 0x00000000);</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> uint64_t kExponentMask = <a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0x7FF00000, 0x00000000);</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> uint64_t kSignificandMask = <a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0x000FFFFF, 0xFFFFFFFF);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> uint64_t kHiddenBit = <a class="code" href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a>(0x00100000, 0x00000000);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keyword">union </span>{</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordtype">double</span> d_;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        uint64_t u_;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    };</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;};</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;} <span class="comment">// namespace internal</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;RAPIDJSON_NAMESPACE_END</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_IEEE754_</span></div>
 <div class="ttc" id="rapidjson_8h_html_aaee1245f375a71be1ac9b8a07ba5fb8f"><div class="ttname"><a href="rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f">RAPIDJSON_UINT64_C2</a></div><div class="ttdeci">#define RAPIDJSON_UINT64_C2(high32, low32)</div><div class="ttdoc">Construct a 64-bit literal by a pair of 32-bit integer. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:288</div></div>
 <div class="ttc" id="namespacerapidjson_html_afb3fa116c66d834b6f4289d648cc8d6d"><div class="ttname"><a href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">rapidjson::Value</a></div><div class="ttdeci">GenericValue&lt; UTF8&lt;&gt; &gt; Value</div><div class="ttdoc">GenericValue with UTF8 encoding. </div><div class="ttdef"><b>Definition:</b> document.h:1753</div></div>
 <div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:371</div></div>
