@@ -886,7 +886,7 @@ private:
                 while (s.Peek() >= '0' && s.Peek() <= '9') {                    
                      if (i64 >= RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC)) // 2^63 = 9223372036854775808
                         if (i64 != RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC) || s.Peek() > '8') {
-                            d = i64;
+                            d = static_cast<double>(i64);
                             useDouble = true;
                             break;
                         }
@@ -897,7 +897,7 @@ private:
                 while (s.Peek() >= '0' && s.Peek() <= '9') {                    
                     if (i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999)) // 2^64 - 1 = 18446744073709551615
                         if (i64 != RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) || s.Peek() > '5') {
-                            d = i64;
+                            d = static_cast<double>(i64);
                             useDouble = true;
                             break;
                         }
@@ -968,7 +968,7 @@ private:
         int exp = 0;
         if (s.Peek() == 'e' || s.Peek() == 'E') {
             if (!useDouble) {
-                d = use64bit ? i64 : i;
+                d = static_cast<double>(use64bit ? i64 : i);
                 useDouble = true;
             }
             s.Take();
