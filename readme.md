@@ -63,9 +63,9 @@ Users can build and run the unit tests on their platform/compiler.
 RapidJSON is a header-only C++ library. Just copy the `include/rapidjson` folder to system or project's include path.
 
 RapidJSON uses following software as its dependencies:
-* [CMake](http://www.cmake.org) as a general build tool
+* [CMake](https://cmake.org/) as a general build tool
 * (optional)[Doxygen](http://www.doxygen.org) to build documentation
-* (optional)[googletest](https://code.google.com/p/googletest/) for unit and performance testing
+* (optional)[googletest](https://github.com/google/googletest) for unit and performance testing
 
 To generate user documentation and run tests please proceed with the steps below:
 
