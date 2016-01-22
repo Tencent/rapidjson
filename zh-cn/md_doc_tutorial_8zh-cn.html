@@ -291,7 +291,7 @@ Value 及 Document</h1>
 <p>在设计RapidJSON时有一个非常特别的决定，就是Value赋值并不是把来源Value复制至目的Value，而是把把来源Value转移（move）至目的Value。例如：</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> a(123);</div>
 <div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> b(456);</div>
-<div class="line">a = b;         <span class="comment">// a变成数字456，b变成Null。</span></div>
+<div class="line">b = a;         <span class="comment">// a变成Null，b变成数字123。</span></div>
 </div><!-- fragment --><div class="image">
 <img src="move1.png" alt="move1.png"/>
 <div class="caption">
@@ -311,7 +311,7 @@ Value 及 Document</h1>
 <img src="move2.png" alt="move2.png"/>
 <div class="caption">
 复制语意产生大量的复制操作。</div></div>
-<p> 那个<code>o</code> Object需要分配一个和contacts相同大小的缓冲区，对<code>contacts</code>做深度复制，并最终要析构<code>contacts</code>。这样会产生大量无必要的内存分配／释放，以及内存复制。</p>
+<p> 那个<code>o</code> Object需要分配一个和contacts相同大小的缓冲区，对conacts做深度复制，并最终要析构contacts。这样会产生大量无必要的内存分配／释放，以及内存复制。</p>
 <p>有一些方案可避免实质地复制这些数据，例如引用计数（reference counting）、垃圾回收（garbage collection, GC）。</p>
 <p>为了使RapidJSON简单及快速，我们选择了对赋值采用*转移*语意。这方法与<code>std::auto_ptr</code>相似，都是在赋值时转移拥有权。转移快得多简单得多，只需要析构原来的Value，把来源<code>memcpy()</code>至目标，最后把来源设置为Null类型。</p>
 <p>因此，使用转移语意后，上面的例子变成：</p>

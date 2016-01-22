@@ -136,6 +136,12 @@ $(document).ready(function(){initNavTree('group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_
 <tr class="memitem:gabeba18d612187bad2ac62aed9276d47c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(x)&#160;&#160;&#160;assert(x)</td></tr>
 <tr class="memdesc:gabeba18d612187bad2ac62aed9276d47c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assertion.  <a href="#gabeba18d612187bad2ac62aed9276d47c">更多...</a><br /></td></tr>
 <tr class="separator:gabeba18d612187bad2ac62aed9276d47c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5dc14176a9e71ace282404b0bcda57a1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga5dc14176a9e71ace282404b0bcda57a1">RAPIDJSON_LIKELY</a>(x)&#160;&#160;&#160;x</td></tr>
+<tr class="memdesc:ga5dc14176a9e71ace282404b0bcda57a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compiler branching hint for expression with high probability to be true.  <a href="#ga5dc14176a9e71ace282404b0bcda57a1">更多...</a><br /></td></tr>
+<tr class="separator:ga5dc14176a9e71ace282404b0bcda57a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6a2b1695c13e77ae425e3cbac980ccb5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga6a2b1695c13e77ae425e3cbac980ccb5">RAPIDJSON_UNLIKELY</a>(x)&#160;&#160;&#160;x</td></tr>
+<tr class="memdesc:ga6a2b1695c13e77ae425e3cbac980ccb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compiler branching hint for expression with low probability to be true.  <a href="#ga6a2b1695c13e77ae425e3cbac980ccb5">更多...</a><br /></td></tr>
+<tr class="separator:ga6a2b1695c13e77ae425e3cbac980ccb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga77005e892e6601599beaf421b0395c31"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga77005e892e6601599beaf421b0395c31">RAPIDJSON_PARSE_DEFAULT_FLAGS</a>&#160;&#160;&#160;kParseNoFlags</td></tr>
 <tr class="memdesc:ga77005e892e6601599beaf421b0395c31"><td class="mdescLeft">&#160;</td><td class="mdescRight">User-defined kParseDefaultFlags definition.  <a href="#ga77005e892e6601599beaf421b0395c31">更多...</a><br /></td></tr>
 <tr class="separator:ga77005e892e6601599beaf421b0395c31"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -222,6 +228,30 @@ $(document).ready(function(){initNavTree('group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_
 
 <p>Enable RapidJSON support for <code>std::string</code>. </p>
 <p>By defining this preprocessor symbol to <code>1</code>, several convenience functions for using <a class="el" href="classrapidjson_1_1_generic_value.html">rapidjson::GenericValue</a> with <code>std::string</code> are enabled, especially for construction and comparison. </p>
+
+</div>
+</div>
+<a class="anchor" id="ga5dc14176a9e71ace282404b0bcda57a1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RAPIDJSON_LIKELY</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x</td><td>)</td>
+          <td>&#160;&#160;&#160;x</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Compiler branching hint for expression with high probability to be true. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>Boolean expression likely to be true. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -315,6 +345,30 @@ $(document).ready(function(){initNavTree('group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_
 <div class="line"><span class="preprocessor">#define RAPIDJSON_SSE42</span></div>
 </div><!-- fragment --><p><code>RAPIDJSON_SSE42</code> takes precedence, if both are defined.</p>
 <p>If any of these symbols is defined, RapidJSON defines the macro <code>RAPIDJSON_SIMD</code> to indicate the availability of the optimized code. </p>
+
+</div>
+</div>
+<a class="anchor" id="ga6a2b1695c13e77ae425e3cbac980ccb5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RAPIDJSON_UNLIKELY</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x</td><td>)</td>
+          <td>&#160;&#160;&#160;x</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Compiler branching hint for expression with low probability to be true. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">x</td><td>Boolean expression unlikely to be true. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

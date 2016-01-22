@@ -12,6 +12,7 @@ var rapidjson_8h =
     [ "RAPIDJSON_DELETE", "rapidjson_8h.html#a52c941c3fdd646527cdcd42aa846a28a", null ],
     [ "RAPIDJSON_ENDIAN", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaba2445f582142cf918e74c2d22d1aa07", null ],
     [ "RAPIDJSON_HAS_STDSTRING", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga2f2eef0ee4477f3fe5874703a66e997f", null ],
+    [ "RAPIDJSON_LIKELY", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga5dc14176a9e71ace282404b0bcda57a1", null ],
     [ "RAPIDJSON_LITTLEENDIAN", "rapidjson_8h.html#addcc0c3607c5790f35cc4c15885ff97c", null ],
     [ "RAPIDJSON_MAJOR_VERSION", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaf1ff1685be6cbebb5d4b2ab997776f45", null ],
     [ "RAPIDJSON_MINOR_VERSION", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaf9125105c593a636a79f1c2d96835376", null ],
@@ -23,6 +24,7 @@ var rapidjson_8h =
     [ "RAPIDJSON_SIMD", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga0ccf72f3ebc4b3306ab669f95ca5c64b", null ],
     [ "RAPIDJSON_STATIC_ASSERT", "rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4", null ],
     [ "RAPIDJSON_UINT64_C2", "rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f", null ],
+    [ "RAPIDJSON_UNLIKELY", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga6a2b1695c13e77ae425e3cbac980ccb5", null ],
     [ "RAPIDJSON_VERSION_STRING", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gad283cfde97d9a32b7d8e8107b11f70a6", null ],
     [ "InsituStringStream", "rapidjson_8h.html#a5660e8e601d2719796bc86c3168a1787", null ],
     [ "SizeType", "rapidjson_8h.html#a44eb33eaa523e36d466b1ced64b85c84", null ],
@@ -36,5 +38,7 @@ var rapidjson_8h =
       [ "kStringType", "rapidjson_8h.html#ae79a4751c1c460ff0de5ecc07874f3e4ad6379da3dc04b83a591992bfb9fabba7", null ],
       [ "kNumberType", "rapidjson_8h.html#ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a", null ]
     ] ],
-    [ "PutN", "rapidjson_8h.html#a1d49d2cab617858b53a1db23b1759f43", null ]
+    [ "PutN", "rapidjson_8h.html#a1d49d2cab617858b53a1db23b1759f43", null ],
+    [ "PutReserve", "rapidjson_8h.html#a820f77efccfbb749bd15fe4822d2c740", null ],
+    [ "PutUnsafe", "rapidjson_8h.html#a0a774dcffe8ae07686f459ae017d2f20", null ]
 ];

@@ -351,6 +351,16 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a820f77efccfbb749bd15fe4822d2c740"><td class="memTemplParams" colspan="2"><a class="anchor" id="a820f77efccfbb749bd15fe4822d2c740"></a>
+template&lt;typename Stream &gt; </td></tr>
+<tr class="memitem:a820f77efccfbb749bd15fe4822d2c740"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a820f77efccfbb749bd15fe4822d2c740">PutReserve</a> (<a class="el" href="classrapidjson_1_1_stream.html">Stream</a> &amp;stream, size_t count)</td></tr>
+<tr class="memdesc:a820f77efccfbb749bd15fe4822d2c740"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserve n characters for writing to a stream. <br /></td></tr>
+<tr class="separator:a820f77efccfbb749bd15fe4822d2c740"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a774dcffe8ae07686f459ae017d2f20"><td class="memTemplParams" colspan="2"><a class="anchor" id="a0a774dcffe8ae07686f459ae017d2f20"></a>
+template&lt;typename Stream &gt; </td></tr>
+<tr class="memitem:a0a774dcffe8ae07686f459ae017d2f20"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a0a774dcffe8ae07686f459ae017d2f20">PutUnsafe</a> (<a class="el" href="classrapidjson_1_1_stream.html">Stream</a> &amp;stream, typename Stream::Ch c)</td></tr>
+<tr class="memdesc:a0a774dcffe8ae07686f459ae017d2f20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write character to a stream, presuming buffer is reserved. <br /></td></tr>
+<tr class="separator:a0a774dcffe8ae07686f459ae017d2f20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d49d2cab617858b53a1db23b1759f43"><td class="memTemplParams" colspan="2"><a class="anchor" id="a1d49d2cab617858b53a1db23b1759f43"></a>
 template&lt;typename Stream , typename Ch &gt; </td></tr>
 <tr class="memitem:a1d49d2cab617858b53a1db23b1759f43"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a1d49d2cab617858b53a1db23b1759f43">PutN</a> (<a class="el" href="classrapidjson_1_1_stream.html">Stream</a> &amp;stream, Ch c, size_t n)</td></tr>
@@ -395,6 +405,14 @@ template&lt;&gt; </td></tr>
 <tr class="memitem:a791735c27e073a70d720c2775ddf9568"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a791735c27e073a70d720c2775ddf9568">SkipWhitespace</a> (<a class="el" href="namespacerapidjson.html#ada4cef9931d4a3a0017ee776c907807b">StringStream</a> &amp;is)</td></tr>
 <tr class="memdesc:a791735c27e073a70d720c2775ddf9568"><td class="mdescLeft">&#160;</td><td class="mdescRight">Template function specialization for StringStream. <br /></td></tr>
 <tr class="separator:a791735c27e073a70d720c2775ddf9568"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab38d4a353d3577fdedd8171316af80b3"><td class="memTemplParams" colspan="2"><a class="anchor" id="ab38d4a353d3577fdedd8171316af80b3"></a>
+template&lt;typename Encoding , typename Allocator &gt; </td></tr>
+<tr class="memitem:ab38d4a353d3577fdedd8171316af80b3"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>PutReserve</b> (<a class="el" href="classrapidjson_1_1_generic_string_buffer.html">GenericStringBuffer</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt; &amp;stream, size_t count)</td></tr>
+<tr class="separator:ab38d4a353d3577fdedd8171316af80b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad338901177ac5feb414a9e620bfbd717"><td class="memTemplParams" colspan="2"><a class="anchor" id="ad338901177ac5feb414a9e620bfbd717"></a>
+template&lt;typename Encoding , typename Allocator &gt; </td></tr>
+<tr class="memitem:ad338901177ac5feb414a9e620bfbd717"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>PutUnsafe</b> (<a class="el" href="classrapidjson_1_1_generic_string_buffer.html">GenericStringBuffer</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt; &amp;stream, typename Encoding::Ch c)</td></tr>
+<tr class="separator:ad338901177ac5feb414a9e620bfbd717"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9d43be9c033dc49738b713fe6fbafecf"><td class="memTemplParams" colspan="2"><a class="anchor" id="a9d43be9c033dc49738b713fe6fbafecf"></a>
 template&lt;&gt; </td></tr>
 <tr class="memitem:a9d43be9c033dc49738b713fe6fbafecf"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a9d43be9c033dc49738b713fe6fbafecf">PutN</a> (<a class="el" href="classrapidjson_1_1_generic_string_buffer.html">GenericStringBuffer</a>&lt; <a class="el" href="structrapidjson_1_1_u_t_f8.html">UTF8</a>&lt;&gt; &gt; &amp;stream, char c, size_t n)</td></tr>

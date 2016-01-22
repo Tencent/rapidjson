@@ -291,7 +291,7 @@ Move Semantics</h2>
 <p>A very special decision during design of RapidJSON is that, assignment of value does not copy the source value to destination value. Instead, the value from source is moved to the destination. For example,</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> a(123);</div>
 <div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> b(456);</div>
-<div class="line">a = b;         <span class="comment">// a becomes number 456, b becomes a Null value.</span></div>
+<div class="line">b = a;         <span class="comment">// a becomes a Null value, b becomes number 123.</span></div>
 </div><!-- fragment --><div class="image">
 <img src="move1.png" alt="move1.png"/>
 <div class="caption">
@@ -312,7 +312,7 @@ Assignment with move semantics.</div></div>
 <img src="move2.png" alt="move2.png"/>
 <div class="caption">
 Copy semantics makes a lots of copy operations.</div></div>
-<p> The object <code>o</code> needs to allocate a buffer of same size as <code>contacts</code>, makes a deep clone of it, and then finally <code>contacts</code> is destructed. This will incur a lot of unnecessary allocations/deallocations and memory copying.</p>
+<p> The object <code>o</code> needs to allocate a buffer of same size as contacts, makes a deep clone of it, and then finally contacts is destructed. This will incur a lot of unnecessary allocations/deallocations and memory copying.</p>
 <p>There are solutions to prevent actual copying these data, such as reference counting and garbage collection(GC).</p>
 <p>To make RapidJSON simple and fast, we chose to use <em>move</em> semantics for assignment. It is similar to <code>std::auto_ptr</code> which transfer ownership during assignment. Move is much faster and simpler, it just destructs the original value, <code>memcpy()</code> the source to destination, and finally sets the source as Null type.</p>
 <p>So, with move semantics, the above example becomes:</p>

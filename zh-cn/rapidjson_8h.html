@@ -189,6 +189,12 @@ $(document).ready(function(){initNavTree('rapidjson_8h.html','');});
 <tr class="memitem:af95188da1d8eb6d4b148fe9ce71cd7c4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4">RAPIDJSON_STATIC_ASSERT</a>(x)</td></tr>
 <tr class="memdesc:af95188da1d8eb6d4b148fe9ce71cd7c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">(Internal) macro to check for conditions at compile-time  <a href="#af95188da1d8eb6d4b148fe9ce71cd7c4">更多...</a><br /></td></tr>
 <tr class="separator:af95188da1d8eb6d4b148fe9ce71cd7c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5dc14176a9e71ace282404b0bcda57a1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga5dc14176a9e71ace282404b0bcda57a1">RAPIDJSON_LIKELY</a>(x)&#160;&#160;&#160;x</td></tr>
+<tr class="memdesc:ga5dc14176a9e71ace282404b0bcda57a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compiler branching hint for expression with high probability to be true.  <a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga5dc14176a9e71ace282404b0bcda57a1">更多...</a><br /></td></tr>
+<tr class="separator:ga5dc14176a9e71ace282404b0bcda57a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6a2b1695c13e77ae425e3cbac980ccb5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga6a2b1695c13e77ae425e3cbac980ccb5">RAPIDJSON_UNLIKELY</a>(x)&#160;&#160;&#160;x</td></tr>
+<tr class="memdesc:ga6a2b1695c13e77ae425e3cbac980ccb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compiler branching hint for expression with low probability to be true.  <a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga6a2b1695c13e77ae425e3cbac980ccb5">更多...</a><br /></td></tr>
+<tr class="separator:ga6a2b1695c13e77ae425e3cbac980ccb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab9e102fa2f1a0ae4914d4dac21f690a2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab9e102fa2f1a0ae4914d4dac21f690a2"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rapidjson_8h.html#ab9e102fa2f1a0ae4914d4dac21f690a2">RAPIDJSON_NEW</a>(x)&#160;&#160;&#160;new x</td></tr>
 <tr class="memdesc:ab9e102fa2f1a0ae4914d4dac21f690a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">! customization point for global <code>new</code> <br /></td></tr>
@@ -233,6 +239,16 @@ GenericInsituStringStream<br class="typebreak" />
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 函数</h2></td></tr>
+<tr class="memitem:a820f77efccfbb749bd15fe4822d2c740"><td class="memTemplParams" colspan="2"><a class="anchor" id="a820f77efccfbb749bd15fe4822d2c740"></a>
+template&lt;typename Stream &gt; </td></tr>
+<tr class="memitem:a820f77efccfbb749bd15fe4822d2c740"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a820f77efccfbb749bd15fe4822d2c740">rapidjson::PutReserve</a> (Stream &amp;stream, size_t count)</td></tr>
+<tr class="memdesc:a820f77efccfbb749bd15fe4822d2c740"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserve n characters for writing to a stream. <br /></td></tr>
+<tr class="separator:a820f77efccfbb749bd15fe4822d2c740"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a774dcffe8ae07686f459ae017d2f20"><td class="memTemplParams" colspan="2"><a class="anchor" id="a0a774dcffe8ae07686f459ae017d2f20"></a>
+template&lt;typename Stream &gt; </td></tr>
+<tr class="memitem:a0a774dcffe8ae07686f459ae017d2f20"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a0a774dcffe8ae07686f459ae017d2f20">rapidjson::PutUnsafe</a> (Stream &amp;stream, typename Stream::Ch c)</td></tr>
+<tr class="memdesc:a0a774dcffe8ae07686f459ae017d2f20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write character to a stream, presuming buffer is reserved. <br /></td></tr>
+<tr class="separator:a0a774dcffe8ae07686f459ae017d2f20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d49d2cab617858b53a1db23b1759f43"><td class="memTemplParams" colspan="2"><a class="anchor" id="a1d49d2cab617858b53a1db23b1759f43"></a>
 template&lt;typename Stream , typename Ch &gt; </td></tr>
 <tr class="memitem:a1d49d2cab617858b53a1db23b1759f43"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a1d49d2cab617858b53a1db23b1759f43">rapidjson::PutN</a> (Stream &amp;stream, Ch c, size_t n)</td></tr>
