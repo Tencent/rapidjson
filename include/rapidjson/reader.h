@@ -855,6 +855,7 @@ private:
     // InsituStringStream -> InsituStringStream
     static RAPIDJSON_FORCEINLINE void ScanCopyUnescapedString(InsituStringStream& is, InsituStringStream& os) {
         RAPIDJSON_ASSERT(&is == &os);
+        (void)os;
 
         if (is.src_ == is.dst_) {
             SkipUnescapedString(is);
@@ -867,8 +868,11 @@ private:
         // Scan one by one until alignment (unaligned load may cross page boundary and cause crash)
         const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
         while (p != nextAligned)
-            if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*p) < 0x20))
-                goto exit; 
+            if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*p) < 0x20)) {
+                is.src_ = p;
+                is.dst_ = q;
+                return;                
+            }
             else
                 *q++ = *p++;
 
@@ -903,7 +907,6 @@ private:
             _mm_storeu_si128(reinterpret_cast<__m128i *>(q), s);
         }
 
-exit:
         is.src_ = p;
         is.dst_ = q;
     }
@@ -915,10 +918,11 @@ exit:
 
         // Scan one by one until alignment (unaligned load may cross page boundary and cause crash)
         const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
-        bool found = false;
         for (; p != nextAligned; p++)
-            if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*p) < 0x20))
-                goto exit;
+            if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*p) < 0x20)) {
+                is.src_ = is.dst_ = p;
+                return;
+            }
 
         // The rest of string using SIMD
         static const char dquote[16] = { '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"' };
@@ -949,7 +953,6 @@ exit:
             }
         }
 
-    exit:
         is.src_ = is.dst_ = p;
     }
 #endif
