@@ -103,6 +103,15 @@ TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_##Name)) {\
         Reader reader;\
         EXPECT_TRUE(reader.Parse(s, h));\
     }\
+}\
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseInsitu_DummyHandler_##Name)) {\
+    for (size_t i = 0; i < kTrialCount * 10; i++) {\
+        memcpy(temp_, types_[index], typesLength_[index] + 1);\
+        InsituStringStream s(temp_);\
+        BaseReaderHandler<> h;\
+        Reader reader;\
+        EXPECT_TRUE(reader.Parse<kParseInsituFlag>(s, h));\
+    }\
 }
 
 TEST_TYPED(0, Booleans)

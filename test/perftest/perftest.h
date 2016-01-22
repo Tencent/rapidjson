@@ -135,11 +135,11 @@ public:
                     sprintf(filename, "%s/%s", typespaths[i], typesfilenames[j]);
                     if (FILE* fp = fopen(filename, "rb")) {
                         fseek(fp, 0, SEEK_END);
-                        size_t length = (size_t)ftell(fp);
+                        typesLength_[j] = (size_t)ftell(fp);
                         fseek(fp, 0, SEEK_SET);
-                        types_[j] = (char*)malloc(length + 1);
-                        ASSERT_EQ(length, fread(types_[j], 1, length, fp));
-                        types_[j][length] = '\0';
+                        types_[j] = (char*)malloc(typesLength_[j] + 1);
+                        ASSERT_EQ(typesLength_[j], fread(types_[j], 1, typesLength_[j], fp));
+                        types_[j][typesLength_[j]] = '\0';
                         fclose(fp);
                         break;
                     }
@@ -170,6 +170,7 @@ protected:
     char *whitespace_;
     size_t whitespace_length_;
     char *types_[7];
+    size_t typesLength_[7];
 
     static const size_t kTrialCount = 1000;
 };

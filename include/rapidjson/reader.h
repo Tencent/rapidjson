@@ -705,6 +705,9 @@ private:
         internal::StreamLocalCopy<InputStream> copy(is);
         InputStream& s(copy.s);
 
+        RAPIDJSON_ASSERT(s.Peek() == '\"');
+        s.Take();  // Skip '\"'
+
         bool success = false;
         if (parseFlags & kParseInsituFlag) {
             typename InputStream::Ch *head = s.PutBegin();
@@ -742,9 +745,6 @@ private:
         };
 #undef Z16
 //!@endcond
-
-        RAPIDJSON_ASSERT(is.Peek() == '\"');
-        is.Take();  // Skip '\"'
 
         for (;;) {
             // Scan and copy string before "\\\"" or < 0x20. This is an optional optimzation.
@@ -801,13 +801,14 @@ private:
     }
 
 #if defined(RAPIDJSON_SSE2) || defined(RAPIDJSON_SSE42)
+    // StringStream -> StackStream<char>
     static RAPIDJSON_FORCEINLINE void ScanCopyUnescapedString(StringStream& is, StackStream<char>& os) {
         const char* p = is.src_;
 
         // Scan one by one until alignment (unaligned load may cross page boundary and cause crash)
         const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
         while (p != nextAligned)
-            if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(*p < 0x20)) {
+            if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*p) < 0x20)) {
                 is.src_ = p;
                 return;
             }
@@ -849,6 +850,107 @@ private:
         }
         
         is.src_ = p;
+    }
+
+    // InsituStringStream -> InsituStringStream
+    static RAPIDJSON_FORCEINLINE void ScanCopyUnescapedString(InsituStringStream& is, InsituStringStream& os) {
+        RAPIDJSON_ASSERT(&is == &os);
+
+        if (is.src_ == is.dst_) {
+            SkipUnescapedString(is);
+            return;
+        }
+
+        char* p = is.src_;
+        char *q = is.dst_;
+
+        // Scan one by one until alignment (unaligned load may cross page boundary and cause crash)
+        const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
+        while (p != nextAligned)
+            if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*p) < 0x20))
+                goto exit; 
+            else
+                *q++ = *p++;
+
+        // The rest of string using SIMD
+        static const char dquote[16] = { '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"' };
+        static const char bslash[16] = { '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\' };
+        static const char space[16] = { 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19 };
+        const __m128i dq = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&dquote[0]));
+        const __m128i bs = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&bslash[0]));
+        const __m128i sp = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&space[0]));
+
+        for (;; p += 16, q += 16) {
+            const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
+            const __m128i t1 = _mm_cmpeq_epi8(s, dq);
+            const __m128i t2 = _mm_cmpeq_epi8(s, bs);
+            const __m128i t3 = _mm_cmpeq_epi8(_mm_max_epu8(s, sp), sp); // s < 0x20 <=> max(s, 0x19) == 0x19
+            const __m128i x = _mm_or_si128(_mm_or_si128(t1, t2), t3);
+            unsigned short r = static_cast<unsigned short>(_mm_movemask_epi8(x));
+            if (RAPIDJSON_UNLIKELY(r != 0)) {   // some of characters is escaped
+                size_t length;
+#ifdef _MSC_VER         // Find the index of first escaped
+                unsigned long offset;
+                _BitScanForward(&offset, r);
+                length = offset;
+#else
+                length = static_cast<size_t>(__builtin_ffs(r) - 1);
+#endif
+                for (const char* pend = p + length; p != pend; )
+                    *q++ = *p++;
+                break;
+            }
+            _mm_storeu_si128(reinterpret_cast<__m128i *>(q), s);
+        }
+
+exit:
+        is.src_ = p;
+        is.dst_ = q;
+    }
+
+    // When read/write pointers are the same for insitu stream, just skip unescaped characters
+    static RAPIDJSON_FORCEINLINE void SkipUnescapedString(InsituStringStream& is) {
+        RAPIDJSON_ASSERT(is.src_ == is.dst_);
+        char* p = is.src_;
+
+        // Scan one by one until alignment (unaligned load may cross page boundary and cause crash)
+        const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
+        bool found = false;
+        for (; p != nextAligned; p++)
+            if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(static_cast<unsigned>(*p) < 0x20))
+                goto exit;
+
+        // The rest of string using SIMD
+        static const char dquote[16] = { '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"' };
+        static const char bslash[16] = { '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\' };
+        static const char space[16] = { 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19 };
+        const __m128i dq = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&dquote[0]));
+        const __m128i bs = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&bslash[0]));
+        const __m128i sp = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&space[0]));
+
+        for (;; p += 16) {
+            const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
+            const __m128i t1 = _mm_cmpeq_epi8(s, dq);
+            const __m128i t2 = _mm_cmpeq_epi8(s, bs);
+            const __m128i t3 = _mm_cmpeq_epi8(_mm_max_epu8(s, sp), sp); // s < 0x20 <=> max(s, 0x19) == 0x19
+            const __m128i x = _mm_or_si128(_mm_or_si128(t1, t2), t3);
+            unsigned short r = static_cast<unsigned short>(_mm_movemask_epi8(x));
+            if (RAPIDJSON_UNLIKELY(r != 0)) {   // some of characters is escaped
+                size_t length;
+#ifdef _MSC_VER         // Find the index of first escaped
+                unsigned long offset;
+                _BitScanForward(&offset, r);
+                length = offset;
+#else
+                length = static_cast<size_t>(__builtin_ffs(r) - 1);
+#endif
+                p += length;
+                break;
+            }
+        }
+
+    exit:
+        is.src_ = is.dst_ = p;
     }
 #endif
 
