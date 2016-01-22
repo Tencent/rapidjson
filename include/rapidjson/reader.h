@@ -679,7 +679,14 @@ private:
             *stack_.template Push<Ch>() = c;
             ++length_;
         }
+        
+        RAPIDJSON_FORCEINLINE void* Push(size_t count) {
+            length_ += count;
+            return stack_.template Push<Ch>(count);
+        }
+
         size_t Length() const { return length_; }
+
         Ch* Pop() {
             return stack_.template Pop<Ch>(length_);
         }
@@ -740,6 +747,10 @@ private:
         is.Take();  // Skip '\"'
 
         for (;;) {
+            // Scan and copy string before "\\\"" or < 0x20. This is an optional optimzation.
+            if (!(parseFlags & kParseValidateEncodingFlag))
+                ScanCopyUnescapedString(is, os);
+
             Ch c = is.Peek();
             if (RAPIDJSON_UNLIKELY(c == '\\')) {    // Escape
                 is.Take();
@@ -769,10 +780,12 @@ private:
                 os.Put('\0');   // null-terminate the string
                 return;
             }
-            else if (RAPIDJSON_UNLIKELY(c == '\0'))
-                RAPIDJSON_PARSE_ERROR(kParseErrorStringMissQuotationMark, is.Tell() - 1);
-            else if (RAPIDJSON_UNLIKELY(static_cast<unsigned>(c) < 0x20)) // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
-                RAPIDJSON_PARSE_ERROR(kParseErrorStringEscapeInvalid, is.Tell() - 1);
+            else if (RAPIDJSON_UNLIKELY(static_cast<unsigned>(c) < 0x20)) { // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
+                if (c == '\0')
+                    RAPIDJSON_PARSE_ERROR(kParseErrorStringMissQuotationMark, is.Tell() - 1);
+                else
+                    RAPIDJSON_PARSE_ERROR(kParseErrorStringEscapeInvalid, is.Tell() - 1);
+            }
             else {
                 if (RAPIDJSON_UNLIKELY((parseFlags & kParseValidateEncodingFlag ? 
                     !Transcoder<SEncoding, TEncoding>::Validate(is, os) : 
@@ -781,6 +794,59 @@ private:
             }
         }
     }
+
+    template<typename InputStream, typename OutputStream>
+    static RAPIDJSON_FORCEINLINE void ScanCopyUnescapedString(InputStream&, OutputStream&) {
+            // Do nothing for generic version
+    }
+
+#if 0 //defined(RAPIDJSON_SSE2) || defined(RAPIDJSON_SSE42)
+    static RAPIDJSON_FORCEINLINE void ScanCopyUnescapedString(StringStream& is, StackStream<char>& os) {
+        const char* p = is.src_;
+
+        // Scan one by one until alignment (unaligned load may cross page boundary and cause crash)
+        const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
+        while (p != nextAligned)
+            if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(*p < 0x20)) {
+                is.src_ = p;
+                return;
+            }
+            else
+                os.Put(*p++);
+
+        // The rest of string using SIMD
+        static const char dquote[16] = { '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"' };
+        static const char bslash[16] = { '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\' };
+        static const char space[16]  = { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
+        const __m128i dq = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&dquote[0]));
+        const __m128i bs = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&bslash[0]));
+        const __m128i sp = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&space[0]));
+
+        for (;; p += 16) {
+            const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
+            __m128i x = _mm_cmpeq_epi8(s, dq);
+            x = _mm_or_si128(x, _mm_cmpeq_epi8(s, bs));
+            x = _mm_or_si128(x, _mm_cmplt_epi8(s, sp));
+            unsigned short r = static_cast<unsigned short>(_mm_movemask_epi8(x));
+            if (RAPIDJSON_UNLIKELY(r != 0)) {   // some of characters is escaped
+                size_t length;
+    #ifdef _MSC_VER         // Find the index of first escaped
+                unsigned long offset;
+                _BitScanForward(&offset, r);
+                length = offset;
+    #else
+                length = static_cast<size_t>(__builtin_ffs(r) - 1);
+    #endif
+                memcpy(os.Push(length), p, length);
+                p += length;
+                break;
+            }
+            _mm_storeu_si128(reinterpret_cast<__m128i *>(os.Push(16)), s);
+        }
+        
+        is.src_ = p;
+    }
+#endif
 
     template<typename InputStream, bool backup>
     class NumberStream;
@@ -887,7 +953,7 @@ private:
                 while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
                      if (RAPIDJSON_UNLIKELY(i64 >= RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC))) // 2^63 = 9223372036854775808
                         if (RAPIDJSON_LIKELY(i64 != RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC) || s.Peek() > '8')) {
-                            d = i64;
+                            d = static_cast<double>(i64);
                             useDouble = true;
                             break;
                         }
@@ -898,7 +964,7 @@ private:
                 while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
                     if (RAPIDJSON_UNLIKELY(i64 >= RAPIDJSON_UINT64_C2(0x19999999, 0x99999999))) // 2^64 - 1 = 18446744073709551615
                         if (RAPIDJSON_LIKELY(i64 != RAPIDJSON_UINT64_C2(0x19999999, 0x99999999) || s.Peek() > '5')) {
-                            d = i64;
+                            d = static_cast<double>(i64);
                             useDouble = true;
                             break;
                         }
@@ -969,7 +1035,7 @@ private:
         int exp = 0;
         if (s.Peek() == 'e' || s.Peek() == 'E') {
             if (!useDouble) {
-                d = use64bit ? i64 : i;
+                d = static_cast<double>(use64bit ? i64 : i);
                 useDouble = true;
             }
             s.Take();

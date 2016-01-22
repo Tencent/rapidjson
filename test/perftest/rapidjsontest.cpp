@@ -95,6 +95,26 @@ TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler)) {
     }
 }
 
+#define TEST_TYPED(index, Name)\
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_##Name)) {\
+    for (size_t i = 0; i < kTrialCount * 10; i++) {\
+        StringStream s(types_[index]);\
+        BaseReaderHandler<> h;\
+        Reader reader;\
+        EXPECT_TRUE(reader.Parse(s, h));\
+    }\
+}
+
+TEST_TYPED(0, Booleans)
+TEST_TYPED(1, Floats)
+TEST_TYPED(2, Guids)
+TEST_TYPED(3, Integers)
+TEST_TYPED(4, Mixed)
+TEST_TYPED(5, Nulls)
+TEST_TYPED(6, Paragraphs)
+
+#undef TEST_TYPED
+
 TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_FullPrecision)) {
     for (size_t i = 0; i < kTrialCount; i++) {
         StringStream s(json_);
@@ -293,7 +313,7 @@ TEST_F(RapidJson, Writer_StringBuffer_##Name) {\
         const char* str = s.GetString();\
         (void)str;\
     }\
-}\
+}
 
 TEST_TYPED(0, Booleans)
 TEST_TYPED(1, Floats)
@@ -302,6 +322,8 @@ TEST_TYPED(3, Integers)
 TEST_TYPED(4, Mixed)
 TEST_TYPED(5, Nulls)
 TEST_TYPED(6, Paragraphs)
+
+#undef TEST_TYPED
 
 TEST_F(RapidJson, PrettyWriter_StringBuffer) {
     for (size_t i = 0; i < kTrialCount; i++) {
