@@ -314,16 +314,14 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
             return p;
 
     // The rest of string
-    static const char whitespaces[4][17] = {
-        "                ",
-        "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
-        "\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r\r",
-        "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"};
+    #define C16(c) { c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c }
+    static const char whitespaces[4][16] = { C16(' '), C16('\n'), C16('\r'), C16('\t') };
+    #undef C16
 
-        const __m128i w0 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[0][0]));
-        const __m128i w1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[1][0]));
-        const __m128i w2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[2][0]));
-        const __m128i w3 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[3][0]));
+    const __m128i w0 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[0][0]));
+    const __m128i w1 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[1][0]));
+    const __m128i w2 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[2][0]));
+    const __m128i w3 = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&whitespaces[3][0]));
 
     for (;; p += 16) {
         const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
