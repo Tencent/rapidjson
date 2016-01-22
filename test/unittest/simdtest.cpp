@@ -66,30 +66,3 @@ TEST(SIMD, SIMD_SUFFIX(SkipWhitespace)) {
     TestSkipWhitespace<StringStream>();
     TestSkipWhitespace<InsituStringStream>();
 }
-
-template <typename Encoding>
-struct ParseStringHandler : BaseReaderHandler<Encoding, ParseStringHandler<Encoding> > {
-    ParseStringHandler() : str_(0), length_(0), copy_() {}
-    ~ParseStringHandler() { EXPECT_TRUE(str_ != 0); if (copy_) free(const_cast<typename Encoding::Ch*>(str_)); }
-
-    ParseStringHandler(const ParseStringHandler&);
-    ParseStringHandler& operator=(const ParseStringHandler&);
-
-    bool Default() { ADD_FAILURE(); return false; }
-    bool String(const typename Encoding::Ch* str, size_t length, bool copy) {
-        EXPECT_EQ(0, str_);
-        if (copy) {
-            str_ = static_cast<typename Encoding::Ch*>(malloc((length + 1) * sizeof(typename Encoding::Ch)));
-            memcpy(const_cast<typename Encoding::Ch*>(str_), str, (length + 1) * sizeof(typename Encoding::Ch));
-        }
-        else
-            str_ = str;
-        length_ = length;
-        copy_ = copy;
-        return true;
-    }
-
-    const typename Encoding::Ch* str_;
-    size_t length_;
-    bool copy_;
-};
