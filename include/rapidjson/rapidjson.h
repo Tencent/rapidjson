@@ -178,9 +178,9 @@
 
 #ifndef RAPIDJSON_FORCEINLINE
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
-#if defined(_MSC_VER) && !defined(NDEBUG)
+#if defined(_MSC_VER) && defined(NDEBUG)
 #define RAPIDJSON_FORCEINLINE __forceinline
-#elif defined(__GNUC__) && __GNUC__ >= 4 && !defined(NDEBUG)
+#elif defined(__GNUC__) && __GNUC__ >= 4 && defined(NDEBUG)
 #define RAPIDJSON_FORCEINLINE __attribute__((always_inline))
 #else
 #define RAPIDJSON_FORCEINLINE

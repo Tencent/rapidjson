@@ -24,14 +24,6 @@
 #include "rapidjson/encodedstream.h"
 #include "rapidjson/memorystream.h"
 
-#ifdef RAPIDJSON_SSE2
-#define SIMD_SUFFIX(name) name##_SSE2
-#elif defined(RAPIDJSON_SSE42)
-#define SIMD_SUFFIX(name) name##_SSE42
-#else
-#define SIMD_SUFFIX(name) name
-#endif
-
 using namespace rapidjson;
 
 class RapidJson : public PerfTest {
