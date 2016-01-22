@@ -805,7 +805,6 @@ private:
         const char* p = is.src_;
 
         // Scan one by one until alignment (unaligned load may cross page boundary and cause crash)
-        const char* start = p;
         const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
         while (p != nextAligned)
             if (RAPIDJSON_UNLIKELY(*p == '\"') || RAPIDJSON_UNLIKELY(*p == '\\') || RAPIDJSON_UNLIKELY(*p < 0x20)) {
