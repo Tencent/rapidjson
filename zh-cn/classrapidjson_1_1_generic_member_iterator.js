@@ -22,6 +22,7 @@ var classrapidjson_1_1_generic_member_iterator =
     [ "operator->", "classrapidjson_1_1_generic_member_iterator.html#a5e7ae66f286fc67da4d53f13eb7f47e7", null ],
     [ "operator<", "classrapidjson_1_1_generic_member_iterator.html#a88534f0a8a2d3095845bf92e92244216", null ],
     [ "operator<=", "classrapidjson_1_1_generic_member_iterator.html#a0122d34447eb93d44a206b458c07f0ad", null ],
+    [ "operator=", "classrapidjson_1_1_generic_member_iterator.html#a192f924969f2b9d99ed1ec4ec2552884", null ],
     [ "operator==", "classrapidjson_1_1_generic_member_iterator.html#a6036bfa6337e6aa30b5e5c8ee6a6b47a", null ],
     [ "operator>", "classrapidjson_1_1_generic_member_iterator.html#a075195a552e8624f3dd95b9cac9d377f", null ],
     [ "operator>=", "classrapidjson_1_1_generic_member_iterator.html#adc513705f7e344cf2eca93e8ae609e4b", null ],
