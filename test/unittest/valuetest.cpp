@@ -39,6 +39,8 @@ TEST(Value, DefaultConstructor) {
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
+#if 0 // Many old compiler does not support these. Turn it off temporaily.
+
 #include <type_traits>
 
 TEST(Value, Traits) {
@@ -76,6 +78,8 @@ TEST(Value, Traits) {
     static_assert(std::is_nothrow_destructible<Value>::value, "");
 #endif
 }
+
+#endif
 
 TEST(Value, MoveConstructor) {
     typedef GenericValue<UTF8<>, CrtAllocator> Value;

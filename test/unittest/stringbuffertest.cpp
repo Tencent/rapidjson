@@ -74,6 +74,8 @@ TEST(StringBuffer, Pop) {
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
+#if 0 // Many old compiler does not support these. Turn it off temporaily.
+
 #include <type_traits>
 
 TEST(StringBuffer, Traits) {
@@ -110,6 +112,8 @@ TEST(StringBuffer, Traits) {
     static_assert(std::is_nothrow_destructible<StringBuffer>::value, "");
 #endif
 }
+
+#endif
 
 TEST(StringBuffer, MoveConstructor) {
     StringBuffer x;

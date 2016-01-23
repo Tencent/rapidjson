@@ -334,6 +334,8 @@ TEST(Document, UTF16_Document) {
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
+#if 0 // Many old compiler does not support these. Turn it off temporaily.
+
 #include <type_traits>
 
 TEST(Document, Traits) {
@@ -370,6 +372,8 @@ TEST(Document, Traits) {
     static_assert(std::is_nothrow_destructible<Document>::value, "");
 #endif
 }
+
+#endif
 
 template <typename Allocator>
 struct DocumentMove: public ::testing::Test {
