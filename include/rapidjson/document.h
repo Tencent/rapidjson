@@ -31,6 +31,7 @@ RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(padded)
 RAPIDJSON_DIAG_OFF(switch-enum)
+RAPIDJSON_DIAG_OFF(c++98-compat)
 #endif
 
 #ifdef __GNUC__
@@ -141,6 +142,7 @@ public:
             Otherwise, the copy constructor is implicitly defined.
     */
     GenericMemberIterator(const NonConstIterator & it) : ptr_(it.ptr_) {}
+    Iterator& operator=(const NonConstIterator & it) { ptr_ = it.ptr_; return *this; }
 
     //! @name stepping
     //@{
@@ -314,8 +316,6 @@ struct GenericStringRef {
     const SizeType length; //!< length of the string (excluding the trailing NULL terminator)
 
 private:
-    //! Disallow copy-assignment
-    GenericStringRef operator=(const GenericStringRef&);
     //! Disallow construction from non-const array
     template<SizeType N>
     GenericStringRef(CharType (&str)[N]) /* = delete */;

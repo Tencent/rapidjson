@@ -15,7 +15,18 @@
 #include "unittest.h"
 #include "rapidjson/rapidjson.h"
 
+#ifdef __clang__
+#pragma GCC diagnostic push
+#if __has_warning("-Wdeprecated")
+#pragma GCC diagnostic ignored "-Wdeprecated"
+#endif
+#endif
+
 AssertException::~AssertException() throw() {}
+
+#ifdef __clang__
+#pragma GCC diagnostic pop
+#endif
 
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);

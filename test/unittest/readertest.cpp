@@ -31,6 +31,7 @@ RAPIDJSON_DIAG_OFF(missing-noreturn)
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(variadic-macros)
+RAPIDJSON_DIAG_OFF(c++98-compat-pedantic)
 #endif
 
 template<bool expect>

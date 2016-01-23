@@ -21,6 +21,12 @@
 #include <sstream>
 #include <algorithm>
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(c++98-compat)
+RAPIDJSON_DIAG_OFF(missing-variable-declarations)
+#endif
+
 using namespace rapidjson;
 
 template <typename DocumentType>
@@ -573,3 +579,7 @@ TYPED_TEST(DocumentMove, MoveAssignmentStack) {
 //  Document d2;
 //  d1 = d2;
 //}
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif

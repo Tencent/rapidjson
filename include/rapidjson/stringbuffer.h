@@ -23,6 +23,11 @@
 
 #include "internal/stack.h"
 
+#if defined(__clang__)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(c++98-compat)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 //! Represents an in-memory output stream.
@@ -102,5 +107,9 @@ inline void PutN(GenericStringBuffer<UTF8<> >& stream, char c, size_t n) {
 }
 
 RAPIDJSON_NAMESPACE_END
+
+#if defined(__clang__)
+RAPIDJSON_DIAG_POP
+#endif
 
 #endif // RAPIDJSON_STRINGBUFFER_H_

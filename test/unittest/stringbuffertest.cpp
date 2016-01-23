@@ -16,6 +16,11 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(c++98-compat)
+#endif
+
 using namespace rapidjson;
 
 TEST(StringBuffer, InitialSize) {
@@ -148,3 +153,7 @@ TEST(StringBuffer, MoveAssignment) {
 }
 
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif

@@ -18,6 +18,11 @@
 #include "../rapidjson.h"
 #include "swap.h"
 
+#if defined(__clang__)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(c++98-compat)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
@@ -202,5 +207,9 @@ private:
 
 } // namespace internal
 RAPIDJSON_NAMESPACE_END
+
+#if defined(__clang__)
+RAPIDJSON_DIAG_POP
+#endif
 
 #endif // RAPIDJSON_STACK_H_
