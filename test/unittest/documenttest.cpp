@@ -21,6 +21,12 @@
 #include <sstream>
 #include <algorithm>
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(c++98-compat)
+RAPIDJSON_DIAG_OFF(missing-variable-declarations)
+#endif
+
 using namespace rapidjson;
 
 template <typename DocumentType>
@@ -328,6 +334,8 @@ TEST(Document, UTF16_Document) {
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
+#if 0 // Many old compiler does not support these. Turn it off temporaily.
+
 #include <type_traits>
 
 TEST(Document, Traits) {
@@ -364,6 +372,8 @@ TEST(Document, Traits) {
     static_assert(std::is_nothrow_destructible<Document>::value, "");
 #endif
 }
+
+#endif
 
 template <typename Allocator>
 struct DocumentMove: public ::testing::Test {
@@ -573,3 +583,7 @@ TYPED_TEST(DocumentMove, MoveAssignmentStack) {
 //  Document d2;
 //  d1 = d2;
 //}
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif

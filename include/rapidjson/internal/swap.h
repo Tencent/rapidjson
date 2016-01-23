@@ -17,6 +17,11 @@
 
 #include "../rapidjson.h"
 
+#if defined(__clang__)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(c++98-compat)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
@@ -33,5 +38,9 @@ inline void Swap(T& a, T& b) RAPIDJSON_NOEXCEPT {
 
 } // namespace internal
 RAPIDJSON_NAMESPACE_END
+
+#if defined(__clang__)
+RAPIDJSON_DIAG_POP
+#endif
 
 #endif // RAPIDJSON_INTERNAL_SWAP_H_

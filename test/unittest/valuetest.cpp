@@ -16,6 +16,11 @@
 #include "rapidjson/document.h"
 #include <algorithm>
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(c++98-compat)
+#endif
+
 using namespace rapidjson;
 
 TEST(Value, DefaultConstructor) {
@@ -33,6 +38,8 @@ TEST(Value, DefaultConstructor) {
 //}
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
+#if 0 // Many old compiler does not support these. Turn it off temporaily.
 
 #include <type_traits>
 
@@ -71,6 +78,8 @@ TEST(Value, Traits) {
     static_assert(std::is_nothrow_destructible<Value>::value, "");
 #endif
 }
+
+#endif
 
 TEST(Value, MoveConstructor) {
     typedef GenericValue<UTF8<>, CrtAllocator> Value;
@@ -764,15 +773,15 @@ TEST(Value, Array) {
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     // PushBack(GenericValue&&, Allocator&);
     {
-        Value y(kArrayType);
-        y.PushBack(Value(true), allocator);
-        y.PushBack(std::move(Value(kArrayType).PushBack(Value(1), allocator).PushBack("foo", allocator)), allocator);
-        EXPECT_EQ(2u, y.Size());
-        EXPECT_TRUE(y[0].IsTrue());
-        EXPECT_TRUE(y[1].IsArray());
-        EXPECT_EQ(2u, y[1].Size());
-        EXPECT_TRUE(y[1][0].IsInt());
-        EXPECT_TRUE(y[1][1].IsString());
+        Value y2(kArrayType);
+        y2.PushBack(Value(true), allocator);
+        y2.PushBack(std::move(Value(kArrayType).PushBack(Value(1), allocator).PushBack("foo", allocator)), allocator);
+        EXPECT_EQ(2u, y2.Size());
+        EXPECT_TRUE(y2[0].IsTrue());
+        EXPECT_TRUE(y2[1].IsArray());
+        EXPECT_EQ(2u, y2[1].Size());
+        EXPECT_TRUE(y2[1][0].IsInt());
+        EXPECT_TRUE(y2[1][1].IsString());
     }
 #endif
 
@@ -1354,3 +1363,27 @@ TEST(Value, AcceptTerminationByHandler) {
     TEST_TERMINATION(11, "{\"a\":[]}");
     TEST_TERMINATION(12, "{\"a\":[]}");
 }
+
+struct ValueIntComparer {
+    bool operator()(const Value& lhs, const Value& rhs) const {
+        return lhs.GetInt() < rhs.GetInt();
+    }
+};
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+TEST(Value, Sorting) {
+    Value::AllocatorType allocator;
+    Value a(kArrayType);
+    a.PushBack(5, allocator);
+    a.PushBack(1, allocator);
+    a.PushBack(3, allocator);
+    std::sort(a.Begin(), a.End(), ValueIntComparer());
+    EXPECT_EQ(1, a[0].GetInt());
+    EXPECT_EQ(3, a[1].GetInt());
+    EXPECT_EQ(5, a[2].GetInt());
+}
+#endif
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif

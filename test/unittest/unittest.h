@@ -99,11 +99,23 @@ inline FILE* TempFile(char *filename) {
 #pragma warning(disable : 4127)
 #endif
 
+#ifdef __clang__
+#pragma GCC diagnostic push
+#if __has_warning("-Wdeprecated")
+#pragma GCC diagnostic ignored "-Wdeprecated"
+#endif
+#endif
+
 class AssertException : public std::logic_error {
 public:
     AssertException(const char* w) : std::logic_error(w) {}
+    AssertException(const AssertException& rhs) : std::logic_error(rhs) {}
     virtual ~AssertException() throw();
 };
+
+#ifdef __clang__
+#pragma GCC diagnostic pop
+#endif
 
 #define RAPIDJSON_ASSERT(x) if (!(x)) throw AssertException(RAPIDJSON_STRINGIFY(x))
 
