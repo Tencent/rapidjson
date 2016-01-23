@@ -678,7 +678,7 @@ private:
             ++length_;
         }
         
-        RAPIDJSON_FORCEINLINE void* Push(size_t count) {
+        RAPIDJSON_FORCEINLINE void* Push(SizeType count) {
             length_ += count;
             return stack_.template Push<Ch>(count);
         }
@@ -829,13 +829,13 @@ private:
             const __m128i x = _mm_or_si128(_mm_or_si128(t1, t2), t3);
             unsigned short r = static_cast<unsigned short>(_mm_movemask_epi8(x));
             if (RAPIDJSON_UNLIKELY(r != 0)) {   // some of characters is escaped
-                size_t length;
+                SizeType length;
     #ifdef _MSC_VER         // Find the index of first escaped
                 unsigned long offset;
                 _BitScanForward(&offset, r);
                 length = offset;
     #else
-                length = static_cast<size_t>(__builtin_ffs(r) - 1);
+                length = static_cast<SizeType>(__builtin_ffs(r) - 1);
     #endif
                 char* q = reinterpret_cast<char*>(os.Push(length));
                 for (size_t i = 0; i < length; i++)
