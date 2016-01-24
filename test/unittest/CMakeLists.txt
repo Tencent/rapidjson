@@ -1,17 +1,18 @@
 set(UNITTEST_SOURCES
-	allocatorstest.cpp
+  allocatorstest.cpp
     bigintegertest.cpp
     documenttest.cpp
     encodedstreamtest.cpp
     encodingstest.cpp
     filestreamtest.cpp
+    iostreamtest.cpp
     itoatest.cpp
     jsoncheckertest.cpp
     namespacetest.cpp
     pointertest.cpp
     prettywritertest.cpp
     readertest.cpp
-	simdtest.cpp
+  simdtest.cpp
     stringbuffertest.cpp
     strtodtest.cpp
     unittest.cpp
