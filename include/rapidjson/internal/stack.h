@@ -147,7 +147,6 @@ public:
     }
 
     template<typename T>
-<<<<<<< HEAD
     const T* Top() const {
         RAPIDJSON_ASSERT(GetSize() >= sizeof(T));
         return reinterpret_cast<T*>(stackTop_ - sizeof(T));
@@ -160,14 +159,10 @@ public:
     const T* End() const { return reinterpret_cast<T*>(stackTop_); }
 
     template<typename T>
-    T* Bottom() { return (T*)stack_; }
+    T* Bottom() { return reinterpret_cast<T*>(stack_); }
 
     template<typename T>
-    const T* Bottom() const { return (T*)stack_; }
-
-    Allocator& GetAllocator() { return *allocator_; }
-=======
-    T* Bottom() { return reinterpret_cast<T*>(stack_); }
+    const T* Bottom() const { return reinterpret_cast<T*>(stack_); }
 
     bool HasAllocator() const {
         return allocator_ != 0;
@@ -177,7 +172,7 @@ public:
         RAPIDJSON_ASSERT(allocator_);
         return *allocator_;
     }
->>>>>>> master
+
     bool Empty() const { return stackTop_ == stack_; }
     size_t GetSize() const { return static_cast<size_t>(stackTop_ - stack_); }
     size_t GetCapacity() const { return static_cast<size_t>(stackEnd_ - stack_); }
