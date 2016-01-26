@@ -175,7 +175,7 @@ bool Parse(InputStream& is, Handler& handler);
 
 # Writer {#Writer}
 
-`Reader`把JSON转换（解析）成为事件。`Writer`完全做相反的事情。它把事件转换成JSON。
+`Reader`把JSON转换（解析）成为事件。`Writer`做完全相反的事情。它把事件转换成JSON。
 
 `Writer`是非常容易使用的。若你的应用程序只需把一些数据转换成JSON，可能直接使用`Writer`，会比建立一个`Document`然后用`Writer`把它转换成JSON更加方便。
 
@@ -265,7 +265,7 @@ public:
 
 ## PrettyWriter {#PrettyWriter}
 
-`Writer`所输出的是没有空格字符的最紧凑JSON，适合网络传输或储存，但就适合人类阅读。
+`Writer`所输出的是没有空格字符的最紧凑JSON，适合网络传输或储存，但不适合人类阅读。
 
 因此，RapidJSON提供了一个`PrettyWriter`，它在输出中加入缩进及换行。
 
@@ -386,13 +386,13 @@ Error: Terminate parsing due to Handler error.
  at offset 59 near '} }...'
 ~~~~~~~~~~
 
-第一个JSON（`json1`）被成功地解析至`MessageMap`。由于`MessageMap`是一个`std::map`，列印次序按键值排序。此次序与JSON中的次序不同。
+第一个JSON（`json1`）被成功地解析至`MessageMap`。由于`MessageMap`是一个`std::map`，打印次序按键值排序。此次序与JSON中的次序不同。
 
-在第二个JSON（`json2`）中，`foo`的值是一个空object。由于它是一个object，`MessageHandler::StartObject()`会被调用。然而，在`state_ = kExpectValue`的情况下，该函数会返回`false`，并令到解析过程终止。错误代码是`kParseErrorTermination`。
+在第二个JSON（`json2`）中，`foo`的值是一个空object。由于它是一个object，`MessageHandler::StartObject()`会被调用。然而，在`state_ = kExpectValue`的情况下，该函数会返回`false`，并导致解析过程终止。错误代码是`kParseErrorTermination`。
 
 ## 过滤JSON {#Filtering}
 
-如前面提及过，`Writer`可处理`Reader`发出的事件。`condense`例子简单地设置`Writer`作为一个`Reader`的处理器，因此它能移除JSON中的所有空白字符。`pretty`例子使用同样的关系，只是以`PrettyWriter`取代`Writer`。因此`pretty`能够重新格式化JSON，加入缩进及换行。
+如前面提及过，`Writer`可处理`Reader`发出的事件。`example/condense/condense.cpp`例子简单地设置`Writer`作为一个`Reader`的处理器，因此它能移除JSON中的所有空白字符。`example/pretty/pretty.cpp`例子使用同样的关系，只是以`PrettyWriter`取代`Writer`。因此`pretty`能够重新格式化JSON，加入缩进及换行。
 
 实际上，我们可以使用SAX风格API去加入（多个）中间层去过滤JSON的内容。例如`capitalize`例子可以把所有JSON string改为大写。
 
@@ -472,5 +472,5 @@ int main(int, char*[]) {
 ["HELLO\nWORLD"]
 ~~~~~~~~~~
 
-我们还可以开发更复杂的过滤器。然而，由于SAX风格API在某一时间点只能提供单一事件的信息，使用者需要自行记录一些上下文信息（例如从根节点起的路径、储存其他相关值）。对些一些处理情况，用DOM会比SAX更容易实现。
+我们还可以开发更复杂的过滤器。然而，由于SAX风格API在某一时间点只能提供单一事件的信息，使用者需要自行记录一些上下文信息（例如从根节点起的路径、储存其他相关值）。对于处理某些情况，用DOM会比SAX更容易实现。
 

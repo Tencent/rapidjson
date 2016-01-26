@@ -120,6 +120,31 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_HAS_STDSTRING
+
+#ifndef RAPIDJSON_HAS_STDSTRING
+#ifdef RAPIDJSON_DOXYGEN_RUNNING
+#define RAPIDJSON_HAS_STDSTRING 1 // force generation of documentation
+#else
+#define RAPIDJSON_HAS_STDSTRING 0 // no std::string support by default
+#endif
+/*! \def RAPIDJSON_HAS_STDSTRING
+    \ingroup RAPIDJSON_CONFIG
+    \brief Enable RapidJSON support for \c std::string
+
+    By defining this preprocessor symbol to \c 1, several convenience functions for using
+    \ref rapidjson::GenericValue with \c std::string are enabled, especially
+    for construction and comparison.
+
+    \hideinitializer
+*/
+#endif // !defined(RAPIDJSON_HAS_STDSTRING)
+
+#if RAPIDJSON_HAS_STDSTRING
+#include <string>
+#endif // RAPIDJSON_HAS_STDSTRING
+
+///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NO_INT64DEFINE
 
 /*! \def RAPIDJSON_NO_INT64DEFINE
@@ -153,9 +178,9 @@
 
 #ifndef RAPIDJSON_FORCEINLINE
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
-#if defined(_MSC_VER) && !defined(NDEBUG)
+#if defined(_MSC_VER) && defined(NDEBUG)
 #define RAPIDJSON_FORCEINLINE __forceinline
-#elif defined(__GNUC__) && __GNUC__ >= 4 && !defined(NDEBUG)
+#elif defined(__GNUC__) && __GNUC__ >= 4 && defined(NDEBUG)
 #define RAPIDJSON_FORCEINLINE __attribute__((always_inline))
 #else
 #define RAPIDJSON_FORCEINLINE
@@ -211,6 +236,8 @@
 #    define RAPIDJSON_ENDIAN RAPIDJSON_BIGENDIAN
 #  elif defined(__i386__) || defined(__alpha__) || defined(__ia64) || defined(__ia64__) || defined(_M_IX86) || defined(_M_IA64) || defined(_M_ALPHA) || defined(__amd64) || defined(__amd64__) || defined(_M_AMD64) || defined(__x86_64) || defined(__x86_64__) || defined(_M_X64) || defined(__bfin__)
 #    define RAPIDJSON_ENDIAN RAPIDJSON_LITTLEENDIAN
+#  elif defined(_MSC_VER) && defined(_M_ARM)
+#    define RAPIDJSON_ENDIAN RAPIDJSON_LITTLEENDIAN
 #  elif defined(RAPIDJSON_DOXYGEN_RUNNING)
 #    define RAPIDJSON_ENDIAN
 #  else
@@ -238,13 +265,13 @@
     \param x pointer to align
 
     Some machines require strict data alignment. Currently the default uses 4 bytes
-    alignment. User can customize by defining the RAPIDJSON_ALIGN function macro.,
+    alignment. User can customize by defining the RAPIDJSON_ALIGN function macro.
 */
 #ifndef RAPIDJSON_ALIGN
 #if RAPIDJSON_64BIT == 1
-#define RAPIDJSON_ALIGN(x) ((x + 7u) & ~7u)
+#define RAPIDJSON_ALIGN(x) (((x) + static_cast<uint64_t>(7u)) & ~static_cast<uint64_t>(7u))
 #else
-#define RAPIDJSON_ALIGN(x) ((x + 3u) & ~3u)
+#define RAPIDJSON_ALIGN(x) (((x) + 3u) & ~3u)
 #endif
 #endif
 
@@ -349,7 +376,9 @@ RAPIDJSON_NAMESPACE_END
 
 // Adopt from boost
 #ifndef RAPIDJSON_STATIC_ASSERT
+#ifndef __clang__
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
+#endif
 RAPIDJSON_NAMESPACE_BEGIN
 template <bool x> struct STATIC_ASSERTION_FAILURE;
 template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
@@ -365,7 +394,9 @@ RAPIDJSON_NAMESPACE_END
 #else
 #define RAPIDJSON_STATIC_ASSERT_UNUSED_ATTRIBUTE 
 #endif
+#ifndef __clang__
 //!@endcond
+#endif
 
 /*! \def RAPIDJSON_STATIC_ASSERT
     \brief (Internal) macro to check for conditions at compile-time
@@ -376,6 +407,35 @@ RAPIDJSON_NAMESPACE_END
     typedef ::RAPIDJSON_NAMESPACE::StaticAssertTest< \
       sizeof(::RAPIDJSON_NAMESPACE::STATIC_ASSERTION_FAILURE<bool(x) >)> \
     RAPIDJSON_JOIN(StaticAssertTypedef, __LINE__) RAPIDJSON_STATIC_ASSERT_UNUSED_ATTRIBUTE
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_LIKELY, RAPIDJSON_UNLIKELY
+
+//! Compiler branching hint for expression with high probability to be true.
+/*!
+    \ingroup RAPIDJSON_CONFIG
+    \param x Boolean expression likely to be true.
+*/
+#ifndef RAPIDJSON_LIKELY
+#if defined(__GNUC__) || defined(__clang__)
+#define RAPIDJSON_LIKELY(x) __builtin_expect(!!(x), 1)
+#else
+#define RAPIDJSON_LIKELY(x) x
+#endif
+#endif
+
+//! Compiler branching hint for expression with low probability to be true.
+/*!
+    \ingroup RAPIDJSON_CONFIG
+    \param x Boolean expression unlikely to be true.
+*/
+#ifndef RAPIDJSON_UNLIKELY
+#if defined(__GNUC__) || defined(__clang__)
+#define RAPIDJSON_UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else
+#define RAPIDJSON_UNLIKELY(x) x
+#endif
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -554,11 +614,25 @@ struct StreamTraits {
     enum { copyOptimization = 0 };
 };
 
+//! Reserve n characters for writing to a stream.
+template<typename Stream>
+inline void PutReserve(Stream& stream, size_t count) {
+    (void)stream;
+    (void)count;
+}
+
+//! Write character to a stream, presuming buffer is reserved.
+template<typename Stream>
+inline void PutUnsafe(Stream& stream, typename Stream::Ch c) {
+    stream.Put(c);
+}
+
 //! Put N copies of a character to a stream.
 template<typename Stream, typename Ch>
 inline void PutN(Stream& stream, Ch c, size_t n) {
+    PutReserve<Stream>(stream, n);
     for (size_t i = 0; i < n; i++)
-        stream.Put(c);
+        PutUnsafe(stream, c);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

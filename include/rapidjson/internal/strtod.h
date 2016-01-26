@@ -149,7 +149,7 @@ inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosit
     v = v.Normalize();
     error <<= -v.e;
 
-    const int dExp = (int)decimalPosition - (int)i + exp;
+    const int dExp = static_cast<int>(decimalPosition) - static_cast<int>(i) + exp;
 
     int actualExp;
     DiyFp cachedPower = GetCachedPower10(dExp, &actualExp);
@@ -206,7 +206,7 @@ inline bool StrtodDiyFp(const char* decimals, size_t length, size_t decimalPosit
 
 inline double StrtodBigInteger(double approx, const char* decimals, size_t length, size_t decimalPosition, int exp) {
     const BigInteger dInt(decimals, length);
-    const int dExp = (int)decimalPosition - (int)length + exp;
+    const int dExp = static_cast<int>(decimalPosition) - static_cast<int>(length) + exp;
     Double a(approx);
     int cmp = CheckWithinHalfULP(a.Value(), dInt, dExp);
     if (cmp < 0)
@@ -246,8 +246,8 @@ inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t 
 
     // Trim right-most digits
     const int kMaxDecimalDigit = 780;
-    if ((int)length > kMaxDecimalDigit) {
-        int delta = (int(length) - kMaxDecimalDigit);
+    if (static_cast<int>(length) > kMaxDecimalDigit) {
+        int delta = (static_cast<int>(length) - kMaxDecimalDigit);
         exp += delta;
         decimalPosition -= static_cast<unsigned>(delta);
         length = kMaxDecimalDigit;

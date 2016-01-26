@@ -53,7 +53,7 @@ public:
         else if (order <= -1074)
             return 0;
         else
-            return (unsigned)order + 1074;
+            return static_cast<unsigned>(order) + 1074;
     }
 
 private:

@@ -22,6 +22,7 @@ using namespace rapidjson;
 class FileStreamTest : public ::testing::Test {
 public:
     FileStreamTest() : filename_(), json_(), length_() {}
+    virtual ~FileStreamTest();
 
     virtual void SetUp() {
         const char *paths[] = {
@@ -42,9 +43,9 @@ public:
         ASSERT_TRUE(fp != 0);
 
         fseek(fp, 0, SEEK_END);
-        length_ = (size_t)ftell(fp);
+        length_ = static_cast<size_t>(ftell(fp));
         fseek(fp, 0, SEEK_SET);
-        json_ = (char*)malloc(length_ + 1);
+        json_ = static_cast<char*>(malloc(length_ + 1));
         size_t readLength = fread(json_, 1, length_, fp);
         json_[readLength] = '\0';
         fclose(fp);
@@ -64,6 +65,8 @@ protected:
     char *json_;
     size_t length_;
 };
+
+FileStreamTest::~FileStreamTest() {}
 
 TEST_F(FileStreamTest, FileReadStream) {
     FILE *fp = fopen(filename_, "rb");

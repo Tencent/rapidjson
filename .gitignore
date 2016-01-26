@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+=======
+/bin/*
+!/bin/data
+!/bin/encodings
+!/bin/jsonchecker
+!/bin/types
+>>>>>>> master
 /build
 /doc/html
 /doc/doxygen_*.db
@@ -16,3 +24,4 @@ Testing
 install_manifest.txt
 Doxyfile
 DartConfiguration.tcl
+*.nupkg

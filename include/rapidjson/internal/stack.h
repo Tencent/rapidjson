@@ -18,6 +18,11 @@
 #include "../rapidjson.h"
 #include "swap.h"
 
+#if defined(__clang__)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(c++98-compat)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
@@ -108,11 +113,21 @@ public:
     // Optimization note: try to minimize the size of this function for force inline.
     // Expansion is run very infrequently, so it is moved to another (probably non-inline) function.
     template<typename T>
-    RAPIDJSON_FORCEINLINE T* Push(size_t count = 1) {
+    RAPIDJSON_FORCEINLINE void Reserve(size_t count = 1) {
          // Expand the stack if needed
-        if (stackTop_ + sizeof(T) * count >= stackEnd_)
+        if (RAPIDJSON_UNLIKELY(stackTop_ + sizeof(T) * count > stackEnd_))
             Expand<T>(count);
+    }
 
+    template<typename T>
+    RAPIDJSON_FORCEINLINE T* Push(size_t count = 1) {
+        Reserve<T>(count);
+        return PushUnsafe<T>(count);
+    }
+
+    template<typename T>
+    RAPIDJSON_FORCEINLINE T* PushUnsafe(size_t count = 1) {
+        RAPIDJSON_ASSERT(stackTop_ + sizeof(T) * count <= stackEnd_);
         T* ret = reinterpret_cast<T*>(stackTop_);
         stackTop_ += sizeof(T) * count;
         return ret;
@@ -132,6 +147,7 @@ public:
     }
 
     template<typename T>
+<<<<<<< HEAD
     const T* Top() const {
         RAPIDJSON_ASSERT(GetSize() >= sizeof(T));
         return reinterpret_cast<T*>(stackTop_ - sizeof(T));
@@ -150,6 +166,18 @@ public:
     const T* Bottom() const { return (T*)stack_; }
 
     Allocator& GetAllocator() { return *allocator_; }
+=======
+    T* Bottom() { return reinterpret_cast<T*>(stack_); }
+
+    bool HasAllocator() const {
+        return allocator_ != 0;
+    }
+
+    Allocator& GetAllocator() {
+        RAPIDJSON_ASSERT(allocator_);
+        return *allocator_;
+    }
+>>>>>>> master
     bool Empty() const { return stackTop_ == stack_; }
     size_t GetSize() const { return static_cast<size_t>(stackTop_ - stack_); }
     size_t GetCapacity() const { return static_cast<size_t>(stackEnd_ - stack_); }
@@ -176,7 +204,7 @@ private:
 
     void Resize(size_t newCapacity) {
         const size_t size = GetSize();  // Backup the current size
-        stack_ = (char*)allocator_->Realloc(stack_, GetCapacity(), newCapacity);
+        stack_ = static_cast<char*>(allocator_->Realloc(stack_, GetCapacity(), newCapacity));
         stackTop_ = stack_ + size;
         stackEnd_ = stack_ + newCapacity;
     }
@@ -200,5 +228,9 @@ private:
 
 } // namespace internal
 RAPIDJSON_NAMESPACE_END
+
+#if defined(__clang__)
+RAPIDJSON_DIAG_POP
+#endif
 
 #endif // RAPIDJSON_STACK_H_

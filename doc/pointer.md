@@ -148,7 +148,7 @@ When using `p.Get(root)` or `GetValueByPointer(root, p)`, `root` is a (const) `V
 
 The other functions have two groups of signature. One group uses `Document& document` as parameter, another one uses `Value& root`. The first group uses `document.GetAllocator()` for creating values. And the second group needs user to supply an allocator, like the functions in DOM.
 
-All examples above do not require an allocator parameter, because the parameter is a `Document&`. But if you want to resolve a pointer to a subtree. You need to supply it as in the following example:
+All examples above do not require an allocator parameter, because the first parameter is a `Document&`. But if you want to resolve a pointer to a subtree, you need to supply the allocator as in the following example:
 
 ~~~cpp
 class Person {
@@ -179,7 +179,7 @@ private:
 
 # Error Handling {#ErrorHandling}
 
-A `Pointer` parses a source string in its constructor. If there is parsing error, `Pointer::IsValid()` returns false. And you can use `Pointer::GetParseErrorCode()` and `GetParseErrorOffset()` to retrieve the error information.
+A `Pointer` parses a source string in its constructor. If there is parsing error, `Pointer::IsValid()` returns `false`. And you can use `Pointer::GetParseErrorCode()` and `GetParseErrorOffset()` to retrieve the error information.
 
 Note that, all resolving functions assumes valid pointer. Resolving with an invalid pointer causes assertion failure.
 
@@ -215,7 +215,7 @@ It can also stringify to URI fragment reprsentation by `StringifyUriFragment()`.
 
 # User-Supplied Tokens {#UserSuppliedTokens}
 
-If a pointer will be resolved multiple times, it should be construct once, and then apply it to different DOMs or in different times. This reduce time and memory allocation for constructing `Pointer` multiple times.
+If a pointer will be resolved multiple times, it should be constructed once, and then apply it to different DOMs or in different times. This reduce time and memory allocation for constructing `Pointer` multiple times.
 
 We can go one step further, to completely eliminate the parsing process and dynamic memory allocation, we can establish the token array directly:
 

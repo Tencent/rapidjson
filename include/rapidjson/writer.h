@@ -23,13 +23,14 @@
 #include "stringbuffer.h"
 #include <new>      // placement new
 
-#if RAPIDJSON_HAS_STDSTRING
-#include <string>
-#endif
-
 #ifdef _MSC_VER
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
+#endif
+
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(padded)
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -145,7 +146,7 @@ public:
         RAPIDJSON_ASSERT(!level_stack_.template Top<Level>()->inArray);
         level_stack_.template Pop<Level>(1);
         bool ret = WriteEndObject();
-        if (level_stack_.Empty())   // end of json text
+        if (RAPIDJSON_UNLIKELY(level_stack_.Empty()))   // end of json text
             os_->Flush();
         return ret;
     }
@@ -162,7 +163,7 @@ public:
         RAPIDJSON_ASSERT(level_stack_.template Top<Level>()->inArray);
         level_stack_.template Pop<Level>(1);
         bool ret = WriteEndArray();
-        if (level_stack_.Empty())   // end of json text
+        if (RAPIDJSON_UNLIKELY(level_stack_.Empty()))   // end of json text
             os_->Flush();
         return ret;
     }
@@ -188,15 +189,18 @@ protected:
     static const size_t kDefaultLevelDepth = 32;
 
     bool WriteNull()  {
-        os_->Put('n'); os_->Put('u'); os_->Put('l'); os_->Put('l'); return true;
+        PutReserve(*os_, 4);
+        PutUnsafe(*os_, 'n'); PutUnsafe(*os_, 'u'); PutUnsafe(*os_, 'l'); PutUnsafe(*os_, 'l'); return true;
     }
 
     bool WriteBool(bool b)  {
         if (b) {
-            os_->Put('t'); os_->Put('r'); os_->Put('u'); os_->Put('e');
+            PutReserve(*os_, 4);
+            PutUnsafe(*os_, 't'); PutUnsafe(*os_, 'r'); PutUnsafe(*os_, 'u'); PutUnsafe(*os_, 'e');
         }
         else {
-            os_->Put('f'); os_->Put('a'); os_->Put('l'); os_->Put('s'); os_->Put('e');
+            PutReserve(*os_, 5);
+            PutUnsafe(*os_, 'f'); PutUnsafe(*os_, 'a'); PutUnsafe(*os_, 'l'); PutUnsafe(*os_, 's'); PutUnsafe(*os_, 'e');
         }
         return true;
     }
@@ -204,45 +208,50 @@ protected:
     bool WriteInt(int i) {
         char buffer[11];
         const char* end = internal::i32toa(i, buffer);
+        PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (const char* p = buffer; p != end; ++p)
-            os_->Put(*p);
+            PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
         return true;
     }
 
     bool WriteUint(unsigned u) {
         char buffer[10];
         const char* end = internal::u32toa(u, buffer);
+        PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (const char* p = buffer; p != end; ++p)
-            os_->Put(*p);
+            PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
         return true;
     }
 
     bool WriteInt64(int64_t i64) {
         char buffer[21];
         const char* end = internal::i64toa(i64, buffer);
+        PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (const char* p = buffer; p != end; ++p)
-            os_->Put(*p);
+            PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
         return true;
     }
 
     bool WriteUint64(uint64_t u64) {
         char buffer[20];
         char* end = internal::u64toa(u64, buffer);
+        PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (char* p = buffer; p != end; ++p)
-            os_->Put(*p);
+            PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
         return true;
     }
 
     bool WriteDouble(double d) {
         char buffer[25];
         char* end = internal::dtoa(d, buffer);
+        PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (char* p = buffer; p != end; ++p)
-            os_->Put(*p);
+            PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
         return true;
     }
 
     bool WriteString(const Ch* str, SizeType length)  {
-        static const char hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+        static const typename TargetEncoding::Ch hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
         static const char escape[256] = {
 #define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
             //0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
@@ -255,22 +264,27 @@ protected:
 #undef Z16
         };
 
-        os_->Put('\"');
+        if (TargetEncoding::supportUnicode)
+            PutReserve(*os_, 2 + length * 6); // "\uxxxx..."
+        else
+            PutReserve(*os_, 2 + length * 12);  // "\uxxxx\uyyyy..."
+
+        PutUnsafe(*os_, '\"');
         GenericStringStream<SourceEncoding> is(str);
-        while (is.Tell() < length) {
+        while (RAPIDJSON_LIKELY(is.Tell() < length)) {
             const Ch c = is.Peek();
-            if (!TargetEncoding::supportUnicode && (unsigned)c >= 0x80) {
+            if (!TargetEncoding::supportUnicode && static_cast<unsigned>(c) >= 0x80) {
                 // Unicode escaping
                 unsigned codepoint;
-                if (!SourceEncoding::Decode(is, &codepoint))
+                if (RAPIDJSON_UNLIKELY(!SourceEncoding::Decode(is, &codepoint)))
                     return false;
-                os_->Put('\\');
-                os_->Put('u');
+                PutUnsafe(*os_, '\\');
+                PutUnsafe(*os_, 'u');
                 if (codepoint <= 0xD7FF || (codepoint >= 0xE000 && codepoint <= 0xFFFF)) {
-                    os_->Put(hexDigits[(codepoint >> 12) & 15]);
-                    os_->Put(hexDigits[(codepoint >>  8) & 15]);
-                    os_->Put(hexDigits[(codepoint >>  4) & 15]);
-                    os_->Put(hexDigits[(codepoint      ) & 15]);
+                    PutUnsafe(*os_, hexDigits[(codepoint >> 12) & 15]);
+                    PutUnsafe(*os_, hexDigits[(codepoint >>  8) & 15]);
+                    PutUnsafe(*os_, hexDigits[(codepoint >>  4) & 15]);
+                    PutUnsafe(*os_, hexDigits[(codepoint      ) & 15]);
                 }
                 else {
                     RAPIDJSON_ASSERT(codepoint >= 0x010000 && codepoint <= 0x10FFFF);
@@ -278,34 +292,34 @@ protected:
                     unsigned s = codepoint - 0x010000;
                     unsigned lead = (s >> 10) + 0xD800;
                     unsigned trail = (s & 0x3FF) + 0xDC00;
-                    os_->Put(hexDigits[(lead >> 12) & 15]);
-                    os_->Put(hexDigits[(lead >>  8) & 15]);
-                    os_->Put(hexDigits[(lead >>  4) & 15]);
-                    os_->Put(hexDigits[(lead      ) & 15]);
-                    os_->Put('\\');
-                    os_->Put('u');
-                    os_->Put(hexDigits[(trail >> 12) & 15]);
-                    os_->Put(hexDigits[(trail >>  8) & 15]);
-                    os_->Put(hexDigits[(trail >>  4) & 15]);
-                    os_->Put(hexDigits[(trail      ) & 15]);                    
+                    PutUnsafe(*os_, hexDigits[(lead >> 12) & 15]);
+                    PutUnsafe(*os_, hexDigits[(lead >>  8) & 15]);
+                    PutUnsafe(*os_, hexDigits[(lead >>  4) & 15]);
+                    PutUnsafe(*os_, hexDigits[(lead      ) & 15]);
+                    PutUnsafe(*os_, '\\');
+                    PutUnsafe(*os_, 'u');
+                    PutUnsafe(*os_, hexDigits[(trail >> 12) & 15]);
+                    PutUnsafe(*os_, hexDigits[(trail >>  8) & 15]);
+                    PutUnsafe(*os_, hexDigits[(trail >>  4) & 15]);
+                    PutUnsafe(*os_, hexDigits[(trail      ) & 15]);                    
                 }
             }
-            else if ((sizeof(Ch) == 1 || (unsigned)c < 256) && escape[(unsigned char)c])  {
+            else if ((sizeof(Ch) == 1 || static_cast<unsigned>(c) < 256) && RAPIDJSON_UNLIKELY(escape[static_cast<unsigned char>(c)]))  {
                 is.Take();
-                os_->Put('\\');
-                os_->Put(escape[(unsigned char)c]);
-                if (escape[(unsigned char)c] == 'u') {
-                    os_->Put('0');
-                    os_->Put('0');
-                    os_->Put(hexDigits[(unsigned char)c >> 4]);
-                    os_->Put(hexDigits[(unsigned char)c & 0xF]);
+                PutUnsafe(*os_, '\\');
+                PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(escape[static_cast<unsigned char>(c)]));
+                if (escape[static_cast<unsigned char>(c)] == 'u') {
+                    PutUnsafe(*os_, '0');
+                    PutUnsafe(*os_, '0');
+                    PutUnsafe(*os_, hexDigits[static_cast<unsigned char>(c) >> 4]);
+                    PutUnsafe(*os_, hexDigits[static_cast<unsigned char>(c) & 0xF]);
                 }
             }
             else
-                if (!Transcoder<SourceEncoding, TargetEncoding>::Transcode(is, *os_))
+                if (RAPIDJSON_UNLIKELY(!(Transcoder<SourceEncoding, TargetEncoding>::TranscodeUnsafe(is, *os_))))
                     return false;
         }
-        os_->Put('\"');
+        PutUnsafe(*os_, '\"');
         return true;
     }
 
@@ -316,7 +330,7 @@ protected:
 
     void Prefix(Type type) {
         (void)type;
-        if (level_stack_.GetSize() != 0) { // this value is not at root
+        if (RAPIDJSON_LIKELY(level_stack_.GetSize() != 0)) { // this value is not at root
             Level* level = level_stack_.template Top<Level>();
             if (level->valueCount > 0) {
                 if (level->inArray) 
@@ -389,6 +403,10 @@ inline bool Writer<StringBuffer>::WriteDouble(double d) {
 RAPIDJSON_NAMESPACE_END
 
 #ifdef _MSC_VER
+RAPIDJSON_DIAG_POP
+#endif
+
+#ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
 

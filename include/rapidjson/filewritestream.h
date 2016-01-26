@@ -18,6 +18,11 @@
 #include "rapidjson.h"
 #include <cstdio>
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(unreachable-code)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 //! Wrapper of C file stream for input using fread().
@@ -57,7 +62,11 @@ public:
 
     void Flush() {
         if (current_ != buffer_) {
-            fwrite(buffer_, 1, static_cast<size_t>(current_ - buffer_), fp_);
+            size_t result = fwrite(buffer_, 1, static_cast<size_t>(current_ - buffer_), fp_);
+            if (result < static_cast<size_t>(current_ - buffer_)) {
+                // failure deliberately ignored at this time
+                // added to avoid warn_unused_result build errors
+            }
             current_ = buffer_;
         }
     }
@@ -87,5 +96,9 @@ inline void PutN(FileWriteStream& stream, char c, size_t n) {
 }
 
 RAPIDJSON_NAMESPACE_END
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif
 
 #endif // RAPIDJSON_FILESTREAM_H_
