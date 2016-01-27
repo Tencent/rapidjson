@@ -23,6 +23,7 @@
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(weak-vtables)
 RAPIDJSON_DIAG_OFF(exit-time-destructors)
+RAPIDJSON_DIAG_OFF(c++98-compat-pedantic)
 #endif
 
 #if !defined(RAPIDJSON_SCHEMA_USE_INTERNALREGEX)
