@@ -19,6 +19,12 @@
 #include "pointer.h"
 #include <cmath> // HUGE_VAL, abs, floor
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(weak-vtables)
+RAPIDJSON_DIAG_OFF(exit-time-destructors)
+#endif
+
 #if !defined(RAPIDJSON_SCHEMA_USE_INTERNALREGEX)
 #define RAPIDJSON_SCHEMA_USE_INTERNALREGEX 1
 #else
@@ -54,6 +60,11 @@
 #if defined(__GNUC__)
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
+#endif
+
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(variadic-macros)
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -865,39 +876,39 @@ public:
         return v;\
     }
 
-    RAPIDJSON_STRING_(Null, 'n', 'u', 'l', 'l');
-    RAPIDJSON_STRING_(Boolean, 'b', 'o', 'o', 'l', 'e', 'a', 'n');
-    RAPIDJSON_STRING_(Object, 'o', 'b', 'j', 'e', 'c', 't');
-    RAPIDJSON_STRING_(Array, 'a', 'r', 'r', 'a', 'y');
-    RAPIDJSON_STRING_(String, 's', 't', 'r', 'i', 'n', 'g');
-    RAPIDJSON_STRING_(Number, 'n', 'u', 'm', 'b', 'e', 'r');
-    RAPIDJSON_STRING_(Integer, 'i', 'n', 't', 'e', 'g', 'e', 'r');
-    RAPIDJSON_STRING_(Type, 't', 'y', 'p', 'e');
-    RAPIDJSON_STRING_(Enum, 'e', 'n', 'u', 'm');
-    RAPIDJSON_STRING_(AllOf, 'a', 'l', 'l', 'O', 'f');
-    RAPIDJSON_STRING_(AnyOf, 'a', 'n', 'y', 'O', 'f');
-    RAPIDJSON_STRING_(OneOf, 'o', 'n', 'e', 'O', 'f');
-    RAPIDJSON_STRING_(Not, 'n', 'o', 't');
-    RAPIDJSON_STRING_(Properties, 'p', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's');
-    RAPIDJSON_STRING_(Required, 'r', 'e', 'q', 'u', 'i', 'r', 'e', 'd');
-    RAPIDJSON_STRING_(Dependencies, 'd', 'e', 'p', 'e', 'n', 'd', 'e', 'n', 'c', 'i', 'e', 's');
-    RAPIDJSON_STRING_(PatternProperties, 'p', 'a', 't', 't', 'e', 'r', 'n', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's');
-    RAPIDJSON_STRING_(AdditionalProperties, 'a', 'd', 'd', 'i', 't', 'i', 'o', 'n', 'a', 'l', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's');
-    RAPIDJSON_STRING_(MinProperties, 'm', 'i', 'n', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's');
-    RAPIDJSON_STRING_(MaxProperties, 'm', 'a', 'x', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's');
-    RAPIDJSON_STRING_(Items, 'i', 't', 'e', 'm', 's');
-    RAPIDJSON_STRING_(MinItems, 'm', 'i', 'n', 'I', 't', 'e', 'm', 's');
-    RAPIDJSON_STRING_(MaxItems, 'm', 'a', 'x', 'I', 't', 'e', 'm', 's');
-    RAPIDJSON_STRING_(AdditionalItems, 'a', 'd', 'd', 'i', 't', 'i', 'o', 'n', 'a', 'l', 'I', 't', 'e', 'm', 's');
-    RAPIDJSON_STRING_(UniqueItems, 'u', 'n', 'i', 'q', 'u', 'e', 'I', 't', 'e', 'm', 's');
-    RAPIDJSON_STRING_(MinLength, 'm', 'i', 'n', 'L', 'e', 'n', 'g', 't', 'h');
-    RAPIDJSON_STRING_(MaxLength, 'm', 'a', 'x', 'L', 'e', 'n', 'g', 't', 'h');
-    RAPIDJSON_STRING_(Pattern, 'p', 'a', 't', 't', 'e', 'r', 'n');
-    RAPIDJSON_STRING_(Minimum, 'm', 'i', 'n', 'i', 'm', 'u', 'm');
-    RAPIDJSON_STRING_(Maximum, 'm', 'a', 'x', 'i', 'm', 'u', 'm');
-    RAPIDJSON_STRING_(ExclusiveMinimum, 'e', 'x', 'c', 'l', 'u', 's', 'i', 'v', 'e', 'M', 'i', 'n', 'i', 'm', 'u', 'm');
-    RAPIDJSON_STRING_(ExclusiveMaximum, 'e', 'x', 'c', 'l', 'u', 's', 'i', 'v', 'e', 'M', 'a', 'x', 'i', 'm', 'u', 'm');
-    RAPIDJSON_STRING_(MultipleOf, 'm', 'u', 'l', 't', 'i', 'p', 'l', 'e', 'O', 'f');
+    RAPIDJSON_STRING_(Null, 'n', 'u', 'l', 'l')
+    RAPIDJSON_STRING_(Boolean, 'b', 'o', 'o', 'l', 'e', 'a', 'n')
+    RAPIDJSON_STRING_(Object, 'o', 'b', 'j', 'e', 'c', 't')
+    RAPIDJSON_STRING_(Array, 'a', 'r', 'r', 'a', 'y')
+    RAPIDJSON_STRING_(String, 's', 't', 'r', 'i', 'n', 'g')
+    RAPIDJSON_STRING_(Number, 'n', 'u', 'm', 'b', 'e', 'r')
+    RAPIDJSON_STRING_(Integer, 'i', 'n', 't', 'e', 'g', 'e', 'r')
+    RAPIDJSON_STRING_(Type, 't', 'y', 'p', 'e')
+    RAPIDJSON_STRING_(Enum, 'e', 'n', 'u', 'm')
+    RAPIDJSON_STRING_(AllOf, 'a', 'l', 'l', 'O', 'f')
+    RAPIDJSON_STRING_(AnyOf, 'a', 'n', 'y', 'O', 'f')
+    RAPIDJSON_STRING_(OneOf, 'o', 'n', 'e', 'O', 'f')
+    RAPIDJSON_STRING_(Not, 'n', 'o', 't')
+    RAPIDJSON_STRING_(Properties, 'p', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's')
+    RAPIDJSON_STRING_(Required, 'r', 'e', 'q', 'u', 'i', 'r', 'e', 'd')
+    RAPIDJSON_STRING_(Dependencies, 'd', 'e', 'p', 'e', 'n', 'd', 'e', 'n', 'c', 'i', 'e', 's')
+    RAPIDJSON_STRING_(PatternProperties, 'p', 'a', 't', 't', 'e', 'r', 'n', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's')
+    RAPIDJSON_STRING_(AdditionalProperties, 'a', 'd', 'd', 'i', 't', 'i', 'o', 'n', 'a', 'l', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's')
+    RAPIDJSON_STRING_(MinProperties, 'm', 'i', 'n', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's')
+    RAPIDJSON_STRING_(MaxProperties, 'm', 'a', 'x', 'P', 'r', 'o', 'p', 'e', 'r', 't', 'i', 'e', 's')
+    RAPIDJSON_STRING_(Items, 'i', 't', 'e', 'm', 's')
+    RAPIDJSON_STRING_(MinItems, 'm', 'i', 'n', 'I', 't', 'e', 'm', 's')
+    RAPIDJSON_STRING_(MaxItems, 'm', 'a', 'x', 'I', 't', 'e', 'm', 's')
+    RAPIDJSON_STRING_(AdditionalItems, 'a', 'd', 'd', 'i', 't', 'i', 'o', 'n', 'a', 'l', 'I', 't', 'e', 'm', 's')
+    RAPIDJSON_STRING_(UniqueItems, 'u', 'n', 'i', 'q', 'u', 'e', 'I', 't', 'e', 'm', 's')
+    RAPIDJSON_STRING_(MinLength, 'm', 'i', 'n', 'L', 'e', 'n', 'g', 't', 'h')
+    RAPIDJSON_STRING_(MaxLength, 'm', 'a', 'x', 'L', 'e', 'n', 'g', 't', 'h')
+    RAPIDJSON_STRING_(Pattern, 'p', 'a', 't', 't', 'e', 'r', 'n')
+    RAPIDJSON_STRING_(Minimum, 'm', 'i', 'n', 'i', 'm', 'u', 'm')
+    RAPIDJSON_STRING_(Maximum, 'm', 'a', 'x', 'i', 'm', 'u', 'm')
+    RAPIDJSON_STRING_(ExclusiveMinimum, 'e', 'x', 'c', 'l', 'u', 's', 'i', 'v', 'e', 'M', 'i', 'n', 'i', 'm', 'u', 'm')
+    RAPIDJSON_STRING_(ExclusiveMaximum, 'e', 'x', 'c', 'l', 'u', 's', 'i', 'v', 'e', 'M', 'a', 'x', 'i', 'm', 'u', 'm')
+    RAPIDJSON_STRING_(MultipleOf, 'm', 'u', 'l', 't', 'i', 'p', 'l', 'e', 'O', 'f')
 
 #undef RAPIDJSON_STRING_
 
@@ -1380,9 +1391,9 @@ private:
                         if (const GenericSchemaDocument* remoteDocument = remoteProvider_->GetRemoteDocument(s, i - 1)) {
                             PointerType pointer(&s[i], len - i, allocator_);
                             if (pointer.IsValid()) {
-                                if (const SchemaType* s = remoteDocument->GetSchema(pointer)) {
+                                if (const SchemaType* sc = remoteDocument->GetSchema(pointer)) {
                                     if (schema)
-                                        *schema = s;
+                                        *schema = sc;
                                     return true;
                                 }
                             }
@@ -1414,7 +1425,7 @@ private:
 
     PointerType GetPointer(const SchemaType* schema) const {
         for (const SchemaEntry* target = schemaMap_.template Bottom<SchemaEntry>(); target != schemaMap_.template End<SchemaEntry>(); ++target)
-            if (schema== target->schema)
+            if (schema == target->schema)
                 return target->pointer;
         return PointerType();
     }
@@ -1457,13 +1468,39 @@ public:
         schemaDocument_(&schemaDocument),
         root_(schemaDocument.GetRoot()),
         outputHandler_(nullOutputHandler_),
+        stateAllocator_(allocator),
+        ownStateAllocator_(0),
         schemaStack_(allocator, schemaStackCapacity),
-        documentStack_(&GetStateAllocator(), documentStackCapacity),
+        documentStack_(allocator, documentStackCapacity),
         valid_(true)
 #if RAPIDJSON_SCHEMA_VERBOSE
         , depth_(0)
 #endif
     {
+        CreateOwnAllocator();
+    }
+
+    // Constructor with outputHandler
+    GenericSchemaValidator(
+        const SchemaDocumentType& schemaDocument,
+        OutputHandler& outputHandler,
+        StateAllocator* allocator = 0, 
+        size_t schemaStackCapacity = kDefaultSchemaStackCapacity,
+        size_t documentStackCapacity = kDefaultDocumentStackCapacity)
+        :
+        schemaDocument_(&schemaDocument),
+        root_(schemaDocument.GetRoot()),
+        outputHandler_(outputHandler),
+        stateAllocator_(allocator),
+        ownStateAllocator_(0),
+        schemaStack_(allocator, schemaStackCapacity),
+        documentStack_(allocator, documentStackCapacity),
+        valid_(true)
+#if RAPIDJSON_SCHEMA_VERBOSE
+        , depth_(0)
+#endif
+    {
+        CreateOwnAllocator();
     }
 
     ~GenericSchemaValidator() {
@@ -1475,7 +1512,7 @@ public:
             PopSchema();
         //documentStack_.Clear();
         valid_ = true;
-    };
+    }
 
     // Implementation of ISchemaValidator
     virtual bool IsValid() const { return valid_; }
@@ -1493,7 +1530,7 @@ public:
     }
 
     StateAllocator& GetStateAllocator() {
-        return schemaStack_.GetAllocator();
+        return *stateAllocator_;
     }
 
 #if RAPIDJSON_SCHEMA_VERBOSE
@@ -1642,6 +1679,8 @@ private:
         schemaDocument_(&schemaDocument),
         root_(root),
         outputHandler_(nullOutputHandler_),
+        stateAllocator_(allocator),
+        ownStateAllocator_(0),
         schemaStack_(allocator, schemaStackCapacity),
         documentStack_(allocator, documentStackCapacity),
         valid_(true)
@@ -1649,6 +1688,12 @@ private:
         , depth_(depth)
 #endif
     {
+        CreateOwnAllocator();
+    }
+
+    void CreateOwnAllocator() {
+        if (!stateAllocator_)
+            stateAllocator_ = ownStateAllocator_ = new StateAllocator;
     }
 
     bool BeginValue() {
@@ -1738,8 +1783,8 @@ private:
     void AppendToken(SizeType index) {
         *documentStack_.template Push<Ch>() = '/';
         char buffer[21];
-        SizeType length = (sizeof(SizeType) == 4 ? internal::u32toa(index, buffer): internal::u64toa(index, buffer)) - buffer;
-        for (SizeType i = 0; i < length; i++)
+        size_t length = static_cast<size_t>((sizeof(SizeType) == 4 ? internal::u32toa(index, buffer) : internal::u64toa(index, buffer)) - buffer);
+        for (size_t i = 0; i < length; i++)
             *documentStack_.template Push<Ch>() = buffer[i];
     }
 
@@ -1762,8 +1807,10 @@ private:
     static const size_t kDefaultDocumentStackCapacity = 256;
     const SchemaDocumentType* schemaDocument_;
     const SchemaType& root_;
-    BaseReaderHandler<EncodingType> nullOutputHandler_;
+    OutputHandler nullOutputHandler_;
     OutputHandler& outputHandler_;
+    StateAllocator* stateAllocator_;
+    StateAllocator* ownStateAllocator_;
     internal::Stack<StateAllocator> schemaStack_;    //!< stack to store the current path of schema (BaseSchemaType *)
     internal::Stack<StateAllocator> documentStack_;  //!< stack to store the current path of validating document (Ch)
     bool valid_;
@@ -1774,9 +1821,61 @@ private:
 
 typedef GenericSchemaValidator<SchemaDocument> SchemaValidator;
 
+template <
+    unsigned parseFlags,
+    typename InputStream,
+    typename SourceEncoding,
+    typename SchemaDocumentType = SchemaDocument,
+    typename StackAllocator = CrtAllocator>
+class SchemaValidatingReader {
+public:
+    typedef typename SchemaDocumentType::PointerType PointerType;
+    typedef typename InputStream::Ch Ch;
+
+    SchemaValidatingReader(InputStream& is, const SchemaDocumentType& sd) : is_(is), sd_(sd), invalidSchemaKeyword_() {}
+
+    template <typename Handler>
+    bool operator()(Handler& handler) {
+        GenericReader<SourceEncoding, typename SchemaDocumentType::EncodingType, StackAllocator> reader;
+        GenericSchemaValidator<SchemaDocumentType, Handler> validator(sd_, handler);
+        parseResult_ = reader.template Parse<parseFlags>(is_, validator);
+
+        if (validator.IsValid()) {
+            invalidSchemaPointer_ = PointerType();
+            invalidSchemaKeyword_ = 0;
+            invalidDocumentPointer_ = PointerType();
+        }
+        else {
+            invalidSchemaPointer_ = validator.GetInvalidSchemaPointer();
+            invalidSchemaKeyword_ = validator.GetInvalidSchemaKeyword();
+            invalidDocumentPointer_ = validator.GetInvalidDocumentPointer();
+        }
+
+        return parseResult_;
+    }
+
+    const ParseResult& GetParseResult() const { return parseResult_; }
+    const PointerType& GetInvalidSchemaPointer() const { return invalidSchemaPointer_; }
+    const Ch* GetInvalidSchemaKeyword() const { return invalidSchemaKeyword_; }
+    const PointerType& GetInvalidDocumentPointer() const { return invalidDocumentPointer_; }
+
+private:
+    InputStream& is_;
+    const SchemaDocumentType& sd_;
+
+    ParseResult parseResult_;
+    PointerType invalidSchemaPointer_;
+    const Ch* invalidSchemaKeyword_;
+    PointerType invalidDocumentPointer_;
+};
+
 RAPIDJSON_NAMESPACE_END
 
 #if defined(__GNUC__)
+RAPIDJSON_DIAG_POP
+#endif
+
+#ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
 

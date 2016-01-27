@@ -16,6 +16,11 @@
 #include "rapidjson/schema.h"
 #include "rapidjson/stringbuffer.h"
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(variadic-macros)
+#endif
+
 using namespace rapidjson;
 
 #define TEST_HASHER(json1, json2, expected) \
@@ -95,7 +100,7 @@ TEST(SchemaValidator, Hasher) {
 {\
     SchemaValidator validator(schema);\
     Document d;\
-    printf("\n%s\n", json);\
+    /*printf("\n%s\n", json);*/\
     d.Parse(json);\
     EXPECT_FALSE(d.HasParseError());\
     EXPECT_TRUE(expected == d.Accept(validator));\
@@ -115,7 +120,7 @@ TEST(SchemaValidator, Hasher) {
 {\
     SchemaValidator validator(schema);\
     Document d;\
-    printf("\n%s\n", json);\
+    /*printf("\n%s\n", json);*/\
     d.Parse(json);\
     EXPECT_FALSE(d.HasParseError());\
     EXPECT_FALSE(d.Accept(validator));\
@@ -841,16 +846,16 @@ TEST(SchemaValidator, AllOf_Nested) {
 template <typename Allocator>
 static char* ReadFile(const char* filename, Allocator& allocator) {
     const char *paths[] = {
-        "%s",
-        "bin/%s",
-        "../bin/%s",
-        "../../bin/%s",
-        "../../../bin/%s"
+        "",
+        "bin/",
+        "../bin/",
+        "../../bin/",
+        "../../../bin/"
     };
     char buffer[1024];
     FILE *fp = 0;
     for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
-        sprintf(buffer, paths[i], filename);
+        sprintf(buffer, "%s%s", paths[i], filename);
         fp = fopen(buffer, "rb");
         if (fp)
             break;
@@ -860,9 +865,9 @@ static char* ReadFile(const char* filename, Allocator& allocator) {
         return 0;
 
     fseek(fp, 0, SEEK_END);
-    size_t length = (size_t)ftell(fp);
+    size_t length = static_cast<size_t>(ftell(fp));
     fseek(fp, 0, SEEK_SET);
-    char* json = (char*)allocator.Malloc(length + 1);
+    char* json = reinterpret_cast<char*>(allocator.Malloc(length + 1));
     size_t readLength = fread(json, 1, length, fp);
     json[readLength] = '\0';
     fclose(fp);
@@ -1088,3 +1093,38 @@ TEST(SchemaValidator, TestSuite) {
     // if (passCount != testCount)
     //     ADD_FAILURE();
 }
+
+TEST(SchemaValidatingReader, Valid) {
+    Document sd;
+    sd.Parse("{ \"type\": \"string\", \"enum\" : [\"red\", \"amber\", \"green\"] }");
+    SchemaDocument s(sd);
+
+    Document d;
+    StringStream ss("\"red\"");
+    SchemaValidatingReader<kParseDefaultFlags, StringStream, UTF8<> > reader(ss, s);
+    d.Populate(reader);
+    EXPECT_TRUE(reader.GetParseResult());
+    EXPECT_TRUE(d.IsString());
+    EXPECT_STREQ("red", d.GetString());
+}
+
+TEST(SchemaValidatingReader, Invalid) {
+    Document sd;
+    sd.Parse("{\"type\":\"string\",\"minLength\":2,\"maxLength\":3}");
+    SchemaDocument s(sd);
+
+    Document d;
+    StringStream ss("\"ABCD\"");
+    SchemaValidatingReader<kParseDefaultFlags, StringStream, UTF8<> > reader(ss, s);
+    d.Populate(reader);
+    EXPECT_FALSE(reader.GetParseResult());
+    EXPECT_EQ(kParseErrorTermination, reader.GetParseResult().Code());
+    EXPECT_STREQ("maxLength", reader.GetInvalidSchemaKeyword());
+    EXPECT_TRUE(reader.GetInvalidSchemaPointer() == SchemaDocument::PointerType(""));
+    EXPECT_TRUE(reader.GetInvalidDocumentPointer() == SchemaDocument::PointerType(""));
+    EXPECT_TRUE(d.IsNull());
+}
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif
