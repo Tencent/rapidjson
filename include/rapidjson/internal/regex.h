@@ -22,6 +22,7 @@
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(padded)
 RAPIDJSON_DIAG_OFF(switch-enum)
+RAPIDJSON_DIAG_OFF(implicit-fallthrough)
 #endif
 
 #ifndef RAPIDJSON_REGEX_VERBOSE
