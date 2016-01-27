@@ -1505,6 +1505,7 @@ public:
 
     ~GenericSchemaValidator() {
         Reset();
+        RAPIDJSON_DELETE(ownStateAllocator_);
     }
 
     void Reset() {
@@ -1693,7 +1694,7 @@ private:
 
     void CreateOwnAllocator() {
         if (!stateAllocator_)
-            stateAllocator_ = ownStateAllocator_ = new StateAllocator;
+            stateAllocator_ = ownStateAllocator_ = RAPIDJSON_NEW(StateAllocator());
     }
 
     bool BeginValue() {
