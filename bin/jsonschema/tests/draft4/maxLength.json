@@ -20,7 +20,7 @@
             },
             {
                 "description": "ignores non-strings",
-                "data": 10,
+                "data": 100,
                 "valid": true
             },
             {

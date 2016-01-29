@@ -19,5 +19,16 @@
                 "valid": true
             }
         ]
+    },
+    {
+        "description": "pattern is not anchored",
+        "schema": {"pattern": "a+"},
+        "tests": [
+            {
+                "description": "matches a substring",
+                "data": "xxaayy",
+                "valid": true
+            }
+        ]
     }
 ]

@@ -992,11 +992,11 @@ private:
 
 TEST(SchemaValidator, TestSuite) {
     const char* filenames[] = {
-        "properties.json",
         "additionalItems.json",
         "additionalProperties.json",
         "allOf.json",
         "anyOf.json",
+        "default.json",
         "definitions.json",
         "dependencies.json",
         "enum.json",

@@ -56,6 +56,25 @@
         ]
     },
     {
+        "description":
+            "additionalProperties can exist by itself",
+        "schema": {
+            "additionalProperties": {"type": "boolean"}
+        },
+        "tests": [
+            {
+                "description": "an additional valid property is valid",
+                "data": {"foo" : true},
+                "valid": true
+            },
+            {
+                "description": "an additional invalid property is invalid",
+                "data": {"foo" : 1},
+                "valid": false
+            }
+        ]
+    },
+    {
         "description": "additionalProperties are allowed by default",
         "schema": {"properties": {"foo": {}, "bar": {}}},
         "tests": [

@@ -86,19 +86,34 @@
         },
         "tests": [
             {
-                "description": "slash",
+                "description": "slash invalid",
                 "data": {"slash": "aoeu"},
                 "valid": false
             },
             {
-                "description": "tilda",
+                "description": "tilda invalid",
                 "data": {"tilda": "aoeu"},
                 "valid": false
             },
             {
-                "description": "percent",
+                "description": "percent invalid",
                 "data": {"percent": "aoeu"},
                 "valid": false
+            },
+            {
+                "description": "slash valid",
+                "data": {"slash": 123},
+                "valid": true
+            },
+            {
+                "description": "tilda valid",
+                "data": {"tilda": 123},
+                "valid": true
+            },
+            {
+                "description": "percent valid",
+                "data": {"percent": 123},
+                "valid": true
             }
         ]
     },

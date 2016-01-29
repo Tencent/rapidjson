@@ -188,7 +188,7 @@
                 "valid": false
             },
             {
-                "description": "an array is not an array",
+                "description": "an array is an array",
                 "data": [],
                 "valid": true
             },
@@ -234,7 +234,7 @@
                 "valid": false
             },
             {
-                "description": "a boolean is not a boolean",
+                "description": "a boolean is a boolean",
                 "data": true,
                 "valid": true
             },
