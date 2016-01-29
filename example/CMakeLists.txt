@@ -9,6 +9,7 @@ set(EXAMPLES
     messagereader
     pretty
     prettyauto
+    schemavalidator
     serialize
     simpledom
     simplereader
