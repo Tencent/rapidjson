@@ -143,7 +143,12 @@ private:
     public:
         DecodedStream(SourceStream& ss) : ss_(ss), codepoint_() { Decode(); }
         unsigned Peek() { return codepoint_; }
-        unsigned Take() { unsigned c = codepoint_; Decode(); return c; }
+        unsigned Take() {
+            unsigned c = codepoint_;
+            if (c) // No further decoding when '\0'
+                Decode();
+            return c;
+        }
 
     private:
         void Decode() {
