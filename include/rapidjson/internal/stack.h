@@ -38,7 +38,6 @@ public:
     // Optimization note: Do not allocate memory for stack_ in constructor.
     // Do it lazily when first Push() -> Expand() -> Resize().
     Stack(Allocator* allocator, size_t stackCapacity) : allocator_(allocator), ownAllocator_(0), stack_(0), stackTop_(0), stackEnd_(0), initialCapacity_(stackCapacity) {
-        RAPIDJSON_ASSERT(stackCapacity > 0);
     }
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS

@@ -300,15 +300,17 @@ struct SchemaValidationContext {
                 factory.DestroySchemaValidator(patternPropertiesValidators[i]);
             factory.FreeState(patternPropertiesValidators);
         }
-        factory.FreeState(patternPropertiesSchemas);
-        factory.FreeState(objectDependencies);
+        if (patternPropertiesSchemas)
+            factory.FreeState(patternPropertiesSchemas);
+        if (objectDependencies)
+            factory.FreeState(objectDependencies);
     }
 
     SchemaValidatorFactoryType& factory;
     const SchemaType* schema;
     const SchemaType* valueSchema;
     const Ch* invalidKeyword;
-    void* hasher; // Only calidator access
+    void* hasher; // Only validator access
     void* arrayElementHashCodes; // Only validator access this
     ISchemaValidator** validators;
     SizeType validatorCount;
@@ -613,7 +615,7 @@ public:
         return true;
     }
 
-    bool EndValue(Context& context) const {
+    RAPIDJSON_FORCEINLINE bool EndValue(Context& context) const {
         if (context.patternPropertiesValidatorCount > 0) {
             bool otherValid = false;
             SizeType count = context.patternPropertiesValidatorCount;
@@ -1080,8 +1082,12 @@ private:
     // O(n)
     template <typename ValueType>
     bool FindPropertyIndex(const ValueType& name, SizeType* outIndex) const {
+        SizeType len = name.GetStringLength();
+        const Ch* str = name.GetString();
         for (SizeType index = 0; index < propertyCount_; index++)
-            if (properties_[index].name == name) {
+            if (properties_[index].name.GetStringLength() == len && 
+                (std::memcmp(properties_[index].name.GetString(), str, sizeof(Ch) * len) == 0))
+            {
                 *outIndex = index;
                 return true;
             }
@@ -1703,7 +1709,7 @@ private:
             PushSchema(root_);
         else {
             if (CurrentContext().inArray)
-                AppendToken(CurrentContext().arrayElementIndex);
+                AppendToken<Ch>(CurrentContext().arrayElementIndex);
 
             if (!CurrentSchema().BeginValue(CurrentContext()))
                 return false;
@@ -1767,21 +1773,23 @@ private:
     }
 
     void AppendToken(const Ch* str, SizeType len) {
-        *documentStack_.template Push<Ch>() = '/';
+        documentStack_.template Reserve<Ch>(1 + len * 2); // worst case all characters are escaped as two characters
+        *documentStack_.template PushUnsafe<Ch>() = '/';
         for (SizeType i = 0; i < len; i++) {
             if (str[i] == '~') {
-                *documentStack_.template Push<Ch>() = '~';
-                *documentStack_.template Push<Ch>() = '0';
+                *documentStack_.template PushUnsafe<Ch>() = '~';
+                *documentStack_.template PushUnsafe<Ch>() = '0';
             }
             else if (str[i] == '/') {
-                *documentStack_.template Push<Ch>() = '~';
-                *documentStack_.template Push<Ch>() = '1';
+                *documentStack_.template PushUnsafe<Ch>() = '~';
+                *documentStack_.template PushUnsafe<Ch>() = '1';
             }
             else
-                *documentStack_.template Push<Ch>() = str[i];
+                *documentStack_.template PushUnsafe<Ch>() = str[i];
         }
     }
 
+    template<typename Ch>
     void AppendToken(SizeType index) {
         *documentStack_.template Push<Ch>() = '/';
         char buffer[21];
@@ -1790,9 +1798,27 @@ private:
             *documentStack_.template Push<Ch>() = buffer[i];
     }
 
-    void PushSchema(const SchemaType& schema) { new (schemaStack_.template Push<Context>()) Context(*this, &schema); }
+    // Specialized version for char to prevent buffer copying.
+    template <>
+    void AppendToken<char>(SizeType index) {
+        if (sizeof(SizeType) == 4) {
+            char *buffer = documentStack_.template Push<Ch>(1 + 10); // '/' + uint
+            *buffer++ = '/';
+            const char* end = internal::u32toa(index, buffer);
+             documentStack_.template Pop<Ch>(static_cast<size_t>(10 - (end - buffer)));
+        }
+        else {
+            char *buffer = documentStack_.template Push<Ch>(1 + 20); // '/' + uint64
+            *buffer++ = '/';
+            const char* end = internal::u64toa(index, buffer);
+            documentStack_.template Pop<Ch>(static_cast<size_t>(20 - (end - buffer)));
+        }
+    }
+
+
+    RAPIDJSON_FORCEINLINE void PushSchema(const SchemaType& schema) { new (schemaStack_.template Push<Context>()) Context(*this, &schema); }
     
-    void PopSchema() {
+    RAPIDJSON_FORCEINLINE void PopSchema() {
         Context* c = schemaStack_.template Pop<Context>(1);
         if (HashCodeArray* a = static_cast<HashCodeArray*>(c->arrayElementHashCodes)) {
             a->~HashCodeArray();

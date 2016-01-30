@@ -71,13 +71,17 @@ class GenericRegex {
 public:
     typedef typename Encoding::Ch Ch;
 
-    GenericRegex(const Ch* source, Allocator* allocator = 0) : states_(allocator, 256), ranges_(allocator, 256), root_(kRegexInvalidState), stateCount_(), rangeCount_(), anchorBegin_(), anchorEnd_() {
+    GenericRegex(const Ch* source, Allocator* allocator = 0) : 
+        states_(allocator, 256), ranges_(allocator, 256), root_(kRegexInvalidState), stateCount_(), rangeCount_(), 
+        stateSet_(), state0_(allocator, 0), state1_(allocator, 0), anchorBegin_(), anchorEnd_()
+    {
         GenericStringStream<Encoding> ss(source);
         DecodedStream<GenericStringStream<Encoding> > ds(ss);
         Parse(ds);
     }
 
     ~GenericRegex() {
+        Allocator::Free(stateSet_);
     }
 
     bool IsValid() const {
@@ -307,6 +311,14 @@ private:
             }
             printf("\n");
 #endif
+        }
+
+        // Preallocate buffer for SearchWithAnchoring()
+        RAPIDJSON_ASSERT(stateSet_ == 0);
+        if (stateCount_ > 0) {
+            stateSet_ = static_cast<unsigned*>(states_.GetAllocator().Malloc(GetStateSetSize()));
+            state0_.Reserve<SizeType>(stateCount_);
+            state1_.Reserve<SizeType>(stateCount_);
         }
     }
 
@@ -568,21 +580,15 @@ private:
         RAPIDJSON_ASSERT(IsValid());
         DecodedStream<InputStream> ds(is);
 
-        Allocator allocator;
-        Stack<Allocator> state0(&allocator, stateCount_ * sizeof(SizeType));
-        Stack<Allocator> state1(&allocator, stateCount_ * sizeof(SizeType));
-        Stack<Allocator> *current = &state0, *next = &state1;
+        state0_.Clear();
+        Stack<Allocator> *current = &state0_, *next = &state1_;
+        const size_t stateSetSize = GetStateSetSize();
+        std::memset(stateSet_, 0, stateSetSize);
 
-        const size_t stateSetSize = (stateCount_ + 31) / 32 * 4;
-        unsigned* stateSet = static_cast<unsigned*>(allocator.Malloc(stateSetSize));
-        std::memset(stateSet, 0, stateSetSize);
-
-        bool matched = false;
-        matched = AddState(stateSet, *current, root_);
-
+        bool matched = AddState(*current, root_);
         unsigned codepoint;
         while (!current->Empty() && (codepoint = ds.Take()) != 0) {
-            std::memset(stateSet, 0, stateSetSize);
+            std::memset(stateSet_, 0, stateSetSize);
             next->Clear();
             matched = false;
             for (const SizeType* s = current->template Bottom<SizeType>(); s != current->template End<SizeType>(); ++s) {
@@ -591,39 +597,38 @@ private:
                     sr.codepoint == kAnyCharacterClass || 
                     (sr.codepoint == kRangeCharacterClass && MatchRange(sr.rangeStart, codepoint)))
                 {
-                    matched = AddState(stateSet, *next, sr.out) || matched;
+                    matched = AddState(*next, sr.out) || matched;
                     if (!anchorEnd && matched)
-                        goto exit;
+                        return true;
                 }
                 if (!anchorBegin)
-                    AddState(stateSet, *next, root_);
+                    AddState(*next, root_);
             }
-            Stack<Allocator>* temp = current;
-            current = next;
-            next = temp;
+            internal::Swap(current, next);
         }
 
-    exit:
-        Allocator::Free(stateSet);
         return matched;
     }
 
+    size_t GetStateSetSize() const {
+        return (stateCount_ + 31) / 32 * 4;
+    }
+
     // Return whether the added states is a match state
-    bool AddState(unsigned* stateSet, Stack<Allocator>& l, SizeType index) const {
+    bool AddState(Stack<Allocator>& l, SizeType index) const {
         if (index == kRegexInvalidState)
             return true;
 
         const State& s = GetState(index);
         if (s.out1 != kRegexInvalidState) { // Split
-            bool matched = AddState(stateSet, l, s.out);
-            matched = AddState(stateSet, l, s.out1) || matched;
-            return matched;
+            bool matched = AddState(l, s.out);
+            return AddState(l, s.out1) || matched;
         }
-        else if (!(stateSet[index >> 5] & (1 << (index & 31)))) {
-            stateSet[index >> 5] |= (1 << (index & 31));
-            *l.template Push<SizeType>() = index;
+        else if (!(stateSet_[index >> 5] & (1 << (index & 31)))) {
+            stateSet_[index >> 5] |= (1 << (index & 31));
+            *l.template PushUnsafe<SizeType>() = index;
         }
-        return GetState(index).out == kRegexInvalidState;
+        return s.out == kRegexInvalidState; // by using PushUnsafe() above, we can ensure s is not validated due to reallocation.
     }
 
     bool MatchRange(SizeType rangeIndex, unsigned codepoint) const {
@@ -642,6 +647,11 @@ private:
     SizeType root_;
     SizeType stateCount_;
     SizeType rangeCount_;
+
+    // For SearchWithAnchoring()
+    uint32_t* stateSet_;        // allocated by states_.GetAllocator()
+    mutable Stack<Allocator> state0_;
+    mutable Stack<Allocator> state1_;
     bool anchorBegin_;
     bool anchorEnd_;
 };
