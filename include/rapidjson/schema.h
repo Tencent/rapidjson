@@ -1249,6 +1249,36 @@ private:
     bool exclusiveMaximum_;
 };
 
+template<typename Stack, typename Ch>
+struct TokenHelper {
+    RAPIDJSON_FORCEINLINE static void AppendIndexToken(Stack& documentStack, SizeType index) {
+        *documentStack.template Push<Ch>() = '/';
+        char buffer[21];
+        size_t length = static_cast<size_t>((sizeof(SizeType) == 4 ? u32toa(index, buffer) : u64toa(index, buffer)) - buffer);
+        for (size_t i = 0; i < length; i++)
+            *documentStack.template Push<Ch>() = buffer[i];
+    }
+};
+
+// Partial specialized version for char to prevent buffer copying.
+template <typename Stack>
+struct TokenHelper<Stack, char> {
+    RAPIDJSON_FORCEINLINE static void AppendIndexToken(Stack& documentStack, SizeType index) {
+        if (sizeof(SizeType) == 4) {
+            char *buffer = documentStack.template Push<char>(1 + 10); // '/' + uint
+            *buffer++ = '/';
+            const char* end = internal::u32toa(index, buffer);
+             documentStack.template Pop<char>(static_cast<size_t>(10 - (end - buffer)));
+        }
+        else {
+            char *buffer = documentStack.template Push<char>(1 + 20); // '/' + uint64
+            *buffer++ = '/';
+            const char* end = internal::u64toa(index, buffer);
+            documentStack.template Pop<char>(static_cast<size_t>(20 - (end - buffer)));
+        }
+    }
+};
+
 } // namespace internal
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1709,7 +1739,7 @@ private:
             PushSchema(root_);
         else {
             if (CurrentContext().inArray)
-                AppendToken<Ch>(CurrentContext().arrayElementIndex);
+                internal::TokenHelper<internal::Stack<StateAllocator>, Ch>::AppendIndexToken(documentStack_, CurrentContext().arrayElementIndex);
 
             if (!CurrentSchema().BeginValue(CurrentContext()))
                 return false;
@@ -1788,33 +1818,6 @@ private:
                 *documentStack_.template PushUnsafe<Ch>() = str[i];
         }
     }
-
-    template<typename Ch>
-    void AppendToken(SizeType index) {
-        *documentStack_.template Push<Ch>() = '/';
-        char buffer[21];
-        size_t length = static_cast<size_t>((sizeof(SizeType) == 4 ? internal::u32toa(index, buffer) : internal::u64toa(index, buffer)) - buffer);
-        for (size_t i = 0; i < length; i++)
-            *documentStack_.template Push<Ch>() = buffer[i];
-    }
-
-    // Specialized version for char to prevent buffer copying.
-    template <>
-    void AppendToken<char>(SizeType index) {
-        if (sizeof(SizeType) == 4) {
-            char *buffer = documentStack_.template Push<Ch>(1 + 10); // '/' + uint
-            *buffer++ = '/';
-            const char* end = internal::u32toa(index, buffer);
-             documentStack_.template Pop<Ch>(static_cast<size_t>(10 - (end - buffer)));
-        }
-        else {
-            char *buffer = documentStack_.template Push<Ch>(1 + 20); // '/' + uint64
-            *buffer++ = '/';
-            const char* end = internal::u64toa(index, buffer);
-            documentStack_.template Pop<Ch>(static_cast<size_t>(20 - (end - buffer)));
-        }
-    }
-
 
     RAPIDJSON_FORCEINLINE void PushSchema(const SchemaType& schema) { new (schemaStack_.template Push<Context>()) Context(*this, &schema); }
     
