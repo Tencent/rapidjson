@@ -25,6 +25,11 @@ RAPIDJSON_DIAG_OFF(switch-enum)
 RAPIDJSON_DIAG_OFF(implicit-fallthrough)
 #endif
 
+#ifdef __GNUC__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(effc++)
+#endif
+
 #ifndef RAPIDJSON_REGEX_VERBOSE
 #define RAPIDJSON_REGEX_VERBOSE 0
 #endif
