@@ -317,8 +317,8 @@ private:
         RAPIDJSON_ASSERT(stateSet_ == 0);
         if (stateCount_ > 0) {
             stateSet_ = static_cast<unsigned*>(states_.GetAllocator().Malloc(GetStateSetSize()));
-            state0_.Reserve<SizeType>(stateCount_);
-            state1_.Reserve<SizeType>(stateCount_);
+            state0_.template Reserve<SizeType>(stateCount_);
+            state1_.template Reserve<SizeType>(stateCount_);
         }
     }
 
