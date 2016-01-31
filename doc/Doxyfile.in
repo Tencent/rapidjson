@@ -774,6 +774,7 @@ INPUT                  = readme.md \
                          doc/encoding.md \
                          doc/dom.md \
                          doc/sax.md \
+                         doc/schema.md \
                          doc/performance.md \
                          doc/internals.md \
                          doc/faq.md
