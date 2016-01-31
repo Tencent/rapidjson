@@ -2,7 +2,7 @@
 
 ## Status: experimental, shall be included in v1.1
 
-JSON Schema is a draft standard for describing format of JSON. The schema itself is also a JSON. By validating a JSON with JSON Schema, your code can safely access the JSON without manually checking types, or whether a key exists, etc.
+JSON Schema is a draft standard for describing format of JSON. The schema itself is also a JSON. By validating a JSON with JSON Schema, your code can safely access the DOM without manually checking types, or whether a key exists, etc. It can also ensure that the serialized JSON conform to a specified schema.
 
 RapidJSON implemented a JSON Schema validator for [JSON Schema Draft v4](http://json-schema.org/documentation.html). If you do not familiar with JSON Schema, you may refer to [Understanding JSON Schema](http://spacetelescope.github.io/understanding-json-schema/).
 
@@ -56,7 +56,7 @@ Differ to most JSON Schema validator implementations, RapidJSON provides a SAX-b
 
 ### DOM parsing
 
-For using DOM in parsing, `Document` needs some preparation and finailizaing tasks, in addition to recieving SAX events, thus it needs some work to route the reader, validator and the document. `SchemaValidatingReader` is a helper class that doing such work.
+For using DOM in parsing, `Document` needs some preparation and finalizing tasks, in addition to receiving SAX events, thus it needs some work to route the reader, validator and the document. `SchemaValidatingReader` is a helper class that doing such work.
 
 ~~~cpp
 #include "rapidjson/filereadstream.h"
@@ -140,7 +140,7 @@ if (!d.Accept(validator)) {
 }
 ~~~
 
-Of course, if your appication only needs SAX-style serialization, it can simply send SAX events to `SchemaValidator` instead of `Writer`.
+Of course, if your application only needs SAX-style serialization, it can simply send SAX events to `SchemaValidator` instead of `Writer`.
 
 ## Remote Schema
 
@@ -211,11 +211,11 @@ For C++11 compiler, it is also possible to use the `std::regex` by defining `RAP
 
 ## Performance
 
-Most C++ JSON libraries have not yet supporting JSON Schema. So we tried to evluate the performance of RapidJSON's JSON Schema validator according to [json-schema-benchmark](https://github.com/ebdrup/json-schema-benchmark), which tests 11 JavaScript libraries running on Node.js.
+Most C++ JSON libraries have not yet supporting JSON Schema. So we tried to evaluate the performance of RapidJSON's JSON Schema validator according to [json-schema-benchmark](https://github.com/ebdrup/json-schema-benchmark), which tests 11 JavaScript libraries running on Node.js.
 
-That benchmark runs validations on [JSON Schema Test Suite](https://github.com/json-schema/JSON-Schema-Test-Suite), in which some test suites and tests are excluded.
+That benchmark runs validations on [JSON Schema Test Suite](https://github.com/json-schema/JSON-Schema-Test-Suite), in which some test suites and tests are excluded. We made the same benchmarking procedure in [`schematest.cpp`](test/perftest/schematest.cpp).
 
-On a Mac Book Pro (2.8 GHz Intel Core i7), the following results are gathered.
+On a Mac Book Pro (2.8 GHz Intel Core i7), the following results are collected.
 
 |Validator|Relative speed|Number of test runs per second|
 |---------|:------------:|:----------------------------:|
