@@ -70,6 +70,10 @@ static const SizeType kRegexInvalidRange = ~SizeType(0);
     - \c \\r Carriage return (U+000D)
     - \c \\t Tab (U+0009)
     - \c \\v Vertical tab (U+000B)
+
+    \note This is a Thompson NFA engine, implemented with reference to 
+        Cox, Russ. "Regular Expression Matching Can Be Simple And Fast (but is slow in Java, Perl, PHP, Python, Ruby,...).", 
+        https://swtch.com/~rsc/regexp/regexp1.html 
 */
 template <typename Encoding, typename Allocator = CrtAllocator>
 class GenericRegex {

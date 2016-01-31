@@ -180,7 +180,7 @@ RapidJSON 通过了 [JSON Schema Test Suite](https://github.com/json-schema/JSON
 
 `pattern` 及 `patternProperties` 这两个 schema 关键字使用了正则表达式去匹配所需的模式。
 
-RapidJSON 实现了一个简单的 DFA 正则表达式引擎，并预设使用。它支持以下语法。
+RapidJSON 实现了一个简单的 NFA 正则表达式引擎，并预设使用。它支持以下语法。
 
 |语法|描述|
 |------|-----------|

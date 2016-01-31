@@ -180,7 +180,7 @@ Besides, the `format` schema keyword for string values is ignored, since it is n
 
 The schema keyword `pattern` and `patternProperties` uses regular expression to match the required pattern.
 
-RapidJSON implemented a simple DFA regular expression engine, which is used by default. It supports the following syntax.
+RapidJSON implemented a simple NFA regular expression engine, which is used by default. It supports the following syntax.
 
 |Syntax|Description|
 |------|-----------|
