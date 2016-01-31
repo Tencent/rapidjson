@@ -6,6 +6,8 @@ JSON Schema is a draft standard for describing format of JSON. The schema itself
 
 RapidJSON implemented a JSON Schema validator for [JSON Schema Draft v4](http://json-schema.org/documentation.html). If you do not familiar with JSON Schema, you may refer to [Understanding JSON Schema](http://spacetelescope.github.io/understanding-json-schema/).
 
+[TOC]
+
 ## Basic Usage
 
 First of all, you need to parse a JSON Schema into `Document`, and then compile the `Document` into `SchemaDocument`.
