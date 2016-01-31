@@ -1863,7 +1863,7 @@ public:
     typedef typename SchemaDocumentType::PointerType PointerType;
     typedef typename InputStream::Ch Ch;
 
-    SchemaValidatingReader(InputStream& is, const SchemaDocumentType& sd) : is_(is), sd_(sd), invalidSchemaKeyword_() {}
+    SchemaValidatingReader(InputStream& is, const SchemaDocumentType& sd) : is_(is), sd_(sd), invalidSchemaKeyword_(), isValid_(true) {}
 
     template <typename Handler>
     bool operator()(Handler& handler) {
@@ -1871,7 +1871,7 @@ public:
         GenericSchemaValidator<SchemaDocumentType, Handler> validator(sd_, handler);
         parseResult_ = reader.template Parse<parseFlags>(is_, validator);
 
-        if (validator.IsValid()) {
+        if ((isValid_ = validator.IsValid())) {
             invalidSchemaPointer_ = PointerType();
             invalidSchemaKeyword_ = 0;
             invalidDocumentPointer_ = PointerType();
@@ -1886,6 +1886,7 @@ public:
     }
 
     const ParseResult& GetParseResult() const { return parseResult_; }
+    bool IsValid() const { return isValid_; }
     const PointerType& GetInvalidSchemaPointer() const { return invalidSchemaPointer_; }
     const Ch* GetInvalidSchemaKeyword() const { return invalidSchemaKeyword_; }
     const PointerType& GetInvalidDocumentPointer() const { return invalidDocumentPointer_; }
@@ -1898,6 +1899,7 @@ private:
     PointerType invalidSchemaPointer_;
     const Ch* invalidSchemaKeyword_;
     PointerType invalidDocumentPointer_;
+    bool isValid_;
 };
 
 RAPIDJSON_NAMESPACE_END

@@ -15,6 +15,7 @@
 #include "unittest.h"
 #include "rapidjson/schema.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
@@ -1094,7 +1095,7 @@ TEST(SchemaValidator, TestSuite) {
     //     ADD_FAILURE();
 }
 
-TEST(SchemaValidatingReader, Valid) {
+TEST(SchemaValidatingReader, Simple) {
     Document sd;
     sd.Parse("{ \"type\": \"string\", \"enum\" : [\"red\", \"amber\", \"green\"] }");
     SchemaDocument s(sd);
@@ -1104,6 +1105,7 @@ TEST(SchemaValidatingReader, Valid) {
     SchemaValidatingReader<kParseDefaultFlags, StringStream, UTF8<> > reader(ss, s);
     d.Populate(reader);
     EXPECT_TRUE(reader.GetParseResult());
+    EXPECT_TRUE(reader.IsValid());
     EXPECT_TRUE(d.IsString());
     EXPECT_STREQ("red", d.GetString());
 }
@@ -1118,11 +1120,34 @@ TEST(SchemaValidatingReader, Invalid) {
     SchemaValidatingReader<kParseDefaultFlags, StringStream, UTF8<> > reader(ss, s);
     d.Populate(reader);
     EXPECT_FALSE(reader.GetParseResult());
+    EXPECT_FALSE(reader.IsValid());
     EXPECT_EQ(kParseErrorTermination, reader.GetParseResult().Code());
     EXPECT_STREQ("maxLength", reader.GetInvalidSchemaKeyword());
     EXPECT_TRUE(reader.GetInvalidSchemaPointer() == SchemaDocument::PointerType(""));
     EXPECT_TRUE(reader.GetInvalidDocumentPointer() == SchemaDocument::PointerType(""));
     EXPECT_TRUE(d.IsNull());
+}
+
+TEST(SchemaValidatingWriter, Simple) {
+    Document sd;
+    sd.Parse("{\"type\":\"string\",\"minLength\":2,\"maxLength\":3}");
+    SchemaDocument s(sd);
+
+    Document d;
+    StringBuffer sb;
+    Writer<StringBuffer> writer(sb);
+    GenericSchemaValidator<SchemaDocument, Writer<StringBuffer> > validator(s, writer);
+
+    d.Parse("\"red\"");
+    EXPECT_TRUE(d.Accept(validator));
+    EXPECT_TRUE(validator.IsValid());
+    EXPECT_STREQ("\"red\"", sb.GetString());
+
+    sb.Clear();
+    validator.Reset();
+    d.Parse("\"ABCD\"");
+    EXPECT_FALSE(d.Accept(validator));
+    EXPECT_FALSE(validator.IsValid());
 }
 
 #ifdef __clang__
