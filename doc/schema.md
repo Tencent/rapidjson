@@ -200,7 +200,7 @@ RapidJSON implemented a simple DFA regular expression engine, which is used by d
 |`[^abc]` | Negated character classes
 |`[^a-c]` | Negated character class range
 |`[\b]`   | Backspace (U+0008)
-|``\|`, `\\`, ...  | Escape characters
+|`\|`, `\\`, ...  | Escape characters
 |`\f` | Form feed (U+000C)
 |`\n` | Line feed (U+000A)
 |`\r` | Carriage return (U+000D)
