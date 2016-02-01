@@ -1296,6 +1296,15 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 // GenericSchemaDocument
 
+//! JSON schema document.
+/*!
+    A JSON schema document is a compiled version of a JSON schema.
+    It is basically a tree of internal::Schema.
+
+    \note This is an immutable class (i.e. its instance cannot be modified after construction).
+    \tparam ValueT Type of JSON value (e.g. \c Value ), which also determine the encoding.
+    \tparam Allocator Allocator type for allocating memory of this document.
+*/
 template <typename ValueT, typename Allocator = CrtAllocator>
 class GenericSchemaDocument {
 public:
@@ -1310,6 +1319,14 @@ public:
     template <typename, typename, typename>
     friend class GenericSchemaValidator;
 
+    //! Constructor.
+    /*!
+        Compile a JSON document into schema document.
+
+        \param document A JSON document as source.
+        \param remoteProvider An optional remote schema document provider for resolving remote reference. Can be null.
+        \param allocator An optional allocator instance for allocating memory. Can be null.
+    */
     GenericSchemaDocument(const ValueType& document, IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) : 
         document_(&document),
         remoteProvider_(remoteProvider),
@@ -1346,6 +1363,7 @@ public:
         schemaRef_.ShrinkToFit(); // Deallocate all memory for ref
     }
 
+    //! Destructor
     ~GenericSchemaDocument() {
         while (!schemaMap_.Empty())
             schemaMap_.template Pop<SchemaEntry>(1)->~SchemaEntry();
@@ -1353,6 +1371,7 @@ public:
         RAPIDJSON_DELETE(ownAllocator_);
     }
 
+    //! Get the root schema.
     const SchemaType& GetRoot() const { return *root_; }
 
 private:
@@ -1479,13 +1498,30 @@ private:
     internal::Stack<Allocator> schemaRef_;  // Stores Pointer from $ref and schema which holds the $ref
 };
 
+//! GenericSchemaDocument using Value type.
 typedef GenericSchemaDocument<Value> SchemaDocument;
+//! IGenericRemoteSchemaDocumentProvider using SchemaDocument.
 typedef IGenericRemoteSchemaDocumentProvider<SchemaDocument> IRemoteSchemaDocumentProvider;
 
 ///////////////////////////////////////////////////////////////////////////////
 // GenericSchemaValidator
 
-template <typename SchemaDocumentType, typename OutputHandler = BaseReaderHandler<typename SchemaDocumentType::SchemaType::EncodingType>, typename StateAllocator = CrtAllocator >
+//! JSON Schema Validator.
+/*!
+    A SAX style JSON schema validator.
+    It uses a \c GenericSchemaDocument to validate SAX events.
+    It delegates the incoming SAX events to an output handler.
+    The default output handler does nothing.
+    It can be reused multiple times by calling \c Reset().
+
+    \tparam SchemaDocumentType Type of schema document.
+    \tparam OutputHandler Type of output handler. Default handler does nothing.
+    \tparam StateAllocator Allocator for storing the internal validation states.
+*/
+template <
+    typename SchemaDocumentType,
+    typename OutputHandler = BaseReaderHandler<typename SchemaDocumentType::SchemaType::EncodingType>,
+    typename StateAllocator = CrtAllocator>
 class GenericSchemaValidator :
     public internal::ISchemaStateFactory<typename SchemaDocumentType::SchemaType>, 
     public internal::ISchemaValidator
@@ -1496,6 +1532,13 @@ public:
     typedef typename SchemaType::EncodingType EncodingType;
     typedef typename EncodingType::Ch Ch;
 
+    //! Constructor without output handler.
+    /*!
+        \param schemaDocument The schema document to conform to.
+        \param allocator Optional allocator for storing internal validation states.
+        \param schemaStackCapacity Optional initial capacity of schema path stack.
+        \param documentStackCapacity Optional initial capacity of document path stack.
+    */
     GenericSchemaValidator(
         const SchemaDocumentType& schemaDocument,
         StateAllocator* allocator = 0, 
@@ -1517,7 +1560,13 @@ public:
         CreateOwnAllocator();
     }
 
-    // Constructor with outputHandler
+    //! Constructor with output handler.
+    /*!
+        \param schemaDocument The schema document to conform to.
+        \param allocator Optional allocator for storing internal validation states.
+        \param schemaStackCapacity Optional initial capacity of schema path stack.
+        \param documentStackCapacity Optional initial capacity of document path stack.
+    */
     GenericSchemaValidator(
         const SchemaDocumentType& schemaDocument,
         OutputHandler& outputHandler,
@@ -1540,11 +1589,13 @@ public:
         CreateOwnAllocator();
     }
 
+    //! Destructor.
     ~GenericSchemaValidator() {
         Reset();
         RAPIDJSON_DELETE(ownStateAllocator_);
     }
 
+    //! Reset the internal states.
     void Reset() {
         while (!schemaStack_.Empty())
             PopSchema();
@@ -1552,17 +1603,21 @@ public:
         valid_ = true;
     }
 
+    //! Checks whether the current state is valid.
     // Implementation of ISchemaValidator
     virtual bool IsValid() const { return valid_; }
 
+    //! Gets the JSON pointer pointed to the invalid schema.
     PointerType GetInvalidSchemaPointer() const {
         return schemaStack_.Empty() ? PointerType() : schemaDocument_->GetPointer(&CurrentSchema());
     }
 
+    //! Gets the keyword of invalid schema.
     const Ch* GetInvalidSchemaKeyword() const {
         return schemaStack_.Empty() ? 0 : CurrentContext().invalidKeyword;
     }
 
+    //! Gets the JSON pointer pointed to the invalid value.
     PointerType GetInvalidDocumentPointer() const {
         return documentStack_.Empty() ? PointerType() : PointerType(documentStack_.template Bottom<Ch>(), documentStack_.GetSize() / sizeof(Ch));
     }
@@ -1852,6 +1907,19 @@ private:
 
 typedef GenericSchemaValidator<SchemaDocument> SchemaValidator;
 
+///////////////////////////////////////////////////////////////////////////////
+// SchemaValidatingReader
+
+//! A helper class for parsing with validation.
+/*!
+    This helper class is a functor, designed as a parameter of \ref GenericDocument::Populate().
+
+    \tparam parseFlags Combination of \ref ParseFlag.
+    \tparam InputStream Type of input stream, implementing Stream concept.
+    \tparam SourceEncoding Encoding of the input stream.
+    \tparam SchemaDocumentType Type of schema document.
+    \tparam StackAllocator Allocator type for stack.
+*/
 template <
     unsigned parseFlags,
     typename InputStream,
@@ -1863,6 +1931,11 @@ public:
     typedef typename SchemaDocumentType::PointerType PointerType;
     typedef typename InputStream::Ch Ch;
 
+    //! Constructor
+    /*!
+        \param is Input stream.
+        \param sd Schema document.
+    */
     SchemaValidatingReader(InputStream& is, const SchemaDocumentType& sd) : is_(is), sd_(sd), invalidSchemaKeyword_(), isValid_(true) {}
 
     template <typename Handler>
