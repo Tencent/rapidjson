@@ -117,8 +117,8 @@ $(document).ready(function(){initNavTree('md_doc_dom_8zh-cn.html','');});
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">};</div>
 <div class="line"></div>
-<div class="line"><span class="keyword">typedef</span> GenericValue&lt;UTF8&lt;&gt; &gt; <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>;</div>
-<div class="line"><span class="keyword">typedef</span> GenericDocument&lt;UTF8&lt;&gt; &gt; <a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a>;</div>
+<div class="line"><span class="keyword">typedef</span> GenericValue&lt;UTF8&lt;&gt; &gt; <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>;</div>
+<div class="line"><span class="keyword">typedef</span> GenericDocument&lt;UTF8&lt;&gt; &gt; <a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a>;</div>
 <div class="line"></div>
 <div class="line">} <span class="comment">// namespace rapidjson</span></div>
 </div><!-- fragment --><p>使用者可以自定义这些模板参数。</p>
@@ -254,7 +254,7 @@ Allocator</h2>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/error/en.h&quot;</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// ...</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line"><span class="keywordflow">if</span> (d.Parse(json).HasParseError()) {</div>
 <div class="line">    fprintf(stderr, <span class="stringliteral">&quot;\nError(offset %u): %s\n&quot;</span>, </div>
 <div class="line">        (<span class="keywordtype">unsigned</span>)d.GetErrorOffset(),</div>
@@ -294,7 +294,7 @@ Allocator</h2>
 <div class="line">fclose(fp);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// 原位解析buffer至d，buffer内容会被修改。</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line">d.ParseInsitu(buffer);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// 在此查询、修改DOM……</span></div>

@@ -121,39 +121,39 @@ JSON Pointer</h1>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/pointer.h&quot;</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// ...</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// 使用 Set() 创建 DOM</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/project&quot;</span>).Set(d, <span class="stringliteral">&quot;RapidJSON&quot;</span>);</div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/stars&quot;</span>).Set(d, 10);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a>(<span class="stringliteral">&quot;/project&quot;</span>).Set(d, <span class="stringliteral">&quot;RapidJSON&quot;</span>);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a>(<span class="stringliteral">&quot;/stars&quot;</span>).Set(d, 10);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 10 }</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// 使用 Get() 访问 DOM。若该值不存在则返回 nullptr。</span></div>
-<div class="line"><span class="keywordflow">if</span> (<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>* stars = <a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/stars&quot;</span>).Get(d))</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>* stars = <a class="code" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a>(<span class="stringliteral">&quot;/stars&quot;</span>).Get(d))</div>
 <div class="line">    stars-&gt;SetInt(stars-&gt;GetInt() + 1);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11 }</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// Set() 和 Create() 自动生成父值（如果它们不存在）。</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/a/b/0&quot;</span>).Create(d);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a>(<span class="stringliteral">&quot;/a/b/0&quot;</span>).Create(d);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11, &quot;a&quot; : { &quot;b&quot; : [ null ] } }</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// GetWithDefault() 返回引用。若该值不存在则会深拷贝缺省值。</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>&amp; hello = <a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/hello&quot;</span>).GetWithDefault(d, <span class="stringliteral">&quot;world&quot;</span>);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>&amp; hello = <a class="code" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a>(<span class="stringliteral">&quot;/hello&quot;</span>).GetWithDefault(d, <span class="stringliteral">&quot;world&quot;</span>);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11, &quot;a&quot; : { &quot;b&quot; : [ null ] }, &quot;hello&quot; : &quot;world&quot; }</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// Swap() 和 Set() 相似</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> x(<span class="stringliteral">&quot;C++&quot;</span>);</div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/hello&quot;</span>).Swap(d, x);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> x(<span class="stringliteral">&quot;C++&quot;</span>);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a>(<span class="stringliteral">&quot;/hello&quot;</span>).Swap(d, x);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11, &quot;a&quot; : { &quot;b&quot; : [ null ] }, &quot;hello&quot; : &quot;C++&quot; }</span></div>
 <div class="line"><span class="comment">// x 变成 &quot;world&quot;</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// 删去一个成员或元素，若值存在返回 true</span></div>
-<div class="line"><span class="keywordtype">bool</span> success = <a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a>(<span class="stringliteral">&quot;/a&quot;</span>).Erase(d);</div>
+<div class="line"><span class="keywordtype">bool</span> success = <a class="code" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a>(<span class="stringliteral">&quot;/a&quot;</span>).Erase(d);</div>
 <div class="line">assert(success);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 10 }</span></div>
@@ -161,19 +161,19 @@ JSON Pointer</h1>
 辅助函数</h1>
 <p>由于面向对象的调用习惯可能不符直觉，RapidJSON 也提供了一些辅助函数，它们把成员函数包装成自由函数。</p>
 <p>以下的例子与上面例子所做的事情完全相同。</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line"></div>
 <div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;/project&quot;</span>, <span class="stringliteral">&quot;RapidJSON&quot;</span>);</div>
 <div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;/stars&quot;</span>, 10);</div>
 <div class="line"></div>
-<div class="line"><span class="keywordflow">if</span> (<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>* stars = GetValueByPointer(d, <span class="stringliteral">&quot;/stars&quot;</span>))</div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>* stars = GetValueByPointer(d, <span class="stringliteral">&quot;/stars&quot;</span>))</div>
 <div class="line">    stars-&gt;SetInt(stars-&gt;GetInt() + 1);</div>
 <div class="line"></div>
 <div class="line">CreateValueByPointer(d, <span class="stringliteral">&quot;/a/b/0&quot;</span>);</div>
 <div class="line"></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>&amp; hello = GetValueByPointerWithDefault(d, <span class="stringliteral">&quot;/hello&quot;</span>, <span class="stringliteral">&quot;world&quot;</span>);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>&amp; hello = GetValueByPointerWithDefault(d, <span class="stringliteral">&quot;/hello&quot;</span>, <span class="stringliteral">&quot;world&quot;</span>);</div>
 <div class="line"></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> x(<span class="stringliteral">&quot;C++&quot;</span>);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> x(<span class="stringliteral">&quot;C++&quot;</span>);</div>
 <div class="line">SwapValueByPointer(d, <span class="stringliteral">&quot;/hello&quot;</span>, x);</div>
 <div class="line"></div>
 <div class="line"><span class="keywordtype">bool</span> success = EraseValueByPointer(d, <span class="stringliteral">&quot;/a&quot;</span>);</div>
@@ -202,7 +202,7 @@ JSON Pointer</h1>
 <div class="fragment"><div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;1/a&quot;</span>, 789); <span class="comment">// { &quot;0&quot; : 123, &quot;1&quot; : { &quot;a&quot; : 789 } }</span></div>
 </div><!-- fragment --><h2>解析负号 token</h2>
 <p>另外，<a href="https://tools.ietf.org/html/rfc6901">RFC6901</a> 定义了一个特殊 token <code>-</code> （单个负号），用于表示数组最后元素的下一个元素。 <code>Get()</code> 只会把此 token 当作成员名字 '"-"'。而其他函数则会以此解析数组，等同于对数组调用 <code>Value::PushBack()</code> 。</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line">d.Parse(<span class="stringliteral">&quot;{\&quot;foo\&quot;:[123]}&quot;</span>);</div>
 <div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;/foo/-&quot;</span>, 456); <span class="comment">// { &quot;foo&quot; : [123, 456] }</span></div>
 <div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;/-&quot;</span>, 789);    <span class="comment">// { &quot;foo&quot; : [123, 456], &quot;-&quot; : 789 }</span></div>
@@ -213,14 +213,14 @@ JSON Pointer</h1>
 <div class="fragment"><div class="line"><span class="keyword">class </span>Person {</div>
 <div class="line"><span class="keyword">public</span>:</div>
 <div class="line">    Person() {</div>
-<div class="line">        document_ = <span class="keyword">new</span> <a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a>();</div>
+<div class="line">        document_ = <span class="keyword">new</span> <a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a>();</div>
 <div class="line">        <span class="comment">// CreateValueByPointer() here no need allocator</span></div>
 <div class="line">        SetLocation(CreateValueByPointer(*document_, <span class="stringliteral">&quot;/residence&quot;</span>), ...);</div>
 <div class="line">        SetLocation(CreateValueByPointer(*document_, <span class="stringliteral">&quot;/office&quot;</span>), ...);</div>
 <div class="line">    };</div>
 <div class="line"></div>
 <div class="line"><span class="keyword">private</span>:</div>
-<div class="line">    <span class="keywordtype">void</span> SetLocation(<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>&amp; location, <span class="keyword">const</span> <span class="keywordtype">char</span>* country, <span class="keyword">const</span> <span class="keywordtype">char</span>* addresses[2]) {</div>
+<div class="line">    <span class="keywordtype">void</span> SetLocation(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>&amp; location, <span class="keyword">const</span> <span class="keywordtype">char</span>* country, <span class="keyword">const</span> <span class="keywordtype">char</span>* addresses[2]) {</div>
 <div class="line">        Value::Allocator&amp; a = document_-&gt;GetAllocator();</div>
 <div class="line">        <span class="comment">// SetValueByPointer() here need allocator</span></div>
 <div class="line">        SetValueByPointer(location, <span class="stringliteral">&quot;/country&quot;</span>, country, a);</div>
@@ -230,7 +230,7 @@ JSON Pointer</h1>
 <div class="line"></div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line"></div>
-<div class="line">    <a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a>* document_;</div>
+<div class="line">    <a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a>* document_;</div>
 <div class="line">};</div>
 </div><!-- fragment --><p><code>Erase()</code> 或 <code>EraseValueByPointer()</code> 不需要 allocator。而且它们成功删除值之后会返回 <code>true</code>。</p>
 <h1><a class="anchor" id="ErrorHandling"></a>
@@ -260,8 +260,8 @@ URI 片段表示方式</h1>
 <p>RapidJSON 完全支持 URI 片段表示方式。它在解译时会自动检测 <code>#</code> 号。</p>
 <h1>字符串化</h1>
 <p>你也可以把一个 <code>Pointer</code> 字符串化，储存于字符串或其他输出流。例如：</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a> p(...);</div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a51a6c35028b76e354bbb9e25d7125641">StringBuffer</a> sb;</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a> p(...);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> sb;</div>
 <div class="line">p.Stringify(sb);</div>
 <div class="line">std::cout &lt;&lt; sb.GetString() &lt;&lt; std::endl;</div>
 </div><!-- fragment --><p>使用 <code>StringifyUriFragment()</code> 可以把 pointer 字符串化为 URI 片段表示法。</p>
@@ -273,7 +273,7 @@ URI 片段表示方式</h1>
 <div class="line"><span class="preprocessor">#define INDEX(i) { #i, sizeof(#i) - 1, i }</span></div>
 <div class="line"></div>
 <div class="line"><span class="keyword">static</span> <span class="keyword">const</span> Pointer::Token kTokens[] = { NAME(<span class="stringliteral">&quot;foo&quot;</span>), INDEX(123) };</div>
-<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a> p(kTokens, <span class="keyword">sizeof</span>(kTokens) / <span class="keyword">sizeof</span>(kTokens[0]));</div>
+<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a> p(kTokens, <span class="keyword">sizeof</span>(kTokens) / <span class="keyword">sizeof</span>(kTokens[0]));</div>
 <div class="line"><span class="comment">// Equivalent to static const Pointer p(&quot;/foo/123&quot;);</span></div>
 </div><!-- fragment --><p>这种做法可能适合内存受限的系统。 </p>
 </div></div><!-- contents -->

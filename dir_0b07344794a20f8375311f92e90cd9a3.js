@@ -8,6 +8,7 @@ var dir_0b07344794a20f8375311f92e90cd9a3 =
     [ "encodings.h", "encodings_8h_source.html", null ],
     [ "filereadstream.h", "filereadstream_8h_source.html", null ],
     [ "filewritestream.h", "filewritestream_8h_source.html", null ],
+    [ "fwd.h", "fwd_8h_source.html", null ],
     [ "memorybuffer.h", "memorybuffer_8h_source.html", null ],
     [ "memorystream.h", "memorystream_8h_source.html", null ],
     [ "pointer.h", "pointer_8h_source.html", null ],
@@ -15,6 +16,7 @@ var dir_0b07344794a20f8375311f92e90cd9a3 =
     [ "rapidjson.h", "rapidjson_8h.html", "rapidjson_8h" ],
     [ "reader.h", "reader_8h.html", "reader_8h" ],
     [ "schema.h", "schema_8h_source.html", null ],
+    [ "stream.h", "stream_8h_source.html", null ],
     [ "stringbuffer.h", "stringbuffer_8h_source.html", null ],
     [ "writer.h", "writer_8h_source.html", null ]
 ];

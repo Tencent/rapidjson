@@ -163,7 +163,7 @@ DOM in the tutorial</div></div>
 </div><!-- fragment --><div class="fragment"><div class="line">i = 123</div>
 <div class="line">pi = 3.1416</div>
 </div><!-- fragment --><p>JSON array contains a number of elements. </p><div class="fragment"><div class="line"><span class="comment">// Using a reference for consecutive access is handy and faster.</span></div>
-<div class="line"><span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>&amp; a = document[<span class="stringliteral">&quot;a&quot;</span>];</div>
+<div class="line"><span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>&amp; a = document[<span class="stringliteral">&quot;a&quot;</span>];</div>
 <div class="line">assert(a.IsArray());</div>
 <div class="line"><span class="keywordflow">for</span> (<a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> i = 0; i &lt; a.Size(); i++) <span class="comment">// Uses SizeType instead of size_t</span></div>
 <div class="line">        printf(<span class="stringliteral">&quot;a[%d] = %d\n&quot;</span>, i, a[i].GetInt());</div>
@@ -271,26 +271,26 @@ Create/Modify Values</h1>
 <h2><a class="anchor" id="ChangeValueType"></a>
 Change Value Type</h2>
 <p>When creating a Value or Document by default constructor, its type is Null. To change its type, call <code>SetXXX()</code> or assignment operator, for example:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d; <span class="comment">// Null</span></div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d; <span class="comment">// Null</span></div>
 <div class="line">d.SetObject();</div>
 <div class="line"></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> v;    <span class="comment">// Null</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> v;    <span class="comment">// Null</span></div>
 <div class="line">v.SetInt(10);</div>
 <div class="line">v = 10;     <span class="comment">// Shortcut, same as above</span></div>
 </div><!-- fragment --><h3>Overloaded Constructors</h3>
 <p>There are also overloaded constructors for several types:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> b(<span class="keyword">true</span>);    <span class="comment">// calls Value(bool)</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> i(-123);    <span class="comment">// calls Value(int)</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> u(123u);    <span class="comment">// calls Value(unsigned)</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> d(1.5);     <span class="comment">// calls Value(double)</span></div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> b(<span class="keyword">true</span>);    <span class="comment">// calls Value(bool)</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> i(-123);    <span class="comment">// calls Value(int)</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> u(123u);    <span class="comment">// calls Value(unsigned)</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> d(1.5);     <span class="comment">// calls Value(double)</span></div>
 </div><!-- fragment --><p>To create empty object or array, you may use <code>SetObject()</code>/<code>SetArray()</code> after default constructor, or using the <code>Value(Type)</code> in one shot:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
 </div><!-- fragment --><h2><a class="anchor" id="MoveSemantics"></a>
 Move Semantics</h2>
 <p>A very special decision during design of RapidJSON is that, assignment of value does not copy the source value to destination value. Instead, the value from source is moved to the destination. For example,</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> a(123);</div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> b(456);</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(123);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> b(456);</div>
 <div class="line">b = a;         <span class="comment">// a becomes a Null value, b becomes number 123.</span></div>
 </div><!-- fragment --><div class="image">
 <img src="move1.png" alt="move1.png"/>
@@ -299,10 +299,10 @@ Assignment with move semantics.</div></div>
 <p> Why? What is the advantage of this semantics?</p>
 <p>The simple answer is performance. For fixed size JSON types (Number, True, False, Null), copying them is fast and easy. However, For variable size JSON types (String, Array, Object), copying them will incur a lot of overheads. And these overheads are often unnoticed. Especially when we need to create temporary object, copy it to another variable, and then destruct it.</p>
 <p>For example, if normal <em>copy</em> semantics was used:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
 <div class="line">{</div>
-<div class="line">    <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> contacts(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
+<div class="line">    <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> contacts(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
 <div class="line">    <span class="comment">// adding elements to contacts array.</span></div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">    o.AddMember(<span class="stringliteral">&quot;contacts&quot;</span>, contacts, d.GetAllocator());  <span class="comment">// deep clone contacts (may be with lots of allocations)</span></div>
@@ -316,10 +316,10 @@ Copy semantics makes a lots of copy operations.</div></div>
 <p>There are solutions to prevent actual copying these data, such as reference counting and garbage collection(GC).</p>
 <p>To make RapidJSON simple and fast, we chose to use <em>move</em> semantics for assignment. It is similar to <code>std::auto_ptr</code> which transfer ownership during assignment. Move is much faster and simpler, it just destructs the original value, <code>memcpy()</code> the source to destination, and finally sets the source as Null type.</p>
 <p>So, with move semantics, the above example becomes:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
 <div class="line">{</div>
-<div class="line">    <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> contacts(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
+<div class="line">    <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> contacts(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
 <div class="line">    <span class="comment">// adding elements to contacts array.</span></div>
 <div class="line">    o.AddMember(<span class="stringliteral">&quot;contacts&quot;</span>, contacts, d.GetAllocator());  <span class="comment">// just memcpy() of contacts itself to the value of new member (16 bytes)</span></div>
 <div class="line">    <span class="comment">// contacts became Null here. Its destruction is trivial.</span></div>
@@ -332,11 +332,11 @@ Move semantics makes no copying.</div></div>
 <h3><a class="anchor" id="TemporaryValues"></a>
 Move semantics and temporary values</h3>
 <p>Sometimes, it is convenient to construct a Value in place, before passing it to one of the "moving" functions, like <code>PushBack()</code> or <code>AddMember()</code>. As temporary objects can't be converted to proper Value references, the convenience function <code>Move()</code> is available:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
 <div class="line">Document::AllocatorType&amp; allocator = document.GetAllocator();</div>
 <div class="line"><span class="comment">// a.PushBack(Value(42), allocator);       // will not compile</span></div>
-<div class="line">a.PushBack(<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>().SetInt(42), allocator); <span class="comment">// fluent API</span></div>
-<div class="line">a.PushBack(<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>(42).Move(), allocator);   <span class="comment">// same as above</span></div>
+<div class="line">a.PushBack(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>().SetInt(42), allocator); <span class="comment">// fluent API</span></div>
+<div class="line">a.PushBack(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(42).Move(), allocator);   <span class="comment">// same as above</span></div>
 </div><!-- fragment --><h2><a class="anchor" id="CreateString"></a>
 Create String</h2>
 <p>RapidJSON provide two strategies for storing string.</p>
@@ -347,8 +347,8 @@ Create String</h2>
 <p>Copy-string is always safe because it owns a copy of the data. Const-string can be used for storing string literal, and in-situ parsing which we will mentioned in Document section.</p>
 <p>To make memory allocation customizable, RapidJSON requires user to pass an instance of allocator, whenever an operation may require allocation. This design is needed to prevent storing a allocator (or Document) pointer per Value.</p>
 <p>Therefore, when we assign a copy-string, we call this overloaded <code>SetString()</code> with allocator:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> document;</div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> author;</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> document;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> author;</div>
 <div class="line"><span class="keywordtype">char</span> buffer[10];</div>
 <div class="line"><span class="keywordtype">int</span> len = sprintf(buffer, <span class="stringliteral">&quot;%s %s&quot;</span>, <span class="stringliteral">&quot;Milo&quot;</span>, <span class="stringliteral">&quot;Yip&quot;</span>); <span class="comment">// dynamically created string.</span></div>
 <div class="line">author.SetString(buffer, len, document.GetAllocator());</div>
@@ -357,13 +357,13 @@ Create String</h2>
 </div><!-- fragment --><p>In this example, we get the allocator from a <code>Document</code> instance. This is a common idiom when using RapidJSON. But you may use other instances of allocator.</p>
 <p>Besides, the above <code>SetString()</code> requires length. This can handle null characters within a string. There is another <code>SetString()</code> overloaded function without the length parameter. And it assumes the input is null-terminated and calls a <code>strlen()</code>-like function to obtain the length.</p>
 <p>Finally, for string literal or string with safe life-cycle can use const-string version of <code>SetString()</code>, which lacks allocator parameter. For string literals (or constant character arrays), simply passing the literal as parameter is safe and efficient:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> s;</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> s;</div>
 <div class="line">s.SetString(<span class="stringliteral">&quot;rapidjson&quot;</span>);    <span class="comment">// can contain null character, length derived at compile time</span></div>
 <div class="line">s = <span class="stringliteral">&quot;rapidjson&quot;</span>;             <span class="comment">// shortcut, same as above</span></div>
 </div><!-- fragment --><p>For character pointer, the RapidJSON requires to mark it as safe before using it without copying. This can be achieved by using the <code>StringRef</code> function:</p>
 <div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span> * cstr = getenv(<span class="stringliteral">&quot;USER&quot;</span>);</div>
 <div class="line"><span class="keywordtype">size_t</span> cstr_len = ...;                 <span class="comment">// in case length is available</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> s;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> s;</div>
 <div class="line"><span class="comment">// s.SetString(cstr);                  // will not compile</span></div>
 <div class="line">s.SetString(<a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(cstr));          <span class="comment">// ok, assume safe lifetime, null-terminated</span></div>
 <div class="line">s = <a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(cstr);                   <span class="comment">// shortcut, same as above</span></div>
@@ -383,7 +383,7 @@ Modify Array</h2>
 </ul>
 <p>Note that, <code>Reserve(...)</code> and <code>PushBack(...)</code> may allocate memory for the array elements, therefore require an allocator.</p>
 <p>Here is an example of <code>PushBack()</code>:</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
 <div class="line">Document::AllocatorType&amp; allocator = document.GetAllocator();</div>
 <div class="line"></div>
 <div class="line"><span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 5; i &lt;= 10; i++)</div>
@@ -394,11 +394,11 @@ Modify Array</h2>
 </div><!-- fragment --><p>Differs from STL, <code>PushBack()</code>/<code>PopBack()</code> returns the array reference itself. This is called <em>fluent interface</em>.</p>
 <p>If you want to add a non-constant string or a string without sufficient lifetime (see <a href="#CreateString">Create String</a>) to the array, you need to create a string Value by using the copy-string API. To avoid the need for an intermediate variable, you can use a <a href="#TemporaryValues">temporary value</a> in place:</p>
 <div class="fragment"><div class="line"><span class="comment">// in-place Value parameter</span></div>
-<div class="line">contact.PushBack(<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>(<span class="stringliteral">&quot;copy&quot;</span>, document.GetAllocator()).Move(), <span class="comment">// copy string</span></div>
+<div class="line">contact.PushBack(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<span class="stringliteral">&quot;copy&quot;</span>, document.GetAllocator()).Move(), <span class="comment">// copy string</span></div>
 <div class="line">                 document.GetAllocator());</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// explicit parameters</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> val(<span class="stringliteral">&quot;key&quot;</span>, document.GetAllocator()); <span class="comment">// copy string</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> val(<span class="stringliteral">&quot;key&quot;</span>, document.GetAllocator()); <span class="comment">// copy string</span></div>
 <div class="line">contact.PushBack(val, document.GetAllocator());</div>
 </div><!-- fragment --><h2><a class="anchor" id="ModifyObject"></a>
 Modify Object</h2>
@@ -409,19 +409,19 @@ Modify Object</h2>
 <li><code>template &lt;typename T&gt; Value&amp; AddMember(StringRefType, T value, Allocator&amp;)</code></li>
 </ul>
 <p>Here is an example.</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> contact(kObject);</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> contact(kObject);</div>
 <div class="line">contact.AddMember(<span class="stringliteral">&quot;name&quot;</span>, <span class="stringliteral">&quot;Milo&quot;</span>, document.GetAllocator());</div>
 <div class="line">contact.AddMember(<span class="stringliteral">&quot;married&quot;</span>, <span class="keyword">true</span>, document.GetAllocator());</div>
 </div><!-- fragment --><p>The name parameter with <code>StringRefType</code> is similar to the interface of <code>SetString</code> function for string values. These overloads are used to avoid the need for copying the <code>name</code> string, as constant key names are very common in JSON objects.</p>
 <p>If you need to create a name from a non-constant string or a string without sufficient lifetime (see <a href="#CreateString">Create String</a>), you need to create a string Value by using the copy-string API. To avoid the need for an intermediate variable, you can use a <a href="#TemporaryValues">temporary value</a> in place:</p>
 <div class="fragment"><div class="line"><span class="comment">// in-place Value parameter</span></div>
-<div class="line">contact.AddMember(<a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>(<span class="stringliteral">&quot;copy&quot;</span>, document.GetAllocator()).Move(), <span class="comment">// copy string</span></div>
-<div class="line">                  <a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a>().Move(),                                <span class="comment">// null value</span></div>
+<div class="line">contact.AddMember(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<span class="stringliteral">&quot;copy&quot;</span>, document.GetAllocator()).Move(), <span class="comment">// copy string</span></div>
+<div class="line">                  <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>().Move(),                                <span class="comment">// null value</span></div>
 <div class="line">                  document.GetAllocator());</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// explicit parameters</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> key(<span class="stringliteral">&quot;key&quot;</span>, document.GetAllocator()); <span class="comment">// copy string name</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> val(42);                             <span class="comment">// some value</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> key(<span class="stringliteral">&quot;key&quot;</span>, document.GetAllocator()); <span class="comment">// copy string name</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> val(42);                             <span class="comment">// some value</span></div>
 <div class="line">contact.AddMember(key, val, document.GetAllocator());</div>
 </div><!-- fragment --><p>For removing members, there are several choices:</p>
 <ul>
@@ -435,12 +435,12 @@ Modify Object</h2>
 <h2><a class="anchor" id="DeepCopyValue"></a>
 Deep Copy Value</h2>
 <p>If we really need to copy a DOM tree, we can use two APIs for deep copy: constructor with allocator, and <code>CopyFrom()</code>.</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line">Document::AllocatorType&amp; a = d.GetAllocator();</div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> v1(<span class="stringliteral">&quot;foo&quot;</span>);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> v1(<span class="stringliteral">&quot;foo&quot;</span>);</div>
 <div class="line"><span class="comment">// Value v2(v1); // not allowed</span></div>
 <div class="line"></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> v2(v1, a);                      <span class="comment">// make a copy</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> v2(v1, a);                      <span class="comment">// make a copy</span></div>
 <div class="line">assert(v1.IsString());                <span class="comment">// v1 untouched</span></div>
 <div class="line">d.SetArray().PushBack(v1, a).PushBack(v2, a);</div>
 <div class="line">assert(v1.IsNull() &amp;&amp; v2.IsNull());   <span class="comment">// both moved to d</span></div>
@@ -452,8 +452,8 @@ Deep Copy Value</h2>
 </div><!-- fragment --><h2><a class="anchor" id="SwapValues"></a>
 Swap Values</h2>
 <p><code>Swap()</code> is also provided.</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> a(123);</div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> b(<span class="stringliteral">&quot;Hello&quot;</span>);</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(123);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> b(<span class="stringliteral">&quot;Hello&quot;</span>);</div>
 <div class="line">a.Swap(b);</div>
 <div class="line">assert(a.IsString());</div>
 <div class="line">assert(b.IsInt());</div>

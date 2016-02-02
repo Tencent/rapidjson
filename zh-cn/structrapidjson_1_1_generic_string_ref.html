@@ -165,14 +165,14 @@ struct rapidjson::GenericStringRef&lt; CharType &gt;</h3>
 </dl>
 <p>This helper class is used to automatically infer constant string references for string literals, especially from <code>const</code> <b></b>(!) character arrays.</p>
 <p>The main use is for creating JSON string values without copying the source string via an <a class="el" href="md_doc_internals.html#Allocator">Allocator</a>. This requires that the referenced string pointers have a sufficient lifetime, which exceeds the lifetime of the associated <a class="el" href="classrapidjson_1_1_generic_value.html" title="Represents a JSON value. Use Value for UTF8 encoding and default allocator. ">GenericValue</a>.</p>
-<p><b>Example</b> </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> v(<span class="stringliteral">&quot;foo&quot;</span>);   <span class="comment">// ok, no need to copy &amp; calculate length</span></div>
+<p><b>Example</b> </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> v(<span class="stringliteral">&quot;foo&quot;</span>);   <span class="comment">// ok, no need to copy &amp; calculate length</span></div>
 <div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span> foo[] = <span class="stringliteral">&quot;foo&quot;</span>;</div>
 <div class="line">v.SetString(foo); <span class="comment">// ok</span></div>
 <div class="line"></div>
 <div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span>* bar = foo;</div>
 <div class="line"><span class="comment">// Value x(bar); // not ok, can&#39;t rely on bar&#39;s lifetime</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> x(<a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(bar)); <span class="comment">// lifetime explicitly guaranteed by user</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> y(<a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(bar, 3));  <span class="comment">// ok, explicitly pass length</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> x(<a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(bar)); <span class="comment">// lifetime explicitly guaranteed by user</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> y(<a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(bar, 3));  <span class="comment">// ok, explicitly pass length</span></div>
 </div><!-- fragment --><dl class="section see"><dt>参见</dt><dd><a class="el" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5" title="Mark a character pointer as constant string. ">StringRef</a>, <a class="el" href="classrapidjson_1_1_generic_value.html#afb91480cc6242ca96ffc603e649c319f" title="Set this value as a string without copying source string. ">GenericValue::SetString</a> </dd></dl>
 </div><h2 class="groupheader">构造及析构函数说明</h2>
 <a class="anchor" id="acd4d5ebac2b610ce647356aa52998002"></a>

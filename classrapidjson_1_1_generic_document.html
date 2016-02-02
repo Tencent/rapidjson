@@ -846,7 +846,7 @@ template&lt;typename Encoding, typename Allocator, typename StackAllocator&gt; <
 
 <p>Implicit conversion to get the last parse result. </p>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html">ParseResult</a> of the last parse operation</dd></dl>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> doc;</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> doc;</div>
 <div class="line">ParseResult ok = doc.Parse(json);</div>
 <div class="line"><span class="keywordflow">if</span> (!ok)</div>
 <div class="line">  printf( <span class="stringliteral">&quot;JSON parse error: %s (%u)\n&quot;</span>, <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(ok.Code()), ok.Offset());</div>

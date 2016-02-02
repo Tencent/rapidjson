@@ -98,15 +98,15 @@ $(document).ready(function(){initNavTree('md_doc_schema_8zh-cn.html','');});
 <div class="line"></div>
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> sd;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> sd;</div>
 <div class="line"><span class="keywordflow">if</span> (!sd.Parse(schemaJson)) {</div>
 <div class="line">    <span class="comment">// the schema is not a valid JSON.</span></div>
 <div class="line">    <span class="comment">// ...       </span></div>
 <div class="line">}</div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a1039ee639733008423fd0dfb67122e54">SchemaDocument</a> schema(sd); <span class="comment">// Compile a Document to SchemaDocument</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#a52bbb5d64d1319495089e1713a0653cf">SchemaDocument</a> schema(sd); <span class="comment">// Compile a Document to SchemaDocument</span></div>
 <div class="line"><span class="comment">// sd is no longer needed here.</span></div>
 <div class="line"></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line"><span class="keywordflow">if</span> (!d.Parse(inputJson)) {</div>
 <div class="line">    <span class="comment">// the input is not a valid JSON.</span></div>
 <div class="line">    <span class="comment">// ...       </span></div>
@@ -116,7 +116,7 @@ $(document).ready(function(){initNavTree('md_doc_schema_8zh-cn.html','');});
 <div class="line"><span class="keywordflow">if</span> (!d.Accept(validator)) {</div>
 <div class="line">    <span class="comment">// Input JSON is invalid according to the schema</span></div>
 <div class="line">    <span class="comment">// Output diagnostic information</span></div>
-<div class="line">    <a class="code" href="namespacerapidjson.html#a51a6c35028b76e354bbb9e25d7125641">StringBuffer</a> sb;</div>
+<div class="line">    <a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> sb;</div>
 <div class="line">    validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);</div>
 <div class="line">    printf(<span class="stringliteral">&quot;Invalid schema: %s\n&quot;</span>, sb.GetString());</div>
 <div class="line">    printf(<span class="stringliteral">&quot;Invalid keyword: %s\n&quot;</span>, validator.GetInvalidSchemaKeyword());</div>
@@ -136,14 +136,14 @@ $(document).ready(function(){initNavTree('md_doc_schema_8zh-cn.html','');});
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/filereadstream.h&quot;</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// ...</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a1039ee639733008423fd0dfb67122e54">SchemaDocument</a> schema(sd); <span class="comment">// Compile a Document to SchemaDocument</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#a52bbb5d64d1319495089e1713a0653cf">SchemaDocument</a> schema(sd); <span class="comment">// Compile a Document to SchemaDocument</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// Use reader to parse the JSON</span></div>
 <div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;big.json&quot;</span>, <span class="stringliteral">&quot;r&quot;</span>);</div>
 <div class="line">FileReadStream is(fp, buffer, <span class="keyword">sizeof</span>(buffer));</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// Parse JSON from reader, validate the SAX events, and store in d.</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line">SchemaValidatingReader&lt;kParseDefaultFlags, FileReadStream, UTF8&lt;&gt; &gt; reader(is, schema);</div>
 <div class="line">d.Populate(reader);</div>
 <div class="line"></div>
@@ -158,7 +158,7 @@ $(document).ready(function(){initNavTree('md_doc_schema_8zh-cn.html','');});
 <div class="line">    <span class="keywordflow">if</span> (!reader.IsValid()) {</div>
 <div class="line">        <span class="comment">// Input JSON is invalid according to the schema</span></div>
 <div class="line">        <span class="comment">// Output diagnostic information</span></div>
-<div class="line">        <a class="code" href="namespacerapidjson.html#a51a6c35028b76e354bbb9e25d7125641">StringBuffer</a> sb;</div>
+<div class="line">        <a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> sb;</div>
 <div class="line">        reader.GetInvalidSchemaPointer().StringifyUriFragment(sb);</div>
 <div class="line">        printf(<span class="stringliteral">&quot;Invalid schema: %s\n&quot;</span>, sb.GetString());</div>
 <div class="line">        printf(<span class="stringliteral">&quot;Invalid keyword: %s\n&quot;</span>, reader.GetInvalidSchemaKeyword());</div>
@@ -170,7 +170,7 @@ $(document).ready(function(){initNavTree('md_doc_schema_8zh-cn.html','');});
 </div><!-- fragment --><h3>SAX 解析</h3>
 <p>使用 SAX 解析时，情况就简单得多。若只需要校验 JSON 而无需进一步处理，那么仅需要：</p>
 <div class="fragment"><div class="line">SchemaValidator validator(schema);</div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a4eaef42a208413d1f2c8d4655ecec52d">Reader</a> reader;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ad5310edd1226f5b3ea82dc0d4d3740c6">Reader</a> reader;</div>
 <div class="line"><span class="keywordflow">if</span> (!reader.Parse(stream, validator)) {</div>
 <div class="line">    <span class="keywordflow">if</span> (!validator.IsValid()) {</div>
 <div class="line">        <span class="comment">// ...    </span></div>
@@ -180,7 +180,7 @@ $(document).ready(function(){initNavTree('md_doc_schema_8zh-cn.html','');});
 <p>若你需要进一步处理 SAX 事件，便可使用模板类 <code>GenericSchemaValidator</code> 去设置校验器的输出 <code>Handler</code>：</p>
 <div class="fragment"><div class="line">MyHandler handler;</div>
 <div class="line">GenericSchemaValidator&lt;SchemaDocument, MyHandler&gt; validator(schema, handler);</div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a4eaef42a208413d1f2c8d4655ecec52d">Reader</a> reader;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ad5310edd1226f5b3ea82dc0d4d3740c6">Reader</a> reader;</div>
 <div class="line"><span class="keywordflow">if</span> (!reader.Parse(ss, validator)) {</div>
 <div class="line">    <span class="keywordflow">if</span> (!validator.IsValid()) {</div>
 <div class="line">        <span class="comment">// ...    </span></div>
@@ -188,7 +188,7 @@ $(document).ready(function(){initNavTree('md_doc_schema_8zh-cn.html','');});
 <div class="line">}</div>
 </div><!-- fragment --><h3>生成</h3>
 <p>我们也可以在生成（serialization）的时候进行校验。这能确保输出的 JSON 符合一个 JSON Schema。</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a51a6c35028b76e354bbb9e25d7125641">StringBuffer</a> sb;</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> sb;</div>
 <div class="line">Writer&lt;StringBuffer&gt; writer(sb);</div>
 <div class="line">GenericSchemaValidator&lt;SchemaDocument, Writer&lt;StringBuffer&gt; &gt; validator(s, writer);</div>
 <div class="line"><span class="keywordflow">if</span> (!d.Accept(validator)) {</div>
@@ -202,9 +202,9 @@ $(document).ready(function(){initNavTree('md_doc_schema_8zh-cn.html','');});
 <p>JSON Schema 支持 <a href="http://spacetelescope.github.io/understanding-json-schema/structuring.html">`$ref` 关键字</a>，它是一个JSON pointer 引用至一个本地（local）或远程（remote） schema。本地指针的首字符是 <code>#</code>，而远程指针是一个相对或绝对 URI。例如：</p>
 <div class="fragment"><div class="line">{ <span class="stringliteral">&quot;$ref&quot;</span>: <span class="stringliteral">&quot;definitions.json#/address&quot;</span> }</div>
 </div><!-- fragment --><p>由于 <code>SchemaValidator</code> 并不知道如何处理那些 URI，它需要使用者提供一个 <code>IRemoteSchemaDocumentProvider</code> 的实例去处理。</p>
-<div class="fragment"><div class="line"><span class="keyword">class </span>MyRemoteSchemaDocumentProvider : <span class="keyword">public</span> <a class="code" href="namespacerapidjson.html#a735a06a6e822111798e302c2f3af3de9">IRemoteSchemaDocumentProvider</a> {</div>
+<div class="fragment"><div class="line"><span class="keyword">class </span>MyRemoteSchemaDocumentProvider : <span class="keyword">public</span> <a class="code" href="namespacerapidjson.html#af91eb8eea47b79d75b23e29fa9c0abb5">IRemoteSchemaDocumentProvider</a> {</div>
 <div class="line"><span class="keyword">public</span>:</div>
-<div class="line">    <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#a1039ee639733008423fd0dfb67122e54">SchemaDocument</a>* GetRemoteDocument(<span class="keyword">const</span> <span class="keywordtype">char</span>* uri, SizeTyp length) {</div>
+<div class="line">    <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#a52bbb5d64d1319495089e1713a0653cf">SchemaDocument</a>* GetRemoteDocument(<span class="keyword">const</span> <span class="keywordtype">char</span>* uri, SizeTyp length) {</div>
 <div class="line">        <span class="comment">// Resolve the uri and returns a pointer to that schema.</span></div>
 <div class="line">    }</div>
 <div class="line">};</div>

@@ -5,7 +5,6 @@ var reader_8h =
     [ "RAPIDJSON_PARSE_DEFAULT_FLAGS", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga77005e892e6601599beaf421b0395c31", null ],
     [ "RAPIDJSON_PARSE_ERROR", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gae3689840fa6e89a241313f33b602f865", null ],
     [ "RAPIDJSON_PARSE_ERROR_NORETURN", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7f8c4265b2edda78568ae3338aaf1461", null ],
-    [ "Reader", "reader_8h.html#a4eaef42a208413d1f2c8d4655ecec52d", null ],
     [ "ParseFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9", [
       [ "kParseNoFlags", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9af2c7fa21e9e7656e467bd71079ac8fb0", null ],
       [ "kParseInsituFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a02748971d6ea0c5e22c69b8aa7f344ea", null ],

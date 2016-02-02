@@ -130,7 +130,7 @@ StringStream（输入）</h2>
 </div><!-- fragment --><p>由于这是非常常用的用法，RapidJSON提供<code>Document::Parse(const char*)</code>去做完全相同的事情：</p>
 <div class="fragment"><div class="line"><span class="comment">// ...</span></div>
 <div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span> json[] = <span class="stringliteral">&quot;[1, 2, 3, 4]&quot;</span>;</div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line">d.Parse(json);</div>
 </div><!-- fragment --><p>需要注意，<code>StringStream</code>是<code>GenericStringStream&lt;UTF8&lt;&gt; &gt;</code>的typedef，使用者可用其他编码类去代表流所使用的字符集。</p>
 <h2><a class="anchor" id="StringBuffer"></a>
@@ -138,14 +138,14 @@ StringBuffer（输出）</h2>
 <p><code>StringBuffer</code>是一个简单的输出流。它分配一个内存缓冲区，供写入整个JSON。可使用<code>GetString()</code>来获取该缓冲区。</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/stringbuffer.h&quot;</span></div>
 <div class="line"></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a51a6c35028b76e354bbb9e25d7125641">StringBuffer</a> buffer;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> buffer;</div>
 <div class="line">Writer&lt;StringBuffer&gt; writer(buffer);</div>
 <div class="line">d.Accept(writer);</div>
 <div class="line"></div>
 <div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span>* output = buffer.GetString();</div>
 </div><!-- fragment --><p>当缓冲区满溢，它将自动增加容量。缺省容量是256个字符（UTF8是256字节，UTF16是512字节等）。使用者能自行提供分配器及初始容量。</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a51a6c35028b76e354bbb9e25d7125641">StringBuffer</a> buffer1(0, 1024); <span class="comment">// 使用它的分配器，初始大小 = 1024</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a51a6c35028b76e354bbb9e25d7125641">StringBuffer</a> buffer2(allocator, 1024);</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> buffer1(0, 1024); <span class="comment">// 使用它的分配器，初始大小 = 1024</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> buffer2(allocator, 1024);</div>
 </div><!-- fragment --><p>如无设置分配器，<code>StringBuffer</code>会自行实例化一个内部分配器。</p>
 <p>相似地，<code>StringBuffer</code>是<code>GenericStringBuffer&lt;UTF8&lt;&gt; &gt;</code>的typedef。</p>
 <h1><a class="anchor" id="FileStreams"></a>
@@ -228,7 +228,7 @@ EncodedOutputStream</h2>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/encodedstream.h&quot;</span>    <span class="comment">// EncodedOutputStream</span></div>
 <div class="line"><span class="preprocessor">#include &lt;cstdio&gt;</span></div>
 <div class="line"></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;         <span class="comment">// Document为GenericDocument&lt;UTF8&lt;&gt; &gt; </span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;         <span class="comment">// Document为GenericDocument&lt;UTF8&lt;&gt; &gt; </span></div>
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"></div>
 <div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;output_utf32le.json&quot;</span>, <span class="stringliteral">&quot;wb&quot;</span>); <span class="comment">// 非Windows平台使用&quot;w&quot;</span></div>
@@ -354,7 +354,7 @@ AutoUTFOutputStream</h2>
 <div class="line">std::stringstream ss(json);</div>
 <div class="line">IStreamWrapper is(ss);</div>
 <div class="line"></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>(is);</div>
 </div><!-- fragment --><p>但要注意，由于标准库的内部开销问，此实现的性能可能不如RapidJSON的内存／文件流。</p>
 <h2><a class="anchor" id="ExampleOStreamWrapper"></a>
@@ -383,7 +383,7 @@ AutoUTFOutputStream</h2>
 <div class="line">    std::ostream&amp; os_;</div>
 <div class="line">};</div>
 </div><!-- fragment --><p>使用者能用它来包装<code>std::stringstream</code>、<code>std::ofstream</code>的实例。</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"></div>
 <div class="line">std::stringstream ss;</div>

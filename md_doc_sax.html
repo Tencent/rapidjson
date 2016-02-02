@@ -212,7 +212,7 @@ GenericReader</h2>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">};</div>
 <div class="line"></div>
-<div class="line"><span class="keyword">typedef</span> GenericReader&lt;UTF8&lt;&gt;, UTF8&lt;&gt; &gt; <a class="code" href="namespacerapidjson.html#a4eaef42a208413d1f2c8d4655ecec52d">Reader</a>;</div>
+<div class="line"><span class="keyword">typedef</span> GenericReader&lt;UTF8&lt;&gt;, UTF8&lt;&gt; &gt; <a class="code" href="namespacerapidjson.html#ad5310edd1226f5b3ea82dc0d4d3740c6">Reader</a>;</div>
 <div class="line"></div>
 <div class="line">} <span class="comment">// namespace rapidjson</span></div>
 </div><!-- fragment --><p>The <code>Reader</code> uses UTF-8 as both source and target encoding. The source encoding means the encoding in the JSON stream. The target encoding means the encoding of the <code>str</code> parameter in <code>String()</code> calls. For example, to parse a UTF-8 stream and outputs UTF-16 string events, you can define a reader by:</p>
@@ -257,7 +257,7 @@ Writer</h1>
 <div class="line">    writer.Key(<span class="stringliteral">&quot;i&quot;</span>);</div>
 <div class="line">    writer.Uint(123);</div>
 <div class="line">    writer.Key(<span class="stringliteral">&quot;pi&quot;</span>);</div>
-<div class="line">    writer.<a class="code" href="classrapidjson_1_1_writer.html#ad5f042d9c1a8ce5be2d52e18255b4390">Double</a>(3.1416);</div>
+<div class="line">    writer.Double(3.1416);</div>
 <div class="line">    writer.Key(<span class="stringliteral">&quot;a&quot;</span>);</div>
 <div class="line">    writer.StartArray();</div>
 <div class="line">    <span class="keywordflow">for</span> (<span class="keywordtype">unsigned</span> i = 0; i &lt; 4; i++)</div>

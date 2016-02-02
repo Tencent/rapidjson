@@ -317,7 +317,7 @@ template&lt;typename stackAllocator &gt; </td></tr>
 <tr class="separator:ad9f28da15453d91c3669618a6f48bfcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename ValueType, typename Allocator = CrtAllocator&gt;<br />
+<div class="textblock"><h3>template&lt;typename ValueType, typename Allocator&gt;<br />
 class rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</h3>
 
 <p>Represents a JSON Pointer. Use Pointer for <a class="el" href="structrapidjson_1_1_u_t_f8.html" title="UTF-8 encoding. ">UTF8</a> encoding and default allocator. </p>
@@ -340,7 +340,7 @@ class rapidjson::GenericPointer&lt; ValueType, Allocator &gt;</h3>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -385,7 +385,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -431,7 +431,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -484,7 +484,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -527,7 +527,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="line"><span class="preprocessor">#define INDEX(i) { #i, sizeof(#i) - 1, i }</span></div>
 <div class="line"></div>
 <div class="line"><span class="keyword">static</span> <span class="keyword">const</span> Pointer::Token kTokens[] = { NAME(<span class="stringliteral">&quot;foo&quot;</span>), INDEX(123) };</div>
-<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#a9c225e4848c5facd20e43084ba2a51a3">Pointer</a> p(kTokens, <span class="keyword">sizeof</span>(kTokens) / <span class="keyword">sizeof</span>(kTokens[0]));</div>
+<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a> p(kTokens, <span class="keyword">sizeof</span>(kTokens) / <span class="keyword">sizeof</span>(kTokens[0]));</div>
 <div class="line"><span class="comment">// Equivalent to static const Pointer p(&quot;/foo/123&quot;);</span></div>
 <div class="line"></div>
 <div class="line"><span class="preprocessor">#undef NAME</span></div>
@@ -540,7 +540,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -586,7 +586,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -639,7 +639,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <div class="memtemplate">
 template&lt;typename T &gt; </div>
 <table class="mlabels">
@@ -687,7 +687,7 @@ template&lt;typename T &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -733,7 +733,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -779,7 +779,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -825,7 +825,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -880,7 +880,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <div class="memtemplate">
 template&lt;typename stackAllocator &gt; </div>
 <table class="mlabels">
@@ -928,7 +928,7 @@ template&lt;typename stackAllocator &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -964,7 +964,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -999,7 +999,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1034,7 +1034,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1088,7 +1088,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <div class="memtemplate">
 template&lt;typename T &gt; </div>
 <table class="mlabels">
@@ -1140,7 +1140,7 @@ template&lt;typename T &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <div class="memtemplate">
 template&lt;typename T , typename stackAllocator &gt; </div>
 <table class="mlabels">
@@ -1186,7 +1186,7 @@ template&lt;typename T , typename stackAllocator &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1215,7 +1215,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1244,7 +1244,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1298,7 +1298,7 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <div class="memtemplate">
 template&lt;typename T &gt; </div>
 <table class="mlabels">
@@ -1350,7 +1350,7 @@ template&lt;typename T &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <div class="memtemplate">
 template&lt;typename T , typename stackAllocator &gt; </div>
 <table class="mlabels">
@@ -1396,7 +1396,7 @@ template&lt;typename T , typename stackAllocator &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <div class="memtemplate">
 template&lt;typename OutputStream &gt; </div>
 <table class="mlabels">
@@ -1438,7 +1438,7 @@ template&lt;typename OutputStream &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <div class="memtemplate">
 template&lt;typename OutputStream &gt; </div>
 <table class="mlabels">
@@ -1480,7 +1480,7 @@ template&lt;typename OutputStream &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
+template&lt;typename ValueType , typename Allocator &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1530,7 +1530,8 @@ template&lt;typename ValueType, typename Allocator  = CrtAllocator&gt; </div>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<hr/>The documentation for this class was generated from the following files:<ul>
+<li>include/rapidjson/<a class="el" href="fwd_8h_source.html">fwd.h</a></li>
 <li>include/rapidjson/<a class="el" href="pointer_8h_source.html">pointer.h</a></li>
 </ul>
 </div><!-- contents -->

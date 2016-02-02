@@ -130,7 +130,7 @@ StringStream (Input)</h2>
 </div><!-- fragment --><p>Since this is very common usage, <code>Document::Parse(const char*)</code> is provided to do exactly the same as above:</p>
 <div class="fragment"><div class="line"><span class="comment">// ...</span></div>
 <div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span> json[] = <span class="stringliteral">&quot;[1, 2, 3, 4]&quot;</span>;</div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line">d.Parse(json);</div>
 </div><!-- fragment --><p>Note that, <code>StringStream</code> is a typedef of <code>GenericStringStream&lt;UTF8&lt;&gt; &gt;</code>, user may use another encodings to represent the character set of the stream.</p>
 <h2><a class="anchor" id="StringBuffer"></a>
@@ -138,14 +138,14 @@ StringBuffer (Output)</h2>
 <p><code>StringBuffer</code> is a simple output stream. It allocates a memory buffer for writing the whole JSON. Use <code>GetString()</code> to obtain the buffer.</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/stringbuffer.h&quot;</span></div>
 <div class="line"></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a51a6c35028b76e354bbb9e25d7125641">StringBuffer</a> buffer;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> buffer;</div>
 <div class="line">Writer&lt;StringBuffer&gt; writer(buffer);</div>
 <div class="line">d.Accept(writer);</div>
 <div class="line"></div>
 <div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span>* output = buffer.GetString();</div>
 </div><!-- fragment --><p>When the buffer is full, it will increases the capacity automatically. The default capacity is 256 characters (256 bytes for UTF8, 512 bytes for UTF16, etc.). User can provide an allocator and a initial capacity.</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a51a6c35028b76e354bbb9e25d7125641">StringBuffer</a> buffer1(0, 1024); <span class="comment">// Use its allocator, initial size = 1024</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a51a6c35028b76e354bbb9e25d7125641">StringBuffer</a> buffer2(allocator, 1024);</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> buffer1(0, 1024); <span class="comment">// Use its allocator, initial size = 1024</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> buffer2(allocator, 1024);</div>
 </div><!-- fragment --><p>By default, <code>StringBuffer</code> will instantiate an internal allocator.</p>
 <p>Similarly, <code>StringBuffer</code> is a typedef of <code>GenericStringBuffer&lt;UTF8&lt;&gt; &gt;</code>.</p>
 <h1><a class="anchor" id="FileStreams"></a>
@@ -228,7 +228,7 @@ EncodedOutputStream</h2>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/encodedstream.h&quot;</span>    <span class="comment">// EncodedOutputStream</span></div>
 <div class="line"><span class="preprocessor">#include &lt;cstdio&gt;</span></div>
 <div class="line"></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;         <span class="comment">// Document is GenericDocument&lt;UTF8&lt;&gt; &gt; </span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;         <span class="comment">// Document is GenericDocument&lt;UTF8&lt;&gt; &gt; </span></div>
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"></div>
 <div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;output_utf32le.json&quot;</span>, <span class="stringliteral">&quot;wb&quot;</span>); <span class="comment">// non-Windows use &quot;w&quot;</span></div>
@@ -354,7 +354,7 @@ Example: istream wrapper</h2>
 <div class="line">std::stringstream ss(json);</div>
 <div class="line">IStreamWrapper is(ss);</div>
 <div class="line"></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>(is);</div>
 </div><!-- fragment --><p>Note that, this implementation may not be as efficient as RapidJSON's memory or file streams, due to internal overheads of the standard library.</p>
 <h2><a class="anchor" id="ExampleOStreamWrapper"></a>
@@ -383,7 +383,7 @@ Example: ostream wrapper</h2>
 <div class="line">    std::ostream&amp; os_;</div>
 <div class="line">};</div>
 </div><!-- fragment --><p>User can use it to wrap instances of <code>std::stringstream</code>, <code>std::ofstream</code>.</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#a660c934c2959121babf799b6cb206659">Document</a> d;</div>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"></div>
 <div class="line">std::stringstream ss;</div>

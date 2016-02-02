@@ -85,12 +85,10 @@ $(document).ready(function(){initNavTree('rapidjson_8h.html','');});
 
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
-<a href="#enum-members">Enumerations</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#enum-members">Enumerations</a>  </div>
   <div class="headertitle">
 <div class="title">rapidjson.h File Reference</div>  </div>
 </div><!--header-->
@@ -102,27 +100,9 @@ $(document).ready(function(){initNavTree('rapidjson_8h.html','');});
 <code>#include &lt;cstring&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 <code>#include &lt;cassert&gt;</code><br />
-<code>#include &quot;allocators.h&quot;</code><br />
-<code>#include &quot;encodings.h&quot;</code><br />
 </div>
 <p><a href="rapidjson_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrapidjson_1_1_stream_traits.html">rapidjson::StreamTraits&lt; Stream &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides additional information for stream.  <a href="structrapidjson_1_1_stream_traits.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrapidjson_1_1_generic_string_stream.html">rapidjson::GenericStringStream&lt; Encoding &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read-only string stream.  <a href="structrapidjson_1_1_generic_string_stream.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrapidjson_1_1_stream_traits_3_01_generic_string_stream_3_01_encoding_01_4_01_4.html">rapidjson::StreamTraits&lt; GenericStringStream&lt; Encoding &gt; &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrapidjson_1_1_generic_insitu_string_stream.html">rapidjson::GenericInsituStringStream&lt; Encoding &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A read-write string stream.  <a href="structrapidjson_1_1_generic_insitu_string_stream.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrapidjson_1_1_stream_traits_3_01_generic_insitu_string_stream_3_01_encoding_01_4_01_4.html">rapidjson::StreamTraits&lt; GenericInsituStringStream&lt; Encoding &gt; &gt;</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
 <tr class="memitem:namespacerapidjson"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html">rapidjson</a></td></tr>
@@ -209,17 +189,6 @@ Typedefs</h2></td></tr>
 <tr class="memitem:a44eb33eaa523e36d466b1ced64b85c84"><td class="memItemLeft" align="right" valign="top">typedef unsigned&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">rapidjson::SizeType</a></td></tr>
 <tr class="memdesc:a44eb33eaa523e36d466b1ced64b85c84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size type (for string lengths, array sizes, etc.)  <a href="#a44eb33eaa523e36d466b1ced64b85c84">More...</a><br /></td></tr>
 <tr class="separator:a44eb33eaa523e36d466b1ced64b85c84"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada4cef9931d4a3a0017ee776c907807b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ada4cef9931d4a3a0017ee776c907807b"></a>
-typedef GenericStringStream<br class="typebreak" />
-&lt; UTF8&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#ada4cef9931d4a3a0017ee776c907807b">rapidjson::StringStream</a></td></tr>
-<tr class="memdesc:ada4cef9931d4a3a0017ee776c907807b"><td class="mdescLeft">&#160;</td><td class="mdescRight">String stream with <a class="el" href="structrapidjson_1_1_u_t_f8.html" title="UTF-8 encoding. ">UTF8</a> encoding. <br /></td></tr>
-<tr class="separator:ada4cef9931d4a3a0017ee776c907807b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5660e8e601d2719796bc86c3168a1787"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5660e8e601d2719796bc86c3168a1787"></a>
-typedef <br class="typebreak" />
-GenericInsituStringStream<br class="typebreak" />
-&lt; UTF8&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a5660e8e601d2719796bc86c3168a1787">rapidjson::InsituStringStream</a></td></tr>
-<tr class="memdesc:a5660e8e601d2719796bc86c3168a1787"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insitu string stream with <a class="el" href="structrapidjson_1_1_u_t_f8.html" title="UTF-8 encoding. ">UTF8</a> encoding. <br /></td></tr>
-<tr class="separator:a5660e8e601d2719796bc86c3168a1787"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -236,24 +205,6 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:ae79a4751c1c460ff0de5ecc07874f3e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Type of JSON value.  <a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">More...</a><br /></td></tr>
 <tr class="separator:ae79a4751c1c460ff0de5ecc07874f3e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a820f77efccfbb749bd15fe4822d2c740"><td class="memTemplParams" colspan="2"><a class="anchor" id="a820f77efccfbb749bd15fe4822d2c740"></a>
-template&lt;typename Stream &gt; </td></tr>
-<tr class="memitem:a820f77efccfbb749bd15fe4822d2c740"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a820f77efccfbb749bd15fe4822d2c740">rapidjson::PutReserve</a> (Stream &amp;stream, size_t count)</td></tr>
-<tr class="memdesc:a820f77efccfbb749bd15fe4822d2c740"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reserve n characters for writing to a stream. <br /></td></tr>
-<tr class="separator:a820f77efccfbb749bd15fe4822d2c740"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a774dcffe8ae07686f459ae017d2f20"><td class="memTemplParams" colspan="2"><a class="anchor" id="a0a774dcffe8ae07686f459ae017d2f20"></a>
-template&lt;typename Stream &gt; </td></tr>
-<tr class="memitem:a0a774dcffe8ae07686f459ae017d2f20"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a0a774dcffe8ae07686f459ae017d2f20">rapidjson::PutUnsafe</a> (Stream &amp;stream, typename Stream::Ch c)</td></tr>
-<tr class="memdesc:a0a774dcffe8ae07686f459ae017d2f20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write character to a stream, presuming buffer is reserved. <br /></td></tr>
-<tr class="separator:a0a774dcffe8ae07686f459ae017d2f20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d49d2cab617858b53a1db23b1759f43"><td class="memTemplParams" colspan="2"><a class="anchor" id="a1d49d2cab617858b53a1db23b1759f43"></a>
-template&lt;typename Stream , typename Ch &gt; </td></tr>
-<tr class="memitem:a1d49d2cab617858b53a1db23b1759f43"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a1d49d2cab617858b53a1db23b1759f43">rapidjson::PutN</a> (Stream &amp;stream, Ch c, size_t n)</td></tr>
-<tr class="memdesc:a1d49d2cab617858b53a1db23b1759f43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Put N copies of a character to a stream. <br /></td></tr>
-<tr class="separator:a1d49d2cab617858b53a1db23b1759f43"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>common definitions and configuration </p>
