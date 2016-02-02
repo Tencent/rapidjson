@@ -1535,22 +1535,22 @@ public:
         case kTrueType:     return handler.Bool(true);
 
         case kObjectType:
-            if (!handler.StartObject())
+            if (RAPIDJSON_UNLIKELY(!handler.StartObject()))
                 return false;
             for (ConstMemberIterator m = MemberBegin(); m != MemberEnd(); ++m) {
                 RAPIDJSON_ASSERT(m->name.IsString()); // User may change the type of name by MemberIterator.
-                if (!handler.Key(m->name.GetString(), m->name.GetStringLength(), (m->name.flags_ & kCopyFlag) != 0))
+                if (RAPIDJSON_UNLIKELY(!handler.Key(m->name.GetString(), m->name.GetStringLength(), (m->name.flags_ & kCopyFlag) != 0)))
                     return false;
-                if (!m->value.Accept(handler))
+                if (RAPIDJSON_UNLIKELY(!m->value.Accept(handler)))
                     return false;
             }
             return handler.EndObject(data_.o.size);
 
         case kArrayType:
-            if (!handler.StartArray())
+            if (RAPIDJSON_UNLIKELY(!handler.StartArray()))
                 return false;
-            for (GenericValue* v = data_.a.elements; v != data_.a.elements + data_.a.size; ++v)
-                if (!v->Accept(handler))
+            for (const GenericValue* v = data_.a.elements; v != data_.a.elements + data_.a.size; ++v)
+                if (RAPIDJSON_UNLIKELY(!v->Accept(handler)))
                     return false;
             return handler.EndArray(data_.a.size);
     
@@ -1559,11 +1559,11 @@ public:
     
         default:
             RAPIDJSON_ASSERT(GetType() == kNumberType);
-            if (IsInt())            return handler.Int(data_.n.i.i);
+            if (IsDouble())         return handler.Double(data_.n.d);
+            else if (IsInt())       return handler.Int(data_.n.i.i);
             else if (IsUint())      return handler.Uint(data_.n.u.u);
             else if (IsInt64())     return handler.Int64(data_.n.i64);
-            else if (IsUint64())    return handler.Uint64(data_.n.u64);
-            else                    return handler.Double(data_.n.d);
+            else                    return handler.Uint64(data_.n.u64);
         }
     }
 
@@ -1869,6 +1869,21 @@ public:
      */
     friend inline void swap(GenericDocument& a, GenericDocument& b) RAPIDJSON_NOEXCEPT { a.Swap(b); }
 
+    //! Populate this document by a generator which produces SAX events.
+    /*! \tparam Generator A functor with <tt>bool f(Handler)</tt> prototype.
+        \param g Generator functor which sends SAX events to the parameter.
+        \return The document itself for fluent API.
+    */
+    template <typename Generator>
+    GenericDocument& Populate(Generator& g) {
+        ClearStackOnExit scope(*this);
+        if (g(*this)) {
+            RAPIDJSON_ASSERT(stack_.GetSize() == sizeof(ValueType)); // Got one and only one root object
+            ValueType::operator=(*stack_.template Pop<ValueType>(1));// Move value from stack to document
+        }
+        return *this;
+    }
+
     //!@name Parse from stream
     //!@{
 
@@ -2017,9 +2032,10 @@ private:
     };
 
     // callers of the following private Handler functions
-    template <typename,typename,typename> friend class GenericReader; // for parsing
+    // template <typename,typename,typename> friend class GenericReader; // for parsing
     template <typename, typename> friend class GenericValue; // for deep copying
 
+public:
     // Implementation of Handler
     bool Null() { new (stack_.template Push<ValueType>()) ValueType(); return true; }
     bool Bool(bool b) { new (stack_.template Push<ValueType>()) ValueType(b); return true; }

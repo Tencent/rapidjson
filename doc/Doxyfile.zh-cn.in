@@ -774,6 +774,7 @@ INPUT                  = readme.zh-cn.md \
                          doc/encoding.zh-cn.md \
                          doc/dom.zh-cn.md \
                          doc/sax.zh-cn.md \
+                         doc/schema.zh-cn.md \
                          doc/performance.zh-cn.md \
                          doc/internals.md \
                          doc/faq.zh-cn.md

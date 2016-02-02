@@ -11,7 +11,10 @@ set(UNITTEST_SOURCES
     pointertest.cpp
     prettywritertest.cpp
     readertest.cpp
+    regextest.cpp
+	schematest.cpp
 	simdtest.cpp
+    strfunctest.cpp
     stringbuffertest.cpp
     strtodtest.cpp
     unittest.cpp

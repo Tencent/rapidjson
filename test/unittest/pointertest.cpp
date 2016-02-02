@@ -32,6 +32,12 @@ static const char kJson[] = "{\n"
 "    \"m~n\" : 8\n"
 "}";
 
+TEST(Pointer, DefaultConstructor) {
+    Pointer p;
+    EXPECT_TRUE(p.IsValid());
+    EXPECT_EQ(0u, p.GetTokenCount());
+}
+
 TEST(Pointer, Parse) {
     {
         Pointer p("");
