@@ -14,14 +14,14 @@
 
 #include "unittest.h"
 
+// Using forward declared types here.
+
+#include "rapidjson/fwd.h"
+
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
-
-// Using forward declared types here.
-
-#include "rapidjson/fwd.h"
 
 using namespace rapidjson;
 
