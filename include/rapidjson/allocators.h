@@ -194,6 +194,9 @@ public:
         if (newSize == 0)
             return NULL;
 
+        originalSize = RAPIDJSON_ALIGN(originalSize);
+        newSize = RAPIDJSON_ALIGN(newSize);
+
         // Do not shrink if new size is smaller than original
         if (originalSize >= newSize)
             return originalPtr;
@@ -201,7 +204,6 @@ public:
         // Simply expand it if it is the last allocation and there is sufficient space
         if (originalPtr == reinterpret_cast<char *>(chunkHead_) + RAPIDJSON_ALIGN(sizeof(ChunkHeader)) + chunkHead_->size - originalSize) {
             size_t increment = static_cast<size_t>(newSize - originalSize);
-            increment = RAPIDJSON_ALIGN(increment);
             if (chunkHead_->size + increment <= chunkHead_->capacity) {
                 chunkHead_->size += increment;
                 return originalPtr;

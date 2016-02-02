@@ -81,3 +81,22 @@ TEST(Allocator, Alignment) {
     }
 #endif
 }
+
+TEST(Allocator, Issue399) {
+    MemoryPoolAllocator<> a;
+    void* p = a.Malloc(100);
+    void* q = a.Realloc(p, 100, 200);
+    EXPECT_EQ(p, q);
+
+    // exhuasive testing
+    for (size_t j = 1; j < 32; j++) {
+        a.Clear();
+        a.Malloc(j); // some unaligned size
+        p = a.Malloc(1);
+        for (size_t i = 1; i < 1024; i++) {
+            q = a.Realloc(p, i, i + 1);
+            EXPECT_EQ(p, q);
+            p = q;
+        }
+    }
+}
