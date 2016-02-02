@@ -201,7 +201,7 @@ Note that, these are compile-time settings. Running the executable on a machine 
 
 ### Page boundary issue
 
-In an early version of RapidJSON, [an issue](https://code.google.com/archive/p/rapidjson/issues/104) reported that the `SkipWhitespace_SIMD()` causes crash very rarely (around 1 in 500,000). After investigation, it is suspected that `_mm_load_si128()` accessed bytes after '\0', and across a protected page boundary.
+In an early version of RapidJSON, [an issue](https://code.google.com/archive/p/rapidjson/issues/104) reported that the `SkipWhitespace_SIMD()` causes crash very rarely (around 1 in 500,000). After investigation, it is suspected that `_mm_loadu_si128()` accessed bytes after `'\0'`, and across a protected page boundary.
 
 In [Intel® 64 and IA-32 Architectures Optimization Reference Manual
 ](http://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-optimization-manual.html), section 10.2.1:
