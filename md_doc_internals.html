@@ -333,6 +333,14 @@ Skip Whitespaces with SIMD</h2>
 <div class="line"><span class="preprocessor">#  define RAPIDJSON_SSE2</span></div>
 <div class="line"><span class="preprocessor">#endif</span></div>
 </div><!-- fragment --><p>Note that, these are compile-time settings. Running the executable on a machine without such instruction set support will make it crash.</p>
+<h3>Page boundary issue</h3>
+<p>In an early version of RapidJSON, <a href="https://code.google.com/archive/p/rapidjson/issues/104">an issue</a> reported that the <code>SkipWhitespace_SIMD()</code> causes crash very rarely (around 1 in 500,000). After investigation, it is suspected that <code>_mm_loadu_si128()</code> accessed bytes after `'\0'`, and across a protected page boundary.</p>
+<p>In <a href="http://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-optimization-manual.html">Intel® 64 and IA-32 Architectures Optimization Reference Manual</a>, section 10.2.1:</p>
+<blockquote class="doxtable">
+<p>To support algorithms requiring unaligned 128-bit SIMD memory accesses, memory buffer allocation by a caller function should consider adding some pad space so that a callee function can safely use the address pointer safely with unaligned 128-bit SIMD memory operations. The minimal padding size should be the width of the SIMD register that might be used in conjunction with unaligned SIMD memory access. </p>
+</blockquote>
+<p>This is not feasible as RapidJSON should not enforce such requirement.</p>
+<p>To fix this issue, currently the routine process bytes up to the next aligned address. After tha, use aligned read to perform SIMD processing. Also see <a href="https://github.com/miloyip/rapidjson/issues/85">#85</a>.</p>
 <h2><a class="anchor" id="LocalStreamCopy"></a>
 Local Stream Copy</h2>
 <p>During optimization, it is found that some compilers cannot localize some member data access of streams into local variables or registers. Experimental results show that for some stream types, making a copy of the stream and used it in inner-loop can improve performance. For example, the actual (non-SIMD) implementation of <code><a class="el" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a" title="Skip the JSON white spaces in a stream. ">SkipWhitespace()</a></code> is implemented as:</p>
