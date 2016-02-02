@@ -199,6 +199,20 @@ To enable this optimization, need to define `RAPIDJSON_SSE2` or `RAPIDJSON_SSE42
 
 Note that, these are compile-time settings. Running the executable on a machine without such instruction set support will make it crash.
 
+### Page boundary issue
+
+In an early version of RapidJSON, [an issue](https://code.google.com/archive/p/rapidjson/issues/104) reported that the `SkipWhitespace_SIMD()` causes crash very rarely (around 1 in 500,000). After investigation, it is suspected that `_mm_load_si128()` accessed bytes after '\0', and across a protected page boundary.
+
+In [Intel® 64 and IA-32 Architectures Optimization Reference Manual
+](http://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-optimization-manual.html), section 10.2.1:
+
+> To support algorithms requiring unaligned 128-bit SIMD memory accesses, memory buffer allocation by a caller function should consider adding some pad space so that a callee function can safely use the address pointer safely with unaligned 128-bit SIMD memory operations.
+> The minimal padding size should be the width of the SIMD register that might be used in conjunction with unaligned SIMD memory access.
+
+This is not feasible as RapidJSON should not enforce such requirement.
+
+To fix this issue, currently the routine process bytes up to the next aligned address. After tha, use aligned read to perform SIMD processing. Also see [#85](https://github.com/miloyip/rapidjson/issues/85).
+
 ## Local Stream Copy {#LocalStreamCopy}
 
 During optimization, it is found that some compilers cannot localize some member data access of streams into local variables or registers. Experimental results show that for some stream types, making a copy of the stream and used it in inner-loop can improve performance. For example, the actual (non-SIMD) implementation of `SkipWhitespace()` is implemented as:
