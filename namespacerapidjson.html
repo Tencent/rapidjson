@@ -156,6 +156,12 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html">GenericReader</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">SAX-style JSON parser. Use <a class="el" href="md_doc_sax.html#Reader">Reader</a> for <a class="el" href="structrapidjson_1_1_u_t_f8.html" title="UTF-8 encoding. ">UTF8</a> encoding and default allocator.  <a href="classrapidjson_1_1_generic_reader.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_document.html">GenericSchemaDocument</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">JSON schema document.  <a href="classrapidjson_1_1_generic_schema_document.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_validator.html">GenericSchemaValidator</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">JSON Schema Validator.  <a href="classrapidjson_1_1_generic_schema_validator.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_string_buffer.html">GenericStringBuffer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents an in-memory output stream.  <a href="classrapidjson_1_1_generic_string_buffer.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -171,6 +177,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_handler.html">Handler</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept for receiving events from <a class="el" href="classrapidjson_1_1_generic_reader.html" title="SAX-style JSON parser. Use Reader for UTF8 encoding and default allocator. ">GenericReader</a> upon parsing. The functions return true if no error occurs. If they return false, the event publisher should terminate the process.  <a href="classrapidjson_1_1_handler.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_i_generic_remote_schema_document_provider.html">IGenericRemoteSchemaDocumentProvider</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_memory_pool_allocator.html">MemoryPoolAllocator</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default memory allocator used by the parser and DOM.  <a href="classrapidjson_1_1_memory_pool_allocator.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -182,6 +190,9 @@ Classes</h2></td></tr>
 <tr class="separator:structrapidjson_1_1_parse_result"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_pretty_writer.html">PrettyWriter</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classrapidjson_1_1_writer.html" title="JSON writer. ">Writer</a> with indentation and spacing.  <a href="classrapidjson_1_1_pretty_writer.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_schema_validating_reader.html">SchemaValidatingReader</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A helper class for parsing with validation.  <a href="classrapidjson_1_1_schema_validating_reader.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_stream.html">Stream</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept for reading and writing characters.  <a href="classrapidjson_1_1_stream.html#details">More...</a><br /></td></tr>
@@ -264,6 +275,21 @@ typedef <a class="el" href="classrapidjson_1_1_generic_reader.html">GenericReade
 &lt;&gt;, <a class="el" href="structrapidjson_1_1_u_t_f8.html">UTF8</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a4eaef42a208413d1f2c8d4655ecec52d">Reader</a></td></tr>
 <tr class="memdesc:a4eaef42a208413d1f2c8d4655ecec52d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reader with <a class="el" href="structrapidjson_1_1_u_t_f8.html" title="UTF-8 encoding. ">UTF8</a> encoding and default allocator. <br /></td></tr>
 <tr class="separator:a4eaef42a208413d1f2c8d4655ecec52d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1039ee639733008423fd0dfb67122e54"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1039ee639733008423fd0dfb67122e54"></a>
+typedef <a class="el" href="classrapidjson_1_1_generic_schema_document.html">GenericSchemaDocument</a><br class="typebreak" />
+&lt; <a class="el" href="namespacerapidjson.html#afb3fa116c66d834b6f4289d648cc8d6d">Value</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a1039ee639733008423fd0dfb67122e54">SchemaDocument</a></td></tr>
+<tr class="memdesc:a1039ee639733008423fd0dfb67122e54"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classrapidjson_1_1_generic_schema_document.html" title="JSON schema document. ">GenericSchemaDocument</a> using Value type. <br /></td></tr>
+<tr class="separator:a1039ee639733008423fd0dfb67122e54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a735a06a6e822111798e302c2f3af3de9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a735a06a6e822111798e302c2f3af3de9"></a>
+typedef <br class="typebreak" />
+<a class="el" href="classrapidjson_1_1_i_generic_remote_schema_document_provider.html">IGenericRemoteSchemaDocumentProvider</a><br class="typebreak" />
+&lt; <a class="el" href="namespacerapidjson.html#a1039ee639733008423fd0dfb67122e54">SchemaDocument</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a735a06a6e822111798e302c2f3af3de9">IRemoteSchemaDocumentProvider</a></td></tr>
+<tr class="memdesc:a735a06a6e822111798e302c2f3af3de9"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classrapidjson_1_1_i_generic_remote_schema_document_provider.html">IGenericRemoteSchemaDocumentProvider</a> using SchemaDocument. <br /></td></tr>
+<tr class="separator:a735a06a6e822111798e302c2f3af3de9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab53b9a536b2918c669052834239de91f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab53b9a536b2918c669052834239de91f"></a>
+typedef <a class="el" href="classrapidjson_1_1_generic_schema_validator.html">GenericSchemaValidator</a><br class="typebreak" />
+&lt; <a class="el" href="namespacerapidjson.html#a1039ee639733008423fd0dfb67122e54">SchemaDocument</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>SchemaValidator</b></td></tr>
+<tr class="separator:ab53b9a536b2918c669052834239de91f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51a6c35028b76e354bbb9e25d7125641"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a51a6c35028b76e354bbb9e25d7125641"></a>
 typedef <a class="el" href="classrapidjson_1_1_generic_string_buffer.html">GenericStringBuffer</a><br class="typebreak" />
 &lt; <a class="el" href="structrapidjson_1_1_u_t_f8.html">UTF8</a>&lt;&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a51a6c35028b76e354bbb9e25d7125641">StringBuffer</a></td></tr>

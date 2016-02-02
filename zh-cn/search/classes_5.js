@@ -7,6 +7,8 @@ var searchData=
   ['genericmemorybuffer',['GenericMemoryBuffer',['../structrapidjson_1_1_generic_memory_buffer.html',1,'rapidjson']]],
   ['genericpointer',['GenericPointer',['../classrapidjson_1_1_generic_pointer.html',1,'rapidjson']]],
   ['genericreader',['GenericReader',['../classrapidjson_1_1_generic_reader.html',1,'rapidjson']]],
+  ['genericschemadocument',['GenericSchemaDocument',['../classrapidjson_1_1_generic_schema_document.html',1,'rapidjson']]],
+  ['genericschemavalidator',['GenericSchemaValidator',['../classrapidjson_1_1_generic_schema_validator.html',1,'rapidjson']]],
   ['genericstringbuffer',['GenericStringBuffer',['../classrapidjson_1_1_generic_string_buffer.html',1,'rapidjson']]],
   ['genericstringref',['GenericStringRef',['../structrapidjson_1_1_generic_string_ref.html',1,'rapidjson']]],
   ['genericstringstream',['GenericStringStream',['../structrapidjson_1_1_generic_string_stream.html',1,'rapidjson']]],

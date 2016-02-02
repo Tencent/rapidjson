@@ -17,6 +17,7 @@ var hierarchy =
     [ "rapidjson::GenericMemoryBuffer< Allocator >", "structrapidjson_1_1_generic_memory_buffer.html", null ],
     [ "rapidjson::GenericPointer< ValueType, Allocator >", "classrapidjson_1_1_generic_pointer.html", null ],
     [ "rapidjson::GenericReader< SourceEncoding, TargetEncoding, StackAllocator >", "classrapidjson_1_1_generic_reader.html", null ],
+    [ "rapidjson::GenericSchemaDocument< ValueType, Allocator >", "classrapidjson_1_1_generic_schema_document.html", null ],
     [ "rapidjson::GenericStringBuffer< Encoding, Allocator >", "classrapidjson_1_1_generic_string_buffer.html", null ],
     [ "rapidjson::GenericStringRef< CharType >", "structrapidjson_1_1_generic_string_ref.html", null ],
     [ "rapidjson::GenericStringStream< Encoding >", "structrapidjson_1_1_generic_string_stream.html", null ],
@@ -26,6 +27,13 @@ var hierarchy =
     [ "rapidjson::GenericValue< rapidjson::Encoding, rapidjson::Allocator >", "classrapidjson_1_1_generic_value.html", null ],
     [ "rapidjson::Handler", "classrapidjson_1_1_handler.html", null ],
     [ "rapidjson::GenericValue< Encoding, Allocator >::Number::I", "structrapidjson_1_1_generic_value_1_1_number_1_1_i.html", null ],
+    [ "rapidjson::IGenericRemoteSchemaDocumentProvider< SchemaDocumentType >", "classrapidjson_1_1_i_generic_remote_schema_document_provider.html", null ],
+    [ "rapidjson::internal::ISchemaStateFactory< SchemaDocumentType::SchemaType >", null, [
+      [ "rapidjson::GenericSchemaValidator< SchemaDocumentType, OutputHandler, StateAllocator >", "classrapidjson_1_1_generic_schema_validator.html", null ]
+    ] ],
+    [ "rapidjson::internal::ISchemaValidator", null, [
+      [ "rapidjson::GenericSchemaValidator< SchemaDocumentType, OutputHandler, StateAllocator >", "classrapidjson_1_1_generic_schema_validator.html", null ]
+    ] ],
     [ "iterator", null, [
       [ "rapidjson::GenericMemberIterator< Const, Encoding, Allocator >", "classrapidjson_1_1_generic_member_iterator.html", null ]
     ] ],
@@ -33,6 +41,7 @@ var hierarchy =
     [ "rapidjson::MemoryPoolAllocator< BaseAllocator >", "classrapidjson_1_1_memory_pool_allocator.html", null ],
     [ "rapidjson::MemoryStream", "structrapidjson_1_1_memory_stream.html", null ],
     [ "rapidjson::ParseResult", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result", null ],
+    [ "rapidjson::SchemaValidatingReader< parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator >", "classrapidjson_1_1_schema_validating_reader.html", null ],
     [ "rapidjson::Stream", "classrapidjson_1_1_stream.html", null ],
     [ "rapidjson::StreamTraits< Stream >", "structrapidjson_1_1_stream_traits.html", null ],
     [ "rapidjson::StreamTraits< GenericInsituStringStream< Encoding > >", "structrapidjson_1_1_stream_traits_3_01_generic_insitu_string_stream_3_01_encoding_01_4_01_4.html", null ],

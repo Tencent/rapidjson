@@ -88,6 +88,7 @@ var NAVTREE =
         [ "过滤JSON", "md_doc_sax_8zh-cn.html#Filtering", null ]
       ] ]
     ] ],
+    [ "Schema", "md_doc_schema_8zh-cn.html", null ],
     [ "性能", "md_doc_performance_8zh-cn.html", null ],
     [ "Internals", "md_doc_internals.html", [
       [ "Architecture", "md_doc_internals.html#Architecture", null ],
@@ -130,7 +131,7 @@ var NAVTREE =
       [ "类继承关系", "hierarchy.html", "hierarchy" ],
       [ "类成员", "functions.html", [
         [ "全部", "functions.html", "functions_dup" ],
-        [ "函数", "functions_func.html", null ],
+        [ "函数", "functions_func.html", "functions_func" ],
         [ "变量", "functions_vars.html", null ],
         [ "类型定义", "functions_type.html", null ],
         [ "相关函数", "functions_rela.html", null ]
@@ -149,9 +150,9 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "allocators_8h_source.html",
-"classrapidjson_1_1_generic_value.html#a5d47340c96346c5028fee4c9068d783d",
-"group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga743a79d3af927391fe3eb5c979136899",
-"structrapidjson_1_1_generic_insitu_string_stream.html#ac6b5cf07cdb691f99abd52a672790d8a"
+"classrapidjson_1_1_generic_string_buffer.html#a315f6f4528438a19d5a93eac3e2c99f0",
+"document_8h.html#af94951529a5d51e8c4e6e770bb707c1f",
+"md_doc_tutorial_8zh-cn.html#ValueDocument"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
