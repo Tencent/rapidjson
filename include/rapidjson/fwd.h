@@ -17,11 +17,6 @@
 
 #include "rapidjson.h"
 
-#ifdef __GNUC__
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(effc++)
-#endif
-
 RAPIDJSON_NAMESPACE_BEGIN
 
 // encodings.h
@@ -147,9 +142,5 @@ class GenericSchemaValidator;
 typedef GenericSchemaValidator<SchemaDocument, BaseReaderHandler<UTF8<char>, void>, CrtAllocator> SchemaValidator;
 
 RAPIDJSON_NAMESPACE_END
-
-#ifdef __GNUC__
-RAPIDJSON_DIAG_POP
-#endif
 
 #endif // RAPIDJSON_RAPIDJSONFWD_H_

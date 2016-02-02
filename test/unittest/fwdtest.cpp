@@ -14,6 +14,11 @@
 
 #include "unittest.h"
 
+#ifdef __GNUC__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(effc++)
+#endif
+
 // Using forward declared types here.
 
 #include "rapidjson/fwd.h"
@@ -206,3 +211,7 @@ Foo::~Foo() {
 TEST(Fwd, Fwd) {
     Foo f;
 }
+
+#ifdef __GNUC__
+RAPIDJSON_DIAG_POP
+#endif
