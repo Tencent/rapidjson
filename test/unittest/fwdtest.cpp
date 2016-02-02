@@ -47,11 +47,11 @@ struct Foo {
     // stringbuffer.h
     StringBuffer* stringbuffer;
 
-    // filereadstream.h
-    FileReadStream* filereadstream;
+    // // filereadstream.h
+    // FileReadStream* filereadstream;
 
-    // filewritestream.h
-    FileWriteStream* filewritestream;
+    // // filewritestream.h
+    // FileWriteStream* filewritestream;
 
     // memorybuffer.h
     MemoryBuffer* memorybuffer;
@@ -77,7 +77,7 @@ struct Foo {
     SchemaDocument* schemadocument;
     SchemaValidator* schemavalidator;
 
-    char buffer[16];
+    // char buffer[16];
 };
 
 // Using type definitions here.
@@ -115,11 +115,11 @@ Foo::Foo() :
     // stringbuffer.h
     stringbuffer(RAPIDJSON_NEW(StringBuffer)),
 
-    // filereadstream.h
-    filereadstream(RAPIDJSON_NEW(FileReadStream(stdout, buffer, sizeof(buffer)))),
+    // // filereadstream.h
+    // filereadstream(RAPIDJSON_NEW(FileReadStream(stdout, buffer, sizeof(buffer)))),
 
-    // filewritestream.h
-    filewritestream(RAPIDJSON_NEW(FileWriteStream(stdout, buffer, sizeof(buffer)))),
+    // // filewritestream.h
+    // filewritestream(RAPIDJSON_NEW(FileWriteStream(stdout, buffer, sizeof(buffer)))),
 
     // memorybuffer.h
     memorybuffer(RAPIDJSON_NEW(MemoryBuffer)),
@@ -172,11 +172,11 @@ Foo::~Foo() {
     // stringbuffer.h
     RAPIDJSON_DELETE(stringbuffer);
 
-    // filereadstream.h
-    RAPIDJSON_DELETE(filereadstream);
+    // // filereadstream.h
+    // RAPIDJSON_DELETE(filereadstream);
 
-    // filewritestream.h
-    RAPIDJSON_DELETE(filewritestream);
+    // // filewritestream.h
+    // RAPIDJSON_DELETE(filewritestream);
 
     // memorybuffer.h
     RAPIDJSON_DELETE(memorybuffer);
