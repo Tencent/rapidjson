@@ -1550,7 +1550,6 @@ public:
         , depth_(0)
 #endif
     {
-        CreateOwnAllocator();
     }
 
     //! Constructor with output handler.
@@ -1579,7 +1578,6 @@ public:
         , depth_(0)
 #endif
     {
-        CreateOwnAllocator();
     }
 
     //! Destructor.
@@ -1592,7 +1590,7 @@ public:
     void Reset() {
         while (!schemaStack_.Empty())
             PopSchema();
-        //documentStack_.Clear();
+        documentStack_.Clear();
         valid_ = true;
     }
 
@@ -1613,10 +1611,6 @@ public:
     //! Gets the JSON pointer pointed to the invalid value.
     PointerType GetInvalidDocumentPointer() const {
         return documentStack_.Empty() ? PointerType() : PointerType(documentStack_.template Bottom<Ch>(), documentStack_.GetSize() / sizeof(Ch));
-    }
-
-    StateAllocator& GetStateAllocator() {
-        return *stateAllocator_;
     }
 
 #if RAPIDJSON_SCHEMA_VERBOSE
@@ -1774,12 +1768,12 @@ private:
         , depth_(depth)
 #endif
     {
-        CreateOwnAllocator();
     }
 
-    void CreateOwnAllocator() {
+    StateAllocator& GetStateAllocator() {
         if (!stateAllocator_)
             stateAllocator_ = ownStateAllocator_ = RAPIDJSON_NEW(StateAllocator());
+        return *stateAllocator_;
     }
 
     bool BeginValue() {

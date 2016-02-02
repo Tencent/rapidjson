@@ -1148,6 +1148,8 @@ TEST(SchemaValidatingWriter, Simple) {
     d.Parse("\"ABCD\"");
     EXPECT_FALSE(d.Accept(validator));
     EXPECT_FALSE(validator.IsValid());
+    EXPECT_TRUE(validator.GetInvalidSchemaPointer() == SchemaDocument::PointerType(""));
+    EXPECT_TRUE(validator.GetInvalidDocumentPointer() == SchemaDocument::PointerType(""));
 }
 
 #ifdef __clang__
