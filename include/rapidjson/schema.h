@@ -957,27 +957,23 @@ private:
         a.PushBack(c, *allocator_);
     }
 
-    template <typename ValueType>
     static const ValueType* GetMember(const ValueType& value, const ValueType& name) {
         typename ValueType::ConstMemberIterator itr = value.FindMember(name);
         return itr != value.MemberEnd() ? &(itr->value) : 0;
     }
 
-    template <typename ValueType>
     static void AssignIfExist(bool& out, const ValueType& value, const ValueType& name) {
         if (const ValueType* v = GetMember(value, name))
             if (v->IsBool())
                 out = v->GetBool();
     }
 
-    template <typename ValueType>
     static void AssignIfExist(SizeType& out, const ValueType& value, const ValueType& name) {
         if (const ValueType* v = GetMember(value, name))
             if (v->IsUint64() && v->GetUint64() <= SizeType(~0))
                 out = static_cast<SizeType>(v->GetUint64());
     }
 
-    template <typename ValueType, typename PointerType>
     void AssignIfExist(SchemaArray& out, SchemaDocumentType& schemaDocument, const PointerType& p, const ValueType& value, const ValueType& name, const ValueType& document) {
         if (const ValueType* v = GetMember(value, name)) {
             if (v->IsArray() && v->Size() > 0) {
@@ -1080,7 +1076,6 @@ private:
     }
 
     // O(n)
-    template <typename ValueType>
     bool FindPropertyIndex(const ValueType& name, SizeType* outIndex) const {
         SizeType len = name.GetStringLength();
         const Ch* str = name.GetString();
