@@ -17,8 +17,8 @@
 
 /*! \file reader.h */
 
-#include "rapidjson.h"
-#include "encodings.h"
+#include "allocators.h"
+#include "stream.h"
 #include "internal/meta.h"
 #include "internal/stack.h"
 #include "internal/strtod.h"

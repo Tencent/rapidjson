@@ -13,7 +13,6 @@
 // specific language governing permissions and limitations under the License.
 
 #include "unittest.h"
-
 #include "rapidjson/internal/strfunc.h"
 
 using namespace rapidjson;

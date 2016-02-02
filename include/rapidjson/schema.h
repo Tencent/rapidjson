@@ -17,7 +17,7 @@
 
 #include "document.h"
 #include "pointer.h"
-#include <cmath> // HUGE_VAL, abs, floor
+#include <cmath> // abs, floor
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
