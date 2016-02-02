@@ -1540,7 +1540,7 @@ public:
         :
         schemaDocument_(&schemaDocument),
         root_(schemaDocument.GetRoot()),
-        outputHandler_(nullOutputHandler_),
+        outputHandler_(GetNullHandler()),
         stateAllocator_(allocator),
         ownStateAllocator_(0),
         schemaStack_(allocator, schemaStackCapacity),
@@ -1764,7 +1764,7 @@ private:
         :
         schemaDocument_(&schemaDocument),
         root_(root),
-        outputHandler_(nullOutputHandler_),
+        outputHandler_(GetNullHandler()),
         stateAllocator_(allocator),
         ownStateAllocator_(0),
         schemaStack_(allocator, schemaStackCapacity),
@@ -1882,11 +1882,15 @@ private:
     Context& CurrentContext() { return *schemaStack_.template Top<Context>(); }
     const Context& CurrentContext() const { return *schemaStack_.template Top<Context>(); }
 
+    static OutputHandler& GetNullHandler() {
+        static OutputHandler nullHandler;
+        return nullHandler;
+    }
+
     static const size_t kDefaultSchemaStackCapacity = 1024;
     static const size_t kDefaultDocumentStackCapacity = 256;
     const SchemaDocumentType* schemaDocument_;
     const SchemaType& root_;
-    OutputHandler nullOutputHandler_;
     OutputHandler& outputHandler_;
     StateAllocator* stateAllocator_;
     StateAllocator* ownStateAllocator_;
