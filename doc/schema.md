@@ -221,7 +221,7 @@ On a Mac Book Pro (2.8 GHz Intel Core i7), the following results are collected.
 
 |Validator|Relative speed|Number of test runs per second|
 |---------|:------------:|:----------------------------:|
-|RapidJSON|36521%|7220217|
+|RapidJSON|155%|30682|
 |[`ajv`](https://github.com/epoberezkin/ajv)|100%|19770 (± 1.31%)|
 |[`is-my-json-valid`](https://github.com/mafintosh/is-my-json-valid)|70%|13835 (± 2.84%)|
 |[`jsen`](https://github.com/bugventure/jsen)|57.7%|11411 (± 1.27%)|
@@ -234,4 +234,4 @@ On a Mac Book Pro (2.8 GHz Intel Core i7), the following results are collected.
 |tv4|0.5%|93 (± 0.94%)|
 |[`jayschema`](https://github.com/natesilva/jayschema)|0.1%|21 (± 1.14%)|
 
-That is, RapidJSON is about ~365 times faster than the fastest JavaScript library (ajv). And ~344 thousand times faster than the slowest one.
+That is, RapidJSON is about 1.5x faster than the fastest JavaScript library (ajv). And 1400x faster than the slowest one.

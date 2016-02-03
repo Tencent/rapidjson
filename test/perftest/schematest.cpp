@@ -100,7 +100,8 @@ public:
             }
 
             for (Value::ConstValueIterator schemaItr = d.Begin(); schemaItr != d.End(); ++schemaItr) {
-                if (IsExcludeTestSuite((*schemaItr)["description"].GetString()))
+                std::string schemaDescription = (*schemaItr)["description"].GetString();
+                if (IsExcludeTestSuite(schemaDescription))
                     continue;
 
                 TestSuite* ts = new TestSuite;
@@ -108,7 +109,7 @@ public:
 
                 const Value& tests = (*schemaItr)["tests"];
                 for (Value::ConstValueIterator testItr = tests.Begin(); testItr != tests.End(); ++testItr) {
-                    if (IsExcludeTest((*testItr)["description"].GetString()))
+                    if (IsExcludeTest(schemaDescription + ", " + (*testItr)["description"].GetString()))
                         continue;
 
                     Document* d2 = new Document;
@@ -191,9 +192,10 @@ TEST_F(Schema, TestSuite) {
     char validatorBuffer[65536];
     MemoryPoolAllocator<> validatorAllocator(validatorBuffer, sizeof(validatorBuffer));
 
+    const int trialCount = 100000;
     int testCount = 0;
     clock_t start = clock();
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < trialCount; i++) {
         for (TestSuiteList::const_iterator itr = testSuites.begin(); itr != testSuites.end(); ++itr) {
             const TestSuite& ts = **itr;
             GenericSchemaValidator<SchemaDocument, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> >  validator(*ts.schema, &validatorAllocator);
@@ -207,7 +209,8 @@ TEST_F(Schema, TestSuite) {
     }
     clock_t end = clock();
     double duration = double(end - start) / CLOCKS_PER_SEC;
-    printf("%d tests in %f s -> %f tests per sec\n", testCount, duration, testCount / duration);
+    printf("%d trials in %f s -> %f trials per sec\n", trialCount, duration, trialCount / duration);
+    printf("%d tests per trial\n", testCount / trialCount);
 }
 
 #endif
