@@ -1459,6 +1459,26 @@ TEST(Reader, IncompleteMultilineComment) {
     EXPECT_EQ(kParseErrorUnspecificSyntaxError, reader.GetParseErrorCode());
 }
 
+TEST(Reader, IncompleteMultilineComment2) {
+    const char* json = "{\"hello\" : \"world\" /* *\0 */}";
+
+    StringStream s(json);
+    ParseObjectHandler h;
+    Reader reader;
+    EXPECT_FALSE(reader.Parse<kParseCommentsFlag>(s, h));
+    EXPECT_EQ(kParseErrorUnspecificSyntaxError, reader.GetParseErrorCode());
+}
+
+TEST(Reader, UnrecognizedComment) {
+    const char* json = "{\"hello\" : \"world\" /! }";
+
+    StringStream s(json);
+    ParseObjectHandler h;
+    Reader reader;
+    EXPECT_FALSE(reader.Parse<kParseCommentsFlag>(s, h));
+    EXPECT_EQ(kParseErrorUnspecificSyntaxError, reader.GetParseErrorCode());
+}
+
 #ifdef __GNUC__
 RAPIDJSON_DIAG_POP
 #endif
