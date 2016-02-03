@@ -68,7 +68,7 @@ TEST(SIMD, SIMD_SUFFIX(SkipWhitespace)) {
 }
 
 struct ScanCopyUnescapedStringHandler : BaseReaderHandler<UTF8<>, ScanCopyUnescapedStringHandler> {
-    bool String(const char* str, size_t length, bool copy) {
+    bool String(const char* str, size_t length, bool) {
         memcpy(buffer, str, length + 1);
         return true;
     }
