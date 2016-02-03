@@ -29,6 +29,11 @@
 
 #include "rapidjson/reader.h"
 
+#ifdef __GNUC__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(effc++)
+#endif
+
 using namespace rapidjson_simd;
 
 #ifdef RAPIDJSON_SSE2
@@ -102,3 +107,7 @@ TEST(SIMD, SIMD_SUFFIX(ScanCopyUnescapedString)) {
     TestScanCopyUnescapedString<StringStream>();
     TestScanCopyUnescapedString<InsituStringStream>();
 }
+
+#ifdef __GNUC__
+RAPIDJSON_DIAG_POP
+#endif
