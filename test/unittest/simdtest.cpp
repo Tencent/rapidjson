@@ -80,7 +80,7 @@ struct ScanCopyUnescapedStringHandler : BaseReaderHandler<UTF8<>, ScanCopyUnesca
     char buffer[1024 + 5];
 };
 
-template <typename StreamType>
+template <unsigned parseFlags, typename StreamType>
 void TestScanCopyUnescapedString() {
     for (size_t step = 0; step < 1024; step++) {
         char json[1024 + 5];
@@ -96,7 +96,7 @@ void TestScanCopyUnescapedString() {
         StreamType s(json);
         Reader reader;
         ScanCopyUnescapedStringHandler h;
-        reader.Parse(s, h);
+        reader.Parse<parseFlags>(s, h);
         EXPECT_TRUE(memcmp(h.buffer, json + 1, step) == 0);
         EXPECT_EQ('\\', h.buffer[step]);    // escaped
         EXPECT_EQ('\0', h.buffer[step + 1]);
@@ -104,8 +104,8 @@ void TestScanCopyUnescapedString() {
 }
 
 TEST(SIMD, SIMD_SUFFIX(ScanCopyUnescapedString)) {
-    TestScanCopyUnescapedString<StringStream>();
-    TestScanCopyUnescapedString<InsituStringStream>();
+    TestScanCopyUnescapedString<kParseDefaultFlags, StringStream>();
+    TestScanCopyUnescapedString<kParseInsituFlag, InsituStringStream>();
 }
 
 #ifdef __GNUC__
