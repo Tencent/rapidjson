@@ -66,3 +66,39 @@ TEST(SIMD, SIMD_SUFFIX(SkipWhitespace)) {
     TestSkipWhitespace<StringStream>();
     TestSkipWhitespace<InsituStringStream>();
 }
+
+struct ScanCopyUnescapedStringHandler : BaseReaderHandler<UTF8<>, ScanCopyUnescapedStringHandler> {
+    bool String(const char* str, size_t length, bool copy) {
+        memcpy(buffer, str, length + 1);
+        return true;
+    }
+    char buffer[1024 + 5];
+};
+
+template <typename StreamType>
+void TestScanCopyUnescapedString() {
+    for (size_t step = 0; step < 1024; step++) {
+        char json[1024 + 5];
+        char *p = json;
+        *p ++= '\"';
+        for (size_t i = 0; i < step; i++)
+            *p++= "ABCD"[i % 4];
+        *p++ = '\\';
+        *p++ = '\\';
+        *p++ = '\"';
+        *p++ = '\0';
+
+        StreamType s(json);
+        Reader reader;
+        ScanCopyUnescapedStringHandler h;
+        reader.Parse(s, h);
+        EXPECT_TRUE(memcmp(h.buffer, json + 1, step) == 0);
+        EXPECT_EQ('\\', h.buffer[step]);    // escaped
+        EXPECT_EQ('\0', h.buffer[step + 1]);
+    }
+}
+
+TEST(SIMD, SIMD_SUFFIX(ScanCopyUnescapedString)) {
+    TestScanCopyUnescapedString<StringStream>();
+    TestScanCopyUnescapedString<InsituStringStream>();
+}
