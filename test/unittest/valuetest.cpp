@@ -1384,6 +1384,67 @@ TEST(Value, Sorting) {
 }
 #endif
 
+// http://stackoverflow.com/questions/35222230/
+
+static void MergeDuplicateKey(Value& v, Value::AllocatorType& a) {
+    if (v.IsObject()) {
+        // Convert all key:value into key:[value]
+        for (Value::MemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr)
+            itr->value = Value(kArrayType).Move().PushBack(itr->value, a);
+        
+        // Merge arrays if key is duplicated
+        for (Value::MemberIterator itr = v.MemberBegin(); itr != v.MemberEnd();) {
+            Value::MemberIterator itr2 = v.FindMember(itr->name);
+            if (itr != itr2) {
+                itr2->value.PushBack(itr->value[0], a);
+                itr = v.EraseMember(itr);
+            }
+            else
+                ++itr;
+        }
+
+        // Convert key:[values] back to key:value if there is only one value
+        for (Value::MemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr) {
+            if (itr->value.Size() == 1)
+                itr->value = itr->value[0];
+            MergeDuplicateKey(itr->value, a); // Recursion on the value
+        }
+    }
+    else if (v.IsArray())
+        for (Value::ValueIterator itr = v.Begin(); itr != v.End(); ++itr)
+            MergeDuplicateKey(*itr, a);
+}
+
+TEST(Value, MergeDuplicateKey) {
+    Document d;
+    d.Parse(
+        "{"
+        "    \"key1\": {"
+        "        \"a\": \"asdf\","
+        "        \"b\": \"foo\","
+        "        \"b\": \"bar\","
+        "        \"c\": \"fdas\""
+        "    }"
+        "}");
+
+    Document d2;
+    d2.Parse(
+        "{"
+        "    \"key1\": {"
+        "        \"a\": \"asdf\","
+        "        \"b\": ["
+        "            \"foo\","
+        "            \"bar\""
+        "        ],"
+        "        \"c\": \"fdas\""
+        "    }"
+        "}");
+
+    EXPECT_NE(d2, d);
+    MergeDuplicateKey(d, d.GetAllocator());
+    EXPECT_EQ(d2, d);
+}
+
 #ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
