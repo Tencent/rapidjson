@@ -138,7 +138,8 @@ TEST(IStreamWrapper, fstream) {
 }
 
 // wifstream/wfstream only works on C++11 with codecvt_utf16
-#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+// But many C++11 library still not have it.
+#if 0
 #include <codecvt>
 
 TEST(IStreamWrapper, wifstream) {
