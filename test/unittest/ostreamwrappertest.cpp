@@ -27,7 +27,7 @@ template <typename StringStreamType>
 static void TestStringStream() {
     typedef typename StringStreamType::char_type Ch;
 
-    Ch s[] = { 'A', 'B', 'C' };
+    Ch s[] = { 'A', 'B', 'C', '\0' };
     StringStreamType oss(s);
     BasicOStreamWrapper<StringStreamType> os(oss);
     for (size_t i = 0; i < 3; i++)
