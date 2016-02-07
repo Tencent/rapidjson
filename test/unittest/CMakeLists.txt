@@ -12,6 +12,7 @@ set(UNITTEST_SOURCES
     namespacetest.cpp
     pointertest.cpp
     prettywritertest.cpp
+    ostreamwrappertest.cpp
     readertest.cpp
     regextest.cpp
 	schematest.cpp
