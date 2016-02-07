@@ -60,6 +60,9 @@ public:
     size_t PutEnd(char*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:
+    BasicOStreamWrapper(const BasicOStreamWrapper&);
+    BasicOStreamWrapper& operator=(const BasicOStreamWrapper&);
+
     StreamType& stream_;
 };
 

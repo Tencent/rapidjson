@@ -87,6 +87,9 @@ public:
     }
 
 private:
+    BasicIStreamWrapper(const BasicIStreamWrapper&);
+    BasicIStreamWrapper& operator=(const BasicIStreamWrapper&);
+
     StreamType& stream_;
     size_t count_;  //!< Number of characters read. Note:
     mutable Ch peekBuffer_[4];
