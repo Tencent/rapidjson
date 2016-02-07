@@ -7,6 +7,7 @@ set(UNITTEST_SOURCES
     fwdtest.cpp
     filestreamtest.cpp
     itoatest.cpp
+    istreamwrappertest.cpp
     jsoncheckertest.cpp
     namespacetest.cpp
     pointertest.cpp
