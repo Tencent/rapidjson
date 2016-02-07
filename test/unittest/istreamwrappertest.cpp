@@ -93,7 +93,7 @@ TEST(IStreamWrapper, wistringstream) {
 }
 
 TEST(IStreamWrapper, wstringstream) {
-    TestStringStream<wistringstream>();
+    TestStringStream<wstringstream>();
 }
 
 template <typename FileStreamType>
