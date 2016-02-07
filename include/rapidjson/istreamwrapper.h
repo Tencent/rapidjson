@@ -13,6 +13,7 @@
 // specific language governing permissions and limitations under the License.
 
 #include "stream.h"
+#include <iosfwd>
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
@@ -38,10 +39,10 @@ RAPIDJSON_NAMESPACE_BEGIN
 */
    
 template <typename StreamType>
-class IStreamWrapper {
+class BasicIStreamWrapper {
 public:
     typedef typename StreamType::char_type Ch;
-    IStreamWrapper(StreamType& stream) : stream_(stream), count_(), peekBuffer_() {}
+    BasicIStreamWrapper(StreamType& stream) : stream_(stream), count_(), peekBuffer_() {}
 
     Ch Peek() const { 
         typename StreamType::int_type c = stream_.peek();
@@ -90,6 +91,9 @@ private:
     size_t count_;  //!< Number of characters read. Note:
     mutable Ch peekBuffer_[4];
 };
+
+typedef BasicIStreamWrapper<std::istream> IStreamWrapper;
+typedef BasicIStreamWrapper<std::wistream> WIStreamWrapper;
 
 #ifdef __clang__
 RAPIDJSON_DIAG_POP

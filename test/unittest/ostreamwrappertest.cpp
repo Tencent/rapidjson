@@ -29,7 +29,7 @@ static void TestStringStream() {
 
     Ch s[] = { 'A', 'B', 'C' };
     StringStreamType oss(s);
-    OStreamWrapper<StringStreamType> os(oss);
+    BasicOStreamWrapper<StringStreamType> os(oss);
     for (size_t i = 0; i < 3; i++)
         os.Put(s[i]);
     os.Flush();
@@ -54,7 +54,7 @@ TEST(OStreamWrapper, wstringstream) {
 }
 
 TEST(OStreamWrapper, cout) {
-    OStreamWrapper<ostream> os(cout);
+    OStreamWrapper os(cout);
     const char* s = "Hello World!\n";
     while (*s)
         os.Put(*s++);
@@ -70,7 +70,7 @@ static void TestFileStream() {
     const char* s = "Hello World!\n";
     {
         ofstream ofs(filename, ios::out | ios::binary);
-        OStreamWrapper<ofstream> osw(ofs);
+        BasicOStreamWrapper<ofstream> osw(ofs);
         for (const char* p = s; *p; p++)
             osw.Put(*p);
         osw.Flush();

@@ -13,6 +13,7 @@
 // specific language governing permissions and limitations under the License.
 
 #include "stream.h"
+#include <iosfwd>
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
@@ -38,10 +39,10 @@ RAPIDJSON_NAMESPACE_BEGIN
 */
    
 template <typename StreamType>
-class OStreamWrapper {
+class BasicOStreamWrapper {
 public:
     typedef typename StreamType::char_type Ch;
-    OStreamWrapper(StreamType& stream) : stream_(stream) {}
+    BasicOStreamWrapper(StreamType& stream) : stream_(stream) {}
 
     void Put(Ch c) {
         stream_.put(c);
@@ -61,6 +62,9 @@ public:
 private:
     StreamType& stream_;
 };
+
+typedef BasicOStreamWrapper<std::ostream> OStreamWrapper;
+typedef BasicOStreamWrapper<std::wostream> WOStreamWrapper;
 
 #ifdef __clang__
 RAPIDJSON_DIAG_POP

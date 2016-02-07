@@ -29,7 +29,7 @@ static void TestStringStream() {
 
     {
         StringStreamType iss;
-        IStreamWrapper<StringStreamType> is(iss);
+        BasicIStreamWrapper<StringStreamType> is(iss);
         EXPECT_EQ(0, is.Tell());
         if (sizeof(Ch) == 1) {
             EXPECT_EQ(0, is.Peek4());
@@ -43,7 +43,7 @@ static void TestStringStream() {
     {
         Ch s[] = { 'A', 'B', 'C', '\0' };
         StringStreamType iss(s);
-        IStreamWrapper<StringStreamType> is(iss);
+        BasicIStreamWrapper<StringStreamType> is(iss);
         EXPECT_EQ(0, is.Tell());
         if (sizeof(Ch) == 1)
             EXPECT_EQ(0, is.Peek4()); // less than 4 bytes
@@ -61,7 +61,7 @@ static void TestStringStream() {
     {
         Ch s[] = { 'A', 'B', 'C', 'D', 'E', '\0' };
         StringStreamType iss(s);
-        IStreamWrapper<StringStreamType> is(iss);
+        BasicIStreamWrapper<StringStreamType> is(iss);
         if (sizeof(Ch) == 1) {
             const Ch* c = is.Peek4();
             for (int i = 0; i < 4; i++)
@@ -118,8 +118,8 @@ static bool Open(FileStreamType& fs, const char* filename) {
 TEST(IStreamWrapper, ifstream) {
     ifstream ifs;
     ASSERT_TRUE(Open(ifs, "utf8bom.json"));
-    IStreamWrapper<ifstream> isw(ifs);
-    EncodedInputStream<UTF8<>, IStreamWrapper<ifstream> > eis(isw);
+    IStreamWrapper isw(ifs);
+    EncodedInputStream<UTF8<>, IStreamWrapper> eis(isw);
     Document d;
     EXPECT_TRUE(!d.ParseStream(eis).HasParseError());
     EXPECT_TRUE(d.IsObject());
@@ -129,8 +129,8 @@ TEST(IStreamWrapper, ifstream) {
 TEST(IStreamWrapper, fstream) {
     fstream fs;
     ASSERT_TRUE(Open(fs, "utf8bom.json"));
-    IStreamWrapper<fstream> isw(fs);
-    EncodedInputStream<UTF8<>, IStreamWrapper<fstream> > eis(isw);
+    IStreamWrapper isw(fs);
+    EncodedInputStream<UTF8<>, IStreamWrapper> eis(isw);
     Document d;
     EXPECT_TRUE(!d.ParseStream(eis).HasParseError());
     EXPECT_TRUE(d.IsObject());
@@ -147,9 +147,9 @@ TEST(IStreamWrapper, wifstream) {
     ASSERT_TRUE(Open(ifs, "utf16bebom.json"));
     ifs.imbue(std::locale(ifs.getloc(),
        new std::codecvt_utf16<wchar_t, 0x10ffff, std::consume_header>));
-    IStreamWrapper<wifstream> isw(ifs);
+    WIStreamWrapper isw(ifs);
     GenericDocument<UTF16<> > d;
-    d.ParseStream<kParseDefaultFlags, UTF16<>, IStreamWrapper<wifstream> >(isw);
+    d.ParseStream<kParseDefaultFlags, UTF16<>, WIStreamWrapper>(isw);
     EXPECT_TRUE(!d.HasParseError());
     EXPECT_TRUE(d.IsObject());
     EXPECT_EQ(5, d.MemberCount());
@@ -160,9 +160,9 @@ TEST(IStreamWrapper, wfstream) {
     ASSERT_TRUE(Open(fs, "utf16bebom.json"));
     fs.imbue(std::locale(fs.getloc(),
        new std::codecvt_utf16<wchar_t, 0x10ffff, std::consume_header>));
-    IStreamWrapper<wfstream> isw(fs);
+    WIStreamWrapper isw(fs);
     GenericDocument<UTF16<> > d;
-    d.ParseStream<kParseDefaultFlags, UTF16<>, IStreamWrapper<wfstream> >(isw);
+    d.ParseStream<kParseDefaultFlags, UTF16<>, WIStreamWrapper>(isw);
     EXPECT_TRUE(!d.HasParseError());
     EXPECT_TRUE(d.IsObject());
     EXPECT_EQ(5, d.MemberCount());
