@@ -97,6 +97,10 @@ $(document).ready(function(){initNavTree('md_doc_stream_8zh-cn.html','');});
 <li class="level2"><a href="#FileWriteStream">FileWriteStream（输出）</a></li>
 </ul>
 </li>
+<li class="level1"><a href="#iostreamWrapper">iostream 包装类</a><ul><li class="level2"><a href="#IStreamWrapper">IStreamWrapper</a></li>
+<li class="level2"><a href="#OStreamWrapper">OStreamWrapper</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#EncodedStreams">编码流</a><ul><li class="level2"><a href="#EncodedInputStream">EncodedInputStream</a></li>
 <li class="level2"><a href="#EncodedOutputStream">EncodedOutputStream</a></li>
 <li class="level2"><a href="#AutoUTFInputStream">AutoUTFInputStream</a></li>
@@ -193,6 +197,47 @@ FileWriteStream（输出）</h2>
 <div class="line"></div>
 <div class="line">fclose(fp);</div>
 </div><!-- fragment --><p>它也可以把输出导向<code>stdout</code>。</p>
+<h1><a class="anchor" id="iostreamWrapper"></a>
+iostream 包装类</h1>
+<p>基于用户的要求，RapidJSON提供了正式的 <code>std::basic_istream</code> 和 <code>std::basic_ostream</code> 包装类。然而，请注意其性能会大大低于以上的其他流。</p>
+<h2><a class="anchor" id="IStreamWrapper"></a>
+IStreamWrapper</h2>
+<p><code>IStreamWrapper</code> 把任何继承自 <code>std::istream</code> 的类（如 <code>std::istringstream</code>、<code>std::stringstream</code>、<code>std::ifstream</code>、<code>std::fstream</code>）包装成 RapidJSON 的输入流。</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="document_8h.html">rapidjson/document.h</a>&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;rapidjson/istreamwrapper.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;fstream&gt;</span></div>
+<div class="line"></div>
+<div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
+<div class="line"><span class="keyword">using namespace </span>std;</div>
+<div class="line"></div>
+<div class="line">ifstream ifs(<span class="stringliteral">&quot;test.json&quot;</span>);</div>
+<div class="line"><a class="code" href="classrapidjson_1_1_basic_i_stream_wrapper.html">IStreamWrapper</a> isw(ifs);</div>
+<div class="line"></div>
+<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> d;</div>
+<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>(isw);</div>
+</div><!-- fragment --><p>对于继承自 <code>std::wistream</code> 的类，则使用 <code>WIStreamWrapper</code>。</p>
+<h2><a class="anchor" id="OStreamWrapper"></a>
+OStreamWrapper</h2>
+<p>相似地，<code>OStreamWrapper</code> 把任何继承自 <code>std::ostream</code> 的类（如 <code>std::ostringstream</code>、<code>std::stringstream</code>、<code>std::ofstream</code>、<code>std::fstream</code>）包装成 RapidJSON 的输出流。</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &lt;<a class="code" href="document_8h.html">rapidjson/document.h</a>&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;rapidjson/ostreamwrapper.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;rapidjson/writer.h&gt;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;fstream&gt;</span></div>
+<div class="line"></div>
+<div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
+<div class="line"><span class="keyword">using namespace </span>std;</div>
+<div class="line"></div>
+<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> d;</div>
+<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c">Parse</a>(json);</div>
+<div class="line"></div>
+<div class="line"><span class="comment">// ...</span></div>
+<div class="line"></div>
+<div class="line">ofstream ofs(<span class="stringliteral">&quot;output.json&quot;</span>);</div>
+<div class="line"><a class="code" href="classrapidjson_1_1_basic_o_stream_wrapper.html">OStreamWrapper</a> osw(ofs);</div>
+<div class="line"></div>
+<div class="line"><a class="code" href="classrapidjson_1_1_writer.html">Writer&lt;OStreamWrapper&gt;</a> writer(osw);</div>
+<div class="line">d.Accept(writer);</div>
+</div><!-- fragment --><p>对于继承自 <code>std::wistream</code> 的类，则使用 <code>WIStreamWrapper</code>。</p>
 <h1><a class="anchor" id="EncodedStreams"></a>
 编码流</h1>
 <p>编码流（encoded streams）本身不存储JSON，它们是通过包装字节流来提供基本的编码／解码功能。</p>
@@ -318,12 +363,12 @@ AutoUTFOutputStream</h2>
 </div><!-- fragment --><p>输入流必须实现<code>Peek()</code>、<code>Take()</code>及<code>Tell()</code>。 输出流必须实现<code>Put()</code>及<code>Flush()</code>。 <code>PutBegin()</code>及<code>PutEnd()</code>是特殊的接口，仅用于原位（*in situ*）解析。一般的流不需实现它们。然而，即使接口不需用于某些流，仍然需要提供空实现，否则会产生编译错误。</p>
 <h2><a class="anchor" id="ExampleIStreamWrapper"></a>
 例子：istream的包装类</h2>
-<p>以下的例子是<code>std::istream</code>的包装类，它只需现3个函数。</p>
-<div class="fragment"><div class="line"><span class="keyword">class </span>IStreamWrapper {</div>
+<p>以下的简单例子是<code>std::istream</code>的包装类，它只需现3个函数。</p>
+<div class="fragment"><div class="line"><span class="keyword">class </span>MyIStreamWrapper {</div>
 <div class="line"><span class="keyword">public</span>:</div>
 <div class="line">    <span class="keyword">typedef</span> <span class="keywordtype">char</span> Ch;</div>
 <div class="line"></div>
-<div class="line">    IStreamWrapper(std::istream&amp; is) : is_(is) {</div>
+<div class="line">    MyIStreamWrapper(std::istream&amp; is) : is_(is) {</div>
 <div class="line">    }</div>
 <div class="line"></div>
 <div class="line">    Ch Peek()<span class="keyword"> const </span>{ <span class="comment">// 1</span></div>
@@ -344,15 +389,15 @@ AutoUTFOutputStream</h2>
 <div class="line">    <span class="keywordtype">size_t</span> PutEnd(Ch*) { assert(<span class="keyword">false</span>); <span class="keywordflow">return</span> 0; }</div>
 <div class="line"></div>
 <div class="line"><span class="keyword">private</span>:</div>
-<div class="line">    IStreamWrapper(<span class="keyword">const</span> IStreamWrapper&amp;);</div>
-<div class="line">    IStreamWrapper&amp; operator=(<span class="keyword">const</span> IStreamWrapper&amp;);</div>
+<div class="line">    MyIStreamWrapper(<span class="keyword">const</span> MyIStreamWrapper&amp;);</div>
+<div class="line">    MyIStreamWrapper&amp; operator=(<span class="keyword">const</span> MyIStreamWrapper&amp;);</div>
 <div class="line"></div>
 <div class="line">    std::istream&amp; is_;</div>
 <div class="line">};</div>
 </div><!-- fragment --><p>使用者能用它来包装<code>std::stringstream</code>、<code>std::ifstream</code>的实例。</p>
 <div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span>* json = <span class="stringliteral">&quot;[1,2,3,4]&quot;</span>;</div>
 <div class="line">std::stringstream ss(json);</div>
-<div class="line">IStreamWrapper is(ss);</div>
+<div class="line">MyIStreamWrapper is(ss);</div>
 <div class="line"></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>(is);</div>
@@ -360,7 +405,7 @@ AutoUTFOutputStream</h2>
 <h2><a class="anchor" id="ExampleOStreamWrapper"></a>
 例子：ostream的包装类</h2>
 <p>以下的例子是<code>std::istream</code>的包装类，它只需实现2个函数。</p>
-<div class="fragment"><div class="line"><span class="keyword">class </span>OStreamWrapper {</div>
+<div class="fragment"><div class="line"><span class="keyword">class </span>MyOStreamWrapper {</div>
 <div class="line"><span class="keyword">public</span>:</div>
 <div class="line">    <span class="keyword">typedef</span> <span class="keywordtype">char</span> Ch;</div>
 <div class="line"></div>
@@ -377,8 +422,8 @@ AutoUTFOutputStream</h2>
 <div class="line">    <span class="keywordtype">size_t</span> PutEnd(Ch*) { assert(<span class="keyword">false</span>); <span class="keywordflow">return</span> 0; }</div>
 <div class="line"></div>
 <div class="line"><span class="keyword">private</span>:</div>
-<div class="line">    OStreamWrapper(<span class="keyword">const</span> OStreamWrapper&amp;);</div>
-<div class="line">    OStreamWrapper&amp; operator=(<span class="keyword">const</span> OStreamWrapper&amp;);</div>
+<div class="line">    MyOStreamWrapper(<span class="keyword">const</span> MyOStreamWrapper&amp;);</div>
+<div class="line">    MyOStreamWrapper&amp; operator=(<span class="keyword">const</span> MyOStreamWrapper&amp;);</div>
 <div class="line"></div>
 <div class="line">    std::ostream&amp; os_;</div>
 <div class="line">};</div>
@@ -387,9 +432,9 @@ AutoUTFOutputStream</h2>
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"></div>
 <div class="line">std::stringstream ss;</div>
-<div class="line">OSStreamWrapper os(ss);</div>
+<div class="line">MyOStreamWrapper os(ss);</div>
 <div class="line"></div>
-<div class="line">Writer&lt;OStreamWrapper&gt; writer(os);</div>
+<div class="line">Writer&lt;MyOStreamWrapper&gt; writer(os);</div>
 <div class="line">d.Accept(writer);</div>
 </div><!-- fragment --><p>但要注意，由于标准库的内部开销问，此实现的性能可能不如RapidJSON的内存／文件流。</p>
 <h1><a class="anchor" id="Summary"></a>

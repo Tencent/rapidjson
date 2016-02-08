@@ -41,6 +41,10 @@ var NAVTREE =
         [ "FileReadStream（输入）", "md_doc_stream_8zh-cn.html#FileReadStream", null ],
         [ "FileWriteStream（输出）", "md_doc_stream_8zh-cn.html#FileWriteStream", null ]
       ] ],
+      [ "iostream 包装类", "md_doc_stream_8zh-cn.html#iostreamWrapper", [
+        [ "IStreamWrapper", "md_doc_stream_8zh-cn.html#IStreamWrapper", null ],
+        [ "OStreamWrapper", "md_doc_stream_8zh-cn.html#OStreamWrapper", null ]
+      ] ],
       [ "编码流", "md_doc_stream_8zh-cn.html#EncodedStreams", [
         [ "EncodedInputStream", "md_doc_stream_8zh-cn.html#EncodedInputStream", null ],
         [ "EncodedOutputStream", "md_doc_stream_8zh-cn.html#EncodedOutputStream", null ],
@@ -150,9 +154,9 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "allocators_8h_source.html",
-"classrapidjson_1_1_generic_string_buffer.html#a315f6f4528438a19d5a93eac3e2c99f0",
-"document_8h.html#ace11b5b575baf1cccd5ba5f8586dcdc8",
-"md_doc_tutorial_8zh-cn.html#TemporaryValues"
+"classrapidjson_1_1_generic_schema_validator.html#a98a80c23569edb89af722c124a136b49",
+"classrapidjson_1_1_writer.html#ac30667a135e9ef11ada903fa18d39940",
+"md_doc_stream_8zh-cn.html#ExampleOStreamWrapper"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

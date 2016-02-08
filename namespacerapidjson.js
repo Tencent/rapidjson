@@ -6,6 +6,8 @@ var namespacerapidjson =
     [ "AutoUTFInputStream", "classrapidjson_1_1_auto_u_t_f_input_stream.html", "classrapidjson_1_1_auto_u_t_f_input_stream" ],
     [ "AutoUTFOutputStream", "classrapidjson_1_1_auto_u_t_f_output_stream.html", "classrapidjson_1_1_auto_u_t_f_output_stream" ],
     [ "BaseReaderHandler", "structrapidjson_1_1_base_reader_handler.html", "structrapidjson_1_1_base_reader_handler" ],
+    [ "BasicIStreamWrapper", "classrapidjson_1_1_basic_i_stream_wrapper.html", "classrapidjson_1_1_basic_i_stream_wrapper" ],
+    [ "BasicOStreamWrapper", "classrapidjson_1_1_basic_o_stream_wrapper.html", "classrapidjson_1_1_basic_o_stream_wrapper" ],
     [ "CrtAllocator", "classrapidjson_1_1_crt_allocator.html", "classrapidjson_1_1_crt_allocator" ],
     [ "EncodedInputStream", "classrapidjson_1_1_encoded_input_stream.html", "classrapidjson_1_1_encoded_input_stream" ],
     [ "EncodedOutputStream", "classrapidjson_1_1_encoded_output_stream.html", "classrapidjson_1_1_encoded_output_stream" ],

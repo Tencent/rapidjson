@@ -117,6 +117,12 @@ $(document).ready(function(){initNavTree('namespacerapidjson.html','');});
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structrapidjson_1_1_base_reader_handler.html">BaseReaderHandler</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default implementation of <a class="el" href="classrapidjson_1_1_handler.html" title="Concept for receiving events from GenericReader upon parsing. The functions return true if no error o...">Handler</a>.  <a href="structrapidjson_1_1_base_reader_handler.html#details">更多...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_basic_i_stream_wrapper.html">BasicIStreamWrapper</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper of <code>std::basic_istream</code> into RapidJSON's <a class="el" href="classrapidjson_1_1_stream.html" title="Concept for reading and writing characters. ">Stream</a> concept.  <a href="classrapidjson_1_1_basic_i_stream_wrapper.html#details">更多...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_basic_o_stream_wrapper.html">BasicOStreamWrapper</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper of <code>std::basic_ostream</code> into RapidJSON's <a class="el" href="classrapidjson_1_1_stream.html" title="Concept for reading and writing characters. ">Stream</a> concept.  <a href="classrapidjson_1_1_basic_o_stream_wrapper.html#details">更多...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_crt_allocator.html">CrtAllocator</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">C-runtime library allocator.  <a href="classrapidjson_1_1_crt_allocator.html#details">更多...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -300,6 +306,22 @@ typedef <a class="el" href="classrapidjson_1_1_generic_schema_validator.html">Ge
 <a class="el" href="structrapidjson_1_1_base_reader_handler.html">BaseReaderHandler</a>&lt; <a class="el" href="structrapidjson_1_1_u_t_f8.html">UTF8</a>&lt; char &gt;<br class="typebreak" />
 , void &gt;, <a class="el" href="classrapidjson_1_1_crt_allocator.html">CrtAllocator</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>SchemaValidator</b></td></tr>
 <tr class="separator:a38dbb50c156f67adc0a70548d5572ccf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4cb54f68bd71aed41b1b26137a7dab84"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4cb54f68bd71aed41b1b26137a7dab84"></a>
+typedef <a class="el" href="classrapidjson_1_1_basic_i_stream_wrapper.html">BasicIStreamWrapper</a><br class="typebreak" />
+&lt; std::istream &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>IStreamWrapper</b></td></tr>
+<tr class="separator:a4cb54f68bd71aed41b1b26137a7dab84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65a9e5d58bff23a6c446cc7722080320"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a65a9e5d58bff23a6c446cc7722080320"></a>
+typedef <a class="el" href="classrapidjson_1_1_basic_i_stream_wrapper.html">BasicIStreamWrapper</a><br class="typebreak" />
+&lt; std::wistream &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>WIStreamWrapper</b></td></tr>
+<tr class="separator:a65a9e5d58bff23a6c446cc7722080320"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15f55e221e1d336afab91cc69c258187"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a15f55e221e1d336afab91cc69c258187"></a>
+typedef <a class="el" href="classrapidjson_1_1_basic_o_stream_wrapper.html">BasicOStreamWrapper</a><br class="typebreak" />
+&lt; std::ostream &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>OStreamWrapper</b></td></tr>
+<tr class="separator:a15f55e221e1d336afab91cc69c258187"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed3cb4533d7293644a01ec707cf8282d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aed3cb4533d7293644a01ec707cf8282d"></a>
+typedef <a class="el" href="classrapidjson_1_1_basic_o_stream_wrapper.html">BasicOStreamWrapper</a><br class="typebreak" />
+&lt; std::wostream &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>WOStreamWrapper</b></td></tr>
+<tr class="separator:aed3cb4533d7293644a01ec707cf8282d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 枚举</h2></td></tr>

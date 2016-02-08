@@ -41,6 +41,10 @@ var NAVTREE =
         [ "FileReadStream (Input)", "md_doc_stream.html#FileReadStream", null ],
         [ "FileWriteStream (Output)", "md_doc_stream.html#FileWriteStream", null ]
       ] ],
+      [ "iostream Wrapper", "md_doc_stream.html#iostreamWrapper", [
+        [ "IStreamWrapper", "md_doc_stream.html#IStreamWrapper", null ],
+        [ "OStreamWrapper", "md_doc_stream.html#OStreamWrapper", null ]
+      ] ],
       [ "Encoded Streams", "md_doc_stream.html#EncodedStreams", [
         [ "EncodedInputStream", "md_doc_stream.html#EncodedInputStream", null ],
         [ "EncodedOutputStream", "md_doc_stream.html#EncodedOutputStream", null ],
@@ -150,9 +154,9 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "allocators_8h_source.html",
-"classrapidjson_1_1_generic_string_buffer.html#a315f6f4528438a19d5a93eac3e2c99f0",
-"document_8h.html#ace11b5b575baf1cccd5ba5f8586dcdc8",
-"md_doc_tutorial.html#TemporaryValues"
+"classrapidjson_1_1_generic_schema_validator.html#a98a80c23569edb89af722c124a136b49",
+"classrapidjson_1_1_writer.html#ac30667a135e9ef11ada903fa18d39940",
+"md_doc_stream.html#ExampleOStreamWrapper"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
