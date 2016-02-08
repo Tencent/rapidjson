@@ -3,6 +3,7 @@
 // https://www-01.ibm.com/support/knowledgecenter/SS9H2Y_7.1.0/com.ibm.dp.doc/json_jsonx.html
 // This example parses JSON text from stdin with validation, 
 // and convert to JSONx format to stdout.
+// Need compile with -D__STDC_FORMAT_MACROS for defining PRId64 and PRIu64 macros.
 
 #include "rapidjson/reader.h"
 #include "rapidjson/stringbuffer.h"
