@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 2.8)
 set(EXAMPLES
     capitalize
     condense
+    jsonx
     messagereader
     pretty
     prettyauto
@@ -17,6 +18,8 @@ set(EXAMPLES
     tutorial)
     
 include_directories("../include/")
+
+add_definitions(-D__STDC_FORMAT_MACROS)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default")
