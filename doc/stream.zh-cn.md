@@ -119,6 +119,58 @@ fclose(fp);
 
 它也可以把输出导向`stdout`。
 
+# iostream 包装类 {#iostreamWrapper}
+
+基于用户的要求，RapidJSON提供了正式的 `std::basic_istream` 和 `std::basic_ostream` 包装类。然而，请注意其性能会大大低于以上的其他流。
+
+## IStreamWrapper {#IStreamWrapper}
+
+`IStreamWrapper` 把任何继承自 `std::istream` 的类（如 `std::istringstream`、`std::stringstream`、`std::ifstream`、`std::fstream`）包装成 RapidJSON 的输入流。
+
+~~~cpp
+#include <rapidjson/document.h>
+#include <rapidjson/istreamwrapper.h>
+#include <fstream>
+
+using namespace rapidjson;
+using namespace std;
+
+ifstream ifs("test.json");
+IStreamWrapper isw(ifs);
+
+Document d;
+d.ParseStream(isw);
+~~~
+
+对于继承自 `std::wistream` 的类，则使用 `WIStreamWrapper`。
+
+## OStreamWrapper {#OStreamWrapper}
+
+相似地，`OStreamWrapper` 把任何继承自 `std::ostream` 的类（如 `std::ostringstream`、`std::stringstream`、`std::ofstream`、`std::fstream`）包装成 RapidJSON 的输出流。
+
+~~~cpp
+#include <rapidjson/document.h>
+#include <rapidjson/ostreamwrapper.h>
+#include <rapidjson/writer.h>
+#include <fstream>
+
+using namespace rapidjson;
+using namespace std;
+
+Document d;
+d.Parse(json);
+
+// ...
+
+ofstream ofs("output.json");
+OStreamWrapper osw(ofs);
+
+Writer<OStreamWrapper> writer(osw);
+d.Accept(writer);
+~~~
+
+对于继承自 `std::wistream` 的类，则使用 `WIStreamWrapper`。
+
 # 编码流 {#EncodedStreams}
 
 编码流（encoded streams）本身不存储JSON，它们是通过包装字节流来提供基本的编码／解码功能。
@@ -277,14 +329,14 @@ concept Stream {
 
 ## 例子：istream的包装类 {#ExampleIStreamWrapper}
 
-以下的例子是`std::istream`的包装类，它只需现3个函数。
+以下的简单例子是`std::istream`的包装类，它只需现3个函数。
 
 ~~~~~~~~~~cpp
-class IStreamWrapper {
+class MyIStreamWrapper {
 public:
     typedef char Ch;
 
-    IStreamWrapper(std::istream& is) : is_(is) {
+    MyIStreamWrapper(std::istream& is) : is_(is) {
     }
 
     Ch Peek() const { // 1
@@ -305,8 +357,8 @@ public:
     size_t PutEnd(Ch*) { assert(false); return 0; }
 
 private:
-    IStreamWrapper(const IStreamWrapper&);
-    IStreamWrapper& operator=(const IStreamWrapper&);
+    MyIStreamWrapper(const MyIStreamWrapper&);
+    MyIStreamWrapper& operator=(const MyIStreamWrapper&);
 
     std::istream& is_;
 };
@@ -317,7 +369,7 @@ private:
 ~~~~~~~~~~cpp
 const char* json = "[1,2,3,4]";
 std::stringstream ss(json);
-IStreamWrapper is(ss);
+MyIStreamWrapper is(ss);
 
 Document d;
 d.ParseStream(is);
@@ -330,7 +382,7 @@ d.ParseStream(is);
 以下的例子是`std::istream`的包装类，它只需实现2个函数。
 
 ~~~~~~~~~~cpp
-class OStreamWrapper {
+class MyOStreamWrapper {
 public:
     typedef char Ch;
 
@@ -347,8 +399,8 @@ public:
     size_t PutEnd(Ch*) { assert(false); return 0; }
 
 private:
-    OStreamWrapper(const OStreamWrapper&);
-    OStreamWrapper& operator=(const OStreamWrapper&);
+    MyOStreamWrapper(const MyOStreamWrapper&);
+    MyOStreamWrapper& operator=(const MyOStreamWrapper&);
 
     std::ostream& os_;
 };
@@ -361,9 +413,9 @@ Document d;
 // ...
 
 std::stringstream ss;
-OSStreamWrapper os(ss);
+MyOStreamWrapper os(ss);
 
-Writer<OStreamWrapper> writer(os);
+Writer<MyOStreamWrapper> writer(os);
 d.Accept(writer);
 ~~~~~~~~~~
 

@@ -119,6 +119,58 @@ fclose(fp);
 
 It can also directs the output to `stdout`.
 
+# iostream Wrapper {#iostreamWrapper}
+
+Due to users' requests, RapidJSON provided official wrappers for `std::basic_istream` and `std::basic_ostream`. However, please note that the performance will be much lower than the other streams above.
+
+## IStreamWrapper {#IStreamWrapper}
+
+`IStreamWrapper` wraps any class drived from `std::istream`, such as `std::istringstream`, `std::stringstream`, `std::ifstream`, `std::fstream`, into RapidJSON's input stream.
+
+~~~cpp
+#include <rapidjson/document.h>
+#include <rapidjson/istreamwrapper.h>
+#include <fstream>
+
+using namespace rapidjson;
+using namespace std;
+
+ifstream ifs("test.json");
+IStreamWrapper isw(ifs);
+
+Document d;
+d.ParseStream(isw);
+~~~
+
+For classes derived from `std::wistream`, use `WIStreamWrapper`.
+
+## OStreamWrapper {#OStreamWrapper}
+
+Similarly, `OStreamWrapper` wraps any class derived from `std::ostream`, such as `std::ostringstream`, `std::stringstream`, `std::ofstream`, `std::fstream`, into RapidJSON's input stream.
+
+~~~cpp
+#include <rapidjson/document.h>
+#include <rapidjson/ostreamwrapper.h>
+#include <rapidjson/writer.h>
+#include <fstream>
+
+using namespace rapidjson;
+using namespace std;
+
+Document d;
+d.Parse(json);
+
+// ...
+
+ofstream ofs("output.json");
+OStreamWrapper osw(ofs);
+
+Writer<OStreamWrapper> writer(osw);
+d.Accept(writer);
+~~~
+
+For classes derived from `std::wostream`, use `WOStreamWrapper`.
+
 # Encoded Streams {#EncodedStreams}
 
 Encoded streams do not contain JSON itself, but they wrap byte streams to provide basic encoding/decoding function.
@@ -277,14 +329,14 @@ There are two special interface, `PutBegin()` and `PutEnd()`, which are only for
 
 ## Example: istream wrapper {#ExampleIStreamWrapper}
 
-The following example is a wrapper of `std::istream`, which only implements 3 functions.
+The following example is a simple wrapper of `std::istream`, which only implements 3 functions.
 
 ~~~~~~~~~~cpp
-class IStreamWrapper {
+class MyIStreamWrapper {
 public:
     typedef char Ch;
 
-    IStreamWrapper(std::istream& is) : is_(is) {
+    MyIStreamWrapper(std::istream& is) : is_(is) {
     }
 
     Ch Peek() const { // 1
@@ -305,8 +357,8 @@ public:
     size_t PutEnd(Ch*) { assert(false); return 0; }
 
 private:
-    IStreamWrapper(const IStreamWrapper&);
-    IStreamWrapper& operator=(const IStreamWrapper&);
+    MyIStreamWrapper(const MyIStreamWrapper&);
+    MyIStreamWrapper& operator=(const MyIStreamWrapper&);
 
     std::istream& is_;
 };
@@ -317,7 +369,7 @@ User can use it to wrap instances of `std::stringstream`, `std::ifstream`.
 ~~~~~~~~~~cpp
 const char* json = "[1,2,3,4]";
 std::stringstream ss(json);
-IStreamWrapper is(ss);
+MyIStreamWrapper is(ss);
 
 Document d;
 d.ParseStream(is);
@@ -327,14 +379,14 @@ Note that, this implementation may not be as efficient as RapidJSON's memory or 
 
 ## Example: ostream wrapper {#ExampleOStreamWrapper}
 
-The following example is a wrapper of `std::istream`, which only implements 2 functions.
+The following example is a simple wrapper of `std::istream`, which only implements 2 functions.
 
 ~~~~~~~~~~cpp
-class OStreamWrapper {
+class MyOStreamWrapper {
 public:
     typedef char Ch;
 
-    OStreamWrapper(std::ostream& os) : os_(os) {
+    MyOStreamWrapper(std::ostream& os) : os_(os) {
     }
 
     Ch Peek() const { assert(false); return '\0'; }
@@ -347,8 +399,8 @@ public:
     size_t PutEnd(Ch*) { assert(false); return 0; }
 
 private:
-    OStreamWrapper(const OStreamWrapper&);
-    OStreamWrapper& operator=(const OStreamWrapper&);
+    MyOStreamWrapper(const MyOStreamWrapper&);
+    MyOStreamWrapper& operator=(const MyOStreamWrapper&);
 
     std::ostream& os_;
 };
@@ -361,9 +413,9 @@ Document d;
 // ...
 
 std::stringstream ss;
-OSStreamWrapper os(ss);
+MyOStreamWrapper os(ss);
 
-Writer<OStreamWrapper> writer(os);
+Writer<MyOStreamWrapper> writer(os);
 d.Accept(writer);
 ~~~~~~~~~~
 
