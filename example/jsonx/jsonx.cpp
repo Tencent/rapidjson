@@ -17,7 +17,7 @@ using namespace rapidjson;
 template <typename OutputStream>
 class JsonxWriter {
 public:
-    JsonxWriter(OutputStream& os) : os_(os), level_(0), hasName_(false) {
+    JsonxWriter(OutputStream& os) : os_(os), name_(), level_(0), hasName_(false) {
     }
 
     bool Null() {
