@@ -221,12 +221,12 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 <tr class="memdesc:a2b5a8fb688e6b6a1b077ce103df455c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a value in a document.  <a href="#a2b5a8fb688e6b6a1b077ce103df455c3">更多...</a><br /></td></tr>
 <tr class="separator:a2b5a8fb688e6b6a1b077ce103df455c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Query value</div></td></tr>
-<tr class="memitem:a1089dad43030e8120d25adcf2ec1220c"><td class="memItemLeft" align="right" valign="top">ValueType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a1089dad43030e8120d25adcf2ec1220c">Get</a> (ValueType &amp;root) const </td></tr>
-<tr class="memdesc:a1089dad43030e8120d25adcf2ec1220c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a value in a subtree.  <a href="#a1089dad43030e8120d25adcf2ec1220c">更多...</a><br /></td></tr>
-<tr class="separator:a1089dad43030e8120d25adcf2ec1220c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80032c73fc091a39a779a33b42e38ddf"><td class="memItemLeft" align="right" valign="top">const ValueType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a80032c73fc091a39a779a33b42e38ddf">Get</a> (const ValueType &amp;root) const </td></tr>
-<tr class="memdesc:a80032c73fc091a39a779a33b42e38ddf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a const value in a const subtree.  <a href="#a80032c73fc091a39a779a33b42e38ddf">更多...</a><br /></td></tr>
-<tr class="separator:a80032c73fc091a39a779a33b42e38ddf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a309d819cc14e9d2183df4807bc99fea5"><td class="memItemLeft" align="right" valign="top">ValueType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a309d819cc14e9d2183df4807bc99fea5">Get</a> (ValueType &amp;root, size_t *unresolvedTokenIndex=0) const </td></tr>
+<tr class="memdesc:a309d819cc14e9d2183df4807bc99fea5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a value in a subtree.  <a href="#a309d819cc14e9d2183df4807bc99fea5">更多...</a><br /></td></tr>
+<tr class="separator:a309d819cc14e9d2183df4807bc99fea5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6982b814e41d8f64bea7d5faab93b1f"><td class="memItemLeft" align="right" valign="top">const ValueType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#ab6982b814e41d8f64bea7d5faab93b1f">Get</a> (const ValueType &amp;root, size_t *unresolvedTokenIndex=0) const </td></tr>
+<tr class="memdesc:ab6982b814e41d8f64bea7d5faab93b1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a const value in a const subtree.  <a href="#ab6982b814e41d8f64bea7d5faab93b1f">更多...</a><br /></td></tr>
+<tr class="separator:ab6982b814e41d8f64bea7d5faab93b1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Query a value with default</div></td></tr>
 <tr class="memitem:a6c615761374ddce265d542f4b4b476b1"><td class="memItemLeft" align="right" valign="top">ValueType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_pointer.html#a6c615761374ddce265d542f4b4b476b1">GetWithDefault</a> (ValueType &amp;root, const ValueType &amp;defaultValue, typename ValueType::AllocatorType &amp;allocator) const </td></tr>
 <tr class="memdesc:a6c615761374ddce265d542f4b4b476b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query a value in a subtree with default value.  <a href="#a6c615761374ddce265d542f4b4b476b1">更多...</a><br /></td></tr>
@@ -960,7 +960,7 @@ template&lt;typename ValueType , typename Allocator &gt; </div>
 
 </div>
 </div>
-<a class="anchor" id="a1089dad43030e8120d25adcf2ec1220c"></a>
+<a class="anchor" id="a309d819cc14e9d2183df4807bc99fea5"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -973,8 +973,18 @@ template&lt;typename ValueType , typename Allocator &gt; </div>
           <td class="memname">ValueType* <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::Get </td>
           <td>(</td>
           <td class="paramtype">ValueType &amp;&#160;</td>
-          <td class="paramname"><em>root</em></td><td>)</td>
-          <td> const</td>
+          <td class="paramname"><em>root</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t *&#160;</td>
+          <td class="paramname"><em>unresolvedTokenIndex</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
         </tr>
       </table>
   </td>
@@ -988,14 +998,22 @@ template&lt;typename ValueType , typename Allocator &gt; </div>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
     <tr><td class="paramname">root</td><td>Root value of a DOM sub-tree to be resolved. It can be any value other than document root. </td></tr>
+    <tr><td class="paramname">unresolvedTokenIndex</td><td>If the pointer cannot resolve a token in the pointer, this parameter can obtain the index of unresolved token. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>返回</dt><dd>Pointer to the value if it can be resolved. Otherwise null. </dd></dl>
+<dl class="section return"><dt>返回</dt><dd>Pointer to the value if it can be resolved. Otherwise null.</dd></dl>
+<dl class="section note"><dt>注解</dt><dd>There are only 3 situations when a value cannot be resolved:<ol type="1">
+<li>A value in the path is not an array nor object.</li>
+<li>An object value does not contain the token.</li>
+<li>A token is out of range of an array value.</li>
+</ol>
+</dd></dl>
+<p>Use unresolvedTokenIndex to retrieve the token index. </p>
 
 </div>
 </div>
-<a class="anchor" id="a80032c73fc091a39a779a33b42e38ddf"></a>
+<a class="anchor" id="ab6982b814e41d8f64bea7d5faab93b1f"></a>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -1008,8 +1026,18 @@ template&lt;typename ValueType , typename Allocator &gt; </div>
           <td class="memname">const ValueType* <a class="el" href="classrapidjson_1_1_generic_pointer.html">rapidjson::GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::Get </td>
           <td>(</td>
           <td class="paramtype">const ValueType &amp;&#160;</td>
-          <td class="paramname"><em>root</em></td><td>)</td>
-          <td> const</td>
+          <td class="paramname"><em>root</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t *&#160;</td>
+          <td class="paramname"><em>unresolvedTokenIndex</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
         </tr>
       </table>
   </td>
@@ -1071,7 +1099,7 @@ template&lt;typename ValueType , typename Allocator &gt; </div>
 </div><div class="memdoc">
 
 <p>Query a value in a subtree with default value. </p>
-<p>Similar to <a class="el" href="classrapidjson_1_1_generic_pointer.html#a1089dad43030e8120d25adcf2ec1220c" title="Query a value in a subtree. ">Get()</a>, but if the specified value do not exists, it creates all parents and clone the default value. So that this function always succeed.</p>
+<p>Similar to <a class="el" href="classrapidjson_1_1_generic_pointer.html#a309d819cc14e9d2183df4807bc99fea5" title="Query a value in a subtree. ">Get()</a>, but if the specified value do not exists, it creates all parents and clone the default value. So that this function always succeed.</p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
     <tr><td class="paramname">root</td><td>Root value of a DOM sub-tree to be resolved. It can be any value other than document root. </td></tr>
