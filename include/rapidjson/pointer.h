@@ -460,9 +460,18 @@ public:
     //! Query a value in a subtree.
     /*!
         \param root Root value of a DOM sub-tree to be resolved. It can be any value other than document root.
+        \param unresolvedTokenIndex If the pointer cannot resolve a token in the pointer, this parameter can obtain the index of unresolved token.
         \return Pointer to the value if it can be resolved. Otherwise null.
+
+        \note
+        There are only 3 situations when a value cannot be resolved:
+        1. A value in the path is not an array nor object.
+        2. An object value does not contain the token.
+        3. A token is out of range of an array value.
+
+        Use unresolvedTokenIndex to retrieve the token index.
     */
-    ValueType* Get(ValueType& root) const {
+    ValueType* Get(ValueType& root, size_t* unresolvedTokenIndex = 0) const {
         RAPIDJSON_ASSERT(IsValid());
         ValueType* v = &root;
         for (const Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
@@ -471,18 +480,23 @@ public:
                 {
                     typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
                     if (m == v->MemberEnd())
-                        return 0;
+                        break;
                     v = &m->value;
                 }
-                break;
+                continue;
             case kArrayType:
                 if (t->index == kPointerInvalidIndex || t->index >= v->Size())
-                    return 0;
+                    break;
                 v = &((*v)[t->index]);
-                break;
+                continue;
             default:
-                return 0;
+                break;
             }
+
+            // Error: unresolved token
+            if (unresolvedTokenIndex)
+                *unresolvedTokenIndex = static_cast<size_t>(t - tokens_);
+            return 0;
         }
         return v;
     }
@@ -492,7 +506,9 @@ public:
         \param root Root value of a DOM sub-tree to be resolved. It can be any value other than document root.
         \return Pointer to the value if it can be resolved. Otherwise null.
     */
-    const ValueType* Get(const ValueType& root) const { return Get(const_cast<ValueType&>(root)); }
+    const ValueType* Get(const ValueType& root, size_t* unresolvedTokenIndex = 0) const { 
+        return Get(const_cast<ValueType&>(root), unresolvedTokenIndex);
+    }
 
     //@}
 
@@ -1053,23 +1069,23 @@ typename DocumentType::ValueType& CreateValueByPointer(DocumentType& document, c
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-typename T::ValueType* GetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer) {
-    return pointer.Get(root);
+typename T::ValueType* GetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, size_t* unresolvedTokenIndex = 0) {
+    return pointer.Get(root, unresolvedTokenIndex);
 }
 
 template <typename T>
-const typename T::ValueType* GetValueByPointer(const T& root, const GenericPointer<typename T::ValueType>& pointer) {
-    return pointer.Get(root);
+const typename T::ValueType* GetValueByPointer(const T& root, const GenericPointer<typename T::ValueType>& pointer, size_t* unresolvedTokenIndex = 0) {
+    return pointer.Get(root, unresolvedTokenIndex);
 }
 
 template <typename T, typename CharType, size_t N>
-typename T::ValueType* GetValueByPointer(T& root, const CharType (&source)[N]) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).Get(root);
+typename T::ValueType* GetValueByPointer(T& root, const CharType (&source)[N], size_t* unresolvedTokenIndex = 0) {
+    return GenericPointer<typename T::ValueType>(source, N - 1).Get(root, unresolvedTokenIndex);
 }
 
 template <typename T, typename CharType, size_t N>
-const typename T::ValueType* GetValueByPointer(const T& root, const CharType(&source)[N]) {
-    return GenericPointer<typename T::ValueType>(source, N - 1).Get(root);
+const typename T::ValueType* GetValueByPointer(const T& root, const CharType(&source)[N], size_t* unresolvedTokenIndex = 0) {
+    return GenericPointer<typename T::ValueType>(source, N - 1).Get(root, unresolvedTokenIndex);
 }
 
 //////////////////////////////////////////////////////////////////////////////
