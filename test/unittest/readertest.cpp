@@ -610,7 +610,7 @@ TEST(Reader, ParseString_Error) {
     GenericStringStream<UTF8<> > s(str);\
     BaseReaderHandler<UTF8<> > h;\
     GenericReader<UTF8<> , UTF8<> > reader;\
-    reader.template Parse<kParseValidateEncodingFlag>(s, h);\
+    reader.Parse<kParseValidateEncodingFlag>(s, h);\
     EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
     EXPECT_EQ(errorOffset, reader.GetErrorOffset());\
 }
