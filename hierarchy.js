@@ -39,7 +39,7 @@ var hierarchy =
     [ "iterator", null, [
       [ "rapidjson::GenericMemberIterator< Const, Encoding, Allocator >", "classrapidjson_1_1_generic_member_iterator.html", null ]
     ] ],
-    [ "rapidjson::Writer< OutputStream, SourceEncoding, TargetEncoding, StackAllocator >::Level", "structrapidjson_1_1_writer_1_1_level.html", null ],
+    [ "rapidjson::Writer< OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags >::Level", "structrapidjson_1_1_writer_1_1_level.html", null ],
     [ "rapidjson::MemoryPoolAllocator< BaseAllocator >", "classrapidjson_1_1_memory_pool_allocator.html", null ],
     [ "rapidjson::MemoryStream", "structrapidjson_1_1_memory_stream.html", null ],
     [ "rapidjson::ParseResult", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result", null ],
@@ -61,7 +61,7 @@ var hierarchy =
       [ "rapidjson::UTF32LE< CharType >", "structrapidjson_1_1_u_t_f32_l_e.html", null ]
     ] ],
     [ "rapidjson::UTF8< CharType >", "structrapidjson_1_1_u_t_f8.html", null ],
-    [ "rapidjson::Writer< OutputStream, SourceEncoding, TargetEncoding, StackAllocator >", "classrapidjson_1_1_writer.html", [
-      [ "rapidjson::PrettyWriter< OutputStream, SourceEncoding, TargetEncoding, StackAllocator >", "classrapidjson_1_1_pretty_writer.html", null ]
+    [ "rapidjson::Writer< OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags >", "classrapidjson_1_1_writer.html", [
+      [ "rapidjson::PrettyWriter< OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags >", "classrapidjson_1_1_pretty_writer.html", null ]
     ] ]
 ];

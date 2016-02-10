@@ -30,6 +30,7 @@ var searchData=
   ['rapidjson_5fuint64_5fc2',['RAPIDJSON_UINT64_C2',['../rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f',1,'rapidjson.h']]],
   ['rapidjson_5funlikely',['RAPIDJSON_UNLIKELY',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga6a2b1695c13e77ae425e3cbac980ccb5',1,'rapidjson.h']]],
   ['rapidjson_5fversion_5fstring',['RAPIDJSON_VERSION_STRING',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gad283cfde97d9a32b7d8e8107b11f70a6',1,'rapidjson.h']]],
+  ['rapidjson_5fwrite_5fdefault_5fflags',['RAPIDJSON_WRITE_DEFAULT_FLAGS',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga1975595e2f1dc20a2d4859f340ac88c6',1,'writer.h']]],
   ['reader',['Reader',['../namespacerapidjson.html#ad5310edd1226f5b3ea82dc0d4d3740c6',1,'rapidjson']]],
   ['reader_2eh',['reader.h',['../reader_8h.html',1,'']]],
   ['realloc',['Realloc',['../classrapidjson_1_1_memory_pool_allocator.html#a880524b17bbecb5d2691b8075050d55d',1,'rapidjson::MemoryPoolAllocator']]],
@@ -37,5 +38,5 @@ var searchData=
   ['removeallmembers',['RemoveAllMembers',['../classrapidjson_1_1_generic_value.html#a68d8d197ae1fb83d4dc202f9812af4cc',1,'rapidjson::GenericValue']]],
   ['removemember',['RemoveMember',['../classrapidjson_1_1_generic_value.html#aa60074f72a6d1651828a104b0c6387b1',1,'rapidjson::GenericValue::RemoveMember(const Ch *name)'],['../classrapidjson_1_1_generic_value.html#af91573ce61d798f0bc5dc88b00742697',1,'rapidjson::GenericValue::RemoveMember(MemberIterator m)']]],
   ['reserve',['Reserve',['../classrapidjson_1_1_generic_value.html#a17971ba2bcd4eb1716098fdfe9182386',1,'rapidjson::GenericValue']]],
-  ['reset',['Reset',['../classrapidjson_1_1_generic_schema_validator.html#afe6cd0d9088a1d4cf8100c0efc9f76fc',1,'rapidjson::GenericSchemaValidator::Reset()'],['../classrapidjson_1_1_writer.html#af4411235dd75ae34274e7eb74d435147',1,'rapidjson::Writer::Reset()']]]
+  ['reset',['Reset',['../classrapidjson_1_1_generic_schema_validator.html#afe6cd0d9088a1d4cf8100c0efc9f76fc',1,'rapidjson::GenericSchemaValidator::Reset()'],['../classrapidjson_1_1_writer.html#ac4026d3f14b80d6d7fc10004b1972722',1,'rapidjson::Writer::Reset()']]]
 ];

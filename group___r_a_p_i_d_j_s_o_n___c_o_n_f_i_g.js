@@ -14,5 +14,6 @@ var group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g =
     [ "RAPIDJSON_PATCH_VERSION", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaf967d31be43666ce7f53756d73bd1cdf", null ],
     [ "RAPIDJSON_SIMD", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga0ccf72f3ebc4b3306ab669f95ca5c64b", null ],
     [ "RAPIDJSON_UNLIKELY", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga6a2b1695c13e77ae425e3cbac980ccb5", null ],
-    [ "RAPIDJSON_VERSION_STRING", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gad283cfde97d9a32b7d8e8107b11f70a6", null ]
+    [ "RAPIDJSON_VERSION_STRING", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gad283cfde97d9a32b7d8e8107b11f70a6", null ],
+    [ "RAPIDJSON_WRITE_DEFAULT_FLAGS", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga1975595e2f1dc20a2d4859f340ac88c6", null ]
 ];

@@ -1,5 +1,7 @@
 var NAVTREEINDEX3 =
 {
+"md_doc_stream_8zh-cn.html#EncodedStreams":[3,3],
+"md_doc_stream_8zh-cn.html#ExampleIStreamWrapper":[3,4,0],
 "md_doc_stream_8zh-cn.html#ExampleOStreamWrapper":[3,4,1],
 "md_doc_stream_8zh-cn.html#FileReadStream":[3,1,0],
 "md_doc_stream_8zh-cn.html#FileStreams":[3,1],
@@ -201,9 +203,9 @@ var NAVTREEINDEX3 =
 "structrapidjson_1_1_u_t_f8.html#a162ec39d1feea956ac7c82ee21bbe037a821cba43661b67d78115cc9366e91b32":[13,0,0,46,1],
 "structrapidjson_1_1_u_t_f8.html#a9f47e775d8306a647a5c9eceac4b52fc":[13,0,0,46,0],
 "structrapidjson_1_1_writer_1_1_level.html":[13,0,0,47,0],
-"structrapidjson_1_1_writer_1_1_level.html#a5920547a092cb88db486d75064ffe50e":[13,0,0,47,0,1],
-"structrapidjson_1_1_writer_1_1_level.html#a8e478a154f4230449e441ce986c49970":[13,0,0,47,0,2],
-"structrapidjson_1_1_writer_1_1_level.html#ac557fb8846daeb3415eb54d4a43cb43f":[13,0,0,47,0,0],
+"structrapidjson_1_1_writer_1_1_level.html#a59255e3b1d371161f7c894503cfd6bec":[13,0,0,47,0,1],
+"structrapidjson_1_1_writer_1_1_level.html#a5d17bdfa9ded5de72f5f91175cc3e36b":[13,0,0,47,0,2],
+"structrapidjson_1_1_writer_1_1_level.html#aa12b98bd13c621e6a19cdb67d118f510":[13,0,0,47,0,0],
 "swap_8h_source.html":[14,0,0,0,1,11],
 "writer_8h_source.html":[14,0,0,0,20]
 };

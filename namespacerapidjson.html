@@ -401,6 +401,12 @@ Enumerations</h2></td></tr>
  }</td></tr>
 <tr class="memdesc:a81379eb4e94a0386d71d15fda882ebc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Combination of parseFlags.  <a href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9">More...</a><br /></td></tr>
 <tr class="separator:a81379eb4e94a0386d71d15fda882ebc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad28b1de6aee37e92fc31792dd6dd6b19"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#ad28b1de6aee37e92fc31792dd6dd6b19">WriteFlag</a> { <a class="el" href="namespacerapidjson.html#ad28b1de6aee37e92fc31792dd6dd6b19ae971aa1fc0ae64c8f3d2b47fd802846a">kWriteNoFlags</a> = 0, 
+<a class="el" href="namespacerapidjson.html#ad28b1de6aee37e92fc31792dd6dd6b19ac1b5e17278b060e9e866df075c104c10">kWriteValidateEncodingFlag</a> = 1, 
+<a class="el" href="namespacerapidjson.html#ad28b1de6aee37e92fc31792dd6dd6b19a5b5ca665afdfa828a74ae5755c67a226">kWriteDefaultFlags</a> = RAPIDJSON_WRITE_DEFAULT_FLAGS
+ }</td></tr>
+<tr class="memdesc:ad28b1de6aee37e92fc31792dd6dd6b19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Combination of writeFlags.  <a href="namespacerapidjson.html#ad28b1de6aee37e92fc31792dd6dd6b19">More...</a><br /></td></tr>
+<tr class="separator:ad28b1de6aee37e92fc31792dd6dd6b19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -797,6 +803,31 @@ template&lt;typename T , typename CharType , size_t N&gt; </td></tr>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="a4aacabc0f8cea1cd628f466d890773ebad6db204b848081468878ed58bc20ce8f"></a>kUTF32BE&#160;</td><td class="fielddoc">
 <p>UTF-32 big endian. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a class="anchor" id="ad28b1de6aee37e92fc31792dd6dd6b19"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="namespacerapidjson.html#ad28b1de6aee37e92fc31792dd6dd6b19">rapidjson::WriteFlag</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Combination of writeFlags. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="ad28b1de6aee37e92fc31792dd6dd6b19ae971aa1fc0ae64c8f3d2b47fd802846a"></a>kWriteNoFlags&#160;</td><td class="fielddoc">
+<p>No flags are set. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ad28b1de6aee37e92fc31792dd6dd6b19ac1b5e17278b060e9e866df075c104c10"></a>kWriteValidateEncodingFlag&#160;</td><td class="fielddoc">
+<p>Validate encoding of JSON strings. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="ad28b1de6aee37e92fc31792dd6dd6b19a5b5ca665afdfa828a74ae5755c67a226"></a>kWriteDefaultFlags&#160;</td><td class="fielddoc">
+<p>Default write flags. Can be customized by defining RAPIDJSON_WRITE_DEFAULT_FLAGS. </p>
 </td></tr>
 </table>
 
