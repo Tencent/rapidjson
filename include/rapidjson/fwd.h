@@ -91,8 +91,13 @@ typedef GenericReader<UTF8<char>, UTF8<char>, CrtAllocator> Reader;
 
 // writer.h
 
-template<typename OutputStream, typename SourceEncoding, typename TargetEncoding, typename StackAllocator>
+template<typename OutputStream, typename SourceEncoding, typename TargetEncoding, typename StackAllocator, unsigned writeFlags>
 class Writer;
+
+// prettywriter.h
+
+template<typename OutputStream, typename SourceEncoding, typename TargetEncoding, typename StackAllocator, unsigned writeFlags>
+class PrettyWriter;
 
 // document.h
 

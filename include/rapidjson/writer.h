@@ -35,6 +35,26 @@ RAPIDJSON_DIAG_OFF(padded)
 
 RAPIDJSON_NAMESPACE_BEGIN
 
+///////////////////////////////////////////////////////////////////////////////
+// WriteFlag
+
+/*! \def RAPIDJSON_WRITE_DEFAULT_FLAGS 
+    \ingroup RAPIDJSON_CONFIG
+    \brief User-defined kWriteDefaultFlags definition.
+
+    User can define this as any \c WriteFlag combinations.
+*/
+#ifndef RAPIDJSON_WRITE_DEFAULT_FLAGS
+#define RAPIDJSON_WRITE_DEFAULT_FLAGS kWriteNoFlags
+#endif
+
+//! Combination of writeFlags
+enum WriteFlag {
+    kWriteNoFlags = 0,              //!< No flags are set.
+    kWriteValidateEncodingFlag = 1, //!< Validate encoding of JSON strings.
+    kWriteDefaultFlags = RAPIDJSON_WRITE_DEFAULT_FLAGS  //!< Default write flags. Can be customized by defining RAPIDJSON_WRITE_DEFAULT_FLAGS
+};
+
 //! JSON writer
 /*! Writer implements the concept Handler.
     It generates JSON text by events to an output os.
@@ -51,7 +71,7 @@ RAPIDJSON_NAMESPACE_BEGIN
     \tparam StackAllocator Type of allocator for allocating memory of stack.
     \note implements Handler concept
 */
-template<typename OutputStream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename StackAllocator = CrtAllocator>
+template<typename OutputStream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename StackAllocator = CrtAllocator, unsigned writeFlags = kWriteDefaultFlags>
 class Writer {
 public:
     typedef typename SourceEncoding::Ch Ch;
@@ -318,9 +338,10 @@ protected:
                     PutUnsafe(*os_, hexDigits[static_cast<unsigned char>(c) & 0xF]);
                 }
             }
-            else
-                if (RAPIDJSON_UNLIKELY(!(Transcoder<SourceEncoding, TargetEncoding>::TranscodeUnsafe(is, *os_))))
-                    return false;
+            else if (RAPIDJSON_UNLIKELY(!(writeFlags & kWriteValidateEncodingFlag ? 
+                Transcoder<SourceEncoding, TargetEncoding>::Validate(is, *os_) :
+                Transcoder<SourceEncoding, TargetEncoding>::TranscodeUnsafe(is, *os_))))
+                return false;
         }
         PutUnsafe(*os_, '\"');
         return true;

@@ -69,7 +69,10 @@ struct Foo {
     Reader* reader;
 
     // writer.h
-    Writer<StringBuffer, UTF8<char>, UTF8<char>, CrtAllocator>* writer;
+    Writer<StringBuffer, UTF8<char>, UTF8<char>, CrtAllocator, 0>* writer;
+
+    // prettywriter.h
+    PrettyWriter<StringBuffer, UTF8<char>, UTF8<char>, CrtAllocator, 0>* prettywriter;
 
     // document.h
     Value* value;
@@ -94,6 +97,7 @@ struct Foo {
 #include "rapidjson/memorystream.h"
 #include "rapidjson/document.h" // -> reader.h
 #include "rapidjson/writer.h"
+#include "rapidjson/prettywriter.h"
 #include "rapidjson/schema.h"   // -> pointer.h
 
 Foo::Foo() : 
@@ -138,6 +142,9 @@ Foo::Foo() :
 
     // writer.h
     writer(RAPIDJSON_NEW((Writer<StringBuffer>))),
+
+    // prettywriter.h
+    prettywriter(RAPIDJSON_NEW((PrettyWriter<StringBuffer>))),
 
     // document.h
     value(RAPIDJSON_NEW(Value)),
@@ -195,6 +202,9 @@ Foo::~Foo() {
 
     // writer.h
     RAPIDJSON_DELETE(writer);
+
+    // prettywriter.h
+    RAPIDJSON_DELETE(prettywriter);
 
     // document.h
     RAPIDJSON_DELETE(value);

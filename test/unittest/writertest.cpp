@@ -347,6 +347,31 @@ TEST(Writer, InvalidEncoding) {
     }
 }
 
+TEST(Writer, ValidateEncoding) {
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteValidateEncodingFlag> writer(buffer);
+        writer.StartArray();
+        EXPECT_TRUE(writer.String("\x24"));             // Dollar sign U+0024
+        EXPECT_TRUE(writer.String("\xC2\xA2"));         // Cents sign U+00A2
+        EXPECT_TRUE(writer.String("\xE2\x82\xAC"));     // Euro sign U+20AC
+        EXPECT_TRUE(writer.String("\xF0\x9D\x84\x9E")); // G clef sign U+1D11E
+        writer.EndArray();
+        EXPECT_STREQ("[\"\x24\",\"\xC2\xA2\",\"\xE2\x82\xAC\",\"\xF0\x9D\x84\x9E\"]", buffer.GetString());
+    }
+
+    // Fail in decoding invalid UTF-8 sequence http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteValidateEncodingFlag> writer(buffer);
+        writer.StartArray();
+        EXPECT_FALSE(writer.String("\xfe"));
+        EXPECT_FALSE(writer.String("\xff"));
+        EXPECT_FALSE(writer.String("\xfe\xfe\xff\xff"));
+        writer.EndArray();
+    }
+}
+
 TEST(Writer, InvalidEventSequence) {
     // {]
     {
