@@ -56,6 +56,8 @@ class Writer {
 public:
     typedef typename SourceEncoding::Ch Ch;
 
+    static const int kDefaultMaxDecimalPlaces = 324;
+
     //! Constructor
     /*! \param os Output stream.
         \param stackAllocator User supplied allocator. If it is null, it will create a private one.
@@ -63,11 +65,11 @@ public:
     */
     explicit
     Writer(OutputStream& os, StackAllocator* stackAllocator = 0, size_t levelDepth = kDefaultLevelDepth) : 
-        os_(&os), level_stack_(stackAllocator, levelDepth * sizeof(Level)), hasRoot_(false) {}
+        os_(&os), level_stack_(stackAllocator, levelDepth * sizeof(Level)), maxDecimalPlaces_(kDefaultMaxDecimalPlaces), hasRoot_(false) {}
 
     explicit
     Writer(StackAllocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) :
-        os_(0), level_stack_(allocator, levelDepth * sizeof(Level)), hasRoot_(false) {}
+        os_(0), level_stack_(allocator, levelDepth * sizeof(Level)), maxDecimalPlaces_(kDefaultMaxDecimalPlaces), hasRoot_(false) {}
 
     //! Reset the writer with a new stream.
     /*!
@@ -99,6 +101,35 @@ public:
     */
     bool IsComplete() const {
         return hasRoot_ && level_stack_.Empty();
+    }
+
+    int GetMaxDecimalPlaces() const {
+        return maxDecimalPlaces_;
+    }
+
+    //! Sets the maximum number of decimal places for double output.
+    /*!
+        This setting truncates the output with specified number of decimal places.
+
+        For example, 
+
+        \code
+        writer.SetMaxDecimalPlaces(3);
+        writer.StartArray();
+        writer.Double(0.12345);                 // "0.123"
+        writer.Double(0.0001);                  // "0.0"
+        writer.Double(1.234567890123456e30);    // "1.234567890123456e30" (do not truncate significand for positive exponent)
+        writer.Double(1.23e-4);                 // "0.0"                  (do truncate significand for negative exponent)
+        writer.EndArray();
+        \endcode
+
+        The default setting does not truncate any decimal places. You can restore to this setting by calling
+        \code
+        writer.SetMaxDecimalPlaces(Writer::kDefaultMaxDecimalPlaces);
+        \endcode
+    */
+    void SetMaxDecimalPlaces(int maxDecimalPlaces) {
+        maxDecimalPlaces_ = maxDecimalPlaces;
     }
 
     /*!@name Implementation of Handler
@@ -246,7 +277,7 @@ protected:
             return false;
         
         char buffer[25];
-        char* end = internal::dtoa(d, buffer);
+        char* end = internal::dtoa(d, buffer, maxDecimalPlaces_);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (char* p = buffer; p != end; ++p)
             PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
@@ -353,6 +384,7 @@ protected:
 
     OutputStream* os_;
     internal::Stack<StackAllocator> level_stack_;
+    int maxDecimalPlaces_;
     bool hasRoot_;
 
 private:
@@ -401,7 +433,7 @@ inline bool Writer<StringBuffer>::WriteDouble(double d) {
         return false;
     
     char *buffer = os_->Push(25);
-    char* end = internal::dtoa(d, buffer);
+    char* end = internal::dtoa(d, buffer, maxDecimalPlaces_);
     os_->Pop(static_cast<size_t>(25 - (end - buffer)));
     return true;
 }
