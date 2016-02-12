@@ -27,7 +27,7 @@ var searchData=
   ['getbool',['GetBool',['../classrapidjson_1_1_generic_value.html#a69d917b47799f63fc588bf294fa71483',1,'rapidjson::GenericValue']]],
   ['getdouble',['GetDouble',['../classrapidjson_1_1_generic_value.html#aa059dee923cc0446752e321ff70936a6',1,'rapidjson::GenericValue']]],
   ['geterroroffset',['GetErrorOffset',['../classrapidjson_1_1_generic_document.html#ab791c05727d83f6834a1b916783dbc06',1,'rapidjson::GenericDocument::GetErrorOffset()'],['../classrapidjson_1_1_generic_reader.html#ab907a36c410e96154c99797a6a0ce16d',1,'rapidjson::GenericReader::GetErrorOffset()']]],
-  ['getfloat',['GetFloat',['../classrapidjson_1_1_generic_value.html#a9872a07e4ce0328ca70df18f36bd9c01',1,'rapidjson::GenericValue']]],
+  ['getfloat',['GetFloat',['../classrapidjson_1_1_generic_value.html#a0eda9834f241e5c5b23161a7ee33758b',1,'rapidjson::GenericValue']]],
   ['getinvaliddocumentpointer',['GetInvalidDocumentPointer',['../classrapidjson_1_1_generic_schema_validator.html#af66e4a41d71c89edfabb176af7839f04',1,'rapidjson::GenericSchemaValidator']]],
   ['getinvalidschemakeyword',['GetInvalidSchemaKeyword',['../classrapidjson_1_1_generic_schema_validator.html#a914628c4d69faea91ada1dee61d25d59',1,'rapidjson::GenericSchemaValidator']]],
   ['getinvalidschemapointer',['GetInvalidSchemaPointer',['../classrapidjson_1_1_generic_schema_validator.html#a8381f8d4dca195449f086ffbd25bb9b7',1,'rapidjson::GenericSchemaValidator']]],

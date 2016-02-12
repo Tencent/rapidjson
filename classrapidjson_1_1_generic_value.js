@@ -56,7 +56,7 @@ var classrapidjson_1_1_generic_value =
     [ "FindMember", "classrapidjson_1_1_generic_value.html#ad2b3832cef0c74490de72954f8891a90", null ],
     [ "GetBool", "classrapidjson_1_1_generic_value.html#a69d917b47799f63fc588bf294fa71483", null ],
     [ "GetDouble", "classrapidjson_1_1_generic_value.html#aa059dee923cc0446752e321ff70936a6", null ],
-    [ "GetFloat", "classrapidjson_1_1_generic_value.html#a9872a07e4ce0328ca70df18f36bd9c01", null ],
+    [ "GetFloat", "classrapidjson_1_1_generic_value.html#a0eda9834f241e5c5b23161a7ee33758b", null ],
     [ "GetInt", "classrapidjson_1_1_generic_value.html#a92991a57de8cf42da2e4efc792acefea", null ],
     [ "GetInt64", "classrapidjson_1_1_generic_value.html#a77b677674bc92a6e6a78cc9736a44f1c", null ],
     [ "GetString", "classrapidjson_1_1_generic_value.html#aab763460a97e8944ddedf51203581a3b", null ],
