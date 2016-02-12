@@ -325,6 +325,43 @@ TEST(Regex, QuantifierMinMax3) {
     EXPECT_FALSE(re.Match("abbbbbbd"));
 }
 
+// Issue538
+TEST(Regex, QuantifierMinMax4) {
+    Regex re("a(b|c){0,3}d");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("ad"));
+    EXPECT_TRUE(re.Match("abd"));
+    EXPECT_TRUE(re.Match("acd"));
+    EXPECT_TRUE(re.Match("abbd"));
+    EXPECT_TRUE(re.Match("accd"));
+    EXPECT_TRUE(re.Match("abcd"));
+    EXPECT_TRUE(re.Match("abbbd"));
+    EXPECT_TRUE(re.Match("acccd"));
+    EXPECT_FALSE(re.Match("abbbbd"));
+    EXPECT_FALSE(re.Match("add"));
+    EXPECT_FALSE(re.Match("accccd"));
+    EXPECT_FALSE(re.Match("abcbcd"));
+}
+
+// Issue538
+TEST(Regex, QuantifierMinMax5) {
+    Regex re("a(b|c){0,}d");
+    ASSERT_TRUE(re.IsValid());
+    EXPECT_TRUE(re.Match("ad"));
+    EXPECT_TRUE(re.Match("abd"));
+    EXPECT_TRUE(re.Match("acd"));
+    EXPECT_TRUE(re.Match("abbd"));
+    EXPECT_TRUE(re.Match("accd"));
+    EXPECT_TRUE(re.Match("abcd"));
+    EXPECT_TRUE(re.Match("abbbd"));
+    EXPECT_TRUE(re.Match("acccd"));
+    EXPECT_TRUE(re.Match("abbbbd"));
+    EXPECT_TRUE(re.Match("accccd"));
+    EXPECT_TRUE(re.Match("abcbcd"));
+    EXPECT_FALSE(re.Match("add"));
+    EXPECT_FALSE(re.Match("aad"));
+}
+
 #define EURO "\xE2\x82\xAC" // "\xE2\x82\xAC" is UTF-8 sequence of Euro sign U+20AC
 
 TEST(Regex, Unicode) {
@@ -501,6 +538,7 @@ TEST(Regex, Invalid) {
         EXPECT_FALSE(re.IsValid());\
     }
 
+    TEST_INVALID("");
     TEST_INVALID("a|");
     TEST_INVALID("()");
     TEST_INVALID(")");
@@ -517,7 +555,7 @@ TEST(Regex, Invalid) {
     TEST_INVALID("a{0}");
     TEST_INVALID("a{-1}");
     TEST_INVALID("a{}");
-    TEST_INVALID("a{0,}");
+    // TEST_INVALID("a{0,}");   // Support now
     TEST_INVALID("a{,0}");
     TEST_INVALID("a{1,0}");
     TEST_INVALID("a{-1,0}");
@@ -528,6 +566,11 @@ TEST(Regex, Invalid) {
     TEST_INVALID("\\a");
 
 #undef TEST_INVALID
+}
+
+TEST(Regex, Issue538) {
+    Regex re("^[0-9]+(\\\\.[0-9]+){0,2}");
+    EXPECT_TRUE(re.IsValid());
 }
 
 #undef EURO
