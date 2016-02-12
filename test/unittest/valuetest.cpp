@@ -335,6 +335,12 @@ TEST(Value, True) {
     Value z;
     z.SetBool(true);
     EXPECT_TRUE(z.IsTrue());
+
+    // Templated functions
+    EXPECT_TRUE(z.Is<bool>());
+    EXPECT_TRUE(z.Get<bool>());
+    EXPECT_FALSE(z.Set<bool>(false).Get<bool>());
+    EXPECT_TRUE(z.Set(true).Get<bool>());
 }
 
 TEST(Value, False) {
@@ -414,6 +420,12 @@ TEST(Value, Int) {
     // operator=(int)
     z = 5678;
     EXPECT_EQ(5678, z.GetInt());
+
+    // Templated functions
+    EXPECT_TRUE(z.Is<int>());
+    EXPECT_EQ(5678, z.Get<int>());
+    EXPECT_EQ(5679, z.Set(5679).Get<int>());
+    EXPECT_EQ(5680, z.Set<int>(5680).Get<int>());
 }
 
 TEST(Value, Uint) {
@@ -453,6 +465,12 @@ TEST(Value, Uint) {
     EXPECT_EQ(2147483648u, z.GetUint());
     EXPECT_FALSE(z.IsInt());
     EXPECT_TRUE(z.IsInt64());   // Issue 41: Incorrect parsing of unsigned int number types
+
+    // Templated functions
+    EXPECT_TRUE(z.Is<unsigned>());
+    EXPECT_EQ(2147483648u, z.Get<unsigned>());
+    EXPECT_EQ(2147483649u, z.Set(2147483649u).Get<unsigned>());
+    EXPECT_EQ(2147483650u, z.Set<unsigned>(2147483650u).Get<unsigned>());
 }
 
 TEST(Value, Int64) {
@@ -505,8 +523,15 @@ TEST(Value, Int64) {
     EXPECT_FALSE(z.IsInt());
     EXPECT_NEAR(-2147483649.0, z.GetDouble(), 0.0);
 
-    z.SetInt64(static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x80000000, 00000000)));
+    int64_t i = static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x80000000, 00000000));
+    z.SetInt64(i);
     EXPECT_DOUBLE_EQ(-9223372036854775808.0, z.GetDouble());
+
+    // Templated functions
+    EXPECT_TRUE(z.Is<int64_t>());
+    EXPECT_EQ(i, z.Get<int64_t>());
+    EXPECT_EQ(i - 1, z.Set(i - 1).Get<int64_t>());
+    EXPECT_EQ(i - 2, z.Set<int64_t>(i - 2).Get<int64_t>());
 }
 
 TEST(Value, Uint64) {
@@ -547,10 +572,17 @@ TEST(Value, Uint64) {
     EXPECT_FALSE(z.IsUint());
     EXPECT_TRUE(z.IsInt64());
 
-    z.SetUint64(RAPIDJSON_UINT64_C2(0x80000000, 0x00000000));    // 2^63 cannot cast as int64
+    uint64_t u = RAPIDJSON_UINT64_C2(0x80000000, 0x00000000);
+    z.SetUint64(u);    // 2^63 cannot cast as int64
     EXPECT_FALSE(z.IsInt64());
-    EXPECT_EQ(RAPIDJSON_UINT64_C2(0x80000000, 0x00000000), z.GetUint64()); // Issue 48
+    EXPECT_EQ(u, z.GetUint64()); // Issue 48
     EXPECT_DOUBLE_EQ(9223372036854775808.0, z.GetDouble());
+
+    // Templated functions
+    EXPECT_TRUE(z.Is<uint64_t>());
+    EXPECT_EQ(u, z.Get<uint64_t>());
+    EXPECT_EQ(u + 1, z.Set(u + 1).Get<uint64_t>());
+    EXPECT_EQ(u + 2, z.Set<uint64_t>(u + 2).Get<uint64_t>());
 }
 
 TEST(Value, Double) {
@@ -577,6 +609,12 @@ TEST(Value, Double) {
 
     z = 56.78;
     EXPECT_NEAR(56.78, z.GetDouble(), 0.0);
+
+    // Templated functions
+    EXPECT_TRUE(z.Is<double>());
+    EXPECT_EQ(56.78, z.Get<double>());
+    EXPECT_EQ(57.78, z.Set(57.78).Get<double>());
+    EXPECT_EQ(58.78, z.Set<double>(58.78).Get<double>());
 }
 
 TEST(Value, Float) {
@@ -604,6 +642,12 @@ TEST(Value, Float) {
 
     z = 56.78f;
     EXPECT_NEAR(56.78f, z.GetFloat(), 0.0f);
+
+    // Templated functions
+    EXPECT_TRUE(z.Is<float>());
+    EXPECT_EQ(56.78f, z.Get<float>());
+    EXPECT_EQ(57.78f, z.Set(57.78f).Get<float>());
+    EXPECT_EQ(58.78f, z.Set<float>(58.78f).Get<float>());
 }
 
 TEST(Value, IsLosslessDouble) {
@@ -759,6 +803,12 @@ TEST(Value, String) {
         vs1 = StringRef(str);
         TestEqual(str, vs1);
         TestEqual(vs0, vs1);
+
+        // Templated function.
+        EXPECT_TRUE(vs0.Is<std::string>());
+        EXPECT_EQ(str, vs0.Get<std::string>());
+        EXPECT_EQ(std::string("Apple"), vs0.Set<std::string>(std::string("Apple"), allocator).template Get<std::string>());
+        EXPECT_EQ(std::string("Orange"), vs0.Set(std::string("Orange"), allocator).template Get<std::string>());
     }
 #endif // RAPIDJSON_HAS_STDSTRING
 }

@@ -394,6 +394,87 @@ template <typename T> struct IsGenericValue : IsGenericValueImpl<T>::Type {};
 } // namespace internal
 
 ///////////////////////////////////////////////////////////////////////////////
+// TypeHelper
+
+namespace internal {
+
+template <typename ValueType, typename T>
+struct TypeHelper {
+    static bool Is(const ValueType&) { RAPIDJSON_ASSERT(false && "Unsupport type"); }
+    static T Get(const ValueType&) { RAPIDJSON_ASSERT(false && "Unsupport type"); }
+    static ValueType& Set(ValueType&, T) { RAPIDJSON_ASSERT(false && "Unsupport type"); }
+    static ValueType& Set(ValueType&, T, typename ValueType::AllocatorType&) { RAPIDJSON_ASSERT(false && "Unsupport type"); }
+};
+
+template<typename ValueType> 
+struct TypeHelper<ValueType, bool> {
+    static bool Is(const ValueType& v) { return v.IsBool(); }
+    static bool Get(const ValueType& v) { return v.GetBool(); }
+    static ValueType& Set(ValueType& v, bool data) { return v.SetBool(data); }
+    static ValueType& Set(ValueType& v, bool data, typename ValueType::AllocatorType&) { return v.SetBool(data); }
+};
+
+template<typename ValueType> 
+struct TypeHelper<ValueType, int> {
+    static bool Is(const ValueType& v) { return v.IsInt(); }
+    static int Get(const ValueType& v) { return v.GetInt(); }
+    static ValueType& Set(ValueType& v, int data) { return v.SetInt(data); }
+    static ValueType& Set(ValueType& v, int data, typename ValueType::AllocatorType&) { return v.SetInt(data); }
+};
+
+template<typename ValueType> 
+struct TypeHelper<ValueType, unsigned> {
+    static bool Is(const ValueType& v) { return v.IsUint(); }
+    static unsigned Get(const ValueType& v) { return v.GetUint(); }
+    static ValueType& Set(ValueType& v, unsigned data) { return v.SetUint(data); }
+    static ValueType& Set(ValueType& v, unsigned data, typename ValueType::AllocatorType&) { return v.SetUint(data); }
+};
+
+template<typename ValueType> 
+struct TypeHelper<ValueType, int64_t> {
+    static bool Is(const ValueType& v) { return v.IsInt64(); }
+    static int64_t Get(const ValueType& v) { return v.GetInt64(); }
+    static ValueType& Set(ValueType& v, int64_t data) { return v.SetInt64(data); }
+    static ValueType& Set(ValueType& v, int64_t data, typename ValueType::AllocatorType&) { return v.SetInt64(data); }
+};
+
+template<typename ValueType> 
+struct TypeHelper<ValueType, uint64_t> {
+    static bool Is(const ValueType& v) { return v.IsUint64(); }
+    static uint64_t Get(const ValueType& v) { return v.GetUint64(); }
+    static ValueType& Set(ValueType& v, uint64_t data) { return v.SetUint64(data); }
+    static ValueType& Set(ValueType& v, uint64_t data, typename ValueType::AllocatorType&) { return v.SetUint64(data); }
+};
+
+template<typename ValueType> 
+struct TypeHelper<ValueType, double> {
+    static bool Is(const ValueType& v) { return v.IsDouble(); }
+    static double Get(const ValueType& v) { return v.GetDouble(); }
+    static ValueType& Set(ValueType& v, double data) { return v.SetDouble(data); }
+    static ValueType& Set(ValueType& v, double data, typename ValueType::AllocatorType&) { return v.SetDouble(data); }
+};
+
+template<typename ValueType> 
+struct TypeHelper<ValueType, float> {
+    static bool Is(const ValueType& v) { return v.IsFloat(); }
+    static float Get(const ValueType& v) { return v.GetFloat(); }
+    static ValueType& Set(ValueType& v, float data) { return v.SetFloat(data); }
+    static ValueType& Set(ValueType& v, float data, typename ValueType::AllocatorType&) { return v.SetFloat(data); }
+};
+
+#if RAPIDJSON_HAS_STDSTRING
+template<typename ValueType> 
+struct TypeHelper<ValueType, std::basic_string<typename ValueType::Ch> > {
+    typedef std::basic_string<typename ValueType::Ch> StringType;
+    static bool Is(const ValueType& v) { return v.IsString(); }
+    static StringType Get(const ValueType& v) { return v.GetString(); }
+    static ValueType& Set(ValueType& v, const StringType& data, typename ValueType::AllocatorType& a) { return v.SetString(data, a); }
+};
+#endif
+
+} // namespace internal
+
+///////////////////////////////////////////////////////////////////////////////
 // GenericValue
 
 //! Represents a JSON value. Use Value for UTF8 encoding and default allocator.
@@ -1484,6 +1565,7 @@ public:
     /*! \note If the value is 64-bit integer type, it may lose precision. Use \c IsLosslessFloat() to check whether the converison is lossless.
     */
     double GetFloat() const {
+        RAPIDJSON_ASSERT(IsFloat());
         return static_cast<float>(GetDouble());
     }
 
@@ -1553,6 +1635,22 @@ public:
 #endif
 
     //@}
+
+    //! Templated version for checking whether this value is type T.
+    /*!
+        \tparam T Either \c bool, \c int, \c unsigned, \c int64_t, \c uint64_t, \c double, \c float, \c std::basic_string<Ch>
+    */
+    template <typename T>
+    bool Is() const { return internal::TypeHelper<ValueType, T>::Is(*this); }
+
+    template <typename T>
+    T Get() const { return internal::TypeHelper<ValueType, T>::Get(*this); }
+
+    template<typename T>
+    ValueType& Set(const T& data) { return internal::TypeHelper<ValueType, T>::Set(*this, data); }
+
+    template<typename T>
+    ValueType& Set(const T& data, AllocatorType& allocator) { return internal::TypeHelper<ValueType, T>::Set(*this, data, allocator); }
 
     //! Generate events of this value to a Handler.
     /*! This function adopts the GoF visitor pattern.
