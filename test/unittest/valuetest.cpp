@@ -768,6 +768,11 @@ TEST(Value, String) {
     EXPECT_STREQ("World", w.GetString());
     EXPECT_EQ(5u, w.GetStringLength());
 
+    // templated functions
+    EXPECT_TRUE(z.Is<const char*>());
+    EXPECT_STREQ(cstr, z.Get<const char*>());
+    EXPECT_STREQ("Apple", z.Set<const char*>("Apple").Get<const char*>());
+
 #if RAPIDJSON_HAS_STDSTRING
     {
         std::string str = "Hello World";

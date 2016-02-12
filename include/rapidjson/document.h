@@ -401,7 +401,7 @@ namespace internal {
 template <typename ValueType, typename T>
 struct TypeHelper {
     static bool Is(const ValueType&) { RAPIDJSON_ASSERT(false && "Unsupport type"); }
-    static T Get(const ValueType&) { RAPIDJSON_ASSERT(false && "Unsupport type"); }
+    static T Get(const ValueType&) { RAPIDJSON_ASSERT(false && "Unsupport type"); return T(); }
     static ValueType& Set(ValueType&, T) { RAPIDJSON_ASSERT(false && "Unsupport type"); }
     static ValueType& Set(ValueType&, T, typename ValueType::AllocatorType&) { RAPIDJSON_ASSERT(false && "Unsupport type"); }
 };
@@ -460,6 +460,15 @@ struct TypeHelper<ValueType, float> {
     static float Get(const ValueType& v) { return v.GetFloat(); }
     static ValueType& Set(ValueType& v, float data) { return v.SetFloat(data); }
     static ValueType& Set(ValueType& v, float data, typename ValueType::AllocatorType&) { return v.SetFloat(data); }
+};
+
+template<typename ValueType> 
+struct TypeHelper<ValueType, const typename ValueType::Ch*> {
+    typedef const typename ValueType::Ch* StringType;
+    static bool Is(const ValueType& v) { return v.IsString(); }
+    static StringType Get(const ValueType& v) { return v.GetString(); }
+    static ValueType& Set(ValueType& v, const StringType data) { return v.SetString(typename ValueType::StringRefType(data)); }
+    static ValueType& Set(ValueType& v, const StringType data, typename ValueType::AllocatorType& a) { return v.SetString(data, a); }
 };
 
 #if RAPIDJSON_HAS_STDSTRING
@@ -1561,10 +1570,10 @@ public:
         RAPIDJSON_ASSERT((flags_ & kUint64Flag) != 0);  return static_cast<double>(data_.n.u64); // uint64_t -> double (may lose precision)
     }
 
-    //! Get the value as double type.
+    //! Get the value as float type.
     /*! \note If the value is 64-bit integer type, it may lose precision. Use \c IsLosslessFloat() to check whether the converison is lossless.
     */
-    double GetFloat() const {
+    float GetFloat() const {
         RAPIDJSON_ASSERT(IsFloat());
         return static_cast<float>(GetDouble());
     }
