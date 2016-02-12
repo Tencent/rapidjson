@@ -1,5 +1,10 @@
 var NAVTREEINDEX3 =
 {
+"md_doc_stream_8zh-cn.html#AutoUTFInputStream":[3,3,2],
+"md_doc_stream_8zh-cn.html#AutoUTFOutputStream":[3,3,3],
+"md_doc_stream_8zh-cn.html#CustomStream":[3,4],
+"md_doc_stream_8zh-cn.html#EncodedInputStream":[3,3,0],
+"md_doc_stream_8zh-cn.html#EncodedOutputStream":[3,3,1],
 "md_doc_stream_8zh-cn.html#EncodedStreams":[3,3],
 "md_doc_stream_8zh-cn.html#ExampleIStreamWrapper":[3,4,0],
 "md_doc_stream_8zh-cn.html#ExampleOStreamWrapper":[3,4,1],

@@ -207,6 +207,15 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsDouble</b> () const
 <tr class="memitem:a7821da23b34e3509a80469acfa1850f5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7821da23b34e3509a80469acfa1850f5"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsString</b> () const </td></tr>
 <tr class="separator:a7821da23b34e3509a80469acfa1850f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a7aca6411c7fb393e0a9129a2ba886d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3a7aca6411c7fb393e0a9129a2ba886d"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsLosslessDouble</b> () const </td></tr>
+<tr class="separator:a3a7aca6411c7fb393e0a9129a2ba886d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adaba7873c2c23ad2733c323040fee69f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adaba7873c2c23ad2733c323040fee69f"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsFloat</b> () const </td></tr>
+<tr class="separator:adaba7873c2c23ad2733c323040fee69f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc8ea5f64c4bb4d32b5286e5e9f4d0e0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acc8ea5f64c4bb4d32b5286e5e9f4d0e0"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsLosslessFloat</b> () const </td></tr>
+<tr class="separator:acc8ea5f64c4bb4d32b5286e5e9f4d0e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Null</div></td></tr>
 <tr class="memitem:a6f0d90a3f269061a73d05999fd61473e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6f0d90a3f269061a73d05999fd61473e"></a>
 <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>SetNull</b> ()</td></tr>
@@ -422,9 +431,12 @@ int64_t&#160;</td><td class="memItemRight" valign="bottom"><b>GetInt64</b> () co
 <tr class="memitem:a25f0f486ad79b8e42774cb070da836c8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a25f0f486ad79b8e42774cb070da836c8"></a>
 uint64_t&#160;</td><td class="memItemRight" valign="bottom"><b>GetUint64</b> () const </td></tr>
 <tr class="separator:a25f0f486ad79b8e42774cb070da836c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa059dee923cc0446752e321ff70936a6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa059dee923cc0446752e321ff70936a6"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>GetDouble</b> () const </td></tr>
+<tr class="memitem:aa059dee923cc0446752e321ff70936a6"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#aa059dee923cc0446752e321ff70936a6">GetDouble</a> () const </td></tr>
+<tr class="memdesc:aa059dee923cc0446752e321ff70936a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value as double type.  <a href="#aa059dee923cc0446752e321ff70936a6">More...</a><br /></td></tr>
 <tr class="separator:aa059dee923cc0446752e321ff70936a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9872a07e4ce0328ca70df18f36bd9c01"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#a9872a07e4ce0328ca70df18f36bd9c01">GetFloat</a> () const </td></tr>
+<tr class="memdesc:a9872a07e4ce0328ca70df18f36bd9c01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value as double type.  <a href="#a9872a07e4ce0328ca70df18f36bd9c01">More...</a><br /></td></tr>
+<tr class="separator:a9872a07e4ce0328ca70df18f36bd9c01"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca0cff58ccd1d50ddce2eb2182e322c2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aca0cff58ccd1d50ddce2eb2182e322c2"></a>
 <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>SetInt</b> (int i)</td></tr>
 <tr class="separator:aca0cff58ccd1d50ddce2eb2182e322c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -440,6 +452,9 @@ double&#160;</td><td class="memItemRight" valign="bottom"><b>GetDouble</b> () co
 <tr class="memitem:af5ada19ad065eeecc7112409bc8d9bbb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af5ada19ad065eeecc7112409bc8d9bbb"></a>
 <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>SetDouble</b> (double d)</td></tr>
 <tr class="separator:af5ada19ad065eeecc7112409bc8d9bbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67f32cbe6eb699f95391a58efd39a070"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a67f32cbe6eb699f95391a58efd39a070"></a>
+<a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>SetFloat</b> (float f)</td></tr>
+<tr class="separator:a67f32cbe6eb699f95391a58efd39a070"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">String</div></td></tr>
 <tr class="memitem:aab763460a97e8944ddedf51203581a3b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aab763460a97e8944ddedf51203581a3b"></a>
 const <a class="el" href="classrapidjson_1_1_generic_value.html#adcdbc7fa85a9a41b78966d7e0dcc2ac4">Ch</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetString</b> () const </td></tr>
@@ -1777,6 +1792,62 @@ template&lt;typename Encoding, typename Allocator&gt; </div>
 </dl>
 <dl class="section pre"><dt>Precondition</dt><dd>IsObject() == true </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>Iterator to member, if it exists. Otherwise returns <a class="el" href="classrapidjson_1_1_generic_value.html#adb109ae9f12615efadf9277cb5e9c4ee">MemberEnd()</a>. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aa059dee923cc0446752e321ff70936a6"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Encoding, typename Allocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classrapidjson_1_1_generic_value.html">rapidjson::GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::GetDouble </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the value as double type. </p>
+<dl class="section note"><dt>Note</dt><dd>If the value is 64-bit integer type, it may lose precision. Use <code>IsLosslessDouble()</code> to check whether the converison is lossless. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a9872a07e4ce0328ca70df18f36bd9c01"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Encoding, typename Allocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classrapidjson_1_1_generic_value.html">rapidjson::GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::GetFloat </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the value as double type. </p>
+<dl class="section note"><dt>Note</dt><dd>If the value is 64-bit integer type, it may lose precision. Use <code>IsLosslessFloat()</code> to check whether the converison is lossless. </dd></dl>
 
 </div>
 </div>

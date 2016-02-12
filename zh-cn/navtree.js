@@ -155,8 +155,8 @@ var NAVTREEINDEX =
 [
 "allocators_8h_source.html",
 "classrapidjson_1_1_generic_schema_validator.html#a98a80c23569edb89af722c124a136b49",
-"classrapidjson_1_1_writer.html#ab7c08a743fff55d9f09dc58f0a75e67f",
-"md_doc_stream_8zh-cn.html#EncodedStreams"
+"classrapidjson_1_1_writer.html#a939007778b53074132750d9eccfdc5a2",
+"md_doc_stream_8zh-cn.html#AutoUTFInputStream"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
