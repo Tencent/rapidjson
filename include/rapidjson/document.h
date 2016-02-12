@@ -788,6 +788,29 @@ public:
     bool IsDouble() const { return (flags_ & kDoubleFlag) != 0; }
     bool IsString() const { return (flags_ & kStringFlag) != 0; }
 
+    // Checks whether a number can be losslessly converted to a double.
+    bool IsLosslessDouble() const {
+        if (!IsNumber()) return false;
+        if (IsUint64())  return static_cast<uint64_t>(static_cast<double>(GetUint64())) == GetUint64();
+        if (IsInt64())   return static_cast< int64_t>(static_cast<double>(GetInt64()))  == GetInt64();
+        return true; // double, int, uint are always lossless
+    }
+
+    // Checks whether a number is a float (possible lossy).
+    bool IsFloat() const  {
+        if ((flags_ & kDoubleFlag) == 0)
+            return false;
+        double d = GetDouble();
+        return d >= -3.4028234e38 && d <= 3.4028234e38;
+    }
+    // Checks whether a number can be losslessly converted to a float.
+    bool IsLosslessFloat() const {
+        if (!IsNumber()) return false;
+        double a = GetDouble();
+        double b = static_cast<double>(static_cast<float>(a));
+        return a >= b && a <= b;    // Prevent -Wfloat-equal
+    }
+
     //@}
 
     //!@name Null
@@ -1445,6 +1468,9 @@ public:
     int64_t GetInt64() const    { RAPIDJSON_ASSERT(flags_ & kInt64Flag); return data_.n.i64; }
     uint64_t GetUint64() const  { RAPIDJSON_ASSERT(flags_ & kUint64Flag); return data_.n.u64; }
 
+    //! Get the value as double type.
+    /*! \note If the value is 64-bit integer type, it may lose precision. Use \c IsLosslessDouble() to check whether the converison is lossless.
+    */
     double GetDouble() const {
         RAPIDJSON_ASSERT(IsNumber());
         if ((flags_ & kDoubleFlag) != 0)                return data_.n.d;   // exact type, no conversion.
@@ -1454,11 +1480,19 @@ public:
         RAPIDJSON_ASSERT((flags_ & kUint64Flag) != 0);  return static_cast<double>(data_.n.u64); // uint64_t -> double (may lose precision)
     }
 
+    //! Get the value as double type.
+    /*! \note If the value is 64-bit integer type, it may lose precision. Use \c IsLosslessFloat() to check whether the converison is lossless.
+    */
+    double GetFloat() const {
+        return static_cast<float>(GetDouble());
+    }
+
     GenericValue& SetInt(int i)             { this->~GenericValue(); new (this) GenericValue(i);    return *this; }
     GenericValue& SetUint(unsigned u)       { this->~GenericValue(); new (this) GenericValue(u);    return *this; }
     GenericValue& SetInt64(int64_t i64)     { this->~GenericValue(); new (this) GenericValue(i64);  return *this; }
     GenericValue& SetUint64(uint64_t u64)   { this->~GenericValue(); new (this) GenericValue(u64);  return *this; }
     GenericValue& SetDouble(double d)       { this->~GenericValue(); new (this) GenericValue(d);    return *this; }
+    GenericValue& SetFloat(float f)         { this->~GenericValue(); new (this) GenericValue(f);    return *this; }
 
     //@}
 
