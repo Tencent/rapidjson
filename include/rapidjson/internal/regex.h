@@ -256,13 +256,13 @@ private:
                 case '{':
                     {
                         unsigned n, m;
-                        if (!ParseUnsigned(ds, &n) || n == 0)
+                        if (!ParseUnsigned(ds, &n))
                             return;
 
                         if (ds.Peek() == ',') {
                             ds.Take();
                             if (ds.Peek() == '}')
-                                m = 0;
+                                m = kInfinityQuantifier;
                             else if (!ParseUnsigned(ds, &m) || m < n)
                                 return;
                         }
@@ -424,15 +424,29 @@ private:
     }
 
     bool EvalQuantifier(Stack<Allocator>& operandStack, unsigned n, unsigned m) {
-        RAPIDJSON_ASSERT(n > 0);
-        RAPIDJSON_ASSERT(m == 0 || n <= m);         // m == 0 means infinity
+        RAPIDJSON_ASSERT(n <= m);
         if (operandStack.GetSize() < sizeof(Frag))
             return false;
+
+        if (n == 0) {
+            if (m == 0)                             // a{0} not support
+                return false;
+            else if (m == kInfinityQuantifier)
+                Eval(operandStack, kZeroOrMore);    // a{0,} -> a*
+            else {
+                Eval(operandStack, kZeroOrOne);         // a{0,5} -> a?
+                for (unsigned i = 0; i < m - 1; i++)
+                    CloneTopOperand(operandStack);      // a{0,5} -> a? a? a? a? a?
+                for (unsigned i = 0; i < m - 1; i++)
+                    Eval(operandStack, kConcatenation); // a{0,5} -> a?a?a?a?a?
+            }
+            return true;
+        }
 
         for (unsigned i = 0; i < n - 1; i++)        // a{3} -> a a a
             CloneTopOperand(operandStack);
 
-        if (m == 0)
+        if (m == kInfinityQuantifier)
             Eval(operandStack, kOneOrMore);         // a{3,} -> a a a+
         else if (m > n) {
             CloneTopOperand(operandStack);          // a{3,5} -> a a a a
@@ -469,6 +483,8 @@ private:
     template <typename InputStream>
     bool ParseUnsigned(DecodedStream<InputStream>& ds, unsigned* u) {
         unsigned r = 0;
+        if (ds.Peek() < '0' || ds.Peek() > '9')
+            return false;
         while (ds.Peek() >= '0' && ds.Peek() <= '9') {
             if (r >= 429496729 && ds.Peek() > '5') // 2^32 - 1 = 4294967295
                 return false; // overflow
@@ -657,6 +673,8 @@ private:
     SizeType root_;
     SizeType stateCount_;
     SizeType rangeCount_;
+
+    static const unsigned kInfinityQuantifier = ~0u;
 
     // For SearchWithAnchoring()
     uint32_t* stateSet_;        // allocated by states_.GetAllocator()
