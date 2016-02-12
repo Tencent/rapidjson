@@ -1480,10 +1480,11 @@ public:
         RAPIDJSON_ASSERT((flags_ & kUint64Flag) != 0);  return static_cast<double>(data_.n.u64); // uint64_t -> double (may lose precision)
     }
 
-    //! Get the value as double type.
+    //! Get the value as float type.
     /*! \note If the value is 64-bit integer type, it may lose precision. Use \c IsLosslessFloat() to check whether the converison is lossless.
     */
-    double GetFloat() const {
+    float GetFloat() const {
+        RAPIDJSON_ASSERT(IsFloat());
         return static_cast<float>(GetDouble());
     }
 
