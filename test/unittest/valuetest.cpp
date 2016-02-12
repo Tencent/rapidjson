@@ -579,6 +579,54 @@ TEST(Value, Double) {
     EXPECT_NEAR(56.78, z.GetDouble(), 0.0);
 }
 
+TEST(Value, Float) {
+    // Constructor with double
+    Value x(12.34f);
+    EXPECT_EQ(kNumberType, x.GetType());
+    EXPECT_NEAR(12.34f, x.GetFloat(), 0.0);
+    EXPECT_TRUE(x.IsNumber());
+    EXPECT_TRUE(x.IsDouble());
+    EXPECT_TRUE(x.IsFloat());
+
+    EXPECT_FALSE(x.IsInt());
+    EXPECT_FALSE(x.IsNull());
+    EXPECT_FALSE(x.IsBool());
+    EXPECT_FALSE(x.IsFalse());
+    EXPECT_FALSE(x.IsTrue());
+    EXPECT_FALSE(x.IsString());
+    EXPECT_FALSE(x.IsObject());
+    EXPECT_FALSE(x.IsArray());
+
+    // SetFloat()
+    Value z;
+    z.SetFloat(12.34f);
+    EXPECT_NEAR(12.34f, z.GetFloat(), 0.0f);
+
+    z = 56.78f;
+    EXPECT_NEAR(56.78f, z.GetFloat(), 0.0f);
+}
+
+TEST(Value, IsLosslessDouble) {
+    EXPECT_TRUE(Value(12.34).IsLosslessDouble());
+    EXPECT_TRUE(Value(-123).IsLosslessDouble());
+    EXPECT_TRUE(Value(2147483648u).IsLosslessDouble());
+    EXPECT_TRUE(Value(static_cast<int64_t>(-RAPIDJSON_UINT64_C2(0x40000000, 0x00000000))).IsLosslessDouble());
+    EXPECT_TRUE(Value(RAPIDJSON_UINT64_C2(0xA0000000, 0x00000000)).IsLosslessDouble());
+
+    EXPECT_FALSE(Value(static_cast<int64_t>(-RAPIDJSON_UINT64_C2(0x7FFFFFFF, 0xFFFFFFFF))).IsLosslessDouble());
+    EXPECT_FALSE(Value(RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0xFFFFFFFF)).IsLosslessDouble());
+}
+
+TEST(Value, IsLosslessFloat) {
+    EXPECT_TRUE(Value(12.25).IsLosslessFloat());
+    EXPECT_TRUE(Value(-123).IsLosslessFloat());
+    EXPECT_TRUE(Value(2147483648u).IsLosslessFloat());
+    EXPECT_TRUE(Value(3.4028234e38f).IsLosslessFloat());
+    EXPECT_TRUE(Value(-3.4028234e38f).IsLosslessFloat());
+    EXPECT_FALSE(Value(3.4028235e38).IsLosslessFloat());
+    EXPECT_FALSE(Value(0.3).IsLosslessFloat());
+}
+
 TEST(Value, String) {
     // Construction with const string
     Value x("Hello", 5); // literal
