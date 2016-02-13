@@ -812,8 +812,10 @@ TEST(Value, String) {
         // Templated function.
         EXPECT_TRUE(vs0.Is<std::string>());
         EXPECT_EQ(str, vs0.Get<std::string>());
-        EXPECT_EQ(std::string("Apple"), vs0.Set<std::string>(std::string("Apple"), allocator).template Get<std::string>());
-        EXPECT_EQ(std::string("Orange"), vs0.Set(std::string("Orange"), allocator).template Get<std::string>());
+        vs0.Set<std::string>(std::string("Apple"), allocator);
+        EXPECT_EQ(std::string("Apple"), vs0.Get<std::string>());
+        vs0.Set(std::string("Orange"), allocator);
+        EXPECT_EQ(std::string("Orange"), vs0.Get<std::string>());
     }
 #endif // RAPIDJSON_HAS_STDSTRING
 }
