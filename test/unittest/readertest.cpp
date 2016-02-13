@@ -418,7 +418,7 @@ TEST(Reader, ParseNumber_NormalPrecisionError) {
 }
 
 TEST(Reader, ParseNumber_Error) {
-#define TEST_NUMBER_ERROR(errorCode, str, errorOffset) \
+#define TEST_NUMBER_ERROR(errorCode, str, errorOffset, streamPos) \
     { \
         char buffer[1001]; \
         sprintf(buffer, "%s", str); \
@@ -428,6 +428,7 @@ TEST(Reader, ParseNumber_Error) {
         EXPECT_FALSE(reader.Parse(s, h)); \
         EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
         EXPECT_EQ(errorOffset, reader.GetErrorOffset());\
+        EXPECT_EQ(streamPos, s.Tell());\
     }
 
     // Number too big to be stored in double.
@@ -437,17 +438,17 @@ TEST(Reader, ParseNumber_Error) {
         for (int i = 1; i < 310; i++)
             n1e309[i] = '0';
         n1e309[310] = '\0';
-        TEST_NUMBER_ERROR(kParseErrorNumberTooBig, n1e309, 0);
+        TEST_NUMBER_ERROR(kParseErrorNumberTooBig, n1e309, 0, 309);
     }
-    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e309", 0);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e309", 0, 5);
 
     // Miss fraction part in number.
-    TEST_NUMBER_ERROR(kParseErrorNumberMissFraction, "1.", 2);
-    TEST_NUMBER_ERROR(kParseErrorNumberMissFraction, "1.a", 2);
+    TEST_NUMBER_ERROR(kParseErrorNumberMissFraction, "1.", 2, 2);
+    TEST_NUMBER_ERROR(kParseErrorNumberMissFraction, "1.a", 2, 2);
 
     // Miss exponent in number.
-    TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e", 2);
-    TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e_", 2);
+    TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e", 2, 2);
+    TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e_", 2, 2);
 
 #undef TEST_NUMBER_ERROR
 }
@@ -605,7 +606,7 @@ ParseErrorCode TestString(const typename Encoding::Ch* str) {
 }
 
 TEST(Reader, ParseString_Error) {
-#define TEST_STRING_ERROR(errorCode, str, errorOffset)\
+#define TEST_STRING_ERROR(errorCode, str, errorOffset, streamPos)\
 {\
     GenericStringStream<UTF8<> > s(str);\
     BaseReaderHandler<UTF8<> > h;\
@@ -613,6 +614,7 @@ TEST(Reader, ParseString_Error) {
     reader.Parse<kParseValidateEncodingFlag>(s, h);\
     EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
     EXPECT_EQ(errorOffset, reader.GetErrorOffset());\
+    EXPECT_EQ(streamPos, s.Tell());\
 }
 
 #define ARRAY(...) { __VA_ARGS__ }
@@ -630,21 +632,21 @@ TEST(Reader, ParseString_Error) {
     }
 
     // Invalid escape character in string.
-    TEST_STRING_ERROR(kParseErrorStringEscapeInvalid, "[\"\\a\"]", 2);
+    TEST_STRING_ERROR(kParseErrorStringEscapeInvalid, "[\"\\a\"]", 2, 3);
 
     // Incorrect hex digit after \\u escape in string.
-    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uABCG\"]", 2);
+    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uABCG\"]", 2, 7);
 
     // Quotation in \\u escape in string (Issue #288)
-    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uaaa\"]", 2);
-    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uD800\\uFFF\"]", 2);
+    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uaaa\"]", 2, 7);
+    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uD800\\uFFF\"]", 2, 13);
 
     // The surrogate pair in string is invalid.
-    TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800X\"]", 2);
-    TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800\\uFFFF\"]", 2);
+    TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800X\"]", 2, 8);
+    TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800\\uFFFF\"]", 2, 14);
 
     // Missing a closing quotation mark in string.
-    TEST_STRING_ERROR(kParseErrorStringMissQuotationMark, "[\"Test]", 7);
+    TEST_STRING_ERROR(kParseErrorStringMissQuotationMark, "[\"Test]", 7, 7);
 
     // http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
 
@@ -667,7 +669,18 @@ TEST(Reader, ParseString_Error) {
         char e[] = { '[', '\"', 0, ' ', '\"', ']', '\0' };
         for (unsigned c = 0xC0u; c <= 0xFFu; c++) {
             e[2] = static_cast<char>(c);
-            TEST_STRING_ERROR(kParseErrorStringInvalidEncoding, e, 2);
+            int streamPos;
+            if (c <= 0xC1u)
+                streamPos = 3; // 0xC0 - 0xC1
+            else if (c <= 0xDFu)
+                streamPos = 4; // 0xC2 - 0xDF
+            else if (c <= 0xEFu)
+                streamPos = 5; // 0xE0 - 0xEF
+            else if (c <= 0xF4u)
+                streamPos = 6; // 0xF0 - 0xF4
+            else
+                streamPos = 3; // 0xF5 - 0xFF
+            TEST_STRING_ERROR(kParseErrorStringInvalidEncoding, e, 2, streamPos);
         }
     }
 
@@ -748,6 +761,7 @@ TEST(Reader, ParseArray) {
 TEST(Reader, ParseArray_Error) {
 #define TEST_ARRAY_ERROR(errorCode, str, errorOffset) \
     { \
+        int streamPos = errorOffset; \
         char buffer[1001]; \
         strncpy(buffer, str, 1000); \
         InsituStringStream s(buffer); \
@@ -756,6 +770,7 @@ TEST(Reader, ParseArray_Error) {
         EXPECT_FALSE(reader.Parse(s, h)); \
         EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
         EXPECT_EQ(errorOffset, reader.GetErrorOffset());\
+        EXPECT_EQ(streamPos, s.Tell());\
     }
 
     // Missing a comma or ']' after an array element.
@@ -910,6 +925,7 @@ TEST(Reader, ParseInsituIterative_MultipleRoot) {
 
 #define TEST_ERROR(errorCode, str, errorOffset) \
     { \
+        int streamPos = errorOffset; \
         char buffer[1001]; \
         strncpy(buffer, str, 1000); \
         InsituStringStream s(buffer); \
@@ -918,6 +934,7 @@ TEST(Reader, ParseInsituIterative_MultipleRoot) {
         EXPECT_FALSE(reader.Parse(s, h)); \
         EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
         EXPECT_EQ(errorOffset, reader.GetErrorOffset());\
+        EXPECT_EQ(streamPos, s.Tell());\
     }
 
 TEST(Reader, ParseDocument_Error) {
@@ -1079,6 +1096,7 @@ TEST(Reader, Parse_IStreamWrapper_StringStream) {
 
 #define TESTERRORHANDLING(text, errorCode, offset)\
 {\
+    int streamPos = offset; \
     StringStream json(text); \
     BaseReaderHandler<> handler; \
     Reader reader; \
@@ -1086,6 +1104,7 @@ TEST(Reader, Parse_IStreamWrapper_StringStream) {
     EXPECT_TRUE(reader.HasParseError()); \
     EXPECT_EQ(errorCode, reader.GetParseErrorCode()); \
     EXPECT_EQ(offset, reader.GetErrorOffset()); \
+    EXPECT_EQ(streamPos, json.Tell()); \
 }
 
 TEST(Reader, IterativeParsing_ErrorHandling) {
