@@ -1082,7 +1082,7 @@ TEST(Value, ArrayHelperRangeFor) {
     }
     {
         int i = 0;
-        for (auto& v : const_cast<const Value&>(x).GetArray())
+        for (const auto& v : const_cast<const Value&>(x).GetArray())
             EXPECT_EQ(i++, v.GetInt());
         EXPECT_EQ(i, 10);
     }
