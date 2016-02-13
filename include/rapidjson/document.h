@@ -399,12 +399,7 @@ template <typename T> struct IsGenericValue : IsGenericValueImpl<T>::Type {};
 namespace internal {
 
 template <typename ValueType, typename T>
-struct TypeHelper {
-    static bool Is(const ValueType&) { RAPIDJSON_ASSERT(false && "Unsupport type"); }
-    static T Get(const ValueType&) { RAPIDJSON_ASSERT(false && "Unsupport type"); return T(); }
-    static ValueType& Set(ValueType&, T) { RAPIDJSON_ASSERT(false && "Unsupport type"); }
-    static ValueType& Set(ValueType&, T, typename ValueType::AllocatorType&) { RAPIDJSON_ASSERT(false && "Unsupport type"); }
-};
+struct TypeHelper {};
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, bool> {
