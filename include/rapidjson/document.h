@@ -483,6 +483,9 @@ struct TypeHelper<ValueType, std::basic_string<typename ValueType::Ch> > {
 
 } // namespace internal
 
+template <typename ValueType>
+class GenericArray;
+
 ///////////////////////////////////////////////////////////////////////////////
 // GenericValue
 
@@ -510,6 +513,7 @@ public:
     typedef GenericValue* ValueIterator;            //!< Value iterator for iterating in array.
     typedef const GenericValue* ConstValueIterator; //!< Constant value iterator for iterating in array.
     typedef GenericValue<Encoding, Allocator> ValueType;    //!< Value type of itself.
+    typedef GenericArray<ValueType> ArrayType;
 
     //!@name Constructors and destructor.
     //@{
@@ -1556,6 +1560,9 @@ public:
         return pos;
     }
 
+    ArrayType GetArray() { RAPIDJSON_ASSERT(IsArray()); return ArrayType(*this); }
+    const ArrayType GetArray() const { RAPIDJSON_ASSERT(IsArray()); return ArrayType(*this); }
+
     //@}
 
     //!@name Number
@@ -1653,9 +1660,12 @@ public:
 
     //@}
 
+    //!@name Array
+    //@{
+
     //! Templated version for checking whether this value is type T.
     /*!
-        \tparam T Either \c bool, \c int, \c unsigned, \c int64_t, \c uint64_t, \c double, \c float, \c std::basic_string<Ch>
+        \tparam T Either \c bool, \c int, \c unsigned, \c int64_t, \c uint64_t, \c double, \c float, \c const \c char*, \c std::basic_string<Ch>
     */
     template <typename T>
     bool Is() const { return internal::TypeHelper<ValueType, T>::Is(*this); }
@@ -1668,6 +1678,8 @@ public:
 
     template<typename T>
     ValueType& Set(const T& data, AllocatorType& allocator) { return internal::TypeHelper<ValueType, T>::Set(*this, data, allocator); }
+
+    //@}
 
     //! Generate events of this value to a Handler.
     /*! This function adopts the GoF visitor pattern.
@@ -2277,6 +2289,65 @@ GenericValue<Encoding,Allocator>::GenericValue(const GenericValue<Encoding,Sourc
         break;
     }
 }
+
+//! Helper class for accessing Value of array type.
+/*!
+    Instance of this helper class is obtained by \c GenericValue::GetArray().
+    In addition to all APIs for array type, it provides range-based for loop if \c RAPIDJSON_HAS_CXX11_RANGE_FOR=1.
+*/
+template <typename ValueType>
+class GenericArray {
+public:
+    typedef typename ValueType::ValueIterator ValueIterator;
+    typedef typename ValueType::ConstValueIterator ConstValueIterator;
+    typedef typename ValueType::AllocatorType AllocatorType;
+    typedef typename ValueType::StringRefType StringRefType;
+
+    template <typename, typename>
+    friend class GenericValue;
+
+    GenericArray() : ptr_() {}
+    GenericArray(const GenericArray& rhs) : ptr_(rhs.ptr_) {}
+    GenericArray& operator=(GenericArray& rhs) { ptr_ = rhs.ptr_; return *this; }
+    ~GenericArray() {}
+
+    SizeType Size() const { return ptr_->Size(); }
+    SizeType Capacity() const { return ptr_->Capacity(); }
+    bool Empty() const { return ptr_->Empty(); }
+    void Clear() { ptr_->Clear(); }
+    ValueType& operator[](SizeType index) { return (*ptr_)[index]; }
+    const ValueType& operator[](SizeType index) const {  return (*ptr_)[index]; }
+    ValueIterator Begin() { return ptr_->Begin(); }
+    ValueIterator End() { return ptr_->End(); }
+    ConstValueIterator Begin() const { return ptr_->Begin(); }
+    ConstValueIterator End() const { return ptr_->End(); }
+    GenericArray& Reserve(SizeType newCapacity, AllocatorType &allocator) { ptr_->Reserve(newCapacity, allocator); return *this; }
+    GenericArray& PushBack(ValueType& value, AllocatorType& allocator) { ptr_->PushBack(value, allocator); return *this; }
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    GenericArray& PushBack(ValueType&& value, AllocatorType& allocator) { ptr_->PushBack(value, allocator); return *this; }
+#endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    GenericArray& PushBack(StringRefType value, AllocatorType& allocator) { ptr_->PushBack(value, allocator); return *this; }
+    template <typename T>
+    RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (GenericArray&))
+    PushBack(T value, AllocatorType& allocator) { ptr_->PushBack(value, allocator); return *this; }
+    GenericArray& PopBack() { ptr_->PopBack(); return *this; }
+    ValueIterator Erase(ConstValueIterator pos) { return ptr_->Erase(pos); }
+    ValueIterator Erase(ConstValueIterator first, ConstValueIterator last) { return ptr_->Erase(first, last); }
+
+#if RAPIDJSON_HAS_CXX11_RANGE_FOR
+    ValueIterator begin() { return ptr_->Begin(); }
+    ValueIterator end() { return ptr_->End(); }
+    ConstValueIterator begin() const { return ptr_->Begin(); }
+    ConstValueIterator end() const { return ptr_->End(); }
+#endif
+
+private:
+    GenericArray(ValueType& value) : ptr_(&value) {}
+    GenericArray(const ValueType& value) : ptr_(const_cast<ValueType*>(&value)) {}
+    ValueType* ptr_;
+};
+
+typedef GenericArray<Value> Array;
 
 RAPIDJSON_NAMESPACE_END
 

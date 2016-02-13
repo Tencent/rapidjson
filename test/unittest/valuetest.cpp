@@ -824,25 +824,9 @@ TEST(Value, SetStringNullException) {
     EXPECT_THROW(v.SetString(0, 0), AssertException);
 }
 
-TEST(Value, Array) {
-    Value x(kArrayType);
-    const Value& y = x;
-    Value::AllocatorType allocator;
-
-    EXPECT_EQ(kArrayType, x.GetType());
-    EXPECT_TRUE(x.IsArray());
-    EXPECT_TRUE(x.Empty());
-    EXPECT_EQ(0u, x.Size());
-    EXPECT_TRUE(y.IsArray());
-    EXPECT_TRUE(y.Empty());
-    EXPECT_EQ(0u, y.Size());
-
-    EXPECT_FALSE(x.IsNull());
-    EXPECT_FALSE(x.IsBool());
-    EXPECT_FALSE(x.IsFalse());
-    EXPECT_FALSE(x.IsTrue());
-    EXPECT_FALSE(x.IsString());
-    EXPECT_FALSE(x.IsObject());
+template <typename T, typename Allocator>
+void TestArray(T& x, Allocator& allocator) {
+    const T& y = x;
 
     // PushBack()
     Value v;
@@ -889,7 +873,7 @@ TEST(Value, Array) {
 #endif
 
     // iterator
-    Value::ValueIterator itr = x.Begin();
+    typename T::ValueIterator itr = x.Begin();
     EXPECT_TRUE(itr != x.End());
     EXPECT_TRUE(itr->IsNull());
     ++itr;
@@ -908,7 +892,7 @@ TEST(Value, Array) {
     EXPECT_STREQ("foo", itr->GetString());
 
     // const iterator
-    Value::ConstValueIterator citr = y.Begin();
+    typename T::ConstValueIterator citr = y.Begin();
     EXPECT_TRUE(citr != y.End());
     EXPECT_TRUE(citr->IsNull());
     ++citr;
@@ -994,6 +978,29 @@ TEST(Value, Array) {
                 EXPECT_EQ(i + removeCount, x[static_cast<SizeType>(i)][0].GetUint());
         }
     }
+}
+
+TEST(Value, Array) {
+    Value x(kArrayType);
+    const Value& y = x;
+    Value::AllocatorType allocator;
+
+    EXPECT_EQ(kArrayType, x.GetType());
+    EXPECT_TRUE(x.IsArray());
+    EXPECT_TRUE(x.Empty());
+    EXPECT_EQ(0u, x.Size());
+    EXPECT_TRUE(y.IsArray());
+    EXPECT_TRUE(y.Empty());
+    EXPECT_EQ(0u, y.Size());
+
+    EXPECT_FALSE(x.IsNull());
+    EXPECT_FALSE(x.IsBool());
+    EXPECT_FALSE(x.IsFalse());
+    EXPECT_FALSE(x.IsTrue());
+    EXPECT_FALSE(x.IsString());
+    EXPECT_FALSE(x.IsObject());
+
+    TestArray(x, allocator);
 
     // Working in gcc without C++11, but VS2013 cannot compile. To be diagnosed.
     // http://en.wikipedia.org/wiki/Erase-remove_idiom
@@ -1016,6 +1023,52 @@ TEST(Value, Array) {
     EXPECT_TRUE(z.IsArray());
     EXPECT_TRUE(z.Empty());
 }
+
+TEST(Value, ArrayHelper) {
+    Value::AllocatorType allocator;
+    {
+        Value x(kArrayType);
+        Array a = x.GetArray();
+        TestArray(a, allocator);
+    }
+
+    Value x(kArrayType);
+    Array a = x.GetArray();
+    a.PushBack(1, allocator);
+
+    Array a2(a); // copy constructor
+    EXPECT_EQ(1, a2.Size());
+
+    Array a3;   // default constructor
+    a3 = a;     // assignment operator
+    EXPECT_EQ(1, a3.Size());    
+}
+
+#if RAPIDJSON_HAS_CXX11_RANGE_FOR
+TEST(Value, ArrayHelperRangeFor) {
+    Value::AllocatorType allocator;
+    Value x(kArrayType);
+
+    for (int i = 0; i < 10; i++)
+        x.PushBack(i, allocator);
+
+    {
+        int i = 0;
+        for (auto& v : x.GetArray())
+            EXPECT_EQ(i++, v.GetInt());
+        EXPECT_EQ(i, 10);
+    }
+    {
+        int i = 0;
+        for (auto& v : const_cast<const Value&>(x).GetArray())
+            EXPECT_EQ(i++, v.GetInt());
+        EXPECT_EQ(i, 10);
+    }
+
+    // Array a = x.GetArray();
+    // Array ca = const_cast<const Value&>(x).GetArray();
+}
+#endif
 
 TEST(Value, Object) {
     Value x(kObjectType);
