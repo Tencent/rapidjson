@@ -2325,8 +2325,8 @@ public:
     typedef GenericArray<false, ValueT> Array;
     typedef ValueT PlainType;
     typedef typename internal::MaybeAddConst<Const,PlainType>::Type ValueType;
-    typedef typename ValueType::ValueIterator ValueIterator;
-    typedef typename ValueType::ConstValueIterator ConstValueIterator;
+    typedef ValueType* ValueIterator;  // This may be const or non-const iterator
+    typedef const ValueType* ConstValueIterator;
     typedef typename ValueType::AllocatorType AllocatorType;
     typedef typename ValueType::StringRefType StringRefType;
 
@@ -2341,31 +2341,26 @@ public:
     SizeType Size() const { return ptr_->Size(); }
     SizeType Capacity() const { return ptr_->Capacity(); }
     bool Empty() const { return ptr_->Empty(); }
-    void Clear() { ptr_->Clear(); }
-    ValueType& operator[](SizeType index) { return (*ptr_)[index]; }
-    const ValueType& operator[](SizeType index) const {  return (*ptr_)[index]; }
-    ValueIterator Begin() { return ptr_->Begin(); }
-    ValueIterator End() { return ptr_->End(); }
-    ConstValueIterator Begin() const { return ptr_->Begin(); }
-    ConstValueIterator End() const { return ptr_->End(); }
-    GenericArray& Reserve(SizeType newCapacity, AllocatorType &allocator) { ptr_->Reserve(newCapacity, allocator); return *this; }
-    GenericArray& PushBack(ValueType& value, AllocatorType& allocator) { ptr_->PushBack(value, allocator); return *this; }
+    void Clear() const { ptr_->Clear(); }
+    ValueType& operator[](SizeType index) const {  return (*ptr_)[index]; }
+    ValueIterator Begin() const { return ptr_->Begin(); }
+    ValueIterator End() const { return ptr_->End(); }
+    const GenericArray& Reserve(SizeType newCapacity, AllocatorType &allocator) const { ptr_->Reserve(newCapacity, allocator); return *this; }
+    const GenericArray& PushBack(ValueType& value, AllocatorType& allocator) const { ptr_->PushBack(value, allocator); return *this; }
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
-    GenericArray& PushBack(ValueType&& value, AllocatorType& allocator) { ptr_->PushBack(value, allocator); return *this; }
+    const GenericArray& PushBack(ValueType&& value, AllocatorType& allocator) const { ptr_->PushBack(value, allocator); return *this; }
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
-    GenericArray& PushBack(StringRefType value, AllocatorType& allocator) { ptr_->PushBack(value, allocator); return *this; }
+    const GenericArray& PushBack(StringRefType value, AllocatorType& allocator) const { ptr_->PushBack(value, allocator); return *this; }
     template <typename T>
-    RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (GenericArray&))
-    PushBack(T value, AllocatorType& allocator) { ptr_->PushBack(value, allocator); return *this; }
-    GenericArray& PopBack() { ptr_->PopBack(); return *this; }
-    ValueIterator Erase(ConstValueIterator pos) { return ptr_->Erase(pos); }
-    ValueIterator Erase(ConstValueIterator first, ConstValueIterator last) { return ptr_->Erase(first, last); }
+    RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (const GenericArray&))
+    PushBack(T value, AllocatorType& allocator) const { ptr_->PushBack(value, allocator); return *this; }
+    const GenericArray& PopBack() const { ptr_->PopBack(); return *this; }
+    ValueIterator Erase(ConstValueIterator pos) const { return ptr_->Erase(pos); }
+    ValueIterator Erase(ConstValueIterator first, ConstValueIterator last) const { return ptr_->Erase(first, last); }
 
 #if RAPIDJSON_HAS_CXX11_RANGE_FOR
-    ValueIterator begin() { return ptr_->Begin(); }
-    ValueIterator end() { return ptr_->End(); }
-    ConstValueIterator begin() const { return ptr_->Begin(); }
-    ConstValueIterator end() const { return ptr_->End(); }
+    ValueIterator begin() const { return ptr_->Begin(); }
+    ValueIterator end() const { return ptr_->End(); }
 #endif
 
 private:
