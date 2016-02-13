@@ -481,9 +481,25 @@ struct TypeHelper<ValueType, std::basic_string<typename ValueType::Ch> > {
 };
 #endif
 
+template<typename ValueType> 
+struct TypeHelper<ValueType, typename ValueType::Array> {
+    typedef typename ValueType::Array ArratType;
+    static bool Is(const ValueType& v) { return v.IsArray(); }
+    static ArratType Get(ValueType& v) { return v.GetArray(); }
+    static ValueType& Set(ValueType& v, ArratType data) { return v.SetArray(data); }
+    static ValueType& Set(ValueType& v, ArratType data, typename ValueType::AllocatorType&) { return v.SetArray(data); }
+};
+
+template<typename ValueType> 
+struct TypeHelper<ValueType, typename ValueType::ConstArray> {
+    typedef typename ValueType::ConstArray ArratType;
+    static bool Is(const ValueType& v) { return v.IsArray(); }
+    static ArratType Get(const ValueType& v) { return v.GetArray(); }
+};
+
 } // namespace internal
 
-template <typename ValueType>
+template <bool, typename>
 class GenericArray;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -513,7 +529,8 @@ public:
     typedef GenericValue* ValueIterator;            //!< Value iterator for iterating in array.
     typedef const GenericValue* ConstValueIterator; //!< Constant value iterator for iterating in array.
     typedef GenericValue<Encoding, Allocator> ValueType;    //!< Value type of itself.
-    typedef GenericArray<ValueType> ArrayType;
+    typedef GenericArray<false, ValueType> Array;
+    typedef GenericArray<true, ValueType> ConstArray;
 
     //!@name Constructors and destructor.
     //@{
@@ -1114,7 +1131,7 @@ public:
         RAPIDJSON_ASSERT(IsObject());
         RAPIDJSON_ASSERT(name.IsString());
 
-        Object& o = data_.o;
+        ObjectData& o = data_.o;
         if (o.size >= o.capacity) {
             if (o.capacity == 0) {
                 o.capacity = kDefaultObjectCapacity;
@@ -1392,7 +1409,10 @@ public:
 
     //! Set this value as an empty array.
     /*! \post IsArray == true */
-    GenericValue& SetArray() {  this->~GenericValue(); new (this) GenericValue(kArrayType); return *this; }
+    GenericValue& SetArray() { this->~GenericValue(); new (this) GenericValue(kArrayType); return *this; }
+
+    //! Set this value with an array.
+    GenericValue& SetArray(Array& a) { return *this = *a.ptr_; }
 
     //! Get the number of elements in array.
     SizeType Size() const { RAPIDJSON_ASSERT(IsArray()); return data_.a.size; }
@@ -1560,8 +1580,8 @@ public:
         return pos;
     }
 
-    ArrayType GetArray() { RAPIDJSON_ASSERT(IsArray()); return ArrayType(*this); }
-    const ArrayType GetArray() const { RAPIDJSON_ASSERT(IsArray()); return ArrayType(*this); }
+    Array GetArray() { RAPIDJSON_ASSERT(IsArray()); return Array(*this); }
+    ConstArray GetArray() const { RAPIDJSON_ASSERT(IsArray()); return ConstArray(*this); }
 
     //@}
 
@@ -1672,6 +1692,9 @@ public:
 
     template <typename T>
     T Get() const { return internal::TypeHelper<ValueType, T>::Get(*this); }
+
+    template <typename T>
+    T Get() { return internal::TypeHelper<ValueType, T>::Get(*this); }
 
     template<typename T>
     ValueType& Set(const T& data) { return internal::TypeHelper<ValueType, T>::Set(*this, data); }
@@ -1815,13 +1838,13 @@ private:
         double d;
     };  // 8 bytes
 
-    struct Object {
+    struct ObjectData {
         Member* members;
         SizeType size;
         SizeType capacity;
     };  // 12 bytes in 32-bit mode, 16 bytes in 64-bit mode
 
-    struct Array {
+    struct ArrayData {
         GenericValue* elements;
         SizeType size;
         SizeType capacity;
@@ -1831,8 +1854,8 @@ private:
         String s;
         ShortString ss;
         Number n;
-        Object o;
-        Array a;
+        ObjectData o;
+        ArrayData a;
     };  // 12 bytes in 32-bit mode, 16 bytes in 64-bit mode
 
     // Initialize this value as array with initial data, without calling destructor.
@@ -2295,9 +2318,13 @@ GenericValue<Encoding,Allocator>::GenericValue(const GenericValue<Encoding,Sourc
     Instance of this helper class is obtained by \c GenericValue::GetArray().
     In addition to all APIs for array type, it provides range-based for loop if \c RAPIDJSON_HAS_CXX11_RANGE_FOR=1.
 */
-template <typename ValueType>
+template <bool Const, typename ValueT>
 class GenericArray {
 public:
+    typedef GenericArray<true, ValueT> ConstArray;
+    typedef GenericArray<false, ValueT> Array;
+    typedef ValueT PlainType;
+    typedef typename internal::MaybeAddConst<Const,PlainType>::Type ValueType;
     typedef typename ValueType::ValueIterator ValueIterator;
     typedef typename ValueType::ConstValueIterator ConstValueIterator;
     typedef typename ValueType::AllocatorType AllocatorType;
@@ -2308,7 +2335,7 @@ public:
 
     GenericArray() : ptr_() {}
     GenericArray(const GenericArray& rhs) : ptr_(rhs.ptr_) {}
-    GenericArray& operator=(GenericArray& rhs) { ptr_ = rhs.ptr_; return *this; }
+    GenericArray& operator=(const GenericArray& rhs) { ptr_ = rhs.ptr_; return *this; }
     ~GenericArray() {}
 
     SizeType Size() const { return ptr_->Size(); }
@@ -2343,11 +2370,8 @@ public:
 
 private:
     GenericArray(ValueType& value) : ptr_(&value) {}
-    GenericArray(const ValueType& value) : ptr_(const_cast<ValueType*>(&value)) {}
     ValueType* ptr_;
 };
-
-typedef GenericArray<Value> Array;
 
 RAPIDJSON_NAMESPACE_END
 

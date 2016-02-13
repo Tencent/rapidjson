@@ -1028,20 +1028,40 @@ TEST(Value, ArrayHelper) {
     Value::AllocatorType allocator;
     {
         Value x(kArrayType);
-        Array a = x.GetArray();
+        Value::Array a = x.GetArray();
         TestArray(a, allocator);
     }
 
-    Value x(kArrayType);
-    Array a = x.GetArray();
-    a.PushBack(1, allocator);
+    {
+        Value x(kArrayType);
+        Value::Array a = x.GetArray();
+        a.PushBack(1, allocator);
 
-    Array a2(a); // copy constructor
-    EXPECT_EQ(1, a2.Size());
+        Value::Array a2(a); // copy constructor
+        EXPECT_EQ(1, a2.Size());
 
-    Array a3;   // default constructor
-    a3 = a;     // assignment operator
-    EXPECT_EQ(1, a3.Size());    
+        Value::Array a3;   // default constructor
+        a3 = a;     // assignment operator
+        EXPECT_EQ(1, a3.Size());
+
+        Value::ConstArray y = static_cast<const Value&>(x).GetArray();
+        (void)y;
+        // y.PushBack(1, allocator); // should not compile
+
+        // Templated functions
+        x.Clear();
+        EXPECT_TRUE(x.Is<Value::Array>());
+        EXPECT_TRUE(x.Is<Value::ConstArray>());
+        a.PushBack(1, allocator);
+        a = x.Get<Value::Array>();
+        EXPECT_EQ(1, a[0].GetInt());
+        EXPECT_EQ(1, x.Get<Value::ConstArray>()[0].GetInt());
+
+        Value x2;
+        x2.Set<Value::Array>(a);
+        EXPECT_TRUE(x.IsNull());
+        EXPECT_EQ(1, x2.Get<Value::Array>()[0].GetInt());
+    }
 }
 
 #if RAPIDJSON_HAS_CXX11_RANGE_FOR
