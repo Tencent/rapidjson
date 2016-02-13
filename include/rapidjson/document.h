@@ -881,8 +881,16 @@ public:
     // Checks whether a number can be losslessly converted to a double.
     bool IsLosslessDouble() const {
         if (!IsNumber()) return false;
-        if (IsUint64())  return static_cast<uint64_t>(static_cast<double>(GetUint64())) == GetUint64();
-        if (IsInt64())   return static_cast< int64_t>(static_cast<double>(GetInt64()))  == GetInt64();
+        if (IsUint64()) {
+            uint64_t u = GetUint64();
+            volatile double d = static_cast<double>(u);
+            return static_cast<uint64_t>(d) == u;
+        }
+        if (IsInt64()) {
+            int64_t i = GetInt64();
+            volatile double d = static_cast<double>(i);
+            return static_cast< int64_t>(d) == i;
+        }
         return true; // double, int, uint are always lossless
     }
 
