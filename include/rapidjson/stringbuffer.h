@@ -67,6 +67,7 @@ public:
 
     void Reserve(size_t count) { stack_.template Reserve<Ch>(count); }
     Ch* Push(size_t count) { return stack_.template Push<Ch>(count); }
+    Ch* PushUnsafe(size_t count) { return stack_.template PushUnsafe<Ch>(count); }
     void Pop(size_t count) { stack_.template Pop<Ch>(count); }
 
     const Ch* GetString() const {
