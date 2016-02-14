@@ -425,3 +425,17 @@ TEST(Writer, Inf) {
         EXPECT_FALSE(writer.Double(-inf));
     }
 }
+
+TEST(Writer, RawValue) {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    writer.StartObject();
+    writer.Key("a");
+    writer.Int(1);
+    writer.Key("raw");
+    const char json[] = "[\"Hello\\nWorld\", 123.456]";
+    writer.RawValue(json, strlen(json), kArrayType);
+    writer.EndObject();
+    EXPECT_TRUE(writer.IsComplete());
+    EXPECT_STREQ("{\"a\":1,\"raw\":[\"Hello\\nWorld\", 123.456]}", buffer.GetString());
+}

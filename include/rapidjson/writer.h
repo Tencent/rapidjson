@@ -198,6 +198,16 @@ public:
 
     //@}
 
+    //! Write a raw JSON value.
+    /*!
+        For user to write a stringified JSON as a value.
+
+        \param json A well-formed JSON value. It should not contain null character within [0, length - 1] range.
+        \param length Length of the json.
+        \param type Type of the root of json.
+    */
+    bool RawValue(const Ch* json, size_t length, Type type) { Prefix(type); return WriteRawValue(json, length); }
+
 protected:
     //! Information for each nested level
     struct Level {
@@ -351,6 +361,15 @@ protected:
     bool WriteEndObject()   { os_->Put('}'); return true; }
     bool WriteStartArray()  { os_->Put('['); return true; }
     bool WriteEndArray()    { os_->Put(']'); return true; }
+
+    bool WriteRawValue(const Ch* json, size_t length) {
+        PutReserve(*os_, length);
+        for (size_t i = 0; i < length; i++) {
+            RAPIDJSON_ASSERT(json[i] != '\0');
+            PutUnsafe(*os_, json[i]);
+        }
+        return true;
+    }
 
     void Prefix(Type type) {
         (void)type;
