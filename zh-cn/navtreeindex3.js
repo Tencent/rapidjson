@@ -1,5 +1,7 @@
 var NAVTREEINDEX3 =
 {
+"md_doc_schema_8zh-cn.html":[7],
+"md_doc_stream_8zh-cn.html":[3],
 "md_doc_stream_8zh-cn.html#AutoUTFInputStream":[3,3,2],
 "md_doc_stream_8zh-cn.html#AutoUTFOutputStream":[3,3,3],
 "md_doc_stream_8zh-cn.html#CustomStream":[3,4],

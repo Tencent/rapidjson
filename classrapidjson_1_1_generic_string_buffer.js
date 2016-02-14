@@ -8,6 +8,7 @@ var classrapidjson_1_1_generic_string_buffer =
     [ "GetString", "classrapidjson_1_1_generic_string_buffer.html#ace0bc8bee07187577116892b566a61d9", null ],
     [ "Pop", "classrapidjson_1_1_generic_string_buffer.html#afb41bae09405ddd9aa9250ac47ab235e", null ],
     [ "Push", "classrapidjson_1_1_generic_string_buffer.html#aa848ba1b8220afb4103d8099cbd6d3ff", null ],
+    [ "PushUnsafe", "classrapidjson_1_1_generic_string_buffer.html#acfdf31dc9458a63e4d6544d3079c8d2e", null ],
     [ "Put", "classrapidjson_1_1_generic_string_buffer.html#a495081cfdd864623565606daf02f1187", null ],
     [ "PutUnsafe", "classrapidjson_1_1_generic_string_buffer.html#a35733ffe70f63b28857b8d738b2ffad7", null ],
     [ "Reserve", "classrapidjson_1_1_generic_string_buffer.html#ae70a632053e258c7c431e0e35b095c84", null ],
