@@ -301,7 +301,7 @@ TEST_F(RapidJson, Writer_NullStream) {
     }
 }
 
-TEST_F(RapidJson, Writer_StringBuffer) {
+TEST_F(RapidJson, SIMD_SUFFIX(Writer_StringBuffer)) {
     for (size_t i = 0; i < kTrialCount; i++) {
         StringBuffer s(0, 1024 * 1024);
         Writer<StringBuffer> writer(s);
@@ -314,7 +314,7 @@ TEST_F(RapidJson, Writer_StringBuffer) {
 }
 
 #define TEST_TYPED(index, Name)\
-TEST_F(RapidJson, Writer_StringBuffer_##Name) {\
+TEST_F(RapidJson, SIMD_SUFFIX(Writer_StringBuffer_##Name)) {\
     for (size_t i = 0; i < kTrialCount * 10; i++) {\
         StringBuffer s(0, 1024 * 1024);\
         Writer<StringBuffer> writer(s);\
@@ -334,7 +334,7 @@ TEST_TYPED(6, Paragraphs)
 
 #undef TEST_TYPED
 
-TEST_F(RapidJson, PrettyWriter_StringBuffer) {
+TEST_F(RapidJson, SIMD_SUFFIX(PrettyWriter_StringBuffer)) {
     for (size_t i = 0; i < kTrialCount; i++) {
         StringBuffer s(0, 2048 * 1024);
         PrettyWriter<StringBuffer> writer(s);
