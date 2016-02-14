@@ -2460,7 +2460,7 @@ public:
 #if RAPIDJSON_HAS_STDSTRING
     bool EraseMember(const std::basic_string<Ch>& name) const { return EraseMember(ValueType(StringRef(name))); }
 #endif
-    template <typename SourceAllocator> bool EraseMember(const GenericValue<EncodingType, SourceAllocator>& name) const { ptr_->EraseMember(name); }
+    template <typename SourceAllocator> bool EraseMember(const GenericValue<EncodingType, SourceAllocator>& name) const { return ptr_->EraseMember(name); }
 
 #if RAPIDJSON_HAS_CXX11_RANGE_FOR
     MemberIterator begin() const { return ptr_->MemberBegin(); }
