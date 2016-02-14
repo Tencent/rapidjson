@@ -2415,7 +2415,7 @@ public:
 
     SizeType MemberCount() const { return ptr_->MemberCount(); }
     bool ObjectEmpty() const { return ptr_->ObjectEmpty(); }
-    ValueType& operator[](Ch* name) const { return (*ptr_)[name]; }
+    template <typename T> ValueType& operator[](T* name) const { return (*ptr_)[name]; }
     template <typename SourceAllocator> ValueType& operator[](const GenericValue<EncodingType, SourceAllocator>& name) const { return (*ptr_)[name]; }
 #if RAPIDJSON_HAS_STDSTRING
     ValueType& operator[](const std::basic_string<Ch>& name) const { return (*ptr_)[name]; }
@@ -2456,7 +2456,7 @@ public:
     MemberIterator RemoveMember(MemberIterator m) const { return ptr_->RemoveMember(m); }
     MemberIterator EraseMember(ConstMemberIterator pos) const { return ptr_->EraseMember(pos); }
     MemberIterator EraseMember(ConstMemberIterator first, ConstMemberIterator last) const { return ptr_->EraseMember(first, last); }
-    bool EraseMember(const Ch* name) const { ptr_->EraseMember(name); }
+    bool EraseMember(const Ch* name) const { return ptr_->EraseMember(name); }
 #if RAPIDJSON_HAS_STDSTRING
     bool EraseMember(const std::basic_string<Ch>& name) const { return EraseMember(ValueType(StringRef(name))); }
 #endif
