@@ -827,7 +827,7 @@ TEST(Value, SetStringNullException) {
 }
 
 template <typename T, typename Allocator>
-void TestArray(T& x, Allocator& allocator) {
+static void TestArray(T& x, Allocator& allocator) {
     const T& y = x;
 
     // PushBack()
@@ -1092,19 +1092,9 @@ TEST(Value, ArrayHelperRangeFor) {
 }
 #endif
 
-TEST(Value, Object) {
-    Value x(kObjectType);
-    const Value& y = x; // const version
-    Value::AllocatorType allocator;
-
-    EXPECT_EQ(kObjectType, x.GetType());
-    EXPECT_TRUE(x.IsObject());
-    EXPECT_TRUE(x.ObjectEmpty());
-    EXPECT_EQ(0u, x.MemberCount());
-    EXPECT_EQ(kObjectType, y.GetType());
-    EXPECT_TRUE(y.IsObject());
-    EXPECT_TRUE(y.ObjectEmpty());
-    EXPECT_EQ(0u, y.MemberCount());
+template <typename T, typename Allocator>
+static void TestObject(T& x, Allocator& allocator) {
+    const T& y = x; // const version
 
     // AddMember()
     x.AddMember("A", "Apple", allocator);
@@ -1345,7 +1335,7 @@ TEST(Value, Object) {
     const unsigned n = 10;
     for (unsigned first = 0; first < n; first++) {
         for (unsigned last = first; last <= n; last++) {
-            Value(kObjectType).Swap(x);
+            x.RemoveAllMembers();
             for (unsigned i = 0; i < n; i++)
                 x.AddMember(keys[i], Value(kArrayType).PushBack(i, allocator), allocator);
 
@@ -1368,12 +1358,108 @@ TEST(Value, Object) {
     x.RemoveAllMembers();
     EXPECT_TRUE(x.ObjectEmpty());
     EXPECT_EQ(0u, x.MemberCount());
+}
+
+TEST(Value, Object) {
+    Value x(kObjectType);
+    const Value& y = x; // const version
+    Value::AllocatorType allocator;
+
+    EXPECT_EQ(kObjectType, x.GetType());
+    EXPECT_TRUE(x.IsObject());
+    EXPECT_TRUE(x.ObjectEmpty());
+    EXPECT_EQ(0u, x.MemberCount());
+    EXPECT_EQ(kObjectType, y.GetType());
+    EXPECT_TRUE(y.IsObject());
+    EXPECT_TRUE(y.ObjectEmpty());
+    EXPECT_EQ(0u, y.MemberCount());
+
+    TestObject(x, allocator);
 
     // SetObject()
     Value z;
     z.SetObject();
     EXPECT_TRUE(z.IsObject());
 }
+
+TEST(Value, ObjectHelper) {
+    Value::AllocatorType allocator;
+    {
+        Value x(kObjectType);
+        Value::Object o = x.GetObject();
+        TestObject(o, allocator);
+    }
+
+    {
+        Value x(kObjectType);
+        Value::Object o = x.GetObject();
+        o.AddMember("1", 1, allocator);
+
+        Value::Object o2(o); // copy constructor
+        EXPECT_EQ(1, o2.MemberCount());
+
+        Value::Object o3;   // default constructor
+        o3 = o;             // assignment operator
+        EXPECT_EQ(1, o3.MemberCount());
+
+        Value::ConstObject y = static_cast<const Value&>(x).GetObject();
+        (void)y;
+        // y.AddMember("1", 1, allocator); // should not compile
+
+        // Templated functions
+        x.RemoveAllMembers();
+        EXPECT_TRUE(x.Is<Value::Object>());
+        EXPECT_TRUE(x.Is<Value::ConstObject>());
+        o.AddMember("1", 1, allocator);
+        o = x.Get<Value::Object>();
+        EXPECT_EQ(1, o["1"].GetInt());
+        EXPECT_EQ(1, x.Get<Value::ConstObject>()["1"].GetInt());
+
+        Value x2;
+        x2.Set<Value::Object>(o);
+        EXPECT_TRUE(x.IsNull());
+        EXPECT_EQ(1, x2.Get<Value::Object>()["1"].GetInt());
+    }
+}
+
+#if RAPIDJSON_HAS_CXX11_RANGE_FOR
+TEST(Value, ObjectHelperRangeFor) {
+    Value::AllocatorType allocator;
+    Value x(kObjectType);
+
+    for (int i = 0; i < 10; i++) {
+        char name[10];
+        Value n(name, static_cast<SizeType>(sprintf(name, "%d", i)), allocator);
+        x.AddMember(n, i, allocator);
+    }
+
+    {
+        int i = 0;
+        for (auto& m : x.GetObject()) {
+            char name[10];
+            sprintf(name, "%d", i);
+            EXPECT_STREQ(name, m.name.GetString());
+            EXPECT_EQ(i, m.value.GetInt());
+            i++;
+        }
+        EXPECT_EQ(i, 10);
+    }
+    {
+        int i = 0;
+        for (const auto& m : const_cast<const Value&>(x).GetObject()) {
+            char name[10];
+            sprintf(name, "%d", i);
+            EXPECT_STREQ(name, m.name.GetString());
+            EXPECT_EQ(i, m.value.GetInt());
+            i++;
+        }
+        EXPECT_EQ(i, 10);
+    }
+
+    // Object a = x.GetObject();
+    // Object ca = const_cast<const Value&>(x).GetObject();
+}
+#endif
 
 TEST(Value, EraseMember_String) {
     Value::AllocatorType allocator;
