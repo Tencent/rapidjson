@@ -2049,7 +2049,8 @@ public:
 #if RAPIDJSON_HAS_STDSTRING
     template <unsigned parseFlags, typename SourceEncoding>
     GenericDocument& Parse(const std::basic_string<typename SourceEncoding::Ch>& str) {
-        return Parse<parseFlags, SourceEncoding>(str.data(), str.size());
+        // c_str() is constant complexity according to standard. Should be faster than Parse(const char*, size_t)
+        return Parse<parseFlags, SourceEncoding>(str.c_str());
     }
 
     template <unsigned parseFlags>
