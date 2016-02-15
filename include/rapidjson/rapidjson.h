@@ -265,7 +265,8 @@
     \param x pointer to align
 
     Some machines require strict data alignment. Currently the default uses 4 bytes
-    alignment. User can customize by defining the RAPIDJSON_ALIGN function macro.
+    alignment on 32-bit platforms and 8 bytes alignment for 64-bit platforms.
+    User can customize by defining the RAPIDJSON_ALIGN function macro.
 */
 #ifndef RAPIDJSON_ALIGN
 #if RAPIDJSON_64BIT == 1
@@ -286,6 +287,36 @@
 */
 #ifndef RAPIDJSON_UINT64_C2
 #define RAPIDJSON_UINT64_C2(high32, low32) ((static_cast<uint64_t>(high32) << 32) | static_cast<uint64_t>(low32))
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_48BITPOINTER_OPTIMIZATION
+
+//! Use only lower 48-bit address for some pointers.
+/*!
+    \ingroup RAPIDJSON_CONFIG
+
+    This optimization uses the fact that current X86-64 architecture only implement lower 48-bit virtual address.
+    The higher 16-bit can be used for storing other data.
+    \c GenericValue uses this optimization to reduce its size form 24 bytes to 16 bytes in 64-bit architecture.
+*/
+#ifndef RAPIDJSON_48BITPOINTER_OPTIMIZATION
+#if defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64)
+#define RAPIDJSON_48BITPOINTER_OPTIMIZATION 1
+#else
+#define RAPIDJSON_48BITPOINTER_OPTIMIZATION 0
+#endif
+#endif // RAPIDJSON_48BITPOINTER_OPTIMIZATION
+
+#if RAPIDJSON_48BITPOINTER_OPTIMIZATION == 1
+#if RAPIDJSON_64BIT != 1
+#error RAPIDJSON_48BITPOINTER_OPTIMIZATION can only be set to 1 when RAPIDJSON_64BIT=1
+#endif
+#define RAPIDJSON_SETPOINTER(type, p, x) (p = reinterpret_cast<type *>((reinterpret_cast<uintptr_t>(p) & static_cast<uintptr_t>(RAPIDJSON_UINT64_C2(0xFFFF0000, 0x00000000))) | reinterpret_cast<uintptr_t>(reinterpret_cast<const void*>(x))))
+#define RAPIDJSON_GETPOINTER(type, p) (reinterpret_cast<type *>(reinterpret_cast<uintptr_t>(p) & static_cast<uintptr_t>(RAPIDJSON_UINT64_C2(0x0000FFFF, 0xFFFFFFFF))))
+#else
+#define RAPIDJSON_SETPOINTER(type, p, x) (p = (x))
+#define RAPIDJSON_GETPOINTER(type, p) (p)
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
