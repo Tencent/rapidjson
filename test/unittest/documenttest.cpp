@@ -34,6 +34,8 @@ void ParseCheck(DocumentType& doc) {
     typedef typename DocumentType::ValueType ValueType;
 
     EXPECT_FALSE(doc.HasParseError());
+    if (doc.HasParseError())
+        printf("Error: %d at %zu\n", static_cast<int>(doc.GetParseError()), doc.GetErrorOffset());
     EXPECT_TRUE(static_cast<ParseResult>(doc));
 
     EXPECT_TRUE(doc.IsObject());
@@ -93,6 +95,26 @@ void ParseTest() {
     doc.ParseInsitu(buffer);
     ParseCheck(doc);
     free(buffer);
+
+    // Parse(const Ch*, size_t)
+    size_t length = strlen(json);
+    buffer = reinterpret_cast<char*>(malloc(length * 2));
+    memcpy(buffer, json, length);
+    memset(buffer + length, 'X', length);
+#if RAPIDJSON_HAS_STDSTRING
+    std::string s2(buffer, length); // backup buffer
+#endif
+    doc.SetNull();
+    doc.Parse(buffer, length);
+    free(buffer);
+    ParseCheck(doc);
+
+#if RAPIDJSON_HAS_STDSTRING
+    // Parse(std::string)
+    doc.SetNull();
+    doc.Parse(s2);
+    ParseCheck(doc);
+#endif
 }
 
 TEST(Document, Parse) {
@@ -138,6 +160,42 @@ static FILE* OpenEncodedFile(const char* filename) {
             return fp;
     }
     return 0;
+}
+
+TEST(Document, Parse_Encoding) {
+    const char* json = " { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3, 4] } ";
+
+    typedef GenericDocument<UTF16<> > DocumentType;
+    DocumentType doc;
+    
+    // Parse<unsigned, SourceEncoding>(const SourceEncoding::Ch*)
+    // doc.Parse<kParseDefaultFlags, UTF8<> >(json);
+    // EXPECT_FALSE(doc.HasParseError());
+    // EXPECT_EQ(0, StrCmp(doc[L"hello"].GetString(), L"world"));
+
+    // Parse<unsigned, SourceEncoding>(const SourceEncoding::Ch*, size_t)
+    size_t length = strlen(json);
+    char* buffer = reinterpret_cast<char*>(malloc(length * 2));
+    memcpy(buffer, json, length);
+    memset(buffer + length, 'X', length);
+#if RAPIDJSON_HAS_STDSTRING
+    std::string s2(buffer, length); // backup buffer
+#endif
+    doc.SetNull();
+    doc.Parse<kParseDefaultFlags, UTF8<> >(buffer, length);
+    free(buffer);
+    EXPECT_FALSE(doc.HasParseError());
+    if (doc.HasParseError())
+        printf("Error: %d at %zu\n", static_cast<int>(doc.GetParseError()), doc.GetErrorOffset());
+    EXPECT_EQ(0, StrCmp(doc[L"hello"].GetString(), L"world"));
+
+#if RAPIDJSON_HAS_STDSTRING
+    // Parse<unsigned, SourceEncoding>(std::string)
+    doc.SetNull();
+    doc.Parse<kParseDefaultFlags, UTF8<> >(s2);
+    EXPECT_FALSE(doc.HasParseError());
+    EXPECT_EQ(0, StrCmp(doc[L"hello"].GetString(), L"world"));
+#endif
 }
 
 TEST(Document, ParseStream_EncodedInputStream) {
