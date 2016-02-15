@@ -579,7 +579,7 @@ public:
                 break;
 
             case kCopyStringFlag:
-                Allocator::Free(GetStringPointer());
+                Allocator::Free(const_cast<Ch*>(GetStringPointer()));
                 break;
 
             default:
@@ -1654,9 +1654,9 @@ private:
 #if RAPIDJSON_48BITPOINTER_OPTIMIZATION
         char payload[sizeof(SizeType) * 2 + 6];     // 2 x SizeType + lower 48-bit pointer
 #elif RAPIDJSON_64BIT
-        char payload[Sizeof(SizeType) * 2 + sizeof(void*) + 6]; // 6 padding bytes
+        char payload[sizeof(SizeType) * 2 + sizeof(void*) + 6]; // 6 padding bytes
 #else
-        char payload[Sizeof(SizeType) * 2 + sizeof(void*) + 2]; // 2 padding bytes
+        char payload[sizeof(SizeType) * 2 + sizeof(void*) + 2]; // 2 padding bytes
 #endif
         uint16_t flags;
     };
@@ -1731,12 +1731,12 @@ private:
         Flag f;
     };  // 16 bytes in 32-bit mode, 24 bytes in 64-bit mode, 16 bytes in 64-bit with RAPIDJSON_48BITPOINTER_OPTIMIZATION
 
-    RAPIDJSON_FORCEINLINE Ch* GetStringPointer() const { return RAPIDJSON_GETPOINTER(Ch, data_.s.str); }
+    RAPIDJSON_FORCEINLINE const Ch* GetStringPointer() const { return RAPIDJSON_GETPOINTER(Ch, data_.s.str); }
     RAPIDJSON_FORCEINLINE const Ch* SetStringPointer(const Ch* str) { return RAPIDJSON_SETPOINTER(Ch, data_.s.str, str); }
     RAPIDJSON_FORCEINLINE GenericValue* GetElementsPointer() const { return RAPIDJSON_GETPOINTER(GenericValue, data_.a.elements); }
-    RAPIDJSON_FORCEINLINE const GenericValue* SetElementsPointer(const GenericValue* elements) { return RAPIDJSON_SETPOINTER(GenericValue, data_.a.elements, elements); }
+    RAPIDJSON_FORCEINLINE GenericValue* SetElementsPointer(GenericValue* elements) { return RAPIDJSON_SETPOINTER(GenericValue, data_.a.elements, elements); }
     RAPIDJSON_FORCEINLINE Member* GetMembersPointer() const { return RAPIDJSON_GETPOINTER(Member, data_.o.members); }
-    RAPIDJSON_FORCEINLINE const Member* SetMembersPointer(const Member* members) { return RAPIDJSON_SETPOINTER(Member, data_.o.members, members); }
+    RAPIDJSON_FORCEINLINE Member* SetMembersPointer(Member* members) { return RAPIDJSON_SETPOINTER(Member, data_.o.members, members); }
 
     // Initialize this value as array with initial data, without calling destructor.
     void SetArrayRaw(GenericValue* values, SizeType count, Allocator& allocator) {
