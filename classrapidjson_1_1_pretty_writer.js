@@ -14,6 +14,7 @@ var classrapidjson_1_1_pretty_writer =
     [ "Key", "classrapidjson_1_1_pretty_writer.html#a0b7000c10be5b1e24920ce27a7ba7f6a", null ],
     [ "Null", "classrapidjson_1_1_pretty_writer.html#afb049092845d2c0168f1570cf4ad66bc", null ],
     [ "PrettyPrefix", "classrapidjson_1_1_pretty_writer.html#aff11c26086470359ef3ab1142515441c", null ],
+    [ "RawValue", "classrapidjson_1_1_pretty_writer.html#a3136e3426a5d06e5da50f6e6aab8a5be", null ],
     [ "SetIndent", "classrapidjson_1_1_pretty_writer.html#a121686c29ca7fe071fa4108c46955ff0", null ],
     [ "StartArray", "classrapidjson_1_1_pretty_writer.html#ad12f40eaec2b43158cee716dbd88c393", null ],
     [ "StartObject", "classrapidjson_1_1_pretty_writer.html#ac043c4de0728cdfa8739af94560bddc3", null ],

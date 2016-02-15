@@ -144,6 +144,9 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaxDecimalPlaces</b
 <tr class="memitem:aa7b6967dc237519e2a6d8b3939fb9634"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#aa7b6967dc237519e2a6d8b3939fb9634">SetMaxDecimalPlaces</a> (int maxDecimalPlaces)</td></tr>
 <tr class="memdesc:aa7b6967dc237519e2a6d8b3939fb9634"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the maximum number of decimal places for double output.  <a href="#aa7b6967dc237519e2a6d8b3939fb9634">More...</a><br /></td></tr>
 <tr class="separator:aa7b6967dc237519e2a6d8b3939fb9634"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8acb89b2bbb1e5f384e6076b65044dbe"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#a8acb89b2bbb1e5f384e6076b65044dbe">RawValue</a> (const Ch *json, size_t length, <a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> type)</td></tr>
+<tr class="memdesc:a8acb89b2bbb1e5f384e6076b65044dbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a raw JSON value.  <a href="#a8acb89b2bbb1e5f384e6076b65044dbe">More...</a><br /></td></tr>
+<tr class="separator:a8acb89b2bbb1e5f384e6076b65044dbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Implementation of Handler</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><dl class="section see"><dt>See also</dt><dd><a class="el" href="classrapidjson_1_1_handler.html" title="Concept for receiving events from GenericReader upon parsing. The functions return true if no error o...">Handler</a> </dd></dl>
 </div></td></tr>
@@ -245,6 +248,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteStartArray</b> (
 <tr class="memitem:a60939802ba2dfdd19754f20bda553a26"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a60939802ba2dfdd19754f20bda553a26"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteEndArray</b> ()</td></tr>
 <tr class="separator:a60939802ba2dfdd19754f20bda553a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60b50a90fa1cfd525e14c37c36b9998d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a60b50a90fa1cfd525e14c37c36b9998d"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteRawValue</b> (const Ch *json, size_t length)</td></tr>
+<tr class="separator:a60b50a90fa1cfd525e14c37c36b9998d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefe33eab3521b2d9366dff3b788f0665"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aefe33eab3521b2d9366dff3b788f0665"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>Prefix</b> (<a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> type)</td></tr>
 <tr class="separator:aefe33eab3521b2d9366dff3b788f0665"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -423,6 +429,59 @@ template&lt;typename OutputStream , typename SourceEncoding , typename TargetEnc
 
 <p>Checks whether the output is a complete JSON. </p>
 <p>A complete JSON has a complete root object or array. </p>
+
+</div>
+</div>
+<a class="anchor" id="a8acb89b2bbb1e5f384e6076b65044dbe"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename OutputStream , typename SourceEncoding , typename TargetEncoding , typename StackAllocator , unsigned writeFlags&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer</a>&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;::RawValue </td>
+          <td>(</td>
+          <td class="paramtype">const Ch *&#160;</td>
+          <td class="paramname"><em>json</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>&#160;</td>
+          <td class="paramname"><em>type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Write a raw JSON value. </p>
+<p>For user to write a stringified JSON as a value.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">json</td><td>A well-formed JSON value. It should not contain null character within [0, length - 1] range. </td></tr>
+    <tr><td class="paramname">length</td><td>Length of the json. </td></tr>
+    <tr><td class="paramname">type</td><td>Type of the root of json. </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

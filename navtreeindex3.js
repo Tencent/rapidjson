@@ -1,5 +1,8 @@
 var NAVTREEINDEX3 =
 {
+"md_doc_sax.html#Filtering":[6,1,3],
+"md_doc_sax.html#GenericReader":[6,0,1],
+"md_doc_sax.html#Handler":[6,0,0],
 "md_doc_sax.html#PrettyWriter":[6,1,0],
 "md_doc_sax.html#Reader":[6,0],
 "md_doc_sax.html#Writer":[6,1],

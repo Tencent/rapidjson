@@ -1,5 +1,8 @@
 var NAVTREEINDEX3 =
 {
+"md_doc_sax_8zh-cn.html#Filtering":[6,1,3],
+"md_doc_sax_8zh-cn.html#GenericReader":[6,0,1],
+"md_doc_sax_8zh-cn.html#Handler":[6,0,0],
 "md_doc_sax_8zh-cn.html#PrettyWriter":[6,1,0],
 "md_doc_sax_8zh-cn.html#Reader":[6,0],
 "md_doc_sax_8zh-cn.html#Writer":[6,1],
