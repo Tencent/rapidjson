@@ -8,6 +8,7 @@ var classrapidjson_1_1_writer =
     [ "Double", "classrapidjson_1_1_writer.html#aff66881798d01e932a0b8b8ef97b0373", null ],
     [ "EndArray", "classrapidjson_1_1_writer.html#a13c98a10c8a8be0823c6cfd8e1b479a4", null ],
     [ "EndObject", "classrapidjson_1_1_writer.html#ac8851882467c9c00cd8c2a202261e2b0", null ],
+    [ "GetMaxDecimalPlaces", "classrapidjson_1_1_writer.html#a5ba4d42de8571712f54f7d40a6414162", null ],
     [ "Int", "classrapidjson_1_1_writer.html#a22fd25fb5cb2db6c25762961e51e9c46", null ],
     [ "Int64", "classrapidjson_1_1_writer.html#ae11f678a8f363b690629f53bdf33b5af", null ],
     [ "IsComplete", "classrapidjson_1_1_writer.html#a0cde8037db76f887cd9c557fd68630c5", null ],
@@ -17,6 +18,7 @@ var classrapidjson_1_1_writer =
     [ "Prefix", "classrapidjson_1_1_writer.html#aefe33eab3521b2d9366dff3b788f0665", null ],
     [ "Reset", "classrapidjson_1_1_writer.html#ac4026d3f14b80d6d7fc10004b1972722", null ],
     [ "ScanWriteUnescapedString", "classrapidjson_1_1_writer.html#a2d5599f972475793e391559db2de1061", null ],
+    [ "SetMaxDecimalPlaces", "classrapidjson_1_1_writer.html#aa7b6967dc237519e2a6d8b3939fb9634", null ],
     [ "StartArray", "classrapidjson_1_1_writer.html#a7019d2c81548f7b4dcc96f98a3e2bf76", null ],
     [ "StartObject", "classrapidjson_1_1_writer.html#a8b0be54744be8ecb53cbe7e408447faa", null ],
     [ "String", "classrapidjson_1_1_writer.html#a3cddcb5176054f559d0d552a3ff8789b", null ],
@@ -43,5 +45,6 @@ var classrapidjson_1_1_writer =
     [ "WriteUint64", "classrapidjson_1_1_writer.html#a474abb8f7b704f1ef7c00bbe2a2e01b6", null ],
     [ "hasRoot_", "classrapidjson_1_1_writer.html#ac374605d753f26912b8462fc478e4b3e", null ],
     [ "level_stack_", "classrapidjson_1_1_writer.html#a939007778b53074132750d9eccfdc5a2", null ],
+    [ "maxDecimalPlaces_", "classrapidjson_1_1_writer.html#a4666542e7957218d23c2a1b68c7295d8", null ],
     [ "os_", "classrapidjson_1_1_writer.html#a1370d3fd6728d4f0b3f20d734bb27eaf", null ]
 ];

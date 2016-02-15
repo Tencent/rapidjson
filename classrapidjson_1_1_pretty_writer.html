@@ -201,6 +201,12 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>Key</b> (const Ch *st
 <tr class="memitem:a0cde8037db76f887cd9c557fd68630c5 inherit pub_methods_classrapidjson_1_1_writer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#a0cde8037db76f887cd9c557fd68630c5">IsComplete</a> () const </td></tr>
 <tr class="memdesc:a0cde8037db76f887cd9c557fd68630c5 inherit pub_methods_classrapidjson_1_1_writer"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the output is a complete JSON.  <a href="#a0cde8037db76f887cd9c557fd68630c5">More...</a><br /></td></tr>
 <tr class="separator:a0cde8037db76f887cd9c557fd68630c5 inherit pub_methods_classrapidjson_1_1_writer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ba4d42de8571712f54f7d40a6414162 inherit pub_methods_classrapidjson_1_1_writer"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5ba4d42de8571712f54f7d40a6414162"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaxDecimalPlaces</b> () const </td></tr>
+<tr class="separator:a5ba4d42de8571712f54f7d40a6414162 inherit pub_methods_classrapidjson_1_1_writer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7b6967dc237519e2a6d8b3939fb9634 inherit pub_methods_classrapidjson_1_1_writer"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#aa7b6967dc237519e2a6d8b3939fb9634">SetMaxDecimalPlaces</a> (int maxDecimalPlaces)</td></tr>
+<tr class="memdesc:aa7b6967dc237519e2a6d8b3939fb9634 inherit pub_methods_classrapidjson_1_1_writer"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the maximum number of decimal places for double output.  <a href="#aa7b6967dc237519e2a6d8b3939fb9634">More...</a><br /></td></tr>
+<tr class="separator:aa7b6967dc237519e2a6d8b3939fb9634 inherit pub_methods_classrapidjson_1_1_writer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e857b9fe7071fc0b9fa89b56ad05651 inherit pub_methods_classrapidjson_1_1_writer"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1e857b9fe7071fc0b9fa89b56ad05651"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>Null</b> ()</td></tr>
 <tr class="separator:a1e857b9fe7071fc0b9fa89b56ad05651 inherit pub_methods_classrapidjson_1_1_writer"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -338,12 +344,19 @@ OutputStream *&#160;</td><td class="memItemRight" valign="bottom"><b>os_</b></td
 <tr class="memitem:a939007778b53074132750d9eccfdc5a2 inherit pro_attribs_classrapidjson_1_1_writer"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a939007778b53074132750d9eccfdc5a2"></a>
 internal::Stack&lt; StackAllocator &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>level_stack_</b></td></tr>
 <tr class="separator:a939007778b53074132750d9eccfdc5a2 inherit pro_attribs_classrapidjson_1_1_writer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4666542e7957218d23c2a1b68c7295d8 inherit pro_attribs_classrapidjson_1_1_writer"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4666542e7957218d23c2a1b68c7295d8"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>maxDecimalPlaces_</b></td></tr>
+<tr class="separator:a4666542e7957218d23c2a1b68c7295d8 inherit pro_attribs_classrapidjson_1_1_writer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac374605d753f26912b8462fc478e4b3e inherit pro_attribs_classrapidjson_1_1_writer"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac374605d753f26912b8462fc478e4b3e"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>hasRoot_</b></td></tr>
 <tr class="separator:ac374605d753f26912b8462fc478e4b3e inherit pro_attribs_classrapidjson_1_1_writer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_static_attribs_classrapidjson_1_1_writer"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classrapidjson_1_1_writer')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td></tr>
+<tr class="memitem:aaf9568d23fcff10e6de27dde77e28547 inherit pub_static_attribs_classrapidjson_1_1_writer"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaf9568d23fcff10e6de27dde77e28547"></a>
+static const int&#160;</td><td class="memItemRight" valign="bottom"><b>kDefaultMaxDecimalPlaces</b> = 324</td></tr>
+<tr class="separator:aaf9568d23fcff10e6de27dde77e28547 inherit pub_static_attribs_classrapidjson_1_1_writer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_attribs_classrapidjson_1_1_writer"><td colspan="2" onclick="javascript:toggleInherit('pro_static_attribs_classrapidjson_1_1_writer')"><img src="closed.png" alt="-"/>&#160;Static Protected Attributes inherited from <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td></tr>
 <tr class="memitem:a9acc453af3bfddea0bf001e022ae411c inherit pro_static_attribs_classrapidjson_1_1_writer"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9acc453af3bfddea0bf001e022ae411c"></a>
 static const size_t&#160;</td><td class="memItemRight" valign="bottom"><b>kDefaultLevelDepth</b> = 32</td></tr>

@@ -88,6 +88,7 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_writer.html','');})
 <a href="#nested-classes">类</a> &#124;
 <a href="#pub-types">Public 类型</a> &#124;
 <a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pub-static-attribs">静态 Public 属性</a> &#124;
 <a href="#pro-methods">Protected 成员函数</a> &#124;
 <a href="#pro-attribs">Protected 属性</a> &#124;
 <a href="#pro-static-attribs">静态 Protected 属性</a> &#124;
@@ -137,6 +138,12 @@ Public 成员函数</h2></td></tr>
 <tr class="memitem:a0cde8037db76f887cd9c557fd68630c5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#a0cde8037db76f887cd9c557fd68630c5">IsComplete</a> () const </td></tr>
 <tr class="memdesc:a0cde8037db76f887cd9c557fd68630c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the output is a complete JSON.  <a href="#a0cde8037db76f887cd9c557fd68630c5">更多...</a><br /></td></tr>
 <tr class="separator:a0cde8037db76f887cd9c557fd68630c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ba4d42de8571712f54f7d40a6414162"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5ba4d42de8571712f54f7d40a6414162"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaxDecimalPlaces</b> () const </td></tr>
+<tr class="separator:a5ba4d42de8571712f54f7d40a6414162"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7b6967dc237519e2a6d8b3939fb9634"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#aa7b6967dc237519e2a6d8b3939fb9634">SetMaxDecimalPlaces</a> (int maxDecimalPlaces)</td></tr>
+<tr class="memdesc:aa7b6967dc237519e2a6d8b3939fb9634"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the maximum number of decimal places for double output.  <a href="#aa7b6967dc237519e2a6d8b3939fb9634">更多...</a><br /></td></tr>
+<tr class="separator:aa7b6967dc237519e2a6d8b3939fb9634"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Implementation of Handler</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><dl class="section see"><dt>参见</dt><dd><a class="el" href="classrapidjson_1_1_handler.html" title="Concept for receiving events from GenericReader upon parsing. The functions return true if no error o...">Handler</a> </dd></dl>
 </div></td></tr>
@@ -190,6 +197,12 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a70fe1aa8437bc5e1525a2a0a69105c24"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a70fe1aa8437bc5e1525a2a0a69105c24"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>Key</b> (const Ch *str)</td></tr>
 <tr class="separator:a70fe1aa8437bc5e1525a2a0a69105c24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
+静态 Public 属性</h2></td></tr>
+<tr class="memitem:aaf9568d23fcff10e6de27dde77e28547"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaf9568d23fcff10e6de27dde77e28547"></a>
+static const int&#160;</td><td class="memItemRight" valign="bottom"><b>kDefaultMaxDecimalPlaces</b> = 324</td></tr>
+<tr class="separator:aaf9568d23fcff10e6de27dde77e28547"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected 成员函数</h2></td></tr>
@@ -264,6 +277,9 @@ OutputStream *&#160;</td><td class="memItemRight" valign="bottom"><b>os_</b></td
 <tr class="memitem:a939007778b53074132750d9eccfdc5a2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a939007778b53074132750d9eccfdc5a2"></a>
 internal::Stack&lt; StackAllocator &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>level_stack_</b></td></tr>
 <tr class="separator:a939007778b53074132750d9eccfdc5a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4666542e7957218d23c2a1b68c7295d8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4666542e7957218d23c2a1b68c7295d8"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>maxDecimalPlaces_</b></td></tr>
+<tr class="separator:a4666542e7957218d23c2a1b68c7295d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac374605d753f26912b8462fc478e4b3e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac374605d753f26912b8462fc478e4b3e"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>hasRoot_</b></td></tr>
 <tr class="separator:ac374605d753f26912b8462fc478e4b3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -452,6 +468,44 @@ template&lt;typename OutputStream , typename SourceEncoding , typename TargetEnc
   </dd>
 </dl>
 
+</div>
+</div>
+<a class="anchor" id="aa7b6967dc237519e2a6d8b3939fb9634"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename OutputStream , typename SourceEncoding , typename TargetEncoding , typename StackAllocator , unsigned writeFlags&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer</a>&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;::SetMaxDecimalPlaces </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>maxDecimalPlaces</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the maximum number of decimal places for double output. </p>
+<p>This setting truncates the output with specified number of decimal places.</p>
+<p>For example,</p>
+<div class="fragment"><div class="line">writer.SetMaxDecimalPlaces(3);</div>
+<div class="line">writer.StartArray();</div>
+<div class="line">writer.Double(0.12345);                 <span class="comment">// &quot;0.123&quot;</span></div>
+<div class="line">writer.Double(0.0001);                  <span class="comment">// &quot;0.0&quot;</span></div>
+<div class="line">writer.Double(1.234567890123456e30);    <span class="comment">// &quot;1.234567890123456e30&quot; (do not truncate significand for positive exponent)</span></div>
+<div class="line">writer.Double(1.23e-4);                 <span class="comment">// &quot;0.0&quot;                  (do truncate significand for negative exponent)</span></div>
+<div class="line">writer.EndArray();</div>
+</div><!-- fragment --><p>The default setting does not truncate any decimal places. You can restore to this setting by calling </p><div class="fragment"><div class="line">writer.SetMaxDecimalPlaces(Writer::kDefaultMaxDecimalPlaces);</div>
+</div><!-- fragment --> 
 </div>
 </div>
 <hr/>该类的文档由以下文件生成:<ul>
