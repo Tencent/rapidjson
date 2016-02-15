@@ -1676,7 +1676,7 @@ private:
     // This allows to store 13-chars strings in 32-bit mode, 21-chars strings in 64-bit mode,
     // 13-chars strings for RAPIDJSON_48BITPOINTER_OPTIMIZATION=1 inline (for `UTF8`-encoded strings).
     struct ShortString {
-        enum { MaxChars = sizeof(Flag::payload) / sizeof(Ch), MaxSize = MaxChars - 1, LenPos = MaxSize };
+        enum { MaxChars = sizeof(static_cast<Flag*>(0)->payload) / sizeof(Ch), MaxSize = MaxChars - 1, LenPos = MaxSize };
         Ch str[MaxChars];
 
         inline static bool Usable(SizeType len) { return                       (MaxSize >= len); }
