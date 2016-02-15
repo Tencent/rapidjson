@@ -159,3 +159,22 @@ TEST(PrettyWriter, FileWriteStream) {
     EXPECT_STREQ(kPrettyJson, json);
     free(json);
 }
+
+TEST(PrettyWriter, RawValue) {
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    writer.StartObject();
+    writer.Key("a");
+    writer.Int(1);
+    writer.Key("raw");
+    const char json[] = "[\"Hello\\nWorld\", 123.456]";
+    writer.RawValue(json, strlen(json), kArrayType);
+    writer.EndObject();
+    EXPECT_TRUE(writer.IsComplete());
+    EXPECT_STREQ(
+        "{\n"
+        "    \"a\": 1,\n"
+        "    \"raw\": [\"Hello\\nWorld\", 123.456]\n" // no indentation within raw value
+        "}",
+        buffer.GetString());
+}

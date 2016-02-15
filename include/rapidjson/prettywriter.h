@@ -146,6 +146,18 @@ public:
     bool Key(const Ch* str) { return Key(str, internal::StrLen(str)); }
 
     //@}
+
+    //! Write a raw JSON value.
+    /*!
+        For user to write a stringified JSON as a value.
+
+        \param json A well-formed JSON value. It should not contain null character within [0, length - 1] range.
+        \param length Length of the json.
+        \param type Type of the root of json.
+        \note When using PrettyWriter::RawValue(), the result json may not be indented correctly.
+    */
+    bool RawValue(const Ch* json, size_t length, Type type) { PrettyPrefix(type); return Base::WriteRawValue(json, length); }
+
 protected:
     void PrettyPrefix(Type type) {
         (void)type;
