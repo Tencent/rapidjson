@@ -81,8 +81,8 @@ public:
     // Not implemented
     void Put(Ch) {}
     void Flush() {} 
-    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
-    size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
+    Ch* PutBegin() { return 0; }
+    size_t PutEnd(Ch*) { return 0; }
 
     MemoryStream& is_;
 };
