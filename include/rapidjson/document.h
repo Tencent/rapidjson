@@ -478,34 +478,34 @@ struct TypeHelper<ValueType, std::basic_string<typename ValueType::Ch> > {
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, typename ValueType::Array> {
-    typedef typename ValueType::Array ArratType;
+    typedef typename ValueType::Array ArrayType;
     static bool Is(const ValueType& v) { return v.IsArray(); }
-    static ArratType Get(ValueType& v) { return v.GetArray(); }
-    static ValueType& Set(ValueType& v, ArratType data) { return v.SetArray(data); }
-    static ValueType& Set(ValueType& v, ArratType data, typename ValueType::AllocatorType&) { return v.SetArray(data); }
+    static ArrayType Get(ValueType& v) { return v.GetArray(); }
+    static ValueType& Set(ValueType& v, ArrayType data) { return v.SetArray(data); }
+    static ValueType& Set(ValueType& v, ArrayType data, typename ValueType::AllocatorType&) { return v.SetArray(data); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, typename ValueType::ConstArray> {
-    typedef typename ValueType::ConstArray ArratType;
+    typedef typename ValueType::ConstArray ArrayType;
     static bool Is(const ValueType& v) { return v.IsArray(); }
-    static ArratType Get(const ValueType& v) { return v.GetArray(); }
+    static ArrayType Get(const ValueType& v) { return v.GetArray(); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, typename ValueType::Object> {
-    typedef typename ValueType::Object ArratType;
+    typedef typename ValueType::Object ObjectType;
     static bool Is(const ValueType& v) { return v.IsObject(); }
-    static ArratType Get(ValueType& v) { return v.GetObject(); }
-    static ValueType& Set(ValueType& v, ArratType data) { return v.SetObject(data); }
-    static ValueType& Set(ValueType& v, ArratType data, typename ValueType::AllocatorType&) { return v.SetObject(data); }
+    static ObjectType Get(ValueType& v) { return v.GetObject(); }
+    static ValueType& Set(ValueType& v, ObjectType data) { return v.SetObject(data); }
+    static ValueType& Set(ValueType& v, ObjectType data, typename ValueType::AllocatorType&) { return v.SetObject(data); }
 };
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, typename ValueType::ConstObject> {
-    typedef typename ValueType::ConstObject ArratType;
+    typedef typename ValueType::ConstObject ObjectType;
     static bool Is(const ValueType& v) { return v.IsObject(); }
-    static ArratType Get(const ValueType& v) { return v.GetObject(); }
+    static ObjectType Get(const ValueType& v) { return v.GetObject(); }
 };
 
 } // namespace internal
