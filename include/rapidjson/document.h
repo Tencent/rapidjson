@@ -2432,21 +2432,21 @@ public:
 #if RAPIDJSON_HAS_STDSTRING
     MemberIterator FindMember(const std::basic_string<Ch>& name) const { return ptr_->FindMember(name); }
 #endif
-    ValueType& AddMember(ValueType& name, ValueType& value, AllocatorType& allocator) const { return ptr_->AddMember(name, value, allocator); }
-    ValueType& AddMember(ValueType& name, StringRefType value, AllocatorType& allocator) const { return ptr_->AddMember(name, value, allocator); }
+    const GenericObject& AddMember(ValueType& name, ValueType& value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
+    const GenericObject& AddMember(ValueType& name, StringRefType value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
 #if RAPIDJSON_HAS_STDSTRING
-    ValueType& AddMember(ValueType& name, std::basic_string<Ch>& value, AllocatorType& allocator) const { return ptr_->AddMember(name, value, allocator); }
+    const GenericObject& AddMember(ValueType& name, std::basic_string<Ch>& value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
 #endif
-    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&)) AddMember(ValueType& name, T value, AllocatorType& allocator) const { return ptr_->AddMember(name, value, allocator); }
+    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&)) AddMember(ValueType& name, T value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
-    ValueType& AddMember(ValueType&& name, ValueType&& value, AllocatorType& allocator) const { return ptr_->AddMember(name, value, allocator); }
-    ValueType& AddMember(ValueType&& name, ValueType& value, AllocatorType& allocator) const { return ptr_->AddMember(name, value, allocator); }
-    ValueType& AddMember(ValueType& name, ValueType&& value, AllocatorType& allocator) const { return ptr_->AddMember(name, value, allocator); }
-    ValueType& AddMember(StringRefType name, ValueType&& value, AllocatorType& allocator) const { return ptr_->AddMember(name, value, allocator); }
+    const GenericObject& AddMember(ValueType&& name, ValueType&& value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
+    const GenericObject& AddMember(ValueType&& name, ValueType& value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
+    const GenericObject& AddMember(ValueType& name, ValueType&& value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
+    const GenericObject& AddMember(StringRefType name, ValueType&& value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
-    ValueType& AddMember(StringRefType name, ValueType& value, AllocatorType& allocator) const { return ptr_->AddMember(name, value, allocator); }
-    ValueType& AddMember(StringRefType name, StringRefType value, AllocatorType& allocator) const { return ptr_->AddMember(name, value, allocator); }
-    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&)) AddMember(StringRefType name, T value, AllocatorType& allocator) const { return ptr_->AddMember(name, value, allocator); }
+    const GenericObject& AddMember(StringRefType name, ValueType& value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
+    const GenericObject& AddMember(StringRefType name, StringRefType value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
+    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (const GenericObject&)) AddMember(StringRefType name, T value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
     void RemoveAllMembers() { return ptr_->RemoveAllMembers(); }
     bool RemoveMember(const Ch* name) const { return ptr_->RemoveMember(name); }
 #if RAPIDJSON_HAS_STDSTRING
