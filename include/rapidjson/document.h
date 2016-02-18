@@ -971,7 +971,7 @@ public:
     GenericValue& SetObject() { this->~GenericValue(); new (this) GenericValue(kObjectType); return *this; }
 
     //! Set this value with an object.
-    GenericValue& SetObject(Object& o) { return *this = *o.ptr_; }
+    GenericValue& SetObject(Object& o) { return *this = o.value_; }
 
     //! Get the number of members in the object.
     SizeType MemberCount() const { RAPIDJSON_ASSERT(IsObject()); return data_.o.size; }
@@ -1432,7 +1432,7 @@ public:
     GenericValue& SetArray() { this->~GenericValue(); new (this) GenericValue(kArrayType); return *this; }
 
     //! Set this value with an array.
-    GenericValue& SetArray(Array& a) { return *this = *a.ptr_; }
+    GenericValue& SetArray(Array& a) { return *this = a.value_; }
 
     //! Get the number of elements in array.
     SizeType Size() const { RAPIDJSON_ASSERT(IsArray()); return data_.a.size; }
@@ -2353,37 +2353,37 @@ public:
     template <typename, typename>
     friend class GenericValue;
 
-    GenericArray() : ptr_() {}
-    GenericArray(const GenericArray& rhs) : ptr_(rhs.ptr_) {}
-    GenericArray& operator=(const GenericArray& rhs) { ptr_ = rhs.ptr_; return *this; }
+    GenericArray(const GenericArray& rhs) : value_(rhs.value_) {}
+    GenericArray& operator=(const GenericArray& rhs) { value_ = rhs.value_; return *this; }
     ~GenericArray() {}
 
-    SizeType Size() const { return ptr_->Size(); }
-    SizeType Capacity() const { return ptr_->Capacity(); }
-    bool Empty() const { return ptr_->Empty(); }
-    void Clear() const { ptr_->Clear(); }
-    ValueType& operator[](SizeType index) const {  return (*ptr_)[index]; }
-    ValueIterator Begin() const { return ptr_->Begin(); }
-    ValueIterator End() const { return ptr_->End(); }
-    GenericArray Reserve(SizeType newCapacity, AllocatorType &allocator) const { ptr_->Reserve(newCapacity, allocator); return *this; }
-    GenericArray PushBack(ValueType& value, AllocatorType& allocator) const { ptr_->PushBack(value, allocator); return *this; }
+    SizeType Size() const { return value_.Size(); }
+    SizeType Capacity() const { return value_.Capacity(); }
+    bool Empty() const { return value_.Empty(); }
+    void Clear() const { value_.Clear(); }
+    ValueType& operator[](SizeType index) const {  return value_[index]; }
+    ValueIterator Begin() const { return value_.Begin(); }
+    ValueIterator End() const { return value_.End(); }
+    GenericArray Reserve(SizeType newCapacity, AllocatorType &allocator) const { value_.Reserve(newCapacity, allocator); return *this; }
+    GenericArray PushBack(ValueType& value, AllocatorType& allocator) const { value_.PushBack(value, allocator); return *this; }
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
-    GenericArray PushBack(ValueType&& value, AllocatorType& allocator) const { ptr_->PushBack(value, allocator); return *this; }
+    GenericArray PushBack(ValueType&& value, AllocatorType& allocator) const { value_.PushBack(value, allocator); return *this; }
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
-    GenericArray PushBack(StringRefType value, AllocatorType& allocator) const { ptr_->PushBack(value, allocator); return *this; }
-    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (const GenericArray&)) PushBack(T value, AllocatorType& allocator) const { ptr_->PushBack(value, allocator); return *this; }
-    GenericArray PopBack() const { ptr_->PopBack(); return *this; }
-    ValueIterator Erase(ConstValueIterator pos) const { return ptr_->Erase(pos); }
-    ValueIterator Erase(ConstValueIterator first, ConstValueIterator last) const { return ptr_->Erase(first, last); }
+    GenericArray PushBack(StringRefType value, AllocatorType& allocator) const { value_.PushBack(value, allocator); return *this; }
+    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (const GenericArray&)) PushBack(T value, AllocatorType& allocator) const { value_.PushBack(value, allocator); return *this; }
+    GenericArray PopBack() const { value_.PopBack(); return *this; }
+    ValueIterator Erase(ConstValueIterator pos) const { return value_.Erase(pos); }
+    ValueIterator Erase(ConstValueIterator first, ConstValueIterator last) const { return value_.Erase(first, last); }
 
 #if RAPIDJSON_HAS_CXX11_RANGE_FOR
-    ValueIterator begin() const { return ptr_->Begin(); }
-    ValueIterator end() const { return ptr_->End(); }
+    ValueIterator begin() const { return value_.Begin(); }
+    ValueIterator end() const { return value_.End(); }
 #endif
 
 private:
-    GenericArray(ValueType& value) : ptr_(&value) {}
-    ValueType* ptr_;
+    GenericArray();
+    GenericArray(ValueType& value) : value_(value) {}
+    ValueType& value_;
 };
 
 //! Helper class for accessing Value of array type.
@@ -2408,68 +2408,68 @@ public:
     template <typename, typename>
     friend class GenericValue;
 
-    GenericObject() : ptr_() {}
-    GenericObject(const GenericObject& rhs) : ptr_(rhs.ptr_) {}
-    GenericObject& operator=(const GenericObject& rhs) { ptr_ = rhs.ptr_; return *this; }
+    GenericObject(const GenericObject& rhs) : value_(rhs.value_) {}
+    GenericObject& operator=(const GenericObject& rhs) { value_ = rhs.value_; return *this; }
     ~GenericObject() {}
 
-    SizeType MemberCount() const { return ptr_->MemberCount(); }
-    bool ObjectEmpty() const { return ptr_->ObjectEmpty(); }
-    template <typename T> ValueType& operator[](T* name) const { return (*ptr_)[name]; }
-    template <typename SourceAllocator> ValueType& operator[](const GenericValue<EncodingType, SourceAllocator>& name) const { return (*ptr_)[name]; }
+    SizeType MemberCount() const { return value_.MemberCount(); }
+    bool ObjectEmpty() const { return value_.ObjectEmpty(); }
+    template <typename T> ValueType& operator[](T* name) const { return value_[name]; }
+    template <typename SourceAllocator> ValueType& operator[](const GenericValue<EncodingType, SourceAllocator>& name) const { return value_[name]; }
 #if RAPIDJSON_HAS_STDSTRING
-    ValueType& operator[](const std::basic_string<Ch>& name) const { return (*ptr_)[name]; }
+    ValueType& operator[](const std::basic_string<Ch>& name) const { return value_[name]; }
 #endif
-    MemberIterator MemberBegin() const { return ptr_->MemberBegin(); }
-    MemberIterator MemberEnd() const { return ptr_->MemberEnd(); }
-    bool HasMember(const Ch* name) const { return ptr_->HasMember(name); }
+    MemberIterator MemberBegin() const { return value_.MemberBegin(); }
+    MemberIterator MemberEnd() const { return value_.MemberEnd(); }
+    bool HasMember(const Ch* name) const { return value_.HasMember(name); }
 #if RAPIDJSON_HAS_STDSTRING
-    bool HasMember(const std::basic_string<Ch>& name) const { return ptr_->HasMember(name); }
+    bool HasMember(const std::basic_string<Ch>& name) const { return value_.HasMember(name); }
 #endif
-    template <typename SourceAllocator> bool HasMember(const GenericValue<EncodingType, SourceAllocator>& name) const { return ptr_->HasMember(name); }
-    MemberIterator FindMember(const Ch* name) const { ptr_->FindMember(name); }
-    template <typename SourceAllocator> MemberIterator FindMember(const GenericValue<EncodingType, SourceAllocator>& name) const { ptr_->FindMember(name); }
+    template <typename SourceAllocator> bool HasMember(const GenericValue<EncodingType, SourceAllocator>& name) const { return value_.HasMember(name); }
+    MemberIterator FindMember(const Ch* name) const { value_.FindMember(name); }
+    template <typename SourceAllocator> MemberIterator FindMember(const GenericValue<EncodingType, SourceAllocator>& name) const { value_.FindMember(name); }
 #if RAPIDJSON_HAS_STDSTRING
-    MemberIterator FindMember(const std::basic_string<Ch>& name) const { return ptr_->FindMember(name); }
+    MemberIterator FindMember(const std::basic_string<Ch>& name) const { return value_.FindMember(name); }
 #endif
-    GenericObject AddMember(ValueType& name, ValueType& value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
-    GenericObject AddMember(ValueType& name, StringRefType value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
+    GenericObject AddMember(ValueType& name, ValueType& value, AllocatorType& allocator) const { value_.AddMember(name, value, allocator); return *this; }
+    GenericObject AddMember(ValueType& name, StringRefType value, AllocatorType& allocator) const { value_.AddMember(name, value, allocator); return *this; }
 #if RAPIDJSON_HAS_STDSTRING
-    GenericObject AddMember(ValueType& name, std::basic_string<Ch>& value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
+    GenericObject AddMember(ValueType& name, std::basic_string<Ch>& value, AllocatorType& allocator) const { value_.AddMember(name, value, allocator); return *this; }
 #endif
-    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&)) AddMember(ValueType& name, T value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
+    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (ValueType&)) AddMember(ValueType& name, T value, AllocatorType& allocator) const { value_.AddMember(name, value, allocator); return *this; }
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
-    GenericObject AddMember(ValueType&& name, ValueType&& value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
-    GenericObject AddMember(ValueType&& name, ValueType& value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
-    GenericObject AddMember(ValueType& name, ValueType&& value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
-    GenericObject AddMember(StringRefType name, ValueType&& value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
+    GenericObject AddMember(ValueType&& name, ValueType&& value, AllocatorType& allocator) const { value_.AddMember(name, value, allocator); return *this; }
+    GenericObject AddMember(ValueType&& name, ValueType& value, AllocatorType& allocator) const { value_.AddMember(name, value, allocator); return *this; }
+    GenericObject AddMember(ValueType& name, ValueType&& value, AllocatorType& allocator) const { value_.AddMember(name, value, allocator); return *this; }
+    GenericObject AddMember(StringRefType name, ValueType&& value, AllocatorType& allocator) const { value_.AddMember(name, value, allocator); return *this; }
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
-    GenericObject AddMember(StringRefType name, ValueType& value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
-    GenericObject AddMember(StringRefType name, StringRefType value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
-    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (GenericObject)) AddMember(StringRefType name, T value, AllocatorType& allocator) const { ptr_->AddMember(name, value, allocator); return *this; }
-    void RemoveAllMembers() { return ptr_->RemoveAllMembers(); }
-    bool RemoveMember(const Ch* name) const { return ptr_->RemoveMember(name); }
+    GenericObject AddMember(StringRefType name, ValueType& value, AllocatorType& allocator) const { value_.AddMember(name, value, allocator); return *this; }
+    GenericObject AddMember(StringRefType name, StringRefType value, AllocatorType& allocator) const { value_.AddMember(name, value, allocator); return *this; }
+    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (GenericObject)) AddMember(StringRefType name, T value, AllocatorType& allocator) const { value_.AddMember(name, value, allocator); return *this; }
+    void RemoveAllMembers() { return value_.RemoveAllMembers(); }
+    bool RemoveMember(const Ch* name) const { return value_.RemoveMember(name); }
 #if RAPIDJSON_HAS_STDSTRING
-    bool RemoveMember(const std::basic_string<Ch>& name) const { return ptr_->RemoveMember(name); }
+    bool RemoveMember(const std::basic_string<Ch>& name) const { return value_.RemoveMember(name); }
 #endif
-    template <typename SourceAllocator> bool RemoveMember(const GenericValue<EncodingType, SourceAllocator>& name) const { return ptr_->RemoveMember(name); }
-    MemberIterator RemoveMember(MemberIterator m) const { return ptr_->RemoveMember(m); }
-    MemberIterator EraseMember(ConstMemberIterator pos) const { return ptr_->EraseMember(pos); }
-    MemberIterator EraseMember(ConstMemberIterator first, ConstMemberIterator last) const { return ptr_->EraseMember(first, last); }
-    bool EraseMember(const Ch* name) const { return ptr_->EraseMember(name); }
+    template <typename SourceAllocator> bool RemoveMember(const GenericValue<EncodingType, SourceAllocator>& name) const { return value_.RemoveMember(name); }
+    MemberIterator RemoveMember(MemberIterator m) const { return value_.RemoveMember(m); }
+    MemberIterator EraseMember(ConstMemberIterator pos) const { return value_.EraseMember(pos); }
+    MemberIterator EraseMember(ConstMemberIterator first, ConstMemberIterator last) const { return value_.EraseMember(first, last); }
+    bool EraseMember(const Ch* name) const { return value_.EraseMember(name); }
 #if RAPIDJSON_HAS_STDSTRING
     bool EraseMember(const std::basic_string<Ch>& name) const { return EraseMember(ValueType(StringRef(name))); }
 #endif
-    template <typename SourceAllocator> bool EraseMember(const GenericValue<EncodingType, SourceAllocator>& name) const { return ptr_->EraseMember(name); }
+    template <typename SourceAllocator> bool EraseMember(const GenericValue<EncodingType, SourceAllocator>& name) const { return value_.EraseMember(name); }
 
 #if RAPIDJSON_HAS_CXX11_RANGE_FOR
-    MemberIterator begin() const { return ptr_->MemberBegin(); }
-    MemberIterator end() const { return ptr_->MemberEnd(); }
+    MemberIterator begin() const { return value_.MemberBegin(); }
+    MemberIterator end() const { return value_.MemberEnd(); }
 #endif
 
 private:
-    GenericObject(ValueType& value) : ptr_(&value) {}
-    ValueType* ptr_;
+    GenericObject();
+    GenericObject(ValueType& value) : value_(value) {}
+    ValueType& value_;
 };
 
 RAPIDJSON_NAMESPACE_END

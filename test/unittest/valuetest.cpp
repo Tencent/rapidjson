@@ -1042,8 +1042,7 @@ TEST(Value, ArrayHelper) {
         Value::Array a2(a); // copy constructor
         EXPECT_EQ(1, a2.Size());
 
-        Value::Array a3;   // default constructor
-        a3 = a;     // assignment operator
+        Value::Array a3 = a;
         EXPECT_EQ(1, a3.Size());
 
         Value::ConstArray y = static_cast<const Value&>(x).GetArray();
@@ -1055,8 +1054,7 @@ TEST(Value, ArrayHelper) {
         EXPECT_TRUE(x.Is<Value::Array>());
         EXPECT_TRUE(x.Is<Value::ConstArray>());
         a.PushBack(1, allocator);
-        a = x.Get<Value::Array>();
-        EXPECT_EQ(1, a[0].GetInt());
+        EXPECT_EQ(1, x.Get<Value::Array>()[0].GetInt());
         EXPECT_EQ(1, x.Get<Value::ConstArray>()[0].GetInt());
 
         Value x2;
@@ -1398,8 +1396,7 @@ TEST(Value, ObjectHelper) {
         Value::Object o2(o); // copy constructor
         EXPECT_EQ(1, o2.MemberCount());
 
-        Value::Object o3;   // default constructor
-        o3 = o;             // assignment operator
+        Value::Object o3 = o;
         EXPECT_EQ(1, o3.MemberCount());
 
         Value::ConstObject y = static_cast<const Value&>(x).GetObject();
@@ -1411,8 +1408,7 @@ TEST(Value, ObjectHelper) {
         EXPECT_TRUE(x.Is<Value::Object>());
         EXPECT_TRUE(x.Is<Value::ConstObject>());
         o.AddMember("1", 1, allocator);
-        o = x.Get<Value::Object>();
-        EXPECT_EQ(1, o["1"].GetInt());
+        EXPECT_EQ(1, x.Get<Value::Object>()["1"].GetInt());
         EXPECT_EQ(1, x.Get<Value::ConstObject>()["1"].GetInt());
 
         Value x2;
