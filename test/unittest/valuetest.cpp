@@ -1059,8 +1059,31 @@ TEST(Value, ArrayHelper) {
 
         Value x2;
         x2.Set<Value::Array>(a);
-        EXPECT_TRUE(x.IsNull());
+        EXPECT_TRUE(x.IsArray());   // IsArray() is invariant after moving.
         EXPECT_EQ(1, x2.Get<Value::Array>()[0].GetInt());
+    }
+
+    {
+        Value y(kArrayType);
+        y.PushBack(123, allocator);
+
+        Value x(y.GetArray());      // Construct value form array.
+        EXPECT_TRUE(x.IsArray());
+        EXPECT_EQ(123, x[0].GetInt());
+        EXPECT_TRUE(y.IsArray());   // Invariant
+        EXPECT_TRUE(y.Empty());
+    }
+
+    {
+        Value x(kArrayType);
+        Value y(kArrayType);
+        y.PushBack(123, allocator);
+        x.PushBack(y.GetArray(), allocator);    // Implicit constructor to convert Array to GenericValue
+
+        EXPECT_EQ(1, x.Size());
+        EXPECT_EQ(123, x[0][0].GetInt());
+        EXPECT_TRUE(y.IsArray());
+        EXPECT_TRUE(y.Empty());
     }
 }
 
@@ -1413,8 +1436,25 @@ TEST(Value, ObjectHelper) {
 
         Value x2;
         x2.Set<Value::Object>(o);
-        EXPECT_TRUE(x.IsNull());
+        EXPECT_TRUE(x.IsObject());   // IsObject() is invariant after moving
         EXPECT_EQ(1, x2.Get<Value::Object>()["1"].GetInt());
+    }
+
+    {
+        Value x(kObjectType);
+        x.AddMember("a", "apple", allocator);
+        Value y(x.GetObject());
+        EXPECT_STREQ("apple", y["a"].GetString());
+        EXPECT_TRUE(x.IsObject());  // Invariant
+    }
+    
+    {
+        Value x(kObjectType);
+        x.AddMember("a", "apple", allocator);
+        Value y(kObjectType);
+        y.AddMember("fruits", x.GetObject(), allocator);
+        EXPECT_STREQ("apple", y["fruits"]["a"].GetString());
+        EXPECT_TRUE(x.IsObject());  // Invariant
     }
 }
 

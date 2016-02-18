@@ -481,8 +481,8 @@ struct TypeHelper<ValueType, typename ValueType::Array> {
     typedef typename ValueType::Array ArrayType;
     static bool Is(const ValueType& v) { return v.IsArray(); }
     static ArrayType Get(ValueType& v) { return v.GetArray(); }
-    static ValueType& Set(ValueType& v, ArrayType data) { return v.SetArray(data); }
-    static ValueType& Set(ValueType& v, ArrayType data, typename ValueType::AllocatorType&) { return v.SetArray(data); }
+    static ValueType& Set(ValueType& v, ArrayType data) { return v = data; }
+    static ValueType& Set(ValueType& v, ArrayType data, typename ValueType::AllocatorType&) { return v = data; }
 };
 
 template<typename ValueType> 
@@ -497,8 +497,8 @@ struct TypeHelper<ValueType, typename ValueType::Object> {
     typedef typename ValueType::Object ObjectType;
     static bool Is(const ValueType& v) { return v.IsObject(); }
     static ObjectType Get(ValueType& v) { return v.GetObject(); }
-    static ValueType& Set(ValueType& v, ObjectType data) { return v.SetObject(data); }
-    static ValueType& Set(ValueType& v, ObjectType data, typename ValueType::AllocatorType&) { return v.SetObject(data); }
+    static ValueType& Set(ValueType& v, ObjectType data) { return v = data; }
+    static ValueType& Set(ValueType& v, ObjectType data, typename ValueType::AllocatorType&) { v = data; }
 };
 
 template<typename ValueType> 
@@ -680,6 +680,28 @@ public:
      */
     GenericValue(const std::basic_string<Ch>& s, Allocator& allocator) : data_(), flags_() { SetStringRaw(StringRef(s), allocator); }
 #endif
+
+    //! Constructor for Array.
+    /*!
+        \param a An array obtained by \c GetArray().
+        \note \c Array is always pass-by-value.
+        \note the source array is moved into this value and the sourec array becomes empty.
+    */
+    GenericValue(Array a) : data_(a.value_.data_), flags_(a.value_.flags_) {
+        a.value_.data_ = Data();
+        a.value_.flags_ = kArrayFlag;
+    }
+
+    //! Constructor for Object.
+    /*!
+        \param o An object obtained by \c GetObject().
+        \note \c Object is always pass-by-value.
+        \note the source object is moved into this value and the sourec object becomes empty.
+    */
+    GenericValue(Object o) : data_(o.value_.data_), flags_(o.value_.flags_) {
+        o.value_.data_ = Data();
+        o.value_.flags_ = kObjectFlag;
+    }
 
     //! Destructor.
     /*! Need to destruct elements of array, members of object, or copy-string.
@@ -969,9 +991,6 @@ public:
     //! Set this value as an empty object.
     /*! \post IsObject() == true */
     GenericValue& SetObject() { this->~GenericValue(); new (this) GenericValue(kObjectType); return *this; }
-
-    //! Set this value with an object.
-    GenericValue& SetObject(Object& o) { return *this = o.value_; }
 
     //! Get the number of members in the object.
     SizeType MemberCount() const { RAPIDJSON_ASSERT(IsObject()); return data_.o.size; }
@@ -1430,9 +1449,6 @@ public:
     //! Set this value as an empty array.
     /*! \post IsArray == true */
     GenericValue& SetArray() { this->~GenericValue(); new (this) GenericValue(kArrayType); return *this; }
-
-    //! Set this value with an array.
-    GenericValue& SetArray(Array& a) { return *this = a.value_; }
 
     //! Get the number of elements in array.
     SizeType Size() const { RAPIDJSON_ASSERT(IsArray()); return data_.a.size; }
