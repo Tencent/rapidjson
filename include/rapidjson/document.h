@@ -687,7 +687,7 @@ public:
         \note \c Array is always pass-by-value.
         \note the source array is moved into this value and the sourec array becomes empty.
     */
-    GenericValue(Array a) : data_(a.value_.data_), flags_(a.value_.flags_) {
+    GenericValue(Array a) RAPIDJSON_NOEXCEPT : data_(a.value_.data_), flags_(a.value_.flags_) {
         a.value_.data_ = Data();
         a.value_.flags_ = kArrayFlag;
     }
@@ -698,7 +698,7 @@ public:
         \note \c Object is always pass-by-value.
         \note the source object is moved into this value and the sourec object becomes empty.
     */
-    GenericValue(Object o) : data_(o.value_.data_), flags_(o.value_.flags_) {
+    GenericValue(Object o) RAPIDJSON_NOEXCEPT : data_(o.value_.data_), flags_(o.value_.flags_) {
         o.value_.data_ = Data();
         o.value_.flags_ = kObjectFlag;
     }
