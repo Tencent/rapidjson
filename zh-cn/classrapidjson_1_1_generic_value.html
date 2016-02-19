@@ -157,6 +157,22 @@ typedef <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue<
 <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#ad2935191ab28c2c2e472b739a9d58202">ValueType</a></td></tr>
 <tr class="memdesc:ad2935191ab28c2c2e472b739a9d58202"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value type of itself. <br /></td></tr>
 <tr class="separator:ad2935191ab28c2c2e472b739a9d58202"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81291ad1031afe43aca4719e2989d7dc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a81291ad1031afe43aca4719e2989d7dc"></a>
+typedef <a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a>&lt; false, <br class="typebreak" />
+<a class="el" href="classrapidjson_1_1_generic_value.html#ad2935191ab28c2c2e472b739a9d58202">ValueType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>Array</b></td></tr>
+<tr class="separator:a81291ad1031afe43aca4719e2989d7dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8fb89523de7b22be0c69069f05d04b41"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8fb89523de7b22be0c69069f05d04b41"></a>
+typedef <a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a>&lt; true, <br class="typebreak" />
+<a class="el" href="classrapidjson_1_1_generic_value.html#ad2935191ab28c2c2e472b739a9d58202">ValueType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>ConstArray</b></td></tr>
+<tr class="separator:a8fb89523de7b22be0c69069f05d04b41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1b1a60a9c69ce5ac48b8c445e3e9231"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae1b1a60a9c69ce5ac48b8c445e3e9231"></a>
+typedef <a class="el" href="classrapidjson_1_1_generic_object.html">GenericObject</a>&lt; false, <br class="typebreak" />
+<a class="el" href="classrapidjson_1_1_generic_value.html#ad2935191ab28c2c2e472b739a9d58202">ValueType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>Object</b></td></tr>
+<tr class="separator:ae1b1a60a9c69ce5ac48b8c445e3e9231"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39f5e1993897a86741b55c32ed4f54ef"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a39f5e1993897a86741b55c32ed4f54ef"></a>
+typedef <a class="el" href="classrapidjson_1_1_generic_object.html">GenericObject</a>&lt; true, <br class="typebreak" />
+<a class="el" href="classrapidjson_1_1_generic_value.html#ad2935191ab28c2c2e472b739a9d58202">ValueType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>ConstObject</b></td></tr>
+<tr class="separator:a39f5e1993897a86741b55c32ed4f54ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
@@ -359,6 +375,12 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>EraseMember</b> (cons
 template&lt;typename SourceAllocator &gt; </td></tr>
 <tr class="memitem:a27db22089fc69aacda8309c593ed9812"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>EraseMember</b> (const <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, SourceAllocator &gt; &amp;name)</td></tr>
 <tr class="separator:a27db22089fc69aacda8309c593ed9812"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a538446f8bdb8e7765d1705d8d157358a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a538446f8bdb8e7765d1705d8d157358a"></a>
+<a class="el" href="classrapidjson_1_1_generic_object.html">Object</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetObject</b> ()</td></tr>
+<tr class="separator:a538446f8bdb8e7765d1705d8d157358a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0faeebacf8592f438654224f2b9f2fe7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0faeebacf8592f438654224f2b9f2fe7"></a>
+<a class="el" href="classrapidjson_1_1_generic_object.html">ConstObject</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetObject</b> () const </td></tr>
+<tr class="separator:a0faeebacf8592f438654224f2b9f2fe7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Array</div></td></tr>
 <tr class="memitem:a25069c76d045b058e54835d8c467c789"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#a25069c76d045b058e54835d8c467c789">SetArray</a> ()</td></tr>
 <tr class="memdesc:a25069c76d045b058e54835d8c467c789"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set this value as an empty array.  <a href="#a25069c76d045b058e54835d8c467c789">更多...</a><br /></td></tr>
@@ -418,6 +440,32 @@ const <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a
 <tr class="memitem:a916f443e02f9379d8fbde49a4d440f61"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_value.html#a06ce0e14ec83b53c83e1b1699b53a25e">ValueIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#a916f443e02f9379d8fbde49a4d440f61">Erase</a> (<a class="el" href="classrapidjson_1_1_generic_value.html#a89a6588121742fc3f154b10b8f15f45f">ConstValueIterator</a> first, <a class="el" href="classrapidjson_1_1_generic_value.html#a89a6588121742fc3f154b10b8f15f45f">ConstValueIterator</a> last)</td></tr>
 <tr class="memdesc:a916f443e02f9379d8fbde49a4d440f61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove elements in the range [first, last) of the array.  <a href="#a916f443e02f9379d8fbde49a4d440f61">更多...</a><br /></td></tr>
 <tr class="separator:a916f443e02f9379d8fbde49a4d440f61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a252af37875a1115f107082263af2cb3c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a252af37875a1115f107082263af2cb3c"></a>
+<a class="el" href="classrapidjson_1_1_generic_array.html">Array</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetArray</b> ()</td></tr>
+<tr class="separator:a252af37875a1115f107082263af2cb3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66f1a57c68b149a31faa739d51c463ec"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a66f1a57c68b149a31faa739d51c463ec"></a>
+<a class="el" href="classrapidjson_1_1_generic_array.html">ConstArray</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetArray</b> () const </td></tr>
+<tr class="separator:a66f1a57c68b149a31faa739d51c463ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade8d1ca2b8e8afa02cde46e26866440b"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:ade8d1ca2b8e8afa02cde46e26866440b"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#ade8d1ca2b8e8afa02cde46e26866440b">Is</a> () const </td></tr>
+<tr class="memdesc:ade8d1ca2b8e8afa02cde46e26866440b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Templated version for checking whether this value is type T.  <a href="#ade8d1ca2b8e8afa02cde46e26866440b">更多...</a><br /></td></tr>
+<tr class="separator:ade8d1ca2b8e8afa02cde46e26866440b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a131eda3b3f5e37fca8dff43c77963fad"><td class="memTemplParams" colspan="2"><a class="anchor" id="a131eda3b3f5e37fca8dff43c77963fad"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a131eda3b3f5e37fca8dff43c77963fad"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><b>Get</b> () const </td></tr>
+<tr class="separator:a131eda3b3f5e37fca8dff43c77963fad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa92aa34a1b7ba91980a461bd526a4db"><td class="memTemplParams" colspan="2"><a class="anchor" id="aaa92aa34a1b7ba91980a461bd526a4db"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:aaa92aa34a1b7ba91980a461bd526a4db"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><b>Get</b> ()</td></tr>
+<tr class="separator:aaa92aa34a1b7ba91980a461bd526a4db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b508fecfecbecb418c999597d83d384"><td class="memTemplParams" colspan="2"><a class="anchor" id="a8b508fecfecbecb418c999597d83d384"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:a8b508fecfecbecb418c999597d83d384"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_value.html#ad2935191ab28c2c2e472b739a9d58202">ValueType</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>Set</b> (const T &amp;data)</td></tr>
+<tr class="separator:a8b508fecfecbecb418c999597d83d384"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5576f5bb31c707ffd8ce6d6c58135a5"><td class="memTemplParams" colspan="2"><a class="anchor" id="ae5576f5bb31c707ffd8ce6d6c58135a5"></a>
+template&lt;typename T &gt; </td></tr>
+<tr class="memitem:ae5576f5bb31c707ffd8ce6d6c58135a5"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_value.html#ad2935191ab28c2c2e472b739a9d58202">ValueType</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>Set</b> (const T &amp;data, <a class="el" href="classrapidjson_1_1_generic_value.html#a5d47340c96346c5028fee4c9068d783d">AllocatorType</a> &amp;allocator)</td></tr>
+<tr class="separator:ae5576f5bb31c707ffd8ce6d6c58135a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Number</div></td></tr>
 <tr class="memitem:a92991a57de8cf42da2e4efc792acefea"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a92991a57de8cf42da2e4efc792acefea"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>GetInt</b> () const </td></tr>
@@ -544,6 +592,12 @@ Constructors and destructor.</h2></td></tr>
 <tr class="memitem:a852788b35257762cd8d6c4bf5c5d77bc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#a852788b35257762cd8d6c4bf5c5d77bc">GenericValue</a> (const std::basic_string&lt; <a class="el" href="classrapidjson_1_1_generic_value.html#adcdbc7fa85a9a41b78966d7e0dcc2ac4">Ch</a> &gt; &amp;s, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &amp;allocator)</td></tr>
 <tr class="memdesc:a852788b35257762cd8d6c4bf5c5d77bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for copy-string from a string object (i.e. do make a copy of string)  <a href="#a852788b35257762cd8d6c4bf5c5d77bc">更多...</a><br /></td></tr>
 <tr class="separator:a852788b35257762cd8d6c4bf5c5d77bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77b0f41557b3c34b57a180698312c4a8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#a77b0f41557b3c34b57a180698312c4a8">GenericValue</a> (<a class="el" href="classrapidjson_1_1_generic_array.html">Array</a> a) RAPIDJSON_NOEXCEPT</td></tr>
+<tr class="memdesc:a77b0f41557b3c34b57a180698312c4a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for Array.  <a href="#a77b0f41557b3c34b57a180698312c4a8">更多...</a><br /></td></tr>
+<tr class="separator:a77b0f41557b3c34b57a180698312c4a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a893da1069660536fd3943a0149206a6e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#a893da1069660536fd3943a0149206a6e">GenericValue</a> (<a class="el" href="classrapidjson_1_1_generic_object.html">Object</a> o) RAPIDJSON_NOEXCEPT</td></tr>
+<tr class="memdesc:a893da1069660536fd3943a0149206a6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for Object.  <a href="#a893da1069660536fd3943a0149206a6e">更多...</a><br /></td></tr>
+<tr class="separator:a893da1069660536fd3943a0149206a6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a433a64b466c80cadf7d1acaa6f065437"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#a433a64b466c80cadf7d1acaa6f065437">~GenericValue</a> ()</td></tr>
 <tr class="memdesc:a433a64b466c80cadf7d1acaa6f065437"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <a href="#a433a64b466c80cadf7d1acaa6f065437">更多...</a><br /></td></tr>
 <tr class="separator:a433a64b466c80cadf7d1acaa6f065437"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -787,6 +841,80 @@ template&lt;typename Encoding, typename Allocator&gt; </div>
 
 <p>Constructor for copy-string from a string object (i.e. do make a copy of string) </p>
 <dl class="section note"><dt>注解</dt><dd>Requires the definition of the preprocessor symbol <a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga2f2eef0ee4477f3fe5874703a66e997f">RAPIDJSON_HAS_STDSTRING</a>. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a77b0f41557b3c34b57a180698312c4a8"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Encoding, typename Allocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrapidjson_1_1_generic_value.html">rapidjson::GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::<a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classrapidjson_1_1_generic_array.html">Array</a>&#160;</td>
+          <td class="paramname"><em>a</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor for Array. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">a</td><td>An array obtained by <code>GetArray()</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd><code>Array</code> is always pass-by-value. </dd>
+<dd>
+the source array is moved into this value and the sourec array becomes empty. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a893da1069660536fd3943a0149206a6e"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Encoding, typename Allocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrapidjson_1_1_generic_value.html">rapidjson::GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::<a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classrapidjson_1_1_generic_object.html">Object</a>&#160;</td>
+          <td class="paramname"><em>o</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor for Object. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">o</td><td>An object obtained by <code>GetObject()</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd><code>Object</code> is always pass-by-value. </dd>
+<dd>
+the source object is moved into this value and the sourec object becomes empty. </dd></dl>
 
 </div>
 </div>
@@ -1995,6 +2123,41 @@ template&lt;typename SourceAllocator &gt; </div>
 <dl class="section note"><dt>注解</dt><dd>It is better to use <a class="el" href="classrapidjson_1_1_generic_value.html#ad22fdeac87ec6c370dd43075d3586811" title="Find member by name. ">FindMember()</a> directly if you need the obtain the value as well. </dd>
 <dd>
 Linear time complexity. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ade8d1ca2b8e8afa02cde46e26866440b"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Encoding, typename Allocator&gt; </div>
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classrapidjson_1_1_generic_value.html">rapidjson::GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::Is </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Templated version for checking whether this value is type T. </p>
+<dl class="tparams"><dt>模板参数</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T</td><td>Either <code>bool</code>, <code>int</code>, <code>unsigned</code>, <code>int64_t</code>, <code>uint64_t</code>, <code>double</code>, <code>float</code>, <code>const</code> <code>char*</code>, <code>std::basic_string&lt;Ch&gt;</code> </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
