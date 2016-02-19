@@ -23,6 +23,18 @@ RAPIDJSON_DIAG_OFF(c++98-compat)
 
 using namespace rapidjson;
 
+TEST(Value, Size) {
+    if (sizeof(SizeType) == 4) {
+#if RAPIDJSON_48BITPOINTER_OPTIMIZATION
+        EXPECT_EQ(16, sizeof(Value));
+#elif RAPIDJSON_64BIT
+        EXPECT_EQ(24, sizeof(Value));
+#else
+        EXPECT_EQ(16, sizeof(Value));
+#endif
+    }
+}
+
 TEST(Value, DefaultConstructor) {
     Value x;
     EXPECT_EQ(kNullType, x.GetType());
