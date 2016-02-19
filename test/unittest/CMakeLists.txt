@@ -2,6 +2,7 @@ set(UNITTEST_SOURCES
 	allocatorstest.cpp
     bigintegertest.cpp
     documenttest.cpp
+    dtoatest.cpp
     encodedstreamtest.cpp
     encodingstest.cpp
     fwdtest.cpp
