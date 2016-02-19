@@ -530,6 +530,17 @@ RAPIDJSON_NAMESPACE_END
 #define RAPIDJSON_HAS_CXX11_TYPETRAITS 0
 #endif
 
+#ifndef RAPIDJSON_HAS_CXX11_RANGE_FOR
+#if defined(__clang__)
+#define RAPIDJSON_HAS_CXX11_RANGE_FOR __has_feature(cxx_range_for)
+#elif (defined(RAPIDJSON_GNUC) && (RAPIDJSON_GNUC >= RAPIDJSON_VERSION_CODE(4,3,0)) && defined(__GXX_EXPERIMENTAL_CXX0X__)) || \
+      (defined(_MSC_VER) && _MSC_VER >= 1600)
+#define RAPIDJSON_HAS_CXX11_RANGE_FOR 1
+#else
+#define RAPIDJSON_HAS_CXX11_RANGE_FOR 0
+#endif
+#endif // RAPIDJSON_HAS_CXX11_RANGE_FOR
+
 //!@endcond
 
 ///////////////////////////////////////////////////////////////////////////////

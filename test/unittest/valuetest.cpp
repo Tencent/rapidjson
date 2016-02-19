@@ -335,6 +335,12 @@ TEST(Value, True) {
     Value z;
     z.SetBool(true);
     EXPECT_TRUE(z.IsTrue());
+
+    // Templated functions
+    EXPECT_TRUE(z.Is<bool>());
+    EXPECT_TRUE(z.Get<bool>());
+    EXPECT_FALSE(z.Set<bool>(false).Get<bool>());
+    EXPECT_TRUE(z.Set(true).Get<bool>());
 }
 
 TEST(Value, False) {
@@ -414,6 +420,12 @@ TEST(Value, Int) {
     // operator=(int)
     z = 5678;
     EXPECT_EQ(5678, z.GetInt());
+
+    // Templated functions
+    EXPECT_TRUE(z.Is<int>());
+    EXPECT_EQ(5678, z.Get<int>());
+    EXPECT_EQ(5679, z.Set(5679).Get<int>());
+    EXPECT_EQ(5680, z.Set<int>(5680).Get<int>());
 }
 
 TEST(Value, Uint) {
@@ -453,6 +465,12 @@ TEST(Value, Uint) {
     EXPECT_EQ(2147483648u, z.GetUint());
     EXPECT_FALSE(z.IsInt());
     EXPECT_TRUE(z.IsInt64());   // Issue 41: Incorrect parsing of unsigned int number types
+
+    // Templated functions
+    EXPECT_TRUE(z.Is<unsigned>());
+    EXPECT_EQ(2147483648u, z.Get<unsigned>());
+    EXPECT_EQ(2147483649u, z.Set(2147483649u).Get<unsigned>());
+    EXPECT_EQ(2147483650u, z.Set<unsigned>(2147483650u).Get<unsigned>());
 }
 
 TEST(Value, Int64) {
@@ -505,8 +523,15 @@ TEST(Value, Int64) {
     EXPECT_FALSE(z.IsInt());
     EXPECT_NEAR(-2147483649.0, z.GetDouble(), 0.0);
 
-    z.SetInt64(static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x80000000, 00000000)));
+    int64_t i = static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x80000000, 00000000));
+    z.SetInt64(i);
     EXPECT_DOUBLE_EQ(-9223372036854775808.0, z.GetDouble());
+
+    // Templated functions
+    EXPECT_TRUE(z.Is<int64_t>());
+    EXPECT_EQ(i, z.Get<int64_t>());
+    EXPECT_EQ(i - 1, z.Set(i - 1).Get<int64_t>());
+    EXPECT_EQ(i - 2, z.Set<int64_t>(i - 2).Get<int64_t>());
 }
 
 TEST(Value, Uint64) {
@@ -547,10 +572,17 @@ TEST(Value, Uint64) {
     EXPECT_FALSE(z.IsUint());
     EXPECT_TRUE(z.IsInt64());
 
-    z.SetUint64(RAPIDJSON_UINT64_C2(0x80000000, 0x00000000));    // 2^63 cannot cast as int64
+    uint64_t u = RAPIDJSON_UINT64_C2(0x80000000, 0x00000000);
+    z.SetUint64(u);    // 2^63 cannot cast as int64
     EXPECT_FALSE(z.IsInt64());
-    EXPECT_EQ(RAPIDJSON_UINT64_C2(0x80000000, 0x00000000), z.GetUint64()); // Issue 48
+    EXPECT_EQ(u, z.GetUint64()); // Issue 48
     EXPECT_DOUBLE_EQ(9223372036854775808.0, z.GetDouble());
+
+    // Templated functions
+    EXPECT_TRUE(z.Is<uint64_t>());
+    EXPECT_EQ(u, z.Get<uint64_t>());
+    EXPECT_EQ(u + 1, z.Set(u + 1).Get<uint64_t>());
+    EXPECT_EQ(u + 2, z.Set<uint64_t>(u + 2).Get<uint64_t>());
 }
 
 TEST(Value, Double) {
@@ -577,6 +609,12 @@ TEST(Value, Double) {
 
     z = 56.78;
     EXPECT_NEAR(56.78, z.GetDouble(), 0.0);
+
+    // Templated functions
+    EXPECT_TRUE(z.Is<double>());
+    EXPECT_EQ(56.78, z.Get<double>());
+    EXPECT_EQ(57.78, z.Set(57.78).Get<double>());
+    EXPECT_EQ(58.78, z.Set<double>(58.78).Get<double>());
 }
 
 TEST(Value, Float) {
@@ -604,6 +642,12 @@ TEST(Value, Float) {
 
     z = 56.78f;
     EXPECT_NEAR(56.78f, z.GetFloat(), 0.0f);
+
+    // Templated functions
+    EXPECT_TRUE(z.Is<float>());
+    EXPECT_EQ(56.78f, z.Get<float>());
+    EXPECT_EQ(57.78f, z.Set(57.78f).Get<float>());
+    EXPECT_EQ(58.78f, z.Set<float>(58.78f).Get<float>());
 }
 
 TEST(Value, IsLosslessDouble) {
@@ -724,6 +768,11 @@ TEST(Value, String) {
     EXPECT_STREQ("World", w.GetString());
     EXPECT_EQ(5u, w.GetStringLength());
 
+    // templated functions
+    EXPECT_TRUE(z.Is<const char*>());
+    EXPECT_STREQ(cstr, z.Get<const char*>());
+    EXPECT_STREQ("Apple", z.Set<const char*>("Apple").Get<const char*>());
+
 #if RAPIDJSON_HAS_STDSTRING
     {
         std::string str = "Hello World";
@@ -759,6 +808,14 @@ TEST(Value, String) {
         vs1 = StringRef(str);
         TestEqual(str, vs1);
         TestEqual(vs0, vs1);
+
+        // Templated function.
+        EXPECT_TRUE(vs0.Is<std::string>());
+        EXPECT_EQ(str, vs0.Get<std::string>());
+        vs0.Set<std::string>(std::string("Apple"), allocator);
+        EXPECT_EQ(std::string("Apple"), vs0.Get<std::string>());
+        vs0.Set(std::string("Orange"), allocator);
+        EXPECT_EQ(std::string("Orange"), vs0.Get<std::string>());
     }
 #endif // RAPIDJSON_HAS_STDSTRING
 }
@@ -769,25 +826,9 @@ TEST(Value, SetStringNullException) {
     EXPECT_THROW(v.SetString(0, 0), AssertException);
 }
 
-TEST(Value, Array) {
-    Value x(kArrayType);
-    const Value& y = x;
-    Value::AllocatorType allocator;
-
-    EXPECT_EQ(kArrayType, x.GetType());
-    EXPECT_TRUE(x.IsArray());
-    EXPECT_TRUE(x.Empty());
-    EXPECT_EQ(0u, x.Size());
-    EXPECT_TRUE(y.IsArray());
-    EXPECT_TRUE(y.Empty());
-    EXPECT_EQ(0u, y.Size());
-
-    EXPECT_FALSE(x.IsNull());
-    EXPECT_FALSE(x.IsBool());
-    EXPECT_FALSE(x.IsFalse());
-    EXPECT_FALSE(x.IsTrue());
-    EXPECT_FALSE(x.IsString());
-    EXPECT_FALSE(x.IsObject());
+template <typename T, typename Allocator>
+static void TestArray(T& x, Allocator& allocator) {
+    const T& y = x;
 
     // PushBack()
     Value v;
@@ -834,7 +875,7 @@ TEST(Value, Array) {
 #endif
 
     // iterator
-    Value::ValueIterator itr = x.Begin();
+    typename T::ValueIterator itr = x.Begin();
     EXPECT_TRUE(itr != x.End());
     EXPECT_TRUE(itr->IsNull());
     ++itr;
@@ -853,7 +894,7 @@ TEST(Value, Array) {
     EXPECT_STREQ("foo", itr->GetString());
 
     // const iterator
-    Value::ConstValueIterator citr = y.Begin();
+    typename T::ConstValueIterator citr = y.Begin();
     EXPECT_TRUE(citr != y.End());
     EXPECT_TRUE(citr->IsNull());
     ++citr;
@@ -939,6 +980,29 @@ TEST(Value, Array) {
                 EXPECT_EQ(i + removeCount, x[static_cast<SizeType>(i)][0].GetUint());
         }
     }
+}
+
+TEST(Value, Array) {
+    Value x(kArrayType);
+    const Value& y = x;
+    Value::AllocatorType allocator;
+
+    EXPECT_EQ(kArrayType, x.GetType());
+    EXPECT_TRUE(x.IsArray());
+    EXPECT_TRUE(x.Empty());
+    EXPECT_EQ(0u, x.Size());
+    EXPECT_TRUE(y.IsArray());
+    EXPECT_TRUE(y.Empty());
+    EXPECT_EQ(0u, y.Size());
+
+    EXPECT_FALSE(x.IsNull());
+    EXPECT_FALSE(x.IsBool());
+    EXPECT_FALSE(x.IsFalse());
+    EXPECT_FALSE(x.IsTrue());
+    EXPECT_FALSE(x.IsString());
+    EXPECT_FALSE(x.IsObject());
+
+    TestArray(x, allocator);
 
     // Working in gcc without C++11, but VS2013 cannot compile. To be diagnosed.
     // http://en.wikipedia.org/wiki/Erase-remove_idiom
@@ -962,19 +1026,96 @@ TEST(Value, Array) {
     EXPECT_TRUE(z.Empty());
 }
 
-TEST(Value, Object) {
-    Value x(kObjectType);
-    const Value& y = x; // const version
+TEST(Value, ArrayHelper) {
     Value::AllocatorType allocator;
+    {
+        Value x(kArrayType);
+        Value::Array a = x.GetArray();
+        TestArray(a, allocator);
+    }
 
-    EXPECT_EQ(kObjectType, x.GetType());
-    EXPECT_TRUE(x.IsObject());
-    EXPECT_TRUE(x.ObjectEmpty());
-    EXPECT_EQ(0u, x.MemberCount());
-    EXPECT_EQ(kObjectType, y.GetType());
-    EXPECT_TRUE(y.IsObject());
-    EXPECT_TRUE(y.ObjectEmpty());
-    EXPECT_EQ(0u, y.MemberCount());
+    {
+        Value x(kArrayType);
+        Value::Array a = x.GetArray();
+        a.PushBack(1, allocator);
+
+        Value::Array a2(a); // copy constructor
+        EXPECT_EQ(1, a2.Size());
+
+        Value::Array a3 = a;
+        EXPECT_EQ(1, a3.Size());
+
+        Value::ConstArray y = static_cast<const Value&>(x).GetArray();
+        (void)y;
+        // y.PushBack(1, allocator); // should not compile
+
+        // Templated functions
+        x.Clear();
+        EXPECT_TRUE(x.Is<Value::Array>());
+        EXPECT_TRUE(x.Is<Value::ConstArray>());
+        a.PushBack(1, allocator);
+        EXPECT_EQ(1, x.Get<Value::Array>()[0].GetInt());
+        EXPECT_EQ(1, x.Get<Value::ConstArray>()[0].GetInt());
+
+        Value x2;
+        x2.Set<Value::Array>(a);
+        EXPECT_TRUE(x.IsArray());   // IsArray() is invariant after moving.
+        EXPECT_EQ(1, x2.Get<Value::Array>()[0].GetInt());
+    }
+
+    {
+        Value y(kArrayType);
+        y.PushBack(123, allocator);
+
+        Value x(y.GetArray());      // Construct value form array.
+        EXPECT_TRUE(x.IsArray());
+        EXPECT_EQ(123, x[0].GetInt());
+        EXPECT_TRUE(y.IsArray());   // Invariant
+        EXPECT_TRUE(y.Empty());
+    }
+
+    {
+        Value x(kArrayType);
+        Value y(kArrayType);
+        y.PushBack(123, allocator);
+        x.PushBack(y.GetArray(), allocator);    // Implicit constructor to convert Array to GenericValue
+
+        EXPECT_EQ(1, x.Size());
+        EXPECT_EQ(123, x[0][0].GetInt());
+        EXPECT_TRUE(y.IsArray());
+        EXPECT_TRUE(y.Empty());
+    }
+}
+
+#if RAPIDJSON_HAS_CXX11_RANGE_FOR
+TEST(Value, ArrayHelperRangeFor) {
+    Value::AllocatorType allocator;
+    Value x(kArrayType);
+
+    for (int i = 0; i < 10; i++)
+        x.PushBack(i, allocator);
+
+    {
+        int i = 0;
+        for (auto& v : x.GetArray())
+            EXPECT_EQ(i++, v.GetInt());
+        EXPECT_EQ(i, 10);
+    }
+    {
+        int i = 0;
+        for (const auto& v : const_cast<const Value&>(x).GetArray())
+            EXPECT_EQ(i++, v.GetInt());
+        EXPECT_EQ(i, 10);
+    }
+
+    // Array a = x.GetArray();
+    // Array ca = const_cast<const Value&>(x).GetArray();
+}
+#endif
+
+template <typename T, typename Allocator>
+static void TestObject(T& x, Allocator& allocator) {
+    const T& y = x; // const version
 
     // AddMember()
     x.AddMember("A", "Apple", allocator);
@@ -1215,7 +1356,7 @@ TEST(Value, Object) {
     const unsigned n = 10;
     for (unsigned first = 0; first < n; first++) {
         for (unsigned last = first; last <= n; last++) {
-            Value(kObjectType).Swap(x);
+            x.RemoveAllMembers();
             for (unsigned i = 0; i < n; i++)
                 x.AddMember(keys[i], Value(kArrayType).PushBack(i, allocator), allocator);
 
@@ -1238,12 +1379,123 @@ TEST(Value, Object) {
     x.RemoveAllMembers();
     EXPECT_TRUE(x.ObjectEmpty());
     EXPECT_EQ(0u, x.MemberCount());
+}
+
+TEST(Value, Object) {
+    Value x(kObjectType);
+    const Value& y = x; // const version
+    Value::AllocatorType allocator;
+
+    EXPECT_EQ(kObjectType, x.GetType());
+    EXPECT_TRUE(x.IsObject());
+    EXPECT_TRUE(x.ObjectEmpty());
+    EXPECT_EQ(0u, x.MemberCount());
+    EXPECT_EQ(kObjectType, y.GetType());
+    EXPECT_TRUE(y.IsObject());
+    EXPECT_TRUE(y.ObjectEmpty());
+    EXPECT_EQ(0u, y.MemberCount());
+
+    TestObject(x, allocator);
 
     // SetObject()
     Value z;
     z.SetObject();
     EXPECT_TRUE(z.IsObject());
 }
+
+TEST(Value, ObjectHelper) {
+    Value::AllocatorType allocator;
+    {
+        Value x(kObjectType);
+        Value::Object o = x.GetObject();
+        TestObject(o, allocator);
+    }
+
+    {
+        Value x(kObjectType);
+        Value::Object o = x.GetObject();
+        o.AddMember("1", 1, allocator);
+
+        Value::Object o2(o); // copy constructor
+        EXPECT_EQ(1, o2.MemberCount());
+
+        Value::Object o3 = o;
+        EXPECT_EQ(1, o3.MemberCount());
+
+        Value::ConstObject y = static_cast<const Value&>(x).GetObject();
+        (void)y;
+        // y.AddMember("1", 1, allocator); // should not compile
+
+        // Templated functions
+        x.RemoveAllMembers();
+        EXPECT_TRUE(x.Is<Value::Object>());
+        EXPECT_TRUE(x.Is<Value::ConstObject>());
+        o.AddMember("1", 1, allocator);
+        EXPECT_EQ(1, x.Get<Value::Object>()["1"].GetInt());
+        EXPECT_EQ(1, x.Get<Value::ConstObject>()["1"].GetInt());
+
+        Value x2;
+        x2.Set<Value::Object>(o);
+        EXPECT_TRUE(x.IsObject());   // IsObject() is invariant after moving
+        EXPECT_EQ(1, x2.Get<Value::Object>()["1"].GetInt());
+    }
+
+    {
+        Value x(kObjectType);
+        x.AddMember("a", "apple", allocator);
+        Value y(x.GetObject());
+        EXPECT_STREQ("apple", y["a"].GetString());
+        EXPECT_TRUE(x.IsObject());  // Invariant
+    }
+    
+    {
+        Value x(kObjectType);
+        x.AddMember("a", "apple", allocator);
+        Value y(kObjectType);
+        y.AddMember("fruits", x.GetObject(), allocator);
+        EXPECT_STREQ("apple", y["fruits"]["a"].GetString());
+        EXPECT_TRUE(x.IsObject());  // Invariant
+    }
+}
+
+#if RAPIDJSON_HAS_CXX11_RANGE_FOR
+TEST(Value, ObjectHelperRangeFor) {
+    Value::AllocatorType allocator;
+    Value x(kObjectType);
+
+    for (int i = 0; i < 10; i++) {
+        char name[10];
+        Value n(name, static_cast<SizeType>(sprintf(name, "%d", i)), allocator);
+        x.AddMember(n, i, allocator);
+    }
+
+    {
+        int i = 0;
+        for (auto& m : x.GetObject()) {
+            char name[10];
+            sprintf(name, "%d", i);
+            EXPECT_STREQ(name, m.name.GetString());
+            EXPECT_EQ(i, m.value.GetInt());
+            i++;
+        }
+        EXPECT_EQ(i, 10);
+    }
+    {
+        int i = 0;
+        for (const auto& m : const_cast<const Value&>(x).GetObject()) {
+            char name[10];
+            sprintf(name, "%d", i);
+            EXPECT_STREQ(name, m.name.GetString());
+            EXPECT_EQ(i, m.value.GetInt());
+            i++;
+        }
+        EXPECT_EQ(i, 10);
+    }
+
+    // Object a = x.GetObject();
+    // Object ca = const_cast<const Value&>(x).GetObject();
+}
+#endif
 
 TEST(Value, EraseMember_String) {
     Value::AllocatorType allocator;
