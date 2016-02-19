@@ -1,11 +1,13 @@
 var rapidjson_8h =
 [
+    [ "RAPIDJSON_48BITPOINTER_OPTIMIZATION", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga93fb983f78208d12c822376e1ea6d185", null ],
     [ "RAPIDJSON_64BIT", "rapidjson_8h.html#a93973847cb99354b6b5bb5605aa7fe52", null ],
     [ "RAPIDJSON_ALIGN", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242", null ],
     [ "RAPIDJSON_ASSERT", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c", null ],
     [ "RAPIDJSON_BIGENDIAN", "rapidjson_8h.html#ac7951ebf8a2624ab85d2dcd3ec7af974", null ],
     [ "RAPIDJSON_DELETE", "rapidjson_8h.html#a52c941c3fdd646527cdcd42aa846a28a", null ],
     [ "RAPIDJSON_ENDIAN", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaba2445f582142cf918e74c2d22d1aa07", null ],
+    [ "RAPIDJSON_GETPOINTER", "rapidjson_8h.html#ab67ad54afdd78883907fd1ecd007573a", null ],
     [ "RAPIDJSON_HAS_STDSTRING", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga2f2eef0ee4477f3fe5874703a66e997f", null ],
     [ "RAPIDJSON_LIKELY", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga5dc14176a9e71ace282404b0bcda57a1", null ],
     [ "RAPIDJSON_LITTLEENDIAN", "rapidjson_8h.html#addcc0c3607c5790f35cc4c15885ff97c", null ],
@@ -16,6 +18,7 @@ var rapidjson_8h =
     [ "RAPIDJSON_NO_INT64DEFINE", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga7f4e50c35dae3b015390daa6d48ce23c", null ],
     [ "RAPIDJSON_NO_SIZETYPEDEFINE", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga250603aa9e2a12429b25ba0c8108ad4f", null ],
     [ "RAPIDJSON_PATCH_VERSION", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaf967d31be43666ce7f53756d73bd1cdf", null ],
+    [ "RAPIDJSON_SETPOINTER", "rapidjson_8h.html#a113598c4750b3aab4de2782ff1865ed4", null ],
     [ "RAPIDJSON_SIMD", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga0ccf72f3ebc4b3306ab669f95ca5c64b", null ],
     [ "RAPIDJSON_STATIC_ASSERT", "rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4", null ],
     [ "RAPIDJSON_UINT64_C2", "rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f", null ],

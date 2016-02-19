@@ -1,5 +1,6 @@
 var group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g =
 [
+    [ "RAPIDJSON_48BITPOINTER_OPTIMIZATION", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga93fb983f78208d12c822376e1ea6d185", null ],
     [ "RAPIDJSON_ALIGN", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242", null ],
     [ "RAPIDJSON_ASSERT", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c", null ],
     [ "RAPIDJSON_ENDIAN", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaba2445f582142cf918e74c2d22d1aa07", null ],

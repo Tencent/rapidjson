@@ -127,6 +127,9 @@ Macros</h2></td></tr>
 <tr class="memitem:ga583915242504c7fdb36e826f02f76242"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a>(x)&#160;&#160;&#160;(((x) + 3u) &amp; ~3u)</td></tr>
 <tr class="memdesc:ga583915242504c7fdb36e826f02f76242"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data alignment of the machine.  <a href="#ga583915242504c7fdb36e826f02f76242">More...</a><br /></td></tr>
 <tr class="separator:ga583915242504c7fdb36e826f02f76242"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga93fb983f78208d12c822376e1ea6d185"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga93fb983f78208d12c822376e1ea6d185">RAPIDJSON_48BITPOINTER_OPTIMIZATION</a>&#160;&#160;&#160;0</td></tr>
+<tr class="memdesc:ga93fb983f78208d12c822376e1ea6d185"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use only lower 48-bit address for some pointers.  <a href="#ga93fb983f78208d12c822376e1ea6d185">More...</a><br /></td></tr>
+<tr class="separator:ga93fb983f78208d12c822376e1ea6d185"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0ccf72f3ebc4b3306ab669f95ca5c64b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga0ccf72f3ebc4b3306ab669f95ca5c64b">RAPIDJSON_SIMD</a></td></tr>
 <tr class="memdesc:ga0ccf72f3ebc4b3306ab669f95ca5c64b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable SSE2/SSE4.2 optimization.  <a href="#ga0ccf72f3ebc4b3306ab669f95ca5c64b">More...</a><br /></td></tr>
 <tr class="separator:ga0ccf72f3ebc4b3306ab669f95ca5c64b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -155,6 +158,21 @@ Macros</h2></td></tr>
 <p>Some additional customization is available in the <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html">RapidJSON error handling</a> APIs.</p>
 <dl class="section note"><dt>Note</dt><dd>These macros should be given on the compiler command-line (where applicable) to avoid inconsistent values when compiling different translation units of a single application. </dd></dl>
 <h2 class="groupheader">Macro Definition Documentation</h2>
+<a class="anchor" id="ga93fb983f78208d12c822376e1ea6d185"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RAPIDJSON_48BITPOINTER_OPTIMIZATION&#160;&#160;&#160;0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Use only lower 48-bit address for some pointers. </p>
+<p>This optimization uses the fact that current X86-64 architecture only implement lower 48-bit virtual address. The higher 16-bit can be used for storing other data. <code>GenericValue</code> uses this optimization to reduce its size form 24 bytes to 16 bytes in 64-bit architecture. </p>
+
+</div>
+</div>
 <a class="anchor" id="ga583915242504c7fdb36e826f02f76242"></a>
 <div class="memitem">
 <div class="memproto">
@@ -176,7 +194,7 @@ Macros</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>Some machines require strict data alignment. Currently the default uses 4 bytes alignment. User can customize by defining the RAPIDJSON_ALIGN function macro. </p>
+<p>Some machines require strict data alignment. Currently the default uses 4 bytes alignment on 32-bit platforms and 8 bytes alignment for 64-bit platforms. User can customize by defining the RAPIDJSON_ALIGN function macro. </p>
 
 </div>
 </div>

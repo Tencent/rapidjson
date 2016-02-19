@@ -2,6 +2,7 @@ var searchData=
 [
   ['rapidjson',['rapidjson',['../namespacerapidjson.html',1,'']]],
   ['rapidjson_2eh',['rapidjson.h',['../rapidjson_8h.html',1,'']]],
+  ['rapidjson_5f48bitpointer_5foptimization',['RAPIDJSON_48BITPOINTER_OPTIMIZATION',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga93fb983f78208d12c822376e1ea6d185',1,'rapidjson.h']]],
   ['rapidjson_5f64bit',['RAPIDJSON_64BIT',['../rapidjson_8h.html#a93973847cb99354b6b5bb5605aa7fe52',1,'rapidjson.h']]],
   ['rapidjson_5falign',['RAPIDJSON_ALIGN',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242',1,'rapidjson.h']]],
   ['rapidjson_5fassert',['RAPIDJSON_ASSERT',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c',1,'rapidjson.h']]],
