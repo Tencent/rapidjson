@@ -2,17 +2,17 @@
 
 ## Status: experimental, shall be included in v1.1
 
-JSON Schema is a draft standard for describing format of JSON. The schema itself is also a JSON. By validating a JSON with JSON Schema, your code can safely access the DOM without manually checking types, or whether a key exists, etc. It can also ensure that the serialized JSON conform to a specified schema.
+JSON Schema is a draft standard for describing the format of JSON data. The schema itself is also JSON data. By validating a JSON structure with JSON Schema, your code can safely access the DOM without manually checking types, or whether a key exists, etc. It can also ensure that the serialized JSON conform to a specified schema.
 
-RapidJSON implemented a JSON Schema validator for [JSON Schema Draft v4](http://json-schema.org/documentation.html). If you do not familiar with JSON Schema, you may refer to [Understanding JSON Schema](http://spacetelescope.github.io/understanding-json-schema/).
+RapidJSON implemented a JSON Schema validator for [JSON Schema Draft v4](http://json-schema.org/documentation.html). If you are not familiar with JSON Schema, you may refer to [Understanding JSON Schema](http://spacetelescope.github.io/understanding-json-schema/).
 
 [TOC]
 
 ## Basic Usage
 
-First of all, you need to parse a JSON Schema into `Document`, and then compile the `Document` into `SchemaDocument`.
+First of all, you need to parse a JSON Schema into `Document`, and then compile the `Document` into a `SchemaDocument`.
 
-Secondly, construct a `SchemaValidator` with the `SchedmaDocument`. It is similar to a `Writer` in the sense of handling SAX events. So, you can use `document.Accept(validator)` to validate a document, and then check the validity.
+Secondly, construct a `SchemaValidator` with the `SchemaDocument`. It is similar to a `Writer` in the sense of handling SAX events. So, you can use `document.Accept(validator)` to validate a document, and then check the validity.
 
 ~~~cpp
 #include "rapidjson/schema.h"
@@ -54,7 +54,7 @@ Some notes:
 
 ## Validation during parsing/serialization
 
-Differ to most JSON Schema validator implementations, RapidJSON provides a SAX-based schema validator. Therefore, you can parse a JSON from a stream while validating it on the fly. If the validator encounters a JSON value that invalidates the supplied schema, the parsing will be terminated immediately. This design is especially useful for parsing large JSON files.
+Unlike most JSON Schema validator implementations, RapidJSON provides a SAX-based schema validator. Therefore, you can parse a JSON from a stream while validating it on the fly. If the validator encounters a JSON value that invalidates the supplied schema, the parsing will be terminated immediately. This design is especially useful for parsing large JSON files.
 
 ### DOM parsing
 
@@ -111,7 +111,7 @@ if (!reader.Parse(stream, validator)) {
 }
 ~~~
 
-This is exactly the method used in [schemavalidator](example/schemavalidator/schemavalidator.cpp) example. The distinct advantage is low memory usage, no matter how big the JSON was (the memory usage depends on the complexity of the schema).
+This is exactly the method used in the [schemavalidator](example/schemavalidator/schemavalidator.cpp) example. The distinct advantage is low memory usage, no matter how big the JSON was (the memory usage depends on the complexity of the schema).
 
 If you need to handle the SAX events further, then you need to use the template class `GenericSchemaValidator` to set the output handler of the validator:
 
@@ -213,7 +213,7 @@ For C++11 compiler, it is also possible to use the `std::regex` by defining `RAP
 
 ## Performance
 
-Most C++ JSON libraries have not yet supporting JSON Schema. So we tried to evaluate the performance of RapidJSON's JSON Schema validator according to [json-schema-benchmark](https://github.com/ebdrup/json-schema-benchmark), which tests 11 JavaScript libraries running on Node.js.
+Most C++ JSON libraries do not yet support JSON Schema. So we tried to evaluate the performance of RapidJSON's JSON Schema validator according to [json-schema-benchmark](https://github.com/ebdrup/json-schema-benchmark), which tests 11 JavaScript libraries running on Node.js.
 
 That benchmark runs validations on [JSON Schema Test Suite](https://github.com/json-schema/JSON-Schema-Test-Suite), in which some test suites and tests are excluded. We made the same benchmarking procedure in [`schematest.cpp`](test/perftest/schematest.cpp).
 
