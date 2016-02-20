@@ -10,6 +10,7 @@ var hierarchy =
     [ "rapidjson::BasicOStreamWrapper< StreamType >", "classrapidjson_1_1_basic_o_stream_wrapper.html", null ],
     [ "rapidjson::CrtAllocator", "classrapidjson_1_1_crt_allocator.html", null ],
     [ "rapidjson::EncodedInputStream< Encoding, InputByteStream >", "classrapidjson_1_1_encoded_input_stream.html", null ],
+    [ "rapidjson::EncodedInputStream< UTF8<>, MemoryStream >", "classrapidjson_1_1_encoded_input_stream_3_01_u_t_f8_3_4_00_01_memory_stream_01_4.html", null ],
     [ "rapidjson::EncodedOutputStream< Encoding, OutputByteStream >", "classrapidjson_1_1_encoded_output_stream.html", null ],
     [ "rapidjson::Encoding", "classrapidjson_1_1_encoding.html", null ],
     [ "rapidjson::FileReadStream", "classrapidjson_1_1_file_read_stream.html", null ],

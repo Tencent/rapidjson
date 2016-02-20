@@ -129,6 +129,9 @@ $(document).ready(function(){initNavTree('namespacerapidjson.html','');});
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_encoded_input_stream.html">EncodedInputStream</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input byte stream wrapper with a statically bound encoding.  <a href="classrapidjson_1_1_encoded_input_stream.html#details">更多...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_encoded_input_stream_3_01_u_t_f8_3_4_00_01_memory_stream_01_4.html">EncodedInputStream&lt; UTF8&lt;&gt;, MemoryStream &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specialized for <a class="el" href="structrapidjson_1_1_u_t_f8.html" title="UTF-8 encoding. ">UTF8</a> <a class="el" href="structrapidjson_1_1_memory_stream.html" title="Represents an in-memory input byte stream. ">MemoryStream</a>.  <a href="classrapidjson_1_1_encoded_input_stream_3_01_u_t_f8_3_4_00_01_memory_stream_01_4.html#details">更多...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_encoded_output_stream.html">EncodedOutputStream</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output byte stream wrapper with statically bound encoding.  <a href="classrapidjson_1_1_encoded_output_stream.html#details">更多...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -450,6 +453,9 @@ template&lt;&gt; </td></tr>
 <tr class="memitem:a6efb0f4d2a6f81477a59718d42e9464a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a">SkipWhitespace</a> (InputStream &amp;is)</td></tr>
 <tr class="memdesc:a6efb0f4d2a6f81477a59718d42e9464a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Skip the JSON white spaces in a stream.  <a href="#a6efb0f4d2a6f81477a59718d42e9464a">更多...</a><br /></td></tr>
 <tr class="separator:a6efb0f4d2a6f81477a59718d42e9464a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a946a04b733bc148c13e7b3b0721cabcc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a946a04b733bc148c13e7b3b0721cabcc"></a>
+const char *&#160;</td><td class="memItemRight" valign="bottom"><b>SkipWhitespace</b> (const char *p, const char *end)</td></tr>
+<tr class="separator:a946a04b733bc148c13e7b3b0721cabcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3caa6f393c9940e6525d5f1c21ed9ea2"><td class="memTemplParams" colspan="2"><a class="anchor" id="a3caa6f393c9940e6525d5f1c21ed9ea2"></a>
 template&lt;&gt; </td></tr>
 <tr class="memitem:a3caa6f393c9940e6525d5f1c21ed9ea2"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a3caa6f393c9940e6525d5f1c21ed9ea2">SkipWhitespace</a> (<a class="el" href="namespacerapidjson.html#a64e957c8d9d7cd15b193ffc31410038e">InsituStringStream</a> &amp;is)</td></tr>
@@ -460,6 +466,10 @@ template&lt;&gt; </td></tr>
 <tr class="memitem:a791735c27e073a70d720c2775ddf9568"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a791735c27e073a70d720c2775ddf9568">SkipWhitespace</a> (<a class="el" href="namespacerapidjson.html#a021f77051e9f85188fc2f71ff5a15ebc">StringStream</a> &amp;is)</td></tr>
 <tr class="memdesc:a791735c27e073a70d720c2775ddf9568"><td class="mdescLeft">&#160;</td><td class="mdescRight">Template function specialization for StringStream. <br /></td></tr>
 <tr class="separator:a791735c27e073a70d720c2775ddf9568"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6bb4c8ff395f8962f7df38a5467ee2ed"><td class="memTemplParams" colspan="2"><a class="anchor" id="a6bb4c8ff395f8962f7df38a5467ee2ed"></a>
+template&lt;&gt; </td></tr>
+<tr class="memitem:a6bb4c8ff395f8962f7df38a5467ee2ed"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>SkipWhitespace</b> (<a class="el" href="classrapidjson_1_1_encoded_input_stream.html">EncodedInputStream</a>&lt; <a class="el" href="structrapidjson_1_1_u_t_f8.html">UTF8</a>&lt;&gt;, <a class="el" href="structrapidjson_1_1_memory_stream.html">MemoryStream</a> &gt; &amp;is)</td></tr>
+<tr class="separator:a6bb4c8ff395f8962f7df38a5467ee2ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a820f77efccfbb749bd15fe4822d2c740"><td class="memTemplParams" colspan="2"><a class="anchor" id="a820f77efccfbb749bd15fe4822d2c740"></a>
 template&lt;typename Stream &gt; </td></tr>
 <tr class="memitem:a820f77efccfbb749bd15fe4822d2c740"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacerapidjson.html#a820f77efccfbb749bd15fe4822d2c740">PutReserve</a> (<a class="el" href="classrapidjson_1_1_stream.html">Stream</a> &amp;stream, size_t count)</td></tr>
