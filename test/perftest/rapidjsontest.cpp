@@ -187,6 +187,25 @@ TEST_F(RapidJson, SIMD_SUFFIX(DocumentParse_MemoryPoolAllocator)) {
     }
 }
 
+TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseLength_MemoryPoolAllocator)) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        Document doc;
+        doc.Parse(json_, length_);
+        ASSERT_TRUE(doc.IsObject());
+    }
+}
+
+#if RAPIDJSON_HAS_STDSTRING
+TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseStdString_MemoryPoolAllocator)) {
+    const std::string s(json_, length_);
+    for (size_t i = 0; i < kTrialCount; i++) {
+        Document doc;
+        doc.Parse(s);
+        ASSERT_TRUE(doc.IsObject());
+    }
+}
+#endif
+
 TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseIterative_MemoryPoolAllocator)) {
     for (size_t i = 0; i < kTrialCount; i++) {
         Document doc;

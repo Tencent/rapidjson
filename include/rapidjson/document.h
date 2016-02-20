@@ -20,6 +20,8 @@
 #include "reader.h"
 #include "internal/meta.h"
 #include "internal/strfunc.h"
+#include "memorystream.h"
+#include "encodedstream.h"
 #include <new>      // placement new
 
 #ifdef _MSC_VER
@@ -2224,6 +2226,42 @@ public:
     GenericDocument& Parse(const Ch* str) {
         return Parse<kParseDefaultFlags>(str);
     }
+
+    template <unsigned parseFlags, typename SourceEncoding>
+    GenericDocument& Parse(const typename SourceEncoding::Ch* str, size_t length) {
+        RAPIDJSON_ASSERT(!(parseFlags & kParseInsituFlag));
+        MemoryStream ms(static_cast<const char*>(str), length * sizeof(typename SourceEncoding::Ch));
+        EncodedInputStream<SourceEncoding, MemoryStream> is(ms);
+        ParseStream<parseFlags, SourceEncoding>(is);
+        return *this;
+    }
+
+    template <unsigned parseFlags>
+    GenericDocument& Parse(const Ch* str, size_t length) {
+        return Parse<parseFlags, Encoding>(str, length);
+    }
+    
+    GenericDocument& Parse(const Ch* str, size_t length) {
+        return Parse<kParseDefaultFlags>(str, length);
+    }
+
+#if RAPIDJSON_HAS_STDSTRING
+    template <unsigned parseFlags, typename SourceEncoding>
+    GenericDocument& Parse(const std::basic_string<typename SourceEncoding::Ch>& str) {
+        // c_str() is constant complexity according to standard. Should be faster than Parse(const char*, size_t)
+        return Parse<parseFlags, SourceEncoding>(str.c_str());
+    }
+
+    template <unsigned parseFlags>
+    GenericDocument& Parse(const std::basic_string<Ch>& str) {
+        return Parse<parseFlags, Encoding>(str);
+    }
+
+    GenericDocument& Parse(const std::basic_string<Ch>& str) {
+        return Parse<kParseDefaultFlags>(str);
+    }
+#endif // RAPIDJSON_HAS_STDSTRING    
+
     //!@}
 
     //!@name Handling parse errors

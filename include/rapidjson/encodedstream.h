@@ -16,6 +16,7 @@
 #define RAPIDJSON_ENCODEDSTREAM_H_
 
 #include "stream.h"
+#include "memorystream.h"
 
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
@@ -60,6 +61,30 @@ private:
 
     InputByteStream& is_;
     Ch current_;
+};
+
+//! Specialized for UTF8 MemoryStream.
+template <>
+class EncodedInputStream<UTF8<>, MemoryStream> {
+public:
+    typedef UTF8<>::Ch Ch;
+
+    EncodedInputStream(MemoryStream& is) : is_(is) {
+        if (static_cast<unsigned char>(is_.Peek()) == 0xEFu) is_.Take();
+        if (static_cast<unsigned char>(is_.Peek()) == 0xBBu) is_.Take();
+        if (static_cast<unsigned char>(is_.Peek()) == 0xBFu) is_.Take();
+    }
+    Ch Peek() const { return is_.Peek(); }
+    Ch Take() { return is_.Take(); }
+    size_t Tell() const { return is_.Tell(); }
+
+    // Not implemented
+    void Put(Ch) {}
+    void Flush() {} 
+    Ch* PutBegin() { return 0; }
+    size_t PutEnd(Ch*) { return 0; }
+
+    MemoryStream& is_;
 };
 
 //! Output byte stream wrapper with statically bound encoding.

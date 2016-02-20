@@ -73,6 +73,28 @@ TEST(SIMD, SIMD_SUFFIX(SkipWhitespace)) {
     TestSkipWhitespace<InsituStringStream>();
 }
 
+TEST(SIMD, SIMD_SUFFIX(SkipWhitespace_EncodedMemoryStream)) {
+    for (size_t step = 1; step < 32; step++) {
+        char buffer[1024];
+        for (size_t i = 0; i < 1024; i++)
+            buffer[i] = " \t\r\n"[i % 4];
+        for (size_t i = 0; i < 1024; i += step)
+            buffer[i] = 'X';
+
+        MemoryStream ms(buffer, 1024);
+        EncodedInputStream<UTF8<>, MemoryStream> s(ms);
+        size_t i = 0;
+        for (;;) {
+            SkipWhitespace(s);
+            if (s.Peek() == '\0')
+                break;
+            //EXPECT_EQ(i, s.Tell());
+            EXPECT_EQ('X', s.Take());
+            i += step;
+        }
+    }
+}
+
 struct ScanCopyUnescapedStringHandler : BaseReaderHandler<UTF8<>, ScanCopyUnescapedStringHandler> {
     bool String(const char* str, size_t length, bool) {
         memcpy(buffer, str, length + 1);
