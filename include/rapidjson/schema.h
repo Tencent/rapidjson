@@ -1322,7 +1322,7 @@ public:
         \param remoteProvider An optional remote schema document provider for resolving remote reference. Can be null.
         \param allocator An optional allocator instance for allocating memory. Can be null.
     */
-    GenericSchemaDocument(const ValueType& document, IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) : 
+    GenericSchemaDocument(const ValueType& document, IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) RAPIDJSON_NOEXCEPT : 
         remoteProvider_(remoteProvider),
         allocator_(allocator),
         ownAllocator_(),
@@ -1357,6 +1357,22 @@ public:
         schemaRef_.ShrinkToFit(); // Deallocate all memory for ref
     }
 
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    //! Move constructor in C++11
+    GenericSchemaDocument(GenericSchemaDocument&& rhs) RAPIDJSON_NOEXCEPT :
+        remoteProvider_(rhs.remoteProvider_),
+        allocator_(rhs.allocator_),
+        ownAllocator_(rhs.ownAllocator_),
+        root_(rhs.root_),
+        schemaMap_(std::move(rhs.schemaMap_)),
+        schemaRef_(std::move(rhs.schemaRef_))
+    {
+        rhs.remoteProvider_ = 0;
+        rhs.allocator_ = 0;
+        rhs.ownAllocator_ = 0;
+    }
+#endif
+
     //! Destructor
     ~GenericSchemaDocument() {
         while (!schemaMap_.Empty())
@@ -1369,6 +1385,11 @@ public:
     const SchemaType& GetRoot() const { return *root_; }
 
 private:
+    //! Prohibit copying
+    GenericSchemaDocument(const GenericSchemaDocument&);
+    //! Prohibit assignment
+    GenericSchemaDocument& operator=(const GenericSchemaDocument&);
+
     struct SchemaRefEntry {
         SchemaRefEntry(const PointerType& s, const PointerType& t, const SchemaType** outSchema, Allocator *allocator) : source(s, allocator), target(t, allocator), schema(outSchema) {}
         PointerType source;

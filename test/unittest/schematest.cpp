@@ -1152,6 +1152,24 @@ TEST(SchemaValidatingWriter, Simple) {
     EXPECT_TRUE(validator.GetInvalidDocumentPointer() == SchemaDocument::PointerType(""));
 }
 
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
+static SchemaDocument ReturnSchemaDocument() {
+    Document sd;
+    sd.Parse("{ \"type\": [\"number\", \"string\"] }");
+    SchemaDocument s(sd);
+    return s;
+}
+
+TEST(Schema, Issue552) {
+    SchemaDocument s = ReturnSchemaDocument();
+    VALIDATE(s, "42", true);
+    VALIDATE(s, "\"I'm a string\"", true);
+    VALIDATE(s, "{ \"an\": [ \"arbitrarily\", \"nested\" ], \"data\": \"structure\" }", true);
+}
+
+#endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
 #ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
