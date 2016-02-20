@@ -67,7 +67,7 @@ private:
 template <>
 class EncodedInputStream<UTF8<>, MemoryStream> {
 public:
-    typedef typename UTF8<>::Ch Ch;
+    typedef UTF8<>::Ch Ch;
 
     EncodedInputStream(MemoryStream& is) : is_(is) {
         if (static_cast<unsigned char>(is_.Peek()) == 0xEFu) is_.Take();
