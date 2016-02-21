@@ -1152,6 +1152,24 @@ TEST(SchemaValidatingWriter, Simple) {
     EXPECT_TRUE(validator.GetInvalidDocumentPointer() == SchemaDocument::PointerType(""));
 }
 
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
+static SchemaDocument ReturnSchemaDocument() {
+    Document sd;
+    sd.Parse("{ \"type\": [\"number\", \"string\"] }");
+    SchemaDocument s(sd);
+    return s;
+}
+
+TEST(Schema, Issue552) {
+    SchemaDocument s = ReturnSchemaDocument();
+    VALIDATE(s, "42", true);
+    VALIDATE(s, "\"Life, the universe, and everything\"", true);
+    INVALIDATE(s, "[\"Life\", \"the universe\", \"and everything\"]", "", "type", "");
+}
+
+#endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
 #ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
