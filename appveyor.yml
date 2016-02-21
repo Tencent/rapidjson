@@ -1,3 +1,4 @@
+os: Visual Studio 2015 CTP  
 version: 1.0.2.{build}
 
 configuration:
@@ -13,6 +14,10 @@ environment:
   - VS_VERSION: 12
     VS_PLATFORM: win32
   - VS_VERSION: 12
+    VS_PLATFORM: x64
+  - VS_VERSION: 13
+    VS_PLATFORM: win32
+  - VS_VERSION: 13
     VS_PLATFORM: x64
 
 before_build:
