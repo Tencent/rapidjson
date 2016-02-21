@@ -2344,7 +2344,7 @@ $(document).ready(function(){initNavTree('document_8h_source.html','');});
 <div class="line"><a name="l02254"></a><span class="lineno"> 2254</span>&#160;</div>
 <div class="line"><a name="l02255"></a><span class="lineno"> 2255</span>&#160;    <span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags&gt;</div>
 <div class="line"><a name="l02256"></a><span class="lineno"> 2256</span>&#160;    GenericDocument&amp; Parse(<span class="keyword">const</span> std::basic_string&lt;Ch&gt;&amp; str) {</div>
-<div class="line"><a name="l02257"></a><span class="lineno"> 2257</span>&#160;        <span class="keywordflow">return</span> Parse&lt;parseFlags, Encoding&gt;(str);</div>
+<div class="line"><a name="l02257"></a><span class="lineno"> 2257</span>&#160;        <span class="keywordflow">return</span> Parse&lt;parseFlags, Encoding&gt;(str.c_str());</div>
 <div class="line"><a name="l02258"></a><span class="lineno"> 2258</span>&#160;    }</div>
 <div class="line"><a name="l02259"></a><span class="lineno"> 2259</span>&#160;</div>
 <div class="line"><a name="l02260"></a><span class="lineno"> 2260</span>&#160;    GenericDocument&amp; Parse(<span class="keyword">const</span> std::basic_string&lt;Ch&gt;&amp; str) {</div>
