@@ -2254,7 +2254,7 @@ public:
 
     template <unsigned parseFlags>
     GenericDocument& Parse(const std::basic_string<Ch>& str) {
-        return Parse<parseFlags, Encoding>(str);
+        return Parse<parseFlags, Encoding>(str.c_str());
     }
 
     GenericDocument& Parse(const std::basic_string<Ch>& str) {
