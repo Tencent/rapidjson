@@ -8,6 +8,7 @@ set(EXAMPLES
     condense
     jsonx
     messagereader
+    parsebyparts
     pretty
     prettyauto
     schemavalidator
