@@ -192,7 +192,12 @@ TEST(Document, Parse_Encoding) {
 #if RAPIDJSON_HAS_STDSTRING
     // Parse<unsigned, SourceEncoding>(std::string)
     doc.SetNull();
+
+#if defined(_MSC_VER) && _MSC_VER < 1800
+    doc.Parse<kParseDefaultFlags, UTF8<> >(s2.c_str()); // VS2010 or below cannot handle templated function overloading. Use const char* instead.
+#else
     doc.Parse<kParseDefaultFlags, UTF8<> >(s2);
+#endif
     EXPECT_FALSE(doc.HasParseError());
     EXPECT_EQ(0, StrCmp(doc[L"hello"].GetString(), L"world"));
 #endif
