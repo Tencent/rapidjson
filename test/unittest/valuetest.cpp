@@ -666,10 +666,12 @@ TEST(Value, IsLosslessDouble) {
     EXPECT_TRUE(Value(12.34).IsLosslessDouble());
     EXPECT_TRUE(Value(-123).IsLosslessDouble());
     EXPECT_TRUE(Value(2147483648u).IsLosslessDouble());
-    EXPECT_TRUE(Value(static_cast<int64_t>(-RAPIDJSON_UINT64_C2(0x40000000, 0x00000000))).IsLosslessDouble());
+    EXPECT_TRUE(Value(-static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x40000000, 0x00000000))).IsLosslessDouble());
+#if !(defined(_MSC_VER) && _MSC_VER < 1800) // VC2010 has problem
     EXPECT_TRUE(Value(RAPIDJSON_UINT64_C2(0xA0000000, 0x00000000)).IsLosslessDouble());
+#endif
 
-    EXPECT_FALSE(Value(static_cast<int64_t>(-RAPIDJSON_UINT64_C2(0x7FFFFFFF, 0xFFFFFFFF))).IsLosslessDouble());
+    EXPECT_FALSE(Value(-static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x7FFFFFFF, 0xFFFFFFFF))).IsLosslessDouble());
     EXPECT_FALSE(Value(RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0xFFFFFFFF)).IsLosslessDouble());
 }
 
