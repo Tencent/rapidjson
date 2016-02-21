@@ -7,7 +7,7 @@ var classrapidjson_1_1_generic_schema_document =
     [ "PointerType", "classrapidjson_1_1_generic_schema_document.html#a61540c0f8aa542760ae03257a0e6dab7", null ],
     [ "SchemaType", "classrapidjson_1_1_generic_schema_document.html#aaf4e7f371de938025f7ed4be3b83266e", null ],
     [ "ValueType", "classrapidjson_1_1_generic_schema_document.html#a87eb1db271e7f57442802a5f4f6178f3", null ],
-    [ "GenericSchemaDocument", "classrapidjson_1_1_generic_schema_document.html#ad200cc7bcb193c8568cdbda7b7fd0496", null ],
+    [ "GenericSchemaDocument", "classrapidjson_1_1_generic_schema_document.html#a5cb8363024b35d6a09f0aaea318385b3", null ],
     [ "~GenericSchemaDocument", "classrapidjson_1_1_generic_schema_document.html#adf6f3372013227873ed392dee1e752bf", null ],
     [ "GetRoot", "classrapidjson_1_1_generic_schema_document.html#af64ea17654ab0f1a91e382d422f91daf", null ],
     [ "GenericSchemaValidator", "classrapidjson_1_1_generic_schema_document.html#afcc03e6ba8f1a819e1a028c31ad38347", null ]
