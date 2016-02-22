@@ -17,7 +17,7 @@ using namespace rapidjson;
 template<unsigned parseFlags = kParseDefaultFlags>
 class AsyncDocumentParser {
 public:
-    AsyncDocumentParser(Document& d) : ass_(*this), d_(d), parseThread_(&AsyncDocumentParser::Parse, this), completed_() {}
+    AsyncDocumentParser(Document& d) : stream_(*this), d_(d), parseThread_(&AsyncDocumentParser::Parse, this), completed_() {}
 
     ~AsyncDocumentParser() {
         if (!parseThread_.joinable())
@@ -27,13 +27,13 @@ public:
             std::unique_lock<std::mutex> lock(mutex_);
 
             // Wait until the buffer is read up (or parsing is completed)
-            while (!ass_.Empty() && !completed_)
+            while (!stream_.Empty() && !completed_)
                 finish_.wait(lock);
 
             // Automatically append '\0' as the terminator in the stream.
             static const char terminator[] = "";
-            ass_.src_ = terminator;
-            ass_.end_ = terminator + 1;
+            stream_.src_ = terminator;
+            stream_.end_ = terminator + 1;
             notEmpty_.notify_one(); // unblock the AsyncStringStream
         }
 
@@ -44,7 +44,7 @@ public:
         std::unique_lock<std::mutex> lock(mutex_);
         
         // Wait until the buffer is read up (or parsing is completed)
-        while (!ass_.Empty() && !completed_)
+        while (!stream_.Empty() && !completed_)
             finish_.wait(lock);
 
         // Stop further parsing if the parsing process is completed.
@@ -52,14 +52,14 @@ public:
             return;
 
         // Set the buffer to stream and unblock the AsyncStringStream
-        ass_.src_ = buffer;
-        ass_.end_ = buffer + length;
+        stream_.src_ = buffer;
+        stream_.end_ = buffer + length;
         notEmpty_.notify_one();
     }
 
 private:
     void Parse() {
-        d_.ParseStream<parseFlags>(ass_);
+        d_.ParseStream<parseFlags>(stream_);
 
         // The stream may not be fully read, notify finish anyway to unblock ParsePart()
         std::unique_lock<std::mutex> lock(mutex_);
@@ -115,7 +115,7 @@ private:
         size_t count_;        //!< Number of characters taken so far.
     };
 
-    AsyncStringStream ass_;
+    AsyncStringStream stream_;
     Document& d_;
     std::thread parseThread_;
     std::mutex mutex_;
