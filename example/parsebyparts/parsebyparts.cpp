@@ -1,7 +1,7 @@
 // Example of parsing JSON to document by parts.
 
 // Using C++11 threads
-#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1600)
+#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1700)
 
 #include "rapidjson/document.h"
 #include "rapidjson/error/en.h"
