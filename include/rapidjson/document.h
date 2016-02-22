@@ -2462,9 +2462,9 @@ private:
     ValueType& value_;
 };
 
-//! Helper class for accessing Value of array type.
+//! Helper class for accessing Value of object type.
 /*!
-    Instance of this helper class is obtained by \c GenericValue::GetArray().
+    Instance of this helper class is obtained by \c GenericValue::GetObject().
     In addition to all APIs for array type, it provides range-based for loop if \c RAPIDJSON_HAS_CXX11_RANGE_FOR=1.
 */
 template <bool Const, typename ValueT>
