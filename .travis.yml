@@ -22,7 +22,8 @@ global:
 
 matrix:
   include:
-    - env: CONF=release ARCH=x86
+    # gcc
+    - env: CONF=release ARCH=x86    CXX11=ON
       compiler: gcc
       addons:
         apt:
@@ -30,9 +31,20 @@ matrix:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
-    - env: CONF=release ARCH=x86_64
+    - env: CONF=release ARCH=x86_64 CXX11=ON
       compiler: gcc
-    - env: CONF=debug   ARCH=x86 CCACHE_CPP2=yes
+    - env: CONF=debug   ARCH=x86    CXX11=OFF
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - *default_packages
+            - g++-multilib
+            - libc6-dbg:i386
+    - env: CONF=debug   ARCH=x86_64 CXX11=OFF
+      compiler: gcc
+    # clang
+    - env: CONF=debug   ARCH=x86    CXX11=ON CCACHE_CPP2=yes
       compiler: clang
       addons:
         apt:
@@ -40,9 +52,9 @@ matrix:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
-    - env: CONF=debug ARCH=x86_64 CCACHE_CPP2=yes
+    - env: CONF=debug   ARCH=x86_64 CXX11=ON CCACHE_CPP2=yes
       compiler: clang
-    - env: CONF=release ARCH=x86 CCACHE_CPP2=yes
+    - env: CONF=debug   ARCH=x86    CXX11=OFF CCACHE_CPP2=yes
       compiler: clang
       addons:
         apt:
@@ -50,10 +62,20 @@ matrix:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
-    - env: CONF=release ARCH=x86_64 CCACHE_CPP2=yes
+    - env: CONF=debug   ARCH=x86_64 CXX11=OFF CCACHE_CPP2=yes
+      compiler: clang
+    - env: CONF=release ARCH=x86    CXX11=ON CCACHE_CPP2=yes
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - *default_packages
+            - g++-multilib
+            - libc6-dbg:i386
+    - env: CONF=release ARCH=x86_64 CXX11=ON CCACHE_CPP2=yes
       compiler: clang
     # coverage report
-    - env: CONF=debug ARCH=x86 GCOV_FLAGS='--coverage'
+    - env: CONF=debug   ARCH=x86    CXX11=ON GCOV_FLAGS='--coverage'
       compiler: gcc
       cache:
         - ccache
@@ -104,6 +126,7 @@ script:
       eval "ARCH_FLAGS=\${ARCH_FLAGS_${ARCH}}" ;
       (cd build && cmake
       -DRAPIDJSON_HAS_STDSTRING=ON
+      -DRAPIDJSON_BUILD_CXX11=$CXX11
       -DCMAKE_VERBOSE_MAKEFILE=ON
       -DCMAKE_BUILD_TYPE=$CONF
       -DCMAKE_CXX_FLAGS="$ARCH_FLAGS $GCOV_FLAGS"
