@@ -20,6 +20,11 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(padded)
 #endif
 
+#ifdef _MSC_VER
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4351) // new behavior: elements of array 'array' will be default initialized
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 //! Wrapper of \c std::basic_istream into RapidJSON's Stream concept.
@@ -98,7 +103,7 @@ private:
 typedef BasicIStreamWrapper<std::istream> IStreamWrapper;
 typedef BasicIStreamWrapper<std::wistream> WIStreamWrapper;
 
-#ifdef __clang__
+#if defined(__clang__) || defined(_MSC_VER)
 RAPIDJSON_DIAG_POP
 #endif
 
