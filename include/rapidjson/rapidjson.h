@@ -159,7 +159,7 @@
 */
 #ifndef RAPIDJSON_NO_INT64DEFINE
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && (_MSC_VER < 1800)	// Visual Studio 2013
 #include "msinttypes/stdint.h"
 #include "msinttypes/inttypes.h"
 #else
