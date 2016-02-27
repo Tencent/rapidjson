@@ -64,6 +64,7 @@ matrix:
             - llvm-toolchain-precise-3.7
             - ubuntu-toolchain-r-test
           packages:
+            - *default_packages
             - clang-3.7
     - env: CONF=debug   ARCH=x86    CXX11=OFF CCACHE_CPP2=yes
       compiler: clang
@@ -85,6 +86,7 @@ matrix:
             - llvm-toolchain-precise-3.7
             - ubuntu-toolchain-r-test
           packages:
+            - *default_packages
             - clang-3.7
     - env: CONF=release ARCH=x86    CXX11=ON CCACHE_CPP2=yes
       compiler: clang
@@ -106,6 +108,7 @@ matrix:
             - llvm-toolchain-precise-3.7
             - ubuntu-toolchain-r-test
           packages:
+            - *default_packages
             - clang-3.7
     # coverage report
     - env: CONF=debug   ARCH=x86    CXX11=ON GCOV_FLAGS='--coverage'
