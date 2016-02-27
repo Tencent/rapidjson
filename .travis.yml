@@ -123,8 +123,8 @@ before_script:
     - mkdir build
 
 script:
+  - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
   - >
-      if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
       eval "ARCH_FLAGS=\${ARCH_FLAGS_${ARCH}}" ;
       (cd build && cmake
       -DRAPIDJSON_HAS_STDSTRING=ON
