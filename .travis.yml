@@ -52,9 +52,13 @@ matrix:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
-            - llvm-toolchain-precise-3.7
+            - clang-3.7
     - env: CONF=debug   ARCH=x86_64 CXX11=ON CCACHE_CPP2=yes
       compiler: clang
+      addons:
+        apt:
+          packages:
+            - clang-3.7
     - env: CONF=debug   ARCH=x86    CXX11=OFF CCACHE_CPP2=yes
       compiler: clang
       addons:
@@ -63,8 +67,13 @@ matrix:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
+            - clang-3.7
     - env: CONF=debug   ARCH=x86_64 CXX11=OFF CCACHE_CPP2=yes
       compiler: clang
+      addons:
+        apt:
+          packages:
+            - clang-3.7
     - env: CONF=release ARCH=x86    CXX11=ON CCACHE_CPP2=yes
       compiler: clang
       addons:
@@ -73,8 +82,13 @@ matrix:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
+            - clang-3.7
     - env: CONF=release ARCH=x86_64 CXX11=ON CCACHE_CPP2=yes
       compiler: clang
+      addons:
+        apt:
+          packages:
+            - clang-3.7
     # coverage report
     - env: CONF=debug   ARCH=x86    CXX11=ON GCOV_FLAGS='--coverage'
       compiler: gcc
