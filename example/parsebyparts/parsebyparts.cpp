@@ -17,7 +17,15 @@ using namespace rapidjson;
 template<unsigned parseFlags = kParseDefaultFlags>
 class AsyncDocumentParser {
 public:
-    AsyncDocumentParser(Document& d) : stream_(*this), d_(d), parseThread_(&AsyncDocumentParser::Parse, this), completed_() {}
+    AsyncDocumentParser(Document& d)
+        : stream_(*this)
+        , d_(d)
+        , parseThread_(&AsyncDocumentParser::Parse, this)
+        , mutex_()
+        , notEmpty_()
+        , finish_()
+        , completed_()
+    {}
 
     ~AsyncDocumentParser() {
         if (!parseThread_.joinable())
