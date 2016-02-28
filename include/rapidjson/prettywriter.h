@@ -74,6 +74,12 @@ public:
     bool Uint64(uint64_t u64)   { PrettyPrefix(kNumberType); return Base::WriteUint64(u64);  }
     bool Double(double d)       { PrettyPrefix(kNumberType); return Base::WriteDouble(d); }
 
+    bool RawNumber(const Ch* str, SizeType length, bool copy = false) {
+        (void)copy;
+        PrettyPrefix(kNumberType);
+        return Base::WriteString(str, length);
+    }
+
     bool String(const Ch* str, SizeType length, bool copy = false) {
         (void)copy;
         PrettyPrefix(kStringType);
