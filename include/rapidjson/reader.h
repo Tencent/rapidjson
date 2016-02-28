@@ -1097,6 +1097,8 @@ private:
         NumberStream<InputStream, (parseFlags & kParseFullPrecisionFlag) != 0> s(*this, copy.s);
         size_t startOffset = s.Tell();
 
+        typename InputStream::Ch *head = is.PutBegin();
+
         // Parse minus
         bool minus = Consume(s, '-');
 
@@ -1268,31 +1270,42 @@ private:
 
         // Finish parsing, call event according to the type of number.
         bool cont = true;
-        size_t length = s.Length();
-        const char* decimal = s.Pop();  // Pop stack no matter if it will be used or not.
 
-        if (useDouble) {
-            int p = exp + expFrac;
-            if (parseFlags & kParseFullPrecisionFlag)
-                d = internal::StrtodFullPrecision(d, p, decimal, length, decimalPosition, exp);
-            else
-                d = internal::StrtodNormalPrecision(d, p);
+        if (parseFlags & kParseNumbersAsStringsFlag)
+        {
+           s.Pop();  // Pop stack no matter if it will be used or not.
+           const size_t length = s.Tell() - startOffset;
 
-            cont = handler.Double(minus ? -d : d);
+           cont = handler.Number(head, length, (parseFlags & kParseInsituFlag) ? false : true);
         }
-        else {
-            if (use64bit) {
-                if (minus)
-                    cont = handler.Int64(static_cast<int64_t>(~i64 + 1));
-                else
-                    cont = handler.Uint64(i64);
-            }
-            else {
-                if (minus)
-                    cont = handler.Int(static_cast<int32_t>(~i + 1));
-                else
-                    cont = handler.Uint(i);
-            }
+        else
+        {
+           size_t length = s.Length();
+           const char* decimal = s.Pop();  // Pop stack no matter if it will be used or not.
+
+           if (useDouble) {
+               int p = exp + expFrac;
+               if (parseFlags & kParseFullPrecisionFlag)
+                   d = internal::StrtodFullPrecision(d, p, decimal, length, decimalPosition, exp);
+               else
+                   d = internal::StrtodNormalPrecision(d, p);
+
+               cont = handler.Double(minus ? -d : d);
+           }
+           else {
+               if (use64bit) {
+                   if (minus)
+                       cont = handler.Int64(static_cast<int64_t>(~i64 + 1));
+                   else
+                       cont = handler.Uint64(i64);
+               }
+               else {
+                   if (minus)
+                       cont = handler.Int(static_cast<int32_t>(~i + 1));
+                   else
+                       cont = handler.Uint(i);
+               }
+           }
         }
         if (RAPIDJSON_UNLIKELY(!cont))
             RAPIDJSON_PARSE_ERROR(kParseErrorTermination, startOffset);
