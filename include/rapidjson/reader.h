@@ -1271,7 +1271,7 @@ private:
         // Finish parsing, call event according to the type of number.
         bool cont = true;
 
-        if (parseFlags & kParseNumbersAsStringsFlag)
+        if ((parseFlags & kParseNumbersAsStringsFlag) && (parseFlags & kParseInsituFlag))
         {
            s.Pop();  // Pop stack no matter if it will be used or not.
            const size_t length = s.Tell() - startOffset;
