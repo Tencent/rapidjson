@@ -170,6 +170,8 @@ concept Handler {
     bool Int64(int64_t i);
     bool Uint64(uint64_t i);
     bool Double(double d);
+    /// enabled via kParseNumbersAsStringsFlag, string is not null-terminated (use length)
+    bool Number(const Ch* str, SizeType length, bool copy);
     bool String(const Ch* str, SizeType length, bool copy);
     bool StartObject();
     bool Key(const Ch* str, SizeType length, bool copy);
@@ -200,6 +202,8 @@ struct BaseReaderHandler {
     bool Int64(int64_t) { return static_cast<Override&>(*this).Default(); }
     bool Uint64(uint64_t) { return static_cast<Override&>(*this).Default(); }
     bool Double(double) { return static_cast<Override&>(*this).Default(); }
+    /// enabled via kParseNumbersAsStringsFlag, string is not null-terminated (use length)
+    bool Number(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
     bool String(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
     bool StartObject() { return static_cast<Override&>(*this).Default(); }
     bool Key(const Ch* str, SizeType len, bool copy) { return static_cast<Override&>(*this).String(str, len, copy); }
