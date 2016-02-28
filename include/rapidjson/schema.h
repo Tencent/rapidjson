@@ -183,6 +183,11 @@ public:
         return WriteNumber(n);
     }
 
+    bool Number(const Ch* str, SizeType len, bool) {
+        WriteBuffer(kNumberType, str, len * sizeof(Ch));
+        return true;
+    }
+
     bool String(const Ch* str, SizeType len, bool) {
         WriteBuffer(kStringType, str, len * sizeof(Ch));
         return true;
