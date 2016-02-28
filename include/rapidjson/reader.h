@@ -171,7 +171,7 @@ concept Handler {
     bool Uint64(uint64_t i);
     bool Double(double d);
     /// enabled via kParseNumbersAsStringsFlag, string is not null-terminated (use length)
-    bool Number(const Ch* str, SizeType length, bool copy);
+    bool RawNumber(const Ch* str, SizeType length, bool copy);
     bool String(const Ch* str, SizeType length, bool copy);
     bool StartObject();
     bool Key(const Ch* str, SizeType length, bool copy);
@@ -203,7 +203,7 @@ struct BaseReaderHandler {
     bool Uint64(uint64_t) { return static_cast<Override&>(*this).Default(); }
     bool Double(double) { return static_cast<Override&>(*this).Default(); }
     /// enabled via kParseNumbersAsStringsFlag, string is not null-terminated (use length)
-    bool Number(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
+    bool RawNumber(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
     bool String(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
     bool StartObject() { return static_cast<Override&>(*this).Default(); }
     bool Key(const Ch* str, SizeType len, bool copy) { return static_cast<Override&>(*this).String(str, len, copy); }
@@ -1276,7 +1276,7 @@ private:
            s.Pop();  // Pop stack no matter if it will be used or not.
            const size_t length = s.Tell() - startOffset;
 
-           cont = handler.Number(head, length, (parseFlags & kParseInsituFlag) ? false : true);
+           cont = handler.RawNumber(head, length, (parseFlags & kParseInsituFlag) ? false : true);
         }
         else
         {

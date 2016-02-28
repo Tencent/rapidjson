@@ -171,7 +171,7 @@ public:
     */
     bool Double(double d)       { Prefix(kNumberType); return WriteDouble(d); }
 
-    bool Number(const Ch* str, SizeType length, bool copy = false) {
+    bool RawNumber(const Ch* str, SizeType length, bool copy = false) {
         (void)copy;
         Prefix(kNumberType);
         return WriteString(str, length);
