@@ -1058,6 +1058,8 @@ private:
         RAPIDJSON_FORCEINLINE Ch Peek() const { return is.Peek(); }
         RAPIDJSON_FORCEINLINE Ch TakePush() { return is.Take(); }
         RAPIDJSON_FORCEINLINE Ch Take() { return is.Take(); }
+		  RAPIDJSON_FORCEINLINE void Push( char c ) {}
+
         size_t Tell() { return is.Tell(); }
         size_t Length() { return 0; }
         const char* Pop() { return 0; }
@@ -1079,6 +1081,10 @@ private:
             stackStream.Put(static_cast<char>(Base::is.Peek()));
             return Base::is.Take();
         }
+
+		  RAPIDJSON_FORCEINLINE void Push(char c) {
+			  stackStream.Put(c);
+		  }
 
         size_t Length() { return stackStream.Length(); }
 
