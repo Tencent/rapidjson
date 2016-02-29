@@ -1644,12 +1644,13 @@ struct TerminateHandler {
     bool Int64(int64_t) { return e != 4; }
     bool Uint64(uint64_t) { return e != 5; }
     bool Double(double) { return e != 6; }
-    bool String(const char*, SizeType, bool) { return e != 7; }
-    bool StartObject() { return e != 8; }
-    bool Key(const char*, SizeType, bool)  { return e != 9; }
-    bool EndObject(SizeType) { return e != 10; }
-    bool StartArray() { return e != 11; }
-    bool EndArray(SizeType) { return e != 12; }
+    bool RawNumber(const char*, SizeType, bool) { return e != 7; }
+    bool String(const char*, SizeType, bool) { return e != 8; }
+    bool StartObject() { return e != 9; }
+    bool Key(const char*, SizeType, bool)  { return e != 10; }
+    bool EndObject(SizeType) { return e != 11; }
+    bool StartArray() { return e != 12; }
+    bool EndArray(SizeType) { return e != 13; }
 };
 
 #define TEST_TERMINATION(e, json)\
@@ -1670,12 +1671,13 @@ TEST(Value, AcceptTerminationByHandler) {
     TEST_TERMINATION(4, "[-1234567890123456789]");
     TEST_TERMINATION(5, "[9223372036854775808]");
     TEST_TERMINATION(6, "[0.5]");
-    TEST_TERMINATION(7, "[\"a\"]");
-    TEST_TERMINATION(8, "[{}]");
-    TEST_TERMINATION(9, "[{\"a\":1}]");
-    TEST_TERMINATION(10, "[{}]");
-    TEST_TERMINATION(11, "{\"a\":[]}");
+    // RawNumber() is never called
+    TEST_TERMINATION(8, "[\"a\"]");
+    TEST_TERMINATION(9, "[{}]");
+    TEST_TERMINATION(10, "[{\"a\":1}]");
+    TEST_TERMINATION(11, "[{}]");
     TEST_TERMINATION(12, "{\"a\":[]}");
+    TEST_TERMINATION(13, "{\"a\":[]}");
 }
 
 struct ValueIntComparer {
