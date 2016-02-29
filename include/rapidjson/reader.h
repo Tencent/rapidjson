@@ -203,7 +203,7 @@ struct BaseReaderHandler {
     bool Uint64(uint64_t) { return static_cast<Override&>(*this).Default(); }
     bool Double(double) { return static_cast<Override&>(*this).Default(); }
     /// enabled via kParseNumbersAsStringsFlag, string is not null-terminated (use length)
-    bool RawNumber(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
+    bool RawNumber(const Ch* str, SizeType len, bool copy) { return static_cast<Override&>(*this).String(str, len, copy); }
     bool String(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
     bool StartObject() { return static_cast<Override&>(*this).Default(); }
     bool Key(const Ch* str, SizeType len, bool copy) { return static_cast<Override&>(*this).String(str, len, copy); }
