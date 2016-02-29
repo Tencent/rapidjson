@@ -1298,8 +1298,14 @@ private:
                 cont = handler.RawNumber(str, SizeType(length), false);
             }
             else {
-                const char* str = s.Pop();
-                SizeType length = static_cast<SizeType>(s.Length()) - 1;
+                StackStream<typename TargetEncoding::Ch> stackStream(stack_);
+					 SizeType numCharsToCopy = s.Length();
+                while (numCharsToCopy--) {
+						  Transcoder<SourceEncoding, TargetEncoding>::Transcode(is, stackStream);
+                }
+					 stackStream.Put('\0');
+                const typename TargetEncoding::Ch* str = stackStream.Pop();
+                const SizeType length = static_cast<SizeType>(stackStream.Length()) - 1;
                 cont = handler.RawNumber(str, SizeType(length), true);
             }
 
