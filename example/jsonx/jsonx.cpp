@@ -57,6 +57,13 @@ public:
         return WriteNumberElement(buffer, sprintf(buffer, "%.17g", d));
     }
 
+    bool RawNumber(const char* str, SizeType length, bool) {
+        return
+            WriteStartElement("number") &&
+            WriteEscapedText(str, length) &&
+            WriteEndElement("number");
+    }
+
     bool String(const char* str, SizeType length, bool) {
         return
             WriteStartElement("string") &&
