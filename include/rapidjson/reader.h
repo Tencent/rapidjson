@@ -1100,10 +1100,12 @@ private:
     template<unsigned parseFlags, typename InputStream, typename Handler>
     void ParseNumber(InputStream& is, Handler& handler) {
         internal::StreamLocalCopy<InputStream> copy(is);
-        NumberStream<InputStream, (parseFlags & kParseFullPrecisionFlag) != 0> s(*this, copy.s);
-        size_t startOffset = s.Tell();
+        NumberStream<InputStream,
+            ((parseFlags & kParseNumbersAsStringsFlag) != 0) ?
+                ((parseFlags & kParseInsituFlag) == 0) :
+                ((parseFlags & kParseFullPrecisionFlag) != 0)> s(*this, copy.s);
 
-        typename InputStream::Ch *head = is.PutBegin();
+        size_t startOffset = s.Tell();
 
         // Parse minus
         bool minus = Consume(s, '-');
@@ -1189,6 +1191,9 @@ private:
         int expFrac = 0;
         size_t decimalPosition;
         if (Consume(s, '.')) {
+            if (((parseFlags & kParseNumbersAsStringsFlag) != 0) && ((parseFlags & kParseInsituFlag) == 0)) {
+					s.Push('.');
+				}
             decimalPosition = s.Length();
 
             if (RAPIDJSON_UNLIKELY(!(s.Peek() >= '0' && s.Peek() <= '9')))
@@ -1236,7 +1241,11 @@ private:
         // Parse exp = e [ minus / plus ] 1*DIGIT
         int exp = 0;
         if (Consume(s, 'e') || Consume(s, 'E')) {
-            if (!useDouble) {
+            if ( ((parseFlags & kParseNumbersAsStringsFlag) != 0) && ((parseFlags & kParseInsituFlag) == 0) ) {
+                s.Push( 'e' );
+            }
+
+			   if (!useDouble) {
                 d = static_cast<double>(use64bit ? i64 : i);
                 useDouble = true;
             }
@@ -1277,15 +1286,24 @@ private:
         // Finish parsing, call event according to the type of number.
         bool cont = true;
 
-        if (parseFlags & kParseNumbersAsStringsFlag)
-        {
-           s.Pop();  // Pop stack no matter if it will be used or not.
-           const size_t length = s.Tell() - startOffset;
+        if (parseFlags & kParseNumbersAsStringsFlag) {
 
-           cont = handler.RawNumber(head, length, (parseFlags & kParseInsituFlag) ? false : true);
+            if (parseFlags & kParseInsituFlag) {
+                s.Pop();  // Pop stack no matter if it will be used or not.
+                typename InputStream::Ch *head = is.PutBegin();
+                const size_t length = s.Tell() - startOffset;
+                RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
+                const typename TargetEncoding::Ch* const str = reinterpret_cast<typename TargetEncoding::Ch*>(head);
+                cont = handler.RawNumber(str, SizeType(length), false);
+            }
+            else {
+                const char* str = s.Pop();
+                SizeType length = static_cast<SizeType>(s.Length()) - 1;
+                cont = handler.RawNumber(str, SizeType(length), true);
+            }
+
         }
-        else
-        {
+        else {
            size_t length = s.Length();
            const char* decimal = s.Pop();  // Pop stack no matter if it will be used or not.
 
