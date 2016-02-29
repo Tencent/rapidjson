@@ -12,6 +12,10 @@ struct MyHandler {
     bool Int64(int64_t i) { cout << "Int64(" << i << ")" << endl; return true; }
     bool Uint64(uint64_t u) { cout << "Uint64(" << u << ")" << endl; return true; }
     bool Double(double d) { cout << "Double(" << d << ")" << endl; return true; }
+    bool RawNumber(const char* str, SizeType length, bool copy) { 
+        cout << "Number(" << str << ", " << length << ", " << boolalpha << copy << ")" << endl;
+        return true;
+    }
     bool String(const char* str, SizeType length, bool copy) { 
         cout << "String(" << str << ", " << length << ", " << boolalpha << copy << ")" << endl;
         return true;
