@@ -1512,6 +1512,46 @@ TEST(Reader, UnrecognizedComment) {
     EXPECT_EQ(kParseErrorUnspecificSyntaxError, reader.GetParseErrorCode());
 }
 
+struct NumbersAsStringsHandler {
+    bool Null() { return true; }
+    bool Bool(bool) { return true; }
+    bool Int(int) { return true; }
+    bool Uint(unsigned) { return true; }
+    bool Int64(int64_t) { return true; }
+    bool Uint64(uint64_t) { return true;  }
+    bool Double(double) { return true; }
+    // 'str' is not null-terminated
+    bool RawNumber(const char* str, SizeType length, bool) {
+        EXPECT_TRUE(str != nullptr);
+        EXPECT_TRUE(strncmp(str, "3.1416", length) == 0);
+        return true;
+    }
+    bool String(const char*, SizeType, bool) { return true; }
+    bool StartObject() { return true; }
+    bool Key(const char*, SizeType, bool) { return true; }
+    bool EndObject(SizeType) { return true; }
+    bool StartArray() { return true; }
+    bool EndArray(SizeType) { return true; }
+};
+
+TEST(Reader, NumbersAsStrings) {
+	{
+      const char* json = "{ \"pi\": 3.1416 } ";
+		StringStream s(json);
+		NumbersAsStringsHandler h;
+		Reader reader;
+		EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+	}
+	{
+      char* json = StrDup("{ \"pi\": 3.1416 } ");
+		InsituStringStream s(json);
+		NumbersAsStringsHandler h;
+		Reader reader;
+		EXPECT_TRUE(reader.Parse<kParseInsituFlag|kParseNumbersAsStringsFlag>(s, h));
+      free(json);
+	}
+}
+
 #ifdef __GNUC__
 RAPIDJSON_DIAG_POP
 #endif
