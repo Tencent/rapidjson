@@ -452,7 +452,7 @@ RAPIDJSON_NAMESPACE_END
 #if defined(__GNUC__) || defined(__clang__)
 #define RAPIDJSON_LIKELY(x) __builtin_expect(!!(x), 1)
 #else
-#define RAPIDJSON_LIKELY(x) x
+#define RAPIDJSON_LIKELY(x) (x)
 #endif
 #endif
 
@@ -465,7 +465,7 @@ RAPIDJSON_NAMESPACE_END
 #if defined(__GNUC__) || defined(__clang__)
 #define RAPIDJSON_UNLIKELY(x) __builtin_expect(!!(x), 0)
 #else
-#define RAPIDJSON_UNLIKELY(x) x
+#define RAPIDJSON_UNLIKELY(x) (x)
 #endif
 #endif
 
