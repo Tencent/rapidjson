@@ -1293,7 +1293,7 @@ private:
                 typename InputStream::Ch* head = is.PutBegin();
                 const size_t length = s.Tell() - startOffset;
                 RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
-                *(head + length) = '\0';
+//                *(head + length) = '\0';
                 const typename TargetEncoding::Ch* const str = reinterpret_cast<typename TargetEncoding::Ch*>(head);
                 cont = handler.RawNumber(str, SizeType(length), false);
             }
