@@ -1522,7 +1522,7 @@ struct NumbersAsStringsHandler {
     bool Double(double) { return true; }
     // 'str' is not null-terminated
     bool RawNumber(const char* str, SizeType length, bool) {
-        EXPECT_TRUE(str != nullptr);
+        EXPECT_TRUE(str != 0);
         EXPECT_TRUE(strncmp(str, "3.1416", length) == 0);
         return true;
     }
