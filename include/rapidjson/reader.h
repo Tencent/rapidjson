@@ -1299,7 +1299,7 @@ private:
             }
             else {
                 StackStream<typename TargetEncoding::Ch> stackStream(stack_);
-                SizeType numCharsToCopy = s.Length();
+                SizeType numCharsToCopy = static_cast<SizeType>(s.Length());
                 while (numCharsToCopy--) {
                     Transcoder<SourceEncoding, TargetEncoding>::Transcode(is, stackStream);
                 }
