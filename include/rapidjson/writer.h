@@ -23,6 +23,16 @@
 #include "stringbuffer.h"
 #include <new>      // placement new
 
+#if defined(RAPIDJSON_SIMD) && defined(_MSC_VER)
+#include <intrin.h>
+#pragma intrinsic(_BitScanForward)
+#endif
+#ifdef RAPIDJSON_SSE42
+#include <nmmintrin.h>
+#elif defined(RAPIDJSON_SSE2)
+#include <emmintrin.h>
+#endif
+
 #ifdef _MSC_VER
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
