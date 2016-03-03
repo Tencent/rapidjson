@@ -2325,6 +2325,14 @@ public:
     bool Uint64(uint64_t i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
     bool Double(double d) { new (stack_.template Push<ValueType>()) ValueType(d); return true; }
 
+    bool RawNumber(const Ch* str, SizeType length, bool copy) { 
+        if (copy) 
+            new (stack_.template Push<ValueType>()) ValueType(str, length, GetAllocator());
+        else
+            new (stack_.template Push<ValueType>()) ValueType(str, length);
+        return true;
+    }
+
     bool String(const Ch* str, SizeType length, bool copy) { 
         if (copy) 
             new (stack_.template Push<ValueType>()) ValueType(str, length, GetAllocator());

@@ -1170,6 +1170,8 @@ struct IterativeParsingReaderHandler {
 
     bool Double(double) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_DOUBLE; return true; }
 
+    bool RawNumber(const Ch*, SizeType, bool) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STRING; return true; }
+
     bool String(const Ch*, SizeType, bool) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STRING; return true; }
 
     bool StartObject() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STARTOBJECT; return true; }
@@ -1349,12 +1351,13 @@ struct TerminateHandler {
     bool Int64(int64_t) { return e != 4; }
     bool Uint64(uint64_t) { return e != 5;  }
     bool Double(double) { return e != 6; }
-    bool String(const char*, SizeType, bool) { return e != 7; }
-    bool StartObject() { return e != 8; }
-    bool Key(const char*, SizeType, bool)  { return e != 9; }
-    bool EndObject(SizeType) { return e != 10; }
-    bool StartArray() { return e != 11; }
-    bool EndArray(SizeType) { return e != 12; }
+    bool RawNumber(const char*, SizeType, bool) { return e != 7; }
+    bool String(const char*, SizeType, bool) { return e != 8; }
+    bool StartObject() { return e != 9; }
+    bool Key(const char*, SizeType, bool)  { return e != 10; }
+    bool EndObject(SizeType) { return e != 11; }
+    bool StartArray() { return e != 12; }
+    bool EndArray(SizeType) { return e != 13; }
 };
 
 #define TEST_TERMINATION(e, json)\
@@ -1375,14 +1378,15 @@ TEST(Reader, ParseTerminationByHandler) {
     TEST_TERMINATION(4, "[-1234567890123456789");
     TEST_TERMINATION(5, "[1234567890123456789");
     TEST_TERMINATION(6, "[0.5]");
-    TEST_TERMINATION(7, "[\"a\"");
-    TEST_TERMINATION(8, "[{");
-    TEST_TERMINATION(9, "[{\"a\"");
-    TEST_TERMINATION(10, "[{}");
-    TEST_TERMINATION(10, "[{\"a\":1}"); // non-empty object
-    TEST_TERMINATION(11, "{\"a\":[");
-    TEST_TERMINATION(12, "{\"a\":[]");
-    TEST_TERMINATION(12, "{\"a\":[1]"); // non-empty array
+    // RawNumber() is never called
+    TEST_TERMINATION(8, "[\"a\"");
+    TEST_TERMINATION(9, "[{");
+    TEST_TERMINATION(10, "[{\"a\"");
+    TEST_TERMINATION(11, "[{}");
+    TEST_TERMINATION(11, "[{\"a\":1}"); // non-empty object
+    TEST_TERMINATION(12, "{\"a\":[");
+    TEST_TERMINATION(13, "{\"a\":[]");
+    TEST_TERMINATION(13, "{\"a\":[1]"); // non-empty array
 }
 
 TEST(Reader, ParseComments) {
@@ -1506,6 +1510,46 @@ TEST(Reader, UnrecognizedComment) {
     Reader reader;
     EXPECT_FALSE(reader.Parse<kParseCommentsFlag>(s, h));
     EXPECT_EQ(kParseErrorUnspecificSyntaxError, reader.GetParseErrorCode());
+}
+
+struct NumbersAsStringsHandler {
+    bool Null() { return true; }
+    bool Bool(bool) { return true; }
+    bool Int(int) { return true; }
+    bool Uint(unsigned) { return true; }
+    bool Int64(int64_t) { return true; }
+    bool Uint64(uint64_t) { return true;  }
+    bool Double(double) { return true; }
+    // 'str' is not null-terminated
+    bool RawNumber(const char* str, SizeType length, bool) {
+        EXPECT_TRUE(str != 0);
+        EXPECT_TRUE(strncmp(str, "3.1416", length) == 0);
+        return true;
+    }
+    bool String(const char*, SizeType, bool) { return true; }
+    bool StartObject() { return true; }
+    bool Key(const char*, SizeType, bool) { return true; }
+    bool EndObject(SizeType) { return true; }
+    bool StartArray() { return true; }
+    bool EndArray(SizeType) { return true; }
+};
+
+TEST(Reader, NumbersAsStrings) {
+	{
+      const char* json = "{ \"pi\": 3.1416 } ";
+		StringStream s(json);
+		NumbersAsStringsHandler h;
+		Reader reader;
+		EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+	}
+	{
+      char* json = StrDup("{ \"pi\": 3.1416 } ");
+		InsituStringStream s(json);
+		NumbersAsStringsHandler h;
+		Reader reader;
+		EXPECT_TRUE(reader.Parse<kParseInsituFlag|kParseNumbersAsStringsFlag>(s, h));
+      free(json);
+	}
 }
 
 #ifdef __GNUC__

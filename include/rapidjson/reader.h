@@ -148,6 +148,7 @@ enum ParseFlag {
     kParseStopWhenDoneFlag = 8,     //!< After parsing a complete JSON root from stream, stop further processing the rest of stream. When this flag is used, parser will not generate kParseErrorDocumentRootNotSingular error.
     kParseFullPrecisionFlag = 16,   //!< Parse number in full precision (but slower).
     kParseCommentsFlag = 32,        //!< Allow one-line (//) and multi-line (/**/) comments.
+    kParseNumbersAsStringsFlag = 64,    //!< Parse all numbers (ints/doubles) as strings.
     kParseDefaultFlags = RAPIDJSON_PARSE_DEFAULT_FLAGS  //!< Default parse flags. Can be customized by defining RAPIDJSON_PARSE_DEFAULT_FLAGS
 };
 
@@ -169,6 +170,8 @@ concept Handler {
     bool Int64(int64_t i);
     bool Uint64(uint64_t i);
     bool Double(double d);
+    /// enabled via kParseNumbersAsStringsFlag, string is not null-terminated (use length)
+    bool RawNumber(const Ch* str, SizeType length, bool copy);
     bool String(const Ch* str, SizeType length, bool copy);
     bool StartObject();
     bool Key(const Ch* str, SizeType length, bool copy);
@@ -199,6 +202,8 @@ struct BaseReaderHandler {
     bool Int64(int64_t) { return static_cast<Override&>(*this).Default(); }
     bool Uint64(uint64_t) { return static_cast<Override&>(*this).Default(); }
     bool Double(double) { return static_cast<Override&>(*this).Default(); }
+    /// enabled via kParseNumbersAsStringsFlag, string is not null-terminated (use length)
+    bool RawNumber(const Ch* str, SizeType len, bool copy) { return static_cast<Override&>(*this).String(str, len, copy); }
     bool String(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
     bool StartObject() { return static_cast<Override&>(*this).Default(); }
     bool Key(const Ch* str, SizeType len, bool copy) { return static_cast<Override&>(*this).String(str, len, copy); }
@@ -1053,6 +1058,8 @@ private:
         RAPIDJSON_FORCEINLINE Ch Peek() const { return is.Peek(); }
         RAPIDJSON_FORCEINLINE Ch TakePush() { return is.Take(); }
         RAPIDJSON_FORCEINLINE Ch Take() { return is.Take(); }
+		  RAPIDJSON_FORCEINLINE void Push(char) {}
+
         size_t Tell() { return is.Tell(); }
         size_t Length() { return 0; }
         const char* Pop() { return 0; }
@@ -1075,6 +1082,10 @@ private:
             return Base::is.Take();
         }
 
+		  RAPIDJSON_FORCEINLINE void Push(char c) {
+			  stackStream.Put(c);
+		  }
+
         size_t Length() { return stackStream.Length(); }
 
         const char* Pop() {
@@ -1089,7 +1100,11 @@ private:
     template<unsigned parseFlags, typename InputStream, typename Handler>
     void ParseNumber(InputStream& is, Handler& handler) {
         internal::StreamLocalCopy<InputStream> copy(is);
-        NumberStream<InputStream, (parseFlags & kParseFullPrecisionFlag) != 0> s(*this, copy.s);
+        NumberStream<InputStream,
+            ((parseFlags & kParseNumbersAsStringsFlag) != 0) ?
+                ((parseFlags & kParseInsituFlag) == 0) :
+                ((parseFlags & kParseFullPrecisionFlag) != 0)> s(*this, copy.s);
+
         size_t startOffset = s.Tell();
 
         // Parse minus
@@ -1176,6 +1191,9 @@ private:
         int expFrac = 0;
         size_t decimalPosition;
         if (Consume(s, '.')) {
+            if (((parseFlags & kParseNumbersAsStringsFlag) != 0) && ((parseFlags & kParseInsituFlag) == 0)) {
+					s.Push('.');
+				}
             decimalPosition = s.Length();
 
             if (RAPIDJSON_UNLIKELY(!(s.Peek() >= '0' && s.Peek() <= '9')))
@@ -1223,7 +1241,11 @@ private:
         // Parse exp = e [ minus / plus ] 1*DIGIT
         int exp = 0;
         if (Consume(s, 'e') || Consume(s, 'E')) {
-            if (!useDouble) {
+            if ( ((parseFlags & kParseNumbersAsStringsFlag) != 0) && ((parseFlags & kParseInsituFlag) == 0) ) {
+                s.Push( 'e' );
+            }
+
+			   if (!useDouble) {
                 d = static_cast<double>(use64bit ? i64 : i);
                 useDouble = true;
             }
@@ -1263,31 +1285,58 @@ private:
 
         // Finish parsing, call event according to the type of number.
         bool cont = true;
-        size_t length = s.Length();
-        const char* decimal = s.Pop();  // Pop stack no matter if it will be used or not.
 
-        if (useDouble) {
-            int p = exp + expFrac;
-            if (parseFlags & kParseFullPrecisionFlag)
-                d = internal::StrtodFullPrecision(d, p, decimal, length, decimalPosition, exp);
-            else
-                d = internal::StrtodNormalPrecision(d, p);
+        if (parseFlags & kParseNumbersAsStringsFlag) {
 
-            cont = handler.Double(minus ? -d : d);
-        }
-        else {
-            if (use64bit) {
-                if (minus)
-                    cont = handler.Int64(static_cast<int64_t>(~i64 + 1));
-                else
-                    cont = handler.Uint64(i64);
+            if (parseFlags & kParseInsituFlag) {
+                s.Pop();  // Pop stack no matter if it will be used or not.
+                typename InputStream::Ch* head = is.PutBegin();
+                const size_t length = s.Tell() - startOffset;
+                RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
+//                *(head + length) = '\0';
+                const typename TargetEncoding::Ch* const str = reinterpret_cast<typename TargetEncoding::Ch*>(head);
+                cont = handler.RawNumber(str, SizeType(length), false);
             }
             else {
-                if (minus)
-                    cont = handler.Int(static_cast<int32_t>(~i + 1));
-                else
-                    cont = handler.Uint(i);
+                StackStream<typename TargetEncoding::Ch> stackStream(stack_);
+                SizeType numCharsToCopy = static_cast<SizeType>(s.Length());
+                while (numCharsToCopy--) {
+                    Transcoder<SourceEncoding, TargetEncoding>::Transcode(is, stackStream);
+                }
+                stackStream.Put('\0');
+                const typename TargetEncoding::Ch* str = stackStream.Pop();
+                const SizeType length = static_cast<SizeType>(stackStream.Length()) - 1;
+                cont = handler.RawNumber(str, SizeType(length), true);
             }
+
+        }
+        else {
+           size_t length = s.Length();
+           const char* decimal = s.Pop();  // Pop stack no matter if it will be used or not.
+
+           if (useDouble) {
+               int p = exp + expFrac;
+               if (parseFlags & kParseFullPrecisionFlag)
+                   d = internal::StrtodFullPrecision(d, p, decimal, length, decimalPosition, exp);
+               else
+                   d = internal::StrtodNormalPrecision(d, p);
+
+               cont = handler.Double(minus ? -d : d);
+           }
+           else {
+               if (use64bit) {
+                   if (minus)
+                       cont = handler.Int64(static_cast<int64_t>(~i64 + 1));
+                   else
+                       cont = handler.Uint64(i64);
+               }
+               else {
+                   if (minus)
+                       cont = handler.Int(static_cast<int32_t>(~i + 1));
+                   else
+                       cont = handler.Uint(i);
+               }
+           }
         }
         if (RAPIDJSON_UNLIKELY(!cont))
             RAPIDJSON_PARSE_ERROR(kParseErrorTermination, startOffset);
