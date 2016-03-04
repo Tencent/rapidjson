@@ -23,6 +23,16 @@
 #include "stringbuffer.h"
 #include <new>      // placement new
 
+#if defined(RAPIDJSON_SIMD) && defined(_MSC_VER)
+#include <intrin.h>
+#pragma intrinsic(_BitScanForward)
+#endif
+#ifdef RAPIDJSON_SSE42
+#include <nmmintrin.h>
+#elif defined(RAPIDJSON_SSE2)
+#include <emmintrin.h>
+#endif
+
 #ifdef _MSC_VER
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
@@ -170,6 +180,12 @@ public:
         \return Whether it is succeed.
     */
     bool Double(double d)       { Prefix(kNumberType); return WriteDouble(d); }
+
+    bool RawNumber(const Ch* str, SizeType length, bool copy = false) {
+        (void)copy;
+        Prefix(kNumberType);
+        return WriteString(str, length);
+    }
 
     bool String(const Ch* str, SizeType length, bool copy = false) {
         (void)copy;

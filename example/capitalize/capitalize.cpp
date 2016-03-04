@@ -24,7 +24,8 @@ struct CapitalizeFilter {
     bool Int64(int64_t i) { return out_.Int64(i); }
     bool Uint64(uint64_t u) { return out_.Uint64(u); }
     bool Double(double d) { return out_.Double(d); }
-    bool String(const char* str, SizeType length, bool) { 
+    bool RawNumber(const char* str, SizeType length, bool copy) { return out_.RawNumber(str, length, copy); }
+    bool String(const char* str, SizeType length, bool) {
         buffer_.clear();
         for (SizeType i = 0; i < length; i++)
             buffer_.push_back(static_cast<char>(std::toupper(str[i])));

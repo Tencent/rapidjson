@@ -48,32 +48,68 @@ matrix:
       compiler: clang
       addons:
         apt:
+          sources:
+            - llvm-toolchain-precise-3.7
+            - ubuntu-toolchain-r-test
           packages:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
+            - clang-3.7
     - env: CONF=debug   ARCH=x86_64 CXX11=ON CCACHE_CPP2=yes
       compiler: clang
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-precise-3.7
+            - ubuntu-toolchain-r-test
+          packages:
+            - *default_packages
+            - clang-3.7
     - env: CONF=debug   ARCH=x86    CXX11=OFF CCACHE_CPP2=yes
       compiler: clang
       addons:
         apt:
+          sources:
+            - llvm-toolchain-precise-3.7
+            - ubuntu-toolchain-r-test
           packages:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
+            - clang-3.7
     - env: CONF=debug   ARCH=x86_64 CXX11=OFF CCACHE_CPP2=yes
       compiler: clang
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-precise-3.7
+            - ubuntu-toolchain-r-test
+          packages:
+            - *default_packages
+            - clang-3.7
     - env: CONF=release ARCH=x86    CXX11=ON CCACHE_CPP2=yes
       compiler: clang
       addons:
         apt:
+          sources:
+            - llvm-toolchain-precise-3.7
+            - ubuntu-toolchain-r-test
           packages:
             - *default_packages
             - g++-multilib
             - libc6-dbg:i386
+            - clang-3.7
     - env: CONF=release ARCH=x86_64 CXX11=ON CCACHE_CPP2=yes
       compiler: clang
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-precise-3.7
+            - ubuntu-toolchain-r-test
+          packages:
+            - *default_packages
+            - clang-3.7
     # coverage report
     - env: CONF=debug   ARCH=x86    CXX11=ON GCOV_FLAGS='--coverage'
       compiler: gcc
@@ -122,6 +158,7 @@ before_script:
     - mkdir build
 
 script:
+  - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
   - >
       eval "ARCH_FLAGS=\${ARCH_FLAGS_${ARCH}}" ;
       (cd build && cmake

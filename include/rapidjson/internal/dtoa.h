@@ -29,6 +29,7 @@ namespace internal {
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
+RAPIDJSON_DIAG_OFF(array-bounds) // some gcc versions generate wrong warnings https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59124
 #endif
 
 inline void GrisuRound(char* buffer, int len, uint64_t delta, uint64_t rest, uint64_t ten_kappa, uint64_t wp_w) {
@@ -148,7 +149,7 @@ inline char* WriteExponent(int K, char* buffer) {
 inline char* Prettify(char* buffer, int length, int k, int maxDecimalPlaces) {
     const int kk = length + k;  // 10^(kk-1) <= v < 10^kk
 
-    if (length <= kk && kk <= 21) {
+    if (0 <= k && kk <= 21) {
         // 1234e7 -> 12340000000
         for (int i = length; i < kk; i++)
             buffer[i] = '0';
@@ -160,7 +161,7 @@ inline char* Prettify(char* buffer, int length, int k, int maxDecimalPlaces) {
         // 1234e-2 -> 12.34
         std::memmove(&buffer[kk + 1], &buffer[kk], static_cast<size_t>(length - kk));
         buffer[kk] = '.';
-        if (length > kk + maxDecimalPlaces) {
+        if (0 > k + maxDecimalPlaces) {
             // When maxDecimalPlaces = 2, 1.2345 -> 1.23, 1.102 -> 1.1
             // Remove extra trailing zeros (at least one) after truncation.
             for (int i = kk + maxDecimalPlaces; i > kk + 1; i--)
