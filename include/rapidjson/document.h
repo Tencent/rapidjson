@@ -1649,7 +1649,6 @@ public:
     /*! \note If the value is 64-bit integer type, it may lose precision. Use \c IsLosslessFloat() to check whether the converison is lossless.
     */
     float GetFloat() const {
-        RAPIDJSON_ASSERT(IsFloat());
         return static_cast<float>(GetDouble());
     }
 

@@ -652,6 +652,10 @@ TEST(Value, Float) {
     z.SetFloat(12.34f);
     EXPECT_NEAR(12.34f, z.GetFloat(), 0.0f);
 
+    // Issue 573
+    z.SetInt(0);
+    EXPECT_EQ(0.0f, z.GetFloat());
+
     z = 56.78f;
     EXPECT_NEAR(56.78f, z.GetFloat(), 0.0f);
 
