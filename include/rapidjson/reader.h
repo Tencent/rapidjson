@@ -1287,13 +1287,12 @@ private:
         bool cont = true;
 
         if (parseFlags & kParseNumbersAsStringsFlag) {
-
             if (parseFlags & kParseInsituFlag) {
                 s.Pop();  // Pop stack no matter if it will be used or not.
                 typename InputStream::Ch* head = is.PutBegin();
                 const size_t length = s.Tell() - startOffset;
                 RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
-//                *(head + length) = '\0';
+                // unable to insert the \0 character here, it will erase the comma after this number
                 const typename TargetEncoding::Ch* const str = reinterpret_cast<typename TargetEncoding::Ch*>(head);
                 cont = handler.RawNumber(str, SizeType(length), false);
             }
@@ -1308,7 +1307,6 @@ private:
                 const SizeType length = static_cast<SizeType>(stackStream.Length()) - 1;
                 cont = handler.RawNumber(str, SizeType(length), true);
             }
-
         }
         else {
            size_t length = s.Length();
