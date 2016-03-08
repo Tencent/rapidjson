@@ -9,12 +9,12 @@ int main() {
     StringBuffer s;
     Writer<StringBuffer> writer(s);
     
-    writer.StartObject();
-    writer.String("hello");
-    writer.String("world");
-    writer.String("t");
-    writer.Bool(true);
-    writer.String("f");
+    writer.StartObject();   // writer expects subsequent key/value pairs.
+    writer.String("hello"); // key
+    writer.String("world"); // value
+    writer.String("t");     // key
+    writer.Bool(true);      // value
+    writer.String("f");     // etc...
     writer.Bool(false);
     writer.String("n");
     writer.Null();
@@ -29,6 +29,7 @@ int main() {
     writer.EndArray();
     writer.EndObject();
 
+    // {"hello":"world","t":true,"f":false,"n":null,"i":123,"pi":3.1416,"a":[0,1,2,3]}
     cout << s.GetString() << endl;
 
     return 0;
