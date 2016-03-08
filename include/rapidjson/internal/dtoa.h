@@ -180,7 +180,7 @@ inline char* Prettify(char* buffer, int length, int k, int maxDecimalPlaces) {
         buffer[1] = '.';
         for (int i = 2; i < offset; i++)
             buffer[i] = '0';
-        if (length + offset > maxDecimalPlaces) {
+        if (length - kk > maxDecimalPlaces) {
             // When maxDecimalPlaces = 2, 0.123 -> 0.12, 0.102 -> 0.1
             // Remove extra trailing zeros (at least one) after truncation.
             for (int i = maxDecimalPlaces + 1; i > 2; i--)
