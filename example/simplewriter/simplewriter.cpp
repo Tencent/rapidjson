@@ -9,23 +9,23 @@ int main() {
     StringBuffer s;
     Writer<StringBuffer> writer(s);
     
-    writer.StartObject();   // writer expects subsequent key/value pairs.
-    writer.String("hello"); // key
-    writer.String("world"); // value
-    writer.String("t");     // key
-    writer.Bool(true);      // value
-    writer.String("f");     // etc...
+    writer.StartObject();               // Between StartObject()/EndObject(), 
+    writer.Key("hello");                // output a key,
+    writer.String("world");             // follow by a value.
+    writer.Key("t");
+    writer.Bool(true);
+    writer.Key("f");
     writer.Bool(false);
-    writer.String("n");
+    writer.Key("n");
     writer.Null();
-    writer.String("i");
+    writer.Key("i");
     writer.Uint(123);
-    writer.String("pi");
+    writer.Key("pi");
     writer.Double(3.1416);
-    writer.String("a");
-    writer.StartArray();
+    writer.Key("a");
+    writer.StartArray();                // Between StartArray()/EndArray(),
     for (unsigned i = 0; i < 4; i++)
-        writer.Uint(i);
+        writer.Uint(i);                 // all values are elements of the array.
     writer.EndArray();
     writer.EndObject();
 
