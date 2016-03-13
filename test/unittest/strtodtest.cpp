@@ -42,7 +42,7 @@ TEST(Strtod, CheckApproximationCase) {
     u.u = 0x465a72e467d88 | ((static_cast<uint64_t>(-149 + kExponentBias)) << kSignificandSize);
     const double b = u.d;
     const uint64_t bInt = (u.u & kSignificandMask) | kHiddenBit;
-    const int bExp = ((u.u & kExponentMask) >> kSignificandSize) - kExponentBias - kSignificandSize;
+    const int bExp = static_cast<int>(((u.u & kExponentMask) >> kSignificandSize) - kExponentBias - kSignificandSize);
     EXPECT_DOUBLE_EQ(1.7864e-45, b);
     EXPECT_EQ(RAPIDJSON_UINT64_C2(0x001465a7, 0x2e467d88), bInt);
     EXPECT_EQ(-201, bExp);
