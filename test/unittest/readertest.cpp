@@ -1562,7 +1562,6 @@ TEST(Reader, NumbersAsStrings) {
 
 TEST(Reader, TrailingCommas) {
     {
-        // trailing array comma
         StringStream s("[1,2,3,]");
         ParseArrayHandler<3> h;
         Reader reader;
@@ -1570,8 +1569,8 @@ TEST(Reader, TrailingCommas) {
         EXPECT_EQ(5u, h.step_);
     }
     {
-        // trailing object comma
-        const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3],}";
+        const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false,"
+                "\"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3],}";
         StringStream s(json);
         ParseObjectHandler h;
         Reader reader;
@@ -1579,13 +1578,92 @@ TEST(Reader, TrailingCommas) {
         EXPECT_EQ(20u, h.step_);
     }
     {
-        // trailing object and array commas with whitespace
-        const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3\n,\n]\n,\n } ";
+        // whitespace around trailing commas
+        const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false,"
+                "\"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3\n,\n]\n,\n} ";
         StringStream s(json);
         ParseObjectHandler h;
         Reader reader;
         EXPECT_TRUE(reader.Parse<kParseTrailingCommasFlag>(s, h));
         EXPECT_EQ(20u, h.step_);
+    }
+    {
+        // comments around trailing commas
+        const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null,"
+                "\"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3/*test*/,/*test*/]/*test*/,/*test*/}";
+        StringStream s(json);
+        ParseObjectHandler h;
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseTrailingCommasFlag|kParseCommentsFlag>(s, h));
+        EXPECT_EQ(20u, h.step_);
+    }
+}
+
+TEST(Reader, MultipleTrailingCommaErrors) {
+    // only a single trailing comma is allowed.
+    {
+        StringStream s("[1,2,3,,]");
+        ParseArrayHandler<3> h;
+        Reader reader;
+        ParseResult r = reader.Parse<kParseTrailingCommasFlag>(s, h);
+        EXPECT_TRUE(reader.HasParseError());
+        EXPECT_EQ(kParseErrorValueInvalid, r.Code());
+        EXPECT_EQ(7u, r.Offset());
+    }
+    {
+        const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false,"
+                "\"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3,],,}";
+        StringStream s(json);
+        ParseObjectHandler h;
+        Reader reader;
+        ParseResult r = reader.Parse<kParseTrailingCommasFlag>(s, h);
+        EXPECT_TRUE(reader.HasParseError());
+        EXPECT_EQ(kParseErrorObjectMissName, r.Code());
+        EXPECT_EQ(95u, r.Offset());
+    }
+}
+
+TEST(Reader, EmptyExceptForCommaErrors) {
+    // not allowed even with trailing commas enabled; the
+    // trailing comma must follow a value.
+    {
+        StringStream s("[,]");
+        ParseArrayHandler<3> h;
+        Reader reader;
+        ParseResult r = reader.Parse<kParseTrailingCommasFlag>(s, h);
+        EXPECT_TRUE(reader.HasParseError());
+        EXPECT_EQ(kParseErrorValueInvalid, r.Code());
+        EXPECT_EQ(1u, r.Offset());
+    }
+    {
+        StringStream s("{,}");
+        ParseObjectHandler h;
+        Reader reader;
+        ParseResult r = reader.Parse<kParseTrailingCommasFlag>(s, h);
+        EXPECT_TRUE(reader.HasParseError());
+        EXPECT_EQ(kParseErrorObjectMissName, r.Code());
+        EXPECT_EQ(1u, r.Offset());
+    }
+}
+
+TEST(Reader, TrailingCommaHandlerTermination) {
+    {
+        HandlerTerminateAtEndArray h;
+        Reader reader;
+        StringStream s("[1,2,3,]");
+        ParseResult r = reader.Parse<kParseTrailingCommasFlag>(s, h);
+        EXPECT_TRUE(reader.HasParseError());
+        EXPECT_EQ(kParseErrorTermination, r.Code());
+        EXPECT_EQ(8u, r.Offset());
+    }
+    {
+        HandlerTerminateAtEndObject h;
+        Reader reader;
+        StringStream s("{\"t\": true, \"f\": false,}");
+        ParseResult r = reader.Parse<kParseTrailingCommasFlag>(s, h);
+        EXPECT_TRUE(reader.HasParseError());
+        EXPECT_EQ(kParseErrorTermination, r.Code());
+        EXPECT_EQ(24u, r.Offset());
     }
 }
 
