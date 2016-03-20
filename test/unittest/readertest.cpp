@@ -1127,6 +1127,16 @@ TEST(Reader, IterativeParsing_ErrorHandling) {
     TESTERRORHANDLING("{\"a\": 1", kParseErrorObjectMissCommaOrCurlyBracket, 7u);
     TESTERRORHANDLING("[1 2 3]", kParseErrorArrayMissCommaOrSquareBracket, 3u);
     TESTERRORHANDLING("{\"a: 1", kParseErrorStringMissQuotationMark, 6u);
+    TESTERRORHANDLING("{\"a\":}", kParseErrorValueInvalid, 5u);
+    TESTERRORHANDLING("{\"a\":]", kParseErrorValueInvalid, 5u);
+    TESTERRORHANDLING("[1,2,}", kParseErrorValueInvalid, 5u);
+    TESTERRORHANDLING("[}]", kParseErrorValueInvalid, 1u);
+    TESTERRORHANDLING("[,]", kParseErrorValueInvalid, 1u);
+    TESTERRORHANDLING("[1,,]", kParseErrorValueInvalid, 3u);
+
+    // Trailing commas are not allowed without kParseTrailingCommasFlag
+    TESTERRORHANDLING("{\"a\": 1,}", kParseErrorObjectMissName, 8u);
+    TESTERRORHANDLING("[1,2,3,]", kParseErrorValueInvalid, 7u);
 
     // Any JSON value can be a valid root element in RFC7159.
     TESTERRORHANDLING("\"ab", kParseErrorStringMissQuotationMark, 3u);
@@ -1560,12 +1570,13 @@ TEST(Reader, NumbersAsStrings) {
 	}
 }
 
-TEST(Reader, TrailingCommas) {
+template <unsigned extraFlags>
+void TestTrailingCommas() {
     {
         StringStream s("[1,2,3,]");
         ParseArrayHandler<3> h;
         Reader reader;
-        EXPECT_TRUE(reader.Parse<kParseTrailingCommasFlag>(s, h));
+        EXPECT_TRUE(reader.Parse<extraFlags|kParseTrailingCommasFlag>(s, h));
         EXPECT_EQ(5u, h.step_);
     }
     {
@@ -1574,7 +1585,7 @@ TEST(Reader, TrailingCommas) {
         StringStream s(json);
         ParseObjectHandler h;
         Reader reader;
-        EXPECT_TRUE(reader.Parse<kParseTrailingCommasFlag>(s, h));
+        EXPECT_TRUE(reader.Parse<extraFlags|kParseTrailingCommasFlag>(s, h));
         EXPECT_EQ(20u, h.step_);
     }
     {
@@ -1584,7 +1595,7 @@ TEST(Reader, TrailingCommas) {
         StringStream s(json);
         ParseObjectHandler h;
         Reader reader;
-        EXPECT_TRUE(reader.Parse<kParseTrailingCommasFlag>(s, h));
+        EXPECT_TRUE(reader.Parse<extraFlags|kParseTrailingCommasFlag>(s, h));
         EXPECT_EQ(20u, h.step_);
     }
     {
@@ -1594,18 +1605,27 @@ TEST(Reader, TrailingCommas) {
         StringStream s(json);
         ParseObjectHandler h;
         Reader reader;
-        EXPECT_TRUE(reader.Parse<kParseTrailingCommasFlag|kParseCommentsFlag>(s, h));
+        EXPECT_TRUE(reader.Parse<extraFlags|kParseTrailingCommasFlag|kParseCommentsFlag>(s, h));
         EXPECT_EQ(20u, h.step_);
     }
 }
 
-TEST(Reader, MultipleTrailingCommaErrors) {
+TEST(Reader, TrailingCommas) {
+    TestTrailingCommas<kParseNoFlags>();
+}
+
+TEST(Reader, TrailingCommasIterative) {
+    TestTrailingCommas<kParseIterativeFlag>();
+}
+
+template <unsigned extraFlags>
+void TestMultipleTrailingCommaErrors() {
     // only a single trailing comma is allowed.
     {
         StringStream s("[1,2,3,,]");
         ParseArrayHandler<3> h;
         Reader reader;
-        ParseResult r = reader.Parse<kParseTrailingCommasFlag>(s, h);
+        ParseResult r = reader.Parse<extraFlags|kParseTrailingCommasFlag>(s, h);
         EXPECT_TRUE(reader.HasParseError());
         EXPECT_EQ(kParseErrorValueInvalid, r.Code());
         EXPECT_EQ(7u, r.Offset());
@@ -1616,21 +1636,30 @@ TEST(Reader, MultipleTrailingCommaErrors) {
         StringStream s(json);
         ParseObjectHandler h;
         Reader reader;
-        ParseResult r = reader.Parse<kParseTrailingCommasFlag>(s, h);
+        ParseResult r = reader.Parse<extraFlags|kParseTrailingCommasFlag>(s, h);
         EXPECT_TRUE(reader.HasParseError());
         EXPECT_EQ(kParseErrorObjectMissName, r.Code());
         EXPECT_EQ(95u, r.Offset());
     }
 }
 
-TEST(Reader, EmptyExceptForCommaErrors) {
+TEST(Reader, MultipleTrailingCommaErrors) {
+    TestMultipleTrailingCommaErrors<kParseNoFlags>();
+}
+
+TEST(Reader, MultipleTrailingCommaErrorsIterative) {
+    TestMultipleTrailingCommaErrors<kParseIterativeFlag>();
+}
+
+template <unsigned extraFlags>
+void TestEmptyExceptForCommaErrors() {
     // not allowed even with trailing commas enabled; the
     // trailing comma must follow a value.
     {
         StringStream s("[,]");
         ParseArrayHandler<3> h;
         Reader reader;
-        ParseResult r = reader.Parse<kParseTrailingCommasFlag>(s, h);
+        ParseResult r = reader.Parse<extraFlags|kParseTrailingCommasFlag>(s, h);
         EXPECT_TRUE(reader.HasParseError());
         EXPECT_EQ(kParseErrorValueInvalid, r.Code());
         EXPECT_EQ(1u, r.Offset());
@@ -1639,32 +1668,49 @@ TEST(Reader, EmptyExceptForCommaErrors) {
         StringStream s("{,}");
         ParseObjectHandler h;
         Reader reader;
-        ParseResult r = reader.Parse<kParseTrailingCommasFlag>(s, h);
+        ParseResult r = reader.Parse<extraFlags|kParseTrailingCommasFlag>(s, h);
         EXPECT_TRUE(reader.HasParseError());
         EXPECT_EQ(kParseErrorObjectMissName, r.Code());
         EXPECT_EQ(1u, r.Offset());
     }
 }
 
-TEST(Reader, TrailingCommaHandlerTermination) {
+TEST(Reader, EmptyExceptForCommaErrors) {
+    TestEmptyExceptForCommaErrors<kParseNoFlags>();
+}
+
+TEST(Reader, EmptyExceptForCommaErrorsIterative) {
+    TestEmptyExceptForCommaErrors<kParseIterativeFlag>();
+}
+
+template <unsigned extraFlags>
+void TestTrailingCommaHandlerTermination() {
     {
         HandlerTerminateAtEndArray h;
         Reader reader;
         StringStream s("[1,2,3,]");
-        ParseResult r = reader.Parse<kParseTrailingCommasFlag>(s, h);
+        ParseResult r = reader.Parse<extraFlags|kParseTrailingCommasFlag>(s, h);
         EXPECT_TRUE(reader.HasParseError());
         EXPECT_EQ(kParseErrorTermination, r.Code());
-        EXPECT_EQ(8u, r.Offset());
+        EXPECT_EQ(7u, r.Offset());
     }
     {
         HandlerTerminateAtEndObject h;
         Reader reader;
         StringStream s("{\"t\": true, \"f\": false,}");
-        ParseResult r = reader.Parse<kParseTrailingCommasFlag>(s, h);
+        ParseResult r = reader.Parse<extraFlags|kParseTrailingCommasFlag>(s, h);
         EXPECT_TRUE(reader.HasParseError());
         EXPECT_EQ(kParseErrorTermination, r.Code());
-        EXPECT_EQ(24u, r.Offset());
+        EXPECT_EQ(23u, r.Offset());
     }
+}
+
+TEST(Reader, TrailingCommaHandlerTermination) {
+    TestTrailingCommaHandlerTermination<kParseNoFlags>();
+}
+
+TEST(Reader, TrailingCommaHandlerTerminationIterative) {
+    TestTrailingCommaHandlerTermination<kParseIterativeFlag>();
 }
 
 #ifdef __GNUC__
