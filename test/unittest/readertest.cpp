@@ -778,6 +778,10 @@ TEST(Reader, ParseArray_Error) {
     TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1}", 2);
     TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1 2]", 3);
 
+    // Array cannot have a trailing comma (without kParseTrailingCommasFlag);
+    // a value must follow a comma
+    TEST_ARRAY_ERROR(kParseErrorValueInvalid, "[1,]", 3);
+
 #undef TEST_ARRAY_ERROR
 }
 
@@ -977,6 +981,10 @@ TEST(Reader, ParseObject_Error) {
 
     // Must be a comma or '}' after an object member
     TEST_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, "{\"a\":1]", 6);
+
+    // Object cannot have a trailing comma (without kParseTrailingCommasFlag);
+    // an object member name must follow a comma
+    TEST_ERROR(kParseErrorObjectMissName, "{\"a\":1,}", 7);
 
     // This tests that MemoryStream is checking the length in Peek().
     {
@@ -1550,6 +1558,35 @@ TEST(Reader, NumbersAsStrings) {
 		EXPECT_TRUE(reader.Parse<kParseInsituFlag|kParseNumbersAsStringsFlag>(s, h));
       free(json);
 	}
+}
+
+TEST(Reader, TrailingCommas) {
+    {
+        // trailing array comma
+        StringStream s("[1,2,3,]");
+        ParseArrayHandler<3> h;
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseTrailingCommasFlag>(s, h));
+        EXPECT_EQ(5u, h.step_);
+    }
+    {
+        // trailing object comma
+        const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3],}";
+        StringStream s(json);
+        ParseObjectHandler h;
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseTrailingCommasFlag>(s, h));
+        EXPECT_EQ(20u, h.step_);
+    }
+    {
+        // trailing object and array commas with whitespace
+        const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3\n,\n]\n,\n } ";
+        StringStream s(json);
+        ParseObjectHandler h;
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseTrailingCommasFlag>(s, h));
+        EXPECT_EQ(20u, h.step_);
+    }
 }
 
 #ifdef __GNUC__
