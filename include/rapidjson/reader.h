@@ -149,6 +149,7 @@ enum ParseFlag {
     kParseFullPrecisionFlag = 16,   //!< Parse number in full precision (but slower).
     kParseCommentsFlag = 32,        //!< Allow one-line (//) and multi-line (/**/) comments.
     kParseNumbersAsStringsFlag = 64,    //!< Parse all numbers (ints/doubles) as strings.
+    kParseTrailingCommasFlag = 128, //!< Allow trailing commas at the end of objects and arrays.
     kParseDefaultFlags = RAPIDJSON_PARSE_DEFAULT_FLAGS  //!< Default parse flags. Can be customized by defining RAPIDJSON_PARSE_DEFAULT_FLAGS
 };
 
@@ -636,6 +637,15 @@ private:
                     RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell());
                     break;
             }
+
+            if (parseFlags & kParseTrailingCommasFlag) {
+                if (is.Peek() == '}') {
+                    if (RAPIDJSON_UNLIKELY(!handler.EndObject(memberCount)))
+                        RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+                    is.Take();
+                    return;
+                }
+            }
         }
     }
 
@@ -676,6 +686,15 @@ private:
             }
             else
                 RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell());
+
+            if (parseFlags & kParseTrailingCommasFlag) {
+                if (is.Peek() == ']') {
+                    if (RAPIDJSON_UNLIKELY(!handler.EndArray(elementCount)))
+                        RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+                    is.Take();
+                    return;
+                }
+            }
         }
     }
 
@@ -1522,7 +1541,7 @@ private:
                 IterativeParsingErrorState,         // Left bracket
                 IterativeParsingErrorState,         // Right bracket
                 IterativeParsingErrorState,         // Left curly bracket
-                IterativeParsingErrorState,         // Right curly bracket
+                IterativeParsingObjectFinishState,  // Right curly bracket
                 IterativeParsingErrorState,         // Comma
                 IterativeParsingErrorState,         // Colon
                 IterativeParsingMemberKeyState,     // String
@@ -1568,7 +1587,7 @@ private:
             // ElementDelimiter
             {
                 IterativeParsingArrayInitialState,      // Left bracket(push Element state)
-                IterativeParsingErrorState,             // Right bracket
+                IterativeParsingArrayFinishState,       // Right bracket
                 IterativeParsingObjectInitialState,     // Left curly bracket(push Element state)
                 IterativeParsingErrorState,             // Right curly bracket
                 IterativeParsingErrorState,             // Comma
@@ -1670,6 +1689,11 @@ private:
 
         case IterativeParsingObjectFinishState:
         {
+            // Transit from delimiter is only allowed when trailing commas are enabled
+            if (!(parseFlags & kParseTrailingCommasFlag) && src == IterativeParsingMemberDelimiterState) {
+                RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorObjectMissName, is.Tell());
+                return IterativeParsingErrorState;
+            }
             // Get member count.
             SizeType c = *stack_.template Pop<SizeType>(1);
             // If the object is not empty, count the last member.
@@ -1695,6 +1719,11 @@ private:
 
         case IterativeParsingArrayFinishState:
         {
+            // Transit from delimiter is only allowed when trailing commas are enabled
+            if (!(parseFlags & kParseTrailingCommasFlag) && src == IterativeParsingElementDelimiterState) {
+                RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorValueInvalid, is.Tell());
+                return IterativeParsingErrorState;
+            }
             // Get element count.
             SizeType c = *stack_.template Pop<SizeType>(1);
             // If the array is not empty, count the last element.
@@ -1754,6 +1783,9 @@ private:
         case IterativeParsingMemberDelimiterState:  RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell()); return;
         case IterativeParsingMemberKeyState:        RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissColon, is.Tell()); return;
         case IterativeParsingMemberValueState:      RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell()); return;
+        case IterativeParsingKeyValueDelimiterState:
+        case IterativeParsingArrayInitialState:
+        case IterativeParsingElementDelimiterState: RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell()); return;
         case IterativeParsingElementState:          RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell()); return;
         default:                                    RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell()); return;
         }       
