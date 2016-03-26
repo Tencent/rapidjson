@@ -2509,8 +2509,8 @@ public:
     bool HasMember(const std::basic_string<Ch>& name) const { return value_.HasMember(name); }
 #endif
     template <typename SourceAllocator> bool HasMember(const GenericValue<EncodingType, SourceAllocator>& name) const { return value_.HasMember(name); }
-    MemberIterator FindMember(const Ch* name) const { value_.FindMember(name); }
-    template <typename SourceAllocator> MemberIterator FindMember(const GenericValue<EncodingType, SourceAllocator>& name) const { value_.FindMember(name); }
+    MemberIterator FindMember(const Ch* name) const { return value_.FindMember(name); }
+    template <typename SourceAllocator> MemberIterator FindMember(const GenericValue<EncodingType, SourceAllocator>& name) const { return value_.FindMember(name); }
 #if RAPIDJSON_HAS_STDSTRING
     MemberIterator FindMember(const std::basic_string<Ch>& name) const { return value_.FindMember(name); }
 #endif
