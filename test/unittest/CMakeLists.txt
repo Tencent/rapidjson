@@ -38,6 +38,11 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default -Wfloat-equal")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default -Wfloat-equal -Wimplicit-fallthrough -Weverything")
+	 # If the user is running a newer version of Clang that includes the
+	 # -Wdouble-promotion, we will ignore that warning.
+	 if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 3.7)
+	     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-double-promotion")
+	 endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
 endif()
