@@ -53,7 +53,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 
     # Force to always compile with /WX
     if(CMAKE_CXX_FLAGS MATCHES "/WX-")
-        string(REGEX REPLACE "/WX-" "/WX" CMAKE_CXX_FLAGS
+        string(REGEX REPLACE "/WX-" "/WX" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     else()
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /WX")
     endif()
