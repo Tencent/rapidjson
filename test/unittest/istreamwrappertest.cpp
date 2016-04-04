@@ -20,6 +20,11 @@
 #include <sstream>
 #include <fstream>
 
+#ifdef _MSC_VER
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4702) // unreachable code
+#endif
+
 using namespace rapidjson;
 using namespace std;
 
@@ -168,4 +173,8 @@ TEST(IStreamWrapper, wfstream) {
     EXPECT_EQ(5, d.MemberCount());
 }
 
-#endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
+#endif
+
+#ifdef _MSC_VER
+RAPIDJSON_DIAG_POP
+#endif

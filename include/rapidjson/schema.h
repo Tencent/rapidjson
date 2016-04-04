@@ -1963,7 +1963,8 @@ public:
         GenericSchemaValidator<SchemaDocumentType, Handler> validator(sd_, handler);
         parseResult_ = reader.template Parse<parseFlags>(is_, validator);
 
-        if ((isValid_ = validator.IsValid())) {
+        isValid_ = validator.IsValid();
+        if (isValid_) {
             invalidSchemaPointer_ = PointerType();
             invalidSchemaKeyword_ = 0;
             invalidDocumentPointer_ = PointerType();

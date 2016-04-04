@@ -1794,7 +1794,7 @@ private:
     template <typename, typename> friend class GenericValue;
     template <typename, typename, typename> friend class GenericDocument;
 
-    enum {
+    static const uint16_t
         kBoolFlag       = 0x0008,
         kNumberFlag     = 0x0010,
         kIntFlag        = 0x0020,
@@ -1822,8 +1822,7 @@ private:
         kObjectFlag = kObjectType,
         kArrayFlag = kArrayType,
 
-        kTypeMask = 0x07
-    };
+        kTypeMask = 0x07;
 
     static const SizeType kDefaultArrayCapacity = 16;
     static const SizeType kDefaultObjectCapacity = 16;
