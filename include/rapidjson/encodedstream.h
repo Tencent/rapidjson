@@ -84,6 +84,10 @@ public:
     Ch* PutBegin() { return 0; }
     size_t PutEnd(Ch*) { return 0; }
 
+private:
+    EncodedInputStream(const EncodedInputStream&);
+    EncodedInputStream& operator=(const EncodedInputStream&);
+
     MemoryStream& is_;
 };
 

@@ -322,6 +322,8 @@ private:
     //! Disallow construction from non-const array
     template<SizeType N>
     GenericStringRef(CharType (&str)[N]) /* = delete */;
+
+    GenericStringRef& operator=(const GenericStringRef&);
 };
 
 //! Mark a character pointer as constant string
