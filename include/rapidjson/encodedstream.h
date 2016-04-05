@@ -84,11 +84,11 @@ public:
     Ch* PutBegin() { return 0; }
     size_t PutEnd(Ch*) { return 0; }
 
+    MemoryStream& is_;
+
 private:
     EncodedInputStream(const EncodedInputStream&);
     EncodedInputStream& operator=(const EncodedInputStream&);
-
-    MemoryStream& is_;
 };
 
 //! Output byte stream wrapper with statically bound encoding.
