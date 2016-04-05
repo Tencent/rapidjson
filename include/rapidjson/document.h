@@ -27,6 +27,7 @@
 #ifdef _MSC_VER
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
+RAPIDJSON_DIAG_OFF(4244) // conversion from kXxxFlags to 'uint16_t', possible loss of data
 #endif
 
 #ifdef __clang__
@@ -1794,17 +1795,17 @@ private:
     template <typename, typename> friend class GenericValue;
     template <typename, typename, typename> friend class GenericDocument;
 
-    static const uint16_t
-        kBoolFlag       = 0x0008,
-        kNumberFlag     = 0x0010,
-        kIntFlag        = 0x0020,
-        kUintFlag       = 0x0040,
-        kInt64Flag      = 0x0080,
-        kUint64Flag     = 0x0100,
-        kDoubleFlag     = 0x0200,
-        kStringFlag     = 0x0400,
-        kCopyFlag       = 0x0800,
-        kInlineStrFlag  = 0x1000,
+    enum {
+        kBoolFlag = 0x0008,
+        kNumberFlag = 0x0010,
+        kIntFlag = 0x0020,
+        kUintFlag = 0x0040,
+        kInt64Flag = 0x0080,
+        kUint64Flag = 0x0100,
+        kDoubleFlag = 0x0200,
+        kStringFlag = 0x0400,
+        kCopyFlag = 0x0800,
+        kInlineStrFlag = 0x1000,
 
         // Initial flags of different types.
         kNullFlag = kNullType,
@@ -1822,7 +1823,8 @@ private:
         kObjectFlag = kObjectType,
         kArrayFlag = kArrayType,
 
-        kTypeMask = 0x07;
+        kTypeMask = 0x07
+    };
 
     static const SizeType kDefaultArrayCapacity = 16;
     static const SizeType kDefaultObjectCapacity = 16;
