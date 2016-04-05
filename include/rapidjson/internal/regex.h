@@ -31,6 +31,11 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
+#ifdef _MSC_VER
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
+#endif
+
 #ifndef RAPIDJSON_REGEX_VERBOSE
 #define RAPIDJSON_REGEX_VERBOSE 0
 #endif
@@ -690,6 +695,10 @@ typedef GenericRegex<UTF8<> > Regex;
 RAPIDJSON_NAMESPACE_END
 
 #ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif
+
+#ifdef _MSC_VER
 RAPIDJSON_DIAG_POP
 #endif
 

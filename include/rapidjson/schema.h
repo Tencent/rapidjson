@@ -68,6 +68,11 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(variadic-macros)
 #endif
 
+#ifdef _MSC_VER
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2002,6 +2007,10 @@ RAPIDJSON_DIAG_POP
 #endif
 
 #ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif
+
+#ifdef _MSC_VER
 RAPIDJSON_DIAG_POP
 #endif
 
