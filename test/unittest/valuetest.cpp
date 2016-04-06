@@ -94,23 +94,23 @@ TEST(Value, Traits) {
 #endif
 
 TEST(Value, MoveConstructor) {
-    typedef GenericValue<UTF8<>, CrtAllocator> Value;
-    Value::AllocatorType allocator;
+    typedef GenericValue<UTF8<>, CrtAllocator> V;
+    V::AllocatorType allocator;
 
-    Value x((Value(kArrayType)));
+    V x((V(kArrayType)));
     x.Reserve(4u, allocator);
     x.PushBack(1, allocator).PushBack(2, allocator).PushBack(3, allocator).PushBack(4, allocator);
     EXPECT_TRUE(x.IsArray());
     EXPECT_EQ(4u, x.Size());
 
     // Value y(x); // does not compile (!is_copy_constructible)
-    Value y(std::move(x));
+    V y(std::move(x));
     EXPECT_TRUE(x.IsNull());
     EXPECT_TRUE(y.IsArray());
     EXPECT_EQ(4u, y.Size());
 
     // Value z = y; // does not compile (!is_copy_assignable)
-    Value z = std::move(y);
+    V z = std::move(y);
     EXPECT_TRUE(y.IsNull());
     EXPECT_TRUE(z.IsArray());
     EXPECT_EQ(4u, z.Size());

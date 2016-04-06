@@ -54,6 +54,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
 endif()
 
 #add extra search paths for libraries and includes

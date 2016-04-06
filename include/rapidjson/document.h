@@ -27,6 +27,7 @@
 #ifdef _MSC_VER
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
+RAPIDJSON_DIAG_OFF(4244) // conversion from kXxxFlags to 'uint16_t', possible loss of data
 #endif
 
 #ifdef __clang__
@@ -310,6 +311,10 @@ struct GenericStringRef {
 #endif
     GenericStringRef(const CharType* str, SizeType len)
         : s(str), length(len) { RAPIDJSON_ASSERT(s != 0); }
+
+    GenericStringRef(const GenericStringRef& rhs) : s(rhs.s), length(rhs.length) {}
+
+    GenericStringRef& operator=(const GenericStringRef& rhs) { s = rhs.s; length = rhs.length; }
 
     //! implicit conversion to plain CharType pointer
     operator const Ch *() const { return s; }

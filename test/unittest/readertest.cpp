@@ -720,7 +720,7 @@ TEST(Reader, ParseString_Error) {
     TEST_STRINGENCODING_ERROR(UTF32<>, UTF8<>, unsigned, ARRAY('[', '\"', 0x110000, '\"', ']', '\0'));
 
     // Malform ASCII sequence
-    TEST_STRINGENCODING_ERROR(ASCII<>, UTF8<>, char, ARRAY('[', '\"', char(0x80), '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(ASCII<>, UTF8<>, char, ARRAY('[', '\"', char(0x80u), '\"', ']', '\0'));
 
 #undef ARRAY
 #undef TEST_STRINGARRAY_ERROR
