@@ -262,7 +262,8 @@ void SkipWhitespace(InputStream& is) {
     internal::StreamLocalCopy<InputStream> copy(is);
     InputStream& s(copy.s);
 
-    while (s.Peek() == ' ' || s.Peek() == '\n' || s.Peek() == '\r' || s.Peek() == '\t')
+    typename InputStream::Ch c;
+    while ((c = s.Peek()) == ' ' || c == '\n' || c == '\r' || c == '\t')
         s.Take();
 }
 
