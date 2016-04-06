@@ -1800,16 +1800,16 @@ private:
     template <typename, typename, typename> friend class GenericDocument;
 
     enum {
-        kBoolFlag = 0x0008,
-        kNumberFlag = 0x0010,
-        kIntFlag = 0x0020,
-        kUintFlag = 0x0040,
-        kInt64Flag = 0x0080,
-        kUint64Flag = 0x0100,
-        kDoubleFlag = 0x0200,
-        kStringFlag = 0x0400,
-        kCopyFlag = 0x0800,
-        kInlineStrFlag = 0x1000,
+        kBoolFlag       = 0x0008,
+        kNumberFlag     = 0x0010,
+        kIntFlag        = 0x0020,
+        kUintFlag       = 0x0040,
+        kInt64Flag      = 0x0080,
+        kUint64Flag     = 0x0100,
+        kDoubleFlag     = 0x0200,
+        kStringFlag     = 0x0400,
+        kCopyFlag       = 0x0800,
+        kInlineStrFlag  = 0x1000,
 
         // Initial flags of different types.
         kNullFlag = kNullType,
