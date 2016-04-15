@@ -119,7 +119,7 @@ class Handler {
 
 当`Reader`遇到JSON true或false值时会调用`Bool(bool)`。
 
-当`Reader`遇到JSON number，它会选择一个合适的C++类型映射，然后调用`Int(int)`、`Uint(unsigned)`、`Int64(int64_t)`、`Uint64(uint64_t)`及`Double(double)`的*其中之一个*。
+当`Reader`遇到JSON number，它会选择一个合适的C++类型映射，然后调用`Int(int)`、`Uint(unsigned)`、`Int64(int64_t)`、`Uint64(uint64_t)`及`Double(double)`的*其中之一个*。 若开启了 `kParseNumbersAsStrings` 选项，`Reader` 便会改为调用 `RawNumber()`。
 
 当`Reader`遇到JSON string，它会调用`String(const char* str, SizeType length, bool copy)`。第一个参数是字符串的指针。第二个参数是字符串的长度（不包含空终止符号）。注意RapidJSON支持字串中含有空字符`'\0'`。若出现这种情况，便会有`strlen(str) < length`。最后的`copy`参数表示处理器是否需要复制该字符串。在正常解析时，`copy = true`。仅当使用原位解析时，`copy = false`。此外，还要注意字符的类型与目标编码相关，我们稍后会再谈这一点。
 
@@ -419,6 +419,7 @@ struct CapitalizeFilter {
     bool Int64(int64_t i) { return out_.Int64(i); }
     bool Uint64(uint64_t u) { return out_.Uint64(u); }
     bool Double(double d) { return out_.Double(d); }
+    bool RawNumber(const char* str, SizeType length, bool copy) { return out_.RawNumber(str, length, copy); }
     bool String(const char* str, SizeType length, bool) { 
         buffer_.clear();
         for (SizeType i = 0; i < length; i++)
