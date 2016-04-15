@@ -95,6 +95,18 @@ TEST(Writer, String) {
 #endif
 }
 
+TEST(Writer, ScanWriteUnescapedString) {
+    const char json[] = "[\" \\\"\"]";
+    char buffer2[sizeof(json) + 32];
+
+    // Use different offset to test different alignments
+    for (int i = 0; i < 32; i++) {
+        char* p = buffer2 + i;
+        memcpy(p, json, sizeof(json));
+        TEST_ROUNDTRIP(p);
+    }
+}
+
 TEST(Writer, Double) {
     TEST_ROUNDTRIP("[1.2345,1.2345678,0.123456789012,1234567.8]");
     TEST_ROUNDTRIP("0.0");
