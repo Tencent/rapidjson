@@ -126,4 +126,23 @@ The following diagram shows the process.
 
 ![simpledom](doc/diagram/simpledom.png)
 
-More [examples](https://github.com/miloyip/rapidjson/tree/master/example) are available.
+More [examples](https://github.com/miloyip/rapidjson/tree/master/example) are available:
+
+* DOM API
+ * [tutorial](https://github.com/miloyip/rapidjson/blob/master/example/tutorial/tutorial.cpp): Basic usage of DOM API.
+
+* SAX API
+ * [simplereader](https://github.com/miloyip/rapidjson/blob/master/example/simplereader/simplereader.cpp): Dumps all SAX events while parsing a JSON by `Reader`.
+ * [condense](https://github.com/miloyip/rapidjson/blob/master/example/condense/condense.cpp): A command line tool to rewrite a JSON, with all whitespaces removed.
+ * [pretty](https://github.com/miloyip/rapidjson/blob/master/example/pretty/pretty.cpp): A command line tool to rewrite a JSON with indents and newlines by `PrettyWriter`.
+ * [capitalize](https://github.com/miloyip/rapidjson/blob/master/example/capitalize/capitalize.cpp): A command line tool to capitalize strings in JSON.
+ * [messagereader](https://github.com/miloyip/rapidjson/blob/master/example/messagereader/messagereader.cpp): Parse a JSON message with SAX API.
+ * [serialize](https://github.com/miloyip/rapidjson/blob/master/example/serialize/serialize.cpp): Serialize a C++ object into JSON with SAX API.
+ * [jsonx](https://github.com/miloyip/rapidjson/blob/master/example/jsonx/jsonx.cpp): Implements a `JsonxWriter` which stringify SAX events into [JSONx](https://www-01.ibm.com/support/knowledgecenter/SS9H2Y_7.1.0/com.ibm.dp.doc/json_jsonx.html) (a kind of XML) format. The example is a command line tool which converts input JSON into JSONx format.
+
+* Schema
+ * [schemavalidator](https://github.com/miloyip/rapidjson/blob/master/example/schemavalidator/schemavalidator.cpp) : A command line tool to validate a JSON with a JSON schema.
+ 
+* Advanced
+ * [prettyauto](https://github.com/miloyip/rapidjson/blob/master/example/prettyauto/prettyauto.cpp): A modified version of [pretty](https://github.com/miloyip/rapidjson/blob/master/example/pretty/pretty.cpp) to automatically handle JSON with any UTF encodings.
+ * [parsebyparts](https://github.com/miloyip/rapidjson/blob/master/example/parsebyparts/parsebyparts.cpp): Implements an `AsyncDocumentParser` which can parse JSON in parts, using C++11 thread.
