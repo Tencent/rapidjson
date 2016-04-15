@@ -423,3 +423,28 @@ TEST(EncodingsTest, UTF32) {
         }
     }
 }
+
+TEST(EncodingsTest, ASCII) {
+    StringBuffer os, os2;
+    for (unsigned codepoint = 0; codepoint < 128; codepoint++) {
+        os.Clear();
+        ASCII<>::Encode(os, codepoint);
+        const ASCII<>::Ch* encodedStr = os.GetString();
+        {
+            StringStream is(encodedStr);
+            unsigned decodedCodepoint;
+            bool result = ASCII<>::Decode(is, &decodedCodepoint);
+            if (!result || codepoint != decodedCodepoint)
+                std::cout << std::hex << codepoint << " " << decodedCodepoint << std::endl;
+        }
+
+        // Validate
+        {
+            StringStream is(encodedStr);
+            os2.Clear();
+            bool result = ASCII<>::Validate(is, os2);
+            EXPECT_TRUE(result);
+            EXPECT_EQ(0, StrCmp(encodedStr, os2.GetString()));
+        }
+    }
+}

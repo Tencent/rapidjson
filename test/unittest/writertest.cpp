@@ -18,6 +18,7 @@
 #include "rapidjson/reader.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/memorybuffer.h"
 
 using namespace rapidjson;
 
@@ -107,35 +108,58 @@ TEST(Writer, Double) {
 
 }
 
+// UTF8 -> TargetEncoding -> UTF8
+template <typename TargetEncoding>
+void TestTranscode(const char* json) {
+    StringStream s(json);
+    GenericStringBuffer<TargetEncoding> buffer;
+    Writer<GenericStringBuffer<TargetEncoding>, UTF8<>, TargetEncoding> writer(buffer);
+    Reader reader;
+    reader.Parse(s, writer);
+
+    StringBuffer buffer2;
+    Writer<StringBuffer> writer2(buffer2);
+    GenericReader<TargetEncoding, UTF8<> > reader2;
+    GenericStringStream<TargetEncoding> s2(buffer.GetString());
+    reader2.Parse(s2, writer2);
+
+    EXPECT_STREQ(json, buffer2.GetString());
+}
+
 TEST(Writer, Transcode) {
     const char json[] = "{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3],\"dollar\":\"\x24\",\"cents\":\"\xC2\xA2\",\"euro\":\"\xE2\x82\xAC\",\"gclef\":\"\xF0\x9D\x84\x9E\"}";
 
     // UTF8 -> UTF16 -> UTF8
-    {
-        StringStream s(json);
-        StringBuffer buffer;
-        Writer<StringBuffer, UTF16<>, UTF8<> > writer(buffer);
-        GenericReader<UTF8<>, UTF16<> > reader;
-        reader.Parse(s, writer);
-        EXPECT_STREQ(json, buffer.GetString());
-    }
+    TestTranscode<UTF8<> >(json);
 
-    // UTF8 -> UTF8 -> ASCII -> UTF8 -> UTF8
+    // UTF8 -> ASCII -> UTF8
+    TestTranscode<ASCII<> >(json);
+
+    // UTF8 -> UTF16 -> UTF8
+    TestTranscode<UTF16<> >(json);
+
+    // UTF8 -> UTF32 -> UTF8
+    TestTranscode<UTF32<> >(json);
+
+    // UTF8 -> AutoUTF (UTF16BE) -> UTF8
     {
         StringStream s(json);
-        StringBuffer buffer;
-        Writer<StringBuffer, UTF8<>, ASCII<> > writer(buffer);
+        MemoryBuffer buffer;
+        AutoUTFOutputStream<unsigned, MemoryBuffer> os(buffer, kUTF16BE, true);
+        Writer<AutoUTFOutputStream<unsigned, MemoryBuffer>, UTF8<>, AutoUTF<unsigned> > writer(os);
         Reader reader;
         reader.Parse(s, writer);
 
         StringBuffer buffer2;
         Writer<StringBuffer> writer2(buffer2);
-        GenericReader<ASCII<>, UTF8<> > reader2;
-        StringStream s2(buffer.GetString());
-        reader2.Parse(s2, writer2);
+        GenericReader<AutoUTF<unsigned>, UTF8<> > reader2;
+        MemoryStream s2(buffer.GetBuffer(), buffer.GetSize());
+        AutoUTFInputStream<unsigned, MemoryStream> is(s2);
+        reader2.Parse(is, writer2);
 
         EXPECT_STREQ(json, buffer2.GetString());
     }
+
 }
 
 #include <sstream>
