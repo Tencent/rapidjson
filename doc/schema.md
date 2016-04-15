@@ -20,7 +20,7 @@ Secondly, construct a `SchemaValidator` with the `SchemaDocument`. It is similar
 // ...
 
 Document sd;
-if (!sd.Parse(schemaJson)) {
+if (!sd.Parse(schemaJson).HasParseError()) {
     // the schema is not a valid JSON.
     // ...       
 }
@@ -28,7 +28,7 @@ SchemaDocument schema(sd); // Compile a Document to SchemaDocument
 // sd is no longer needed here.
 
 Document d;
-if (!d.Parse(inputJson)) {
+if (!d.Parse(inputJson).HasParseError()) {
     // the input is not a valid JSON.
     // ...       
 }
@@ -184,30 +184,30 @@ RapidJSON implemented a simple NFA regular expression engine, which is used by d
 
 |Syntax|Description|
 |------|-----------|
-|`ab`    | Concatenation
-|`a|b`   | Alternation
-|`a?`    | Zero or one
-|`a*`    | Zero or more
-|`a+`    | One or more
-|`a{3}`  | Exactly 3 times
-|`a{3,}` | At least 3 times
-|`a{3,5}`| 3 to 5 times
-|`(ab)`  | Grouping
-|`^a`    | At the beginning
-|`a$`    | At the end
-|`.`     | Any character
-|`[abc]` | Character classes
-|`[a-c]` | Character class range
-|`[a-z0-9_]` | Character class combination
-|`[^abc]` | Negated character classes
-|`[^a-c]` | Negated character class range
-|`[\b]`   | Backspace (U+0008)
-|`\|`, `\\`, ...  | Escape characters
-|`\f` | Form feed (U+000C)
-|`\n` | Line feed (U+000A)
-|`\r` | Carriage return (U+000D)
-|`\t` | Tab (U+0009)
-|`\v` | Vertical tab (U+000B)
+|`ab`    | Concatenation |
+|`a|b`   | Alternation |
+|`a?`    | Zero or one |
+|`a*`    | Zero or more |
+|`a+`    | One or more |
+|`a{3}`  | Exactly 3 times |
+|`a{3,}` | At least 3 times |
+|`a{3,5}`| 3 to 5 times |
+|`(ab)`  | Grouping |
+|`^a`    | At the beginning |
+|`a$`    | At the end |
+|`.`     | Any character |
+|`[abc]` | Character classes |
+|`[a-c]` | Character class range |
+|`[a-z0-9_]` | Character class combination |
+|`[^abc]` | Negated character classes |
+|`[^a-c]` | Negated character class range |
+|`[\b]`   | Backspace (U+0008) |
+|`\|`, `\\`, ...  | Escape characters |
+|`\f` | Form feed (U+000C) |
+|`\n` | Line feed (U+000A) |
+|`\r` | Carriage return (U+000D) |
+|`\t` | Tab (U+0009) |
+|`\v` | Vertical tab (U+000B) |
 
 For C++11 compiler, it is also possible to use the `std::regex` by defining `RAPIDJSON_SCHEMA_USE_INTERNALREGEX=0` and `RAPIDJSON_SCHEMA_USE_STDREGEX=1`. If your schemas do not need `pattern` and `patternProperties`, you can set both macros to zero to disable this feature, which will reduce some code size.
 

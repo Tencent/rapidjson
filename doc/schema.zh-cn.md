@@ -20,23 +20,23 @@ RapidJSON 实现了一个 [JSON Schema Draft v4](http://json-schema.org/document
 // ...
 
 Document sd;
-if (!sd.Parse(schemaJson)) {
-    // the schema is not a valid JSON.
+if (!sd.Parse(schemaJson).HasParseError()) {
+    // 此 schema 不是合法的 JSON
     // ...       
 }
-SchemaDocument schema(sd); // Compile a Document to SchemaDocument
-// sd is no longer needed here.
+SchemaDocument schema(sd); // 把一个 Document 编译至 SchemaDocument
+// 之后不再需要 sd
 
 Document d;
-if (!d.Parse(inputJson)) {
-    // the input is not a valid JSON.
+if (!d.Parse(inputJson).HasParseError()) {
+    // 输入不是一个合法的 JSON
     // ...       
 }
 
 SchemaValidator validator(schema);
 if (!d.Accept(validator)) {
-    // Input JSON is invalid according to the schema
-    // Output diagnostic information
+    // 输入的 JSON 不合乎 schema
+    // 打印诊断信息
     StringBuffer sb;
     validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);
     printf("Invalid schema: %s\n", sb.GetString());
@@ -49,8 +49,8 @@ if (!d.Accept(validator)) {
 
 一些注意点：
 
-* 一个 `SchemaDocment` 能被多个 `SchemaValidator` 吊用。它不会被 `SchemaValidator` 修改。
-* 一个 `SchemaValidator` 可以重复使用来校验多个文件。在校验其他文件前，先调用 `validator.Reset()`。
+* 一个 `SchemaDocment` 能被多个 `SchemaValidator` 引用。它不会被 `SchemaValidator` 修改。
+* 可以重复使用一个 `SchemaValidator` 来校验多个文件。在校验其他文件前，须先调用 `validator.Reset()`。
 
 ## 在解析／生成时进行校验
 
@@ -64,28 +64,28 @@ if (!d.Accept(validator)) {
 #include "rapidjson/filereadstream.h"
 
 // ...
-SchemaDocument schema(sd); // Compile a Document to SchemaDocument
+SchemaDocument schema(sd); // 把一个 Document 编译至 SchemaDocument
 
-// Use reader to parse the JSON
+// 使用 reader 解析 JSON
 FILE* fp = fopen("big.json", "r");
 FileReadStream is(fp, buffer, sizeof(buffer));
 
-// Parse JSON from reader, validate the SAX events, and store in d.
+// 用 reader 解析 JSON，校验它的 SAX 事件，并存储至 d
 Document d;
 SchemaValidatingReader<kParseDefaultFlags, FileReadStream, UTF8<> > reader(is, schema);
 d.Populate(reader);
 
 if (!reader.GetParseResult()) {
-    // Not a valid JSON
-    // When reader.GetParseResult().Code() == kParseErrorTermination,
-    // it may be terminated by:
-    // (1) the validator found that the JSON is invalid according to schema; or
-    // (2) the input stream has I/O error.
+    // 不是一个合法的 JSON
+    // 当 reader.GetParseResult().Code() == kParseErrorTermination,
+    // 它可能是被以下原因中止：
+    // (1) 校验器发现 JSON 不合乎 schema；或
+    // (2) 输入流有 I/O 错误。
 
-    // Check the validation result
+    // 检查校验结果
     if (!reader.IsValid()) {
-        // Input JSON is invalid according to the schema
-        // Output diagnostic information
+        // 输入的 JSON 不合乎 schema
+        // 打印诊断信息
         StringBuffer sb;
         reader.GetInvalidSchemaPointer().StringifyUriFragment(sb);
         printf("Invalid schema: %s\n", sb.GetString());
@@ -184,30 +184,30 @@ RapidJSON 实现了一个简单的 NFA 正则表达式引擎，并预设使用�
 
 |语法|描述|
 |------|-----------|
-|`ab`    | 串联
-|`a|b`   | 交替
-|`a?`    | 零或一次
-|`a*`    | 零或多次
-|`a+`    | 一或多次
-|`a{3}`  | 刚好 3 次
-|`a{3,}` | 至少 3 次
-|`a{3,5}`| 3 至 5 次
-|`(ab)`  | 分组
-|`^a`    | 在开始处
-|`a$`    | 在结束处
-|`.`     | 任何字符
-|`[abc]` | 字符组
-|`[a-c]` | 字符组范围
-|`[a-z0-9_]` | 字符组组合
-|`[^abc]` | 字符组取反
-|`[^a-c]` | 字符组范围取反
-|`[\b]`   | 退格符 (U+0008)
-|`\|`, `\\`, ...  | 转义字符
-|`\f` | 馈页 (U+000C)
-|`\n` | 馈行 (U+000A)
-|`\r` | 回车 (U+000D)
-|`\t` | 制表 (U+0009)
-|`\v` | 垂直制表 (U+000B)
+|`ab`    | 串联 |
+|`a|b`   | 交替 |
+|`a?`    | 零或一次 |
+|`a*`    | 零或多次 |
+|`a+`    | 一或多次 |
+|`a{3}`  | 刚好 3 次 |
+|`a{3,}` | 至少 3 次 |
+|`a{3,5}`| 3 至 5 次 |
+|`(ab)`  | 分组 |
+|`^a`    | 在开始处 |
+|`a$`    | 在结束处 |
+|`.`     | 任何字符 |
+|`[abc]` | 字符组 |
+|`[a-c]` | 字符组范围 |
+|`[a-z0-9_]` | 字符组组合 |
+|`[^abc]` | 字符组取反 |
+|`[^a-c]` | 字符组范围取反 |
+|`[\b]`   | 退格符 (U+0008) |
+|`\|`, `\\`, ...  | 转义字符 |
+|`\f` | 馈页 (U+000C) |
+|`\n` | 馈行 (U+000A) |
+|`\r` | 回车 (U+000D) |
+|`\t` | 制表 (U+0009) |
+|`\v` | 垂直制表 (U+000B) |
 
 对于使用 C++11 编译器的使用者，也可使用 `std::regex`，只需定义 `RAPIDJSON_SCHEMA_USE_INTERNALREGEX=0` 及 `RAPIDJSON_SCHEMA_USE_STDREGEX=1`。若你的 schema 无需使用 `pattern` 或 `patternProperties`，可以把两个宏都设为零，以禁用此功能，这样做可节省一些代码体积。
 
