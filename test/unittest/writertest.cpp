@@ -96,7 +96,8 @@ TEST(Writer, String) {
 }
 
 TEST(Writer, ScanWriteUnescapedString) {
-    const char json[] = "[\" \\\"\"]";
+    const char json[] = "[\" \\\"0123456789ABCDEF\"]";
+    //                       ^ scanning stops here.
     char buffer2[sizeof(json) + 32];
 
     // Use different offset to test different alignments
