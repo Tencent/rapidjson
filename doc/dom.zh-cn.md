@@ -116,6 +116,7 @@ GenericDocument& GenericDocument::Parse(const Ch* str);
 `kParseStopWhenDoneFlag`      | 当从流解析了一个完整的JSON根节点之后，停止继续处理余下的流。当使用了此标志，解析器便不会产生`kParseErrorDocumentRootNotSingular`错误。可使用本标志去解析同一个流里的多个JSON。
 `kParseFullPrecisionFlag`     | 使用完整的精确度去解析数字（较慢）。如不设置此标节，则会使用正常的精确度（较快）。正常精确度会有最多3个[ULP](http://en.wikipedia.org/wiki/Unit_in_the_last_place)的误差。
 `kParseCommentsFlag`          | 容许单行 `// ...` 及多行 `/* ... */` 注释（放宽的JSON语法）。
+`kParseTrailingCommasFlag`    | 容许在对象和数组结束前含有逗号（放宽的JSON语法）。
 
 由于使用了非类型模板参数，而不是函数参数，C++编译器能为个别组合生成代码，以改善性能及减少代码尺寸（当只用单种特化）。缺点是需要在编译期决定标志。
 

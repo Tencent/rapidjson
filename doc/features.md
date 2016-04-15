@@ -24,7 +24,8 @@
 * Support null character (`"\u0000"`)
  * For example, `["Hello\u0000World"]` can be parsed and handled gracefully. There is API for getting/setting lengths of string.
 * Support optional relaxed syntax.
- * Single line (`// ...`) and multiple line (`/* ... */`) comments.
+ * Single line (`// ...`) and multiple line (`/* ... */`) comments (`kParseCommentsFlag`). 
+ * Trailing commas at the end of objects and arrays (`kParseTrailingCommasFlag`).
 
 ## Unicode
 
