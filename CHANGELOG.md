@@ -4,6 +4,63 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+* Add GenericDocument ctor overload to specify JSON type (#369)
+* Add FAQ (#372, #373, #374, #376)
+* Add @PlatformIO Library Registry manifest file (#400)
+* Implement assignment operator for BigInteger (#404)
+* Add comments support (#443)
+* Adding coapp definition (#460)
+* documenttest.cpp: EXPECT_THROW when checking empty allocator (470)
+* GenericDocument: add implicit conversion to ParseResult (#480)
+* Use <wchar.h> with C++ linkage on Windows ARM (#485)
+* Detect little endian for Microsoft ARM targets 
+* Check Nan/Inf when writing a double (#510)
+* Add JSON Schema Implementation (#522)
+* Add iostream wrapper (#530)
+* Add Jsonx example for converting JSON into JSONx (a XML format) (#531)
+* Add optional unresolvedTokenIndex parameter to Pointer::Get() (#532)
+* Add encoding validation option for Writer/PrettyWriter (#534)
+* Add Writer::SetMaxDecimalPlaces() (#536)
+* Support {0, } and {0, m} in Regex (#539)
+* Add Value::Get/SetFloat(), Value::IsLossLessFloat/Double() (#540)
+* Add stream position check to reader unit tests (#541)
+* Add Templated accessors and range-based for (#542)
+* Add (Pretty)Writer::RawValue() (#543)
+* Add Document::Parse(std::string), Document::Parse(const char*, size_t length) and related APIs. (#553)
+* Add move constructor for GenericSchemaDocument (#554)
+* Add VS2010 and VS2015 to AppVeyor CI (#555)
+* Add parse-by-parts example (#556, #562)
+* Support parse number as string (#564, #589)
+* Add kFormatSingleLineArray for PrettyWriter (#577)
+* Added optional support for trailing commas #584
+
+### Fixed
+* Fix gcc/clang/vc warnings (#350, #394, #397, #444, #447, #473, #515, #582, #589, #595)
+* Fix documentation (#482, #511, #550, #557)
+* Fix emscripten alignment issue (#535)
+* Fix missing allocator to uses of AddMember in document (#365)
+* CMake will no longer complain that the minimum CMake version is not specified (#501)
+* Make it usable with old VC8 (VS2005) (#383)
+* Prohibit C++11 move from Document to Value (#391)
+* Try to fix incorrect 64-bit alignment (#419)
+* Check return of fwrite to avoid warn_unused_result build failures (#421)
+* Fix UB in GenericDocument::ParseStream (#426)
+* Keep Document value unchanged on parse error (#439)
+* Add missing return statement (#450)
+* Fix Document::Parse(const Ch*) for transcoding (#478)
+* encodings.h: fix typo in preprocessor condition (#495)
+* Custom Microsoft headers are necessary only for Visual Studio 2012 and lower (#559)
+* 
+
+### Changed
+* Clarify problematic JSON license (#392)
+* Move Travis to container based infrastructure (#504, #558)
+* Make whitespace array more compact (#513)
+* Optimize Writer::WriteString() with SIMD (#544)
+* x86-64 48-bit pointer optimization for GenericValue (#546)
+
+
 ## [1.0.2] - 2015-05-14
 
 ### Added
@@ -12,6 +69,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 * Include rapidjson.h for all internal/error headers.
 * Parsing some numbers incorrectly in full-precision mode (`kFullPrecisionParseFlag`) (#342)
+* Fix some numbers parsed incorrectly (#336)
 * Fix alignment of 64bit platforms (#328)
 * Fix MemoryPoolAllocator::Clear() to clear user-buffer (0691502573f1afd3341073dd24b12c3db20fbde4)
 
