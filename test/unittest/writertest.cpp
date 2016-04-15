@@ -141,11 +141,12 @@ TEST(Writer, Transcode) {
     // UTF8 -> UTF32 -> UTF8
     TestTranscode<UTF32<> >(json);
 
-    // UTF8 -> AutoUTF (UTF16BE) -> UTF8
-    {
+    // UTF8 -> AutoUTF -> UTF8
+    UTFType types[] = { kUTF8, kUTF16LE , kUTF16BE, kUTF32LE , kUTF32BE };
+    for (size_t i = 0; i < 5; i++) {
         StringStream s(json);
         MemoryBuffer buffer;
-        AutoUTFOutputStream<unsigned, MemoryBuffer> os(buffer, kUTF16BE, true);
+        AutoUTFOutputStream<unsigned, MemoryBuffer> os(buffer, types[i], true);
         Writer<AutoUTFOutputStream<unsigned, MemoryBuffer>, UTF8<>, AutoUTF<unsigned> > writer(os);
         Reader reader;
         reader.Parse(s, writer);
