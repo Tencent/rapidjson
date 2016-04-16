@@ -1108,6 +1108,9 @@ private:
                 if (exclusiveMinimum_ ? i <= minimum_.GetInt64() : i < minimum_.GetInt64())
                     RAPIDJSON_INVALID_KEYWORD_RETURN(GetMinimumString());
             }
+            else if (minimum_.IsUint64()) {
+                RAPIDJSON_INVALID_KEYWORD_RETURN(GetMinimumString()); // i <= max(int64_t) < minimum.GetUint64()
+            }
             else if (!CheckDoubleMinimum(context, static_cast<double>(i)))
                 return false;
         }
@@ -1117,6 +1120,8 @@ private:
                 if (exclusiveMaximum_ ? i >= maximum_.GetInt64() : i > maximum_.GetInt64())
                     RAPIDJSON_INVALID_KEYWORD_RETURN(GetMaximumString());
             }
+            else if (maximum_.IsUint64())
+                /* do nothing */; // i <= max(int64_t) < maximum_.GetUint64()
             else if (!CheckDoubleMaximum(context, static_cast<double>(i)))
                 return false;
         }
@@ -1142,6 +1147,8 @@ private:
                 if (exclusiveMinimum_ ? i <= minimum_.GetUint64() : i < minimum_.GetUint64())
                     RAPIDJSON_INVALID_KEYWORD_RETURN(GetMinimumString());
             }
+            else if (minimum_.IsInt64())
+                /* do nothing */; // i >= 0 > minimum.Getint64()
             else if (!CheckDoubleMinimum(context, static_cast<double>(i)))
                 return false;
         }
@@ -1151,6 +1158,8 @@ private:
                 if (exclusiveMaximum_ ? i >= maximum_.GetUint64() : i > maximum_.GetUint64())
                     RAPIDJSON_INVALID_KEYWORD_RETURN(GetMaximumString());
             }
+            else if (maximum_.IsInt64())
+                RAPIDJSON_INVALID_KEYWORD_RETURN(GetMaximumString()); // i >= 0 > maximum_
             else if (!CheckDoubleMaximum(context, static_cast<double>(i)))
                 return false;
         }
