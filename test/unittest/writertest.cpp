@@ -448,6 +448,10 @@ TEST(Writer, NaN) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     EXPECT_FALSE(writer.Double(nan));
+
+    GenericStringBuffer<UTF16<> > buffer2;
+    Writer<GenericStringBuffer<UTF16<> > > writer2(buffer2);
+    EXPECT_FALSE(writer2.Double(nan));
 }
 
 TEST(Writer, Inf) {
@@ -456,7 +460,7 @@ TEST(Writer, Inf) {
     StringBuffer buffer;
     {
         Writer<StringBuffer> writer(buffer);
-        EXPECT_FALSE(writer.Double(inf));
+        EXPECT_FALSE(writer.Double(inf));        
     }
     {
         Writer<StringBuffer> writer(buffer);

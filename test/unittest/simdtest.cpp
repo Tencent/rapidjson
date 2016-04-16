@@ -105,24 +105,28 @@ struct ScanCopyUnescapedStringHandler : BaseReaderHandler<UTF8<>, ScanCopyUnesca
 
 template <unsigned parseFlags, typename StreamType>
 void TestScanCopyUnescapedString() {
-    for (size_t step = 0; step < 1024; step++) {
-        char json[1024 + 5];
-        char *p = json;
-        *p ++= '\"';
-        for (size_t i = 0; i < step; i++)
-            *p++= "ABCD"[i % 4];
-        *p++ = '\\';
-        *p++ = '\\';
-        *p++ = '\"';
-        *p++ = '\0';
+    char buffer[1024 + 5 + 32];
 
-        StreamType s(json);
-        Reader reader;
-        ScanCopyUnescapedStringHandler h;
-        reader.Parse<parseFlags>(s, h);
-        EXPECT_TRUE(memcmp(h.buffer, json + 1, step) == 0);
-        EXPECT_EQ('\\', h.buffer[step]);    // escaped
-        EXPECT_EQ('\0', h.buffer[step + 1]);
+    for (size_t offset = 0; offset < 32; offset++) {
+        for (size_t step = 0; step < 1024; step++) {
+            char* json = buffer + offset;
+            char *p = json;
+            *p++ = '\"';
+            for (size_t i = 0; i < step; i++)
+                *p++ = "ABCD"[i % 4];
+            *p++ = '\\';
+            *p++ = '\\';
+            *p++ = '\"';
+            *p++ = '\0';
+
+            StreamType s(json);
+            Reader reader;
+            ScanCopyUnescapedStringHandler h;
+            reader.Parse<parseFlags>(s, h);
+            EXPECT_TRUE(memcmp(h.buffer, json + 1, step) == 0);
+            EXPECT_EQ('\\', h.buffer[step]);    // escaped
+            EXPECT_EQ('\0', h.buffer[step + 1]);
+        }
     }
 }
 
