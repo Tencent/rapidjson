@@ -1006,6 +1006,7 @@ private:
             RegexType* r = new (allocator_->Malloc(sizeof(RegexType))) RegexType(value.GetString());
             if (!r->IsValid()) {
                 r->~RegexType();
+                AllocatorType::Free(r);
                 r = 0;
             }
             return r;
