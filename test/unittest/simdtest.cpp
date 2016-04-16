@@ -100,13 +100,15 @@ struct ScanCopyUnescapedStringHandler : BaseReaderHandler<UTF8<>, ScanCopyUnesca
         memcpy(buffer, str, length + 1);
         return true;
     }
-    char buffer[1024 + 5];
+    char buffer[1024 + 5 + 32];
 };
 
 template <unsigned parseFlags, typename StreamType>
 void TestScanCopyUnescapedString() {
     char buffer[1024 + 5 + 32];
+    char backup[1024 + 5 + 32];
 
+    // Test "ABCDABCD...\\"
     for (size_t offset = 0; offset < 32; offset++) {
         for (size_t step = 0; step < 1024; step++) {
             char* json = buffer + offset;
@@ -118,13 +120,38 @@ void TestScanCopyUnescapedString() {
             *p++ = '\\';
             *p++ = '\"';
             *p++ = '\0';
+            strcpy(backup, json); // insitu parsing will overwrite buffer, so need to backup first
 
             StreamType s(json);
             Reader reader;
             ScanCopyUnescapedStringHandler h;
             reader.Parse<parseFlags>(s, h);
-            EXPECT_TRUE(memcmp(h.buffer, json + 1, step) == 0);
+            EXPECT_TRUE(memcmp(h.buffer, backup + 1, step) == 0);
             EXPECT_EQ('\\', h.buffer[step]);    // escaped
+            EXPECT_EQ('\0', h.buffer[step + 1]);
+        }
+    }
+
+    // Test "\\ABCDABCD..."
+    for (size_t offset = 0; offset < 32; offset++) {
+        for (size_t step = 0; step < 1024; step++) {
+            char* json = buffer + offset;
+            char *p = json;
+            *p++ = '\"';
+            *p++ = '\\';
+            *p++ = '\\';
+            for (size_t i = 0; i < step; i++)
+                *p++ = "ABCD"[i % 4];
+            *p++ = '\"';
+            *p++ = '\0';
+            strcpy(backup, json); // insitu parsing will overwrite buffer, so need to backup first
+
+            StreamType s(json);
+            Reader reader;
+            ScanCopyUnescapedStringHandler h;
+            reader.Parse<parseFlags>(s, h);
+            EXPECT_TRUE(memcmp(h.buffer + 1, backup + 3, step) == 0);
+            EXPECT_EQ('\\', h.buffer[0]);    // escaped
             EXPECT_EQ('\0', h.buffer[step + 1]);
         }
     }
