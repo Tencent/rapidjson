@@ -136,47 +136,50 @@ TEST(SIMD, SIMD_SUFFIX(ScanCopyUnescapedString)) {
 }
 
 TEST(SIMD, SIMD_SUFFIX(ScanWriteUnescapedString)) {
-    for (size_t step = 0; step < 1024; step++) {
-        char s[2048 + 1];
-        char *p = s;
-        for (size_t i = 0; i < step; i++)
-            *p++= "ABCD"[i % 4];
-        char escape = "\0\n\\\""[step % 4];
-        *p++ = escape;
-        for (size_t i = 0; i < step; i++)
-            *p++= "ABCD"[i % 4];
+    char buffer[2048 + 1 + 32];
+    for (size_t offset = 0; offset < 32; offset++) {
+        for (size_t step = 0; step < 1024; step++) {
+            char* s = buffer + offset;
+            char* p = s;
+            for (size_t i = 0; i < step; i++)
+                *p++ = "ABCD"[i % 4];
+            char escape = "\0\n\\\""[step % 4];
+            *p++ = escape;
+            for (size_t i = 0; i < step; i++)
+                *p++ = "ABCD"[i % 4];
 
-        StringBuffer sb;
-        Writer<StringBuffer> writer(sb);
-        writer.String(s, SizeType(step * 2 + 1));
-        const char* q = sb.GetString();
-        EXPECT_EQ('\"', *q++);
-        for (size_t i = 0; i < step; i++)
-            EXPECT_EQ("ABCD"[i % 4], *q++);
-        if (escape == '\0') {
-            EXPECT_EQ('\\', *q++);
-            EXPECT_EQ('u', *q++);
-            EXPECT_EQ('0', *q++);
-            EXPECT_EQ('0', *q++);
-            EXPECT_EQ('0', *q++);
-            EXPECT_EQ('0', *q++);
-        }
-        else if (escape == '\n') {
-            EXPECT_EQ('\\', *q++);
-            EXPECT_EQ('n', *q++);
-        }
-        else if (escape == '\\') {
-            EXPECT_EQ('\\', *q++);
-            EXPECT_EQ('\\', *q++);
-        }
-        else if (escape == '\"') {
-            EXPECT_EQ('\\', *q++);
+            StringBuffer sb;
+            Writer<StringBuffer> writer(sb);
+            writer.String(s, SizeType(step * 2 + 1));
+            const char* q = sb.GetString();
             EXPECT_EQ('\"', *q++);
+            for (size_t i = 0; i < step; i++)
+                EXPECT_EQ("ABCD"[i % 4], *q++);
+            if (escape == '\0') {
+                EXPECT_EQ('\\', *q++);
+                EXPECT_EQ('u', *q++);
+                EXPECT_EQ('0', *q++);
+                EXPECT_EQ('0', *q++);
+                EXPECT_EQ('0', *q++);
+                EXPECT_EQ('0', *q++);
+            }
+            else if (escape == '\n') {
+                EXPECT_EQ('\\', *q++);
+                EXPECT_EQ('n', *q++);
+            }
+            else if (escape == '\\') {
+                EXPECT_EQ('\\', *q++);
+                EXPECT_EQ('\\', *q++);
+            }
+            else if (escape == '\"') {
+                EXPECT_EQ('\\', *q++);
+                EXPECT_EQ('\"', *q++);
+            }
+            for (size_t i = 0; i < step; i++)
+                EXPECT_EQ("ABCD"[i % 4], *q++);
+            EXPECT_EQ('\"', *q++);
+            EXPECT_EQ('\0', *q++);
         }
-        for (size_t i = 0; i < step; i++)
-            EXPECT_EQ("ABCD"[i % 4], *q++);
-        EXPECT_EQ('\"', *q++);
-        EXPECT_EQ('\0', *q++);
     }
 }
 
