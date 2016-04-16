@@ -55,6 +55,7 @@ TEST(SchemaValidator, Hasher) {
     TEST_HASHER("-2147483649", "-2147483649", true); // -2^31 - 1 can only be fit in int64_t
     TEST_HASHER("2147483648", "2147483648", true); // 2^31 can only be fit in unsigned
     TEST_HASHER("4294967296", "4294967296", true); // 2^32 can only be fit in int64_t
+    TEST_HASHER("9223372036854775808", "9223372036854775808", true); // 2^63 can only be fit in uint64_t
     TEST_HASHER("1.5", "1.5", true);
     TEST_HASHER("1", "1.0", true);
     TEST_HASHER("1", "-1", false);
@@ -399,7 +400,7 @@ TEST(SchemaValidator, Integer_Range64Boundary) {
     VALIDATE(s, "0", true);
     VALIDATE(s, "2147483647", true);  // int max
     VALIDATE(s, "2147483648", true);  // unsigned first
-    VALIDATE(s, "4294967296", true);  // unsigned max
+    VALIDATE(s, "4294967295", true);  // unsigned max
     VALIDATE(s, "9223372036854775806", true);
     INVALIDATE(s, "9223372036854775807", "", "maximum", "");
     INVALIDATE(s, "18446744073709551615", "", "maximum", "");   // uint64_t max
@@ -416,7 +417,7 @@ TEST(SchemaValidator, Integer_RangeU64Boundary) {
     INVALIDATE(s, "0", "", "minimum", "");
     INVALIDATE(s, "2147483647", "", "minimum", "");  // int max
     INVALIDATE(s, "2147483648", "", "minimum", "");  // unsigned first
-    INVALIDATE(s, "4294967296", "", "minimum", "");  // unsigned max
+    INVALIDATE(s, "4294967295", "", "minimum", "");  // unsigned max
     VALIDATE(s, "9223372036854775808", true);
     VALIDATE(s, "18446744073709551614", true);
     INVALIDATE(s, "18446744073709551615", "", "maximum", "");
@@ -472,6 +473,26 @@ TEST(SchemaValidator, Number_Range) {
     INVALIDATE(s, "101.5", "", "maximum", "");
 }
 
+TEST(SchemaValidator, Number_RangeInt) {
+    Document sd;
+    sd.Parse("{\"type\":\"number\",\"minimum\":-100,\"maximum\":-1,\"exclusiveMaximum\":true}");
+    SchemaDocument s(sd);
+
+    INVALIDATE(s, "-101", "", "minimum", "");
+    INVALIDATE(s, "-100.1", "", "minimum", "");
+    VALIDATE(s, "-100", true);
+    VALIDATE(s, "-2", true);
+    INVALIDATE(s, "-1", "", "maximum", "");
+    INVALIDATE(s, "-0.9", "", "maximum", "");
+    INVALIDATE(s, "0", "", "maximum", "");
+    INVALIDATE(s, "2147483647", "", "maximum", "");  // int max
+    INVALIDATE(s, "2147483648", "", "maximum", "");  // unsigned first
+    INVALIDATE(s, "4294967295", "", "maximum", "");  // unsigned max
+    INVALIDATE(s, "9223372036854775808", "", "maximum", "");
+    INVALIDATE(s, "18446744073709551614", "", "maximum", "");
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "");
+}
+
 TEST(SchemaValidator, Number_RangeDouble) {
     Document sd;
     sd.Parse("{\"type\":\"number\",\"minimum\":0.1,\"maximum\":100.1,\"exclusiveMaximum\":true}");
@@ -490,9 +511,25 @@ TEST(SchemaValidator, Number_RangeDouble) {
     INVALIDATE(s, "18446744073709551615", "", "maximum", "");
     INVALIDATE(s, "2147483647", "", "maximum", "");  // int max
     INVALIDATE(s, "2147483648", "", "maximum", "");  // unsigned first
-    INVALIDATE(s, "4294967296", "", "maximum", "");  // unsigned max
+    INVALIDATE(s, "4294967295", "", "maximum", "");  // unsigned max
     INVALIDATE(s, "9223372036854775808", "", "maximum", "");
     INVALIDATE(s, "18446744073709551614", "", "maximum", "");
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "");
+}
+
+TEST(SchemaValidator, Number_RangeDoubleU64Boundary) {
+    Document sd;
+    sd.Parse("{\"type\":\"number\",\"minimum\":9223372036854775808.0,\"maximum\":18446744073709550000.0}");
+    SchemaDocument s(sd);
+
+    INVALIDATE(s, "-9223372036854775808", "", "minimum", "");
+    INVALIDATE(s, "-2147483648", "", "minimum", ""); // int min
+    INVALIDATE(s, "0", "", "minimum", "");
+    INVALIDATE(s, "2147483647", "", "minimum", "");  // int max
+    INVALIDATE(s, "2147483648", "", "minimum", "");  // unsigned first
+    INVALIDATE(s, "4294967295", "", "minimum", "");  // unsigned max
+    VALIDATE(s, "9223372036854775808", true);
+    VALIDATE(s, "18446744073709540000", true);
     INVALIDATE(s, "18446744073709551615", "", "maximum", "");
 }
 
@@ -506,6 +543,13 @@ TEST(SchemaValidator, Number_MultipleOf) {
     VALIDATE(s, "-10", true);
     VALIDATE(s, "20", true);
     INVALIDATE(s, "23", "", "multipleOf", "");
+    INVALIDATE(s, "-2147483648", "", "multipleOf", "");  // int min
+    VALIDATE(s, "-2147483640", true);
+    INVALIDATE(s, "2147483647", "", "multipleOf", "");  // int max
+    INVALIDATE(s, "2147483648", "", "multipleOf", "");  // unsigned first
+    VALIDATE(s, "2147483650", true);
+    INVALIDATE(s, "4294967295", "", "multipleOf", "");  // unsigned max
+    VALIDATE(s, "4294967300", true);
 }
 
 TEST(SchemaValidator, Number_MultipleOfOne) {
