@@ -584,4 +584,9 @@ TEST(Regex, Issue538) {
     EXPECT_TRUE(re.IsValid());
 }
 
+TEST(Regex, Issue583) {
+    Regex re("[0-9]{99999}");
+    ASSERT_TRUE(re.IsValid());
+}
+
 #undef EURO
