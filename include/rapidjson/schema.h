@@ -159,7 +159,6 @@ public:
     virtual uint64_t GetHashCode(void* hasher) = 0;
     virtual void DestroryHasher(void* hasher) = 0;
     virtual void* MallocState(size_t size) = 0;
-    virtual void* ReallocState(void* originalPtr, size_t originalSize, size_t newSize) = 0;
     virtual void FreeState(void* p) = 0;
 };
 
@@ -1774,10 +1773,6 @@ RAPIDJSON_MULTILINEMACRO_END
 
     virtual void* MallocState(size_t size) {
         return GetStateAllocator().Malloc(size);
-    }
-
-    virtual void* ReallocState(void* originalPtr, size_t originalSize, size_t newSize) {
-        return GetStateAllocator().Realloc(originalPtr, originalSize, newSize);
     }
 
     virtual void FreeState(void* p) {
