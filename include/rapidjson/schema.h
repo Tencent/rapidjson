@@ -159,7 +159,6 @@ public:
     virtual uint64_t GetHashCode(void* hasher) = 0;
     virtual void DestroryHasher(void* hasher) = 0;
     virtual void* MallocState(size_t size) = 0;
-    virtual void* ReallocState(void* originalPtr, size_t originalSize, size_t newSize) = 0;
     virtual void FreeState(void* p) = 0;
 };
 
@@ -1006,6 +1005,7 @@ private:
             RegexType* r = new (allocator_->Malloc(sizeof(RegexType))) RegexType(value.GetString());
             if (!r->IsValid()) {
                 r->~RegexType();
+                AllocatorType::Free(r);
                 r = 0;
             }
             return r;
@@ -1108,6 +1108,9 @@ private:
                 if (exclusiveMinimum_ ? i <= minimum_.GetInt64() : i < minimum_.GetInt64())
                     RAPIDJSON_INVALID_KEYWORD_RETURN(GetMinimumString());
             }
+            else if (minimum_.IsUint64()) {
+                RAPIDJSON_INVALID_KEYWORD_RETURN(GetMinimumString()); // i <= max(int64_t) < minimum.GetUint64()
+            }
             else if (!CheckDoubleMinimum(context, static_cast<double>(i)))
                 return false;
         }
@@ -1117,6 +1120,8 @@ private:
                 if (exclusiveMaximum_ ? i >= maximum_.GetInt64() : i > maximum_.GetInt64())
                     RAPIDJSON_INVALID_KEYWORD_RETURN(GetMaximumString());
             }
+            else if (maximum_.IsUint64())
+                /* do nothing */; // i <= max(int64_t) < maximum_.GetUint64()
             else if (!CheckDoubleMaximum(context, static_cast<double>(i)))
                 return false;
         }
@@ -1142,6 +1147,8 @@ private:
                 if (exclusiveMinimum_ ? i <= minimum_.GetUint64() : i < minimum_.GetUint64())
                     RAPIDJSON_INVALID_KEYWORD_RETURN(GetMinimumString());
             }
+            else if (minimum_.IsInt64())
+                /* do nothing */; // i >= 0 > minimum.Getint64()
             else if (!CheckDoubleMinimum(context, static_cast<double>(i)))
                 return false;
         }
@@ -1151,6 +1158,8 @@ private:
                 if (exclusiveMaximum_ ? i >= maximum_.GetUint64() : i > maximum_.GetUint64())
                     RAPIDJSON_INVALID_KEYWORD_RETURN(GetMaximumString());
             }
+            else if (maximum_.IsInt64())
+                RAPIDJSON_INVALID_KEYWORD_RETURN(GetMaximumString()); // i >= 0 > maximum_
             else if (!CheckDoubleMaximum(context, static_cast<double>(i)))
                 return false;
         }
@@ -1428,8 +1437,6 @@ private:
             const SchemaType* s = GetSchema(pointer);
             if (!s)
                 CreateSchema(schema, pointer, v, document);
-            else if (schema)
-                *schema = s;
 
             for (typename ValueType::ConstMemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr)
                 CreateSchemaRecursive(0, pointer.Append(itr->name, allocator_), itr->value, document);
@@ -1764,10 +1771,6 @@ RAPIDJSON_MULTILINEMACRO_END
 
     virtual void* MallocState(size_t size) {
         return GetStateAllocator().Malloc(size);
-    }
-
-    virtual void* ReallocState(void* originalPtr, size_t originalSize, size_t newSize) {
-        return GetStateAllocator().Realloc(originalPtr, originalSize, newSize);
     }
 
     virtual void FreeState(void* p) {

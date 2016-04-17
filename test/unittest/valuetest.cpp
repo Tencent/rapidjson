@@ -402,6 +402,7 @@ TEST(Value, Int) {
     EXPECT_TRUE(x.IsUint64());
 
     EXPECT_FALSE(x.IsDouble());
+    EXPECT_FALSE(x.IsFloat());
     EXPECT_FALSE(x.IsNull());
     EXPECT_FALSE(x.IsBool());
     EXPECT_FALSE(x.IsFalse());
@@ -456,6 +457,7 @@ TEST(Value, Uint) {
     EXPECT_NEAR(1234.0, x.GetDouble(), 0.0);   // Number can always be cast as double but !IsDouble().
 
     EXPECT_FALSE(x.IsDouble());
+    EXPECT_FALSE(x.IsFloat());
     EXPECT_FALSE(x.IsNull());
     EXPECT_FALSE(x.IsBool());
     EXPECT_FALSE(x.IsFalse());
@@ -500,6 +502,7 @@ TEST(Value, Int64) {
     EXPECT_TRUE(x.IsUint64());
 
     EXPECT_FALSE(x.IsDouble());
+    EXPECT_FALSE(x.IsFloat());
     EXPECT_FALSE(x.IsNull());
     EXPECT_FALSE(x.IsBool());
     EXPECT_FALSE(x.IsFalse());
@@ -561,6 +564,7 @@ TEST(Value, Uint64) {
     EXPECT_TRUE(x.IsUint64());
 
     EXPECT_FALSE(x.IsDouble());
+    EXPECT_FALSE(x.IsFloat());
     EXPECT_FALSE(x.IsNull());
     EXPECT_FALSE(x.IsBool());
     EXPECT_FALSE(x.IsFalse());

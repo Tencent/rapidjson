@@ -100,29 +100,60 @@ struct ScanCopyUnescapedStringHandler : BaseReaderHandler<UTF8<>, ScanCopyUnesca
         memcpy(buffer, str, length + 1);
         return true;
     }
-    char buffer[1024 + 5];
+    char buffer[1024 + 5 + 32];
 };
 
 template <unsigned parseFlags, typename StreamType>
 void TestScanCopyUnescapedString() {
-    for (size_t step = 0; step < 1024; step++) {
-        char json[1024 + 5];
-        char *p = json;
-        *p ++= '\"';
-        for (size_t i = 0; i < step; i++)
-            *p++= "ABCD"[i % 4];
-        *p++ = '\\';
-        *p++ = '\\';
-        *p++ = '\"';
-        *p++ = '\0';
+    char buffer[1024 + 5 + 32];
+    char backup[1024 + 5 + 32];
 
-        StreamType s(json);
-        Reader reader;
-        ScanCopyUnescapedStringHandler h;
-        reader.Parse<parseFlags>(s, h);
-        EXPECT_TRUE(memcmp(h.buffer, json + 1, step) == 0);
-        EXPECT_EQ('\\', h.buffer[step]);    // escaped
-        EXPECT_EQ('\0', h.buffer[step + 1]);
+    // Test "ABCDABCD...\\"
+    for (size_t offset = 0; offset < 32; offset++) {
+        for (size_t step = 0; step < 1024; step++) {
+            char* json = buffer + offset;
+            char *p = json;
+            *p++ = '\"';
+            for (size_t i = 0; i < step; i++)
+                *p++ = "ABCD"[i % 4];
+            *p++ = '\\';
+            *p++ = '\\';
+            *p++ = '\"';
+            *p++ = '\0';
+            strcpy(backup, json); // insitu parsing will overwrite buffer, so need to backup first
+
+            StreamType s(json);
+            Reader reader;
+            ScanCopyUnescapedStringHandler h;
+            reader.Parse<parseFlags>(s, h);
+            EXPECT_TRUE(memcmp(h.buffer, backup + 1, step) == 0);
+            EXPECT_EQ('\\', h.buffer[step]);    // escaped
+            EXPECT_EQ('\0', h.buffer[step + 1]);
+        }
+    }
+
+    // Test "\\ABCDABCD..."
+    for (size_t offset = 0; offset < 32; offset++) {
+        for (size_t step = 0; step < 1024; step++) {
+            char* json = buffer + offset;
+            char *p = json;
+            *p++ = '\"';
+            *p++ = '\\';
+            *p++ = '\\';
+            for (size_t i = 0; i < step; i++)
+                *p++ = "ABCD"[i % 4];
+            *p++ = '\"';
+            *p++ = '\0';
+            strcpy(backup, json); // insitu parsing will overwrite buffer, so need to backup first
+
+            StreamType s(json);
+            Reader reader;
+            ScanCopyUnescapedStringHandler h;
+            reader.Parse<parseFlags>(s, h);
+            EXPECT_TRUE(memcmp(h.buffer + 1, backup + 3, step) == 0);
+            EXPECT_EQ('\\', h.buffer[0]);    // escaped
+            EXPECT_EQ('\0', h.buffer[step + 1]);
+        }
     }
 }
 
@@ -132,47 +163,50 @@ TEST(SIMD, SIMD_SUFFIX(ScanCopyUnescapedString)) {
 }
 
 TEST(SIMD, SIMD_SUFFIX(ScanWriteUnescapedString)) {
-    for (size_t step = 0; step < 1024; step++) {
-        char s[2048 + 1];
-        char *p = s;
-        for (size_t i = 0; i < step; i++)
-            *p++= "ABCD"[i % 4];
-        char escape = "\0\n\\\""[step % 4];
-        *p++ = escape;
-        for (size_t i = 0; i < step; i++)
-            *p++= "ABCD"[i % 4];
+    char buffer[2048 + 1 + 32];
+    for (size_t offset = 0; offset < 32; offset++) {
+        for (size_t step = 0; step < 1024; step++) {
+            char* s = buffer + offset;
+            char* p = s;
+            for (size_t i = 0; i < step; i++)
+                *p++ = "ABCD"[i % 4];
+            char escape = "\0\n\\\""[step % 4];
+            *p++ = escape;
+            for (size_t i = 0; i < step; i++)
+                *p++ = "ABCD"[i % 4];
 
-        StringBuffer sb;
-        Writer<StringBuffer> writer(sb);
-        writer.String(s, SizeType(step * 2 + 1));
-        const char* q = sb.GetString();
-        EXPECT_EQ('\"', *q++);
-        for (size_t i = 0; i < step; i++)
-            EXPECT_EQ("ABCD"[i % 4], *q++);
-        if (escape == '\0') {
-            EXPECT_EQ('\\', *q++);
-            EXPECT_EQ('u', *q++);
-            EXPECT_EQ('0', *q++);
-            EXPECT_EQ('0', *q++);
-            EXPECT_EQ('0', *q++);
-            EXPECT_EQ('0', *q++);
-        }
-        else if (escape == '\n') {
-            EXPECT_EQ('\\', *q++);
-            EXPECT_EQ('n', *q++);
-        }
-        else if (escape == '\\') {
-            EXPECT_EQ('\\', *q++);
-            EXPECT_EQ('\\', *q++);
-        }
-        else if (escape == '\"') {
-            EXPECT_EQ('\\', *q++);
+            StringBuffer sb;
+            Writer<StringBuffer> writer(sb);
+            writer.String(s, SizeType(step * 2 + 1));
+            const char* q = sb.GetString();
             EXPECT_EQ('\"', *q++);
+            for (size_t i = 0; i < step; i++)
+                EXPECT_EQ("ABCD"[i % 4], *q++);
+            if (escape == '\0') {
+                EXPECT_EQ('\\', *q++);
+                EXPECT_EQ('u', *q++);
+                EXPECT_EQ('0', *q++);
+                EXPECT_EQ('0', *q++);
+                EXPECT_EQ('0', *q++);
+                EXPECT_EQ('0', *q++);
+            }
+            else if (escape == '\n') {
+                EXPECT_EQ('\\', *q++);
+                EXPECT_EQ('n', *q++);
+            }
+            else if (escape == '\\') {
+                EXPECT_EQ('\\', *q++);
+                EXPECT_EQ('\\', *q++);
+            }
+            else if (escape == '\"') {
+                EXPECT_EQ('\\', *q++);
+                EXPECT_EQ('\"', *q++);
+            }
+            for (size_t i = 0; i < step; i++)
+                EXPECT_EQ("ABCD"[i % 4], *q++);
+            EXPECT_EQ('\"', *q++);
+            EXPECT_EQ('\0', *q++);
         }
-        for (size_t i = 0; i < step; i++)
-            EXPECT_EQ("ABCD"[i % 4], *q++);
-        EXPECT_EQ('\"', *q++);
-        EXPECT_EQ('\0', *q++);
     }
 }
 

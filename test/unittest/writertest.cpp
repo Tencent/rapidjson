@@ -18,6 +18,7 @@
 #include "rapidjson/reader.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/memorybuffer.h"
 
 using namespace rapidjson;
 
@@ -94,6 +95,19 @@ TEST(Writer, String) {
 #endif
 }
 
+TEST(Writer, ScanWriteUnescapedString) {
+    const char json[] = "[\" \\\"0123456789ABCDEF\"]";
+    //                       ^ scanning stops here.
+    char buffer2[sizeof(json) + 32];
+
+    // Use different offset to test different alignments
+    for (int i = 0; i < 32; i++) {
+        char* p = buffer2 + i;
+        memcpy(p, json, sizeof(json));
+        TEST_ROUNDTRIP(p);
+    }
+}
+
 TEST(Writer, Double) {
     TEST_ROUNDTRIP("[1.2345,1.2345678,0.123456789012,1234567.8]");
     TEST_ROUNDTRIP("0.0");
@@ -107,35 +121,59 @@ TEST(Writer, Double) {
 
 }
 
+// UTF8 -> TargetEncoding -> UTF8
+template <typename TargetEncoding>
+void TestTranscode(const char* json) {
+    StringStream s(json);
+    GenericStringBuffer<TargetEncoding> buffer;
+    Writer<GenericStringBuffer<TargetEncoding>, UTF8<>, TargetEncoding> writer(buffer);
+    Reader reader;
+    reader.Parse(s, writer);
+
+    StringBuffer buffer2;
+    Writer<StringBuffer> writer2(buffer2);
+    GenericReader<TargetEncoding, UTF8<> > reader2;
+    GenericStringStream<TargetEncoding> s2(buffer.GetString());
+    reader2.Parse(s2, writer2);
+
+    EXPECT_STREQ(json, buffer2.GetString());
+}
+
 TEST(Writer, Transcode) {
     const char json[] = "{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3],\"dollar\":\"\x24\",\"cents\":\"\xC2\xA2\",\"euro\":\"\xE2\x82\xAC\",\"gclef\":\"\xF0\x9D\x84\x9E\"}";
 
     // UTF8 -> UTF16 -> UTF8
-    {
-        StringStream s(json);
-        StringBuffer buffer;
-        Writer<StringBuffer, UTF16<>, UTF8<> > writer(buffer);
-        GenericReader<UTF8<>, UTF16<> > reader;
-        reader.Parse(s, writer);
-        EXPECT_STREQ(json, buffer.GetString());
-    }
+    TestTranscode<UTF8<> >(json);
 
-    // UTF8 -> UTF8 -> ASCII -> UTF8 -> UTF8
-    {
+    // UTF8 -> ASCII -> UTF8
+    TestTranscode<ASCII<> >(json);
+
+    // UTF8 -> UTF16 -> UTF8
+    TestTranscode<UTF16<> >(json);
+
+    // UTF8 -> UTF32 -> UTF8
+    TestTranscode<UTF32<> >(json);
+
+    // UTF8 -> AutoUTF -> UTF8
+    UTFType types[] = { kUTF8, kUTF16LE , kUTF16BE, kUTF32LE , kUTF32BE };
+    for (size_t i = 0; i < 5; i++) {
         StringStream s(json);
-        StringBuffer buffer;
-        Writer<StringBuffer, UTF8<>, ASCII<> > writer(buffer);
+        MemoryBuffer buffer;
+        AutoUTFOutputStream<unsigned, MemoryBuffer> os(buffer, types[i], true);
+        Writer<AutoUTFOutputStream<unsigned, MemoryBuffer>, UTF8<>, AutoUTF<unsigned> > writer(os);
         Reader reader;
         reader.Parse(s, writer);
 
         StringBuffer buffer2;
         Writer<StringBuffer> writer2(buffer2);
-        GenericReader<ASCII<>, UTF8<> > reader2;
-        StringStream s2(buffer.GetString());
-        reader2.Parse(s2, writer2);
+        GenericReader<AutoUTF<unsigned>, UTF8<> > reader2;
+        MemoryStream s2(buffer.GetBuffer(), buffer.GetSize());
+        AutoUTFInputStream<unsigned, MemoryStream> is(s2);
+        reader2.Parse(is, writer2);
 
         EXPECT_STREQ(json, buffer2.GetString());
     }
+
 }
 
 #include <sstream>
@@ -410,6 +448,10 @@ TEST(Writer, NaN) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     EXPECT_FALSE(writer.Double(nan));
+
+    GenericStringBuffer<UTF16<> > buffer2;
+    Writer<GenericStringBuffer<UTF16<> > > writer2(buffer2);
+    EXPECT_FALSE(writer2.Double(nan));
 }
 
 TEST(Writer, Inf) {
@@ -418,7 +460,7 @@ TEST(Writer, Inf) {
     StringBuffer buffer;
     {
         Writer<StringBuffer> writer(buffer);
-        EXPECT_FALSE(writer.Double(inf));
+        EXPECT_FALSE(writer.Double(inf));        
     }
     {
         Writer<StringBuffer> writer(buffer);

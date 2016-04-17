@@ -375,14 +375,14 @@ private:
     bool Eval(Stack<Allocator>& operandStack, Operator op) {
         switch (op) {
             case kConcatenation:
-                if (operandStack.GetSize() >= sizeof(Frag) * 2) {
+                RAPIDJSON_ASSERT(operandStack.GetSize() >= sizeof(Frag) * 2);
+                {
                     Frag e2 = *operandStack.template Pop<Frag>(1);
                     Frag e1 = *operandStack.template Pop<Frag>(1);
                     Patch(e1.out, e2.start);
                     *operandStack.template Push<Frag>() = Frag(e1.start, e2.out, Min(e1.minIndex, e2.minIndex));
-                    return true;
                 }
-                return false;
+                return true;
 
             case kAlternation:
                 if (operandStack.GetSize() >= sizeof(Frag) * 2) {
@@ -413,7 +413,8 @@ private:
                 }
                 return false;
 
-            case kOneOrMore:
+            default: 
+                RAPIDJSON_ASSERT(op == kOneOrMore);
                 if (operandStack.GetSize() >= sizeof(Frag)) {
                     Frag e = *operandStack.template Pop<Frag>(1);
                     SizeType s = NewState(kRegexInvalidState, e.start, 0);
@@ -422,16 +423,12 @@ private:
                     return true;
                 }
                 return false;
-
-            default:
-                return false;
         }
     }
 
     bool EvalQuantifier(Stack<Allocator>& operandStack, unsigned n, unsigned m) {
         RAPIDJSON_ASSERT(n <= m);
-        if (operandStack.GetSize() < sizeof(Frag))
-            return false;
+        RAPIDJSON_ASSERT(operandStack.GetSize() >= sizeof(Frag));
 
         if (n == 0) {
             if (m == 0)                             // a{0} not support
@@ -647,8 +644,7 @@ private:
 
     // Return whether the added states is a match state
     bool AddState(Stack<Allocator>& l, SizeType index) const {
-        if (index == kRegexInvalidState)
-            return true;
+        RAPIDJSON_ASSERT(index != kRegexInvalidState);
 
         const State& s = GetState(index);
         if (s.out1 != kRegexInvalidState) { // Split
