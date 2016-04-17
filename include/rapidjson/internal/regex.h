@@ -468,17 +468,17 @@ private:
     static SizeType Min(SizeType a, SizeType b) { return a < b ? a : b; }
 
     void CloneTopOperand(Stack<Allocator>& operandStack) {
-        const Frag *src = operandStack.template Top<Frag>();
-        SizeType count = stateCount_ - src->minIndex; // Assumes top operand contains states in [src->minIndex, stateCount_)
+        const Frag src = *operandStack.template Top<Frag>(); // Copy constructor to prevent invalidation
+        SizeType count = stateCount_ - src.minIndex; // Assumes top operand contains states in [src->minIndex, stateCount_)
         State* s = states_.template Push<State>(count);
-        memcpy(s, &GetState(src->minIndex), count * sizeof(State));
+        memcpy(s, &GetState(src.minIndex), count * sizeof(State));
         for (SizeType j = 0; j < count; j++) {
             if (s[j].out != kRegexInvalidState)
                 s[j].out += count;
             if (s[j].out1 != kRegexInvalidState)
                 s[j].out1 += count;
         }
-        *operandStack.template Push<Frag>() = Frag(src->start + count, src->out + count, src->minIndex + count);
+        *operandStack.template Push<Frag>() = Frag(src.start + count, src.out + count, src.minIndex + count);
         stateCount_ += count;
     }
 
