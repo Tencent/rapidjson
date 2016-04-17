@@ -960,6 +960,19 @@ TEST(SchemaValidator, AllOf_Nested) {
     INVALIDATE(s, "123", "", "allOf", "");
 }
 
+TEST(SchemaValidator, EscapedPointer) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "  \"type\": \"object\","
+        "  \"properties\": {"
+        "    \"~/\": { \"type\": \"number\" }"
+        "  }"
+        "}");
+    SchemaDocument s(sd);
+    INVALIDATE(s, "{\"~/\":true}", "/properties/~0~1", "type", "/~0~1");
+}
+
 template <typename Allocator>
 static char* ReadFile(const char* filename, Allocator& allocator) {
     const char *paths[] = {
