@@ -1,10 +1,10 @@
 # 性能
 
-有一个[native JSON benchmark collection][1]项目，能评估20个JSON库在不同操作下的速度、內存用量及代码大小。
+有一个 [native JSON benchmark collection][1] 项目，能评估 20 个 JSON 库在不同操作下的速度、內存用量及代码大小。
 
 [1]: https://github.com/miloyip/nativejson-benchmark
 
-RapidJSON 0.1版本的性能测试文章位于[这里](https://code.google.com/p/rapidjson/wiki/Performance).
+RapidJSON 0.1 版本的性能测试文章位于 [这里](https://code.google.com/p/rapidjson/wiki/Performance).
 
 此外，你也可以参考以下这些第三方的评测。
 

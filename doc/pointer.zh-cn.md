@@ -25,7 +25,7 @@ JSON Pointer 是一个标准化（[RFC6901]）的方式去选取一个 JSON Docu
 3. `"/foo/1"` → `"baz"`
 4. `"/pi"` → `3.1416`
 
-要注意，一个空 JSON Pointer `""` （零个token）解析为整个 JSON。
+要注意，一个空 JSON Pointer `""` （零个 token）解析为整个 JSON。
 
 # 基本使用方法 {#BasicUsage}
 
@@ -123,7 +123,7 @@ assert(success);
 
 Token `"0"` 在第一个 pointer 中被当作成员名字。它在第二个 pointer 中被当作成数组索引。
 
-其他函数会改变 DOM，包括`Create()`、`GetWithDefault()`、`Set()`、`Swap()`。这些函数总是成功的。若一些父值不存在，就会创建它们。若父值类型不匹配 token，也会强行改变其类型。改变类型也意味着完全移除其 DOM 子树的内容。
+其他函数会改变 DOM，包括 `Create()`、`GetWithDefault()`、`Set()`、`Swap()`。这些函数总是成功的。若一些父值不存在，就会创建它们。若父值类型不匹配 token，也会强行改变其类型。改变类型也意味着完全移除其 DOM 子树的内容。
 
 例如，把上面的 JSON 解译至 `d` 之后，
 
@@ -185,7 +185,7 @@ private:
 
 # URI 片段表示方式 {#URIFragment}
 
-除了我们一直在使用的字符串方式表示 JSON pointer，[RFC6901]也定义了一个 JSON Pointer 的 URI 片段（fragment）表示方式。URI 片段是定义于 [RFC3986] "Uniform Resource Identifier (URI): Generic Syntax"。
+除了我们一直在使用的字符串方式表示 JSON pointer，[RFC6901] 也定义了一个 JSON Pointer 的 URI 片段（fragment）表示方式。URI 片段是定义于 [RFC3986] "Uniform Resource Identifier (URI): Generic Syntax"。
 
 URI 片段的主要分别是必然以 `#` （pound sign）开头，而一些字符也会以百分比编码成 UTF-8 序列。例如，以下的表展示了不同表示法下的 C/C++ 字符串常数。
 

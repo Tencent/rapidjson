@@ -2,7 +2,7 @@
 
 ![](https://img.shields.io/badge/release-v1.0.2-blue.png)
 
-## 高效的C++ JSON解析／生成器，提供SAX及DOM风格API
+## 高效的 C++ JSON 解析／生成器，提供 SAX 及 DOM 风格 API
 
 Tencent is pleased to support the open source community by making RapidJSON available.
 
@@ -12,7 +12,7 @@ Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights 
 * RapidJSON 文档
   * [English](http://rapidjson.org/)
   * [简体中文](http://rapidjson.org/zh-cn/)
-  * [GitBook](https://www.gitbook.com/book/miloyip/rapidjson/)可下载PDF/EPUB/MOBI，但不含API参考手册。
+  * [GitBook](https://www.gitbook.com/book/miloyip/rapidjson/) 可下载 PDF/EPUB/MOBI，但不含 API 参考手册。
 
 ## Build 状态
 
@@ -29,28 +29,28 @@ Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights 
 
 ## 简介
 
-RapidJSON是一个C++的JSON解析器及生成器。它的灵感来自[RapidXml](http://rapidxml.sourceforge.net/)。
+RapidJSON 是一个 C++ 的 JSON 解析器及生成器。它的灵感来自 [RapidXml](http://rapidxml.sourceforge.net/)。
 
-* RapidJSON小而全。它同时支持SAX和DOM风格的API。SAX解析器只有约500行代码。
+* RapidJSON 小而全。它同时支持 SAX 和 DOM 风格的 API。SAX 解析器只有约 500 行代码。
 
-* RapidJSON快。它的性能可与`strlen()`相比。可支持SSE2/SSE4.2加速。
+* RapidJSON 快。它的性能可与 `strlen()` 相比。可支持 SSE2/SSE4.2 加速。
 
-* RapidJSON独立。它不依赖于BOOST等外部库。它甚至不依赖于STL。
+* RapidJSON 独立。它不依赖于 BOOST 等外部库。它甚至不依赖于 STL。
 
-* RapidJSON对内存友好。在大部分32/64位机器上，每个JSON值只占16或20字节（除字符串外）。它预设使用一个快速的内存分配器，令分析器可以紧凑地分配内存。
+* RapidJSON 对内存友好。在大部分 32/64 位机器上，每个 JSON 值只占 16 或 20 字节（除字符串外）。它预设使用一个快速的内存分配器，令分析器可以紧凑地分配内存。
 
-* RapidJSON对Unicode友好。它支持UTF-8、UTF-16、UTF-32 (大端序／小端序)，并内部支持这些编码的检测、校验及转码。例如，RapidJSON可以在分析一个UTF-8文件至DOM时，把当中的JSON字符串转码至UTF-16。它也支持代理对（surrogate pair）及`"\u0000"`（空字符）。
+* RapidJSON 对 Unicode 友好。它支持 UTF-8、UTF-16、UTF-32 (大端序／小端序)，并内部支持这些编码的检测、校验及转码。例如，RapidJSON 可以在分析一个 UTF-8 文件至 DOM 时，把当中的 JSON 字符串转码至 UTF-16。它也支持代理对（surrogate pair）及 `"\u0000"`（空字符）。
 
-在[这里](doc/features.md)可读取更多特点。
+在 [这里](doc/features.md) 可读取更多特点。
 
-JSON（JavaScript Object Notation）是一个轻量的数据交换格式。RapidJSON应该完全遵从RFC7159/ECMA-404。 关于JSON的更多信息可参考：
+JSON（JavaScript Object Notation）是一个轻量的数据交换格式。RapidJSON 应该完全遵从 RFC7159/ECMA-404。 关于 JSON 的更多信息可参考：
 * [Introducing JSON](http://json.org/)
 * [RFC7159: The JavaScript Object Notation (JSON) Data Interchange Format](http://www.ietf.org/rfc/rfc7159.txt)
 * [Standard ECMA-404: The JSON Data Interchange Format](http://www.ecma-international.org/publications/standards/Ecma-404.htm)
 
 ## 兼容性
 
-RapidJSON是跨平台的。以下是一些曾测试的平台／编译器组合：
+RapidJSON 是跨平台的。以下是一些曾测试的平台／编译器组合：
 * Visual C++ 2008/2010/2013 在 Windows (32/64-bit)
 * GNU C++ 3.8.x 在 Cygwin
 * Clang 3.4 在 Mac OS X (32/64-bit) 及 iOS
@@ -60,27 +60,27 @@ RapidJSON是跨平台的。以下是一些曾测试的平台／编译器组合�
 
 ## 安装
 
-RapidJSON是只有头文件的C++库。只需把`include/rapidjson`目录复制至系统或项目的include目录中。
+RapidJSON 是只有头文件的 C++ 库。只需把 `include/rapidjson` 目录复制至系统或项目的 include 目录中。
 
-RapidJSON依赖于以下软件：
+RapidJSON 依赖于以下软件：
 * [CMake](http://www.cmake.org) 作为通用生成工具
-* (optional)[Doxygen](http://www.doxygen.org)用于生成文档
-* (optional)[googletest](https://code.google.com/p/googletest/)用于单元及性能测试
+* (optional)[Doxygen](http://www.doxygen.org) 用于生成文档
+* (optional)[googletest](https://code.google.com/p/googletest/) 用于单元及性能测试
 
 生成测试及例子的步骤：
 
 1. 执行 `git submodule update --init` 去获取 thirdparty submodules (google test)。
-2. 在rapidjson目渌下，建立一个`build`目录。
-3. 在`build`目录下执行`cmake ..`命令以设置生成。Windows用户可使用cmake-gui应用程序。
-4. 在Windows下，编译生成在build目录中的solution。在Linux下，于build目录运行`make`。
+2. 在 rapidjson 目渌下，建立一个 `build` 目录。
+3. 在 `build` 目录下执行 `cmake ..` 命令以设置生成。Windows 用户可使用 cmake-gui 应用程序。
+4. 在 Windows 下，编译生成在 build 目录中的 solution。在 Linux 下，于 build 目录运行 `make`。
 
-成功生成后，你会在`bin`的目录下找到编译后的测试及例子可执行文件。而生成的文档将位于build下的`doc/html`目录。要执行测试，请在build下执行`make test`或`ctest`。使用`ctest -V`命令可获取详细的输出。
+成功生成后，你会在 `bin` 的目录下找到编译后的测试及例子可执行文件。而生成的文档将位于 build 下的 `doc/html` 目录。要执行测试，请在 build 下执行 `make test` 或 `ctest`。使用 `ctest -V` 命令可获取详细的输出。
 
-我们也可以把程序库安装至全系统中，只要在具管理權限下从build目录执行`make install`命令。这样会按系统的偏好设置安装所有文件。当安装RapidJSON后，其他的CMake项目需要使用它时，可以通过在`CMakeLists.txt`加入一句`find_package(RapidJSON)`。
+我们也可以把程序库安装至全系统中，只要在具管理權限下从 build 目录执行 `make install` 命令。这样会按系统的偏好设置安装所有文件。当安装 RapidJSON 后，其他的 CMake 项目需要使用它时，可以通过在 `CMakeLists.txt` 加入一句 `find_package(RapidJSON)`。
 
 ## 用法一览
 
-此简单例子解析一个JSON字符串至一个document (DOM)，对DOM作出简单修改，最终把DOM转换（stringify）至JSON字符串。
+此简单例子解析一个 JSON 字符串至一个 document (DOM)，对 DOM 作出简单修改，最终把 DOM 转换（stringify）至 JSON 字符串。
 
 ~~~~~~~~~~cpp
 // rapidjson/example/simpledom/simpledom.cpp`
@@ -92,16 +92,16 @@ RapidJSON依赖于以下软件：
 using namespace rapidjson;
 
 int main() {
-    // 1. 把JSON解析至DOM。
+    // 1. 把 JSON 解析至 DOM。
     const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
     Document d;
     d.Parse(json);
 
-    // 2. 利用DOM作出修改。
+    // 2. 利用 DOM 作出修改。
     Value& s = d["stars"];
     s.SetInt(s.GetInt() + 1);
 
-    // 3. 把DOM转换（stringify）成JSON。
+    // 3. 把 DOM 转换（stringify）成 JSON。
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     d.Accept(writer);
@@ -118,7 +118,7 @@ int main() {
 
 ![simpledom](doc/diagram/simpledom.png)
 
-还有许多[例子](https://github.com/miloyip/rapidjson/tree/master/example)可供参考：
+还有许多 [例子](https://github.com/miloyip/rapidjson/tree/master/example) 可供参考：
 
 * DOM API
  * [tutorial](https://github.com/miloyip/rapidjson/blob/master/example/tutorial/tutorial.cpp): DOM API 的基本使用方法。
@@ -137,4 +137,4 @@ int main() {
  
 * 进阶
  * [prettyauto](https://github.com/miloyip/rapidjson/blob/master/example/prettyauto/prettyauto.cpp): [pretty](https://github.com/miloyip/rapidjson/blob/master/example/pretty/pretty.cpp) 的修改版本，可自动处理任何 UTF 编码的 JSON。
- * [parsebyparts](https://github.com/miloyip/rapidjson/blob/master/example/parsebyparts/parsebyparts.cpp): 这例子中的`AsyncDocumentParser` 类使用 C++ 线程来逐段解析 JSON。
+ * [parsebyparts](https://github.com/miloyip/rapidjson/blob/master/example/parsebyparts/parsebyparts.cpp): 这例子中的 `AsyncDocumentParser` 类使用 C++ 线程来逐段解析 JSON。
