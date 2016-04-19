@@ -54,6 +54,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Fix memory leak for invalid regex (26e69ffde95ba4773ab06db6457b78f308716f4b)
 * Fix a bug in schema minimum/maximum keywords for 64-bit integer (e7149d665941068ccf8c565e77495521331cf390)
 * Fix a crash bug in regex (#605)
+* Fix schema "required" keyword cannot handle duplicated keys (#609)
 
 ### Changed
 * Clarify problematic JSON license (#392)
