@@ -289,8 +289,7 @@ struct SchemaValidationContext {
         patternPropertiesSchemas(),
         patternPropertiesSchemaCount(),
         valuePatternValidatorType(kPatternValidatorOnly),
-        objectDependencies(),
-        objectRequired(),
+        propertyExist(),
         inArray(false),
         valueUniqueness(false),
         arrayUniqueness(false)
@@ -312,10 +311,8 @@ struct SchemaValidationContext {
         }
         if (patternPropertiesSchemas)
             factory.FreeState(patternPropertiesSchemas);
-        if (objectDependencies)
-            factory.FreeState(objectDependencies);
-        if (objectRequired)
-            factory.FreeState(objectRequired);
+        if (propertyExist)
+            factory.FreeState(propertyExist);
     }
 
     SchemaValidatorFactoryType& factory;
@@ -333,8 +330,7 @@ struct SchemaValidationContext {
     PatternValidatorType valuePatternValidatorType;
     PatternValidatorType objectPatternValidatorType;
     SizeType arrayElementIndex;
-    bool* objectDependencies;
-    bool* objectRequired;
+    bool* propertyExist;
     bool inArray;
     bool valueUniqueness;
     bool arrayUniqueness;
@@ -770,14 +766,9 @@ public:
         if (!(type_ & (1 << kObjectSchemaType)))
             RAPIDJSON_INVALID_KEYWORD_RETURN(GetTypeString());
 
-        if (hasRequired_) {
-            context.objectRequired = static_cast<bool*>(context.factory.MallocState(sizeof(bool) * propertyCount_));
-            std::memset(context.objectRequired, 0, sizeof(bool) * propertyCount_);
-        }
-
-        if (hasDependencies_) {
-            context.objectDependencies = static_cast<bool*>(context.factory.MallocState(sizeof(bool) * propertyCount_));
-            std::memset(context.objectDependencies, 0, sizeof(bool) * propertyCount_);
+        if (hasDependencies_ || hasRequired_) {
+            context.propertyExist = static_cast<bool*>(context.factory.MallocState(sizeof(bool) * propertyCount_));
+            std::memset(context.propertyExist, 0, sizeof(bool) * propertyCount_);
         }
 
         if (patternProperties_) { // pre-allocate schema array
@@ -808,11 +799,8 @@ public:
             else
                 context.valueSchema = properties_[index].schema;
 
-            if (hasRequired_)
-                context.objectRequired[index] = true;
-
-            if (hasDependencies_)
-                context.objectDependencies[index] = true;
+            if (context.propertyExist)
+                context.propertyExist[index] = true;
 
             return true;
         }
@@ -840,11 +828,10 @@ public:
 
     bool EndObject(Context& context, SizeType memberCount) const {
         if (hasRequired_)
-            for (SizeType index = 0; index < propertyCount_; index++) {
+            for (SizeType index = 0; index < propertyCount_; index++)
                 if (properties_[index].required)
-                    if (!context.objectRequired[index])
+                    if (!context.propertyExist[index])
                         RAPIDJSON_INVALID_KEYWORD_RETURN(GetRequiredString());
-            }
 
         if (memberCount < minProperties_)
             RAPIDJSON_INVALID_KEYWORD_RETURN(GetMinPropertiesString());
@@ -854,10 +841,10 @@ public:
 
         if (hasDependencies_) {
             for (SizeType sourceIndex = 0; sourceIndex < propertyCount_; sourceIndex++)
-                if (context.objectDependencies[sourceIndex]) {
+                if (context.propertyExist[sourceIndex]) {
                     if (properties_[sourceIndex].dependencies) {
                         for (SizeType targetIndex = 0; targetIndex < propertyCount_; targetIndex++)
-                            if (properties_[sourceIndex].dependencies[targetIndex] && !context.objectDependencies[targetIndex])
+                            if (properties_[sourceIndex].dependencies[targetIndex] && !context.propertyExist[targetIndex])
                                 RAPIDJSON_INVALID_KEYWORD_RETURN(GetDependenciesString());
                     }
                     else if (properties_[sourceIndex].dependenciesSchema)
