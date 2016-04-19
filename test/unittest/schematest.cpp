@@ -1299,6 +1299,15 @@ TEST(Schema, Issue552) {
 
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
+TEST(SchemaValidator, Issue608) {
+    Document sd;
+    sd.Parse("{\"required\": [\"a\", \"b\"] }");
+    SchemaDocument s(sd);
+
+    VALIDATE(s, "{\"a\" : null, \"b\": null}", true);
+    INVALIDATE(s, "{\"a\" : null, \"a\" : null}", "", "required", "");
+}
+
 #ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
