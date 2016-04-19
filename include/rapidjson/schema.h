@@ -290,6 +290,7 @@ struct SchemaValidationContext {
         patternPropertiesSchemaCount(),
         valuePatternValidatorType(kPatternValidatorOnly),
         objectDependencies(),
+        objectRequired(),
         inArray(false),
         valueUniqueness(false),
         arrayUniqueness(false)
@@ -313,6 +314,8 @@ struct SchemaValidationContext {
             factory.FreeState(patternPropertiesSchemas);
         if (objectDependencies)
             factory.FreeState(objectDependencies);
+        if (objectRequired)
+            factory.FreeState(objectRequired);
     }
 
     SchemaValidatorFactoryType& factory;
@@ -329,9 +332,9 @@ struct SchemaValidationContext {
     SizeType patternPropertiesSchemaCount;
     PatternValidatorType valuePatternValidatorType;
     PatternValidatorType objectPatternValidatorType;
-    SizeType objectRequiredCount;
     SizeType arrayElementIndex;
     bool* objectDependencies;
+    bool* objectRequired;
     bool inArray;
     bool valueUniqueness;
     bool arrayUniqueness;
@@ -365,11 +368,11 @@ public:
         patternProperties_(),
         patternPropertyCount_(),
         propertyCount_(),
-        requiredCount_(),
         minProperties_(),
         maxProperties_(SizeType(~0)),
         additionalProperties_(true),
         hasDependencies_(),
+        hasRequired_(),
         hasSchemaDependencies_(),
         additionalItemsSchema_(),
         itemsList_(),
@@ -490,7 +493,7 @@ public:
                     SizeType index;
                     if (FindPropertyIndex(*itr, &index)) {
                         properties_[index].required = true;
-                        requiredCount_++;
+                        hasRequired_ = true;
                     }
                 }
 
@@ -767,7 +770,11 @@ public:
         if (!(type_ & (1 << kObjectSchemaType)))
             RAPIDJSON_INVALID_KEYWORD_RETURN(GetTypeString());
 
-        context.objectRequiredCount = 0;
+        if (hasRequired_) {
+            context.objectRequired = static_cast<bool*>(context.factory.MallocState(sizeof(bool) * propertyCount_));
+            std::memset(context.objectRequired, 0, sizeof(bool) * propertyCount_);
+        }
+
         if (hasDependencies_) {
             context.objectDependencies = static_cast<bool*>(context.factory.MallocState(sizeof(bool) * propertyCount_));
             std::memset(context.objectDependencies, 0, sizeof(bool) * propertyCount_);
@@ -801,8 +808,8 @@ public:
             else
                 context.valueSchema = properties_[index].schema;
 
-            if (properties_[index].required)
-                context.objectRequiredCount++;
+            if (hasRequired_)
+                context.objectRequired[index] = true;
 
             if (hasDependencies_)
                 context.objectDependencies[index] = true;
@@ -832,8 +839,12 @@ public:
     }
 
     bool EndObject(Context& context, SizeType memberCount) const {
-        if (context.objectRequiredCount != requiredCount_)
-            RAPIDJSON_INVALID_KEYWORD_RETURN(GetRequiredString());
+        if (hasRequired_)
+            for (SizeType index = 0; index < propertyCount_; index++) {
+                if (properties_[index].required)
+                    if (!context.objectRequired[index])
+                        RAPIDJSON_INVALID_KEYWORD_RETURN(GetRequiredString());
+            }
 
         if (memberCount < minProperties_)
             RAPIDJSON_INVALID_KEYWORD_RETURN(GetMinPropertiesString());
@@ -1236,11 +1247,11 @@ private:
     PatternProperty* patternProperties_;
     SizeType patternPropertyCount_;
     SizeType propertyCount_;
-    SizeType requiredCount_;
     SizeType minProperties_;
     SizeType maxProperties_;
     bool additionalProperties_;
     bool hasDependencies_;
+    bool hasRequired_;
     bool hasSchemaDependencies_;
 
     const SchemaType* additionalItemsSchema_;
