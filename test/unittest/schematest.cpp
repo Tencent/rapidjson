@@ -352,7 +352,7 @@ TEST(SchemaValidator, String_Pattern) {
 
 TEST(SchemaValidator, String_Pattern_Invalid) {
     Document sd;
-    sd.Parse("{\"type\":\"string\",\"pattern\":\"a{0}\"}"); // TODO: report regex is invalid somehow
+    sd.Parse("{\"type\":\"string\",\"pattern\":\"a{}\"}"); // TODO: report regex is invalid somehow
     SchemaDocument s(sd);
 
     VALIDATE(s, "\"\"", true);

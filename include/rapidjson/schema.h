@@ -32,10 +32,12 @@ RAPIDJSON_DIAG_OFF(c++98-compat-pedantic)
 #define RAPIDJSON_SCHEMA_USE_INTERNALREGEX 0
 #endif
 
-#if !RAPIDJSON_SCHEMA_USE_INTERNALREGEX && !defined(RAPIDJSON_SCHEMA_USE_STDREGEX) && (__cplusplus >=201103L || (defined(_MSC_VER) && _MSC_VER >= 1800))
+#if !defined(RAPIDJSON_SCHEMA_USE_STDREGEX)
+#if !RAPIDJSON_SCHEMA_USE_INTERNALREGEX && (__cplusplus >=201103L || (defined(_MSC_VER) && _MSC_VER >= 1800))
 #define RAPIDJSON_SCHEMA_USE_STDREGEX 1
 #else
 #define RAPIDJSON_SCHEMA_USE_STDREGEX 0
+#endif
 #endif
 
 #if RAPIDJSON_SCHEMA_USE_INTERNALREGEX
@@ -1017,12 +1019,17 @@ private:
 #elif RAPIDJSON_SCHEMA_USE_STDREGEX
     template <typename ValueType>
     RegexType* CreatePattern(const ValueType& value) {
-        if (value.IsString())
+        if (value.IsString()) {
+            RegexType* r = static_cast<RegexType*>(allocator_->Malloc(sizeof(RegexType)));
             try {
-                return new (allocator_->Malloc(sizeof(RegexType))) RegexType(value.GetString(), std::size_t(value.GetStringLength()), std::regex_constants::ECMAScript);
+                new (r) RegexType(value.GetString(), std::size_t(value.GetStringLength()), std::regex_constants::ECMAScript);
             }
             catch (const std::regex_error&) {
+                AllocatorType::Free(r);
+                r = 0;
             }
+            return r;
+        }
         return 0;
     }
 
