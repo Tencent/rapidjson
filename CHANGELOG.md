@@ -55,6 +55,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Fix a bug in schema minimum/maximum keywords for 64-bit integer (e7149d665941068ccf8c565e77495521331cf390)
 * Fix a crash bug in regex (#605)
 * Fix schema "required" keyword cannot handle duplicated keys (#609)
+* Fix cmake CMP0054 warning (#612)
 
 ### Changed
 * Clarify problematic JSON license (#392)
