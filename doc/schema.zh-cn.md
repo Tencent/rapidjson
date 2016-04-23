@@ -146,7 +146,7 @@ if (!d.Accept(validator)) {
 
 ## 远程 Schema
 
-JSON Schema 支持 [`$ref` 关键字](http://spacetelescope.github.io/understanding-json-schema/structuring.html)，它是一个[JSON pointer](pointer.md) 引用至一个本地（local）或远程（remote） schema。本地指针的首字符是 `#`，而远程指针是一个相对或绝对 URI。例如：
+JSON Schema 支持 [`$ref` 关键字](http://spacetelescope.github.io/understanding-json-schema/structuring.html)，它是一个 [JSON pointer](pointer.md) 引用至一个本地（local）或远程（remote） schema。本地指针的首字符是 `#`，而远程指针是一个相对或绝对 URI。例如：
 
 ~~~js
 { "$ref": "definitions.json#/address" }
