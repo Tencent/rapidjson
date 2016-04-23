@@ -7,6 +7,8 @@ endif()
 set(EXAMPLES
     capitalize
     condense
+    filterkey
+    filterkeydom
     jsonx
     messagereader
     parsebyparts

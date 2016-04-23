@@ -138,3 +138,5 @@ int main() {
 * 进阶
  * [prettyauto](https://github.com/miloyip/rapidjson/blob/master/example/prettyauto/prettyauto.cpp): [pretty](https://github.com/miloyip/rapidjson/blob/master/example/pretty/pretty.cpp) 的修改版本，可自动处理任何 UTF 编码的 JSON。
  * [parsebyparts](https://github.com/miloyip/rapidjson/blob/master/example/parsebyparts/parsebyparts.cpp): 这例子中的 `AsyncDocumentParser` 类使用 C++ 线程来逐段解析 JSON。
+ * [filterkey](https://github.com/miloyip/rapidjson/blob/master/example/filterkey/filterkey.cpp): 移取使用者指定的键值的命令行工具。
+ * [filterkeydom](https://github.com/miloyip/rapidjson/blob/master/example/filterkey/filterkey.cpp): 如上的工具，但展示如何使用生成器（generator）去填充一个 `Document`。
