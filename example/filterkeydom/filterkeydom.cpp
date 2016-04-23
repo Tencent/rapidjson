@@ -16,7 +16,8 @@ using namespace rapidjson;
 
 // This handler forwards event into an output handler, with filtering the descendent events of specified key.
 template <typename OutputHandler>
-struct FilterKeyHandler {
+class FilterKeyHandler {
+public:
     typedef char Ch;
 
     FilterKeyHandler(OutputHandler& outputHandler, const Ch* keyString, SizeType keyLength) : 
@@ -88,12 +89,16 @@ struct FilterKeyHandler {
             return outputHandler_.EndArray(elementCount) && EndValue();
     }
 
+private:
+    FilterKeyHandler(const FilterKeyHandler&);
+    FilterKeyHandler& operator=(const FilterKeyHandler&);
+
     bool EndValue() {
         if (filterValueDepth_ == 1) // Just at the end of value after filtered key
             filterValueDepth_ = 0;
         return true;
     }
-
+    
     OutputHandler& outputHandler_;
     const char* keyString_;
     const SizeType keyLength_;
@@ -122,6 +127,9 @@ public:
     const ParseResult& GetParseResult() const { return parseResult_; }
 
 private:
+    FilterKeyReader(const FilterKeyReader&);
+    FilterKeyReader& operator=(const FilterKeyReader&);
+
     InputStream& is_;
     const char* keyString_;
     const SizeType keyLength_;
