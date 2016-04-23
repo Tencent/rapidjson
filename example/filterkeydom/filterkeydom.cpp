@@ -98,7 +98,7 @@ private:
             filterValueDepth_ = 0;
         return true;
     }
-    
+
     OutputHandler& outputHandler_;
     const char* keyString_;
     const SizeType keyLength_;
@@ -113,7 +113,7 @@ public:
     typedef char Ch;
 
     FilterKeyReader(InputStream& is, const Ch* keyString, SizeType keyLength) : 
-        is_(is), keyString_(keyString), keyLength_(keyLength)
+        is_(is), keyString_(keyString), keyLength_(keyLength), parseResult_()
     {}
 
     // SAX event flow: reader -> filter -> handler
@@ -121,7 +121,8 @@ public:
     bool operator()(Handler& handler) {
         FilterKeyHandler<Handler> filter(handler, keyString_, keyLength_);
         Reader reader;
-        return parseResult_ = reader.Parse(is_, filter);
+        parseResult_ = reader.Parse(is_, filter);
+        return parseResult_;
     }
 
     const ParseResult& GetParseResult() const { return parseResult_; }
