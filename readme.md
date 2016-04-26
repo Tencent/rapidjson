@@ -147,4 +147,4 @@ More [examples](https://github.com/miloyip/rapidjson/tree/master/example) are av
  * [prettyauto](https://github.com/miloyip/rapidjson/blob/master/example/prettyauto/prettyauto.cpp): A modified version of [pretty](https://github.com/miloyip/rapidjson/blob/master/example/pretty/pretty.cpp) to automatically handle JSON with any UTF encodings.
  * [parsebyparts](https://github.com/miloyip/rapidjson/blob/master/example/parsebyparts/parsebyparts.cpp): Implements an `AsyncDocumentParser` which can parse JSON in parts, using C++11 thread.
  * [filterkey](https://github.com/miloyip/rapidjson/blob/master/example/filterkey/filterkey.cpp): A command line tool to remove all values with user-specified key.
- * [filterkeydom](https://github.com/miloyip/rapidjson/blob/master/example/filterkey/filterkey.cpp): Same tool as above, but it demonstrates how to use a generator to populate a `Document`.
+ * [filterkeydom](https://github.com/miloyip/rapidjson/blob/master/example/filterkeydom/filterkeydom.cpp): Same tool as above, but it demonstrates how to use a generator to populate a `Document`.
