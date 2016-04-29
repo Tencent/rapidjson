@@ -163,7 +163,7 @@ Document d;
 if (d.Parse(json).HasParseError()) {
     fprintf(stderr, "\nError(offset %u): %s\n", 
         (unsigned)d.GetErrorOffset(),
-        GetParseError_En(d.GetParseErrorCode()));
+        GetParseError_En(d.GetParseError()));
     // ...
 }
 ~~~~~~~~~~
