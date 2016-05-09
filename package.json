@@ -13,13 +13,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/milkandsour/rapidjson.git"
+    "url": "git+https://github.com/miloyip/rapidjson.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/milkandsour/rapidjson/issues"
+    "url": "https://github.com/miloyip/rapidjson/issues"
   },
-  "homepage": "https://github.com/milkandsour/rapidjson#readme",
+  "homepage": "https://github.com/miloyip/rapidjson#readme",
   "main": "include_dirs.js"
 }
