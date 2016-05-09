@@ -1,0 +1,24 @@
+{
+  "name": "rapidjson",
+  "version": "1.0.2",
+  "description": "![](doc/logo/rapidjson.png)",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc",
+    "example": "example",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/milkandsour/rapidjson.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/milkandsour/rapidjson/issues"
+  },
+  "homepage": "https://github.com/milkandsour/rapidjson#readme"
+}
