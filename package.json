@@ -1,6 +1,6 @@
 {
   "name": "rapidjson",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "![](doc/logo/rapidjson.png)",
   "main": "index.js",
   "directories": {
@@ -20,5 +20,6 @@
   "bugs": {
     "url": "https://github.com/milkandsour/rapidjson/issues"
   },
-  "homepage": "https://github.com/milkandsour/rapidjson#readme"
+  "homepage": "https://github.com/milkandsour/rapidjson#readme",
+  "main": "include_dirs.js"
 }
