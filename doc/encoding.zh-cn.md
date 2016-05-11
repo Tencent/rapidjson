@@ -138,7 +138,7 @@ GenericStringBuffer<UTF16<> > target;
 
 bool hasError = false;
 while (source.Peek() != '\0')
-    if (!Transcoder<UTF8<>, UTF16<>>::Transcode(source, target)) {
+    if (!Transcoder<UTF8<>, UTF16<> >::Transcode(source, target)) {
         hasError = true;
         break;
     }
