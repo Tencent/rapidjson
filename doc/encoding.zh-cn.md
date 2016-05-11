@@ -137,8 +137,8 @@ StringStream source(s);
 GenericStringBuffer<UTF16<> > target;
 
 bool hasError = false;
-while (source.Peak() != '\0')
-    if (!Transcoder::Transcode<UTF8<>, UTF16<> >(source, target)) {
+while (source.Peek() != '\0')
+    if (!Transcoder<UTF8<>, UTF16<> >::Transcode(source, target)) {
         hasError = true;
         break;
     }
