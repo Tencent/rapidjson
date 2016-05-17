@@ -1,8 +1,8 @@
 {
   "name": "rapidjson",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "![](doc/logo/rapidjson.png)",
-  "main": "index.js",
+  "main": "include_dirs.js",
   "directories": {
     "doc": "doc",
     "example": "example",
@@ -20,6 +20,5 @@
   "bugs": {
     "url": "https://github.com/miloyip/rapidjson/issues"
   },
-  "homepage": "https://github.com/miloyip/rapidjson#readme",
-  "main": "include_dirs.js"
+  "homepage": "https://github.com/miloyip/rapidjson#readme"
 }
