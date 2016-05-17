@@ -26,6 +26,7 @@
 * Support optional relaxed syntax.
  * Single line (`// ...`) and multiple line (`/* ... */`) comments (`kParseCommentsFlag`). 
  * Trailing commas at the end of objects and arrays (`kParseTrailingCommasFlag`).
+* [NPM compliant](doc/npm.md).
 
 ## Unicode
 
