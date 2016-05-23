@@ -62,6 +62,7 @@ RAPIDJSON_NAMESPACE_BEGIN
 enum WriteFlag {
     kWriteNoFlags = 0,              //!< No flags are set.
     kWriteValidateEncodingFlag = 1, //!< Validate encoding of JSON strings.
+    kWriteNanAndInfFlag = 2,        //!< Allow writing of Inf, -Inf and NaN.
     kWriteDefaultFlags = RAPIDJSON_WRITE_DEFAULT_FLAGS  //!< Default write flags. Can be customized by defining RAPIDJSON_WRITE_DEFAULT_FLAGS
 };
 
@@ -319,9 +320,25 @@ protected:
     }
 
     bool WriteDouble(double d) {
-        if (internal::Double(d).IsNanOrInf())
-            return false;
-        
+        if (internal::Double(d).IsNanOrInf()) {
+            if (!(writeFlags & kWriteNanAndInfFlag))
+                return false;
+            if (internal::Double(d).IsNan()) {
+                PutReserve(*os_, 3);
+                PutUnsafe(*os_, 'N'); PutUnsafe(*os_, 'a'); PutUnsafe(*os_, 'N');
+                return true;
+            }
+            if (internal::Double(d).Sign()) {
+                PutReserve(*os_, 9);
+                PutUnsafe(*os_, '-');
+            }
+            else
+                PutReserve(*os_, 8);
+            PutUnsafe(*os_, 'I'); PutUnsafe(*os_, 'n'); PutUnsafe(*os_, 'f');
+            PutUnsafe(*os_, 'i'); PutUnsafe(*os_, 'n'); PutUnsafe(*os_, 'i'); PutUnsafe(*os_, 't'); PutUnsafe(*os_, 'y');
+            return true;
+        }
+
         char buffer[25];
         char* end = internal::dtoa(d, buffer, maxDecimalPlaces_);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
@@ -489,8 +506,25 @@ inline bool Writer<StringBuffer>::WriteUint64(uint64_t u) {
 
 template<>
 inline bool Writer<StringBuffer>::WriteDouble(double d) {
-    if (internal::Double(d).IsNanOrInf())
-        return false;
+    if (internal::Double(d).IsNanOrInf()) {
+        // Note: This code path can only be reached if (RAPIDJSON_WRITE_DEFAULT_FLAGS & kWriteNanAndInfFlag).
+        if (!(kWriteDefaultFlags & kWriteNanAndInfFlag))
+            return false;
+        if (internal::Double(d).IsNan()) {
+            PutReserve(*os_, 3);
+            PutUnsafe(*os_, 'N'); PutUnsafe(*os_, 'a'); PutUnsafe(*os_, 'N');
+            return true;
+        }
+        if (internal::Double(d).Sign()) {
+            PutReserve(*os_, 9);
+            PutUnsafe(*os_, '-');
+        }
+        else
+            PutReserve(*os_, 8);
+        PutUnsafe(*os_, 'I'); PutUnsafe(*os_, 'n'); PutUnsafe(*os_, 'f');
+        PutUnsafe(*os_, 'i'); PutUnsafe(*os_, 'n'); PutUnsafe(*os_, 'i'); PutUnsafe(*os_, 't'); PutUnsafe(*os_, 'y');
+        return true;
+    }
     
     char *buffer = os_->Push(25);
     char* end = internal::dtoa(d, buffer, maxDecimalPlaces_);

@@ -23,6 +23,7 @@
 #include "internal/meta.h"
 #include "internal/stack.h"
 #include "internal/strtod.h"
+#include <limits>
 
 #if defined(RAPIDJSON_SIMD) && defined(_MSC_VER)
 #include <intrin.h>
@@ -150,6 +151,7 @@ enum ParseFlag {
     kParseCommentsFlag = 32,        //!< Allow one-line (//) and multi-line (/**/) comments.
     kParseNumbersAsStringsFlag = 64,    //!< Parse all numbers (ints/doubles) as strings.
     kParseTrailingCommasFlag = 128, //!< Allow trailing commas at the end of objects and arrays.
+    kParseNanAndInfFlag = 256,      //!< Allow parsing NaN, Inf, Infinity, -Inf and -Infinity as doubles.
     kParseDefaultFlags = RAPIDJSON_PARSE_DEFAULT_FLAGS  //!< Default parse flags. Can be customized by defining RAPIDJSON_PARSE_DEFAULT_FLAGS
 };
 
@@ -1137,6 +1139,8 @@ private:
                 (parseFlags & kParseInsituFlag) == 0> s(*this, copy.s);
 
         size_t startOffset = s.Tell();
+        double d = 0.0;
+        bool useNanOrInf = false;
 
         // Parse minus
         bool minus = Consume(s, '-');
@@ -1178,12 +1182,26 @@ private:
                     significandDigit++;
                 }
         }
+        // Parse NaN or Infinity here
+        else if ((parseFlags & kParseNanAndInfFlag) && RAPIDJSON_LIKELY((s.Peek() == 'I' || s.Peek() == 'N'))) {
+            useNanOrInf = true;
+            if (RAPIDJSON_LIKELY(Consume(s, 'N') && Consume(s, 'a') && Consume(s, 'N'))) {
+                d = std::numeric_limits<double>::quiet_NaN();
+            }
+            else if (RAPIDJSON_LIKELY(Consume(s, 'I') && Consume(s, 'n') && Consume(s, 'f'))) {
+                d = (minus ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity());
+                if (RAPIDJSON_UNLIKELY(s.Peek() == 'i' && !(Consume(s, 'i') && Consume(s, 'n')
+                                                            && Consume(s, 'i') && Consume(s, 't') && Consume(s, 'y'))))
+                    RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
+            }
+            else
+                RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
+        }
         else
             RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
 
         // Parse 64bit int
         bool useDouble = false;
-        double d = 0.0;
         if (use64bit) {
             if (minus)
                 while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
@@ -1345,6 +1363,9 @@ private:
                    d = internal::StrtodNormalPrecision(d, p);
 
                cont = handler.Double(minus ? -d : d);
+           }
+           else if (useNanOrInf) {
+               cont = handler.Double(d);
            }
            else {
                if (use64bit) {
