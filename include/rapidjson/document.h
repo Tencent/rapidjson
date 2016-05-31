@@ -978,6 +978,9 @@ public:
     bool IsLosslessFloat() const {
         if (!IsNumber()) return false;
         double a = GetDouble();
+        if (a < static_cast<double>(-std::numeric_limits<float>::max())
+                || a > static_cast<double>(std::numeric_limits<float>::max()))
+            return false;
         double b = static_cast<double>(static_cast<float>(a));
         return a >= b && a <= b;    // Prevent -Wfloat-equal
     }
