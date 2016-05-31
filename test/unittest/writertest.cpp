@@ -439,11 +439,9 @@ TEST(Writer, InvalidEventSequence) {
     }
 }
 
-extern double zero; // clang -Wmissing-variable-declarations
-double zero = 0.0;	// Use global variable to prevent compiler warning
-
 TEST(Writer, NaN) {
-    double nan = zero / zero;
+    double nan = std::numeric_limits<double>::quiet_NaN();
+
     EXPECT_TRUE(internal::Double(nan).IsNan());
     StringBuffer buffer;
     {
@@ -461,7 +459,8 @@ TEST(Writer, NaN) {
 }
 
 TEST(Writer, Inf) {
-    double inf = 1.0 / zero;
+    double inf = std::numeric_limits<double>::infinity();
+
     EXPECT_TRUE(internal::Double(inf).IsInf());
     StringBuffer buffer;
     {
