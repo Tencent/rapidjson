@@ -84,6 +84,8 @@ static void Verify(void(*f)(T, char*), char* (*g)(T, char*)) {
                 VerifyValue<T>(Traits<T>::Negate(i + 1), f, g);
             }
             last = i;
+            if (i > static_cast<T>(std::numeric_limits<T>::max() / static_cast<T>(power)))
+                break;
             i *= power;
         } while (last < i);
     }
