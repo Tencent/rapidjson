@@ -545,8 +545,10 @@ TEST(Value, Int64) {
     // Templated functions
     EXPECT_TRUE(z.Is<int64_t>());
     EXPECT_EQ(i, z.Get<int64_t>());
+#if 0 // signed integer underflow is undefined behaviour
     EXPECT_EQ(i - 1, z.Set(i - 1).Get<int64_t>());
     EXPECT_EQ(i - 2, z.Set<int64_t>(i - 2).Get<int64_t>());
+#endif
 }
 
 TEST(Value, Uint64) {
