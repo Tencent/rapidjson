@@ -413,9 +413,11 @@ public:
                 }
             }
 
-        AssignIfExist(allOf_, *schemaDocument, p, value, GetAllOfString(), document);
-        AssignIfExist(anyOf_, *schemaDocument, p, value, GetAnyOfString(), document);
-        AssignIfExist(oneOf_, *schemaDocument, p, value, GetOneOfString(), document);
+        if (schemaDocument) {
+            AssignIfExist(allOf_, *schemaDocument, p, value, GetAllOfString(), document);
+            AssignIfExist(anyOf_, *schemaDocument, p, value, GetAnyOfString(), document);
+            AssignIfExist(oneOf_, *schemaDocument, p, value, GetOneOfString(), document);
+        }
 
         if (const ValueType* v = GetMember(value, GetNotString())) {
             schemaDocument->CreateSchema(&not_, p.Append(GetNotString(), allocator_), *v, document);
@@ -578,7 +580,9 @@ public:
     }
 
     ~Schema() {
-        allocator_->Free(enum_);
+        if (allocator_) {
+            allocator_->Free(enum_);
+        }
         if (properties_) {
             for (SizeType i = 0; i < propertyCount_; i++)
                 properties_[i].~Property();
