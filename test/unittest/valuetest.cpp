@@ -1119,14 +1119,18 @@ TEST(Value, ArrayHelperRangeFor) {
 
     {
         int i = 0;
-        for (auto& v : x.GetArray())
-            EXPECT_EQ(i++, v.GetInt());
+        for (auto& v : x.GetArray()) {
+            EXPECT_EQ(i, v.GetInt());
+            i++;
+        }
         EXPECT_EQ(i, 10);
     }
     {
         int i = 0;
-        for (const auto& v : const_cast<const Value&>(x).GetArray())
-            EXPECT_EQ(i++, v.GetInt());
+        for (const auto& v : const_cast<const Value&>(x).GetArray()) {
+            EXPECT_EQ(i, v.GetInt());
+            i++;
+        }
         EXPECT_EQ(i, 10);
     }
 
