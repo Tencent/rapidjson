@@ -1,7 +1,7 @@
 
 SET(GTEST_SEARCH_PATH
     "${GTEST_SOURCE_DIR}"
-    "${CMAKE_CURRENT_LIST_DIR}/../thirdparty/gtest")
+    "${CMAKE_CURRENT_LIST_DIR}/../thirdparty/gtest/googletest")
 
 IF(UNIX)
     IF(RAPIDJSON_BUILD_THIRDPARTY_GTEST)
