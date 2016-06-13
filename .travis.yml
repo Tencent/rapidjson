@@ -1,16 +1,12 @@
+sudo: required
+dist: precise
+
 language: cpp
-sudo: false
 cache:
   - ccache
 
-addons:
-  apt:
-    packages: &default_packages
-      - cmake
-      - valgrind
-
 env:
-global:
+  global:
     - USE_CCACHE=1
     - CCACHE_SLOPPINESS=pch_defines,time_macros
     - CCACHE_COMPRESS=1
@@ -20,108 +16,41 @@ global:
     - GITHUB_REPO='miloyip/rapidjson'
     - secure: "HrsaCb+N66EG1HR+LWH1u51SjaJyRwJEDzqJGYMB7LJ/bfqb9mWKF1fLvZGk46W5t7TVaXRDD5KHFx9DPWvKn4gRUVkwTHEy262ah5ORh8M6n/6VVVajeV/AYt2C0sswdkDBDO4Xq+xy5gdw3G8s1A4Inbm73pUh+6vx+7ltBbk="
 
+before_install:
+    - sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
+    - sudo apt-get update -qq
+    - sudo apt-get install -y cmake valgrind g++-multilib libc6-dbg:i386
+
 matrix:
   include:
     # gcc
     - env: CONF=release ARCH=x86    CXX11=ON
       compiler: gcc
-      addons:
-        apt:
-          packages:
-            - *default_packages
-            - g++-multilib
-            - libc6-dbg:i386
     - env: CONF=release ARCH=x86_64 CXX11=ON
       compiler: gcc
     - env: CONF=debug   ARCH=x86    CXX11=OFF
       compiler: gcc
-      addons:
-        apt:
-          packages:
-            - *default_packages
-            - g++-multilib
-            - libc6-dbg:i386
     - env: CONF=debug   ARCH=x86_64 CXX11=OFF
       compiler: gcc
     # clang
     - env: CONF=debug   ARCH=x86    CXX11=ON CCACHE_CPP2=yes
       compiler: clang
-      addons:
-        apt:
-          sources:
-            - llvm-toolchain-precise-3.7
-            - ubuntu-toolchain-r-test
-          packages:
-            - *default_packages
-            - g++-multilib
-            - libc6-dbg:i386
-            - clang-3.7
     - env: CONF=debug   ARCH=x86_64 CXX11=ON CCACHE_CPP2=yes
       compiler: clang
-      addons:
-        apt:
-          sources:
-            - llvm-toolchain-precise-3.7
-            - ubuntu-toolchain-r-test
-          packages:
-            - *default_packages
-            - clang-3.7
     - env: CONF=debug   ARCH=x86    CXX11=OFF CCACHE_CPP2=yes
       compiler: clang
-      addons:
-        apt:
-          sources:
-            - llvm-toolchain-precise-3.7
-            - ubuntu-toolchain-r-test
-          packages:
-            - *default_packages
-            - g++-multilib
-            - libc6-dbg:i386
-            - clang-3.7
     - env: CONF=debug   ARCH=x86_64 CXX11=OFF CCACHE_CPP2=yes
       compiler: clang
-      addons:
-        apt:
-          sources:
-            - llvm-toolchain-precise-3.7
-            - ubuntu-toolchain-r-test
-          packages:
-            - *default_packages
-            - clang-3.7
     - env: CONF=release ARCH=x86    CXX11=ON CCACHE_CPP2=yes
       compiler: clang
-      addons:
-        apt:
-          sources:
-            - llvm-toolchain-precise-3.7
-            - ubuntu-toolchain-r-test
-          packages:
-            - *default_packages
-            - g++-multilib
-            - libc6-dbg:i386
-            - clang-3.7
     - env: CONF=release ARCH=x86_64 CXX11=ON CCACHE_CPP2=yes
       compiler: clang
-      addons:
-        apt:
-          sources:
-            - llvm-toolchain-precise-3.7
-            - ubuntu-toolchain-r-test
-          packages:
-            - *default_packages
-            - clang-3.7
     # coverage report
     - env: CONF=debug   ARCH=x86    CXX11=ON GCOV_FLAGS='--coverage'
       compiler: gcc
       cache:
         - ccache
         - pip
-      addons:
-        apt:
-          packages:
-            - *default_packages
-            - g++-multilib
-            - libc6-dbg:i386
       after_success:
         - pip install --user cpp-coveralls
         - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
@@ -130,12 +59,6 @@ matrix:
       cache:
         - ccache
         - pip
-      addons:
-        apt:
-          packages:
-            - *default_packages
-            - g++-multilib
-            - libc6-dbg:i386
       after_success:
         - pip install --user cpp-coveralls
         - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
@@ -158,7 +81,7 @@ before_script:
     - mkdir build
 
 script:
-  - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
+  - if [ "$CXX" = "clang++" ]; then export CXXFLAGS="-stdlib=libc++ ${CXXFLAGS}"; fi
   - >
       eval "ARCH_FLAGS=\${ARCH_FLAGS_${ARCH}}" ;
       (cd build && cmake
