@@ -41,6 +41,7 @@ RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(padded)
+RAPIDJSON_DIAG_OFF(unreachable-code)
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
