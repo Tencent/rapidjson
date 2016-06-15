@@ -59,7 +59,7 @@ These events can be easily matched with the JSON, except some event parameters n
 using namespace rapidjson;
 using namespace std;
 
-struct MyHandler {
+struct MyHandler : public BaseReaderHandler<UTF8<>, MyHandler> {
     bool Null() { cout << "Null()" << endl; return true; }
     bool Bool(bool b) { cout << "Bool(" << boolalpha << b << ")" << endl; return true; }
     bool Int(int i) { cout << "Int(" << i << ")" << endl; return true; }

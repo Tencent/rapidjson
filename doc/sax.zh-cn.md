@@ -59,7 +59,7 @@ EndObject(7)
 using namespace rapidjson;
 using namespace std;
 
-struct MyHandler {
+struct MyHandler : public BaseReaderHandler<UTF8<>, MyHandler> {
     bool Null() { cout << "Null()" << endl; return true; }
     bool Bool(bool b) { cout << "Bool(" << boolalpha << b << ")" << endl; return true; }
     bool Int(int i) { cout << "Int(" << i << ")" << endl; return true; }
@@ -106,6 +106,7 @@ class Handler {
     bool Int64(int64_t i);
     bool Uint64(uint64_t i);
     bool Double(double d);
+    bool RawNumber(const Ch* str, SizeType length, bool copy);
     bool String(const Ch* str, SizeType length, bool copy);
     bool StartObject();
     bool Key(const Ch* str, SizeType length, bool copy);
