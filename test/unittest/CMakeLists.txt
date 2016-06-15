@@ -1,3 +1,5 @@
+include(CheckCXXCompilerFlag)
+
 set(UNITTEST_SOURCES
 	allocatorstest.cpp
     bigintegertest.cpp
@@ -38,11 +40,14 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default -Wfloat-equal")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default -Wfloat-equal -Wimplicit-fallthrough -Weverything")
-	# If the user is running a newer version of Clang that includes the
-	# -Wdouble-promotion, we will ignore that warning.
-	# if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 3.7)
-	#     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-double-promotion")
-	# endif()
+    # If the user is running a newer version of Clang that includes the
+    # -Wdouble-promotion, we will ignore that warning.
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 3.7)
+        CHECK_CXX_COMPILER_FLAG("-Wno-double-promotion" HAS_NO_DOUBLE_PROMOTION)
+        if (HAS_NO_DOUBLE_PROMOTION)
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-double-promotion")
+        endif()
+    endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     # Force to always compile with /W4
     if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")

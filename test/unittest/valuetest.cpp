@@ -545,8 +545,10 @@ TEST(Value, Int64) {
     // Templated functions
     EXPECT_TRUE(z.Is<int64_t>());
     EXPECT_EQ(i, z.Get<int64_t>());
+#if 0 // signed integer underflow is undefined behaviour
     EXPECT_EQ(i - 1, z.Set(i - 1).Get<int64_t>());
     EXPECT_EQ(i - 2, z.Set<int64_t>(i - 2).Get<int64_t>());
+#endif
 }
 
 TEST(Value, Uint64) {
@@ -671,6 +673,7 @@ TEST(Value, Float) {
 }
 
 TEST(Value, IsLosslessDouble) {
+    EXPECT_TRUE(Value(0.0).IsLosslessDouble());
     EXPECT_TRUE(Value(12.34).IsLosslessDouble());
     EXPECT_TRUE(Value(-123).IsLosslessDouble());
     EXPECT_TRUE(Value(2147483648u).IsLosslessDouble());
@@ -679,8 +682,19 @@ TEST(Value, IsLosslessDouble) {
     EXPECT_TRUE(Value(RAPIDJSON_UINT64_C2(0xA0000000, 0x00000000)).IsLosslessDouble());
 #endif
 
-    EXPECT_FALSE(Value(-static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x7FFFFFFF, 0xFFFFFFFF))).IsLosslessDouble());
-    EXPECT_FALSE(Value(RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0xFFFFFFFF)).IsLosslessDouble());
+    EXPECT_FALSE(Value(static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x7FFFFFFF, 0xFFFFFFFF))).IsLosslessDouble()); // INT64_MAX
+    EXPECT_FALSE(Value(-static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x7FFFFFFF, 0xFFFFFFFF))).IsLosslessDouble()); // -INT64_MAX
+    EXPECT_TRUE(Value(-static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x7FFFFFFF, 0xFFFFFFFF)) - 1).IsLosslessDouble()); // INT64_MIN
+    EXPECT_FALSE(Value(RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0xFFFFFFFF)).IsLosslessDouble()); // UINT64_MAX
+
+    EXPECT_TRUE(Value(3.4028234e38f).IsLosslessDouble()); // FLT_MAX
+    EXPECT_TRUE(Value(-3.4028234e38f).IsLosslessDouble()); // -FLT_MAX
+    EXPECT_TRUE(Value(1.17549435e-38f).IsLosslessDouble()); // FLT_MIN
+    EXPECT_TRUE(Value(-1.17549435e-38f).IsLosslessDouble()); // -FLT_MIN
+    EXPECT_TRUE(Value(1.7976931348623157e+308).IsLosslessDouble()); // DBL_MAX
+    EXPECT_TRUE(Value(-1.7976931348623157e+308).IsLosslessDouble()); // -DBL_MAX
+    EXPECT_TRUE(Value(2.2250738585072014e-308).IsLosslessDouble()); // DBL_MIN
+    EXPECT_TRUE(Value(-2.2250738585072014e-308).IsLosslessDouble()); // -DBL_MIN
 }
 
 TEST(Value, IsLosslessFloat) {
@@ -1119,14 +1133,18 @@ TEST(Value, ArrayHelperRangeFor) {
 
     {
         int i = 0;
-        for (auto& v : x.GetArray())
-            EXPECT_EQ(i++, v.GetInt());
+        for (auto& v : x.GetArray()) {
+            EXPECT_EQ(i, v.GetInt());
+            i++;
+        }
         EXPECT_EQ(i, 10);
     }
     {
         int i = 0;
-        for (const auto& v : const_cast<const Value&>(x).GetArray())
-            EXPECT_EQ(i++, v.GetInt());
+        for (const auto& v : const_cast<const Value&>(x).GetArray()) {
+            EXPECT_EQ(i, v.GetInt());
+            i++;
+        }
         EXPECT_EQ(i, 10);
     }
 

@@ -767,8 +767,12 @@ private:
         tokenCount_ = rhs.tokenCount_ + extraToken;
         tokens_ = static_cast<Token *>(allocator_->Malloc(tokenCount_ * sizeof(Token) + (nameBufferSize + extraNameBufferSize) * sizeof(Ch)));
         nameBuffer_ = reinterpret_cast<Ch *>(tokens_ + tokenCount_);
-        std::memcpy(tokens_, rhs.tokens_, rhs.tokenCount_ * sizeof(Token));
-        std::memcpy(nameBuffer_, rhs.nameBuffer_, nameBufferSize * sizeof(Ch));
+        if (rhs.tokenCount_ > 0) {
+            std::memcpy(tokens_, rhs.tokens_, rhs.tokenCount_ * sizeof(Token));
+        }
+        if (nameBufferSize > 0) {
+            std::memcpy(nameBuffer_, rhs.nameBuffer_, nameBufferSize * sizeof(Ch));
+        }
 
         // Adjust pointers to name buffer
         std::ptrdiff_t diff = nameBuffer_ - rhs.nameBuffer_;

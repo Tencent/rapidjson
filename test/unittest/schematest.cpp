@@ -111,7 +111,7 @@ TEST(SchemaValidator, Hasher) {
     EXPECT_FALSE(d.HasParseError());\
     EXPECT_TRUE(expected == d.Accept(validator));\
     EXPECT_TRUE(expected == validator.IsValid());\
-    if (expected && !validator.IsValid()) {\
+    if ((expected) && !validator.IsValid()) {\
         StringBuffer sb;\
         validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);\
         printf("Invalid schema: %s\n", sb.GetString());\

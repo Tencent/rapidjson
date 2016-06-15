@@ -154,7 +154,11 @@ struct UTF8 {
         }
 
         unsigned char type = GetRange(static_cast<unsigned char>(c));
-        *codepoint = (0xFF >> type) & static_cast<unsigned char>(c);
+        if (type >= 32) {
+            *codepoint = 0;
+        } else {
+            *codepoint = (0xFF >> type) & static_cast<unsigned char>(c);
+        }
         bool result = true;
         switch (type) {
         case 2: TAIL(); return result;
