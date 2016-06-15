@@ -379,7 +379,7 @@ const char * cstr = getenv("USER");
 size_t cstr_len = ...;                 // 如果有长度
 Value s;
 // s.SetString(cstr);                  // 这不能通过编译
-s.SetString(StringRef(cstr));          // 可以，假设它的生命周期案全，并且是以空字符结尾的
+s.SetString(StringRef(cstr));          // 可以，假设它的生命周期安全，并且是以空字符结尾的
 s = StringRef(cstr);                   // 上行的缩写
 s.SetString(StringRef(cstr, cstr_len));// 更快，可处理空字符
 s = StringRef(cstr, cstr_len);         // 上行的缩写
