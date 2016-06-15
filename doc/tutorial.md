@@ -166,7 +166,7 @@ If we are unsure whether a member exists, we need to call `HasMember()` before c
 ~~~~~~~~~~cpp
 Value::ConstMemberIterator itr = document.FindMember("hello");
 if (itr != document.MemberEnd())
-    printf("%s %s\n", itr->value.GetString());
+    printf("%s\n", itr->value.GetString());
 ~~~~~~~~~~
 
 ## Querying Number {#QueryNumber}

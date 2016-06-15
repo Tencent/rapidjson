@@ -166,7 +166,7 @@ Type of member a is Array
 ~~~~~~~~~~cpp
 Value::ConstMemberIterator itr = document.FindMember("hello");
 if (itr != document.MemberEnd())
-    printf("%s %s\n", itr->value.GetString());
+    printf("%s\n", itr->value.GetString());
 ~~~~~~~~~~
 
 ## 查询 Number {#QueryNumber}
