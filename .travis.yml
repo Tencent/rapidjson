@@ -77,7 +77,7 @@ before_script:
       #   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
       #   exposed by merging PR#163 (using -march=native)
       #   TODO: Since this bug is already fixed. Remove this when valgrind can be upgraded.
-    - sed -i "s/-march=native//" CMakeLists.txt
+    # - sed -i "s/-march=native//" CMakeLists.txt
     - mkdir build
 
 script:
