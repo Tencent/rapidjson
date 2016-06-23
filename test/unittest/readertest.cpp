@@ -23,15 +23,17 @@
 
 using namespace rapidjson;
 
-#ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
+#ifdef __GNUC__
 RAPIDJSON_DIAG_OFF(effc++)
 RAPIDJSON_DIAG_OFF(float-equal)
 RAPIDJSON_DIAG_OFF(missing-noreturn)
+#if __GNUC__ >= 6
+RAPIDJSON_DIAG_OFF(dangling-else)
 #endif
+#endif // __GNUC__
 
 #ifdef __clang__
-RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(variadic-macros)
 RAPIDJSON_DIAG_OFF(c++98-compat-pedantic)
 #endif
@@ -1839,10 +1841,4 @@ TEST(Reader, ParseNanAndInfinity) {
 #undef TEST_NAN_INF
 }
 
-#ifdef __GNUC__
 RAPIDJSON_DIAG_POP
-#endif
-
-#ifdef __clang__
-RAPIDJSON_DIAG_POP
-#endif

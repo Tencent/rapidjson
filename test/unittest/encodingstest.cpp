@@ -302,8 +302,9 @@ TEST(EncodingsTest, UTF8) {
                         decodedCount++;
                     }
 
-                if (*encodedStr)                // This decoder cannot handle U+0000
+                if (*encodedStr) {                  // This decoder cannot handle U+0000
                     EXPECT_EQ(1u, decodedCount);    // Should only contain one code point
+                }
 
                 EXPECT_EQ(UTF8_ACCEPT, state);
                 if (UTF8_ACCEPT != state)
