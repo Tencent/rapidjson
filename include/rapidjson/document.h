@@ -25,23 +25,24 @@
 #include <new>      // placement new
 #include <limits>
 
-#ifdef _MSC_VER
 RAPIDJSON_DIAG_PUSH
+#ifdef _MSC_VER
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 RAPIDJSON_DIAG_OFF(4244) // conversion from kXxxFlags to 'uint16_t', possible loss of data
 #endif
 
 #ifdef __clang__
-RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(padded)
 RAPIDJSON_DIAG_OFF(switch-enum)
 RAPIDJSON_DIAG_OFF(c++98-compat)
 #endif
 
 #ifdef __GNUC__
-RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
+#if __GNUC__ >= 6
+RAPIDJSON_DIAG_OFF(terminate) // ignore throwing RAPIDJSON_ASSERT in RAPIDJSON_NOEXCEPT functions
 #endif
+#endif // __GNUC__
 
 #ifndef RAPIDJSON_NOMEMBERITERATORCLASS
 #include <iterator> // std::iterator, std::random_access_iterator_tag
@@ -2569,17 +2570,6 @@ private:
 };
 
 RAPIDJSON_NAMESPACE_END
-
-#ifdef _MSC_VER
 RAPIDJSON_DIAG_POP
-#endif
-
-#ifdef __clang__
-RAPIDJSON_DIAG_POP
-#endif
-
-#ifdef __GNUC__
-RAPIDJSON_DIAG_POP
-#endif
 
 #endif // RAPIDJSON_DOCUMENT_H_
