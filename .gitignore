@@ -20,5 +20,6 @@ Testing
 /googletest
 install_manifest.txt
 Doxyfile
+Doxyfile.zh-cn
 DartConfiguration.tcl
 *.nupkg
