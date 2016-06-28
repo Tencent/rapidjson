@@ -28,7 +28,7 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 RAPIDJSON_DIAG_OFF(float-equal)
 RAPIDJSON_DIAG_OFF(missing-noreturn)
-#if __GNUC__ >= 6
+#if __GNUC__ >= 7
 RAPIDJSON_DIAG_OFF(dangling-else)
 #endif
 #endif // __GNUC__
