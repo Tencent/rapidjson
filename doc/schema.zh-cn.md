@@ -152,7 +152,7 @@ JSON Schema 支持 [`$ref` 关键字](http://spacetelescope.github.io/understand
 { "$ref": "definitions.json#/address" }
 ~~~
 
-由于 `SchemaValidator` 并不知道如何处理那些 URI，它需要使用者提供一个 `IRemoteSchemaDocumentProvider` 的实例去处理。
+由于 `SchemaDocument` 并不知道如何处理那些 URI，它需要使用者提供一个 `IRemoteSchemaDocumentProvider` 的实例去处理。
 
 ~~~
 class MyRemoteSchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
@@ -165,7 +165,7 @@ public:
 // ...
 
 MyRemoteSchemaDocumentProvider provider;
-SchemaValidator validator(schema, &provider);
+SchemaDocument schema(sd, &provider);
 ~~~
 
 ## 标准的符合程度

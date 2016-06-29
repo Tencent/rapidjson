@@ -152,7 +152,7 @@ JSON Schema supports [`$ref` keyword](http://spacetelescope.github.io/understand
 { "$ref": "definitions.json#/address" }
 ~~~
 
-As `SchemaValidator` does not know how to resolve such URI, it needs a user-provided `IRemoteSchemaDocumentProvider` instance to do so.
+As `SchemaDocument` does not know how to resolve such URI, it needs a user-provided `IRemoteSchemaDocumentProvider` instance to do so.
 
 ~~~
 class MyRemoteSchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
@@ -165,7 +165,7 @@ public:
 // ...
 
 MyRemoteSchemaDocumentProvider provider;
-SchemaValidator validator(schema, &provider);
+SchemaDocument schema(sd, &provider);
 ~~~
 
 ## Conformance
