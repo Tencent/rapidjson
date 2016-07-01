@@ -95,7 +95,7 @@ inline void PutUnsafe(Stream& stream, typename Stream::Ch c) {
 //! Put N copies of a character to a stream.
 template<typename Stream, typename Ch>
 inline void PutN(Stream& stream, Ch c, size_t n) {
-    PutReserve<Stream>(stream, n);
+    PutReserve(stream, n);
     for (size_t i = 0; i < n; i++)
         PutUnsafe(stream, c);
 }

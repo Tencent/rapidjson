@@ -37,6 +37,13 @@ TEST(StringBuffer, Put) {
     EXPECT_STREQ("A", buffer.GetString());
 }
 
+TEST(StringBuffer, PutN_Issue672) {
+    GenericStringBuffer<UTF8<>, MemoryPoolAllocator<> > buffer;
+    EXPECT_EQ(0, buffer.GetSize());
+    rapidjson::PutN(buffer, ' ', 1);
+    EXPECT_EQ(1, buffer.GetSize());
+}
+
 TEST(StringBuffer, Clear) {
     StringBuffer buffer;
     buffer.Put('A');
