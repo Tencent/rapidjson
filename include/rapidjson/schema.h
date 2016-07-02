@@ -1338,7 +1338,7 @@ public:
         \param remoteProvider An optional remote schema document provider for resolving remote reference. Can be null.
         \param allocator An optional allocator instance for allocating memory. Can be null.
     */
-    GenericSchemaDocument(const ValueType& document, IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) :
+    explicit GenericSchemaDocument(const ValueType& document, IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) :
         remoteProvider_(remoteProvider),
         allocator_(allocator),
         ownAllocator_(),
