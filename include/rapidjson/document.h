@@ -480,7 +480,7 @@ template<typename ValueType>
 struct TypeHelper<ValueType, std::basic_string<typename ValueType::Ch> > {
     typedef std::basic_string<typename ValueType::Ch> StringType;
     static bool Is(const ValueType& v) { return v.IsString(); }
-    static StringType Get(const ValueType& v) { return v.GetString(); }
+    static StringType Get(const ValueType& v) { return StringType(v.GetString(), v.GetStringLength()); }
     static ValueType& Set(ValueType& v, const StringType& data, typename ValueType::AllocatorType& a) { return v.SetString(data, a); }
 };
 #endif
