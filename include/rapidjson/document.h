@@ -1169,8 +1169,8 @@ public:
         \return Iterator to member, if it exists.
             Otherwise returns \ref MemberEnd().
     */
-    MemberIterator FindMember(const std::basic_string<Ch>& name) { return FindMember(StringRef(name)); }
-    ConstMemberIterator FindMember(const std::basic_string<Ch>& name) const { return FindMember(StringRef(name)); }
+    MemberIterator FindMember(const std::basic_string<Ch>& name) { return FindMember(GenericValue(StringRef(name))); }
+    ConstMemberIterator FindMember(const std::basic_string<Ch>& name) const { return FindMember(GenericValue(StringRef(name))); }
 #endif
 
     //! Add a member (name-value pair) to the object.
