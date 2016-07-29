@@ -42,8 +42,8 @@ abort() {
 	skip "Running Doxygen only for updates on 'master' branch (current: ${TRAVIS_BRANCH})."
 
 # check for job number
-[ "${TRAVIS_JOB_NUMBER}" = "${TRAVIS_BUILD_NUMBER}.1" ] || \
-	skip "Running Doxygen only on first job of build ${TRAVIS_BUILD_NUMBER} (current: ${TRAVIS_JOB_NUMBER})."
+# [ "${TRAVIS_JOB_NUMBER}" = "${TRAVIS_BUILD_NUMBER}.1" ] || \
+# 	skip "Running Doxygen only on first job of build ${TRAVIS_BUILD_NUMBER} (current: ${TRAVIS_JOB_NUMBER})."
 
 # install doxygen binary distribution
 doxygen_install()
