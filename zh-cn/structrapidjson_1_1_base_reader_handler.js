@@ -11,6 +11,7 @@ var structrapidjson_1_1_base_reader_handler =
     [ "Int64", "structrapidjson_1_1_base_reader_handler.html#afb78023dc0f5a31f9c5d5de4a55d9077", null ],
     [ "Key", "structrapidjson_1_1_base_reader_handler.html#a92649c2dc3e94e085ee056c17444d418", null ],
     [ "Null", "structrapidjson_1_1_base_reader_handler.html#a823c816871a8dd881019ee8526b517cb", null ],
+    [ "RawNumber", "structrapidjson_1_1_base_reader_handler.html#a0de969fd05528960c2a7de51b2265bf1", null ],
     [ "StartArray", "structrapidjson_1_1_base_reader_handler.html#a0c6fba36350848cb691879758b2d8d59", null ],
     [ "StartObject", "structrapidjson_1_1_base_reader_handler.html#a2f3d3bec89a751cdcf7a4236dbc6b26d", null ],
     [ "String", "structrapidjson_1_1_base_reader_handler.html#ad48b724f01c31c1fdbd623bd31df6a3c", null ],

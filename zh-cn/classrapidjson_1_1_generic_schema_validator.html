@@ -176,6 +176,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>Uint64</b> (uint64_t 
 <tr class="memitem:a9d1110efc1a7f8c18cd88020310b35bf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9d1110efc1a7f8c18cd88020310b35bf"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>Double</b> (double d)</td></tr>
 <tr class="separator:a9d1110efc1a7f8c18cd88020310b35bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a58fb3589123904533021926530a206ce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a58fb3589123904533021926530a206ce"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>RawNumber</b> (const Ch *str, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, bool copy)</td></tr>
+<tr class="separator:a58fb3589123904533021926530a206ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a92a6d2ba413cfd05cb2122fc119efd46"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a92a6d2ba413cfd05cb2122fc119efd46"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>String</b> (const Ch *str, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, bool copy)</td></tr>
 <tr class="separator:a92a6d2ba413cfd05cb2122fc119efd46"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -212,9 +215,6 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>DestroryHashe
 <tr class="memitem:a73d58da18b6e77665daaa977852f205c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a73d58da18b6e77665daaa977852f205c"></a>
 virtual void *&#160;</td><td class="memItemRight" valign="bottom"><b>MallocState</b> (size_t size)</td></tr>
 <tr class="separator:a73d58da18b6e77665daaa977852f205c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2544b83c6ea83c07533d8335f19f189b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2544b83c6ea83c07533d8335f19f189b"></a>
-virtual void *&#160;</td><td class="memItemRight" valign="bottom"><b>ReallocState</b> (void *originalPtr, size_t originalSize, size_t newSize)</td></tr>
-<tr class="separator:a2544b83c6ea83c07533d8335f19f189b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acd4ac0e7042c9ab63e5b9e443dbc0d14"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acd4ac0e7042c9ab63e5b9e443dbc0d14"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>FreeState</b> (void *p)</td></tr>
 <tr class="separator:acd4ac0e7042c9ab63e5b9e443dbc0d14"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -371,18 +371,5 @@ template&lt;typename SchemaDocumentType , typename OutputHandler , typename Stat
     <li class="navelem"><a class="el" href="namespacerapidjson.html">rapidjson</a></li><li class="navelem"><a class="el" href="classrapidjson_1_1_generic_schema_validator.html">GenericSchemaValidator</a></li>
   </ul>
 </div>
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = 'rapidjson-doc';
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-	    var dt = document.createElement('div');
-	    dt.id = "disqus_thread";
-	    (document.getElementsByClassName('contents')[0]).appendChild(dt);
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
 </body>
 </html>

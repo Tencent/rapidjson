@@ -206,6 +206,12 @@ Parsing</h1>
 <td><code>kParseFullPrecisionFlag</code> </td><td>Parse number in full precision (slower). If this flag is not set, the normal precision (faster) is used. Normal precision has maximum 3 <a href="http://en.wikipedia.org/wiki/Unit_in_the_last_place">ULP</a> error. </td></tr>
 <tr>
 <td><code>kParseCommentsFlag</code> </td><td>Allow one-line <code>// ...</code> and multi-line <code>/* ... */</code> comments (relaxed JSON syntax). </td></tr>
+<tr>
+<td><code>kParseNumbersAsStringsFlag</code> </td><td>Parse numerical type values as strings. </td></tr>
+<tr>
+<td><code>kParseTrailingCommasFlag</code> </td><td>Allow trailing commas at the end of objects and arrays (relaxed JSON syntax). </td></tr>
+<tr>
+<td><code>kParseNanAndInfFlag</code> </td><td>Allow parsing <code>NaN</code>, <code>Inf</code>, <code>Infinity</code>, <code>-Inf</code> and <code>-Infinity</code> as <code>double</code> values (relaxed JSON syntax). </td></tr>
 </table>
 <p>By using a non-type template parameter, instead of a function parameter, C++ compiler can generate code which is optimized for specified combinations, improving speed, and reducing code size (if only using a single specialization). The downside is the flags needed to be determined in compile-time.</p>
 <p>The <code>SourceEncoding</code> parameter defines what encoding is in the stream. This can be differed to the <code>Encoding</code> of the <code>Document</code>. See <a href="#TranscodingAndValidation">Transcoding and Validation</a> section for details.</p>
@@ -260,7 +266,7 @@ Parse Error</h2>
 <div class="line"><span class="keywordflow">if</span> (d.Parse(json).HasParseError()) {</div>
 <div class="line">    fprintf(stderr, <span class="stringliteral">&quot;\nError(offset %u): %s\n&quot;</span>, </div>
 <div class="line">        (<span class="keywordtype">unsigned</span>)d.GetErrorOffset(),</div>
-<div class="line">        <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(d.GetParseErrorCode()));</div>
+<div class="line">        <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(d.GetParseError()));</div>
 <div class="line">    <span class="comment">// ...</span></div>
 <div class="line">}</div>
 </div><!-- fragment --><h2><a class="anchor" id="InSituParsing"></a>
@@ -350,18 +356,5 @@ User Buffer</h2>
   <ul>
   </ul>
 </div>
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = 'rapidjson-doc';
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-	    var dt = document.createElement('div');
-	    dt.id = "disqus_thread";
-	    (document.getElementsByClassName('contents')[0]).appendChild(dt);
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
 </body>
 </html>

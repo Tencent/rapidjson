@@ -232,7 +232,7 @@ $(document).ready(function(){initNavTree('strtod_8h_source.html','');});
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keywordtype">size_t</span> remaining = length - i;</div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> kUlpShift = 3;</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">unsigned</span> kUlp = 1 &lt;&lt; kUlpShift;</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="keywordtype">int</span> error = (remaining == 0) ? 0 : kUlp / 2;</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    int64_t error = (remaining == 0) ? 0 : kUlp / 2;</div>
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    DiyFp v(significand, 0);</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    v = v.Normalize();</div>
@@ -368,18 +368,5 @@ $(document).ready(function(){initNavTree('strtod_8h_source.html','');});
     <li class="navelem"><a class="el" href="dir_2e777bb85672ca91d8484c1593fb1d89.html">include</a></li><li class="navelem"><a class="el" href="dir_0b07344794a20f8375311f92e90cd9a3.html">rapidjson</a></li><li class="navelem"><a class="el" href="dir_5167ae66a3a40cb9e5e46c75b7477e81.html">internal</a></li><li class="navelem"><b>strtod.h</b></li>
   </ul>
 </div>
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = 'rapidjson-doc';
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-	    var dt = document.createElement('div');
-	    dt.id = "disqus_thread";
-	    (document.getElementsByClassName('contents')[0]).appendChild(dt);
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
 </body>
 </html>

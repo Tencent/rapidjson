@@ -114,7 +114,7 @@ JSON Pointer</h1>
 <li><code>"/foo/1"</code> → <code>"baz"</code></li>
 <li><code>"/pi"</code> → <code>3.1416</code></li>
 </ol>
-<p>要注意，一个空 JSON Pointer <code>""</code> （零个token）解析为整个 JSON。</p>
+<p>要注意，一个空 JSON Pointer <code>""</code> （零个 token）解析为整个 JSON。</p>
 <h1><a class="anchor" id="BasicUsage"></a>
 基本使用方法</h1>
 <p>以下的代码范例不解自明。</p>
@@ -197,7 +197,7 @@ JSON Pointer</h1>
 <li><code>"/1/0"</code> → <code>456</code></li>
 </ol>
 <p>Token <code>"0"</code> 在第一个 pointer 中被当作成员名字。它在第二个 pointer 中被当作成数组索引。</p>
-<p>其他函数会改变 DOM，包括<code>Create()</code>、<code>GetWithDefault()</code>、<code>Set()</code>、<code>Swap()</code>。这些函数总是成功的。若一些父值不存在，就会创建它们。若父值类型不匹配 token，也会强行改变其类型。改变类型也意味着完全移除其 DOM 子树的内容。</p>
+<p>其他函数会改变 DOM，包括 <code>Create()</code>、<code>GetWithDefault()</code>、<code>Set()</code>、<code>Swap()</code>。这些函数总是成功的。若一些父值不存在，就会创建它们。若父值类型不匹配 token，也会强行改变其类型。改变类型也意味着完全移除其 DOM 子树的内容。</p>
 <p>例如，把上面的 JSON 解译至 <code>d</code> 之后，</p>
 <div class="fragment"><div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;1/a&quot;</span>, 789); <span class="comment">// { &quot;0&quot; : 123, &quot;1&quot; : { &quot;a&quot; : 789 } }</span></div>
 </div><!-- fragment --><h2>解析负号 token</h2>
@@ -239,7 +239,7 @@ JSON Pointer</h1>
 <p>要注意的是，所有解析函数都假设 pointer 是合法的。对一个非法 pointer 解析会做成断言失败。</p>
 <h1><a class="anchor" id="URIFragment"></a>
 URI 片段表示方式</h1>
-<p>除了我们一直在使用的字符串方式表示 JSON pointer，<a href="https://tools.ietf.org/html/rfc6901">RFC6901</a>也定义了一个 JSON Pointer 的 URI 片段（fragment）表示方式。URI 片段是定义于 <a href="https://tools.ietf.org/html/rfc3986">RFC3986</a> "Uniform Resource Identifier (URI): Generic Syntax"。</p>
+<p>除了我们一直在使用的字符串方式表示 JSON pointer，<a href="https://tools.ietf.org/html/rfc6901">RFC6901</a> 也定义了一个 JSON Pointer 的 URI 片段（fragment）表示方式。URI 片段是定义于 <a href="https://tools.ietf.org/html/rfc3986">RFC3986</a> "Uniform Resource Identifier (URI): Generic Syntax"。</p>
 <p>URI 片段的主要分别是必然以 <code>#</code> （pound sign）开头，而一些字符也会以百分比编码成 UTF-8 序列。例如，以下的表展示了不同表示法下的 C/C++ 字符串常数。</p>
 <table class="doxtable">
 <tr>
@@ -284,18 +284,5 @@ URI 片段表示方式</h1>
   <ul>
   </ul>
 </div>
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = 'rapidjson-doc';
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-	    var dt = document.createElement('div');
-	    dt.id = "disqus_thread";
-	    (document.getElementsByClassName('contents')[0]).appendChild(dt);
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
 </body>
 </html>

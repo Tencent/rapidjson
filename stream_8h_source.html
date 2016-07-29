@@ -185,7 +185,7 @@ $(document).ready(function(){initNavTree('stream_8h_source.html','');});
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="comment">//! Put N copies of a character to a stream.</span></div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="comment"></span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Stream, <span class="keyword">typename</span> Ch&gt;</div>
 <div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="namespacerapidjson.html#a1d49d2cab617858b53a1db23b1759f43">   97</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespacerapidjson.html#a1ac13bac5976fc06587e00fc0bcfb32a">PutN</a>(<a class="code" href="classrapidjson_1_1_stream.html">Stream</a>&amp; stream, Ch c, <span class="keywordtype">size_t</span> n) {</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    PutReserve&lt;Stream&gt;(stream, n);</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <a class="code" href="namespacerapidjson.html#a820f77efccfbb749bd15fe4822d2c740">PutReserve</a>(stream, n);</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; n; i++)</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        <a class="code" href="namespacerapidjson.html#a0a774dcffe8ae07686f459ae017d2f20">PutUnsafe</a>(stream, c);</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;}</div>
@@ -288,18 +288,5 @@ $(document).ready(function(){initNavTree('stream_8h_source.html','');});
     <li class="navelem"><a class="el" href="dir_2e777bb85672ca91d8484c1593fb1d89.html">include</a></li><li class="navelem"><a class="el" href="dir_0b07344794a20f8375311f92e90cd9a3.html">rapidjson</a></li><li class="navelem"><b>stream.h</b></li>
   </ul>
 </div>
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = 'rapidjson-doc';
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-	    var dt = document.createElement('div');
-	    dt.id = "disqus_thread";
-	    (document.getElementsByClassName('contents')[0]).appendChild(dt);
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
 </body>
 </html>

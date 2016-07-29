@@ -107,20 +107,20 @@ $(document).ready(function(){initNavTree('md_doc_stream_8zh-cn.html','');});
 <li class="level2"><a href="#AutoUTFOutputStream">AutoUTFOutputStream</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#CustomStream">自定义流</a><ul><li class="level2"><a href="#ExampleIStreamWrapper">例子：istream的包装类</a></li>
-<li class="level2"><a href="#ExampleOStreamWrapper">例子：ostream的包装类</a></li>
+<li class="level1"><a href="#CustomStream">自定义流</a><ul><li class="level2"><a href="#ExampleIStreamWrapper">例子：istream 的包装类</a></li>
+<li class="level2"><a href="#ExampleOStreamWrapper">例子：ostream 的包装类</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#Summary">总结</a></li>
 </ul>
 </div>
-<div class="textblock"><p>在RapidJSON中，<code><a class="el" href="classrapidjson_1_1_stream.html" title="Concept for reading and writing characters. ">rapidjson::Stream</a></code>是用於读写JSON的概念（概念是指C++的concept）。在这里我们先介绍如何使用RapidJSON提供的各种流。然后再看看如何自行定义流。</p>
+<div class="textblock"><p>在 RapidJSON 中，<code><a class="el" href="classrapidjson_1_1_stream.html" title="Concept for reading and writing characters. ">rapidjson::Stream</a></code> 是用於读写 JSON 的概念（概念是指 C++ 的 concept）。在这里我们先介绍如何使用 RapidJSON 提供的各种流。然后再看看如何自行定义流。</p>
 <h1><a class="anchor" id="MemoryStreams"></a>
 内存流</h1>
-<p>内存流把JSON存储在内存之中。</p>
+<p>内存流把 JSON 存储在内存之中。</p>
 <h2><a class="anchor" id="StringStream"></a>
 StringStream（输入）</h2>
-<p><code>StringStream</code>是最基本的输入流，它表示一个完整的、只读的、存储于内存的JSON。它在<code><a class="el" href="rapidjson_8h.html" title="common definitions and configuration ">rapidjson/rapidjson.h</a></code>中定义。</p>
+<p><code>StringStream</code> 是最基本的输入流，它表示一个完整的、只读的、存储于内存的 JSON。它在 <code><a class="el" href="rapidjson_8h.html" title="common definitions and configuration ">rapidjson/rapidjson.h</a></code> 中定义。</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="document_8h.html">rapidjson/document.h</a>&quot;</span> <span class="comment">// 会包含 &quot;rapidjson/rapidjson.h&quot;</span></div>
 <div class="line"></div>
 <div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
@@ -131,15 +131,15 @@ StringStream（输入）</h2>
 <div class="line"></div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> d;</div>
 <div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>(s);</div>
-</div><!-- fragment --><p>由于这是非常常用的用法，RapidJSON提供<code>Document::Parse(const char*)</code>去做完全相同的事情：</p>
+</div><!-- fragment --><p>由于这是非常常用的用法，RapidJSON 提供 <code>Document::Parse(const char*)</code> 去做完全相同的事情：</p>
 <div class="fragment"><div class="line"><span class="comment">// ...</span></div>
 <div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span> json[] = <span class="stringliteral">&quot;[1, 2, 3, 4]&quot;</span>;</div>
 <div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line">d.Parse(json);</div>
-</div><!-- fragment --><p>需要注意，<code>StringStream</code>是<code>GenericStringStream&lt;UTF8&lt;&gt; &gt;</code>的typedef，使用者可用其他编码类去代表流所使用的字符集。</p>
+</div><!-- fragment --><p>需要注意，<code>StringStream</code> 是 <code>GenericStringStream&lt;UTF8&lt;&gt; &gt;</code> 的 typedef，使用者可用其他编码类去代表流所使用的字符集。</p>
 <h2><a class="anchor" id="StringBuffer"></a>
 StringBuffer（输出）</h2>
-<p><code>StringBuffer</code>是一个简单的输出流。它分配一个内存缓冲区，供写入整个JSON。可使用<code>GetString()</code>来获取该缓冲区。</p>
+<p><code>StringBuffer</code> 是一个简单的输出流。它分配一个内存缓冲区，供写入整个 JSON。可使用 <code>GetString()</code> 来获取该缓冲区。</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/stringbuffer.h&quot;</span></div>
 <div class="line"></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> buffer;</div>
@@ -147,24 +147,24 @@ StringBuffer（输出）</h2>
 <div class="line">d.Accept(writer);</div>
 <div class="line"></div>
 <div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span>* output = buffer.GetString();</div>
-</div><!-- fragment --><p>当缓冲区满溢，它将自动增加容量。缺省容量是256个字符（UTF8是256字节，UTF16是512字节等）。使用者能自行提供分配器及初始容量。</p>
+</div><!-- fragment --><p>当缓冲区满溢，它将自动增加容量。缺省容量是 256 个字符（UTF8 是 256 字节，UTF16 是 512 字节等）。使用者能自行提供分配器及初始容量。</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> buffer1(0, 1024); <span class="comment">// 使用它的分配器，初始大小 = 1024</span></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> buffer2(allocator, 1024);</div>
-</div><!-- fragment --><p>如无设置分配器，<code>StringBuffer</code>会自行实例化一个内部分配器。</p>
-<p>相似地，<code>StringBuffer</code>是<code>GenericStringBuffer&lt;UTF8&lt;&gt; &gt;</code>的typedef。</p>
+</div><!-- fragment --><p>如无设置分配器，<code>StringBuffer</code> 会自行实例化一个内部分配器。</p>
+<p>相似地，<code>StringBuffer</code> 是 <code>GenericStringBuffer&lt;UTF8&lt;&gt; &gt;</code> 的 typedef。</p>
 <h1><a class="anchor" id="FileStreams"></a>
 文件流</h1>
-<p>当要从文件解析一个JSON，你可以把整个JSON读入内存并使用上述的<code>StringStream</code>。</p>
-<p>然而，若JSON很大，或是内存有限，你可以改用<code>FileReadStream</code>。它只会从文件读取一部分至缓冲区，然后让那部分被解析。若缓冲区的字符都被读完，它会再从文件读取下一部分。</p>
+<p>当要从文件解析一个 JSON，你可以把整个 JSON 读入内存并使用上述的 <code>StringStream</code>。</p>
+<p>然而，若 JSON 很大，或是内存有限，你可以改用 <code>FileReadStream</code>。它只会从文件读取一部分至缓冲区，然后让那部分被解析。若缓冲区的字符都被读完，它会再从文件读取下一部分。</p>
 <h2><a class="anchor" id="FileReadStream"></a>
 FileReadStream（输入）</h2>
-<p><code>FileReadStream</code>通过<code>FILE</code>指针读取文件。使用者需要提供一个缓冲区。</p>
+<p><code>FileReadStream</code> 通过 <code>FILE</code> 指针读取文件。使用者需要提供一个缓冲区。</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/filereadstream.h&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;cstdio&gt;</span></div>
 <div class="line"></div>
 <div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
 <div class="line"></div>
-<div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;big.json&quot;</span>, <span class="stringliteral">&quot;rb&quot;</span>); <span class="comment">// 非Windows平台使用&quot;r&quot;</span></div>
+<div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;big.json&quot;</span>, <span class="stringliteral">&quot;rb&quot;</span>); <span class="comment">// 非 Windows 平台使用 &quot;r&quot;</span></div>
 <div class="line"></div>
 <div class="line"><span class="keywordtype">char</span> readBuffer[65536];</div>
 <div class="line"><a class="code" href="classrapidjson_1_1_file_read_stream.html">FileReadStream</a> is(fp, readBuffer, <span class="keyword">sizeof</span>(readBuffer));</div>
@@ -173,11 +173,11 @@ FileReadStream（输入）</h2>
 <div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>(is);</div>
 <div class="line"></div>
 <div class="line">fclose(fp);</div>
-</div><!-- fragment --><p>与<code>StringStreams</code>不一样，<code>FileReadStream</code>是一个字节流。它不处理编码。若文件并非UTF-8编码，可以把字节流用<code>EncodedInputStream</code>包装。我们很快会讨论这个问题。</p>
-<p>除了读取文件，使用者也可以使用<code>FileReadStream</code>来读取<code>stdin</code>。</p>
+</div><!-- fragment --><p>与 <code>StringStreams</code> 不一样，<code>FileReadStream</code> 是一个字节流。它不处理编码。若文件并非 UTF-8 编码，可以把字节流用 <code>EncodedInputStream</code> 包装。我们很快会讨论这个问题。</p>
+<p>除了读取文件，使用者也可以使用 <code>FileReadStream</code> 来读取 <code>stdin</code>。</p>
 <h2><a class="anchor" id="FileWriteStream"></a>
 FileWriteStream（输出）</h2>
-<p><code>FileWriteStream</code>是一个含缓冲功能的输出流。它的用法与<code>FileReadStream</code>非常相似。</p>
+<p><code>FileWriteStream</code> 是一个含缓冲功能的输出流。它的用法与 <code>FileReadStream</code> 非常相似。</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/filewritestream.h&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;cstdio&gt;</span></div>
 <div class="line"></div>
@@ -187,7 +187,7 @@ FileWriteStream（输出）</h2>
 <div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c">Parse</a>(json);</div>
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"></div>
-<div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;output.json&quot;</span>, <span class="stringliteral">&quot;wb&quot;</span>); <span class="comment">// 非Windows平台使用&quot;w&quot;</span></div>
+<div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;output.json&quot;</span>, <span class="stringliteral">&quot;wb&quot;</span>); <span class="comment">// 非 Windows 平台使用 &quot;w&quot;</span></div>
 <div class="line"></div>
 <div class="line"><span class="keywordtype">char</span> writeBuffer[65536];</div>
 <div class="line"><a class="code" href="classrapidjson_1_1_file_write_stream.html">FileWriteStream</a> os(fp, writeBuffer, <span class="keyword">sizeof</span>(writeBuffer));</div>
@@ -196,10 +196,10 @@ FileWriteStream（输出）</h2>
 <div class="line">d.Accept(writer);</div>
 <div class="line"></div>
 <div class="line">fclose(fp);</div>
-</div><!-- fragment --><p>它也可以把输出导向<code>stdout</code>。</p>
+</div><!-- fragment --><p>它也可以把输出导向 <code>stdout</code>。</p>
 <h1><a class="anchor" id="iostreamWrapper"></a>
 iostream 包装类</h1>
-<p>基于用户的要求，RapidJSON提供了正式的 <code>std::basic_istream</code> 和 <code>std::basic_ostream</code> 包装类。然而，请注意其性能会大大低于以上的其他流。</p>
+<p>基于用户的要求，RapidJSON 提供了正式的 <code>std::basic_istream</code> 和 <code>std::basic_ostream</code> 包装类。然而，请注意其性能会大大低于以上的其他流。</p>
 <h2><a class="anchor" id="IStreamWrapper"></a>
 IStreamWrapper</h2>
 <p><code>IStreamWrapper</code> 把任何继承自 <code>std::istream</code> 的类（如 <code>std::istringstream</code>、<code>std::stringstream</code>、<code>std::ifstream</code>、<code>std::fstream</code>）包装成 RapidJSON 的输入流。</p>
@@ -240,14 +240,14 @@ OStreamWrapper</h2>
 </div><!-- fragment --><p>对于继承自 <code>std::wistream</code> 的类，则使用 <code>WIStreamWrapper</code>。</p>
 <h1><a class="anchor" id="EncodedStreams"></a>
 编码流</h1>
-<p>编码流（encoded streams）本身不存储JSON，它们是通过包装字节流来提供基本的编码／解码功能。</p>
-<p>如上所述，我们可以直接读入UTF-8字节流。然而，UTF-16及UTF-32有字节序（endian）问题。要正确地处理字节序，需要在读取时把字节转换成字符（如对UTF-16使用<code>wchar_t</code>），以及在写入时把字符转换为字节。</p>
-<p>除此以外，我们也需要处理<a href="http://en.wikipedia.org/wiki/Byte_order_mark">字节顺序标记（byte order mark, BOM）</a>。当从一个字节流读取时，需要检测BOM，或者仅仅是把存在的BOM消去。当把JSON写入字节流时，也可选择写入BOM。</p>
-<p>若一个流的编码在编译期已知，你可使用<code>EncodedInputStream</code>及<code>EncodedOutputStream</code>。若一个流可能存储UTF-8、UTF-16LE、UTF-16BE、UTF-32LE、UTF-32BE的JSON，并且编码只能在运行时得知，你便可以使用<code>AutoUTFInputStream</code>及<code>AutoUTFOutputStream</code>。这些流定义在<code><a class="el" href="encodedstream_8h_source.html">rapidjson/encodedstream.h</a></code>。</p>
+<p>编码流（encoded streams）本身不存储 JSON，它们是通过包装字节流来提供基本的编码／解码功能。</p>
+<p>如上所述，我们可以直接读入 UTF-8 字节流。然而，UTF-16 及 UTF-32 有字节序（endian）问题。要正确地处理字节序，需要在读取时把字节转换成字符（如对 UTF-16 使用 <code>wchar_t</code>），以及在写入时把字符转换为字节。</p>
+<p>除此以外，我们也需要处理 <a href="http://en.wikipedia.org/wiki/Byte_order_mark">字节顺序标记（byte order mark, BOM）</a>。当从一个字节流读取时，需要检测 BOM，或者仅仅是把存在的 BOM 消去。当把 JSON 写入字节流时，也可选择写入 BOM。</p>
+<p>若一个流的编码在编译期已知，你可使用 <code>EncodedInputStream</code> 及 <code>EncodedOutputStream</code>。若一个流可能存储 UTF-8、UTF-16LE、UTF-16BE、UTF-32LE、UTF-32BE 的 JSON，并且编码只能在运行时得知，你便可以使用 <code>AutoUTFInputStream</code> 及 <code>AutoUTFOutputStream</code>。这些流定义在 <code><a class="el" href="encodedstream_8h_source.html">rapidjson/encodedstream.h</a></code>。</p>
 <p>注意到，这些编码流可以施于文件以外的流。例如，你可以用编码流包装内存中的文件或自定义的字节流。</p>
 <h2><a class="anchor" id="EncodedInputStream"></a>
 EncodedInputStream</h2>
-<p><code>EncodedInputStream</code>含两个模板参数。第一个是<code>Encoding</code>类型，例如定义于<code><a class="el" href="encodings_8h_source.html">rapidjson/encodings.h</a></code>的<code>UTF8</code>、<code>UTF16LE</code>。第二个参数是被包装的流的类型。</p>
+<p><code>EncodedInputStream</code> 含两个模板参数。第一个是 <code>Encoding</code> 类型，例如定义于 <code><a class="el" href="encodings_8h_source.html">rapidjson/encodings.h</a></code> 的 <code>UTF8</code>、<code>UTF16LE</code>。第二个参数是被包装的流的类型。</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="document_8h.html">rapidjson/document.h</a>&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/filereadstream.h&quot;</span>   <span class="comment">// FileReadStream</span></div>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/encodedstream.h&quot;</span>    <span class="comment">// EncodedInputStream</span></div>
@@ -255,43 +255,43 @@ EncodedInputStream</h2>
 <div class="line"></div>
 <div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
 <div class="line"></div>
-<div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;utf16le.json&quot;</span>, <span class="stringliteral">&quot;rb&quot;</span>); <span class="comment">// 非Windows平台使用&quot;r&quot;</span></div>
+<div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;utf16le.json&quot;</span>, <span class="stringliteral">&quot;rb&quot;</span>); <span class="comment">// 非 Windows 平台使用 &quot;r&quot;</span></div>
 <div class="line"></div>
 <div class="line"><span class="keywordtype">char</span> readBuffer[256];</div>
 <div class="line"><a class="code" href="classrapidjson_1_1_file_read_stream.html">FileReadStream</a> bis(fp, readBuffer, <span class="keyword">sizeof</span>(readBuffer));</div>
 <div class="line"></div>
-<div class="line"><a class="code" href="classrapidjson_1_1_encoded_input_stream.html">EncodedInputStream&lt;UTF16LE&lt;&gt;</a>, <a class="code" href="classrapidjson_1_1_file_read_stream.html">FileReadStream</a>&gt; eis(bis);  <span class="comment">// 用eis包装bis</span></div>
+<div class="line"><a class="code" href="classrapidjson_1_1_encoded_input_stream.html">EncodedInputStream&lt;UTF16LE&lt;&gt;</a>, <a class="code" href="classrapidjson_1_1_file_read_stream.html">FileReadStream</a>&gt; eis(bis);  <span class="comment">// 用 eis 包装 bis</span></div>
 <div class="line"></div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> d; <span class="comment">// Document为GenericDocument&lt;UTF8&lt;&gt; &gt; </span></div>
-<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>&lt;0, <a class="code" href="structrapidjson_1_1_u_t_f16_l_e.html">UTF16LE&lt;&gt;</a> &gt;(eis);  <span class="comment">// 把UTF-16LE文件解析至内存中的UTF-8</span></div>
+<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> d; <span class="comment">// Document 为 GenericDocument&lt;UTF8&lt;&gt; &gt; </span></div>
+<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>&lt;0, <a class="code" href="structrapidjson_1_1_u_t_f16_l_e.html">UTF16LE&lt;&gt;</a> &gt;(eis);  <span class="comment">// 把 UTF-16LE 文件解析至内存中的 UTF-8</span></div>
 <div class="line"></div>
 <div class="line">fclose(fp);</div>
 </div><!-- fragment --><h2><a class="anchor" id="EncodedOutputStream"></a>
 EncodedOutputStream</h2>
-<p><code>EncodedOutputStream</code>也是相似的，但它的构造函数有一个<code>bool putBOM</code>参数，用于控制是否在输出字节流写入BOM。</p>
+<p><code>EncodedOutputStream</code> 也是相似的，但它的构造函数有一个 <code>bool putBOM</code> 参数，用于控制是否在输出字节流写入 BOM。</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/filewritestream.h&quot;</span>  <span class="comment">// FileWriteStream</span></div>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/encodedstream.h&quot;</span>    <span class="comment">// EncodedOutputStream</span></div>
 <div class="line"><span class="preprocessor">#include &lt;cstdio&gt;</span></div>
 <div class="line"></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;         <span class="comment">// Document为GenericDocument&lt;UTF8&lt;&gt; &gt; </span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;         <span class="comment">// Document 为 GenericDocument&lt;UTF8&lt;&gt; &gt; </span></div>
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"></div>
-<div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;output_utf32le.json&quot;</span>, <span class="stringliteral">&quot;wb&quot;</span>); <span class="comment">// 非Windows平台使用&quot;w&quot;</span></div>
+<div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;output_utf32le.json&quot;</span>, <span class="stringliteral">&quot;wb&quot;</span>); <span class="comment">// 非 Windows 平台使用 &quot;w&quot;</span></div>
 <div class="line"></div>
 <div class="line"><span class="keywordtype">char</span> writeBuffer[256];</div>
 <div class="line">FileWriteStream bos(fp, writeBuffer, <span class="keyword">sizeof</span>(writeBuffer));</div>
 <div class="line"></div>
 <div class="line"><span class="keyword">typedef</span> EncodedOutputStream&lt;UTF32LE&lt;&gt;, FileWriteStream&gt; OutputStream;</div>
-<div class="line">OutputStream eos(bos, <span class="keyword">true</span>);   <span class="comment">// 写入BOM</span></div>
+<div class="line">OutputStream eos(bos, <span class="keyword">true</span>);   <span class="comment">// 写入 BOM</span></div>
 <div class="line"></div>
 <div class="line">Writer&lt;OutputStream, UTF32LE&lt;&gt;, UTF8&lt;&gt;&gt; writer(eos);</div>
-<div class="line">d.Accept(writer);   <span class="comment">// 这里从内存的UTF-8生成UTF32-LE文件</span></div>
+<div class="line">d.Accept(writer);   <span class="comment">// 这里从内存的 UTF-8 生成 UTF32-LE 文件</span></div>
 <div class="line"></div>
 <div class="line">fclose(fp);</div>
 </div><!-- fragment --><h2><a class="anchor" id="AutoUTFInputStream"></a>
 AutoUTFInputStream</h2>
-<p>有时候，应用软件可能需要㲃理所有可支持的JSON编码。<code>AutoUTFInputStream</code>会先使用BOM来检测编码。若BOM不存在，它便会使用合法JSON的特性来检测。若两种方法都失败，它就会倒退至构造函数提供的UTF类型。</p>
-<p>由于字符（编码单元／code unit）可能是8位、16位或32位，<code>AutoUTFInputStream</code> 需要一个能至少储存32位的字符类型。我们可以使用<code>unsigned</code>作为模板参数：</p>
+<p>有时候，应用软件可能需要㲃理所有可支持的 JSON 编码。<code>AutoUTFInputStream</code> 会先使用 BOM 来检测编码。若 BOM 不存在，它便会使用合法 JSON 的特性来检测。若两种方法都失败，它就会倒退至构造函数提供的 UTF 类型。</p>
+<p>由于字符（编码单元／code unit）可能是 8 位、16 位或 32 位，<code>AutoUTFInputStream</code> 需要一个能至少储存 32 位的字符类型。我们可以使用 <code>unsigned</code> 作为模板参数：</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="document_8h.html">rapidjson/document.h</a>&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/filereadstream.h&quot;</span>   <span class="comment">// FileReadStream</span></div>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/encodedstream.h&quot;</span>    <span class="comment">// AutoUTFInputStream</span></div>
@@ -299,22 +299,22 @@ AutoUTFInputStream</h2>
 <div class="line"></div>
 <div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
 <div class="line"></div>
-<div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;any.json&quot;</span>, <span class="stringliteral">&quot;rb&quot;</span>); <span class="comment">// 非Windows平台使用&quot;r&quot;</span></div>
+<div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;any.json&quot;</span>, <span class="stringliteral">&quot;rb&quot;</span>); <span class="comment">// 非 Windows 平台使用 &quot;r&quot;</span></div>
 <div class="line"></div>
 <div class="line"><span class="keywordtype">char</span> readBuffer[256];</div>
 <div class="line"><a class="code" href="classrapidjson_1_1_file_read_stream.html">FileReadStream</a> bis(fp, readBuffer, <span class="keyword">sizeof</span>(readBuffer));</div>
 <div class="line"></div>
-<div class="line"><a class="code" href="classrapidjson_1_1_auto_u_t_f_input_stream.html">AutoUTFInputStream&lt;unsigned, FileReadStream&gt;</a> eis(bis);  <span class="comment">// 用eis包装bis</span></div>
+<div class="line"><a class="code" href="classrapidjson_1_1_auto_u_t_f_input_stream.html">AutoUTFInputStream&lt;unsigned, FileReadStream&gt;</a> eis(bis);  <span class="comment">// 用 eis 包装 bis</span></div>
 <div class="line"></div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> d;         <span class="comment">// Document为GenericDocument&lt;UTF8&lt;&gt; &gt; </span></div>
-<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>&lt;0, <a class="code" href="structrapidjson_1_1_auto_u_t_f.html">AutoUTF&lt;unsigned&gt;</a> &gt;(eis); <span class="comment">// 把任何UTF编码的文件解析至内存中的UTF-8</span></div>
+<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> d;         <span class="comment">// Document 为 GenericDocument&lt;UTF8&lt;&gt; &gt; </span></div>
+<div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>&lt;0, <a class="code" href="structrapidjson_1_1_auto_u_t_f.html">AutoUTF&lt;unsigned&gt;</a> &gt;(eis); <span class="comment">// 把任何 UTF 编码的文件解析至内存中的 UTF-8</span></div>
 <div class="line"></div>
 <div class="line">fclose(fp);</div>
-</div><!-- fragment --><p>当要指定流的编码，可使用上面例子中<code>ParseStream()</code>的参数<code>AutoUTF&lt;CharType&gt;</code>。</p>
-<p>你可以使用<code>UTFType GetType()</code>去获取UTF类型，并且用<code>HasBOM()</code>检测输入流是否含有BOM。</p>
+</div><!-- fragment --><p>当要指定流的编码，可使用上面例子中 <code>ParseStream()</code> 的参数 <code>AutoUTF&lt;CharType&gt;</code>。</p>
+<p>你可以使用 <code>UTFType GetType()</code> 去获取 UTF 类型，并且用 <code>HasBOM()</code> 检测输入流是否含有 BOM。</p>
 <h2><a class="anchor" id="AutoUTFOutputStream"></a>
 AutoUTFOutputStream</h2>
-<p>相似地，要在运行时选择输出的编码，我们可使用<code>AutoUTFOutputStream</code>。这个类本身并非「自动」。你需要在运行时指定UTF类型，以及是否写入BOM。</p>
+<p>相似地，要在运行时选择输出的编码，我们可使用 <code>AutoUTFOutputStream</code>。这个类本身并非「自动」。你需要在运行时指定 UTF 类型，以及是否写入 BOM。</p>
 <div class="fragment"><div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
 <div class="line"></div>
 <div class="line"><span class="keywordtype">void</span> WriteJSONFile(FILE* fp, <a class="code" href="namespacerapidjson.html#a4aacabc0f8cea1cd628f466d890773eb">UTFType</a> type, <span class="keywordtype">bool</span> putBOM, <span class="keyword">const</span> <a class="code" href="classrapidjson_1_1_generic_document.html">Document</a>&amp; d) {</div>
@@ -327,11 +327,11 @@ AutoUTFOutputStream</h2>
 <div class="line">    <a class="code" href="classrapidjson_1_1_writer.html">Writer&lt;OutputStream, UTF8&lt;&gt;</a>, <a class="code" href="structrapidjson_1_1_auto_u_t_f.html">AutoUTF&lt;&gt;</a> &gt; writer;</div>
 <div class="line">    d.<a class="code" href="classrapidjson_1_1_generic_value.html#aeef0506cd1f8d703db4833c503f0657e">Accept</a>(writer);</div>
 <div class="line">}</div>
-</div><!-- fragment --><p><code>AutoUTFInputStream</code>／<code>AutoUTFOutputStream</code>是比<code>EncodedInputStream</code>／<code>EncodedOutputStream</code>方便。但前者会产生一点运行期额外开销。</p>
+</div><!-- fragment --><p><code>AutoUTFInputStream</code>／<code>AutoUTFOutputStream</code> 是比 <code>EncodedInputStream</code>／<code>EncodedOutputStream</code> 方便。但前者会产生一点运行期额外开销。</p>
 <h1><a class="anchor" id="CustomStream"></a>
 自定义流</h1>
-<p>除了内存／文件流，使用者可创建自行定义适配RapidJSON API的流类。例如，你可以创建网络流、从压缩文件读取的流等等。</p>
-<p>RapidJSON利用模板结合不同的类型。只要一个类包含所有所需的接口，就可以作为一个流。流的接合定义在<code><a class="el" href="rapidjson_8h.html" title="common definitions and configuration ">rapidjson/rapidjson.h</a></code>的注释里：</p>
+<p>除了内存／文件流，使用者可创建自行定义适配 RapidJSON API 的流类。例如，你可以创建网络流、从压缩文件读取的流等等。</p>
+<p>RapidJSON 利用模板结合不同的类型。只要一个类包含所有所需的接口，就可以作为一个流。流的接合定义在 <code><a class="el" href="rapidjson_8h.html" title="common definitions and configuration ">rapidjson/rapidjson.h</a></code> 的注释里：</p>
 <div class="fragment"><div class="line">concept Stream {</div>
 <div class="line">    <span class="keyword">typename</span> Ch;    <span class="comment">//!&lt; 流的字符类型</span></div>
 <div class="line"><span class="comment"></span><span class="comment"></span></div>
@@ -356,14 +356,14 @@ AutoUTFOutputStream</h2>
 <div class="line"><span class="comment"></span>    <span class="keywordtype">void</span> Flush();</div>
 <div class="line"><span class="comment"></span></div>
 <div class="line"><span class="comment">    //! 完成写作操作。</span></div>
-<div class="line"><span class="comment">    //! \param begin PutBegin()返回的开始写入指针。</span></div>
+<div class="line"><span class="comment">    //! \param begin PutBegin() 返回的开始写入指针。</span></div>
 <div class="line"><span class="comment">    //! \return 已写入的字符数量。</span></div>
 <div class="line"><span class="comment"></span>    <span class="keywordtype">size_t</span> PutEnd(Ch* begin);</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>输入流必须实现<code>Peek()</code>、<code>Take()</code>及<code>Tell()</code>。 输出流必须实现<code>Put()</code>及<code>Flush()</code>。 <code>PutBegin()</code>及<code>PutEnd()</code>是特殊的接口，仅用于原位（*in situ*）解析。一般的流不需实现它们。然而，即使接口不需用于某些流，仍然需要提供空实现，否则会产生编译错误。</p>
+</div><!-- fragment --><p>输入流必须实现 <code>Peek()</code>、<code>Take()</code> 及 <code>Tell()</code>。 输出流必须实现 <code>Put()</code> 及 <code>Flush()</code>。 <code>PutBegin()</code> 及 <code>PutEnd()</code> 是特殊的接口，仅用于原位（*in situ*）解析。一般的流不需实现它们。然而，即使接口不需用于某些流，仍然需要提供空实现，否则会产生编译错误。</p>
 <h2><a class="anchor" id="ExampleIStreamWrapper"></a>
-例子：istream的包装类</h2>
-<p>以下的简单例子是<code>std::istream</code>的包装类，它只需现3个函数。</p>
+例子：istream 的包装类</h2>
+<p>以下的简单例子是 <code>std::istream</code> 的包装类，它只需现 3 个函数。</p>
 <div class="fragment"><div class="line"><span class="keyword">class </span>MyIStreamWrapper {</div>
 <div class="line"><span class="keyword">public</span>:</div>
 <div class="line">    <span class="keyword">typedef</span> <span class="keywordtype">char</span> Ch;</div>
@@ -394,17 +394,17 @@ AutoUTFOutputStream</h2>
 <div class="line"></div>
 <div class="line">    std::istream&amp; is_;</div>
 <div class="line">};</div>
-</div><!-- fragment --><p>使用者能用它来包装<code>std::stringstream</code>、<code>std::ifstream</code>的实例。</p>
+</div><!-- fragment --><p>使用者能用它来包装 <code>std::stringstream</code>、<code>std::ifstream</code> 的实例。</p>
 <div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span>* json = <span class="stringliteral">&quot;[1,2,3,4]&quot;</span>;</div>
 <div class="line">std::stringstream ss(json);</div>
 <div class="line">MyIStreamWrapper is(ss);</div>
 <div class="line"></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>(is);</div>
-</div><!-- fragment --><p>但要注意，由于标准库的内部开销问，此实现的性能可能不如RapidJSON的内存／文件流。</p>
+</div><!-- fragment --><p>但要注意，由于标准库的内部开销问，此实现的性能可能不如 RapidJSON 的内存／文件流。</p>
 <h2><a class="anchor" id="ExampleOStreamWrapper"></a>
-例子：ostream的包装类</h2>
-<p>以下的例子是<code>std::istream</code>的包装类，它只需实现2个函数。</p>
+例子：ostream 的包装类</h2>
+<p>以下的例子是 <code>std::istream</code> 的包装类，它只需实现 2 个函数。</p>
 <div class="fragment"><div class="line"><span class="keyword">class </span>MyOStreamWrapper {</div>
 <div class="line"><span class="keyword">public</span>:</div>
 <div class="line">    <span class="keyword">typedef</span> <span class="keywordtype">char</span> Ch;</div>
@@ -427,7 +427,7 @@ AutoUTFOutputStream</h2>
 <div class="line"></div>
 <div class="line">    std::ostream&amp; os_;</div>
 <div class="line">};</div>
-</div><!-- fragment --><p>使用者能用它来包装<code>std::stringstream</code>、<code>std::ofstream</code>的实例。</p>
+</div><!-- fragment --><p>使用者能用它来包装 <code>std::stringstream</code>、<code>std::ofstream</code> 的实例。</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"></div>
@@ -436,10 +436,10 @@ AutoUTFOutputStream</h2>
 <div class="line"></div>
 <div class="line">Writer&lt;MyOStreamWrapper&gt; writer(os);</div>
 <div class="line">d.Accept(writer);</div>
-</div><!-- fragment --><p>但要注意，由于标准库的内部开销问，此实现的性能可能不如RapidJSON的内存／文件流。</p>
+</div><!-- fragment --><p>但要注意，由于标准库的内部开销问，此实现的性能可能不如 RapidJSON 的内存／文件流。</p>
 <h1><a class="anchor" id="Summary"></a>
 总结</h1>
-<p>本节描述了RapidJSON提供的各种流的类。内存流很简单。若JSON存储在文件中，文件流可减少JSON解析及生成所需的内存量。编码流在字节流和字符流之间作转换。最后，使用者可使用一个简单接口创建自定义的流。 </p>
+<p>本节描述了 RapidJSON 提供的各种流的类。内存流很简单。若 JSON 存储在文件中，文件流可减少 JSON 解析及生成所需的内存量。编码流在字节流和字符流之间作转换。最后，使用者可使用一个简单接口创建自定义的流。 </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->
@@ -448,18 +448,5 @@ AutoUTFOutputStream</h2>
   <ul>
   </ul>
 </div>
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = 'rapidjson-doc';
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-	    var dt = document.createElement('div');
-	    dt.id = "disqus_thread";
-	    (document.getElementsByClassName('contents')[0]).appendChild(dt);
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
 </body>
 </html>

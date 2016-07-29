@@ -90,216 +90,216 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <div class="contents">
 <div class="textblock"><h2>一般问题</h2>
 <ol type="1">
-<li><p class="startli">RapidJSON是什么？</p>
-<p class="startli">RapidJSON是一个C++库，用于解析及生成JSON。读者可参考它的所有<a class="el" href="md_doc_features_8zh-cn.html">特点</a>。</p>
+<li><p class="startli">RapidJSON 是什么？</p>
+<p class="startli">RapidJSON 是一个 C++ 库，用于解析及生成 JSON。读者可参考它的所有 <a class="el" href="md_doc_features_8zh-cn.html">特点</a>。</p>
 </li>
-<li><p class="startli">为什么称作RapidJSON？</p>
-<p class="startli">它的灵感来自于<a href="http://rapidxml.sourceforge.net/">RapidXML</a>，RapidXML是一个高速的XML DOM解析器。</p>
+<li><p class="startli">为什么称作 RapidJSON？</p>
+<p class="startli">它的灵感来自于 <a href="http://rapidxml.sourceforge.net/">RapidXML</a>，RapidXML 是一个高速的 XML DOM 解析器。</p>
 </li>
-<li><p class="startli">RapidJSON与RapidXML相似么？</p>
-<p class="startli">RapidJSON借镜了RapidXML的一些设计, 包括原位（*in situ*）解析、只有头文件的库。但两者的API是完全不同的。此外RapidJSON也提供许多RapidXML没有的特点。</p>
+<li><p class="startli">RapidJSON 与 RapidXML 相似么？</p>
+<p class="startli">RapidJSON 借镜了 RapidXML 的一些设计, 包括原位（*in situ*）解析、只有头文件的库。但两者的 API 是完全不同的。此外 RapidJSON 也提供许多 RapidXML 没有的特点。</p>
 </li>
-<li><p class="startli">RapidJSON是免费的么？</p>
-<p class="startli">是的，它在MIT特許條款下免费。它可用于商业软件。详情请参看<a href="https://github.com/miloyip/rapidjson/blob/master/license.txt">license.txt</a>。</p>
+<li><p class="startli">RapidJSON 是免费的么？</p>
+<p class="startli">是的，它在 MIT 特許條款下免费。它可用于商业软件。详情请参看 <a href="https://github.com/miloyip/rapidjson/blob/master/license.txt">license.txt</a>。</p>
 </li>
-<li><p class="startli">RapidJSON很小么？它有何依赖？</p>
-<p class="startli">是的。在Windows上，一个解析JSON并打印出统计的可执行文件少于30KB。</p>
-<p class="startli">RapidJSON仅依赖于C++标准库。</p>
+<li><p class="startli">RapidJSON 很小么？它有何依赖？</p>
+<p class="startli">是的。在 Windows 上，一个解析 JSON 并打印出统计的可执行文件少于 30KB。</p>
+<p class="startli">RapidJSON 仅依赖于 C++ 标准库。</p>
 </li>
-<li><p class="startli">怎样安装RapidJSON？</p>
-<p class="startli">见<a href="../readme.zh-cn.md#安装">安装一节</a>。</p>
+<li><p class="startli">怎样安装 RapidJSON？</p>
+<p class="startli">见 <a href="../readme.zh-cn.md#安装">安装一节</a>。</p>
 </li>
-<li><p class="startli">RapidJSON能否运行于我的平台？</p>
-<p class="startli">社区已在多个操作系统／编译器／CPU架构的组合上测试RapidJSON。但我们无法确保它能运行于你特定的平台上。只需要生成及执行单元测试便能获取答案。</p>
+<li><p class="startli">RapidJSON 能否运行于我的平台？</p>
+<p class="startli">社区已在多个操作系统／编译器／CPU 架构的组合上测试 RapidJSON。但我们无法确保它能运行于你特定的平台上。只需要生成及执行单元测试便能获取答案。</p>
 </li>
-<li><p class="startli">RapidJSON支持C++03么？C++11呢？</p>
-<p class="startli">RapidJSON开始时在C++03上实现。后来加入了可选的C++11特性支持（如转移构造函数、<code>noexcept</code>）。RapidJSON应该兼容所有遵从C++03或C++11的编译器。</p>
+<li><p class="startli">RapidJSON 支持 C++03 么？C++11 呢？</p>
+<p class="startli">RapidJSON 开始时在 C++03 上实现。后来加入了可选的 C++11 特性支持（如转移构造函数、<code>noexcept</code>）。RapidJSON 应该兼容所有遵从 C++03 或 C++11 的编译器。</p>
 </li>
-<li><p class="startli">RapidJSON是否真的用于实际应用？</p>
-<p class="startli">是的。它被配置于前台及后台的真实应用中。一个社区成员说RapidJSON在他们的系统中每日解析5千万个JSON。</p>
+<li><p class="startli">RapidJSON 是否真的用于实际应用？</p>
+<p class="startli">是的。它被配置于前台及后台的真实应用中。一个社区成员说 RapidJSON 在他们的系统中每日解析 5 千万个 JSON。</p>
 </li>
-<li><p class="startli">RapidJSON是如何被测试的？</p>
-<p class="startli">RapidJSON包含一组单元测试去执行自动测试。<a href="https://travis-ci.org/miloyip/rapidjson/">Travis</a>（供Linux平台）及<a href="https://ci.appveyor.com/project/miloyip/rapidjson/">AppVeyor</a>（供Windows平台）会对所有修改进行编译及执行单元测试。在Linux下还会使用Valgrind去检测内存泄漏。</p>
+<li><p class="startli">RapidJSON 是如何被测试的？</p>
+<p class="startli">RapidJSON 包含一组单元测试去执行自动测试。<a href="https://travis-ci.org/miloyip/rapidjson/">Travis</a>（供 Linux 平台）及 <a href="https://ci.appveyor.com/project/miloyip/rapidjson/">AppVeyor</a>（供 Windows 平台）会对所有修改进行编译及执行单元测试。在 Linux 下还会使用 Valgrind 去检测内存泄漏。</p>
 </li>
-<li><p class="startli">RapidJSON是否有完整的文档？</p>
-<p class="startli">RapidJSON提供了使用手册及API说明文档。</p>
+<li><p class="startli">RapidJSON 是否有完整的文档？</p>
+<p class="startli">RapidJSON 提供了使用手册及 API 说明文档。</p>
 </li>
 <li><p class="startli">有没有其他替代品？</p>
-<p class="startli">有许多替代品。例如<a href="https://github.com/miloyip/nativejson-benchmark">nativejson-benchmark</a>列出了一些开源的C/C++ JSON库。<a href="http://www.json.org/">json.org</a>也有一个列表。</p>
+<p class="startli">有许多替代品。例如 <a href="https://github.com/miloyip/nativejson-benchmark">nativejson-benchmark</a> 列出了一些开源的 C/C++ JSON 库。<a href="http://www.json.org/">json.org</a> 也有一个列表。</p>
 </li>
 </ol>
 <h2>JSON</h2>
 <ol type="1">
-<li><p class="startli">什么是JSON？</p>
-<p class="startli">JSON (JavaScript Object Notation)是一个轻量的数据交换格式。它使用人类可读的文本格式。更多关于JSON的细节可考<a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a>及<a href="http://www.ecma-international.org/publications/standards/Ecma-404.htm">ECMA-404</a>。</p>
+<li><p class="startli">什么是 JSON？</p>
+<p class="startli">JSON (JavaScript Object Notation) 是一个轻量的数据交换格式。它使用人类可读的文本格式。更多关于 JSON 的细节可考 <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a> 及 <a href="http://www.ecma-international.org/publications/standards/Ecma-404.htm">ECMA-404</a>。</p>
 </li>
-<li><p class="startli">JSON有什么应用场合？</p>
-<p class="startli">JSON常用于网页应用程序，以传送结构化数据。它也可作为文件格式用于数据持久化。</p>
+<li><p class="startli">JSON 有什么应用场合？</p>
+<p class="startli">JSON 常用于网页应用程序，以传送结构化数据。它也可作为文件格式用于数据持久化。</p>
 </li>
 </ol>
 <ol type="1">
-<li><p class="startli">RapidJSON是否符合JSON标准？</p>
-<p class="startli">是。RapidJSON完全符合<a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a>及<a href="http://www.ecma-international.org/publications/standards/Ecma-404.htm">ECMA-404</a>。它能处理一些特殊情况，例如支持JSON字符串中含有空字符及代理对（surrogate pair）。</p>
+<li><p class="startli">RapidJSON 是否符合 JSON 标准？</p>
+<p class="startli">是。RapidJSON 完全符合 <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a> 及 <a href="http://www.ecma-international.org/publications/standards/Ecma-404.htm">ECMA-404</a>。它能处理一些特殊情况，例如支持 JSON 字符串中含有空字符及代理对（surrogate pair）。</p>
 </li>
-<li><p class="startli">RapidJSON是否支持宽松的语法？</p>
-<p class="startli">现时不支持。RapidJSON只支持严格的标准格式。宽松语法现时在这<a href="https://github.com/miloyip/rapidjson/issues/36">issue</a>中进行讨论。</p>
+<li><p class="startli">RapidJSON 是否支持宽松的语法？</p>
+<p class="startli">现时不支持。RapidJSON 只支持严格的标准格式。宽松语法现时在这 <a href="https://github.com/miloyip/rapidjson/issues/36">issue</a> 中进行讨论。</p>
 </li>
 </ol>
-<h2>DOM与SAX</h2>
+<h2>DOM 与 SAX</h2>
 <ol type="1">
-<li><p class="startli">什么是DOM风格API？</p>
-<p class="startli">Document Object Model（DOM）是一个储存于内存的JSON表示方式，用于查询及修改JSON。</p>
+<li><p class="startli">什么是 DOM 风格 API？</p>
+<p class="startli">Document Object Model（DOM）是一个储存于内存的 JSON 表示方式，用于查询及修改 JSON。</p>
 </li>
-<li><p class="startli">什么是SAX风格API?</p>
-<p class="startli">SAX是一个事件驱动的API，用于解析及生成JSON。</p>
+<li><p class="startli">什么是 SAX 风格 API?</p>
+<p class="startli">SAX 是一个事件驱动的 API，用于解析及生成 JSON。</p>
 </li>
-<li><p class="startli">我应用DOM还是SAX？</p>
-<p class="startli">DOM易于查询及修改。SAX则是非常快及省内存的，但通常较难使用。</p>
+<li><p class="startli">我应用 DOM 还是 SAX？</p>
+<p class="startli">DOM 易于查询及修改。SAX 则是非常快及省内存的，但通常较难使用。</p>
 </li>
 <li><p class="startli">什么是原位（*in situ*）解析？</p>
-<p class="startli">原位解析会把JSON字符串直接解码至输入的JSON中。这是一个优化，可减少内存消耗及提升性能，但输入的JSON会被更改。进一步细节请参考原位解析 。</p>
+<p class="startli">原位解析会把 JSON 字符串直接解码至输入的 JSON 中。这是一个优化，可减少内存消耗及提升性能，但输入的 JSON 会被更改。进一步细节请参考 原位解析 。</p>
 </li>
 <li><p class="startli">什么时候会产生解析错误？</p>
-<p class="startli">当输入的JSON包含非法语法，或不能表示一个值（如Number太大），或解析器的处理器中断解析过程，解析器都会产生一个错误。详情请参考解析错误。</p>
+<p class="startli">当输入的 JSON 包含非法语法，或不能表示一个值（如 Number 太大），或解析器的处理器中断解析过程，解析器都会产生一个错误。详情请参考 解析错误。</p>
 </li>
 <li><p class="startli">有什么错误信息？</p>
-<p class="startli">错误信息存储在<code>ParseResult</code>，它包含错误代号及偏移值（从JSON开始至错误处的字符数目）。可以把错误代号翻译为人类可读的错误讯息。</p>
+<p class="startli">错误信息存储在 <code>ParseResult</code>，它包含错误代号及偏移值（从 JSON 开始至错误处的字符数目）。可以把错误代号翻译为人类可读的错误讯息。</p>
 </li>
-<li><p class="startli">为何不只使用<code>double</code>去表示JSON number？</p>
-<p class="startli">一些应用需要使用64位无号／有号整数。这些整数不能无损地转换成<code>double</code>。因此解析器会检测一个JSON number是否能转换至各种整数类型及<code>double</code>。</p>
+<li><p class="startli">为何不只使用 <code>double</code> 去表示 JSON number？</p>
+<p class="startli">一些应用需要使用 64 位无号／有号整数。这些整数不能无损地转换成 <code>double</code>。因此解析器会检测一个 JSON number 是否能转换至各种整数类型及 <code>double</code>。</p>
 </li>
-<li><p class="startli">如何清空并最小化<code>document</code>或<code>value</code>的容量？</p>
-<p class="startli">调用 <code>SetXXX()</code> 方法 - 这些方法会调用析构函数，并重建空的Object或Array:</p>
+<li><p class="startli">如何清空并最小化 <code>document</code> 或 <code>value</code> 的容量？</p>
+<p class="startli">调用 <code>SetXXX()</code> 方法 - 这些方法会调用析构函数，并重建空的 Object 或 Array:</p>
 </li>
 </ol>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line">...</div>
 <div class="line">d.SetObject();  <span class="comment">// clear and minimize</span></div>
-</div><!-- fragment --><p>另外，也可以参考在 <a href="https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Clear-and-minimize">C++ swap with temporary idiom</a>中的一种等价的方法: </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>).Swap(d);</div>
+</div><!-- fragment --><p>另外，也可以参考在 <a href="https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Clear-and-minimize">C++ swap with temporary idiom</a> 中的一种等价的方法: </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>).Swap(d);</div>
 </div><!-- fragment --><p> 或者，使用这个稍微长一点的代码也能完成同样的事情: </p><div class="fragment"><div class="line">d.Swap(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>).Move()); </div>
 </div><!-- fragment --><ol type="1">
-<li><p class="startli">如何将一个<code>document</code>节点插入到另一个<code>document</code>中？</p>
-<p class="startli">比如有以下两个document(DOM): </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> person;</div>
+<li><p class="startli">如何将一个 <code>document</code> 节点插入到另一个 <code>document</code> 中？</p>
+<p class="startli">比如有以下两个 document(DOM): </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> person;</div>
 <div class="line">person.Parse(<span class="stringliteral">&quot;{\&quot;person\&quot;:{\&quot;name\&quot;:{\&quot;first\&quot;:\&quot;Adam\&quot;,\&quot;last\&quot;:\&quot;Thomas\&quot;}}}&quot;</span>);</div>
 <div class="line"></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> address;</div>
 <div class="line">address.Parse(<span class="stringliteral">&quot;{\&quot;address\&quot;:{\&quot;city\&quot;:\&quot;Moscow\&quot;,\&quot;street\&quot;:\&quot;Quiet\&quot;}}&quot;</span>);</div>
-</div><!-- fragment --><p> 假设我们希望将整个 <code>address</code> 插入到<code>person</code>中，作为其的一个子节点: </p><div class="fragment"><div class="line">{ <span class="stringliteral">&quot;person&quot;</span>: {</div>
+</div><!-- fragment --><p> 假设我们希望将整个 <code>address</code> 插入到 <code>person</code> 中，作为其的一个子节点: </p><div class="fragment"><div class="line">{ <span class="stringliteral">&quot;person&quot;</span>: {</div>
 <div class="line">   <span class="stringliteral">&quot;name&quot;</span>: { <span class="stringliteral">&quot;first&quot;</span>: <span class="stringliteral">&quot;Adam&quot;</span>, <span class="stringliteral">&quot;last&quot;</span>: <span class="stringliteral">&quot;Thomas&quot;</span> },</div>
 <div class="line">   <span class="stringliteral">&quot;address&quot;</span>: { <span class="stringliteral">&quot;city&quot;</span>: <span class="stringliteral">&quot;Moscow&quot;</span>, <span class="stringliteral">&quot;street&quot;</span>: <span class="stringliteral">&quot;Quiet&quot;</span> }</div>
 <div class="line">   }</div>
 <div class="line">}</div>
-</div><!-- fragment --><p class="startli">在插入节点的过程中需要注意<code>document</code>和<code>value</code>的生命周期并且正确地使用allocator进行内存分配和管理。</p>
-<p class="startli">一个简单有效的方法就是修改上述<code>address</code>变量的定义，让其使用<code>person</code>的allocator初始化，然后将其添加到根节点。</p>
+</div><!-- fragment --><p class="startli">在插入节点的过程中需要注意 <code>document</code> 和 <code>value</code> 的生命周期并且正确地使用 allocator 进行内存分配和管理。</p>
+<p class="startli">一个简单有效的方法就是修改上述 <code>address</code> 变量的定义，让其使用 <code>person</code> 的 allocator 初始化，然后将其添加到根节点。</p>
 </li>
 </ol>
 <div class="fragment"><div class="line">Documnet address(person.GetAllocator());</div>
 <div class="line">...</div>
 <div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(<span class="stringliteral">&quot;address&quot;</span>, address[<span class="stringliteral">&quot;address&quot;</span>], person.GetAllocator());</div>
-</div><!-- fragment --><p> 当然，如果你不想通过显式地写出<code>address</code>的key来得到其值，可以使用迭代器来实现: </p><div class="fragment"><div class="line"><span class="keyword">auto</span> addressRoot = address.MemberBegin();</div>
+</div><!-- fragment --><p> 当然，如果你不想通过显式地写出 <code>address</code> 的 key 来得到其值，可以使用迭代器来实现: </p><div class="fragment"><div class="line"><span class="keyword">auto</span> addressRoot = address.MemberBegin();</div>
 <div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(addressRoot-&gt;name, addressRoot-&gt;value, person.GetAllocator());</div>
-</div><!-- fragment --><p>此外，还可以通过深拷贝address document来实现: </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> addressValue = <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(address[<span class="stringliteral">&quot;address&quot;</span>], person.GetAllocator());</div>
+</div><!-- fragment --><p>此外，还可以通过深拷贝 address document 来实现: </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> addressValue = <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(address[<span class="stringliteral">&quot;address&quot;</span>], person.GetAllocator());</div>
 <div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(<span class="stringliteral">&quot;address&quot;</span>, addressValue, person.GetAllocator());</div>
 </div><!-- fragment --><h2>Document/Value (DOM)</h2>
 <ol type="1">
 <li><p class="startli">什么是转移语意？为什么？</p>
-<p class="startli"><code>Value</code>不用复制语意，而使用了转移语意。这是指，当把来源值赋值于目标值时，来源值的所有权会转移至目标值。</p>
+<p class="startli"><code>Value</code> 不用复制语意，而使用了转移语意。这是指，当把来源值赋值于目标值时，来源值的所有权会转移至目标值。</p>
 <p class="startli">由于转移快于复制，此设计决定强迫使用者注意到复制的消耗。</p>
 </li>
 <li><p class="startli">怎样去复制一个值？</p>
-<p class="startli">有两个API可用：含allocator的构造函数，以及<code>CopyFrom()</code>。可参考深复制Value里的用例。</p>
+<p class="startli">有两个 API 可用：含 allocator 的构造函数，以及 <code>CopyFrom()</code>。可参考 深复制 Value 里的用例。</p>
 </li>
 <li><p class="startli">为什么我需要提供字符串的长度？</p>
-<p class="startli">由于C字符串是空字符结尾的，需要使用<code>strlen()</code>去计算其长度，这是线性复杂度的操作。若使用者已知字符串的长度，对很多操作来说会造成不必要的消耗。</p>
-<p class="startli">此外，RapidJSON可处理含有<code>\u0000</code>（空字符）的字符串。若一个字符串含有空字符，<code>strlen()</code>便不能返回真正的字符串长度。在这种情况下使用者必须明确地提供字符串长度。</p>
+<p class="startli">由于 C 字符串是空字符结尾的，需要使用 <code>strlen()</code> 去计算其长度，这是线性复杂度的操作。若使用者已知字符串的长度，对很多操作来说会造成不必要的消耗。</p>
+<p class="startli">此外，RapidJSON 可处理含有 <code>\u0000</code>（空字符）的字符串。若一个字符串含有空字符，<code>strlen()</code> 便不能返回真正的字符串长度。在这种情况下使用者必须明确地提供字符串长度。</p>
 </li>
-<li><p class="startli">为什么在许多DOM操作API中要提供分配器作为参数？</p>
-<p class="startli">由于这些API是<code>Value</code>的成员函数，我们不希望为每个<code>Value</code>储存一个分配器指针。</p>
+<li><p class="startli">为什么在许多 DOM 操作 API 中要提供分配器作为参数？</p>
+<p class="startli">由于这些 API 是 <code>Value</code> 的成员函数，我们不希望为每个 <code>Value</code> 储存一个分配器指针。</p>
 </li>
 <li><p class="startli">它会转换各种数值类型么？</p>
-<p class="startli">当使用<code>GetInt()</code>、<code>GetUint()</code>等API时，可能会发生转换。对于整数至整数转换，仅当保证转换安全才会转换（否则会断言失败）。然而，当把一个64位有号／无号整数转换至double时，它会转换，但有可能会损失精度。含有小数的数字、或大于64位的整数，都只能使用<code>GetDouble()</code>获取其值。</p>
+<p class="startli">当使用 <code>GetInt()</code>、<code>GetUint()</code> 等 API 时，可能会发生转换。对于整数至整数转换，仅当保证转换安全才会转换（否则会断言失败）。然而，当把一个 64 位有号／无号整数转换至 double 时，它会转换，但有可能会损失精度。含有小数的数字、或大于 64 位的整数，都只能使用 <code>GetDouble()</code> 获取其值。</p>
 </li>
 </ol>
 <h2>Reader/Writer (SAX)</h2>
 <ol type="1">
-<li><p class="startli">为什么不仅仅用<code>printf</code>输出一个JSON？为什么需要<code>Writer</code>？</p>
-<p class="startli">最重要的是，<code>Writer</code>能确保输出的JSON是格式正确的。错误地调用SAX事件（如<code>StartObject()</code>错配<code>EndArray()</code>）会造成断言失败。此外，<code>Writer</code>会把字符串进行转义（如<code>\n</code>）。最后，<code>printf()</code>的数值输出可能并不是一个合法的JSON number，特别是某些locale会有数字分隔符。而且<code>Writer</code>的数值字符串转换是使用非常快的算法来实现的，胜过<code>printf()</code>及<code>iostream</code>。</p>
+<li><p class="startli">为什么不仅仅用 <code>printf</code> 输出一个 JSON？为什么需要 <code>Writer</code>？</p>
+<p class="startli">最重要的是，<code>Writer</code> 能确保输出的 JSON 是格式正确的。错误地调用 SAX 事件（如 <code>StartObject()</code> 错配 <code>EndArray()</code>）会造成断言失败。此外，<code>Writer</code> 会把字符串进行转义（如 <code>\n</code>）。最后，<code>printf()</code> 的数值输出可能并不是一个合法的 JSON number，特别是某些 locale 会有数字分隔符。而且 <code>Writer</code> 的数值字符串转换是使用非常快的算法来实现的，胜过 <code>printf()</code> 及 <code>iostream</code>。</p>
 </li>
 <li><p class="startli">我能否暂停解析过程，并在稍后继续？</p>
-<p class="startli">基于性能考虑，目前版本并不直接支持此功能。然而，若执行环境支持多线程，使用者可以在另一线程解析JSON，并通过阻塞输入流去暂停。</p>
+<p class="startli">基于性能考虑，目前版本并不直接支持此功能。然而，若执行环境支持多线程，使用者可以在另一线程解析 JSON，并通过阻塞输入流去暂停。</p>
 </li>
 </ol>
 <h2>Unicode</h2>
 <ol type="1">
-<li><p class="startli">它是否支持UTF-8、UTF-16及其他格式？</p>
-<p class="startli">是。它完全支持UTF-8、UTF-16（大端／小端）、UTF-32（大端／小端）及ASCII。</p>
+<li><p class="startli">它是否支持 UTF-8、UTF-16 及其他格式？</p>
+<p class="startli">是。它完全支持 UTF-8、UTF-16（大端／小端）、UTF-32（大端／小端）及 ASCII。</p>
 </li>
 <li><p class="startli">它能否检测编码的合法性？</p>
-<p class="startli">能。只需把<code>kParseValidateEncodingFlag</code>参考传给<code>Parse()</code>。若发现在输入流中有非法的编码，它就会产生<code>kParseErrorStringInvalidEncoding</code>错误。</p>
+<p class="startli">能。只需把 <code>kParseValidateEncodingFlag</code> 参考传给 <code>Parse()</code>。若发现在输入流中有非法的编码，它就会产生 <code>kParseErrorStringInvalidEncoding</code> 错误。</p>
 </li>
-<li><p class="startli">什么是代理对（surrogate pair)？RapidJSON是否支持？</p>
-<p class="startli">JSON使用UTF-16编码去转义Unicode字符，例如<code>\u5927</code>表示中文字“大”。要处理基本多文种平面（basic multilingual plane，BMP）以外的字符时，UTF-16会把那些字符编码成两个16位值，这称为UTF-16代理对。例如，绘文字字符U+1F602在JSON中可被编码成<code>\uD83D\uDE02</code>。</p>
-<p class="startli">RapidJSON完全支持解析及生成UTF-16代理对。</p>
+<li><p class="startli">什么是代理对（surrogate pair)？RapidJSON 是否支持？</p>
+<p class="startli">JSON 使用 UTF-16 编码去转义 Unicode 字符，例如 <code>\u5927</code> 表示中文字“大”。要处理基本多文种平面（basic multilingual plane，BMP）以外的字符时，UTF-16 会把那些字符编码成两个 16 位值，这称为 UTF-16 代理对。例如，绘文字字符 U+1F602 在 JSON 中可被编码成 <code>\uD83D\uDE02</code>。</p>
+<p class="startli">RapidJSON 完全支持解析及生成 UTF-16 代理对。</p>
 </li>
-<li><p class="startli">它能否处理JSON字符串中的<code>\u0000</code>（空字符）？</p>
-<p class="startli">能。RapidJSON完全支持JSON字符串中的空字符。然而，使用者需要注意到这件事，并使用<code>GetStringLength()</code>及相关API去取得字符串真正长度。</p>
+<li><p class="startli">它能否处理 JSON 字符串中的 <code>\u0000</code>（空字符）？</p>
+<p class="startli">能。RapidJSON 完全支持 JSON 字符串中的空字符。然而，使用者需要注意到这件事，并使用 <code>GetStringLength()</code> 及相关 API 去取得字符串真正长度。</p>
 </li>
-<li><p class="startli">能否对所有非ASCII字符输出成<code>\uxxxx</code>形式？</p>
-<p class="startli">可以。只要在<code>Writer</code>中使用<code>ASCII&lt;&gt;</code>作为输出编码参数，就可以强逼转义那些字符。</p>
+<li><p class="startli">能否对所有非 ASCII 字符输出成 <code>\uxxxx</code> 形式？</p>
+<p class="startli">可以。只要在 <code>Writer</code> 中使用 <code>ASCII&lt;&gt;</code> 作为输出编码参数，就可以强逼转义那些字符。</p>
 </li>
 </ol>
 <h2>流</h2>
 <ol type="1">
-<li><p class="startli">我有一个很大的JSON文件。我应否把它整个载入内存中？</p>
-<p class="startli">使用者可使用<code>FileReadStream</code>去逐块读入文件。但若使用于原位解析，必须载入整个文件。</p>
+<li><p class="startli">我有一个很大的 JSON 文件。我应否把它整个载入内存中？</p>
+<p class="startli">使用者可使用 <code>FileReadStream</code> 去逐块读入文件。但若使用于原位解析，必须载入整个文件。</p>
 </li>
-<li><p class="startli">我能否解析一个从网络上串流进来的JSON？</p>
-<p class="startli">可以。使用者可根据<code>FileReadStream</code>的实现，去实现一个自定义的流。</p>
+<li><p class="startli">我能否解析一个从网络上串流进来的 JSON？</p>
+<p class="startli">可以。使用者可根据 <code>FileReadStream</code> 的实现，去实现一个自定义的流。</p>
 </li>
-<li><p class="startli">我不知道一些JSON将会使用哪种编码。怎样处理它们？</p>
-<p class="startli">你可以使用<code>AutoUTFInputStream</code>，它能自动检测输入流的编码。然而，它会带来一些性能开销。</p>
+<li><p class="startli">我不知道一些 JSON 将会使用哪种编码。怎样处理它们？</p>
+<p class="startli">你可以使用 <code>AutoUTFInputStream</code>，它能自动检测输入流的编码。然而，它会带来一些性能开销。</p>
 </li>
-<li><p class="startli">什么是BOM？RapidJSON怎样处理它？</p>
-<p class="startli"><a href="http://en.wikipedia.org/wiki/Byte_order_mark">字节顺序标记（byte order mark, BOM）</a>有时会出现于文件／流的开始，以表示其UTF编码类型。</p>
-<p class="startli">RapidJSON的<code>EncodedInputStream</code>可检测／跳过BOM。<code>EncodedOutputStream</code>可选择是否写入BOM。可参考编码流中的例子。</p>
+<li><p class="startli">什么是 BOM？RapidJSON 怎样处理它？</p>
+<p class="startli"><a href="http://en.wikipedia.org/wiki/Byte_order_mark">字节顺序标记（byte order mark, BOM）</a> 有时会出现于文件／流的开始，以表示其 UTF 编码类型。</p>
+<p class="startli">RapidJSON 的 <code>EncodedInputStream</code> 可检测／跳过 BOM。<code>EncodedOutputStream</code> 可选择是否写入 BOM。可参考 编码流 中的例子。</p>
 </li>
 <li><p class="startli">为什么会涉及大端／小端？</p>
-<p class="startli">流的大端／小端是UTF-16及UTF-32流要处理的问题，而UTF-8不需要处理。</p>
+<p class="startli">流的大端／小端是 UTF-16 及 UTF-32 流要处理的问题，而 UTF-8 不需要处理。</p>
 </li>
 </ol>
 <h2>性能</h2>
 <ol type="1">
-<li><p class="startli">RapidJSON是否真的快？</p>
-<p class="startli">是。它可能是最快的开源JSON库。有一个<a href="https://github.com/miloyip/nativejson-benchmark">评测</a>评估C/C++ JSON库的性能。</p>
+<li><p class="startli">RapidJSON 是否真的快？</p>
+<p class="startli">是。它可能是最快的开源 JSON 库。有一个 <a href="https://github.com/miloyip/nativejson-benchmark">评测</a> 评估 C/C++ JSON 库的性能。</p>
 </li>
 <li><p class="startli">为什么它会快？</p>
-<p class="startli">RapidJSON的许多设计是针对时间／空间性能来设计的，这些决定可能会影响API的易用性。此外，它也使用了许多底层优化（内部函数／intrinsic、SIMD）及特别的算法（自定义的double至字符串转换、字符串至double的转换）。</p>
+<p class="startli">RapidJSON 的许多设计是针对时间／空间性能来设计的，这些决定可能会影响 API 的易用性。此外，它也使用了许多底层优化（内部函数／intrinsic、SIMD）及特别的算法（自定义的 double 至字符串转换、字符串至 double 的转换）。</p>
 </li>
-<li><p class="startli">什是是SIMD？它如何用于RapidJSON？</p>
-<p class="startli"><a href="http://en.wikipedia.org/wiki/SIMD">SIMD</a>指令可以在现代CPU中执行并行运算。RapidJSON支持了Intel的SSE2/SSE4.2去加速跳过空白字符。在解析含缩进的JSON时，这能提升性能。只要定义名为<code>RAPIDJSON_SSE2</code>或<code>RAPIDJSON_SSE42</code>的宏，就能启动这个功能。然而，若在不支持这些指令集的机器上执行这些可执行文件，会导致崩溃。</p>
+<li><p class="startli">什是是 SIMD？它如何用于 RapidJSON？</p>
+<p class="startli"><a href="http://en.wikipedia.org/wiki/SIMD">SIMD</a> 指令可以在现代 CPU 中执行并行运算。RapidJSON 支持了 Intel 的 SSE2/SSE4.2 去加速跳过空白字符。在解析含缩进的 JSON 时，这能提升性能。只要定义名为 <code>RAPIDJSON_SSE2</code> 或 <code>RAPIDJSON_SSE42</code> 的宏，就能启动这个功能。然而，若在不支持这些指令集的机器上执行这些可执行文件，会导致崩溃。</p>
 </li>
 <li><p class="startli">它会消耗许多内存么？</p>
-<p class="startli">RapidJSON的设计目标是减低内存占用。</p>
-<p class="startli">在SAX API中，<code>Reader</code>消耗的内存与JSON树深度加上最长JSON字符成正比。</p>
-<p class="startli">在DOM API中，每个<code>Value</code>在32/64位架构下分别消耗16/24字节。RapidJSON也使用一个特殊的内存分配器去减少分配的额外开销。</p>
+<p class="startli">RapidJSON 的设计目标是减低内存占用。</p>
+<p class="startli">在 SAX API 中，<code>Reader</code> 消耗的内存与 JSON 树深度加上最长 JSON 字符成正比。</p>
+<p class="startli">在 DOM API 中，每个 <code>Value</code> 在 32/64 位架构下分别消耗 16/24 字节。RapidJSON 也使用一个特殊的内存分配器去减少分配的额外开销。</p>
 </li>
 <li><p class="startli">高性能的意义何在？</p>
-<p class="startli">有些应用程序需要处理非常大的JSON文件。而有些后台应用程序需要处理大量的JSON。达到高性能同时改善延时及吞吐量。更广义来说，这也可以节省能源。</p>
+<p class="startli">有些应用程序需要处理非常大的 JSON 文件。而有些后台应用程序需要处理大量的 JSON。达到高性能同时改善延时及吞吐量。更广义来说，这也可以节省能源。</p>
 </li>
 </ol>
 <h2>八挂</h2>
 <ol type="1">
-<li><p class="startli">谁是RapidJSON的开发者？</p>
-<p class="startli">叶劲峰（Milo Yip，<a href="https://github.com/miloyip">miloyip</a>）是RapidJSON的原作者。全世界许多贡献者一直在改善RapidJSON。Philipp A. Hartmann（<a href="https://github.com/pah">pah</a>）实现了许多改进，也设置了自动化测试，而且还参与许多社区讨论。丁欧南（Don Ding，<a href="https://github.com/thebusytypist">thebusytypist</a>）实现了迭代式解析器。Andrii Senkovych（<a href="https://github.com/jollyroger">jollyroger</a>）完成了向CMake的迁移。Kosta（<a href="https://github.com/Kosta-Github">Kosta-Github</a>）提供了一个非常灵巧的短字符串优化。也需要感谢其他献者及社区成员。</p>
+<li><p class="startli">谁是 RapidJSON 的开发者？</p>
+<p class="startli">叶劲峰（Milo Yip，<a href="https://github.com/miloyip">miloyip</a>）是 RapidJSON 的原作者。全世界许多贡献者一直在改善 RapidJSON。Philipp A. Hartmann（<a href="https://github.com/pah">pah</a>）实现了许多改进，也设置了自动化测试，而且还参与许多社区讨论。丁欧南（Don Ding，<a href="https://github.com/thebusytypist">thebusytypist</a>）实现了迭代式解析器。Andrii Senkovych（<a href="https://github.com/jollyroger">jollyroger</a>）完成了向 CMake 的迁移。Kosta（<a href="https://github.com/Kosta-Github">Kosta-Github</a>）提供了一个非常灵巧的短字符串优化。也需要感谢其他献者及社区成员。</p>
 </li>
-<li><p class="startli">为何你要开发RapidJSON？</p>
-<p class="startli">在2011年开始这项目是，它仅一个兴趣项目。Milo Yip是一个游戏程序员，他在那时候认识到JSON并希望在未来的项目中使用。由于JSON好像很简单，他希望写一个仅有头文件并且快速的程序库。</p>
+<li><p class="startli">为何你要开发 RapidJSON？</p>
+<p class="startli">在 2011 年开始这项目是，它仅一个兴趣项目。Milo Yip 是一个游戏程序员，他在那时候认识到 JSON 并希望在未来的项目中使用。由于 JSON 好像很简单，他希望写一个仅有头文件并且快速的程序库。</p>
 </li>
 <li><p class="startli">为什么开发中段有一段长期空档？</p>
-<p class="startli">主要是个人因素，例如加入新家庭成员。另外，Milo Yip也花了许多业馀时间去翻译Jason Gregory的《Game Engine Architecture》至中文版《游戏引擎架构》。</p>
+<p class="startli">主要是个人因素，例如加入新家庭成员。另外，Milo Yip 也花了许多业馀时间去翻译 Jason Gregory 的《Game Engine Architecture》至中文版《游戏引擎架构》。</p>
 </li>
-<li><p class="startli">为什么这个项目从Google Code搬到GitHub？</p>
-<p class="startli">这是大势所趋，而且GitHub更为强大及方便。 </p>
+<li><p class="startli">为什么这个项目从 Google Code 搬到 GitHub？</p>
+<p class="startli">这是大势所趋，而且 GitHub 更为强大及方便。 </p>
 </li>
 </ol>
 </div></div><!-- contents -->
@@ -310,18 +310,5 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
   <ul>
   </ul>
 </div>
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = 'rapidjson-doc';
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-	    var dt = document.createElement('div');
-	    dt.id = "disqus_thread";
-	    (document.getElementsByClassName('contents')[0]).appendChild(dt);
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
 </body>
 </html>

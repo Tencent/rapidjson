@@ -196,7 +196,34 @@ $(document).ready(function(){initNavTree('index.html','');});
 <img src="simpledom.png" alt="simpledom.png"/>
 <div class="caption">
 simpledom</div></div>
-<p> More <a href="https://github.com/miloyip/rapidjson/tree/master/example">examples</a> are available. </p>
+<p> More <a href="https://github.com/miloyip/rapidjson/tree/master/example">examples</a> are available:</p>
+<ul>
+<li>DOM API<ul>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/tutorial/tutorial.cpp">tutorial</a>: Basic usage of DOM API.</li>
+</ul>
+</li>
+<li>SAX API<ul>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/simplereader/simplereader.cpp">simplereader</a>: Dumps all SAX events while parsing a JSON by <code>Reader</code>.</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/condense/condense.cpp">condense</a>: A command line tool to rewrite a JSON, with all whitespaces removed.</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/pretty/pretty.cpp">pretty</a>: A command line tool to rewrite a JSON with indents and newlines by <code>PrettyWriter</code>.</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/capitalize/capitalize.cpp">capitalize</a>: A command line tool to capitalize strings in JSON.</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/messagereader/messagereader.cpp">messagereader</a>: Parse a JSON message with SAX API.</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/serialize/serialize.cpp">serialize</a>: Serialize a C++ object into JSON with SAX API.</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/jsonx/jsonx.cpp">jsonx</a>: Implements a <code>JsonxWriter</code> which stringify SAX events into <a href="https://www-01.ibm.com/support/knowledgecenter/SS9H2Y_7.1.0/com.ibm.dp.doc/json_jsonx.html">JSONx</a> (a kind of XML) format. The example is a command line tool which converts input JSON into JSONx format.</li>
+</ul>
+</li>
+<li>Schema<ul>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/schemavalidator/schemavalidator.cpp">schemavalidator</a> : A command line tool to validate a JSON with a JSON schema.</li>
+</ul>
+</li>
+<li>Advanced<ul>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/prettyauto/prettyauto.cpp">prettyauto</a>: A modified version of <a href="https://github.com/miloyip/rapidjson/blob/master/example/pretty/pretty.cpp">pretty</a> to automatically handle JSON with any UTF encodings.</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/parsebyparts/parsebyparts.cpp">parsebyparts</a>: Implements an <code>AsyncDocumentParser</code> which can parse JSON in parts, using C++11 thread.</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/filterkey/filterkey.cpp">filterkey</a>: A command line tool to remove all values with user-specified key.</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/filterkeydom/filterkeydom.cpp">filterkeydom</a>: Same tool as above, but it demonstrates how to use a generator to populate a <code>Document</code>. </li>
+</ul>
+</li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->
@@ -205,18 +232,5 @@ simpledom</div></div>
   <ul>
   </ul>
 </div>
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = 'rapidjson-doc';
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-	    var dt = document.createElement('div');
-	    dt.id = "disqus_thread";
-	    (document.getElementsByClassName('contents')[0]).appendChild(dt);
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
 </body>
 </html>

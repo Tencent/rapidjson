@@ -206,7 +206,7 @@ Query Object</h2>
 <p>If we are unsure whether a member exists, we need to call <code>HasMember()</code> before calling <code>operator[](const char*)</code>. However, this incurs two lookup. A better way is to call <code>FindMember()</code>, which can check the existence of member and obtain its value at once:</p>
 <div class="fragment"><div class="line">Value::ConstMemberIterator itr = document.FindMember(<span class="stringliteral">&quot;hello&quot;</span>);</div>
 <div class="line"><span class="keywordflow">if</span> (itr != document.MemberEnd())</div>
-<div class="line">    printf(<span class="stringliteral">&quot;%s %s\n&quot;</span>, itr-&gt;value.GetString());</div>
+<div class="line">    printf(<span class="stringliteral">&quot;%s\n&quot;</span>, itr-&gt;value.GetString());</div>
 </div><!-- fragment --><h2><a class="anchor" id="QueryNumber"></a>
 Querying Number</h2>
 <p>JSON provide a single numerical type called Number. Number can be integer or real numbers. RFC 4627 says the range of Number is specified by parser.</p>
@@ -478,18 +478,5 @@ What's next</h1>
   <ul>
   </ul>
 </div>
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = 'rapidjson-doc';
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-	    var dt = document.createElement('div');
-	    dt.id = "disqus_thread";
-	    (document.getElementsByClassName('contents')[0]).appendChild(dt);
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
 </body>
 </html>

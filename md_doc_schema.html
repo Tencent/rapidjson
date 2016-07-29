@@ -99,7 +99,7 @@ $(document).ready(function(){initNavTree('md_doc_schema.html','');});
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> sd;</div>
-<div class="line"><span class="keywordflow">if</span> (!sd.Parse(schemaJson)) {</div>
+<div class="line"><span class="keywordflow">if</span> (!sd.Parse(schemaJson).HasParseError()) {</div>
 <div class="line">    <span class="comment">// the schema is not a valid JSON.</span></div>
 <div class="line">    <span class="comment">// ...       </span></div>
 <div class="line">}</div>
@@ -107,7 +107,7 @@ $(document).ready(function(){initNavTree('md_doc_schema.html','');});
 <div class="line"><span class="comment">// sd is no longer needed here.</span></div>
 <div class="line"></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
-<div class="line"><span class="keywordflow">if</span> (!d.Parse(inputJson)) {</div>
+<div class="line"><span class="keywordflow">if</span> (!d.Parse(inputJson).HasParseError()) {</div>
 <div class="line">    <span class="comment">// the input is not a valid JSON.</span></div>
 <div class="line">    <span class="comment">// ...       </span></div>
 <div class="line">}</div>
@@ -201,7 +201,7 @@ $(document).ready(function(){initNavTree('md_doc_schema.html','');});
 <h2>Remote Schema</h2>
 <p>JSON Schema supports <a href="http://spacetelescope.github.io/understanding-json-schema/structuring.html">`$ref` keyword</a>, which is a JSON pointer referencing to a local or remote schema. Local pointer is prefixed with <code>#</code>, while remote pointer is an relative or absolute URI. For example:</p>
 <div class="fragment"><div class="line">{ <span class="stringliteral">&quot;$ref&quot;</span>: <span class="stringliteral">&quot;definitions.json#/address&quot;</span> }</div>
-</div><!-- fragment --><p>As <code>SchemaValidator</code> does not know how to resolve such URI, it needs a user-provided <code>IRemoteSchemaDocumentProvider</code> instance to do so.</p>
+</div><!-- fragment --><p>As <code>SchemaDocument</code> does not know how to resolve such URI, it needs a user-provided <code>IRemoteSchemaDocumentProvider</code> instance to do so.</p>
 <div class="fragment"><div class="line"><span class="keyword">class </span>MyRemoteSchemaDocumentProvider : <span class="keyword">public</span> <a class="code" href="namespacerapidjson.html#af91eb8eea47b79d75b23e29fa9c0abb5">IRemoteSchemaDocumentProvider</a> {</div>
 <div class="line"><span class="keyword">public</span>:</div>
 <div class="line">    <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#a52bbb5d64d1319495089e1713a0653cf">SchemaDocument</a>* GetRemoteDocument(<span class="keyword">const</span> <span class="keywordtype">char</span>* uri, SizeTyp length) {</div>
@@ -212,7 +212,7 @@ $(document).ready(function(){initNavTree('md_doc_schema.html','');});
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"></div>
 <div class="line">MyRemoteSchemaDocumentProvider provider;</div>
-<div class="line">SchemaValidator validator(schema, &amp;provider);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#a52bbb5d64d1319495089e1713a0653cf">SchemaDocument</a> schema(sd, &amp;provider);</div>
 </div><!-- fragment --><h2>Conformance</h2>
 <p>RapidJSON passed 262 out of 263 tests in <a href="https://github.com/json-schema/JSON-Schema-Test-Suite">JSON Schema Test Suite</a> (Json Schema draft 4).</p>
 <p>The failed test is "changed scope ref invalid" of "change resolution scope" in <code>refRemote.json</code>. It is due to that <code>id</code> schema keyword and URI combining function are not implemented.</p>
@@ -226,7 +226,7 @@ $(document).ready(function(){initNavTree('md_doc_schema.html','');});
 <tr>
 <td><code>ab</code> </td><td>Concatenation </td></tr>
 </table>
-<p>|<code>a|b</code> | Alternation |<code>a?</code> | Zero or one |<code>a*</code> | Zero or more |<code>a+</code> | One or more |<code>a{3}</code> | Exactly 3 times |<code>a{3,}</code> | At least 3 times |<code>a{3,5}</code>| 3 to 5 times |<code>(ab)</code> | Grouping |<code>^a</code> | At the beginning |<code>a$</code> | At the end |<code>.</code> | Any character |<code>[abc]</code> | Character classes |<code>[a-c]</code> | Character class range |<code>[a-z0-9_]</code> | Character class combination |<code>[^abc]</code> | Negated character classes |<code>[^a-c]</code> | Negated character class range |<code>[\b]</code> | Backspace (U+0008) |<code>\|</code>, <code>\\</code>, ... | Escape characters |<code>\f</code> | Form feed (U+000C) |<code>\n</code> | Line feed (U+000A) |<code>\r</code> | Carriage return (U+000D) |<code>\t</code> | Tab (U+0009) |<code>\v</code> | Vertical tab (U+000B)</p>
+<p>|<code>a|b</code> | Alternation | |<code>a?</code> | Zero or one | |<code>a*</code> | Zero or more | |<code>a+</code> | One or more | |<code>a{3}</code> | Exactly 3 times | |<code>a{3,}</code> | At least 3 times | |<code>a{3,5}</code>| 3 to 5 times | |<code>(ab)</code> | Grouping | |<code>^a</code> | At the beginning | |<code>a$</code> | At the end | |<code>.</code> | Any character | |<code>[abc]</code> | Character classes | |<code>[a-c]</code> | Character class range | |<code>[a-z0-9_]</code> | Character class combination | |<code>[^abc]</code> | Negated character classes | |<code>[^a-c]</code> | Negated character class range | |<code>[\b]</code> | Backspace (U+0008) | |<code>\|</code>, <code>\\</code>, ... | Escape characters | |<code>\f</code> | Form feed (U+000C) | |<code>\n</code> | Line feed (U+000A) | |<code>\r</code> | Carriage return (U+000D) | |<code>\t</code> | Tab (U+0009) | |<code>\v</code> | Vertical tab (U+000B) |</p>
 <p>For C++11 compiler, it is also possible to use the <code>std::regex</code> by defining <code>RAPIDJSON_SCHEMA_USE_INTERNALREGEX=0</code> and <code>RAPIDJSON_SCHEMA_USE_STDREGEX=1</code>. If your schemas do not need <code>pattern</code> and <code>patternProperties</code>, you can set both macros to zero to disable this feature, which will reduce some code size.</p>
 <h2>Performance</h2>
 <p>Most C++ JSON libraries do not yet support JSON Schema. So we tried to evaluate the performance of RapidJSON's JSON Schema validator according to <a href="https://github.com/ebdrup/json-schema-benchmark">json-schema-benchmark</a>, which tests 11 JavaScript libraries running on Node.js.</p>
@@ -269,18 +269,5 @@ $(document).ready(function(){initNavTree('md_doc_schema.html','');});
   <ul>
   </ul>
 </div>
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = 'rapidjson-doc';
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-	    var dt = document.createElement('div');
-	    dt.id = "disqus_thread";
-	    (document.getElementsByClassName('contents')[0]).appendChild(dt);
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
 </body>
 </html>

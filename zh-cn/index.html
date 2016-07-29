@@ -94,7 +94,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <div class="image">
 <img src="https://img.shields.io/badge/release-v1.0.2-blue.png" />
 </div>
-<h2>高效的C++ JSON解析／生成器，提供SAX及DOM风格API</h2>
+<h2>高效的 C++ JSON 解析／生成器，提供 SAX 及 DOM 风格 API</h2>
 <p>Tencent is pleased to support the open source community by making RapidJSON available.</p>
 <p>Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.</p>
 <ul>
@@ -102,7 +102,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>RapidJSON 文档<ul>
 <li><a href="http://rapidjson.org/">English</a></li>
 <li><a href="http://rapidjson.org/zh-cn/">简体中文</a></li>
-<li><a href="https://www.gitbook.com/book/miloyip/rapidjson/">GitBook</a>可下载PDF/EPUB/MOBI，但不含API参考手册。</li>
+<li><a href="https://www.gitbook.com/book/miloyip/rapidjson/">GitBook</a> 可下载 PDF/EPUB/MOBI，但不含 API 参考手册。</li>
 </ul>
 </li>
 </ul>
@@ -123,22 +123,22 @@ $(document).ready(function(){initNavTree('index.html','');});
  </td></tr>
 </table>
 <h2>简介</h2>
-<p>RapidJSON是一个C++的JSON解析器及生成器。它的灵感来自<a href="http://rapidxml.sourceforge.net/">RapidXml</a>。</p>
+<p>RapidJSON 是一个 C++ 的 JSON 解析器及生成器。它的灵感来自 <a href="http://rapidxml.sourceforge.net/">RapidXml</a>。</p>
 <ul>
-<li>RapidJSON小而全。它同时支持SAX和DOM风格的API。SAX解析器只有约500行代码。</li>
-<li>RapidJSON快。它的性能可与<code>strlen()</code>相比。可支持SSE2/SSE4.2加速。</li>
-<li>RapidJSON独立。它不依赖于BOOST等外部库。它甚至不依赖于STL。</li>
-<li>RapidJSON对内存友好。在大部分32/64位机器上，每个JSON值只占16或20字节（除字符串外）。它预设使用一个快速的内存分配器，令分析器可以紧凑地分配内存。</li>
-<li>RapidJSON对Unicode友好。它支持UTF-8、UTF-16、UTF-32 (大端序／小端序)，并内部支持这些编码的检测、校验及转码。例如，RapidJSON可以在分析一个UTF-8文件至DOM时，把当中的JSON字符串转码至UTF-16。它也支持代理对（surrogate pair）及<code>"\\u0000"</code>（空字符）。</li>
+<li>RapidJSON 小而全。它同时支持 SAX 和 DOM 风格的 API。SAX 解析器只有约 500 行代码。</li>
+<li>RapidJSON 快。它的性能可与 <code>strlen()</code> 相比。可支持 SSE2/SSE4.2 加速。</li>
+<li>RapidJSON 独立。它不依赖于 BOOST 等外部库。它甚至不依赖于 STL。</li>
+<li>RapidJSON 对内存友好。在大部分 32/64 位机器上，每个 JSON 值只占 16 或 20 字节（除字符串外）。它预设使用一个快速的内存分配器，令分析器可以紧凑地分配内存。</li>
+<li>RapidJSON 对 Unicode 友好。它支持 UTF-8、UTF-16、UTF-32 (大端序／小端序)，并内部支持这些编码的检测、校验及转码。例如，RapidJSON 可以在分析一个 UTF-8 文件至 DOM 时，把当中的 JSON 字符串转码至 UTF-16。它也支持代理对（surrogate pair）及 <code>"\\u0000"</code>（空字符）。</li>
 </ul>
-<p>在这里可读取更多特点。</p>
-<p>JSON（JavaScript Object Notation）是一个轻量的数据交换格式。RapidJSON应该完全遵从RFC7159/ECMA-404。 关于JSON的更多信息可参考：</p><ul>
+<p>在 这里 可读取更多特点。</p>
+<p>JSON（JavaScript Object Notation）是一个轻量的数据交换格式。RapidJSON 应该完全遵从 RFC7159/ECMA-404。 关于 JSON 的更多信息可参考：</p><ul>
 <li><a href="http://json.org/">Introducing JSON</a></li>
 <li><a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159: The JavaScript Object Notation (JSON) Data Interchange Format</a></li>
 <li><a href="http://www.ecma-international.org/publications/standards/Ecma-404.htm">Standard ECMA-404: The JSON Data Interchange Format</a></li>
 </ul>
 <h2>兼容性</h2>
-<p>RapidJSON是跨平台的。以下是一些曾测试的平台／编译器组合：</p><ul>
+<p>RapidJSON 是跨平台的。以下是一些曾测试的平台／编译器组合：</p><ul>
 <li>Visual C++ 2008/2010/2013 在 Windows (32/64-bit)</li>
 <li>GNU C++ 3.8.x 在 Cygwin</li>
 <li>Clang 3.4 在 Mac OS X (32/64-bit) 及 iOS</li>
@@ -146,23 +146,23 @@ $(document).ready(function(){initNavTree('index.html','');});
 </ul>
 <p>用户也可以在他们的平台上生成及执行单元测试。</p>
 <h2>安装</h2>
-<p>RapidJSON是只有头文件的C++库。只需把<code>include/rapidjson</code>目录复制至系统或项目的include目录中。</p>
-<p>RapidJSON依赖于以下软件：</p><ul>
+<p>RapidJSON 是只有头文件的 C++ 库。只需把 <code>include/rapidjson</code> 目录复制至系统或项目的 include 目录中。</p>
+<p>RapidJSON 依赖于以下软件：</p><ul>
 <li><a href="http://www.cmake.org">CMake</a> 作为通用生成工具</li>
-<li>(optional)<a href="http://www.doxygen.org">Doxygen</a>用于生成文档</li>
-<li>(optional)<a href="https://code.google.com/p/googletest/">googletest</a>用于单元及性能测试</li>
+<li>(optional)<a href="http://www.doxygen.org">Doxygen</a> 用于生成文档</li>
+<li>(optional)<a href="https://code.google.com/p/googletest/">googletest</a> 用于单元及性能测试</li>
 </ul>
 <p>生成测试及例子的步骤：</p>
 <ol type="1">
 <li>执行 <code>git submodule update --init</code> 去获取 thirdparty submodules (google test)。</li>
-<li>在rapidjson目渌下，建立一个<code>build</code>目录。</li>
-<li>在<code>build</code>目录下执行<code>cmake ..</code>命令以设置生成。Windows用户可使用cmake-gui应用程序。</li>
-<li>在Windows下，编译生成在build目录中的solution。在Linux下，于build目录运行<code>make</code>。</li>
+<li>在 rapidjson 目渌下，建立一个 <code>build</code> 目录。</li>
+<li>在 <code>build</code> 目录下执行 <code>cmake ..</code> 命令以设置生成。Windows 用户可使用 cmake-gui 应用程序。</li>
+<li>在 Windows 下，编译生成在 build 目录中的 solution。在 Linux 下，于 build 目录运行 <code>make</code>。</li>
 </ol>
-<p>成功生成后，你会在<code>bin</code>的目录下找到编译后的测试及例子可执行文件。而生成的文档将位于build下的<code>doc/html</code>目录。要执行测试，请在build下执行<code>make test</code>或<code>ctest</code>。使用<code>ctest -V</code>命令可获取详细的输出。</p>
-<p>我们也可以把程序库安装至全系统中，只要在具管理權限下从build目录执行<code>make install</code>命令。这样会按系统的偏好设置安装所有文件。当安装RapidJSON后，其他的CMake项目需要使用它时，可以通过在<code>CMakeLists.txt</code>加入一句<code>find_package(RapidJSON)</code>。</p>
+<p>成功生成后，你会在 <code>bin</code> 的目录下找到编译后的测试及例子可执行文件。而生成的文档将位于 build 下的 <code>doc/html</code> 目录。要执行测试，请在 build 下执行 <code>make test</code> 或 <code>ctest</code>。使用 <code>ctest -V</code> 命令可获取详细的输出。</p>
+<p>我们也可以把程序库安装至全系统中，只要在具管理權限下从 build 目录执行 <code>make install</code> 命令。这样会按系统的偏好设置安装所有文件。当安装 RapidJSON 后，其他的 CMake 项目需要使用它时，可以通过在 <code>CMakeLists.txt</code> 加入一句 <code>find_package(RapidJSON)</code>。</p>
 <h2>用法一览</h2>
-<p>此简单例子解析一个JSON字符串至一个document (DOM)，对DOM作出简单修改，最终把DOM转换（stringify）至JSON字符串。</p>
+<p>此简单例子解析一个 JSON 字符串至一个 document (DOM)，对 DOM 作出简单修改，最终把 DOM 转换（stringify）至 JSON 字符串。</p>
 <div class="fragment"><div class="line"><span class="comment">// rapidjson/example/simpledom/simpledom.cpp`</span></div>
 <div class="line"><span class="preprocessor">#include &quot;<a class="code" href="document_8h.html">rapidjson/document.h</a>&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &quot;rapidjson/writer.h&quot;</span></div>
@@ -172,16 +172,16 @@ $(document).ready(function(){initNavTree('index.html','');});
 <div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
 <div class="line"></div>
 <div class="line"><span class="keywordtype">int</span> main() {</div>
-<div class="line">    <span class="comment">// 1. 把JSON解析至DOM。</span></div>
+<div class="line">    <span class="comment">// 1. 把 JSON 解析至 DOM。</span></div>
 <div class="line">    <span class="keyword">const</span> <span class="keywordtype">char</span>* json = <span class="stringliteral">&quot;{\&quot;project\&quot;:\&quot;rapidjson\&quot;,\&quot;stars\&quot;:10}&quot;</span>;</div>
 <div class="line">    <a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> d;</div>
 <div class="line">    d.<a class="code" href="classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c">Parse</a>(json);</div>
 <div class="line"></div>
-<div class="line">    <span class="comment">// 2. 利用DOM作出修改。</span></div>
+<div class="line">    <span class="comment">// 2. 利用 DOM 作出修改。</span></div>
 <div class="line">    <a class="code" href="classrapidjson_1_1_generic_value.html">Value</a>&amp; s = d[<span class="stringliteral">&quot;stars&quot;</span>];</div>
 <div class="line">    s.SetInt(s.GetInt() + 1);</div>
 <div class="line"></div>
-<div class="line">    <span class="comment">// 3. 把DOM转换（stringify）成JSON。</span></div>
+<div class="line">    <span class="comment">// 3. 把 DOM 转换（stringify）成 JSON。</span></div>
 <div class="line">    <a class="code" href="classrapidjson_1_1_generic_string_buffer.html">StringBuffer</a> buffer;</div>
 <div class="line">    <a class="code" href="classrapidjson_1_1_writer.html">Writer&lt;StringBuffer&gt;</a> writer(buffer);</div>
 <div class="line">    d.<a class="code" href="classrapidjson_1_1_generic_value.html#aeef0506cd1f8d703db4833c503f0657e">Accept</a>(writer);</div>
@@ -196,7 +196,34 @@ $(document).ready(function(){initNavTree('index.html','');});
 <img src="simpledom.png" alt="simpledom.png"/>
 <div class="caption">
 simpledom</div></div>
-<p> 还有许多<a href="https://github.com/miloyip/rapidjson/tree/master/example">例子</a>可供参考。 </p>
+<p> 还有许多 <a href="https://github.com/miloyip/rapidjson/tree/master/example">例子</a> 可供参考：</p>
+<ul>
+<li>DOM API<ul>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/tutorial/tutorial.cpp">tutorial</a>: DOM API 的基本使用方法。</li>
+</ul>
+</li>
+<li>SAX API<ul>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/simplereader/simplereader.cpp">simplereader</a>: 使用 <code>Reader</code> 解析 JSON 时，打印所有 SAX 事件。</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/condense/condense.cpp">condense</a>: 移除 JSON 中所有空白符的命令行工具。</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/pretty/pretty.cpp">pretty</a>: 为 JSON 加入缩进与换行的命令行工具，当中使用了 <code>PrettyWriter</code>。</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/capitalize/capitalize.cpp">capitalize</a>: 把 JSON 中所有字符串改为大写的命令行工具。</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/messagereader/messagereader.cpp">messagereader</a>: 使用 SAX API 去解析一个 JSON 报文。</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/serialize/serialize.cpp">serialize</a>: 使用 SAX API 去序列化 C++ 对象，生成 JSON。</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/jsonx/jsonx.cpp">jsonx</a>: 实现了一个 <code>JsonxWriter</code>，它能把 SAX 事件写成 <a href="https://www-01.ibm.com/support/knowledgecenter/SS9H2Y_7.1.0/com.ibm.dp.doc/json_jsonx.html">JSONx</a>（一种 XML）格式。这个例子是把 JSON 输入转换成 JSONx 格式的命令行工具。</li>
+</ul>
+</li>
+<li>Schema API<ul>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/schemavalidator/schemavalidator.cpp">schemavalidator</a>: 使用 JSON Schema 去校验 JSON 的命令行工具。</li>
+</ul>
+</li>
+<li>进阶<ul>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/prettyauto/prettyauto.cpp">prettyauto</a>: <a href="https://github.com/miloyip/rapidjson/blob/master/example/pretty/pretty.cpp">pretty</a> 的修改版本，可自动处理任何 UTF 编码的 JSON。</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/parsebyparts/parsebyparts.cpp">parsebyparts</a>: 这例子中的 <code>AsyncDocumentParser</code> 类使用 C++ 线程来逐段解析 JSON。</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/filterkey/filterkey.cpp">filterkey</a>: 移取使用者指定的键值的命令行工具。</li>
+<li><a href="https://github.com/miloyip/rapidjson/blob/master/example/filterkey/filterkey.cpp">filterkeydom</a>: 如上的工具，但展示如何使用生成器（generator）去填充一个 <code>Document</code>。 </li>
+</ul>
+</li>
+</ul>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->
@@ -205,18 +232,5 @@ simpledom</div></div>
   <ul>
   </ul>
 </div>
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = 'rapidjson-doc';
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-	    var dt = document.createElement('div');
-	    dt.id = "disqus_thread";
-	    (document.getElementsByClassName('contents')[0]).appendChild(dt);
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
 </body>
 </html>

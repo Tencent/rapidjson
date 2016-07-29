@@ -4,22 +4,22 @@ var NAVTREE =
     [ "特点", "md_doc_features_8zh-cn.html", null ],
     [ "教程", "md_doc_tutorial_8zh-cn.html", [
       [ "Value 及 Document", "md_doc_tutorial_8zh-cn.html#ValueDocument", null ],
-      [ "查询Value", "md_doc_tutorial_8zh-cn.html#QueryValue", [
-        [ "查询Array", "md_doc_tutorial_8zh-cn.html#QueryArray", null ],
-        [ "查询Object", "md_doc_tutorial_8zh-cn.html#QueryObject", null ],
-        [ "查询Number", "md_doc_tutorial_8zh-cn.html#QueryNumber", null ],
-        [ "查询String", "md_doc_tutorial_8zh-cn.html#QueryString", null ]
+      [ "查询 Value", "md_doc_tutorial_8zh-cn.html#QueryValue", [
+        [ "查询 Array", "md_doc_tutorial_8zh-cn.html#QueryArray", null ],
+        [ "查询 Object", "md_doc_tutorial_8zh-cn.html#QueryObject", null ],
+        [ "查询 Number", "md_doc_tutorial_8zh-cn.html#QueryNumber", null ],
+        [ "查询 String", "md_doc_tutorial_8zh-cn.html#QueryString", null ]
       ] ],
       [ "创建／修改值", "md_doc_tutorial_8zh-cn.html#CreateModifyValues", [
-        [ "改变Value类型", "md_doc_tutorial_8zh-cn.html#ChangeValueType", null ],
+        [ "改变 Value 类型", "md_doc_tutorial_8zh-cn.html#ChangeValueType", null ],
         [ "转移语意（Move Semantics）", "md_doc_tutorial_8zh-cn.html#MoveSemantics", [
           [ "转移语意及临时值", "md_doc_tutorial_8zh-cn.html#TemporaryValues", null ]
         ] ],
-        [ "创建String", "md_doc_tutorial_8zh-cn.html#CreateString", null ],
-        [ "修改Array", "md_doc_tutorial_8zh-cn.html#ModifyArray", null ],
-        [ "修改Object", "md_doc_tutorial_8zh-cn.html#ModifyObject", null ],
-        [ "深复制Value", "md_doc_tutorial_8zh-cn.html#DeepCopyValue", null ],
-        [ "交换Value", "md_doc_tutorial_8zh-cn.html#SwapValues", null ]
+        [ "创建 String", "md_doc_tutorial_8zh-cn.html#CreateString", null ],
+        [ "修改 Array", "md_doc_tutorial_8zh-cn.html#ModifyArray", null ],
+        [ "修改 Object", "md_doc_tutorial_8zh-cn.html#ModifyObject", null ],
+        [ "深复制 Value", "md_doc_tutorial_8zh-cn.html#DeepCopyValue", null ],
+        [ "交换 Value", "md_doc_tutorial_8zh-cn.html#SwapValues", null ]
       ] ],
       [ "下一部分", "md_doc_tutorial_8zh-cn.html#WhatsNext", null ]
     ] ],
@@ -52,14 +52,14 @@ var NAVTREE =
         [ "AutoUTFOutputStream", "md_doc_stream_8zh-cn.html#AutoUTFOutputStream", null ]
       ] ],
       [ "自定义流", "md_doc_stream_8zh-cn.html#CustomStream", [
-        [ "例子：istream的包装类", "md_doc_stream_8zh-cn.html#ExampleIStreamWrapper", null ],
-        [ "例子：ostream的包装类", "md_doc_stream_8zh-cn.html#ExampleOStreamWrapper", null ]
+        [ "例子：istream 的包装类", "md_doc_stream_8zh-cn.html#ExampleIStreamWrapper", null ],
+        [ "例子：ostream 的包装类", "md_doc_stream_8zh-cn.html#ExampleOStreamWrapper", null ]
       ] ],
       [ "总结", "md_doc_stream_8zh-cn.html#Summary", null ]
     ] ],
     [ "编码", "md_doc_encoding_8zh-cn.html", [
       [ "Unicode", "md_doc_encoding_8zh-cn.html#Unicode", [
-        [ "Unicode转换格式", "md_doc_encoding_8zh-cn.html#UTF", null ],
+        [ "Unicode 转换格式", "md_doc_encoding_8zh-cn.html#UTF", null ],
         [ "字符类型", "md_doc_encoding_8zh-cn.html#CharacterType", null ],
         [ "AutoUTF", "md_doc_encoding_8zh-cn.html#AutoUTF", null ],
         [ "ASCII", "md_doc_encoding_8zh-cn.html#ASCII", null ]
@@ -88,8 +88,8 @@ var NAVTREE =
       [ "Writer", "md_doc_sax_8zh-cn.html#Writer", [
         [ "PrettyWriter", "md_doc_sax_8zh-cn.html#PrettyWriter", null ],
         [ "完整性及重置", "md_doc_sax_8zh-cn.html#CompletenessReset", null ],
-        [ "解析JSON至自定义结构", "md_doc_sax_8zh-cn.html#CustomDataStructure", null ],
-        [ "过滤JSON", "md_doc_sax_8zh-cn.html#Filtering", null ]
+        [ "解析 JSON 至自定义结构", "md_doc_sax_8zh-cn.html#CustomDataStructure", null ],
+        [ "过滤 JSON", "md_doc_sax_8zh-cn.html#Filtering", null ]
       ] ]
     ] ],
     [ "Schema", "md_doc_schema_8zh-cn.html", null ],
@@ -154,10 +154,10 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "allocators_8h_source.html",
-"classrapidjson_1_1_generic_object.html#aec5d23c7e1e0156c254c5e9f73d96c0f",
-"classrapidjson_1_1_generic_value.html#ad2b3832cef0c74490de72954f8891a90",
-"group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaf967d31be43666ce7f53756d73bd1cdf",
-"structrapidjson_1_1_generic_memory_buffer.html#a1b2639889f687f0f6f1b90181918f273"
+"classrapidjson_1_1_generic_object.html#ae38ccb43fb8bbd15ebcfbfb7ef02b6ce",
+"classrapidjson_1_1_generic_value.html#ad2935191ab28c2c2e472b739a9d58202",
+"group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c",
+"structrapidjson_1_1_generic_insitu_string_stream.html#a95abb3fe7cc3b08ecb70d804eb234dc2"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

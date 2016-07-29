@@ -2,6 +2,8 @@ var searchData=
 [
   ['karraytype',['kArrayType',['../namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468',1,'rapidjson']]],
   ['kfalsetype',['kFalseType',['../namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a9f2e7047832dce1029551b5de0f05607',1,'rapidjson']]],
+  ['kformatdefault',['kFormatDefault',['../namespacerapidjson.html#a084b31753ef2edefdeca8a5374eccc4ba8164b0d4993439856171585b9cf3adc0',1,'rapidjson']]],
+  ['kformatsinglelinearray',['kFormatSingleLineArray',['../namespacerapidjson.html#a084b31753ef2edefdeca8a5374eccc4ba64b0f8a37ab3125118682046ff06500f',1,'rapidjson']]],
   ['knulltype',['kNullType',['../namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a952871e4326b527154fc8aac1ac1f6ff',1,'rapidjson']]],
   ['knumbertype',['kNumberType',['../namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a',1,'rapidjson']]],
   ['kobjecttype',['kObjectType',['../namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9',1,'rapidjson']]],
@@ -28,8 +30,11 @@ var searchData=
   ['kparsefullprecisionflag',['kParseFullPrecisionFlag',['../namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9adf80892cdfa076b2d1a7dd9530e15cb0',1,'rapidjson']]],
   ['kparseinsituflag',['kParseInsituFlag',['../namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a02748971d6ea0c5e22c69b8aa7f344ea',1,'rapidjson']]],
   ['kparseiterativeflag',['kParseIterativeFlag',['../namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a7923686c8bdb7614699f1fb1bb615bb2',1,'rapidjson']]],
+  ['kparsenanandinfflag',['kParseNanAndInfFlag',['../namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a857894ab51cafa62956e9c9f0dafc4d8',1,'rapidjson']]],
   ['kparsenoflags',['kParseNoFlags',['../namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9af2c7fa21e9e7656e467bd71079ac8fb0',1,'rapidjson']]],
+  ['kparsenumbersasstringsflag',['kParseNumbersAsStringsFlag',['../namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a13981c0b803803f59d7a01aef3dfc987',1,'rapidjson']]],
   ['kparsestopwhendoneflag',['kParseStopWhenDoneFlag',['../namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9af84c60868704433b80aa51a62e042bb1',1,'rapidjson']]],
+  ['kparsetrailingcommasflag',['kParseTrailingCommasFlag',['../namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9af8b8470221dbc6046a40ff31d758ceec',1,'rapidjson']]],
   ['kparsevalidateencodingflag',['kParseValidateEncodingFlag',['../namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a3df81f75479da8e052393f92cbec394b',1,'rapidjson']]],
   ['kpointerparseerrorcharactermustpercentencode',['kPointerParseErrorCharacterMustPercentEncode',['../group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7bae244a98f53279fda5a750f847b81c54f',1,'rapidjson']]],
   ['kpointerparseerrorinvalidescape',['kPointerParseErrorInvalidEscape',['../group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7ba907c9fe4e541b257513e3a18635379f7',1,'rapidjson']]],
@@ -44,6 +49,7 @@ var searchData=
   ['kutf32le',['kUTF32LE',['../namespacerapidjson.html#a4aacabc0f8cea1cd628f466d890773eba2ec8c855b2edacca40fa73ad307a66b4',1,'rapidjson']]],
   ['kutf8',['kUTF8',['../namespacerapidjson.html#a4aacabc0f8cea1cd628f466d890773eba3bda3a2e3f0ec2b7e8c5a3d5d4f60a81',1,'rapidjson']]],
   ['kwritedefaultflags',['kWriteDefaultFlags',['../namespacerapidjson.html#ad28b1de6aee37e92fc31792dd6dd6b19a5b5ca665afdfa828a74ae5755c67a226',1,'rapidjson']]],
+  ['kwritenanandinfflag',['kWriteNanAndInfFlag',['../namespacerapidjson.html#ad28b1de6aee37e92fc31792dd6dd6b19a3adbca1d31ad845ff4e9d742280cce39',1,'rapidjson']]],
   ['kwritenoflags',['kWriteNoFlags',['../namespacerapidjson.html#ad28b1de6aee37e92fc31792dd6dd6b19ae971aa1fc0ae64c8f3d2b47fd802846a',1,'rapidjson']]],
   ['kwritevalidateencodingflag',['kWriteValidateEncodingFlag',['../namespacerapidjson.html#ad28b1de6aee37e92fc31792dd6dd6b19ac1b5e17278b060e9e866df075c104c10',1,'rapidjson']]]
 ];

@@ -35,6 +35,7 @@ var classrapidjson_1_1_generic_document =
     [ "ParseStream", "classrapidjson_1_1_generic_document.html#ae4ee7d86b8c906c83dbe15e57eb6ac6a", null ],
     [ "ParseStream", "classrapidjson_1_1_generic_document.html#acf96a3c7fd61486d049c701b1fe5d414", null ],
     [ "Populate", "classrapidjson_1_1_generic_document.html#a63e18887979da500ece6f0bd10d29b64", null ],
+    [ "RawNumber", "classrapidjson_1_1_generic_document.html#a278e93a502e19762fdfc337875ca34f8", null ],
     [ "StartArray", "classrapidjson_1_1_generic_document.html#a5ea841518170c19b896c53dc255fae41", null ],
     [ "StartObject", "classrapidjson_1_1_generic_document.html#acdbdf67f126b45fcf3c7029bdaa930d8", null ],
     [ "String", "classrapidjson_1_1_generic_document.html#aeab83624e94e75f3f9faa18e0c74ba20", null ],

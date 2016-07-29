@@ -135,6 +135,9 @@ Public 成员函数</h2></td></tr>
 <tr class="memitem:a121686c29ca7fe071fa4108c46955ff0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_pretty_writer.html">PrettyWriter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_pretty_writer.html#a121686c29ca7fe071fa4108c46955ff0">SetIndent</a> (Ch indentChar, unsigned indentCharCount)</td></tr>
 <tr class="memdesc:a121686c29ca7fe071fa4108c46955ff0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set custom indentation.  <a href="#a121686c29ca7fe071fa4108c46955ff0">更多...</a><br /></td></tr>
 <tr class="separator:a121686c29ca7fe071fa4108c46955ff0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acde6176577f29869e28a4f3c4a251090"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_pretty_writer.html">PrettyWriter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_pretty_writer.html#acde6176577f29869e28a4f3c4a251090">SetFormatOptions</a> (<a class="el" href="namespacerapidjson.html#a084b31753ef2edefdeca8a5374eccc4b">PrettyFormatOptions</a> options)</td></tr>
+<tr class="memdesc:acde6176577f29869e28a4f3c4a251090"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set pretty writer formatting options.  <a href="#acde6176577f29869e28a4f3c4a251090">更多...</a><br /></td></tr>
+<tr class="separator:acde6176577f29869e28a4f3c4a251090"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3136e3426a5d06e5da50f6e6aab8a5be"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_pretty_writer.html#a3136e3426a5d06e5da50f6e6aab8a5be">RawValue</a> (const Ch *json, size_t length, <a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> type)</td></tr>
 <tr class="memdesc:a3136e3426a5d06e5da50f6e6aab8a5be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a raw JSON value.  <a href="#a3136e3426a5d06e5da50f6e6aab8a5be">更多...</a><br /></td></tr>
 <tr class="separator:a3136e3426a5d06e5da50f6e6aab8a5be"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -162,6 +165,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>Uint64</b> (uint64_t 
 <tr class="memitem:a912576054f9ebf5c614e42981f8404ce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a912576054f9ebf5c614e42981f8404ce"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>Double</b> (double d)</td></tr>
 <tr class="separator:a912576054f9ebf5c614e42981f8404ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1189fbfd7e57207be1d5dc36d3d4b385"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1189fbfd7e57207be1d5dc36d3d4b385"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>RawNumber</b> (const Ch *str, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, bool copy=false)</td></tr>
+<tr class="separator:a1189fbfd7e57207be1d5dc36d3d4b385"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3c6ad244ef86efafa62ff3b3dd8e25b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af3c6ad244ef86efafa62ff3b3dd8e25b"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>String</b> (const Ch *str, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, bool copy=false)</td></tr>
 <tr class="separator:af3c6ad244ef86efafa62ff3b3dd8e25b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -174,6 +180,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>StartObject</b> ()</t
 <tr class="memitem:aec6183f368bb54310a41e0e1e00bf329"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aec6183f368bb54310a41e0e1e00bf329"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>Key</b> (const Ch *str, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, bool copy=false)</td></tr>
 <tr class="separator:aec6183f368bb54310a41e0e1e00bf329"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ebfb88ba0a9d87fe2a2f59f4e0b72fb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0ebfb88ba0a9d87fe2a2f59f4e0b72fb"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>Key</b> (const std::basic_string&lt; Ch &gt; &amp;str)</td></tr>
+<tr class="separator:a0ebfb88ba0a9d87fe2a2f59f4e0b72fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab53444ec4b12be2152bd712c24ec5193"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab53444ec4b12be2152bd712c24ec5193"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>EndObject</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> memberCount=0)</td></tr>
 <tr class="separator:ab53444ec4b12be2152bd712c24ec5193"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -234,6 +243,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>Uint64</b> (uint64_t 
 <tr class="memitem:aff66881798d01e932a0b8b8ef97b0373 inherit pub_methods_classrapidjson_1_1_writer"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#aff66881798d01e932a0b8b8ef97b0373">Double</a> (double d)</td></tr>
 <tr class="memdesc:aff66881798d01e932a0b8b8ef97b0373 inherit pub_methods_classrapidjson_1_1_writer"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes the given <code>double</code> value to the stream.  <a href="#aff66881798d01e932a0b8b8ef97b0373">更多...</a><br /></td></tr>
 <tr class="separator:aff66881798d01e932a0b8b8ef97b0373 inherit pub_methods_classrapidjson_1_1_writer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65a378b4de5df3fb02521a4a78b25230 inherit pub_methods_classrapidjson_1_1_writer"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a65a378b4de5df3fb02521a4a78b25230"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>RawNumber</b> (const Ch *str, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, bool copy=false)</td></tr>
+<tr class="separator:a65a378b4de5df3fb02521a4a78b25230 inherit pub_methods_classrapidjson_1_1_writer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3cddcb5176054f559d0d552a3ff8789b inherit pub_methods_classrapidjson_1_1_writer"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3cddcb5176054f559d0d552a3ff8789b"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>String</b> (const Ch *str, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, bool copy=false)</td></tr>
 <tr class="separator:a3cddcb5176054f559d0d552a3ff8789b inherit pub_methods_classrapidjson_1_1_writer"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -317,6 +329,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>WriteRawValue</b> (co
 <tr class="memitem:aefe33eab3521b2d9366dff3b788f0665 inherit pro_methods_classrapidjson_1_1_writer"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aefe33eab3521b2d9366dff3b788f0665"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>Prefix</b> (<a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> type)</td></tr>
 <tr class="separator:aefe33eab3521b2d9366dff3b788f0665 inherit pro_methods_classrapidjson_1_1_writer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adca78a0b05864d1c903f9afa955f3b07 inherit pro_methods_classrapidjson_1_1_writer"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adca78a0b05864d1c903f9afa955f3b07"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>EndValue</b> (bool ret)</td></tr>
+<tr class="separator:adca78a0b05864d1c903f9afa955f3b07 inherit pro_methods_classrapidjson_1_1_writer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2ccb801bfd355ecc03a3a3ba5eb7392 inherit pro_methods_classrapidjson_1_1_writer"><td class="memTemplParams" colspan="2"><a class="anchor" id="ab2ccb801bfd355ecc03a3a3ba5eb7392"></a>
 template&lt;&gt; </td></tr>
 <tr class="memitem:ab2ccb801bfd355ecc03a3a3ba5eb7392 inherit pro_methods_classrapidjson_1_1_writer"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>WriteInt</b> (int i)</td></tr>
@@ -346,6 +361,9 @@ Ch&#160;</td><td class="memItemRight" valign="bottom"><b>indentChar_</b></td></t
 <tr class="memitem:a8b4afa26067dcc84e3940bdde08e59f1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8b4afa26067dcc84e3940bdde08e59f1"></a>
 unsigned&#160;</td><td class="memItemRight" valign="bottom"><b>indentCharCount_</b></td></tr>
 <tr class="separator:a8b4afa26067dcc84e3940bdde08e59f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27c46a2b1fd7a0c1cb518ba9c0f998cf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a27c46a2b1fd7a0c1cb518ba9c0f998cf"></a>
+<a class="el" href="namespacerapidjson.html#a084b31753ef2edefdeca8a5374eccc4b">PrettyFormatOptions</a>&#160;</td><td class="memItemRight" valign="bottom"><b>formatOptions_</b></td></tr>
+<tr class="separator:a27c46a2b1fd7a0c1cb518ba9c0f998cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classrapidjson_1_1_writer"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classrapidjson_1_1_writer')"><img src="closed.png" alt="-"/>&#160;Protected 属性 继承自 <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td></tr>
 <tr class="memitem:a1370d3fd6728d4f0b3f20d734bb27eaf inherit pro_attribs_classrapidjson_1_1_writer"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1370d3fd6728d4f0b3f20d734bb27eaf"></a>
 OutputStream *&#160;</td><td class="memItemRight" valign="bottom"><b>os_</b></td></tr>
@@ -493,6 +511,40 @@ template&lt;typename OutputStream , typename SourceEncoding , typename TargetEnc
 
 </div>
 </div>
+<a class="anchor" id="acde6176577f29869e28a4f3c4a251090"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename OutputStream , typename SourceEncoding , typename TargetEncoding , typename StackAllocator , unsigned writeFlags&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrapidjson_1_1_pretty_writer.html">PrettyWriter</a>&amp; <a class="el" href="classrapidjson_1_1_pretty_writer.html">rapidjson::PrettyWriter</a>&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;::SetFormatOptions </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacerapidjson.html#a084b31753ef2edefdeca8a5374eccc4b">PrettyFormatOptions</a>&#160;</td>
+          <td class="paramname"><em>options</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set pretty writer formatting options. </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">options</td><td>Formatting options. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a121686c29ca7fe071fa4108c46955ff0"></a>
 <div class="memitem">
 <div class="memproto">
@@ -552,18 +604,5 @@ template&lt;typename OutputStream , typename SourceEncoding , typename TargetEnc
     <li class="navelem"><a class="el" href="namespacerapidjson.html">rapidjson</a></li><li class="navelem"><a class="el" href="classrapidjson_1_1_pretty_writer.html">PrettyWriter</a></li>
   </ul>
 </div>
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = 'rapidjson-doc';
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-	    var dt = document.createElement('div');
-	    dt.id = "disqus_thread";
-	    (document.getElementsByClassName('contents')[0]).appendChild(dt);
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
 </body>
 </html>

@@ -11,10 +11,13 @@ var classrapidjson_1_1_pretty_writer =
     [ "Int", "classrapidjson_1_1_pretty_writer.html#a631a35ee8006c1c218ce78e3d919c927", null ],
     [ "Int64", "classrapidjson_1_1_pretty_writer.html#aebdf6ed7eeb5e953b941239384d3a4e1", null ],
     [ "Key", "classrapidjson_1_1_pretty_writer.html#aec6183f368bb54310a41e0e1e00bf329", null ],
+    [ "Key", "classrapidjson_1_1_pretty_writer.html#a0ebfb88ba0a9d87fe2a2f59f4e0b72fb", null ],
     [ "Key", "classrapidjson_1_1_pretty_writer.html#a0b7000c10be5b1e24920ce27a7ba7f6a", null ],
     [ "Null", "classrapidjson_1_1_pretty_writer.html#afb049092845d2c0168f1570cf4ad66bc", null ],
     [ "PrettyPrefix", "classrapidjson_1_1_pretty_writer.html#aff11c26086470359ef3ab1142515441c", null ],
+    [ "RawNumber", "classrapidjson_1_1_pretty_writer.html#a1189fbfd7e57207be1d5dc36d3d4b385", null ],
     [ "RawValue", "classrapidjson_1_1_pretty_writer.html#a3136e3426a5d06e5da50f6e6aab8a5be", null ],
+    [ "SetFormatOptions", "classrapidjson_1_1_pretty_writer.html#acde6176577f29869e28a4f3c4a251090", null ],
     [ "SetIndent", "classrapidjson_1_1_pretty_writer.html#a121686c29ca7fe071fa4108c46955ff0", null ],
     [ "StartArray", "classrapidjson_1_1_pretty_writer.html#ad12f40eaec2b43158cee716dbd88c393", null ],
     [ "StartObject", "classrapidjson_1_1_pretty_writer.html#ac043c4de0728cdfa8739af94560bddc3", null ],
@@ -24,6 +27,7 @@ var classrapidjson_1_1_pretty_writer =
     [ "Uint", "classrapidjson_1_1_pretty_writer.html#a93a81e65915f0b607a2f69b2d9728c39", null ],
     [ "Uint64", "classrapidjson_1_1_pretty_writer.html#a3a2d3bf5af1edf76b4d2c6b1fdf08d26", null ],
     [ "WriteIndent", "classrapidjson_1_1_pretty_writer.html#aa0bfa813b170d7fc27f1b370388861e4", null ],
+    [ "formatOptions_", "classrapidjson_1_1_pretty_writer.html#a27c46a2b1fd7a0c1cb518ba9c0f998cf", null ],
     [ "indentChar_", "classrapidjson_1_1_pretty_writer.html#ad5492530262115dee2b44fc7682ddc07", null ],
     [ "indentCharCount_", "classrapidjson_1_1_pretty_writer.html#a8b4afa26067dcc84e3940bdde08e59f1", null ]
 ];

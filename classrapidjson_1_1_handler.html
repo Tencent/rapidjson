@@ -104,7 +104,9 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_handler.html','');}
 <div class="line">    <span class="keywordtype">bool</span> Uint(<span class="keywordtype">unsigned</span> i);</div>
 <div class="line">    <span class="keywordtype">bool</span> Int64(int64_t i);</div>
 <div class="line">    <span class="keywordtype">bool</span> Uint64(uint64_t i);</div>
-<div class="line">    <span class="keywordtype">bool</span> Double(<span class="keywordtype">double</span> d);</div>
+<div class="line">    <span class="keywordtype">bool</span> Double(<span class="keywordtype">double</span> d);<span class="comment"></span></div>
+<div class="line"><span class="comment">    /// enabled via kParseNumbersAsStringsFlag, string is not null-terminated (use length)</span></div>
+<div class="line"><span class="comment"></span>    <span class="keywordtype">bool</span> RawNumber(<span class="keyword">const</span> Ch* str, <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, <span class="keywordtype">bool</span> copy);</div>
 <div class="line">    <span class="keywordtype">bool</span> String(<span class="keyword">const</span> Ch* str, <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, <span class="keywordtype">bool</span> copy);</div>
 <div class="line">    <span class="keywordtype">bool</span> StartObject();</div>
 <div class="line">    <span class="keywordtype">bool</span> Key(<span class="keyword">const</span> Ch* str, <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, <span class="keywordtype">bool</span> copy);</div>
@@ -124,18 +126,5 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_handler.html','');}
     <li class="navelem"><a class="el" href="namespacerapidjson.html">rapidjson</a></li><li class="navelem"><a class="el" href="classrapidjson_1_1_handler.html">Handler</a></li>
   </ul>
 </div>
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = 'rapidjson-doc';
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function() {
-	    var dt = document.createElement('div');
-	    dt.id = "disqus_thread";
-	    (document.getElementsByClassName('contents')[0]).appendChild(dt);
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
 </body>
 </html>

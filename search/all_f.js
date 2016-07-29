@@ -32,6 +32,7 @@ var searchData=
   ['rapidjson_5funlikely',['RAPIDJSON_UNLIKELY',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga6a2b1695c13e77ae425e3cbac980ccb5',1,'rapidjson.h']]],
   ['rapidjson_5fversion_5fstring',['RAPIDJSON_VERSION_STRING',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gad283cfde97d9a32b7d8e8107b11f70a6',1,'rapidjson.h']]],
   ['rapidjson_5fwrite_5fdefault_5fflags',['RAPIDJSON_WRITE_DEFAULT_FLAGS',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga1975595e2f1dc20a2d4859f340ac88c6',1,'writer.h']]],
+  ['rawnumber',['RawNumber',['../structrapidjson_1_1_base_reader_handler.html#a0de969fd05528960c2a7de51b2265bf1',1,'rapidjson::BaseReaderHandler']]],
   ['rawvalue',['RawValue',['../classrapidjson_1_1_pretty_writer.html#a3136e3426a5d06e5da50f6e6aab8a5be',1,'rapidjson::PrettyWriter::RawValue()'],['../classrapidjson_1_1_writer.html#a8acb89b2bbb1e5f384e6076b65044dbe',1,'rapidjson::Writer::RawValue()']]],
   ['reader',['Reader',['../namespacerapidjson.html#ad5310edd1226f5b3ea82dc0d4d3740c6',1,'rapidjson']]],
   ['reader_2eh',['reader.h',['../reader_8h.html',1,'']]],

@@ -13,6 +13,9 @@ var reader_8h =
       [ "kParseStopWhenDoneFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9af84c60868704433b80aa51a62e042bb1", null ],
       [ "kParseFullPrecisionFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9adf80892cdfa076b2d1a7dd9530e15cb0", null ],
       [ "kParseCommentsFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9ab5d719b36aac626135d5d622d0d837c1", null ],
+      [ "kParseNumbersAsStringsFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a13981c0b803803f59d7a01aef3dfc987", null ],
+      [ "kParseTrailingCommasFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9af8b8470221dbc6046a40ff31d758ceec", null ],
+      [ "kParseNanAndInfFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a857894ab51cafa62956e9c9f0dafc4d8", null ],
       [ "kParseDefaultFlags", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835", null ]
     ] ],
     [ "SkipWhitespace", "reader_8h.html#a6efb0f4d2a6f81477a59718d42e9464a", null ],

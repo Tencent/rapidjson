@@ -26,7 +26,7 @@ var classrapidjson_1_1_generic_schema_validator =
     [ "Key", "classrapidjson_1_1_generic_schema_validator.html#af2ad6b4fb9837b90643da7cdd62e413b", null ],
     [ "MallocState", "classrapidjson_1_1_generic_schema_validator.html#a73d58da18b6e77665daaa977852f205c", null ],
     [ "Null", "classrapidjson_1_1_generic_schema_validator.html#aefcbbbdba183ef7b13347aa3b4f352bd", null ],
-    [ "ReallocState", "classrapidjson_1_1_generic_schema_validator.html#a2544b83c6ea83c07533d8335f19f189b", null ],
+    [ "RawNumber", "classrapidjson_1_1_generic_schema_validator.html#a58fb3589123904533021926530a206ce", null ],
     [ "Reset", "classrapidjson_1_1_generic_schema_validator.html#afe6cd0d9088a1d4cf8100c0efc9f76fc", null ],
     [ "StartArray", "classrapidjson_1_1_generic_schema_validator.html#a615b93b84c732e405f3847c7d789acf8", null ],
     [ "StartObject", "classrapidjson_1_1_generic_schema_validator.html#a311489ae16471b5e111a62090a8675e0", null ],
