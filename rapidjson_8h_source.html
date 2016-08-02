@@ -332,7 +332,7 @@ $(document).ready(function(){initNavTree('rapidjson_8h_source.html','');});
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;<span class="comment">//! Whether using 64-bit architecture</span></div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;<span class="comment"></span><span class="preprocessor">#ifndef RAPIDJSON_64BIT</span></div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;<span class="preprocessor">#if defined(__LP64__) || defined(_WIN64) || defined(__EMSCRIPTEN__)</span></div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;<span class="preprocessor">#if defined(__LP64__) || (defined(__x86_64__) &amp;&amp; defined(__ILP32__)) || defined(_WIN64) || defined(__EMSCRIPTEN__)</span></div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;<span class="preprocessor">#define RAPIDJSON_64BIT 1</span></div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;<span class="preprocessor">#else</span></div>
 <div class="line"><a name="l00256"></a><span class="lineno"><a class="line" href="rapidjson_8h.html#a93973847cb99354b6b5bb5605aa7fe52">  256</a></span>&#160;<span class="preprocessor">#define RAPIDJSON_64BIT 0</span></div>
