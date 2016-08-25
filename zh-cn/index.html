@@ -84,7 +84,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <img src="rapidjson.png" alt="rapidjson.png"/>
 </div>
 <div class="image">
-<img src="https://img.shields.io/badge/release-v1.0.2-blue.png" />
+<img src="https://img.shields.io/badge/release-v1.1.0-blue.png" />
 </div>
 <h2>高效的 C++ JSON 解析／生成器，提供 SAX 及 DOM 风格 API</h2>
 <p>Tencent is pleased to support the open source community by making RapidJSON available.</p>
@@ -120,15 +120,24 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>RapidJSON 小而全。它同时支持 SAX 和 DOM 风格的 API。SAX 解析器只有约 500 行代码。</li>
 <li>RapidJSON 快。它的性能可与 <code>strlen()</code> 相比。可支持 SSE2/SSE4.2 加速。</li>
 <li>RapidJSON 独立。它不依赖于 BOOST 等外部库。它甚至不依赖于 STL。</li>
-<li>RapidJSON 对内存友好。在大部分 32/64 位机器上，每个 JSON 值只占 16 或 20 字节（除字符串外）。它预设使用一个快速的内存分配器，令分析器可以紧凑地分配内存。</li>
+<li>RapidJSON 对内存友好。在大部分 32/64 位机器上，每个 JSON 值只占 16 字节（除字符串外）。它预设使用一个快速的内存分配器，令分析器可以紧凑地分配内存。</li>
 <li>RapidJSON 对 Unicode 友好。它支持 UTF-8、UTF-16、UTF-32 (大端序／小端序)，并内部支持这些编码的检测、校验及转码。例如，RapidJSON 可以在分析一个 UTF-8 文件至 DOM 时，把当中的 JSON 字符串转码至 UTF-16。它也支持代理对（surrogate pair）及 <code>"\\u0000"</code>（空字符）。</li>
 </ul>
-<p>在 这里 可读取更多特点。</p>
-<p>JSON（JavaScript Object Notation）是一个轻量的数据交换格式。RapidJSON 应该完全遵从 RFC7159/ECMA-404。 关于 JSON 的更多信息可参考：</p><ul>
+<p>在 <a class="el" href="md_doc_features_8zh-cn.html">这里</a> 可读取更多特点。</p>
+<p>JSON（JavaScript Object Notation）是一个轻量的数据交换格式。RapidJSON 应该完全遵从 RFC7159/ECMA-404，并支持可选的放宽语法。 关于 JSON 的更多信息可参考：</p><ul>
 <li><a href="http://json.org/">Introducing JSON</a></li>
 <li><a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159: The JavaScript Object Notation (JSON) Data Interchange Format</a></li>
 <li><a href="http://www.ecma-international.org/publications/standards/Ecma-404.htm">Standard ECMA-404: The JSON Data Interchange Format</a></li>
 </ul>
+<h2>v1.1 中的亮点 (2016-8-25)</h2>
+<ul>
+<li>加入 <a class="el" href="md_doc_pointer_8zh-cn.html">JSON Pointer</a> 功能，可更简单地访问及更改 DOM。</li>
+<li>加入 <a class="el" href="md_doc_schema_8zh-cn.html">JSON Schema</a> 功能，可在解析或生成 JSON 时进行校验。</li>
+<li>加入 <a class="el" href="md_doc_dom_8zh-cn.html">放宽的 JSON 语法</a> （注释、尾随逗号、NaN/Infinity）</li>
+<li>使用 <a class="el" href="md_doc_tutorial_8zh-cn.html">C++11 范围 for 循环</a> 去遍历 array 和 object。</li>
+<li>在 x86-64 架构下，缩减每个 <code>Value</code> 的内存开销从 24 字节至 16 字节。</li>
+</ul>
+<p>其他改动请参考 <a class="el" href="md__c_h_a_n_g_e_l_o_g.html">change log</a>.</p>
 <h2>兼容性</h2>
 <p>RapidJSON 是跨平台的。以下是一些曾测试的平台／编译器组合：</p><ul>
 <li>Visual C++ 2008/2010/2013 在 Windows (32/64-bit)</li>

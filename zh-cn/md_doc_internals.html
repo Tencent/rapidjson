@@ -87,7 +87,7 @@ $(document).ready(function(){initNavTree('md_doc_internals.html','');});
 <li class="level2"><a href="#ShortString">Short-String Optimization</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#Allocator">Allocator</a><ul><li class="level2"><a href="#MemoryPoolAllocator">MemoryPoolAllocator</a></li>
+<li class="level1"><a href="#InternalAllocator">Allocator</a><ul><li class="level2"><a href="#MemoryPoolAllocator">MemoryPoolAllocator</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#ParsingOptimization">Parsing Optimization</a><ul><li class="level2"><a href="#SkipwhitespaceWithSIMD">Skip Whitespaces with SIMD</a></li>
@@ -258,7 +258,7 @@ Flags</h2>
 <p>Number is a bit more complicated. For normal integer values, it can contains <code>kIntFlag</code>, <code>kUintFlag</code>, <code>kInt64Flag</code> and/or <code>kUint64Flag</code>, according to the range of the integer. For numbers with fraction, and integers larger than 64-bit range, they will be stored as <code>double</code> with <code>kDoubleFlag</code>.</p>
 <h2><a class="anchor" id="ShortString"></a>
 Short-String Optimization</h2>
-<p>Kosta (-Github) provided a very neat short-string optimization. The optimization idea is given as follow. Excluding the <code>flags_</code>, a <code>Value</code> has 12 or 16 bytes (32-bit or 64-bit) for storing actual data. Instead of storing a pointer to a string, it is possible to store short strings in these space internally. For encoding with 1-byte character type (e.g. <code>char</code>), it can store maximum 11 or 15 characters string inside the <code>Value</code> type.</p>
+<p><a href="https://github.com/Kosta-Github">Kosta</a> provided a very neat short-string optimization. The optimization idea is given as follow. Excluding the <code>flags_</code>, a <code>Value</code> has 12 or 16 bytes (32-bit or 64-bit) for storing actual data. Instead of storing a pointer to a string, it is possible to store short strings in these space internally. For encoding with 1-byte character type (e.g. <code>char</code>), it can store maximum 11 or 15 characters string inside the <code>Value</code> type.</p>
 <table class="doxtable">
 <tr>
 <th>ShortString (Ch=char) </th><th></th><th align="center">32-bit</th><th align="center">64-bit  </th></tr>
@@ -271,7 +271,7 @@ Short-String Optimization</h2>
 </table>
 <p>A special technique is applied. Instead of storing the length of string directly, it stores (MaxChars - length). This make it possible to store 11 characters with trailing <code>\0</code>.</p>
 <p>This optimization can reduce memory usage for copy-string. It can also improve cache-coherence thus improve runtime performance.</p>
-<h1><a class="anchor" id="Allocator"></a>
+<h1><a class="anchor" id="InternalAllocator"></a>
 Allocator</h1>
 <p><code>Allocator</code> is a concept in RapidJSON: </p><div class="fragment"><div class="line">concept Allocator {</div>
 <div class="line">    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> kNeedFree;    <span class="comment">//!&lt; Whether this allocator needs to call Free().</span></div>

@@ -1,6 +1,7 @@
 var NAVTREE =
 [
   [ "RapidJSON", "index.html", [
+    [ "Change Log", "md__c_h_a_n_g_e_l_o_g.html", null ],
     [ "特点", "md_doc_features_8zh-cn.html", null ],
     [ "教程", "md_doc_tutorial_8zh-cn.html", [
       [ "Value 及 Document", "md_doc_tutorial_8zh-cn.html#ValueDocument", null ],
@@ -72,13 +73,15 @@ var NAVTREE =
       [ "模板", "md_doc_dom_8zh-cn.html#Template", [
         [ "编码", "md_doc_dom_8zh-cn.html#Encoding", null ]
       ] ],
-      [ "Allocator", "md_doc_dom_8zh-cn.html#Allocator", null ],
+      [ "Allocator", "md_doc_dom_8zh-cn.html#InternalAllocator", null ],
       [ "解析", "md_doc_dom_8zh-cn.html#Parsing", [
         [ "解析错误", "md_doc_dom_8zh-cn.html#ParseError", null ],
         [ "原位解析", "md_doc_dom_8zh-cn.html#InSituParsing", null ],
         [ "转码与校验", "md_doc_dom_8zh-cn.html#TranscodingAndValidation", null ]
       ] ],
-      [ "技巧", "md_doc_dom_8zh-cn.html#Techniques", null ]
+      [ "技巧", "md_doc_dom_8zh-cn.html#Techniques", [
+        [ "使用者缓冲区", "md_doc_dom_8zh-cn.html#UserBuffer", null ]
+      ] ]
     ] ],
     [ "SAX", "md_doc_sax_8zh-cn.html", [
       [ "Reader", "md_doc_sax_8zh-cn.html#Reader", [
@@ -101,7 +104,7 @@ var NAVTREE =
         [ "Flags", "md_doc_internals.html#Flags", null ],
         [ "Short-String Optimization", "md_doc_internals.html#ShortString", null ]
       ] ],
-      [ "Allocator", "md_doc_internals.html#Allocator", [
+      [ "Allocator", "md_doc_internals.html#InternalAllocator", [
         [ "MemoryPoolAllocator", "md_doc_internals.html#MemoryPoolAllocator", null ]
       ] ],
       [ "Parsing Optimization", "md_doc_internals.html#ParsingOptimization", [
@@ -157,7 +160,7 @@ var NAVTREEINDEX =
 "classrapidjson_1_1_generic_object.html#ae38ccb43fb8bbd15ebcfbfb7ef02b6ce",
 "classrapidjson_1_1_generic_value.html#ad2935191ab28c2c2e472b739a9d58202",
 "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c",
-"structrapidjson_1_1_generic_insitu_string_stream.html#a95abb3fe7cc3b08ecb70d804eb234dc2"
+"structrapidjson_1_1_generic_insitu_string_stream.html#a6d611d9f5372d457373b90a711dd2717"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

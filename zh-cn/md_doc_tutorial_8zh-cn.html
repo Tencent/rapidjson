@@ -175,7 +175,11 @@ Value 及 Document</h1>
 <li><code>SizeType Capacity() const</code></li>
 <li><code>bool Empty() const</code></li>
 </ul>
-<h2><a class="anchor" id="QueryObject"></a>
+<h3>范围 for 循环 (v1.1.0 中的新功能)</h3>
+<p>当使用 C++11 功能时，你可使用范围 for 循环去访问 Array 内的所有元素。</p>
+<div class="fragment"><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; v : a.GetArray())</div>
+<div class="line">    printf(<span class="stringliteral">&quot;%d &quot;</span>, v.GetInt());</div>
+</div><!-- fragment --><h2><a class="anchor" id="QueryObject"></a>
 查询 Object</h2>
 <p>和 Array 相似，我们可以用迭代器去访问所有 Object 成员：</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* kTypeNames[] = </div>
@@ -199,6 +203,11 @@ Value 及 Document</h1>
 <div class="fragment"><div class="line">Value::ConstMemberIterator itr = document.FindMember(<span class="stringliteral">&quot;hello&quot;</span>);</div>
 <div class="line"><span class="keywordflow">if</span> (itr != document.MemberEnd())</div>
 <div class="line">    printf(<span class="stringliteral">&quot;%s\n&quot;</span>, itr-&gt;value.GetString());</div>
+</div><!-- fragment --><h3>范围 for 循环 (v1.1.0 中的新功能)</h3>
+<p>当使用 C++11 功能时，你可使用范围 for 循环去访问 Object 内的所有成员。</p>
+<div class="fragment"><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; m : document.GetObject())</div>
+<div class="line">    printf(<span class="stringliteral">&quot;Type of member %s is %s\n&quot;</span>,</div>
+<div class="line">        m.name.GetString(), kTypeNames[m.value.GetType()]);</div>
 </div><!-- fragment --><h2><a class="anchor" id="QueryNumber"></a>
 查询 Number</h2>
 <p>JSON 只提供一种数值类型──Number。数字可以是整数或实数。RFC 4627 规定数字的范围由解析器指定。</p>
@@ -457,9 +466,9 @@ Value 及 Document</h1>
 <li><a class="el" href="md_doc_dom_8zh-cn.html">DOM</a> 的基本功能已在本教程里介绍。还有更高级的功能，如原位（*in situ*）解析、其他解析选项及高级用法。</li>
 <li><a class="el" href="md_doc_sax_8zh-cn.html">SAX</a> 是 RapidJSON 解析／生成功能的基础。学习使用 <code>Reader</code>/<code>Writer</code> 去实现更高性能的应用程序。也可以使用 <code>PrettyWriter</code> 去格式化 JSON。</li>
 <li><a class="el" href="md_doc_performance_8zh-cn.html">性能</a> 展示一些我们做的及第三方的性能测试。</li>
-<li>技术内幕 讲述一些 RapidJSON 内部的设计及技术。</li>
+<li><a class="el" href="md_doc_internals.html">技术内幕</a> 讲述一些 RapidJSON 内部的设计及技术。</li>
 </ol>
-<p>你也可以参考 常见问题、API 文档、例子及单元测试。 </p>
+<p>你也可以参考 <a class="el" href="md_doc_faq_8zh-cn.html">常见问题</a>、API 文档、例子及单元测试。 </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->

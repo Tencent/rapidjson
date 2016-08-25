@@ -108,16 +108,20 @@ $(document).ready(function(){initNavTree('md_doc_features_8zh-cn.html','');});
 <h2>符合标准</h2>
 <ul>
 <li>RapidJSON 应完全符合 RFC4627/ECMA-404 标准。</li>
+<li>支持 JSON Pointer (RFC6901).</li>
+<li>支持 JSON Schema Draft v4.</li>
 <li>支持 Unicod 代理对（surrogate pair）。</li>
 <li>支持空字符（<code>"\\u0000"</code>）。<ul>
 <li>例如，可以优雅地解析及处理 <code>["Hello\\u0000World"]</code>。含读写字符串长度的 API。</li>
 </ul>
 </li>
-<li>支持放宽的可选语法<ul>
+<li>支持可选的放宽语法<ul>
 <li>单行（<code>// ...</code>）及多行（<code>/* ... */</code>） 注释 (<code>kParseCommentsFlag</code>)。</li>
 <li>在对象和数组结束前含逗号 (<code>kParseTrailingCommasFlag</code>)。</li>
+<li><code>NaN</code>、<code>Inf</code>、<code>Infinity</code>、<code>-Inf</code> 及 <code>-Infinity</code> 作为 <code>double</code> 值 (<code>kParseNanAndInfFlag</code>)</li>
 </ul>
 </li>
+<li>https://github.com/miloyip/rapidjson/blob/master/doc/npm.md "NPM 兼容".</li>
 </ul>
 <h2>Unicode</h2>
 <ul>
@@ -180,7 +184,7 @@ $(document).ready(function(){initNavTree('md_doc_features_8zh-cn.html','');});
 </li>
 <li>优化“短”字符串<ul>
 <li>在 <code>Value</code> 内储存短字符串，无需额外分配。</li>
-<li>对 UTF-8 字符串来说，32 位架构下可存储最多 11 字符，64 位下 15 字符。</li>
+<li>对 UTF-8 字符串来说，32 位架构下可存储最多 11 字符，64 位下 21 字符（x86-64 下 13 字符）。</li>
 </ul>
 </li>
 <li>可选地支持 <code>std::string</code>（定义 <code>RAPIDJSON_HAS_STDSTRING=1</code>）</li>
@@ -213,7 +217,8 @@ $(document).ready(function(){initNavTree('md_doc_features_8zh-cn.html','');});
 <ul>
 <li>一些 C++11 的支持（可选）<ul>
 <li>右值引用（rvalue reference）</li>
-<li><code>noexcept</code> 修饰符 </li>
+<li><code>noexcept</code> 修饰符</li>
+<li>范围 for 循环 </li>
 </ul>
 </li>
 </ul>

@@ -80,7 +80,7 @@ $(document).ready(function(){initNavTree('md_doc_schema_8zh-cn.html','');});
 <div class="title">Schema </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h2>状态: 实验性，应该会合进 v1.1</h2>
+<div class="textblock"><p>（本功能于 v1.1.0 发布）</p>
 <p>JSON Schema 是描述 JSON 格式的一个标准草案。一个 schema 本身也是一个 JSON。使用 JSON Schema 去校验 JSON，可以让你的代码安全地访问 DOM，而无须检查类型或键值是否存在等。这也能确保输出的 JSON 是符合指定的 schema。</p>
 <p>RapidJSON 实现了一个 <a href="http://json-schema.org/documentation.html">JSON Schema Draft v4</a> 的校验器。若你不熟悉 JSON Schema，可以参考 <a href="http://spacetelescope.github.io/understanding-json-schema/">Understanding JSON Schema</a>。</p>
 <h2>基本用法</h2>
@@ -191,7 +191,7 @@ $(document).ready(function(){initNavTree('md_doc_schema_8zh-cn.html','');});
 <div class="line">}</div>
 </div><!-- fragment --><p>当然，如果你的应用仅需要 SAX 风格的生成，那么只需要把 SAX 事件由原来发送到 <code>Writer</code>，改为发送到 <code>SchemaValidator</code>。</p>
 <h2>远程 Schema</h2>
-<p>JSON Schema 支持 <a href="http://spacetelescope.github.io/understanding-json-schema/structuring.html">`$ref` 关键字</a>，它是一个 JSON pointer 引用至一个本地（local）或远程（remote） schema。本地指针的首字符是 <code>#</code>，而远程指针是一个相对或绝对 URI。例如：</p>
+<p>JSON Schema 支持 <a href="http://spacetelescope.github.io/understanding-json-schema/structuring.html">`$ref` 关键字</a>，它是一个 <a class="el" href="md_doc_pointer_8zh-cn.html">JSON pointer</a> 引用至一个本地（local）或远程（remote） schema。本地指针的首字符是 <code>#</code>，而远程指针是一个相对或绝对 URI。例如：</p>
 <div class="fragment"><div class="line">{ <span class="stringliteral">&quot;$ref&quot;</span>: <span class="stringliteral">&quot;definitions.json#/address&quot;</span> }</div>
 </div><!-- fragment --><p>由于 <code>SchemaDocument</code> 并不知道如何处理那些 URI，它需要使用者提供一个 <code>IRemoteSchemaDocumentProvider</code> 的实例去处理。</p>
 <div class="fragment"><div class="line"><span class="keyword">class </span>MyRemoteSchemaDocumentProvider : <span class="keyword">public</span> <a class="code" href="namespacerapidjson.html#af91eb8eea47b79d75b23e29fa9c0abb5">IRemoteSchemaDocumentProvider</a> {</div>

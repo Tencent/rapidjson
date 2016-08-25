@@ -19,7 +19,7 @@ var indexSectionsWithContent =
   9: "os",
   10: "r",
   11: "r",
-  12: "defipst"
+  12: "cdefipst"
 };
 
 var indexSectionNames =

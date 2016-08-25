@@ -1,6 +1,7 @@
 var NAVTREE =
 [
   [ "RapidJSON", "index.html", [
+    [ "Change Log", "md__c_h_a_n_g_e_l_o_g.html", null ],
     [ "Features", "md_doc_features.html", null ],
     [ "Tutorial", "md_doc_tutorial.html", [
       [ "Value & Document", "md_doc_tutorial.html#ValueDocument", null ],
@@ -157,7 +158,7 @@ var NAVTREEINDEX =
 "classrapidjson_1_1_generic_object.html#ae38ccb43fb8bbd15ebcfbfb7ef02b6ce",
 "classrapidjson_1_1_generic_value.html#ad2935191ab28c2c2e472b739a9d58202",
 "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c",
-"structrapidjson_1_1_generic_insitu_string_stream.html#a95abb3fe7cc3b08ecb70d804eb234dc2"
+"structrapidjson_1_1_generic_insitu_string_stream.html#a75f19e02d6aa78478aab0d5a5c03c1c8"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

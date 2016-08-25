@@ -84,7 +84,7 @@ $(document).ready(function(){initNavTree('index.html','');});
 <img src="rapidjson.png" alt="rapidjson.png"/>
 </div>
 <div class="image">
-<img src="https://img.shields.io/badge/release-v1.0.2-blue.png" />
+<img src="https://img.shields.io/badge/release-v1.1.0-blue.png" />
 </div>
 <h2>A fast JSON parser/generator for C++ with both SAX/DOM style API</h2>
 <p>Tencent is pleased to support the open source community by making RapidJSON available.</p>
@@ -120,15 +120,24 @@ $(document).ready(function(){initNavTree('index.html','');});
 <li>RapidJSON is <b>small</b> but <b>complete</b>. It supports both SAX and DOM style API. The SAX parser is only a half thousand lines of code.</li>
 <li>RapidJSON is <b>fast</b>. Its performance can be comparable to <code>strlen()</code>. It also optionally supports SSE2/SSE4.2 for acceleration.</li>
 <li>RapidJSON is <b>self-contained</b> and <b>header-only</b>. It does not depend on external libraries such as BOOST. It even does not depend on STL.</li>
-<li>RapidJSON is <b>memory-friendly</b>. Each JSON value occupies exactly 16/20 bytes for most 32/64-bit machines (excluding text string). By default it uses a fast memory allocator, and the parser allocates memory compactly during parsing.</li>
+<li>RapidJSON is <b>memory-friendly</b>. Each JSON value occupies exactly 16 bytes for most 32/64-bit machines (excluding text string). By default it uses a fast memory allocator, and the parser allocates memory compactly during parsing.</li>
 <li>RapidJSON is <b>Unicode-friendly</b>. It supports UTF-8, UTF-16, UTF-32 (LE &amp; BE), and their detection, validation and transcoding internally. For example, you can read a UTF-8 file and let RapidJSON transcode the JSON strings into UTF-16 in the DOM. It also supports surrogates and "\u0000" (null character).</li>
 </ul>
 <p>More features can be read <a class="el" href="md_doc_features.html">here</a>.</p>
-<p>JSON(JavaScript Object Notation) is a light-weight data exchange format. RapidJSON should be in fully compliance with RFC7159/ECMA-404. More information about JSON can be obtained at</p><ul>
+<p>JSON(JavaScript Object Notation) is a light-weight data exchange format. RapidJSON should be in fully compliance with RFC7159/ECMA-404, with optional support of relaxed syntax. More information about JSON can be obtained at</p><ul>
 <li><a href="http://json.org/">Introducing JSON</a></li>
 <li><a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159: The JavaScript Object Notation (JSON) Data Interchange Format</a></li>
 <li><a href="http://www.ecma-international.org/publications/standards/Ecma-404.htm">Standard ECMA-404: The JSON Data Interchange Format</a></li>
 </ul>
+<h2>Highlights in v1.1 (2016-8-25)</h2>
+<ul>
+<li>Added <a class="el" href="md_doc_pointer.html">JSON Pointer</a></li>
+<li>Added <a class="el" href="md_doc_schema.html">JSON Schema</a></li>
+<li>Added <a class="el" href="md_doc_dom.html">relaxed JSON syntax</a> (comment, trailing comma, NaN/Infinity)</li>
+<li>Iterating array/object with <a class="el" href="md_doc_tutorial.html">C++11 Range-based for loop</a></li>
+<li>Reduce memory overhead of each <code>Value</code> from 24 bytes to 16 bytes in x86-64 architecture.</li>
+</ul>
+<p>For other changes please refer to <a class="el" href="md__c_h_a_n_g_e_l_o_g.html">change log</a>.</p>
 <h2>Compatibility</h2>
 <p>RapidJSON is cross-platform. Some platform/compiler combinations which have been tested are shown as follows.</p><ul>
 <li>Visual C++ 2008/2010/2013 on Windows (32/64-bit)</li>

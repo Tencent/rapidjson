@@ -149,10 +149,10 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <p class="startli">DOM 易于查询及修改。SAX 则是非常快及省内存的，但通常较难使用。</p>
 </li>
 <li><p class="startli">什么是原位（*in situ*）解析？</p>
-<p class="startli">原位解析会把 JSON 字符串直接解码至输入的 JSON 中。这是一个优化，可减少内存消耗及提升性能，但输入的 JSON 会被更改。进一步细节请参考 原位解析 。</p>
+<p class="startli">原位解析会把 JSON 字符串直接解码至输入的 JSON 中。这是一个优化，可减少内存消耗及提升性能，但输入的 JSON 会被更改。进一步细节请参考 <a class="el" href="md_doc_dom_8zh-cn.html">原位解析</a> 。</p>
 </li>
 <li><p class="startli">什么时候会产生解析错误？</p>
-<p class="startli">当输入的 JSON 包含非法语法，或不能表示一个值（如 Number 太大），或解析器的处理器中断解析过程，解析器都会产生一个错误。详情请参考 解析错误。</p>
+<p class="startli">当输入的 JSON 包含非法语法，或不能表示一个值（如 Number 太大），或解析器的处理器中断解析过程，解析器都会产生一个错误。详情请参考 <a class="el" href="md_doc_dom_8zh-cn.html">解析错误</a>。</p>
 </li>
 <li><p class="startli">有什么错误信息？</p>
 <p class="startli">错误信息存储在 <code>ParseResult</code>，它包含错误代号及偏移值（从 JSON 开始至错误处的字符数目）。可以把错误代号翻译为人类可读的错误讯息。</p>
@@ -199,7 +199,7 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <p class="startli">由于转移快于复制，此设计决定强迫使用者注意到复制的消耗。</p>
 </li>
 <li><p class="startli">怎样去复制一个值？</p>
-<p class="startli">有两个 API 可用：含 allocator 的构造函数，以及 <code>CopyFrom()</code>。可参考 深复制 Value 里的用例。</p>
+<p class="startli">有两个 API 可用：含 allocator 的构造函数，以及 <code>CopyFrom()</code>。可参考 <a class="el" href="md_doc_tutorial_8zh-cn.html">深复制 Value</a> 里的用例。</p>
 </li>
 <li><p class="startli">为什么我需要提供字符串的长度？</p>
 <p class="startli">由于 C 字符串是空字符结尾的，需要使用 <code>strlen()</code> 去计算其长度，这是线性复杂度的操作。若使用者已知字符串的长度，对很多操作来说会造成不必要的消耗。</p>
@@ -253,7 +253,7 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 </li>
 <li><p class="startli">什么是 BOM？RapidJSON 怎样处理它？</p>
 <p class="startli"><a href="http://en.wikipedia.org/wiki/Byte_order_mark">字节顺序标记（byte order mark, BOM）</a> 有时会出现于文件／流的开始，以表示其 UTF 编码类型。</p>
-<p class="startli">RapidJSON 的 <code>EncodedInputStream</code> 可检测／跳过 BOM。<code>EncodedOutputStream</code> 可选择是否写入 BOM。可参考 编码流 中的例子。</p>
+<p class="startli">RapidJSON 的 <code>EncodedInputStream</code> 可检测／跳过 BOM。<code>EncodedOutputStream</code> 可选择是否写入 BOM。可参考 <a class="el" href="md_doc_stream_8zh-cn.html">编码流</a> 中的例子。</p>
 </li>
 <li><p class="startli">为什么会涉及大端／小端？</p>
 <p class="startli">流的大端／小端是 UTF-16 及 UTF-32 流要处理的问题，而 UTF-8 不需要处理。</p>

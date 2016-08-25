@@ -80,7 +80,7 @@ $(document).ready(function(){initNavTree('md_doc_schema.html','');});
 <div class="title">Schema </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h2>Status: experimental, shall be included in v1.1</h2>
+<div class="textblock"><p>(This feature was released in v1.1.0)</p>
 <p>JSON Schema is a draft standard for describing the format of JSON data. The schema itself is also JSON data. By validating a JSON structure with JSON Schema, your code can safely access the DOM without manually checking types, or whether a key exists, etc. It can also ensure that the serialized JSON conform to a specified schema.</p>
 <p>RapidJSON implemented a JSON Schema validator for <a href="http://json-schema.org/documentation.html">JSON Schema Draft v4</a>. If you are not familiar with JSON Schema, you may refer to <a href="http://spacetelescope.github.io/understanding-json-schema/">Understanding JSON Schema</a>.</p>
 <h2>Basic Usage</h2>
@@ -191,7 +191,7 @@ $(document).ready(function(){initNavTree('md_doc_schema.html','');});
 <div class="line">}</div>
 </div><!-- fragment --><p>Of course, if your application only needs SAX-style serialization, it can simply send SAX events to <code>SchemaValidator</code> instead of <code>Writer</code>.</p>
 <h2>Remote Schema</h2>
-<p>JSON Schema supports <a href="http://spacetelescope.github.io/understanding-json-schema/structuring.html">`$ref` keyword</a>, which is a JSON pointer referencing to a local or remote schema. Local pointer is prefixed with <code>#</code>, while remote pointer is an relative or absolute URI. For example:</p>
+<p>JSON Schema supports <a href="http://spacetelescope.github.io/understanding-json-schema/structuring.html">`$ref` keyword</a>, which is a <a class="el" href="md_doc_pointer.html">JSON pointer</a> referencing to a local or remote schema. Local pointer is prefixed with <code>#</code>, while remote pointer is an relative or absolute URI. For example:</p>
 <div class="fragment"><div class="line">{ <span class="stringliteral">&quot;$ref&quot;</span>: <span class="stringliteral">&quot;definitions.json#/address&quot;</span> }</div>
 </div><!-- fragment --><p>As <code>SchemaDocument</code> does not know how to resolve such URI, it needs a user-provided <code>IRemoteSchemaDocumentProvider</code> instance to do so.</p>
 <div class="fragment"><div class="line"><span class="keyword">class </span>MyRemoteSchemaDocumentProvider : <span class="keyword">public</span> <a class="code" href="namespacerapidjson.html#af91eb8eea47b79d75b23e29fa9c0abb5">IRemoteSchemaDocumentProvider</a> {</div>

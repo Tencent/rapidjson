@@ -175,7 +175,11 @@ Query Array</h2>
 <li><code>SizeType Capacity() const</code></li>
 <li><code>bool Empty() const</code></li>
 </ul>
-<h2><a class="anchor" id="QueryObject"></a>
+<h3>Range-based For Loop (New in v1.1.0)</h3>
+<p>When C++11 is enabled, you can use range-based for loop to access all elements in an array.</p>
+<div class="fragment"><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; v : a.GetArray())</div>
+<div class="line">    printf(<span class="stringliteral">&quot;%d &quot;</span>, v.GetInt());</div>
+</div><!-- fragment --><h2><a class="anchor" id="QueryObject"></a>
 Query Object</h2>
 <p>Similar to array, we can access all object members by iterator:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* kTypeNames[] = </div>
@@ -199,6 +203,11 @@ Query Object</h2>
 <div class="fragment"><div class="line">Value::ConstMemberIterator itr = document.FindMember(<span class="stringliteral">&quot;hello&quot;</span>);</div>
 <div class="line"><span class="keywordflow">if</span> (itr != document.MemberEnd())</div>
 <div class="line">    printf(<span class="stringliteral">&quot;%s\n&quot;</span>, itr-&gt;value.GetString());</div>
+</div><!-- fragment --><h3>Range-based For Loop (New in v1.1.0)</h3>
+<p>When C++11 is enabled, you can use range-based for loop to access all members in an object.</p>
+<div class="fragment"><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; m : document.GetObject())</div>
+<div class="line">    printf(<span class="stringliteral">&quot;Type of member %s is %s\n&quot;</span>,</div>
+<div class="line">        m.name.GetString(), kTypeNames[m.value.GetType()]);</div>
 </div><!-- fragment --><h2><a class="anchor" id="QueryNumber"></a>
 Querying Number</h2>
 <p>JSON provide a single numerical type called Number. Number can be integer or real numbers. RFC 4627 says the range of Number is specified by parser.</p>

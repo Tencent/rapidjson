@@ -212,8 +212,8 @@ GenericReader</h2>
 <div class="fragment"><div class="line">GenericReader&lt;UTF8&lt;&gt;, UTF16&lt;&gt; &gt; reader;</div>
 </div><!-- fragment --><p>Note that, the default character type of <code>UTF16</code> is <code>wchar_t</code>. So this <code>reader</code>needs to call <code>String(const wchar_t*, SizeType, bool)</code> of the handler.</p>
 <p>The third template parameter <code>Allocator</code> is the allocator type for internal data structure (actually a stack).</p>
-<h2><a class="anchor" id="Parsing"></a>
-Parsing</h2>
+<h2><a class="anchor" id=""></a>
+</h2>
 <p>The one and only one function of <code>Reader</code> is to parse JSON.</p>
 <div class="fragment"><div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> Handler&gt;</div>
 <div class="line"><span class="keywordtype">bool</span> Parse(InputStream&amp; is, Handler&amp; handler);</div>
@@ -277,7 +277,7 @@ Writer</h1>
 <p><code>Writer</code> has a minor design difference to <code>Reader</code>. <code>Writer</code> is a template class, not a typedef. There is no <code>GenericWriter</code>. The following is the declaration.</p>
 <div class="fragment"><div class="line"><span class="keyword">namespace </span>rapidjson {</div>
 <div class="line"></div>
-<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> OutputStream, <span class="keyword">typename</span> SourceEncoding = UTF8&lt;&gt;, <span class="keyword">typename</span> TargetEncoding = UTF8&lt;&gt;, <span class="keyword">typename</span> Allocator = CrtAllocator&lt;&gt; &gt;</div>
+<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> OutputStream, <span class="keyword">typename</span> SourceEncoding = UTF8&lt;&gt;, <span class="keyword">typename</span> TargetEncoding = UTF8&lt;&gt;, <span class="keyword">typename</span> Allocator = CrtAllocator&lt;&gt;, <span class="keywordtype">unsigned</span> writeFlags = kWriteDefaultFlags&gt;</div>
 <div class="line"><span class="keyword">class </span>Writer {</div>
 <div class="line"><span class="keyword">public</span>:</div>
 <div class="line">    <a class="code" href="classrapidjson_1_1_writer.html#a98a421c806b456688874511f64add1f2">Writer</a>(OutputStream&amp; os, Allocator* allocator = 0, <span class="keywordtype">size_t</span> levelDepth = kDefaultLevelDepth)</div>
@@ -288,7 +288,20 @@ Writer</h1>
 </div><!-- fragment --><p>The <code>OutputStream</code> template parameter is the type of output stream. It cannot be deduced and must be specified by user.</p>
 <p>The <code>SourceEncoding</code> template parameter specifies the encoding to be used in <code>String(const Ch*, ...)</code>.</p>
 <p>The <code>TargetEncoding</code> template parameter specifies the encoding in the output stream.</p>
-<p>The last one, <code>Allocator</code> is the type of allocator, which is used for allocating internal data structure (a stack).</p>
+<p>The <code>Allocator</code> is the type of allocator, which is used for allocating internal data structure (a stack).</p>
+<p>The <code>writeFlags</code> are combination of the following bit-flags:</p>
+<table class="doxtable">
+<tr>
+<th>Parse flags </th><th>Meaning  </th></tr>
+<tr>
+<td><code>kWriteNoFlags</code> </td><td>No flag is set. </td></tr>
+<tr>
+<td><code>kWriteDefaultFlags</code> </td><td>Default write flags. It is equal to macro <code>RAPIDJSON_WRITE_DEFAULT_FLAGS</code>, which is defined as <code>kWriteNoFlags</code>. </td></tr>
+<tr>
+<td><code>kWriteValidateEncodingFlag</code> </td><td>Validate encoding of JSON strings. </td></tr>
+<tr>
+<td><code>kWriteNanAndInfFlag</code> </td><td>Allow writing of <code>Infinity</code>, <code>-Infinity</code> and <code>NaN</code>. </td></tr>
+</table>
 <p>Besides, the constructor of <code>Writer</code> has a <code>levelDepth</code> parameter. This parameter affects the initial memory allocated for storing information per hierarchy level.</p>
 <h2><a class="anchor" id="PrettyWriter"></a>
 PrettyWriter</h2>
@@ -299,175 +312,6 @@ PrettyWriter</h2>
 Completeness and Reset</h2>
 <p>A <code>Writer</code> can only output a single JSON, which can be any JSON type at the root. Once the singular event for root (e.g. <code>String()</code>), or the last matching <code>EndObject()</code> or <code>EndArray()</code> event, is handled, the output JSON is well-formed and complete. User can detect this state by calling <code>Writer::IsComplete()</code>.</p>
 <p>When a JSON is complete, the <code>Writer</code> cannot accept any new events. Otherwise the output will be invalid (i.e. having more than one root). To reuse the <code>Writer</code> object, user can call <code>Writer::Reset(OutputStream&amp; os)</code> to reset all internal states of the <code>Writer</code> with a new output stream.</p>
-<h1><a class="anchor" id="Techniques"></a>
-Techniques</h1>
-<h2><a class="anchor" id="CustomDataStructure"></a>
-Parsing JSON to Custom Data Structure</h2>
-<p><code>Document</code>'s parsing capability is completely based on <code>Reader</code>. Actually <code>Document</code> is a handler which receives events from a reader to build a DOM during parsing.</p>
-<p>User may uses <code>Reader</code> to build other data structures directly. This eliminates building of DOM, thus reducing memory and improving performance.</p>
-<p>In the following <code>messagereader</code> example, <code>ParseMessages()</code> parses a JSON which should be an object with key-string pairs.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="reader_8h.html">rapidjson/reader.h</a>&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;rapidjson/error/en.h&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &lt;iostream&gt;</span></div>
-<div class="line"><span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><span class="preprocessor">#include &lt;map&gt;</span></div>
-<div class="line"></div>
-<div class="line"><span class="keyword">using namespace </span>std;</div>
-<div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">typedef</span> map&lt;string, string&gt; MessageMap;</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">struct </span>MessageHandler</div>
-<div class="line">    : <span class="keyword">public</span> <a class="code" href="structrapidjson_1_1_base_reader_handler.html">BaseReaderHandler</a>&lt;UTF8&lt;&gt;, MessageHandler&gt; {</div>
-<div class="line">    MessageHandler() : state_(kExpectObjectStart) {</div>
-<div class="line">    }</div>
-<div class="line"></div>
-<div class="line">    <span class="keywordtype">bool</span> StartObject() {</div>
-<div class="line">        <span class="keywordflow">switch</span> (state_) {</div>
-<div class="line">        <span class="keywordflow">case</span> kExpectObjectStart:</div>
-<div class="line">            state_ = kExpectNameOrObjectEnd;</div>
-<div class="line">            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line">        <span class="keywordflow">default</span>:</div>
-<div class="line">            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line">        }</div>
-<div class="line">    }</div>
-<div class="line"></div>
-<div class="line">    <span class="keywordtype">bool</span> String(<span class="keyword">const</span> <span class="keywordtype">char</span>* str, <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, <span class="keywordtype">bool</span>) {</div>
-<div class="line">        <span class="keywordflow">switch</span> (state_) {</div>
-<div class="line">        <span class="keywordflow">case</span> kExpectNameOrObjectEnd:</div>
-<div class="line">            name_ = string(str, length);</div>
-<div class="line">            state_ = kExpectValue;</div>
-<div class="line">            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line">        <span class="keywordflow">case</span> kExpectValue:</div>
-<div class="line">            messages_.insert(MessageMap::value_type(name_, <span class="keywordtype">string</span>(str, length)));</div>
-<div class="line">            state_ = kExpectNameOrObjectEnd;</div>
-<div class="line">            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line">        <span class="keywordflow">default</span>:</div>
-<div class="line">            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line">        }</div>
-<div class="line">    }</div>
-<div class="line"></div>
-<div class="line">    <span class="keywordtype">bool</span> EndObject(<a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>) { <span class="keywordflow">return</span> state_ == kExpectNameOrObjectEnd; }</div>
-<div class="line"></div>
-<div class="line">    <span class="keywordtype">bool</span> Default() { <span class="keywordflow">return</span> <span class="keyword">false</span>; } <span class="comment">// All other events are invalid.</span></div>
-<div class="line"></div>
-<div class="line">    MessageMap messages_;</div>
-<div class="line">    <span class="keyword">enum</span> State {</div>
-<div class="line">        kExpectObjectStart,</div>
-<div class="line">        kExpectNameOrObjectEnd,</div>
-<div class="line">        kExpectValue,</div>
-<div class="line">    }state_;</div>
-<div class="line">    std::string name_;</div>
-<div class="line">};</div>
-<div class="line"></div>
-<div class="line"><span class="keywordtype">void</span> ParseMessages(<span class="keyword">const</span> <span class="keywordtype">char</span>* json, MessageMap&amp; messages) {</div>
-<div class="line">    <a class="code" href="classrapidjson_1_1_generic_reader.html">Reader</a> reader;</div>
-<div class="line">    MessageHandler handler;</div>
-<div class="line">    <a class="code" href="structrapidjson_1_1_generic_string_stream.html">StringStream</a> ss(json);</div>
-<div class="line">    <span class="keywordflow">if</span> (reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b">Parse</a>(ss, handler))</div>
-<div class="line">        messages.swap(handler.messages_);   <span class="comment">// Only change it if success.</span></div>
-<div class="line">    <span class="keywordflow">else</span> {</div>
-<div class="line">        <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> e = reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#a40fd326bad7d7033f096b549cbf159db">GetParseErrorCode</a>();</div>
-<div class="line">        <span class="keywordtype">size_t</span> o = reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#ab907a36c410e96154c99797a6a0ce16d">GetErrorOffset</a>();</div>
-<div class="line">        cout &lt;&lt; <span class="stringliteral">&quot;Error: &quot;</span> &lt;&lt; <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(e) &lt;&lt; endl;;</div>
-<div class="line">        cout &lt;&lt; <span class="stringliteral">&quot; at offset &quot;</span> &lt;&lt; o &lt;&lt; <span class="stringliteral">&quot; near &#39;&quot;</span> &lt;&lt; string(json).substr(o, 10) &lt;&lt; <span class="stringliteral">&quot;...&#39;&quot;</span> &lt;&lt; endl;</div>
-<div class="line">    }</div>
-<div class="line">}</div>
-<div class="line"></div>
-<div class="line"><span class="keywordtype">int</span> main() {</div>
-<div class="line">    MessageMap messages;</div>
-<div class="line"></div>
-<div class="line">    <span class="keyword">const</span> <span class="keywordtype">char</span>* json1 = <span class="stringliteral">&quot;{ \&quot;greeting\&quot; : \&quot;Hello!\&quot;, \&quot;farewell\&quot; : \&quot;bye-bye!\&quot; }&quot;</span>;</div>
-<div class="line">    cout &lt;&lt; json1 &lt;&lt; endl;</div>
-<div class="line">    ParseMessages(json1, messages);</div>
-<div class="line"></div>
-<div class="line">    <span class="keywordflow">for</span> (MessageMap::const_iterator itr = messages.begin(); itr != messages.end(); ++itr)</div>
-<div class="line">        cout &lt;&lt; itr-&gt;first &lt;&lt; <span class="stringliteral">&quot;: &quot;</span> &lt;&lt; itr-&gt;second &lt;&lt; endl;</div>
-<div class="line"></div>
-<div class="line">    cout &lt;&lt; endl &lt;&lt; <span class="stringliteral">&quot;Parse a JSON with invalid schema.&quot;</span> &lt;&lt; endl;</div>
-<div class="line">    <span class="keyword">const</span> <span class="keywordtype">char</span>* json2 = <span class="stringliteral">&quot;{ \&quot;greeting\&quot; : \&quot;Hello!\&quot;, \&quot;farewell\&quot; : \&quot;bye-bye!\&quot;, \&quot;foo\&quot; : {} }&quot;</span>;</div>
-<div class="line">    cout &lt;&lt; json2 &lt;&lt; endl;</div>
-<div class="line">    ParseMessages(json2, messages);</div>
-<div class="line"></div>
-<div class="line">    <span class="keywordflow">return</span> 0;</div>
-<div class="line">}</div>
-</div><!-- fragment --><div class="fragment"><div class="line">{ <span class="stringliteral">&quot;greeting&quot;</span> : <span class="stringliteral">&quot;Hello!&quot;</span>, <span class="stringliteral">&quot;farewell&quot;</span> : <span class="stringliteral">&quot;bye-bye!&quot;</span> }</div>
-<div class="line">farewell: bye-bye!</div>
-<div class="line">greeting: Hello!</div>
-<div class="line"></div>
-<div class="line">Parse a JSON with invalid schema.</div>
-<div class="line">{ <span class="stringliteral">&quot;greeting&quot;</span> : <span class="stringliteral">&quot;Hello!&quot;</span>, <span class="stringliteral">&quot;farewell&quot;</span> : <span class="stringliteral">&quot;bye-bye!&quot;</span>, <span class="stringliteral">&quot;foo&quot;</span> : {} }</div>
-<div class="line">Error: Terminate parsing due to Handler error.</div>
-<div class="line"> at offset 59 near <span class="stringliteral">&#39;} }...&#39;</span></div>
-</div><!-- fragment --><p>The first JSON (<code>json1</code>) was successfully parsed into <code>MessageMap</code>. Since <code>MessageMap</code> is a <code>std::map</code>, the printing order are sorted by the key. This order is different from the JSON's order.</p>
-<p>In the second JSON (<code>json2</code>), <code>foo</code>'s value is an empty object. As it is an object, <code>MessageHandler::StartObject()</code> will be called. However, at that moment <code>state_ = kExpectValue</code>, so that function returns <code>false</code> and cause the parsing process be terminated. The error code is <code>kParseErrorTermination</code>.</p>
-<h2><a class="anchor" id="Filtering"></a>
-Filtering of JSON</h2>
-<p>As mentioned earlier, <code>Writer</code> can handle the events published by <code>Reader</code>. <code>condense</code> example simply set a <code>Writer</code> as handler of a <code>Reader</code>, so it can remove all white-spaces in JSON. <code>pretty</code> example uses the same relationship, but replacing <code>Writer</code> by <code>PrettyWriter</code>. So <code>pretty</code> can be used to reformat a JSON with indentation and line feed.</p>
-<p>Actually, we can add intermediate layer(s) to filter the contents of JSON via these SAX-style API. For example, <code>capitalize</code> example capitalize all strings in a JSON.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="reader_8h.html">rapidjson/reader.h</a>&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;rapidjson/writer.h&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;rapidjson/filereadstream.h&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;rapidjson/filewritestream.h&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;rapidjson/error/en.h&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &lt;vector&gt;</span></div>
-<div class="line"><span class="preprocessor">#include &lt;cctype&gt;</span></div>
-<div class="line"></div>
-<div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> OutputHandler&gt;</div>
-<div class="line"><span class="keyword">struct </span>CapitalizeFilter {</div>
-<div class="line">    CapitalizeFilter(OutputHandler&amp; out) : out_(out), buffer_() {</div>
-<div class="line">    }</div>
-<div class="line"></div>
-<div class="line">    <span class="keywordtype">bool</span> Null() { <span class="keywordflow">return</span> out_.Null(); }</div>
-<div class="line">    <span class="keywordtype">bool</span> Bool(<span class="keywordtype">bool</span> b) { <span class="keywordflow">return</span> out_.Bool(b); }</div>
-<div class="line">    <span class="keywordtype">bool</span> Int(<span class="keywordtype">int</span> i) { <span class="keywordflow">return</span> out_.Int(i); }</div>
-<div class="line">    <span class="keywordtype">bool</span> Uint(<span class="keywordtype">unsigned</span> u) { <span class="keywordflow">return</span> out_.Uint(u); }</div>
-<div class="line">    <span class="keywordtype">bool</span> Int64(int64_t i) { <span class="keywordflow">return</span> out_.Int64(i); }</div>
-<div class="line">    <span class="keywordtype">bool</span> Uint64(uint64_t u) { <span class="keywordflow">return</span> out_.Uint64(u); }</div>
-<div class="line">    <span class="keywordtype">bool</span> Double(<span class="keywordtype">double</span> d) { <span class="keywordflow">return</span> out_.Double(d); }</div>
-<div class="line">    <span class="keywordtype">bool</span> RawNumber(<span class="keyword">const</span> <span class="keywordtype">char</span>* str, <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, <span class="keywordtype">bool</span> copy) { <span class="keywordflow">return</span> out_.RawNumber(str, length, copy); }</div>
-<div class="line">    <span class="keywordtype">bool</span> String(<span class="keyword">const</span> <span class="keywordtype">char</span>* str, <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, <span class="keywordtype">bool</span>) { </div>
-<div class="line">        buffer_.clear();</div>
-<div class="line">        <span class="keywordflow">for</span> (<a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> i = 0; i &lt; length; i++)</div>
-<div class="line">            buffer_.push_back(std::toupper(str[i]));</div>
-<div class="line">        <span class="keywordflow">return</span> out_.String(&amp;buffer_.front(), length, <span class="keyword">true</span>); <span class="comment">// true = output handler need to copy the string</span></div>
-<div class="line">    }</div>
-<div class="line">    <span class="keywordtype">bool</span> StartObject() { <span class="keywordflow">return</span> out_.StartObject(); }</div>
-<div class="line">    <span class="keywordtype">bool</span> Key(<span class="keyword">const</span> <span class="keywordtype">char</span>* str, <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, <span class="keywordtype">bool</span> copy) { <span class="keywordflow">return</span> String(str, length, copy); }</div>
-<div class="line">    <span class="keywordtype">bool</span> EndObject(<a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> memberCount) { <span class="keywordflow">return</span> out_.EndObject(memberCount); }</div>
-<div class="line">    <span class="keywordtype">bool</span> StartArray() { <span class="keywordflow">return</span> out_.StartArray(); }</div>
-<div class="line">    <span class="keywordtype">bool</span> EndArray(<a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> elementCount) { <span class="keywordflow">return</span> out_.EndArray(elementCount); }</div>
-<div class="line"></div>
-<div class="line">    OutputHandler&amp; out_;</div>
-<div class="line">    std::vector&lt;char&gt; buffer_;</div>
-<div class="line">};</div>
-<div class="line"></div>
-<div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">int</span>, <span class="keywordtype">char</span>*[]) {</div>
-<div class="line">    <span class="comment">// Prepare JSON reader and input stream.</span></div>
-<div class="line">    <a class="code" href="classrapidjson_1_1_generic_reader.html">Reader</a> reader;</div>
-<div class="line">    <span class="keywordtype">char</span> readBuffer[65536];</div>
-<div class="line">    <a class="code" href="classrapidjson_1_1_file_read_stream.html">FileReadStream</a> is(stdin, readBuffer, <span class="keyword">sizeof</span>(readBuffer));</div>
-<div class="line"></div>
-<div class="line">    <span class="comment">// Prepare JSON writer and output stream.</span></div>
-<div class="line">    <span class="keywordtype">char</span> writeBuffer[65536];</div>
-<div class="line">    <a class="code" href="classrapidjson_1_1_file_write_stream.html">FileWriteStream</a> os(stdout, writeBuffer, <span class="keyword">sizeof</span>(writeBuffer));</div>
-<div class="line">    <a class="code" href="classrapidjson_1_1_writer.html">Writer&lt;FileWriteStream&gt;</a> writer(os);</div>
-<div class="line"></div>
-<div class="line">    <span class="comment">// JSON reader parse from the input stream and let writer generate the output.</span></div>
-<div class="line">    CapitalizeFilter&lt;Writer&lt;FileWriteStream&gt; &gt; filter(writer);</div>
-<div class="line">    <span class="keywordflow">if</span> (!reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b">Parse</a>(is, filter)) {</div>
-<div class="line">        fprintf(stderr, <span class="stringliteral">&quot;\nError(%u): %s\n&quot;</span>, (<span class="keywordtype">unsigned</span>)reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#ab907a36c410e96154c99797a6a0ce16d">GetErrorOffset</a>(), <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#a40fd326bad7d7033f096b549cbf159db">GetParseErrorCode</a>()));</div>
-<div class="line">        <span class="keywordflow">return</span> 1;</div>
-<div class="line">    }</div>
-<div class="line"></div>
-<div class="line">    <span class="keywordflow">return</span> 0;</div>
-<div class="line">}</div>
-</div><!-- fragment --><p>Note that, it is incorrect to simply capitalize the JSON as a string. For example: </p><div class="fragment"><div class="line">[<span class="stringliteral">&quot;Hello\nWorld&quot;</span>]</div>
-</div><!-- fragment --><p>Simply capitalizing the whole JSON would contain incorrect escape character: </p><div class="fragment"><div class="line">[<span class="stringliteral">&quot;HELLO\NWORLD&quot;</span>]</div>
-</div><!-- fragment --><p>The correct result by <code>capitalize</code>: </p><div class="fragment"><div class="line">[<span class="stringliteral">&quot;HELLO\nWORLD&quot;</span>]</div>
-</div><!-- fragment --><p>More complicated filters can be developed. However, since SAX-style API can only provide information about a single event at a time, user may need to book-keeping the contextual information (e.g. the path from root value, storage of other related values). Some processing may be easier to be implemented in DOM than SAX. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->

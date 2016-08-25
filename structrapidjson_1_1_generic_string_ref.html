@@ -162,7 +162,7 @@ struct rapidjson::GenericStringRef&lt; CharType &gt;</h3>
   </dd>
 </dl>
 <p>This helper class is used to automatically infer constant string references for string literals, especially from <code>const</code> <b></b>(!) character arrays.</p>
-<p>The main use is for creating JSON string values without copying the source string via an <a class="el" href="md_doc_internals.html#Allocator">Allocator</a>. This requires that the referenced string pointers have a sufficient lifetime, which exceeds the lifetime of the associated <a class="el" href="classrapidjson_1_1_generic_value.html" title="Represents a JSON value. Use Value for UTF8 encoding and default allocator. ">GenericValue</a>.</p>
+<p>The main use is for creating JSON string values without copying the source string via an <a class="el" href="md_doc_dom.html#Allocator">Allocator</a>. This requires that the referenced string pointers have a sufficient lifetime, which exceeds the lifetime of the associated <a class="el" href="classrapidjson_1_1_generic_value.html" title="Represents a JSON value. Use Value for UTF8 encoding and default allocator. ">GenericValue</a>.</p>
 <p><b>Example</b> </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> v(<span class="stringliteral">&quot;foo&quot;</span>);   <span class="comment">// ok, no need to copy &amp; calculate length</span></div>
 <div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span> foo[] = <span class="stringliteral">&quot;foo&quot;</span>;</div>
 <div class="line">v.SetString(foo); <span class="comment">// ok</span></div>

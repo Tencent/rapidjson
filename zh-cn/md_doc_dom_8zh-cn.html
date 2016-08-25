@@ -84,16 +84,18 @@ $(document).ready(function(){initNavTree('md_doc_dom_8zh-cn.html','');});
 <ul><li class="level1"><a href="#Template">模板</a><ul><li class="level2"><a href="#Encoding">编码</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#Allocator">Allocator</a></li>
+<li class="level1"><a href="#InternalAllocator">Allocator</a></li>
 <li class="level1"><a href="#Parsing">解析</a><ul><li class="level2"><a href="#ParseError">解析错误</a></li>
 <li class="level2"><a href="#InSituParsing">原位解析</a></li>
 <li class="level2"><a href="#TranscodingAndValidation">转码与校验</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#Techniques">技巧</a></li>
+<li class="level1"><a href="#Techniques">技巧</a><ul><li class="level2"><a href="#UserBuffer">使用者缓冲区</a></li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="textblock"><p>文档对象模型（Document Object Model, DOM）是一种罝于内存中的 JSON 表示方式，以供查询及操作。我们己于 教程 中介绍了 DOM 的基本用法，本节将讲述一些细节及高级用法。</p>
+<div class="textblock"><p>文档对象模型（Document Object Model, DOM）是一种罝于内存中的 JSON 表示方式，以供查询及操作。我们己于 <a class="el" href="md_doc_tutorial_8zh-cn.html">教程</a> 中介绍了 DOM 的基本用法，本节将讲述一些细节及高级用法。</p>
 <h1><a class="anchor" id="Template"></a>
 模板</h1>
 <p>教程中使用了 <code>Value</code> 和 <code>Document</code> 类型。与 <code>std::string</code> 相似，这些类型其实是两个模板类的 <code>typedef</code>：</p>
@@ -116,7 +118,7 @@ $(document).ready(function(){initNavTree('md_doc_dom_8zh-cn.html','');});
 </div><!-- fragment --><p>使用者可以自定义这些模板参数。</p>
 <h2><a class="anchor" id="Encoding"></a>
 编码</h2>
-<p><code>Encoding</code> 参数指明在内存中的 JSON String 使用哪种编码。可行的选项有 <code>UTF8</code>、<code>UTF16</code>、<code>UTF32</code>。要注意这 3 个类型其实也是模板类。<code>UTF8&lt;&gt;</code> 等同 <code>UTF8&lt;char&gt;</code>，这代表它使用 <code>char</code> 来存储字符串。更多细节可以参考 编码。</p>
+<p><code>Encoding</code> 参数指明在内存中的 JSON String 使用哪种编码。可行的选项有 <code>UTF8</code>、<code>UTF16</code>、<code>UTF32</code>。要注意这 3 个类型其实也是模板类。<code>UTF8&lt;&gt;</code> 等同 <code>UTF8&lt;char&gt;</code>，这代表它使用 <code>char</code> 来存储字符串。更多细节可以参考 <a class="el" href="md_doc_encoding_8zh-cn.html">编码</a>。</p>
 <p>这里是一个例子。假设一个 Windows 应用软件希望查询存储于 JSON 中的本地化字符串。Windows 中含 Unicode 的函数使用 UTF-16（宽字符）编码。无论 JSON 文件使用哪种编码，我们都可以把字符串以 UTF-16 形式存储在内存。</p>
 <div class="fragment"><div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
 <div class="line"></div>
@@ -136,7 +138,7 @@ $(document).ready(function(){initNavTree('md_doc_dom_8zh-cn.html','');});
 <div class="line"><span class="keyword">const</span> WValue locale(L<span class="stringliteral">&quot;ja&quot;</span>); <span class="comment">// Japanese</span></div>
 <div class="line"></div>
 <div class="line">MessageBoxW(hWnd, d[locale].GetString(), L<span class="stringliteral">&quot;Test&quot;</span>, MB_OK);</div>
-</div><!-- fragment --><h2><a class="anchor" id="Allocator"></a>
+</div><!-- fragment --><h2><a class="anchor" id="InternalAllocator"></a>
 Allocator</h2>
 <p><code>Allocator</code> 定义当 <code>Document</code>/<code>Value</code> 分配或释放内存时使用那个分配类。<code>Document</code> 拥有或引用到一个 <code>Allocator</code> 实例。而为了节省内存，<code>Value</code> 没有这么做。</p>
 <p><code>GenericDocument</code> 的缺省分配器是 <code>MemoryPoolAllocator</code>。此分配器实际上会顺序地分配内存，并且不能逐一释放。当要解析一个 JSON 并生成 DOM，这种分配器是非常合适的。</p>
@@ -175,7 +177,7 @@ Allocator</h2>
 <div class="line"></div>
 <div class="line"><span class="comment">// (8) 正常解析一个字符串，使用缺省标志</span></div>
 <div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c">GenericDocument::Parse</a>(<span class="keyword">const</span> Ch* str);</div>
-</div><!-- fragment --><p>教程 中的例使用 (8) 去正常解析字符串。而 流 的例子使用前 3 个函数。我们将稍后介绍原位（*In situ*） 解析。</p>
+</div><!-- fragment --><p><a class="el" href="md_doc_tutorial_8zh-cn.html">教程</a> 中的例使用 (8) 去正常解析字符串。而 <a class="el" href="md_doc_stream_8zh-cn.html">流</a> 的例子使用前 3 个函数。我们将稍后介绍原位（*In situ*） 解析。</p>
 <p><code>parseFlags</code> 是以下位标置的组合：</p>
 <table class="doxtable">
 <tr>
@@ -200,6 +202,8 @@ Allocator</h2>
 <td><code>kParseNumbersAsStringsFlag</code> </td><td>把数字类型解析成字符串。 </td></tr>
 <tr>
 <td><code>kParseTrailingCommasFlag</code> </td><td>容许在对象和数组结束前含有逗号（放宽的 JSON 语法）。 </td></tr>
+<tr>
+<td><code>kParseNanAndInfFlag</code> </td><td>容许 <code>NaN</code>、<code>Inf</code>、<code>Infinity</code>、<code>-Inf</code> 及 <code>-Infinity</code> 作为 <code>double</code> 值（放宽的 JSON 语法）。 </td></tr>
 </table>
 <p>由于使用了非类型模板参数，而不是函数参数，C++ 编译器能为个别组合生成代码，以改善性能及减少代码尺寸（当只用单种特化）。缺点是需要在编译期决定标志。</p>
 <p><code>SourceEncoding</code> 参数定义流使用了什么编码。这与 <code>Document</code> 的 <code>Encoding</code> 不相同。细节可参考 <a href="#TranscodingAndValidation">转码和校验</a> 一节。</p>
@@ -309,8 +313,8 @@ Allocator</h2>
 <p>原位解析最适合用于短期的、用完即弃的 JSON。实际应用中，这些场合是非常普遍的，例如反序列化 JSON 至 C++ 对象、处理以 JSON 表示的 web 请求等。</p>
 <h2><a class="anchor" id="TranscodingAndValidation"></a>
 转码与校验</h2>
-<p>RapidJSON 内部支持不同 Unicode 格式（正式的术语是 UCS 变换格式）间的转换。在 DOM 解析时，流的来源编码与 DOM 的编码可以不同。例如，来源流可能含有 UTF-8 的 JSON，而 DOM 则使用 UTF-16 编码。在 EncodedInputStream 一节里有一个例子。</p>
-<p>当从 DOM 输出一个 JSON 至输出流之时，也可以使用转码功能。在 EncodedOutputStream 一节里有一个例子。</p>
+<p>RapidJSON 内部支持不同 Unicode 格式（正式的术语是 UCS 变换格式）间的转换。在 DOM 解析时，流的来源编码与 DOM 的编码可以不同。例如，来源流可能含有 UTF-8 的 JSON，而 DOM 则使用 UTF-16 编码。在 <a class="el" href="md_doc_stream_8zh-cn.html">EncodedInputStream</a> 一节里有一个例子。</p>
+<p>当从 DOM 输出一个 JSON 至输出流之时，也可以使用转码功能。在 <a class="el" href="md_doc_stream_8zh-cn.html">EncodedOutputStream</a> 一节里有一个例子。</p>
 <p>在转码过程中，会把来源 string 解码成 Unicode 码点，然后把码点编码成目标格式。在解码时，它会校验来源 string 的字节序列是否合法。若遇上非合法序列，解析器会停止并返回 <code>kParseErrorStringInvalidEncoding</code> 错误。</p>
 <p>当来源编码与 DOM 的编码相同，解析器缺省地 * 不会 * 校验序列。使用者可开启 <code>kParseValidateEncodingFlag</code> 去强制校验。</p>
 <h1><a class="anchor" id="Techniques"></a>
@@ -323,8 +327,9 @@ Allocator</h2>
 <div class="line">d.Accept(writer);</div>
 </div><!-- fragment --><p>实际上，<code>Value::Accept()</code> 是负责发布该值相关的 SAX 事件至处理器的。通过这个设计，<code>Value</code> 及 <code>Writer</code> 解除了偶合。<code>Value</code> 可生成 SAX 事件，而 <code>Writer</code> 则可以处理这些事件。</p>
 <p>使用者可以创建自定义的处理器，去把 DOM 转换成其它格式。例如，一个把 DOM 转换成 XML 的处理器。</p>
-<p>要知道更多关于 SAX 事件与处理器，可参阅 SAX。</p>
-<h2>使用者缓冲区{ #UserBuffer}</h2>
+<p>要知道更多关于 SAX 事件与处理器，可参阅 <a class="el" href="md_doc_sax_8zh-cn.html">SAX</a>。</p>
+<h2><a class="anchor" id="UserBuffer"></a>
+使用者缓冲区</h2>
 <p>许多应用软件可能需要尽量减少内存分配。</p>
 <p><code>MemoryPoolAllocator</code> 可以帮助这方面，它容许使用者提供一个缓冲区。该缓冲区可能置于程序堆栈，或是一个静态分配的「草稿缓冲区（scratch buffer）」（一个静态／全局的数组），用于储存临时数据。</p>
 <p><code>MemoryPoolAllocator</code> 会先用使用者缓冲区去解决分配请求。当使用者缓冲区用完，就会从基础分配器（缺省为 <code>CrtAllocator</code>）分配一块内存。</p>
