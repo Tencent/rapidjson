@@ -63,7 +63,7 @@ RAPIDJSON_NAMESPACE_BEGIN
 enum WriteFlag {
     kWriteNoFlags = 0,              //!< No flags are set.
     kWriteValidateEncodingFlag = 1, //!< Validate encoding of JSON strings.
-    kWriteNanAndInfFlag = 2,        //!< Allow writing of Inf, -Inf and NaN.
+    kWriteNanAndInfFlag = 2,        //!< Allow writing of Infinity, -Infinity and NaN.
     kWriteDefaultFlags = RAPIDJSON_WRITE_DEFAULT_FLAGS  //!< Default write flags. Can be customized by defining RAPIDJSON_WRITE_DEFAULT_FLAGS
 };
 

@@ -1,6 +1,6 @@
 ![](doc/logo/rapidjson.png)
 
-![](https://img.shields.io/badge/release-v1.0.2-blue.png)
+![](https://img.shields.io/badge/release-v1.1.0-blue.png)
 
 ## A fast JSON parser/generator for C++ with both SAX/DOM style API 
 
@@ -37,16 +37,26 @@ RapidJSON is a JSON parser and generator for C++. It was inspired by [RapidXml](
 
 * RapidJSON is **self-contained** and **header-only**. It does not depend on external libraries such as BOOST. It even does not depend on STL.
 
-* RapidJSON is **memory-friendly**. Each JSON value occupies exactly 16/20 bytes for most 32/64-bit machines (excluding text string). By default it uses a fast memory allocator, and the parser allocates memory compactly during parsing.
+* RapidJSON is **memory-friendly**. Each JSON value occupies exactly 16 bytes for most 32/64-bit machines (excluding text string). By default it uses a fast memory allocator, and the parser allocates memory compactly during parsing.
 
 * RapidJSON is **Unicode-friendly**. It supports UTF-8, UTF-16, UTF-32 (LE & BE), and their detection, validation and transcoding internally. For example, you can read a UTF-8 file and let RapidJSON transcode the JSON strings into UTF-16 in the DOM. It also supports surrogates and "\u0000" (null character).
 
 More features can be read [here](doc/features.md).
 
-JSON(JavaScript Object Notation) is a light-weight data exchange format. RapidJSON should be in fully compliance with RFC7159/ECMA-404. More information about JSON can be obtained at
+JSON(JavaScript Object Notation) is a light-weight data exchange format. RapidJSON should be in fully compliance with RFC7159/ECMA-404, with optional support of relaxed syntax. More information about JSON can be obtained at
 * [Introducing JSON](http://json.org/)
 * [RFC7159: The JavaScript Object Notation (JSON) Data Interchange Format](http://www.ietf.org/rfc/rfc7159.txt)
 * [Standard ECMA-404: The JSON Data Interchange Format](http://www.ecma-international.org/publications/standards/Ecma-404.htm)
+
+## Highlights in v1.1 (2016-8-25)
+
+* Added [JSON Pointer](doc/pointer.md)
+* Added [JSON Schema](doc/schema.md)
+* Added [relaxed JSON syntax](doc/dom.md) (comment, trailing comma, NaN/Infinity)
+* Iterating array/object with [C++11 Range-based for loop](doc/tutorial.md)
+* Reduce memory overhead of each `Value` from 24 bytes to 16 bytes in x86-64 architecture.
+
+For other changes please refer to [change log](CHANGELOG.md).
 
 ## Compatibility
 

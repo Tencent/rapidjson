@@ -1,11 +1,11 @@
 nuget {
-	//Usage:  Write-NuGetPackage rapidjson.autopkg -defines:MYVERSION=1.0.2
+	//Usage:  Write-NuGetPackage rapidjson.autopkg -defines:MYVERSION=1.1.0
 	//Be sure you are running Powershell 3.0 and have the CoApp powershell extensions installed properly.
 	nuspec {
 		id = rapidjson;
 		version : ${MYVERSION};
 		title: "rapidjson";
-		authors: {"https://github.com/miloyip/rapidjson/releases/tag/v1.0.2"};
+		authors: {"https://github.com/miloyip/rapidjson/releases/tag/v1.1.0"};
 		owners: {"@lsantos (github)"};
 		licenseUrl: "https://github.com/miloyip/rapidjson/blob/master/license.txt";
 		projectUrl: "https://github.com/miloyip/rapidjson/";

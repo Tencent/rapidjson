@@ -114,7 +114,7 @@ Number is a bit more complicated. For normal integer values, it can contains `kI
 
 ## Short-String Optimization {#ShortString}
 
- Kosta (@Kosta-Github) provided a very neat short-string optimization. The optimization idea is given as follow. Excluding the `flags_`, a `Value` has 12 or 16 bytes (32-bit or 64-bit) for storing actual data. Instead of storing a pointer to a string, it is possible to store short strings in these space internally. For encoding with 1-byte character type (e.g. `char`), it can store maximum 11 or 15 characters string inside the `Value` type.
+ [Kosta](https://github.com/Kosta-Github) provided a very neat short-string optimization. The optimization idea is given as follow. Excluding the `flags_`, a `Value` has 12 or 16 bytes (32-bit or 64-bit) for storing actual data. Instead of storing a pointer to a string, it is possible to store short strings in these space internally. For encoding with 1-byte character type (e.g. `char`), it can store maximum 11 or 15 characters string inside the `Value` type.
 
 | ShortString (Ch=char) |                                   |32-bit|64-bit|
 |---------------------|-------------------------------------|:----:|:----:|
@@ -126,7 +126,7 @@ A special technique is applied. Instead of storing the length of string directly
 
 This optimization can reduce memory usage for copy-string. It can also improve cache-coherence thus improve runtime performance.
 
-# Allocator {#Allocator}
+# Allocator {#InternalAllocator}
 
 `Allocator` is a concept in RapidJSON:
 ~~~cpp
@@ -158,7 +158,7 @@ Note that `Malloc()` and `Realloc()` are member functions but `Free()` is static
 
 Internally, it allocates chunks of memory from the base allocator (by default `CrtAllocator`) and stores the chunks as a singly linked list. When user requests an allocation, it allocates memory from the following order:
 
-1. User supplied buffer if it is available. (See [User Buffer section in DOM](dom.md))
+1. User supplied buffer if it is available. (See [User Buffer section in DOM](doc/dom.md))
 2. If user supplied buffer is full, use the current memory chunk.
 3. If the current block is full, allocate a new block of memory.
 

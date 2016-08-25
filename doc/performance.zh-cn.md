@@ -1,6 +1,6 @@
 # 性能
 
-有一个 [native JSON benchmark collection][1] 项目，能评估 20 个 JSON 库在不同操作下的速度、內存用量及代码大小。
+有一个 [native JSON benchmark collection][1] 项目，能评估 37 个 JSON 库在不同操作下的速度、內存用量及代码大小。
 
 [1]: https://github.com/miloyip/nativejson-benchmark
 

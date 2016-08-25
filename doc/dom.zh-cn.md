@@ -1,6 +1,6 @@
 # DOM
 
-文档对象模型（Document Object Model, DOM）是一种罝于内存中的 JSON 表示方式，以供查询及操作。我们己于 [教程](doc/tutorial.md) 中介绍了 DOM 的基本用法，本节将讲述一些细节及高级用法。
+文档对象模型（Document Object Model, DOM）是一种罝于内存中的 JSON 表示方式，以供查询及操作。我们己于 [教程](doc/tutorial.zh-cn.md) 中介绍了 DOM 的基本用法，本节将讲述一些细节及高级用法。
 
 [TOC]
 
@@ -31,7 +31,7 @@ typedef GenericDocument<UTF8<> > Document;
 
 ## 编码 {#Encoding}
 
-`Encoding` 参数指明在内存中的 JSON String 使用哪种编码。可行的选项有 `UTF8`、`UTF16`、`UTF32`。要注意这 3 个类型其实也是模板类。`UTF8<>` 等同 `UTF8<char>`，这代表它使用 `char` 来存储字符串。更多细节可以参考 [编码](encoding.md)。
+`Encoding` 参数指明在内存中的 JSON String 使用哪种编码。可行的选项有 `UTF8`、`UTF16`、`UTF32`。要注意这 3 个类型其实也是模板类。`UTF8<>` 等同 `UTF8<char>`，这代表它使用 `char` 来存储字符串。更多细节可以参考 [编码](doc/encoding.zh-cn.md)。
 
 这里是一个例子。假设一个 Windows 应用软件希望查询存储于 JSON 中的本地化字符串。Windows 中含 Unicode 的函数使用 UTF-16（宽字符）编码。无论 JSON 文件使用哪种编码，我们都可以把字符串以 UTF-16 形式存储在内存。
 
@@ -102,7 +102,7 @@ GenericDocument& GenericDocument::Parse(const Ch* str);
 GenericDocument& GenericDocument::Parse(const Ch* str);
 ~~~~~~~~~~
 
-[教程](tutorial.md) 中的例使用 (8) 去正常解析字符串。而 [流](stream.md) 的例子使用前 3 个函数。我们将稍后介绍原位（*In situ*） 解析。
+[教程](doc/tutorial.zh-cn.md) 中的例使用 (8) 去正常解析字符串。而 [流](doc/stream.zh-cn.md) 的例子使用前 3 个函数。我们将稍后介绍原位（*In situ*） 解析。
 
 `parseFlags` 是以下位标置的组合：
 
@@ -118,6 +118,7 @@ GenericDocument& GenericDocument::Parse(const Ch* str);
 `kParseCommentsFlag`          | 容许单行 `// ...` 及多行 `/* ... */` 注释（放宽的 JSON 语法）。
 `kParseNumbersAsStringsFlag`  | 把数字类型解析成字符串。
 `kParseTrailingCommasFlag`    | 容许在对象和数组结束前含有逗号（放宽的 JSON 语法）。
+`kParseNanAndInfFlag`         | 容许 `NaN`、`Inf`、`Infinity`、`-Inf` 及 `-Infinity` 作为 `double` 值（放宽的 JSON 语法）。
 
 由于使用了非类型模板参数，而不是函数参数，C++ 编译器能为个别组合生成代码，以改善性能及减少代码尺寸（当只用单种特化）。缺点是需要在编译期决定标志。
 
@@ -230,9 +231,9 @@ JSON string 会被打上 const-string 的标志。但它们可能并非真正的
 
 ## 转码与校验 {#TranscodingAndValidation}
 
-RapidJSON 内部支持不同 Unicode 格式（正式的术语是 UCS 变换格式）间的转换。在 DOM 解析时，流的来源编码与 DOM 的编码可以不同。例如，来源流可能含有 UTF-8 的 JSON，而 DOM 则使用 UTF-16 编码。在 [EncodedInputStream](doc/stream.md) 一节里有一个例子。
+RapidJSON 内部支持不同 Unicode 格式（正式的术语是 UCS 变换格式）间的转换。在 DOM 解析时，流的来源编码与 DOM 的编码可以不同。例如，来源流可能含有 UTF-8 的 JSON，而 DOM 则使用 UTF-16 编码。在 [EncodedInputStream](doc/stream.zh-cn.md) 一节里有一个例子。
 
-当从 DOM 输出一个 JSON 至输出流之时，也可以使用转码功能。在 [EncodedOutputStream](doc/stream.md) 一节里有一个例子。
+当从 DOM 输出一个 JSON 至输出流之时，也可以使用转码功能。在 [EncodedOutputStream](doc/stream.zh-cn.md) 一节里有一个例子。
 
 在转码过程中，会把来源 string 解码成 Unicode 码点，然后把码点编码成目标格式。在解码时，它会校验来源 string 的字节序列是否合法。若遇上非合法序列，解析器会停止并返回 `kParseErrorStringInvalidEncoding` 错误。
 
@@ -256,9 +257,9 @@ d.Accept(writer);
 
 使用者可以创建自定义的处理器，去把 DOM 转换成其它格式。例如，一个把 DOM 转换成 XML 的处理器。
 
-要知道更多关于 SAX 事件与处理器，可参阅 [SAX](doc/sax.md)。
+要知道更多关于 SAX 事件与处理器，可参阅 [SAX](doc/sax.zh-cn.md)。
 
-## 使用者缓冲区{ #UserBuffer}
+## 使用者缓冲区 {#UserBuffer}
 
 许多应用软件可能需要尽量减少内存分配。
 
