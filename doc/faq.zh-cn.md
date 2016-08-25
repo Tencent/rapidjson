@@ -88,11 +88,11 @@
 
 4. 什么是原位（*in situ*）解析？
 
-   原位解析会把 JSON 字符串直接解码至输入的 JSON 中。这是一个优化，可减少内存消耗及提升性能，但输入的 JSON 会被更改。进一步细节请参考 [原位解析](doc/dom.md) 。
+   原位解析会把 JSON 字符串直接解码至输入的 JSON 中。这是一个优化，可减少内存消耗及提升性能，但输入的 JSON 会被更改。进一步细节请参考 [原位解析](doc/dom.zh-cn.md) 。
 
 5. 什么时候会产生解析错误？
 
-   当输入的 JSON 包含非法语法，或不能表示一个值（如 Number 太大），或解析器的处理器中断解析过程，解析器都会产生一个错误。详情请参考 [解析错误](doc/dom.md)。
+   当输入的 JSON 包含非法语法，或不能表示一个值（如 Number 太大），或解析器的处理器中断解析过程，解析器都会产生一个错误。详情请参考 [解析错误](doc/dom.zh-cn.md)。
 
 6. 有什么错误信息？
 
@@ -171,7 +171,7 @@
 
 2. 怎样去复制一个值？
 
-   有两个 API 可用：含 allocator 的构造函数，以及 `CopyFrom()`。可参考 [深复制 Value](doc/tutorial.md) 里的用例。
+   有两个 API 可用：含 allocator 的构造函数，以及 `CopyFrom()`。可参考 [深复制 Value](doc/tutorial.zh-cn.md) 里的用例。
 
 3. 为什么我需要提供字符串的长度？
 
@@ -239,7 +239,7 @@
 
    [字节顺序标记（byte order mark, BOM）](http://en.wikipedia.org/wiki/Byte_order_mark) 有时会出现于文件／流的开始，以表示其 UTF 编码类型。
 
-   RapidJSON 的 `EncodedInputStream` 可检测／跳过 BOM。`EncodedOutputStream` 可选择是否写入 BOM。可参考 [编码流](doc/stream.md) 中的例子。
+   RapidJSON 的 `EncodedInputStream` 可检测／跳过 BOM。`EncodedOutputStream` 可选择是否写入 BOM。可参考 [编码流](doc/stream.zh-cn.md) 中的例子。
 
 5. 为什么会涉及大端／小端？
 

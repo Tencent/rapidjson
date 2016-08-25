@@ -159,7 +159,7 @@ GenericReader<UTF8<>, UTF16<> > reader;
 
 第三个模板参数 `Allocator` 是内部数据结构（实际上是一个堆栈）的分配器类型。
 
-## 解析 {#Parsing}
+## 解析 {#SaxParsing}
 
 `Reader` 的唯一功能就是解析 JSON。 
 
@@ -172,7 +172,7 @@ template <typename InputStream, typename Handler>
 bool Parse(InputStream& is, Handler& handler);
 ~~~~~~~~~~
 
-若在解析中出现错误，它会返回 `false`。使用者可调用 `bool HasParseEror()`, `ParseErrorCode GetParseErrorCode()` 及 `size_t GetErrorOffset()` 获取错误状态。实际上 `Document` 使用这些 `Reader` 函数去获取解析错误。请参考 [DOM](doc/dom.md) 去了解有关解析错误的细节。
+若在解析中出现错误，它会返回 `false`。使用者可调用 `bool HasParseEror()`, `ParseErrorCode GetParseErrorCode()` 及 `size_t GetErrorOffset()` 获取错误状态。实际上 `Document` 使用这些 `Reader` 函数去获取解析错误。请参考 [DOM](doc/dom.zh-cn.md) 去了解有关解析错误的细节。
 
 # Writer {#Writer}
 
@@ -260,7 +260,16 @@ public:
 
 `TargetEncoding` 模板参数指定输出流的编码。
 
-最后一个 `Allocator` 是分配器的类型，用于分配内部数据结构（一个堆栈）。
+`Allocator` 是分配器的类型，用于分配内部数据结构（一个堆栈）。
+
+`writeFlags` 是以下位标志的组合：
+
+写入位标志                     | 意义
+------------------------------|-----------------------------------
+`kWriteNoFlags`               | 没有任何标志。
+`kWriteDefaultFlags`          | 缺省的解析选项。它等于 `RAPIDJSON_WRITE_DEFAULT_FLAGS` 宏，此宏定义为  `kWriteNoFlags`。
+`kWriteValidateEncodingFlag`  | 校验 JSON 字符串的编码。
+`kWriteNanAndInfFlag`         | 容许写入 `Infinity`, `-Infinity` 及 `NaN`。
 
 此外，`Writer` 的构造函数有一 `levelDepth` 参数。存储每层阶信息的初始内存分配量受此参数影响。
 
@@ -278,7 +287,7 @@ public:
 
 当 JSON 完整时，`Writer` 不能再接受新的事件。不然其输出便会是不合法的（例如有超过一个根节点）。为了重新利用 `Writer` 对象，使用者可调用 `Writer::Reset(OutputStream& os)` 去重置其所有内部状态及设置新的输出流。
 
-# 技巧 {#Techniques}
+# 技巧 {#SaxTechniques}
 
 ## 解析 JSON 至自定义结构 {#CustomDataStructure}
 

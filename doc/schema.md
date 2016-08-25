@@ -1,6 +1,6 @@
 # Schema
 
-## Status: experimental, shall be included in v1.1
+(This feature was released in v1.1.0)
 
 JSON Schema is a draft standard for describing the format of JSON data. The schema itself is also JSON data. By validating a JSON structure with JSON Schema, your code can safely access the DOM without manually checking types, or whether a key exists, etc. It can also ensure that the serialized JSON conform to a specified schema.
 
@@ -146,7 +146,7 @@ Of course, if your application only needs SAX-style serialization, it can simply
 
 ## Remote Schema
 
-JSON Schema supports [`$ref` keyword](http://spacetelescope.github.io/understanding-json-schema/structuring.html), which is a [JSON pointer](pointer.md) referencing to a local or remote schema. Local pointer is prefixed with `#`, while remote pointer is an relative or absolute URI. For example:
+JSON Schema supports [`$ref` keyword](http://spacetelescope.github.io/understanding-json-schema/structuring.html), which is a [JSON pointer](doc/pointer.md) referencing to a local or remote schema. Local pointer is prefixed with `#`, while remote pointer is an relative or absolute URI. For example:
 
 ~~~js
 { "$ref": "definitions.json#/address" }

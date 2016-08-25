@@ -1,6 +1,6 @@
 # Pointer
 
-## 状态: 实验性，应该会合进 v1.1
+（本功能于 v1.1.0 发布）
 
 JSON Pointer 是一个标准化（[RFC6901]）的方式去选取一个 JSON Document（DOM）中的值。这类似于 XML 的 XPath。然而，JSON Pointer 简单得多，而且每个 JSON Pointer 仅指向单个值。
 

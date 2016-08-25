@@ -1,6 +1,6 @@
 # Schema
 
-## 状态: 实验性，应该会合进 v1.1
+（本功能于 v1.1.0 发布）
 
 JSON Schema 是描述 JSON 格式的一个标准草案。一个 schema 本身也是一个 JSON。使用 JSON Schema 去校验 JSON，可以让你的代码安全地访问 DOM，而无须检查类型或键值是否存在等。这也能确保输出的 JSON 是符合指定的 schema。
 
@@ -146,7 +146,7 @@ if (!d.Accept(validator)) {
 
 ## 远程 Schema
 
-JSON Schema 支持 [`$ref` 关键字](http://spacetelescope.github.io/understanding-json-schema/structuring.html)，它是一个 [JSON pointer](pointer.md) 引用至一个本地（local）或远程（remote） schema。本地指针的首字符是 `#`，而远程指针是一个相对或绝对 URI。例如：
+JSON Schema 支持 [`$ref` 关键字](http://spacetelescope.github.io/understanding-json-schema/structuring.html)，它是一个 [JSON pointer](doc/pointer.zh-cn.md) 引用至一个本地（local）或远程（remote） schema。本地指针的首字符是 `#`，而远程指针是一个相对或绝对 URI。例如：
 
 ~~~js
 { "$ref": "definitions.json#/address" }

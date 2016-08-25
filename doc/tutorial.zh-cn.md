@@ -133,6 +133,15 @@ for (Value::ConstValueIterator itr = a.Begin(); itr != a.End(); ++itr)
 * `SizeType Capacity() const`
 * `bool Empty() const`
 
+### 范围 for 循环 (v1.1.0 中的新功能)
+
+当使用 C++11 功能时，你可使用范围 for 循环去访问 Array 内的所有元素。
+
+~~~~~~~~~~cpp
+for (auto& v : a.GetArray())
+    printf("%d ", v.GetInt());
+~~~~~~~~~~
+
 ## 查询 Object {#QueryObject}
 
 和 Array 相似，我们可以用迭代器去访问所有 Object 成员：
@@ -167,6 +176,16 @@ Type of member a is Array
 Value::ConstMemberIterator itr = document.FindMember("hello");
 if (itr != document.MemberEnd())
     printf("%s\n", itr->value.GetString());
+~~~~~~~~~~
+
+### 范围 for 循环 (v1.1.0 中的新功能)
+
+当使用 C++11 功能时，你可使用范围 for 循环去访问 Object 内的所有成员。
+
+~~~~~~~~~~cpp
+for (auto& m : document.GetObject())
+    printf("Type of member %s is %s\n",
+        m.name.GetString(), kTypeNames[m.value.GetType()]);
 ~~~~~~~~~~
 
 ## 查询 Number {#QueryNumber}
@@ -510,6 +529,6 @@ assert(b.IsInt());
 3. [DOM](doc/dom.zh-cn.md) 的基本功能已在本教程里介绍。还有更高级的功能，如原位（*in situ*）解析、其他解析选项及高级用法。
 4. [SAX](doc/sax.zh-cn.md) 是 RapidJSON 解析／生成功能的基础。学习使用 `Reader`/`Writer` 去实现更高性能的应用程序。也可以使用 `PrettyWriter` 去格式化 JSON。
 5. [性能](doc/performance.zh-cn.md) 展示一些我们做的及第三方的性能测试。
-6. [技术内幕](doc/internals.zh-cn.md) 讲述一些 RapidJSON 内部的设计及技术。
+6. [技术内幕](doc/internals.md) 讲述一些 RapidJSON 内部的设计及技术。
 
-你也可以参考 [常见问题](faq.zh-cn.md)、API 文档、例子及单元测试。
+你也可以参考 [常见问题](doc/faq.zh-cn.md)、API 文档、例子及单元测试。

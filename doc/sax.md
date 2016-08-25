@@ -159,7 +159,7 @@ Note that, the default character type of `UTF16` is `wchar_t`. So this `reader`n
 
 The third template parameter `Allocator` is the allocator type for internal data structure (actually a stack).
 
-## Parsing {#Parsing}
+## Parsing {#SaxParsing}
 
 The one and only one function of `Reader` is to parse JSON. 
 
@@ -244,7 +244,7 @@ Anyway, using `Writer` API is even simpler than generating a JSON by ad hoc meth
 ~~~~~~~~~~cpp
 namespace rapidjson {
 
-template<typename OutputStream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename Allocator = CrtAllocator<> >
+template<typename OutputStream, typename SourceEncoding = UTF8<>, typename TargetEncoding = UTF8<>, typename Allocator = CrtAllocator<>, unsigned writeFlags = kWriteDefaultFlags>
 class Writer {
 public:
     Writer(OutputStream& os, Allocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth)
@@ -260,7 +260,16 @@ The `SourceEncoding` template parameter specifies the encoding to be used in `St
 
 The `TargetEncoding` template parameter specifies the encoding in the output stream.
 
-The last one, `Allocator` is the type of allocator, which is used for allocating internal data structure (a stack).
+The `Allocator` is the type of allocator, which is used for allocating internal data structure (a stack).
+
+The `writeFlags` are combination of the following bit-flags:
+
+Parse flags                   | Meaning
+------------------------------|-----------------------------------
+`kWriteNoFlags`               | No flag is set.
+`kWriteDefaultFlags`          | Default write flags. It is equal to macro `RAPIDJSON_WRITE_DEFAULT_FLAGS`, which is defined as `kWriteNoFlags`.
+`kWriteValidateEncodingFlag`  | Validate encoding of JSON strings.
+`kWriteNanAndInfFlag`         | Allow writing of `Infinity`, `-Infinity` and `NaN`.
 
 Besides, the constructor of `Writer` has a `levelDepth` parameter. This parameter affects the initial memory allocated for storing information per hierarchy level.
 
@@ -278,7 +287,7 @@ A `Writer` can only output a single JSON, which can be any JSON type at the root
 
 When a JSON is complete, the `Writer` cannot accept any new events. Otherwise the output will be invalid (i.e. having more than one root). To reuse the `Writer` object, user can call `Writer::Reset(OutputStream& os)` to reset all internal states of the `Writer` with a new output stream.
 
-# Techniques {#Techniques}
+# Techniques {#SaxTechniques}
 
 ## Parsing JSON to Custom Data Structure {#CustomDataStructure}
 

@@ -133,6 +133,15 @@ And other familiar query functions:
 * `SizeType Capacity() const`
 * `bool Empty() const`
 
+### Range-based For Loop (New in v1.1.0)
+
+When C++11 is enabled, you can use range-based for loop to access all elements in an array.
+
+~~~~~~~~~~cpp
+for (auto& v : a.GetArray())
+    printf("%d ", v.GetInt());
+~~~~~~~~~~
+
 ## Query Object {#QueryObject}
 
 Similar to array, we can access all object members by iterator:
@@ -167,6 +176,16 @@ If we are unsure whether a member exists, we need to call `HasMember()` before c
 Value::ConstMemberIterator itr = document.FindMember("hello");
 if (itr != document.MemberEnd())
     printf("%s\n", itr->value.GetString());
+~~~~~~~~~~
+
+### Range-based For Loop (New in v1.1.0)
+
+When C++11 is enabled, you can use range-based for loop to access all members in an object.
+
+~~~~~~~~~~cpp
+for (auto& m : document.GetObject())
+    printf("Type of member %s is %s\n",
+        m.name.GetString(), kTypeNames[m.value.GetType()]);
 ~~~~~~~~~~
 
 ## Querying Number {#QueryNumber}

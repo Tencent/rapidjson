@@ -79,7 +79,7 @@ typedef GenericDocument<UTF16<> > WDocument;
 typedef GenericValue<UTF16<> > WValue;
 ~~~~~~~~~~
 
-可以在 [DOM's Encoding](doc/stream.md) 一节看到更详细的使用例子。
+可以在 [DOM's Encoding](doc/stream.zh-cn.md) 一节看到更详细的使用例子。
 
 ## 字符类型 {#CharacterType}
 

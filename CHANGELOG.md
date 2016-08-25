@@ -4,9 +4,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 1.1.0 - 2016-08-25
+
 ### Added
 * Add GenericDocument ctor overload to specify JSON type (#369)
 * Add FAQ (#372, #373, #374, #376)
+* Add forward declaration header `fwd.h`
 * Add @PlatformIO Library Registry manifest file (#400)
 * Implement assignment operator for BigInteger (#404)
 * Add comments support (#443)
@@ -33,11 +36,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Add parse-by-parts example (#556, #562)
 * Support parse number as string (#564, #589)
 * Add kFormatSingleLineArray for PrettyWriter (#577)
-* Added optional support for trailing commas #584
+* Added optional support for trailing commas (#584)
+* Added filterkey and filterkeydom examples (#615)
+* Added npm docs (#639)
+* Allow options for writing and parsing NaN/Infinity (#641)
+* Add std::string overload to PrettyWriter::Key() when RAPIDJSON_HAS_STDSTRING is defined (#698)
 
 ### Fixed
-* Fix gcc/clang/vc warnings (#350, #394, #397, #444, #447, #473, #515, #582, #589, #595)
-* Fix documentation (#482, #511, #550, #557)
+* Fix gcc/clang/vc warnings (#350, #394, #397, #444, #447, #473, #515, #582, #589, #595, #667)
+* Fix documentation (#482, #511, #550, #557, #614, #635, #660)
 * Fix emscripten alignment issue (#535)
 * Fix missing allocator to uses of AddMember in document (#365)
 * CMake will no longer complain that the minimum CMake version is not specified (#501)
@@ -56,6 +63,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Fix a crash bug in regex (#605)
 * Fix schema "required" keyword cannot handle duplicated keys (#609)
 * Fix cmake CMP0054 warning (#612)
+* Added missing include guards in istreamwrapper.h and ostreamwrapper.h (#634)
+* Fix undefined behaviour (#646)
+* Fix buffer overrun using PutN (#673)
+* Fix rapidjson::value::Get<std::string>() may returns wrong data (#681)
+* Add Flush() for all value types (#689)
+* Handle malloc() fail in PoolAllocator (#691)
+* Fix builds on x32 platform. #703
 
 ### Changed
 * Clarify problematic JSON license (#392)
@@ -63,7 +77,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Make whitespace array more compact (#513)
 * Optimize Writer::WriteString() with SIMD (#544)
 * x86-64 48-bit pointer optimization for GenericValue (#546)
-
+* Define RAPIDJSON_HAS_CXX11_RVALUE_REFS directly in clang (#617)
+* Make GenericSchemaDocument constructor explicit (#674)
+* Optimize FindMember when use std::string (#690)
 
 ## [1.0.2] - 2015-05-14
 
@@ -135,7 +151,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 0.1 - 2011-11-18
 
-[Unreleased]: https://github.com/miloyip/rapidjson/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/miloyip/rapidjson/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/miloyip/rapidjson/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/miloyip/rapidjson/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/miloyip/rapidjson/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/miloyip/rapidjson/compare/v1.0-beta...v1.0.0
