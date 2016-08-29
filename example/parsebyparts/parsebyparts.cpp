@@ -21,12 +21,15 @@ public:
     AsyncDocumentParser(Document& d)
         : stream_(*this)
         , d_(d)
-        , parseThread_(&AsyncDocumentParser::Parse, this)
+        , parseThread_()
         , mutex_()
         , notEmpty_()
         , finish_()
         , completed_()
-    {}
+    {
+        // Create and execute thread after all member variables are initialized.
+        parseThread_ = std::thread(&AsyncDocumentParser::Parse, this);
+    }
 
     ~AsyncDocumentParser() {
         if (!parseThread_.joinable())
