@@ -6,7 +6,6 @@ var structrapidjson_1_1_generic_string_ref =
     [ "GenericStringRef", "structrapidjson_1_1_generic_string_ref.html#ad9eb120a58cee500ff3bd5706779c4e4", null ],
     [ "GenericStringRef", "structrapidjson_1_1_generic_string_ref.html#a45345164abed97ea24603d2020b33448", null ],
     [ "operator const Ch *", "structrapidjson_1_1_generic_string_ref.html#af535787e3593802222f7b3f3096beff0", null ],
-    [ "operator=", "structrapidjson_1_1_generic_string_ref.html#a54f516a5ada5bba4a8cfca18d779fa45", null ],
     [ "StringRef", "structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5", null ],
     [ "StringRef", "structrapidjson_1_1_generic_string_ref.html#a578c51ab574a50a9c760b9da7c7562f2", null ],
     [ "StringRef", "structrapidjson_1_1_generic_string_ref.html#af94951529a5d51e8c4e6e770bb707c1f", null ],
