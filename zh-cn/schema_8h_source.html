@@ -1555,7 +1555,7 @@ $(document).ready(function(){initNavTree('schema_8h_source.html','');});
 <div class="line"><a name="l01473"></a><span class="lineno"> 1473</span>&#160;</div>
 <div class="line"><a name="l01474"></a><span class="lineno"> 1474</span>&#160;                <span class="keywordflow">if</span> (i &gt; 0) { <span class="comment">// Remote reference, resolve immediately</span></div>
 <div class="line"><a name="l01475"></a><span class="lineno"> 1475</span>&#160;                    <span class="keywordflow">if</span> (remoteProvider_) {</div>
-<div class="line"><a name="l01476"></a><span class="lineno"> 1476</span>&#160;                        <span class="keywordflow">if</span> (<span class="keyword">const</span> GenericSchemaDocument* remoteDocument = remoteProvider_-&gt;GetRemoteDocument(s, i - 1)) {</div>
+<div class="line"><a name="l01476"></a><span class="lineno"> 1476</span>&#160;                        <span class="keywordflow">if</span> (<span class="keyword">const</span> GenericSchemaDocument* remoteDocument = remoteProvider_-&gt;GetRemoteDocument(s, i)) {</div>
 <div class="line"><a name="l01477"></a><span class="lineno"> 1477</span>&#160;                            PointerType pointer(&amp;s[i], len - i, allocator_);</div>
 <div class="line"><a name="l01478"></a><span class="lineno"> 1478</span>&#160;                            <span class="keywordflow">if</span> (pointer.IsValid()) {</div>
 <div class="line"><a name="l01479"></a><span class="lineno"> 1479</span>&#160;                                <span class="keywordflow">if</span> (<span class="keyword">const</span> SchemaType* sc = remoteDocument-&gt;GetSchema(pointer)) {</div>
