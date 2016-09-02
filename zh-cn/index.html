@@ -156,12 +156,12 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p>生成测试及例子的步骤：</p>
 <ol type="1">
 <li>执行 <code>git submodule update --init</code> 去获取 thirdparty submodules (google test)。</li>
-<li>在 rapidjson 目渌下，建立一个 <code>build</code> 目录。</li>
+<li>在 rapidjson 目录下，建立一个 <code>build</code> 目录。</li>
 <li>在 <code>build</code> 目录下执行 <code>cmake ..</code> 命令以设置生成。Windows 用户可使用 cmake-gui 应用程序。</li>
 <li>在 Windows 下，编译生成在 build 目录中的 solution。在 Linux 下，于 build 目录运行 <code>make</code>。</li>
 </ol>
 <p>成功生成后，你会在 <code>bin</code> 的目录下找到编译后的测试及例子可执行文件。而生成的文档将位于 build 下的 <code>doc/html</code> 目录。要执行测试，请在 build 下执行 <code>make test</code> 或 <code>ctest</code>。使用 <code>ctest -V</code> 命令可获取详细的输出。</p>
-<p>我们也可以把程序库安装至全系统中，只要在具管理權限下从 build 目录执行 <code>make install</code> 命令。这样会按系统的偏好设置安装所有文件。当安装 RapidJSON 后，其他的 CMake 项目需要使用它时，可以通过在 <code>CMakeLists.txt</code> 加入一句 <code>find_package(RapidJSON)</code>。</p>
+<p>我们也可以把程序库安装至全系统中，只要在具管理权限下从 build 目录执行 <code>make install</code> 命令。这样会按系统的偏好设置安装所有文件。当安装 RapidJSON 后，其他的 CMake 项目需要使用它时，可以通过在 <code>CMakeLists.txt</code> 加入一句 <code>find_package(RapidJSON)</code>。</p>
 <h2>用法一览</h2>
 <p>此简单例子解析一个 JSON 字符串至一个 document (DOM)，对 DOM 作出简单修改，最终把 DOM 转换（stringify）至 JSON 字符串。</p>
 <div class="fragment"><div class="line"><span class="comment">// rapidjson/example/simpledom/simpledom.cpp`</span></div>
