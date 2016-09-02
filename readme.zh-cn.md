@@ -80,13 +80,13 @@ RapidJSON 依赖于以下软件：
 生成测试及例子的步骤：
 
 1. 执行 `git submodule update --init` 去获取 thirdparty submodules (google test)。
-2. 在 rapidjson 目渌下，建立一个 `build` 目录。
+2. 在 rapidjson 目录下，建立一个 `build` 目录。
 3. 在 `build` 目录下执行 `cmake ..` 命令以设置生成。Windows 用户可使用 cmake-gui 应用程序。
 4. 在 Windows 下，编译生成在 build 目录中的 solution。在 Linux 下，于 build 目录运行 `make`。
 
 成功生成后，你会在 `bin` 的目录下找到编译后的测试及例子可执行文件。而生成的文档将位于 build 下的 `doc/html` 目录。要执行测试，请在 build 下执行 `make test` 或 `ctest`。使用 `ctest -V` 命令可获取详细的输出。
 
-我们也可以把程序库安装至全系统中，只要在具管理權限下从 build 目录执行 `make install` 命令。这样会按系统的偏好设置安装所有文件。当安装 RapidJSON 后，其他的 CMake 项目需要使用它时，可以通过在 `CMakeLists.txt` 加入一句 `find_package(RapidJSON)`。
+我们也可以把程序库安装至全系统中，只要在具管理权限下从 build 目录执行 `make install` 命令。这样会按系统的偏好设置安装所有文件。当安装 RapidJSON 后，其他的 CMake 项目需要使用它时，可以通过在 `CMakeLists.txt` 加入一句 `find_package(RapidJSON)`。
 
 ## 用法一览
 
