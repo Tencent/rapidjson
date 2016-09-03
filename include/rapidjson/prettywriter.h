@@ -91,12 +91,14 @@ public:
     bool Double(double d)       { PrettyPrefix(kNumberType); return Base::WriteDouble(d); }
 
     bool RawNumber(const Ch* str, SizeType length, bool copy = false) {
+        RAPIDJSON_ASSERT(str != 0);
         (void)copy;
         PrettyPrefix(kNumberType);
         return Base::WriteString(str, length);
     }
 
     bool String(const Ch* str, SizeType length, bool copy = false) {
+        RAPIDJSON_ASSERT(str != 0);
         (void)copy;
         PrettyPrefix(kStringType);
         return Base::WriteString(str, length);
@@ -184,7 +186,11 @@ public:
         \param type Type of the root of json.
         \note When using PrettyWriter::RawValue(), the result json may not be indented correctly.
     */
-    bool RawValue(const Ch* json, size_t length, Type type) { PrettyPrefix(type); return Base::WriteRawValue(json, length); }
+    bool RawValue(const Ch* json, size_t length, Type type) {
+        RAPIDJSON_ASSERT(json != 0);
+        PrettyPrefix(type);
+        return Base::WriteRawValue(json, length);
+    }
 
 protected:
     void PrettyPrefix(Type type) {
