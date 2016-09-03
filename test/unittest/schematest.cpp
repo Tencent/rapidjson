@@ -1101,7 +1101,7 @@ public:
         };
 
         for (size_t i = 0; i < kCount; i++)
-            if (strncmp(uri, uris[i], length) == 0)
+            if (strncmp(uri, uris[i], length) == 0 && strlen(uris[i]) == length)
                 return sd_[i];
         return 0;
     }
