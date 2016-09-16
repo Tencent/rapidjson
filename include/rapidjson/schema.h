@@ -1011,7 +1011,8 @@ private:
     }
 
     static bool IsPatternMatch(const RegexType* pattern, const Ch *str, SizeType) {
-        return pattern->Search(str);
+        GenericRegexSearch<RegexType> rs(*pattern);
+        return rs.Search(str);
     }
 #elif RAPIDJSON_SCHEMA_USE_STDREGEX
     template <typename ValueType>
