@@ -20,6 +20,11 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/memorybuffer.h"
 
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(c++98-compat)
+#endif
+
 using namespace rapidjson;
 
 TEST(Writer, Compact) {
@@ -495,3 +500,25 @@ TEST(Writer, RawValue) {
     EXPECT_TRUE(writer.IsComplete());
     EXPECT_STREQ("{\"a\":1,\"raw\":[\"Hello\\nWorld\", 123.456]}", buffer.GetString());
 }
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+TEST(Writer, MoveCtor) {
+    StringBuffer buffer;
+    auto writerGen=[](StringBuffer &target) -> Writer<StringBuffer> {
+        Writer<StringBuffer> writer(target);
+        writer.StartObject();
+        writer.Key("a");
+        writer.Int(1);
+        return std::move(writer);
+    };
+
+    Writer<StringBuffer> writer(writerGen(buffer));
+    writer.EndObject();
+    EXPECT_TRUE(writer.IsComplete());
+    EXPECT_STREQ("{\"a\":1}", buffer.GetString());
+}
+#endif
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif
