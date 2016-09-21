@@ -107,7 +107,7 @@ public:
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     Writer(Writer&& rhs) :
         os_(rhs.os_), level_stack_(std::move(rhs.level_stack_)), maxDecimalPlaces_(rhs.maxDecimalPlaces_), hasRoot_(rhs.hasRoot_) {
-        rhs.os_=nullptr;
+        rhs.os_ = 0;
     }
 #endif
 
