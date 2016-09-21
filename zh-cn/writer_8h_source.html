@@ -189,7 +189,7 @@ $(document).ready(function(){initNavTree('writer_8h_source.html','');});
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="preprocessor">#if RAPIDJSON_HAS_CXX11_RVALUE_REFS</span></div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    Writer(Writer&amp;&amp; rhs) :</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        os_(rhs.os_), level_stack_(std::move(rhs.level_stack_)), maxDecimalPlaces_(rhs.maxDecimalPlaces_), hasRoot_(rhs.hasRoot_) {</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        rhs.os_=<span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        rhs.os_ = 0;</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    }</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment"></span></div>
