@@ -502,17 +502,17 @@ TEST(Writer, RawValue) {
 }
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+static Writer<StringBuffer> WriterGen(StringBuffer &target) {
+    Writer<StringBuffer> writer(target);
+    writer.StartObject();
+    writer.Key("a");
+    writer.Int(1);
+    return std::move(writer);
+}
+
 TEST(Writer, MoveCtor) {
     StringBuffer buffer;
-    auto writerGen=[](StringBuffer &target) -> Writer<StringBuffer> {
-        Writer<StringBuffer> writer(target);
-        writer.StartObject();
-        writer.Key("a");
-        writer.Int(1);
-        return std::move(writer);
-    };
-
-    Writer<StringBuffer> writer(writerGen(buffer));
+    Writer<StringBuffer> writer(WriterGen(buffer));
     writer.EndObject();
     EXPECT_TRUE(writer.IsComplete());
     EXPECT_STREQ("{\"a\":1}", buffer.GetString());

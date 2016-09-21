@@ -208,17 +208,18 @@ TEST(PrettyWriter, RawValue) {
 }
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
+static PrettyWriter<StringBuffer> WriterGen(StringBuffer &target) {
+    PrettyWriter<StringBuffer> writer(target);
+    writer.StartObject();
+    writer.Key("a");
+    writer.Int(1);
+    return std::move(writer);
+}
+
 TEST(PrettyWriter, MoveCtor) {
     StringBuffer buffer;
-    auto writerGen=[](StringBuffer &target) -> PrettyWriter<StringBuffer> {
-        PrettyWriter<StringBuffer> writer(target);
-        writer.StartObject();
-        writer.Key("a");
-        writer.Int(1);
-        return std::move(writer);
-    };
-
-    PrettyWriter<StringBuffer> writer(writerGen(buffer));
+    PrettyWriter<StringBuffer> writer(WriterGen(buffer));
     writer.EndObject();
     EXPECT_TRUE(writer.IsComplete());
     EXPECT_STREQ(
