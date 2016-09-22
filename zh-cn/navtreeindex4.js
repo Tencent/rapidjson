@@ -1,5 +1,6 @@
 var NAVTREEINDEX4 =
 {
+"structrapidjson_1_1_generic_insitu_string_stream.html#a5a17e183fec782bf9bc11d247ffbee73":[14,0,0,17,1],
 "structrapidjson_1_1_generic_insitu_string_stream.html#a6d611d9f5372d457373b90a711dd2717":[14,0,0,17,12],
 "structrapidjson_1_1_generic_insitu_string_stream.html#a75f19e02d6aa78478aab0d5a5c03c1c8":[14,0,0,17,8],
 "structrapidjson_1_1_generic_insitu_string_stream.html#a95abb3fe7cc3b08ecb70d804eb234dc2":[14,0,0,17,2],
