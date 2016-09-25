@@ -13,8 +13,8 @@ var NAVTREE =
       ] ],
       [ "创建／修改值", "md_doc_tutorial_8zh-cn.html#CreateModifyValues", [
         [ "改变 Value 类型", "md_doc_tutorial_8zh-cn.html#ChangeValueType", null ],
-        [ "转移语意（Move Semantics）", "md_doc_tutorial_8zh-cn.html#MoveSemantics", [
-          [ "转移语意及临时值", "md_doc_tutorial_8zh-cn.html#TemporaryValues", null ]
+        [ "转移语义（Move Semantics）", "md_doc_tutorial_8zh-cn.html#MoveSemantics", [
+          [ "转移语义及临时值", "md_doc_tutorial_8zh-cn.html#TemporaryValues", null ]
         ] ],
         [ "创建 String", "md_doc_tutorial_8zh-cn.html#CreateString", null ],
         [ "修改 Array", "md_doc_tutorial_8zh-cn.html#ModifyArray", null ],

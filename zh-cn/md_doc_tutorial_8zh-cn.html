@@ -89,7 +89,7 @@ $(document).ready(function(){initNavTree('md_doc_tutorial_8zh-cn.html','');});
 </ul>
 </li>
 <li class="level1"><a href="#CreateModifyValues">创建／修改值</a><ul><li class="level2"><a href="#ChangeValueType">改变 Value 类型</a></li>
-<li class="level2"><a href="#MoveSemantics">转移语意（Move Semantics）</a><ul><li class="level3"><a href="#TemporaryValues">转移语意及临时值</a></li>
+<li class="level2"><a href="#MoveSemantics">转移语义（Move Semantics）</a><ul><li class="level3"><a href="#TemporaryValues">转移语义及临时值</a></li>
 </ul>
 </li>
 <li class="level2"><a href="#CreateString">创建 String</a></li>
@@ -288,7 +288,7 @@ Value 及 Document</h1>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
 <div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
 </div><!-- fragment --><h2><a class="anchor" id="MoveSemantics"></a>
-转移语意（Move Semantics）</h2>
+转移语义（Move Semantics）</h2>
 <p>在设计 RapidJSON 时有一个非常特别的决定，就是 Value 赋值并不是把来源 Value 复制至目的 Value，而是把把来源 Value 转移（move）至目的 Value。例如：</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(123);</div>
 <div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> b(456);</div>
@@ -296,10 +296,10 @@ Value 及 Document</h1>
 </div><!-- fragment --><div class="image">
 <img src="move1.png" alt="move1.png"/>
 <div class="caption">
-使用移动语意赋值。</div></div>
-<p> 为什么？此语意有何优点？</p>
+使用移动语义赋值。</div></div>
+<p> 为什么？此语义有何优点？</p>
 <p>最简单的答案就是性能。对于固定大小的 JSON 类型（Number、True、False、Null），复制它们是简单快捷。然而，对于可变大小的 JSON 类型（String、Array、Object），复制它们会产生大量开销，而且这些开销常常不被察觉。尤其是当我们需要创建临时 Object，把它复制至另一变量，然后再析构它。</p>
-<p>例如，若使用正常 * 复制 * 语意：</p>
+<p>例如，若使用正常 * 复制 * 语义：</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
 <div class="line">{</div>
 <div class="line">    <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> contacts(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
@@ -311,11 +311,11 @@ Value 及 Document</h1>
 </div><!-- fragment --><div class="image">
 <img src="move2.png" alt="move2.png"/>
 <div class="caption">
-复制语意产生大量的复制操作。</div></div>
+复制语义产生大量的复制操作。</div></div>
 <p> 那个 <code>o</code> Object 需要分配一个和 contacts 相同大小的缓冲区，对 conacts 做深度复制，并最终要析构 contacts。这样会产生大量无必要的内存分配／释放，以及内存复制。</p>
 <p>有一些方案可避免实质地复制这些数据，例如引用计数（reference counting）、垃圾回收（garbage collection, GC）。</p>
-<p>为了使 RapidJSON 简单及快速，我们选择了对赋值采用 * 转移 * 语意。这方法与 <code>std::auto_ptr</code> 相似，都是在赋值时转移拥有权。转移快得多简单得多，只需要析构原来的 Value，把来源 <code>memcpy()</code> 至目标，最后把来源设置为 Null 类型。</p>
-<p>因此，使用转移语意后，上面的例子变成：</p>
+<p>为了使 RapidJSON 简单及快速，我们选择了对赋值采用 * 转移 * 语义。这方法与 <code>std::auto_ptr</code> 相似，都是在赋值时转移拥有权。转移快得多简单得多，只需要析构原来的 Value，把来源 <code>memcpy()</code> 至目标，最后把来源设置为 Null 类型。</p>
+<p>因此，使用转移语义后，上面的例子变成：</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
 <div class="line">{</div>
 <div class="line">    <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> contacts(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
@@ -326,10 +326,10 @@ Value 及 Document</h1>
 </div><!-- fragment --><div class="image">
 <img src="move3.png" alt="move3.png"/>
 <div class="caption">
-转移语意不需复制。</div></div>
-<p> 在 C++11 中这称为转移赋值操作（move assignment operator）。由于 RapidJSON 支持 C++03，它在赋值操作采用转移语意，其它修改形函数如 <code>AddMember()</code>, <code>PushBack()</code> 也采用转移语意。</p>
+转移语义不需复制。</div></div>
+<p> 在 C++11 中这称为转移赋值操作（move assignment operator）。由于 RapidJSON 支持 C++03，它在赋值操作采用转移语义，其它修改形函数如 <code>AddMember()</code>, <code>PushBack()</code> 也采用转移语义。</p>
 <h3><a class="anchor" id="TemporaryValues"></a>
-转移语意及临时值</h3>
+转移语义及临时值</h3>
 <p>有时候，我们想直接构造一个 Value 并传递给一个“转移”函数（如 <code>PushBack()</code>、<code>AddMember()</code>）。由于临时对象是不能转换为正常的 Value 引用，我们加入了一个方便的 <code>Move()</code> 函数：</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
 <div class="line">Document::AllocatorType&amp; allocator = document.GetAllocator();</div>
