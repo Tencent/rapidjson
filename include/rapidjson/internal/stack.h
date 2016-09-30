@@ -113,7 +113,6 @@ public:
     // Expansion is run very infrequently, so it is moved to another (probably non-inline) function.
     template<typename T>
     RAPIDJSON_FORCEINLINE void Reserve(size_t count = 1) {
-        RAPIDJSON_ASSERT(stackTop_);
          // Expand the stack if needed
         if (RAPIDJSON_UNLIKELY(stackTop_ + sizeof(T) * count > stackEnd_))
             Expand<T>(count);
