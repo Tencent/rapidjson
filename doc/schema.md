@@ -157,7 +157,7 @@ As `SchemaDocument` does not know how to resolve such URI, it needs a user-provi
 ~~~
 class MyRemoteSchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
 public:
-    virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeTyp length) {
+    virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
         // Resolve the uri and returns a pointer to that schema.
     }
 };
@@ -185,7 +185,7 @@ RapidJSON implemented a simple NFA regular expression engine, which is used by d
 |Syntax|Description|
 |------|-----------|
 |`ab`    | Concatenation |
-|`a|b`   | Alternation |
+|<code>a&#124;b</code>   | Alternation |
 |`a?`    | Zero or one |
 |`a*`    | Zero or more |
 |`a+`    | One or more |
@@ -202,7 +202,7 @@ RapidJSON implemented a simple NFA regular expression engine, which is used by d
 |`[^abc]` | Negated character classes |
 |`[^a-c]` | Negated character class range |
 |`[\b]`   | Backspace (U+0008) |
-|`\|`, `\\`, ...  | Escape characters |
+|<code>\\&#124;</code>, `\\`, ...  | Escape characters |
 |`\f` | Form feed (U+000C) |
 |`\n` | Line feed (U+000A) |
 |`\r` | Carriage return (U+000D) |
