@@ -214,7 +214,7 @@ static PrettyWriter<StringBuffer> WriterGen(StringBuffer &target) {
     writer.StartObject();
     writer.Key("a");
     writer.Int(1);
-    return std::move(writer);
+    return writer;
 }
 
 TEST(PrettyWriter, MoveCtor) {
