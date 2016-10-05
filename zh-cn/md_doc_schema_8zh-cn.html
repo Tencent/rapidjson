@@ -196,7 +196,7 @@ $(document).ready(function(){initNavTree('md_doc_schema_8zh-cn.html','');});
 </div><!-- fragment --><p>由于 <code>SchemaDocument</code> 并不知道如何处理那些 URI，它需要使用者提供一个 <code>IRemoteSchemaDocumentProvider</code> 的实例去处理。</p>
 <div class="fragment"><div class="line"><span class="keyword">class </span>MyRemoteSchemaDocumentProvider : <span class="keyword">public</span> <a class="code" href="namespacerapidjson.html#af91eb8eea47b79d75b23e29fa9c0abb5">IRemoteSchemaDocumentProvider</a> {</div>
 <div class="line"><span class="keyword">public</span>:</div>
-<div class="line">    <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#a52bbb5d64d1319495089e1713a0653cf">SchemaDocument</a>* GetRemoteDocument(<span class="keyword">const</span> <span class="keywordtype">char</span>* uri, SizeTyp length) {</div>
+<div class="line">    <span class="keyword">virtual</span> <span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#a52bbb5d64d1319495089e1713a0653cf">SchemaDocument</a>* GetRemoteDocument(<span class="keyword">const</span> <span class="keywordtype">char</span>* uri, <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length) {</div>
 <div class="line">        <span class="comment">// Resolve the uri and returns a pointer to that schema.</span></div>
 <div class="line">    }</div>
 <div class="line">};</div>
@@ -217,8 +217,53 @@ $(document).ready(function(){initNavTree('md_doc_schema_8zh-cn.html','');});
 <th>语法</th><th>描述  </th></tr>
 <tr>
 <td><code>ab</code> </td><td>串联 </td></tr>
+<tr>
+<td><code>a&amp;#124;b</code> </td><td>交替 </td></tr>
+<tr>
+<td><code>a?</code> </td><td>零或一次 </td></tr>
+<tr>
+<td><code>a*</code> </td><td>零或多次 </td></tr>
+<tr>
+<td><code>a+</code> </td><td>一或多次 </td></tr>
+<tr>
+<td><code>a{3}</code> </td><td>刚好 3 次 </td></tr>
+<tr>
+<td><code>a{3,}</code> </td><td>至少 3 次 </td></tr>
+<tr>
+<td><code>a{3,5}</code></td><td>3 至 5 次 </td></tr>
+<tr>
+<td><code>(ab)</code> </td><td>分组 </td></tr>
+<tr>
+<td><code>^a</code> </td><td>在开始处 </td></tr>
+<tr>
+<td><code>a$</code> </td><td>在结束处 </td></tr>
+<tr>
+<td><code>.</code> </td><td>任何字符 </td></tr>
+<tr>
+<td><code>[abc]</code> </td><td>字符组 </td></tr>
+<tr>
+<td><code>[a-c]</code> </td><td>字符组范围 </td></tr>
+<tr>
+<td><code>[a-z0-9_]</code> </td><td>字符组组合 </td></tr>
+<tr>
+<td><code>[^abc]</code> </td><td>字符组取反 </td></tr>
+<tr>
+<td><code>[^a-c]</code> </td><td>字符组范围取反 </td></tr>
+<tr>
+<td><code>[\b]</code> </td><td>退格符 (U+0008) </td></tr>
+<tr>
+<td><code>\&amp;#124;</code>, <code>\\</code>, ... </td><td>转义字符 </td></tr>
+<tr>
+<td><code>\f</code> </td><td>馈页 (U+000C) </td></tr>
+<tr>
+<td><code>\n</code> </td><td>馈行 (U+000A) </td></tr>
+<tr>
+<td><code>\r</code> </td><td>回车 (U+000D) </td></tr>
+<tr>
+<td><code>\t</code> </td><td>制表 (U+0009) </td></tr>
+<tr>
+<td><code>\v</code> </td><td>垂直制表 (U+000B) </td></tr>
 </table>
-<p>|<code>a|b</code> | 交替 | |<code>a?</code> | 零或一次 | |<code>a*</code> | 零或多次 | |<code>a+</code> | 一或多次 | |<code>a{3}</code> | 刚好 3 次 | |<code>a{3,}</code> | 至少 3 次 | |<code>a{3,5}</code>| 3 至 5 次 | |<code>(ab)</code> | 分组 | |<code>^a</code> | 在开始处 | |<code>a$</code> | 在结束处 | |<code>.</code> | 任何字符 | |<code>[abc]</code> | 字符组 | |<code>[a-c]</code> | 字符组范围 | |<code>[a-z0-9_]</code> | 字符组组合 | |<code>[^abc]</code> | 字符组取反 | |<code>[^a-c]</code> | 字符组范围取反 | |<code>[\b]</code> | 退格符 (U+0008) | |<code>\|</code>, <code>\\</code>, ... | 转义字符 | |<code>\f</code> | 馈页 (U+000C) | |<code>\n</code> | 馈行 (U+000A) | |<code>\r</code> | 回车 (U+000D) | |<code>\t</code> | 制表 (U+0009) | |<code>\v</code> | 垂直制表 (U+000B) |</p>
 <p>对于使用 C++11 编译器的使用者，也可使用 <code>std::regex</code>，只需定义 <code>RAPIDJSON_SCHEMA_USE_INTERNALREGEX=0</code> 及 <code>RAPIDJSON_SCHEMA_USE_STDREGEX=1</code>。若你的 schema 无需使用 <code>pattern</code> 或 <code>patternProperties</code>，可以把两个宏都设为零，以禁用此功能，这样做可节省一些代码体积。</p>
 <h2>性能</h2>
 <p>大部分 C++ JSON 库都未支持 JSON Schema。因此我们尝试按照 <a href="https://github.com/ebdrup/json-schema-benchmark">json-schema-benchmark</a> 去评估 RapidJSON 的 JSON Schema 校验器。该评测测试了 11 个运行在 node.js 上的 JavaScript 库。</p>
