@@ -23,6 +23,7 @@ var classrapidjson_1_1_generic_value =
     [ "GenericValue", "classrapidjson_1_1_generic_value.html#acd4ae9a8dba4498d1d7cce6667529bb8", null ],
     [ "GenericValue", "classrapidjson_1_1_generic_value.html#a1f125e735577aae64c0306345de45563", null ],
     [ "GenericValue", "classrapidjson_1_1_generic_value.html#a71b9e2ec1f7bf9e2f034126ca7b4945a", null ],
+    [ "GenericValue", "classrapidjson_1_1_generic_value.html#afe94e5e86a5b1a3fb605a9f8422f048b", null ],
     [ "GenericValue", "classrapidjson_1_1_generic_value.html#a51e93a4fb57f77a39767acb076bf43c1", null ],
     [ "GenericValue", "classrapidjson_1_1_generic_value.html#a65bfc3073fa80ee5eba8e985abe2f941", null ],
     [ "GenericValue", "classrapidjson_1_1_generic_value.html#ad9553bb9ccbfd19547c473a95405a8b2", null ],
