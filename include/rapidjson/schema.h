@@ -1368,7 +1368,7 @@ public:
             }
             else if (refEntry->schema)
                 *refEntry->schema = SchemaType::GetTypeless();
-            
+
             refEntry->~SchemaRefEntry();
         }
 
@@ -1579,11 +1579,11 @@ public:
         :
         schemaDocument_(&schemaDocument),
         root_(schemaDocument.GetRoot()),
-        outputHandler_(GetNullHandler()),
         stateAllocator_(allocator),
         ownStateAllocator_(0),
         schemaStack_(allocator, schemaStackCapacity),
         documentStack_(allocator, documentStackCapacity),
+        outputHandler_(CreateNullHandler()),
         valid_(true)
 #if RAPIDJSON_SCHEMA_VERBOSE
         , depth_(0)
@@ -1607,11 +1607,12 @@ public:
         :
         schemaDocument_(&schemaDocument),
         root_(schemaDocument.GetRoot()),
-        outputHandler_(outputHandler),
         stateAllocator_(allocator),
         ownStateAllocator_(0),
         schemaStack_(allocator, schemaStackCapacity),
         documentStack_(allocator, documentStackCapacity),
+        outputHandler_(outputHandler),
+        nullHandler_(0),
         valid_(true)
 #if RAPIDJSON_SCHEMA_VERBOSE
         , depth_(0)
@@ -1795,11 +1796,11 @@ private:
         :
         schemaDocument_(&schemaDocument),
         root_(root),
-        outputHandler_(GetNullHandler()),
         stateAllocator_(allocator),
         ownStateAllocator_(0),
         schemaStack_(allocator, schemaStackCapacity),
         documentStack_(allocator, documentStackCapacity),
+        outputHandler_(CreateNullHandler()),
         valid_(true)
 #if RAPIDJSON_SCHEMA_VERBOSE
         , depth_(depth)
@@ -1913,20 +1914,20 @@ private:
     Context& CurrentContext() { return *schemaStack_.template Top<Context>(); }
     const Context& CurrentContext() const { return *schemaStack_.template Top<Context>(); }
 
-    static OutputHandler& GetNullHandler() {
-        static OutputHandler nullHandler;
-        return nullHandler;
+    OutputHandler& CreateNullHandler() {
+        return *(nullHandler_ = static_cast<OutputHandler*>(stateAllocator_->Malloc(sizeof(OutputHandler))));
     }
 
     static const size_t kDefaultSchemaStackCapacity = 1024;
     static const size_t kDefaultDocumentStackCapacity = 256;
     const SchemaDocumentType* schemaDocument_;
     const SchemaType& root_;
-    OutputHandler& outputHandler_;
     StateAllocator* stateAllocator_;
     StateAllocator* ownStateAllocator_;
     internal::Stack<StateAllocator> schemaStack_;    //!< stack to store the current path of schema (BaseSchemaType *)
     internal::Stack<StateAllocator> documentStack_;  //!< stack to store the current path of validating document (Ch)
+    OutputHandler& outputHandler_;
+    OutputHandler* nullHandler_;
     bool valid_;
 #if RAPIDJSON_SCHEMA_VERBOSE
     unsigned depth_;
