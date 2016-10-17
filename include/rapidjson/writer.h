@@ -42,6 +42,7 @@ RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(padded)
 RAPIDJSON_DIAG_OFF(unreachable-code)
+RAPIDJSON_DIAG_OFF(c++98-compat)
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -102,6 +103,13 @@ public:
     explicit
     Writer(StackAllocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) :
         os_(0), level_stack_(allocator, levelDepth * sizeof(Level)), maxDecimalPlaces_(kDefaultMaxDecimalPlaces), hasRoot_(false) {}
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    Writer(Writer&& rhs) :
+        os_(rhs.os_), level_stack_(std::move(rhs.level_stack_)), maxDecimalPlaces_(rhs.maxDecimalPlaces_), hasRoot_(rhs.hasRoot_) {
+        rhs.os_ = 0;
+    }
+#endif
 
     //! Reset the writer with a new stream.
     /*!

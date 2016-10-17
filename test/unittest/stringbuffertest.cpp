@@ -26,6 +26,7 @@ using namespace rapidjson;
 TEST(StringBuffer, InitialSize) {
     StringBuffer buffer;
     EXPECT_EQ(0u, buffer.GetSize());
+    EXPECT_EQ(0u, buffer.GetLength());
     EXPECT_STREQ("", buffer.GetString());
 }
 
@@ -34,14 +35,17 @@ TEST(StringBuffer, Put) {
     buffer.Put('A');
 
     EXPECT_EQ(1u, buffer.GetSize());
+    EXPECT_EQ(1u, buffer.GetLength());
     EXPECT_STREQ("A", buffer.GetString());
 }
 
 TEST(StringBuffer, PutN_Issue672) {
     GenericStringBuffer<UTF8<>, MemoryPoolAllocator<> > buffer;
     EXPECT_EQ(0, buffer.GetSize());
+    EXPECT_EQ(0, buffer.GetLength());
     rapidjson::PutN(buffer, ' ', 1);
     EXPECT_EQ(1, buffer.GetSize());
+    EXPECT_EQ(1, buffer.GetLength());
 }
 
 TEST(StringBuffer, Clear) {
@@ -52,6 +56,7 @@ TEST(StringBuffer, Clear) {
     buffer.Clear();
 
     EXPECT_EQ(0u, buffer.GetSize());
+    EXPECT_EQ(0u, buffer.GetLength());
     EXPECT_STREQ("", buffer.GetString());
 }
 
@@ -60,6 +65,7 @@ TEST(StringBuffer, Push) {
     buffer.Push(5);
 
     EXPECT_EQ(5u, buffer.GetSize());
+    EXPECT_EQ(5u, buffer.GetLength());
 
     // Causes sudden expansion to make the stack's capacity equal to size
     buffer.Push(65536u);
@@ -76,7 +82,17 @@ TEST(StringBuffer, Pop) {
     buffer.Pop(3);
 
     EXPECT_EQ(2u, buffer.GetSize());
+    EXPECT_EQ(2u, buffer.GetLength());
     EXPECT_STREQ("AB", buffer.GetString());
+}
+
+TEST(StringBuffer, GetLength_Issue744) {
+    GenericStringBuffer<UTF16<wchar_t> > buffer;
+    buffer.Put('A');
+    buffer.Put('B');
+    buffer.Put('C');
+    EXPECT_EQ(3u * sizeof(wchar_t), buffer.GetSize());
+    EXPECT_EQ(3u, buffer.GetLength());
 }
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
@@ -130,18 +146,23 @@ TEST(StringBuffer, MoveConstructor) {
     x.Put('D');
 
     EXPECT_EQ(4u, x.GetSize());
+    EXPECT_EQ(4u, x.GetLength());
     EXPECT_STREQ("ABCD", x.GetString());
 
     // StringBuffer y(x); // does not compile (!is_copy_constructible)
     StringBuffer y(std::move(x));
     EXPECT_EQ(0u, x.GetSize());
+    EXPECT_EQ(0u, x.GetLength());
     EXPECT_EQ(4u, y.GetSize());
+    EXPECT_EQ(4u, y.GetLength());
     EXPECT_STREQ("ABCD", y.GetString());
 
     // StringBuffer z = y; // does not compile (!is_copy_assignable)
     StringBuffer z = std::move(y);
     EXPECT_EQ(0u, y.GetSize());
+    EXPECT_EQ(0u, y.GetLength());
     EXPECT_EQ(4u, z.GetSize());
+    EXPECT_EQ(4u, z.GetLength());
     EXPECT_STREQ("ABCD", z.GetString());
 }
 
@@ -153,13 +174,14 @@ TEST(StringBuffer, MoveAssignment) {
     x.Put('D');
 
     EXPECT_EQ(4u, x.GetSize());
+    EXPECT_EQ(4u, x.GetLength());
     EXPECT_STREQ("ABCD", x.GetString());
 
     StringBuffer y;
     // y = x; // does not compile (!is_copy_assignable)
     y = std::move(x);
     EXPECT_EQ(0u, x.GetSize());
-    EXPECT_EQ(4u, y.GetSize());
+    EXPECT_EQ(4u, y.GetLength());
     EXPECT_STREQ("ABCD", y.GetString());
 }
 

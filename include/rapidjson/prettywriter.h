@@ -22,6 +22,11 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
 #endif
 
+#if defined(__clang__)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(c++98-compat)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 //! Combination of PrettyWriter format flags.
@@ -56,6 +61,11 @@ public:
 
     explicit PrettyWriter(StackAllocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
         Base(allocator, levelDepth), indentChar_(' '), indentCharCount_(4) {}
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+    PrettyWriter(PrettyWriter&& rhs) :
+        Base(std::forward<PrettyWriter>(rhs)), indentChar_(rhs.indentChar_), indentCharCount_(rhs.indentCharCount_), formatOptions_(rhs.formatOptions_) {}
+#endif
 
     //! Set custom indentation.
     /*! \param indentChar       Character for indentation. Must be whitespace character (' ', '\\t', '\\n', '\\r').
@@ -253,6 +263,10 @@ private:
 };
 
 RAPIDJSON_NAMESPACE_END
+
+#if defined(__clang__)
+RAPIDJSON_DIAG_POP
+#endif
 
 #ifdef __GNUC__
 RAPIDJSON_DIAG_POP

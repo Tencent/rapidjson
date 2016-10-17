@@ -575,7 +575,7 @@ private:
                     }
                 }
                 else if (RAPIDJSON_LIKELY(Consume(is, '/')))
-                    while (is.Peek() != '\0' && is.Take() != '\n');
+                    while (is.Peek() != '\0' && is.Take() != '\n') {}
                 else
                     RAPIDJSON_PARSE_ERROR(kParseErrorUnspecificSyntaxError, is.Tell());
 

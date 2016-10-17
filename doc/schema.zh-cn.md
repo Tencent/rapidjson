@@ -157,7 +157,7 @@ JSON Schema 支持 [`$ref` 关键字](http://spacetelescope.github.io/understand
 ~~~
 class MyRemoteSchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
 public:
-    virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeTyp length) {
+    virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
         // Resolve the uri and returns a pointer to that schema.
     }
 };
@@ -185,7 +185,7 @@ RapidJSON 实现了一个简单的 NFA 正则表达式引擎，并预设使用�
 |语法|描述|
 |------|-----------|
 |`ab`    | 串联 |
-|`a|b`   | 交替 |
+|<code>a&#124;b</code>   | 交替 |
 |`a?`    | 零或一次 |
 |`a*`    | 零或多次 |
 |`a+`    | 一或多次 |
@@ -202,7 +202,7 @@ RapidJSON 实现了一个简单的 NFA 正则表达式引擎，并预设使用�
 |`[^abc]` | 字符组取反 |
 |`[^a-c]` | 字符组范围取反 |
 |`[\b]`   | 退格符 (U+0008) |
-|`\|`, `\\`, ...  | 转义字符 |
+|<code>\\&#124;</code>, `\\`, ...  | 转义字符 |
 |`\f` | 馈页 (U+000C) |
 |`\n` | 馈行 (U+000A) |
 |`\r` | 回车 (U+000D) |
