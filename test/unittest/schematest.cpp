@@ -1308,6 +1308,14 @@ TEST(SchemaValidator, Issue608) {
     INVALIDATE(s, "{\"a\" : null, \"a\" : null}", "", "required", "");
 }
 
+// Fail to resolve $ref in allOf causes crash in SchemaValidator::StartObject()
+TEST(SchemaValidator, Issue728_AllOfRef) {
+    Document sd;
+    sd.Parse("{\"allOf\": [{\"$ref\": \"#/abc\"}]}");
+    SchemaDocument s(sd);
+    VALIDATE(s, "{\"key1\": \"abc\", \"key2\": \"def\"}", true);
+}
+
 #ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif

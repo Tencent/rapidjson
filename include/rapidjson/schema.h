@@ -1366,6 +1366,9 @@ public:
                     new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(refEntry->source, const_cast<SchemaType*>(s), false, allocator_);
                 }
             }
+            else if (refEntry->schema)
+                *refEntry->schema = SchemaType::GetTypeless();
+            
             refEntry->~SchemaRefEntry();
         }
 
