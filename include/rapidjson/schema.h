@@ -1623,6 +1623,10 @@ public:
     //! Destructor.
     ~GenericSchemaValidator() {
         Reset();
+        if (nullHandler_) {
+            nullHandler_->~OutputHandler();
+            StateAllocator::Free(nullHandler_);
+        }
         RAPIDJSON_DELETE(ownStateAllocator_);
     }
 
