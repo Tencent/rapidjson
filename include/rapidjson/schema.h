@@ -1339,6 +1339,7 @@ public:
         allocator_(allocator),
         ownAllocator_(),
         root_(),
+        typeless_(),
         schemaMap_(allocator, kInitialSchemaMapSize),
         schemaRef_(allocator, kInitialSchemaRefSize)
     {
@@ -1398,8 +1399,10 @@ public:
         while (!schemaMap_.Empty())
             schemaMap_.template Pop<SchemaEntry>(1)->~SchemaEntry();
 
-        typeless_->~SchemaType();
-        Allocator::Free(typeless_);
+        if (typeless_) {
+            typeless_->~SchemaType();
+            Allocator::Free(typeless_);
+        }
 
         RAPIDJSON_DELETE(ownAllocator_);
     }
