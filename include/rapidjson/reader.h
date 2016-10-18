@@ -299,16 +299,9 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
 
     for (;; p += 16) {
         const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
-        const int r = _mm_cvtsi128_si32(_mm_cmpistrm(w, s, _SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_BIT_MASK | _SIDD_NEGATIVE_POLARITY));
-        if (r != 0) {   // some of characters is non-whitespace
-#ifdef _MSC_VER         // Find the index of first non-whitespace
-            unsigned long offset;
-            _BitScanForward(&offset, r);
-            return p + offset;
-#else
-            return p + __builtin_ffs(r) - 1;
-#endif
-        }
+        const int r = _mm_cmpistri(w, s, _SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT | _SIDD_NEGATIVE_POLARITY);
+        if (r != 16)    // some of characters is non-whitespace
+            return p + r;
     }
 }
 
@@ -325,16 +318,9 @@ inline const char *SkipWhitespace_SIMD(const char* p, const char* end) {
 
     for (; p <= end - 16; p += 16) {
         const __m128i s = _mm_loadu_si128(reinterpret_cast<const __m128i *>(p));
-        const int r = _mm_cvtsi128_si32(_mm_cmpistrm(w, s, _SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_BIT_MASK | _SIDD_NEGATIVE_POLARITY));
-        if (r != 0) {   // some of characters is non-whitespace
-#ifdef _MSC_VER         // Find the index of first non-whitespace
-            unsigned long offset;
-            _BitScanForward(&offset, r);
-            return p + offset;
-#else
-            return p + __builtin_ffs(r) - 1;
-#endif
-        }
+        const int r = _mm_cmpistri(w, s, _SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT | _SIDD_NEGATIVE_POLARITY);
+        if (r != 16)    // some of characters is non-whitespace
+            return p + r;
     }
 
     return SkipWhitespace(p, end);
