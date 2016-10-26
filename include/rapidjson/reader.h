@@ -1061,7 +1061,6 @@ private:
         typedef typename InputStream::Ch Ch;
 
         NumberStream(GenericReader& reader, InputStream& s) : is(s) { (void)reader;  }
-        ~NumberStream() {}
 
         RAPIDJSON_FORCEINLINE Ch Peek() const { return is.Peek(); }
         RAPIDJSON_FORCEINLINE Ch TakePush() { return is.Take(); }
@@ -1083,7 +1082,6 @@ private:
         typedef NumberStream<InputStream, false, false> Base;
     public:
         NumberStream(GenericReader& reader, InputStream& is) : Base(reader, is), stackStream(reader.stack_) {}
-        ~NumberStream() {}
 
         RAPIDJSON_FORCEINLINE Ch TakePush() {
             stackStream.Put(static_cast<char>(Base::is.Peek()));
@@ -1110,7 +1108,6 @@ private:
         typedef NumberStream<InputStream, true, false> Base;
     public:
         NumberStream(GenericReader& reader, InputStream& is) : Base(reader, is) {}
-        ~NumberStream() {}
 
         RAPIDJSON_FORCEINLINE Ch Take() { return Base::TakePush(); }
     };
