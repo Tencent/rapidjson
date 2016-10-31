@@ -2419,11 +2419,28 @@ inline
 GenericValue<Encoding,Allocator>::GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator)
 {
     switch (rhs.GetType()) {
-    case kObjectType:
-    case kArrayType: { // perform deep copy via SAX Handler
-            GenericDocument<Encoding,Allocator> d(&allocator);
-            rhs.Accept(d);
-            RawAssign(*d.stack_.template Pop<GenericValue>(1));
+    case kObjectType: {
+            SizeType count = rhs.data_.o.size;
+            Member* lm = reinterpret_cast<Member*>(allocator.Malloc(count * sizeof(Member)));
+            const typename GenericValue<Encoding,SourceAllocator>::Member* rm = rhs.GetMembersPointer();
+            for (SizeType i = 0; i < count; i++) {
+                new (&lm[i].name) GenericValue(rm[i].name, allocator);
+                new (&lm[i].value) GenericValue(rm[i].value, allocator);
+            }
+            data_.f.flags = kObjectFlag;
+            data_.o.size = data_.o.capacity = count;
+            SetMembersPointer(lm);
+        }
+        break;
+    case kArrayType: {
+            SizeType count = rhs.data_.a.size;
+            GenericValue* le = reinterpret_cast<GenericValue*>(allocator.Malloc(count * sizeof(GenericValue)));
+            const GenericValue<Encoding,SourceAllocator>* re = rhs.GetElementsPointer();
+            for (SizeType i = 0; i < count; i++)
+                new (&le[i]) GenericValue(re[i], allocator);
+            data_.f.flags = kArrayFlag;
+            data_.a.size = data_.a.capacity = count;
+            SetElementsPointer(le);
         }
         break;
     case kStringType:
