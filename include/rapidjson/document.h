@@ -617,8 +617,47 @@ public:
         \param allocator Allocator for allocating copied elements and buffers. Commonly use GenericDocument::GetAllocator().
         \see CopyFrom()
     */
-    template< typename SourceAllocator >
-    GenericValue(const GenericValue<Encoding, SourceAllocator>& rhs, Allocator & allocator);
+    template <typename SourceAllocator>
+    GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator) {
+        switch (rhs.GetType()) {
+        case kObjectType: {
+                SizeType count = rhs.data_.o.size;
+                Member* lm = reinterpret_cast<Member*>(allocator.Malloc(count * sizeof(Member)));
+                const typename GenericValue<Encoding,SourceAllocator>::Member* rm = rhs.GetMembersPointer();
+                for (SizeType i = 0; i < count; i++) {
+                    new (&lm[i].name) GenericValue(rm[i].name, allocator);
+                    new (&lm[i].value) GenericValue(rm[i].value, allocator);
+                }
+                data_.f.flags = kObjectFlag;
+                data_.o.size = data_.o.capacity = count;
+                SetMembersPointer(lm);
+            }
+            break;
+        case kArrayType: {
+                SizeType count = rhs.data_.a.size;
+                GenericValue* le = reinterpret_cast<GenericValue*>(allocator.Malloc(count * sizeof(GenericValue)));
+                const GenericValue<Encoding,SourceAllocator>* re = rhs.GetElementsPointer();
+                for (SizeType i = 0; i < count; i++)
+                    new (&le[i]) GenericValue(re[i], allocator);
+                data_.f.flags = kArrayFlag;
+                data_.a.size = data_.a.capacity = count;
+                SetElementsPointer(le);
+            }
+            break;
+        case kStringType:
+            if (rhs.data_.f.flags == kConstStringFlag) {
+                data_.f.flags = rhs.data_.f.flags;
+                data_  = *reinterpret_cast<const Data*>(&rhs.data_);
+            }
+            else
+                SetStringRaw(StringRef(rhs.GetString(), rhs.GetStringLength()), allocator);
+            break;
+        default:
+            data_.f.flags = rhs.data_.f.flags;
+            data_  = *reinterpret_cast<const Data*>(&rhs.data_);
+            break;
+        }
+    }
 
     //! Constructor for boolean value.
     /*! \param b Boolean value
@@ -2411,35 +2450,6 @@ private:
 
 //! GenericDocument with UTF8 encoding
 typedef GenericDocument<UTF8<> > Document;
-
-// defined here due to the dependency on GenericDocument
-template <typename Encoding, typename Allocator>
-template <typename SourceAllocator>
-inline
-GenericValue<Encoding,Allocator>::GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator)
-{
-    switch (rhs.GetType()) {
-    case kObjectType:
-    case kArrayType: { // perform deep copy via SAX Handler
-            GenericDocument<Encoding,Allocator> d(&allocator);
-            rhs.Accept(d);
-            RawAssign(*d.stack_.template Pop<GenericValue>(1));
-        }
-        break;
-    case kStringType:
-        if (rhs.data_.f.flags == kConstStringFlag) {
-            data_.f.flags = rhs.data_.f.flags;
-            data_  = *reinterpret_cast<const Data*>(&rhs.data_);
-        } else {
-            SetStringRaw(StringRef(rhs.GetString(), rhs.GetStringLength()), allocator);
-        }
-        break;
-    default:
-        data_.f.flags = rhs.data_.f.flags;
-        data_  = *reinterpret_cast<const Data*>(&rhs.data_);
-        break;
-    }
-}
 
 //! Helper class for accessing Value of array type.
 /*!
