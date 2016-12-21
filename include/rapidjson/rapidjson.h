@@ -583,7 +583,7 @@ RAPIDJSON_NAMESPACE_END
 
 #ifndef RAPIDJSON_NEW
 ///! customization point for global \c new
-#define RAPIDJSON_NEW(x) new x
+#define RAPIDJSON_NEW(type, ...) new type(__VA_ARGS__)
 #endif
 #ifndef RAPIDJSON_DELETE
 ///! customization point for global \c delete

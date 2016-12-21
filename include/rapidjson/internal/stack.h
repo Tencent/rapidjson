@@ -183,7 +183,7 @@ private:
         size_t newCapacity;
         if (stack_ == 0) {
             if (!allocator_)
-                ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
+                ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator);
             newCapacity = initialCapacity_;
         } else {
             newCapacity = GetCapacity();
