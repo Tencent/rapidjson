@@ -14,7 +14,7 @@ var rapidjson_8h =
     [ "RAPIDJSON_MAJOR_VERSION", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaf1ff1685be6cbebb5d4b2ab997776f45", null ],
     [ "RAPIDJSON_MINOR_VERSION", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaf9125105c593a636a79f1c2d96835376", null ],
     [ "RAPIDJSON_NAMESPACE", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga743a79d3af927391fe3eb5c979136899", null ],
-    [ "RAPIDJSON_NEW", "rapidjson_8h.html#ab9e102fa2f1a0ae4914d4dac21f690a2", null ],
+    [ "RAPIDJSON_NEW", "rapidjson_8h.html#abdc7cd7902748ffe6626d71c59a73c3b", null ],
     [ "RAPIDJSON_NO_INT64DEFINE", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga7f4e50c35dae3b015390daa6d48ce23c", null ],
     [ "RAPIDJSON_NO_SIZETYPEDEFINE", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga250603aa9e2a12429b25ba0c8108ad4f", null ],
     [ "RAPIDJSON_PATCH_VERSION", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaf967d31be43666ce7f53756d73bd1cdf", null ],
