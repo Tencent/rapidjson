@@ -934,11 +934,13 @@ private:
     #else
                 length = static_cast<SizeType>(__builtin_ffs(r) - 1);
     #endif
-                char* q = reinterpret_cast<char*>(os.Push(length));
-                for (size_t i = 0; i < length; i++)
-                    q[i] = p[i];
+                if (length != 0) {
+                    char* q = reinterpret_cast<char*>(os.Push(length));
+                    for (size_t i = 0; i < length; i++)
+                        q[i] = p[i];
 
-                p += length;
+                    p += length;
+                }
                 break;
             }
             _mm_storeu_si128(reinterpret_cast<__m128i *>(os.Push(16)), s);
