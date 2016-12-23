@@ -1344,7 +1344,7 @@ public:
         schemaRef_(allocator, kInitialSchemaRefSize)
     {
         if (!allocator_)
-            ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
+            ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
 
         typeless_ = static_cast<SchemaType*>(allocator_->Malloc(sizeof(SchemaType)));
         new (typeless_) SchemaType(this, PointerType(), ValueType(kObjectType).Move(), ValueType(kObjectType).Move(), 0);
@@ -1823,7 +1823,7 @@ private:
 
     StateAllocator& GetStateAllocator() {
         if (!stateAllocator_)
-            stateAllocator_ = ownStateAllocator_ = RAPIDJSON_NEW(StateAllocator());
+            stateAllocator_ = ownStateAllocator_ = RAPIDJSON_NEW(StateAllocator)();
         return *stateAllocator_;
     }
 
