@@ -199,23 +199,23 @@ void SkipWhitespace(InputStream& s) {
 
 需要注意的是，这是编译期的设置。在不支持这些指令的机器上运行可执行文件会使它崩溃。
 
-### Page boundary issue
+### 页面对齐问题
 
-In an early version of RapidJSON, [an issue](https://code.google.com/archive/p/rapidjson/issues/104) reported that the `SkipWhitespace_SIMD()` causes crash very rarely (around 1 in 500,000). After investigation, it is suspected that `_mm_loadu_si128()` accessed bytes after `'\0'`, and across a protected page boundary.
+在 RapidJSON 的早期版本中，被报告了[一个问题](https://code.google.com/archive/p/rapidjson/issues/104)：`SkipWhitespace_SIMD()` 会罕见地导致崩溃（约五十万分之一的几率）。在调查之后，怀疑是 `_mm_loadu_si128()` 访问了 `'\0'` 之后的内存，并越过被保护的页面边界。
 
-In [Intel® 64 and IA-32 Architectures Optimization Reference Manual
-](http://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-optimization-manual.html), section 10.2.1:
+在 [Intel® 64 and IA-32 Architectures Optimization Reference Manual
+](http://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-optimization-manual.html) 中，章节 10.2.1：
 
-> To support algorithms requiring unaligned 128-bit SIMD memory accesses, memory buffer allocation by a caller function should consider adding some pad space so that a callee function can safely use the address pointer safely with unaligned 128-bit SIMD memory operations.
-> The minimal padding size should be the width of the SIMD register that might be used in conjunction with unaligned SIMD memory access.
+> 为了支持需要费对齐的128位 SIMD 内存访问的算法，调用者的内存缓冲区申请应当考虑添加一些填充空间，这样被调用的函数可以安全地将地址指针用于未对齐的128位 SIMD 内存操作。
+> 在结合非对齐的 SIMD 内存操作中，最小的对齐大小应该等于 SIMD 寄存器的大小。
 
-This is not feasible as RapidJSON should not enforce such requirement.
+对于 RapidJSON 来说，这显然是不可行的，因为 RapidJSON 不应当强迫用户进行内存对齐。
 
-To fix this issue, currently the routine process bytes up to the next aligned address. After tha, use aligned read to perform SIMD processing. Also see [#85](https://github.com/miloyip/rapidjson/issues/85).
+为了修复这个问题，当前的代码会先按字节处理直到下一个对齐的地址。在这之后，使用对齐读取来进行 SIMD 处理。见 [#85](https://github.com/miloyip/rapidjson/issues/85)。
 
-## Local Stream Copy {#LocalStreamCopy}
+## 局部流拷贝 {#LocalStreamCopy}
 
-During optimization, it is found that some compilers cannot localize some member data access of streams into local variables or registers. Experimental results show that for some stream types, making a copy of the stream and used it in inner-loop can improve performance. For example, the actual (non-SIMD) implementation of `SkipWhitespace()` is implemented as:
+在优化的过程中，我们发现一些编译器不能将访问流的一些成员数据放入局部变量或者寄存器中。测试结果显示，对于一些流类型，创建流的拷贝并将其用于内层循环中可以改善性能。例如，实际（非 SIMD）的 `SkipWhitespace()` 被实现为：
 
 ~~~cpp
 template<typename InputStream>
@@ -228,48 +228,47 @@ void SkipWhitespace(InputStream& is) {
 }
 ~~~
 
-Depending on the traits of stream, `StreamLocalCopy` will make (or not make) a copy of the stream object, use it locally and copy the states of stream back to the original stream.
+基于流的特征，`StreamLocalCopy` 会创建（或不创建）流对象的拷贝，在局部使用它并将流的状态拷贝回原来的流。
 
-## Parsing to Double {#ParsingDouble}
+## 解析为双精度浮点数 {#ParsingDouble}
 
-Parsing string into `double` is difficult. The standard library function `strtod()` can do the job but it is slow. By default, the parsers use normal precision setting. This has has maximum 3 [ULP](http://en.wikipedia.org/wiki/Unit_in_the_last_place) error and implemented in `internal::StrtodNormalPrecision()`.
+将字符串解析为 `double` 并不简单。标准库函数 `strtod()` 可以胜任这项工作，但它比较缓慢。默认情况下，解析器使用默认的精度设置。这最多有 3[ULP](http://en.wikipedia.org/wiki/Unit_in_the_last_place) 的误差，并实现在 `internal::StrtodNormalPrecision()` 中。
 
-When using `kParseFullPrecisionFlag`, the parsers calls `internal::StrtodFullPrecision()` instead, and this function actually implemented 3 versions of conversion methods.
-1. [Fast-Path](http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/).
-2. Custom DIY-FP implementation as in [double-conversion](https://github.com/floitsch/double-conversion).
-3. Big Integer Method as in (Clinger, William D. How to read floating point numbers accurately. Vol. 25. No. 6. ACM, 1990).
+当使用 `kParseFullPrecisionFlag` 时，编译器会改为调用 `internal::StrtodFullPrecision()` ，这个函数会自动调用三个版本的转换。
+1. [Fast-Path](http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/)。
+2. [double-conversion](https://github.com/floitsch/double-conversion) 中的自定义 DIY-FP 实现。
+3. （Clinger, William D. How to read floating point numbers accurately. Vol. 25. No. 6. ACM, 1990） 中的大整数算法。
 
-If the first conversion methods fail, it will try the second, and so on.
+如果第一个转换方法失败，则尝试使用第二种方法，以此类推。
 
-# Generation Optimization {#GenerationOptimization}
+# 生成优化 {#GenerationOptimization}
 
-## Integer-to-String conversion {#itoa}
+## 整数到字符串的转换 {#itoa}
 
-The naive algorithm for integer-to-string conversion involves division per each decimal digit. We have implemented various implementations and evaluated them in [itoa-benchmark](https://github.com/miloyip/itoa-benchmark).
+整数到字符串转换的朴素算法需要对每一个十进制位进行一次处罚。我们实现了若干版本并在 [itoa-benchmark](https://github.com/miloyip/itoa-benchmark) 中对它们进行了评估。
 
-Although SSE2 version is the fastest but the difference is minor by comparing to the first running-up `branchlut`. And `branchlut` is pure C++ implementation so we adopt `branchlut` in RapidJSON.
+虽然 SSE2 版本是最快的，但它和第二快的 `branchlut` 差距不大。而且 `branchlut` 是纯C++实现，所以我们在 RapidJSON 中使用了 `branchlut`。
 
-## Double-to-String conversion {#dtoa}
+## 双精度浮点数到字符串的转换 {#dtoa}
 
-Originally RapidJSON uses `snprintf(..., ..., "%g")`  to achieve double-to-string conversion. This is not accurate as the default precision is 6. Later we also find that this is slow and there is an alternative.
+原来 RapidJSON 使用 `snprintf(..., ..., "%g")` 来进行双精度浮点数到字符串的转换。这是不准确的，因为默认的精度是6。随后我们发现它很缓慢，而且有其它的替代品。
 
-Google's V8 [double-conversion](https://github.com/floitsch/double-conversion
-) implemented a newer, fast algorithm called Grisu3 (Loitsch, Florian. "Printing floating-point numbers quickly and accurately with integers." ACM Sigplan Notices 45.6 (2010): 233-243.).
+Google 的 V8 [double-conversion](https://github.com/floitsch/double-conversion
+) 实现了更新的、快速的被称为 Grisu3 的算法（Loitsch, Florian. "Printing floating-point numbers quickly and accurately with integers." ACM Sigplan Notices 45.6 (2010): 233-243.）。
 
-However, since it is not header-only so that we implemented a header-only version of Grisu2. This algorithm guarantees that the result is always accurate. And in most of cases it produces the shortest (optimal) string representation.
+然而，这个实现不是仅头文件的，所以我们实现了一个仅头文件的 Grisu2 版本。这个算法保证了结果永远精确。而且在大多数情况下，它会生成最短的（可选）字符串表示。
 
-The header-only conversion function has been evaluated in [dtoa-benchmark](https://github.com/miloyip/dtoa-benchmark).
+这个仅头文件的转换函数在 [dtoa-benchmark](https://github.com/miloyip/dtoa-benchmark) 中进行评估。
 
-# Parser {#Parser}
+# 解析器 {#Parser}
 
-## Iterative Parser {#IterativeParser}
+## 迭代解析 {#IterativeParser}
 
-The iterative parser is a recursive descent LL(1) parser
-implemented in a non-recursive manner.
+迭代解析器是一个以非递归方式实现的递归下降的 LL(1) 解析器。
 
-### Grammar {#IterativeParserGrammar}
+### 语法 {#IterativeParserGrammar}
 
-The grammar used for this parser is based on strict JSON syntax:
+解析器使用的语法是基于严格 JSON 语法的：
 ~~~~~~~~~~
 S -> array | object
 array -> [ values ]
@@ -284,14 +283,13 @@ member -> STRING : value
 value -> STRING | NUMBER | NULL | BOOLEAN | object | array
 ~~~~~~~~~~
 
-Note that left factoring is applied to non-terminals `values` and `members`
-to make the grammar be LL(1).
+注意到左因子被加入了非终结符的 `values` 和 `members` 来保证语法是 LL(1) 的。
 
-### Parsing Table {#IterativeParserParsingTable}
+### 解析表 {#IterativeParserParsingTable}
 
-Based on the grammar, we can construct the FIRST and FOLLOW set.
+基于这份语法，我们可以构造 FIRST 和 FOLLOW 集合。
 
-The FIRST set of non-terminals is listed below:
+非终结符的 FIRST 集合如下所示：
 
 |    NON-TERMINAL   |               FIRST              |
 |:-----------------:|:--------------------------------:|
@@ -307,7 +305,7 @@ The FIRST set of non-terminals is listed below:
 | non-empty-members |              STRING              |
 |  non-empty-values |  STRING NUMBER NULL BOOLEAN { [  |
 
-The FOLLOW set is listed below:
+FOLLOW 集合如下所示：
 
 |    NON-TERMINAL   |  FOLLOW |
 |:-----------------:|:-------:|
@@ -323,7 +321,7 @@ The FOLLOW set is listed below:
 |       member      |   , }   |
 |       value       |  , } ]  |
 
-Finally the parsing table can be constructed from FIRST and FOLLOW set:
+最终可以从 FIRST 和 FOLLOW 集合生成解析表：
 
 |    NON-TERMINAL   |           [           |           {           |          ,          | : | ] | } |          STRING         |         NUMBER        |          NULL         |        BOOLEAN        |
 |:-----------------:|:---------------------:|:---------------------:|:-------------------:|:-:|:-:|:-:|:-----------------------:|:---------------------:|:---------------------:|:---------------------:|
@@ -339,27 +337,24 @@ Finally the parsing table can be constructed from FIRST and FOLLOW set:
 |       member      |                       |                       |                     |   |   |   |      STRING : value     |                       |                       |                       |
 |       value       |         array         |         object        |                     |   |   |   |          STRING         |         NUMBER        |          NULL         |        BOOLEAN        |
 
-There is a great [tool](http://hackingoff.com/compilers/predict-first-follow-set) for above grammar analysis.
+对于上面的语法分析，这里有一个很棒的[工具](http://hackingoff.com/compilers/predict-first-follow-set)。
 
-### Implementation {#IterativeParserImplementation}
+### 实现 {#IterativeParserImplementation}
 
-Based on the parsing table, a direct(or conventional) implementation
-that pushes the production body in reverse order
-while generating a production could work.
+基于这份解析表，一个直接的（常规的）将规则反向入栈的实现可以正常工作。
 
-In RapidJSON, several modifications(or adaptations to current design) are made to a direct implementation.
+在 RapidJSON 中，对直接的实现进行了一些修改：
 
-First, the parsing table is encoded in a state machine in RapidJSON.
-States are constructed by the head and body of production.
-State transitions are constructed by production rules.
-Besides, extra states are added for productions involved with `array` and `object`.
-In this way the generation of array values or object members would be a single state transition,
-rather than several pop/push operations in the direct implementation.
-This also makes the estimation of stack size more easier.
+首先，在 RapidJSON 中，这份解析表被编码为状态机。
+规则由头部和主体组成。
+状态转换由规则构造。
+除此之外，额外的状态被添加到与 `array` 和 `object` 有关的规则。
+通过这种方式，生成数组值或对象成员可以只用一次状态转移便可完成，
+而不需要在直接的实现中的多次出栈/入栈操作。
+这也使得估计栈的大小更加容易。
 
-The state diagram is shown as follows:
+状态图如如下所示：
 
-![State Diagram](diagram/iterative-parser-states-diagram.png)
+![状态图](diagram/iterative-parser-states-diagram.png)
 
-Second, the iterative parser also keeps track of array's value count and object's member count
-in its internal stack, which may be different from a conventional implementation.
+第二，迭代解析器也在内部栈保存了数组的值个数和对象成员的数量，这也与传统的实现不同。
