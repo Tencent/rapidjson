@@ -71,9 +71,9 @@ var NAVTREE =
     ] ],
     [ "DOM", "md_doc_dom_8zh-cn.html", [
       [ "模板", "md_doc_dom_8zh-cn.html#Template", [
-        [ "编码", "md_doc_dom_8zh-cn.html#Encoding", null ]
+        [ "编码", "md_doc_dom_8zh-cn.html#Encoding", null ],
+        [ "分配器", "md_doc_dom_8zh-cn.html#Allocator", null ]
       ] ],
-      [ "Allocator", "md_doc_dom_8zh-cn.html#InternalAllocator", null ],
       [ "解析", "md_doc_dom_8zh-cn.html#Parsing", [
         [ "解析错误", "md_doc_dom_8zh-cn.html#ParseError", null ],
         [ "原位解析", "md_doc_dom_8zh-cn.html#InSituParsing", null ],
@@ -97,30 +97,30 @@ var NAVTREE =
     ] ],
     [ "Schema", "md_doc_schema_8zh-cn.html", null ],
     [ "性能", "md_doc_performance_8zh-cn.html", null ],
-    [ "Internals", "md_doc_internals.html", [
-      [ "Architecture", "md_doc_internals.html#Architecture", null ],
-      [ "Value", "md_doc_internals.html#Value", [
-        [ "Data Layout", "md_doc_internals.html#DataLayout", null ],
-        [ "Flags", "md_doc_internals.html#Flags", null ],
-        [ "Short-String Optimization", "md_doc_internals.html#ShortString", null ]
+    [ "内部架构", "md_doc_internals_8zh-cn.html", [
+      [ "架构", "md_doc_internals_8zh-cn.html#Architecture", null ],
+      [ "值（Value）", "md_doc_internals_8zh-cn.html#Value", [
+        [ "数据布局", "md_doc_internals_8zh-cn.html#DataLayout", null ],
+        [ "标志", "md_doc_internals_8zh-cn.html#Flags", null ],
+        [ "短字符串优化", "md_doc_internals_8zh-cn.html#ShortString", null ]
       ] ],
-      [ "Allocator", "md_doc_internals.html#InternalAllocator", [
-        [ "MemoryPoolAllocator", "md_doc_internals.html#MemoryPoolAllocator", null ]
+      [ "分配器（Allocator）", "md_doc_internals_8zh-cn.html#InternalAllocator", [
+        [ "MemoryPoolAllocator", "md_doc_internals_8zh-cn.html#MemoryPoolAllocator", null ]
       ] ],
-      [ "Parsing Optimization", "md_doc_internals.html#ParsingOptimization", [
-        [ "Skip Whitespaces with SIMD", "md_doc_internals.html#SkipwhitespaceWithSIMD", null ],
-        [ "Local Stream Copy", "md_doc_internals.html#LocalStreamCopy", null ],
-        [ "Parsing to Double", "md_doc_internals.html#ParsingDouble", null ]
+      [ "解析优化", "md_doc_internals_8zh-cn.html#ParsingOptimization", [
+        [ "使用 SIMD 跳过空格", "md_doc_internals_8zh-cn.html#SkipwhitespaceWithSIMD", null ],
+        [ "局部流拷贝", "md_doc_internals_8zh-cn.html#LocalStreamCopy", null ],
+        [ "解析为双精度浮点数", "md_doc_internals_8zh-cn.html#ParsingDouble", null ]
       ] ],
-      [ "Generation Optimization", "md_doc_internals.html#GenerationOptimization", [
-        [ "Integer-to-String conversion", "md_doc_internals.html#itoa", null ],
-        [ "Double-to-String conversion", "md_doc_internals.html#dtoa", null ]
+      [ "生成优化", "md_doc_internals_8zh-cn.html#GenerationOptimization", [
+        [ "整数到字符串的转换", "md_doc_internals_8zh-cn.html#itoa", null ],
+        [ "双精度浮点数到字符串的转换", "md_doc_internals_8zh-cn.html#dtoa", null ]
       ] ],
-      [ "Parser", "md_doc_internals.html#Parser", [
-        [ "Iterative Parser", "md_doc_internals.html#IterativeParser", [
-          [ "Grammar", "md_doc_internals.html#IterativeParserGrammar", null ],
-          [ "Parsing Table", "md_doc_internals.html#IterativeParserParsingTable", null ],
-          [ "Implementation", "md_doc_internals.html#IterativeParserImplementation", null ]
+      [ "解析器", "md_doc_internals_8zh-cn.html#Parser", [
+        [ "迭代解析", "md_doc_internals_8zh-cn.html#IterativeParser", [
+          [ "语法", "md_doc_internals_8zh-cn.html#IterativeParserGrammar", null ],
+          [ "解析表", "md_doc_internals_8zh-cn.html#IterativeParserParsingTable", null ],
+          [ "实现", "md_doc_internals_8zh-cn.html#IterativeParserImplementation", null ]
         ] ]
       ] ]
     ] ],

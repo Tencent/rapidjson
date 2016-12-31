@@ -82,9 +82,9 @@ $(document).ready(function(){initNavTree('md_doc_dom_8zh-cn.html','');});
 <div class="contents">
 <div class="toc"><h3>目录</h3>
 <ul><li class="level1"><a href="#Template">模板</a><ul><li class="level2"><a href="#Encoding">编码</a></li>
+<li class="level2"><a href="#Allocator">分配器</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#InternalAllocator">Allocator</a></li>
 <li class="level1"><a href="#Parsing">解析</a><ul><li class="level2"><a href="#ParseError">解析错误</a></li>
 <li class="level2"><a href="#InSituParsing">原位解析</a></li>
 <li class="level2"><a href="#TranscodingAndValidation">转码与校验</a></li>
@@ -138,8 +138,8 @@ $(document).ready(function(){initNavTree('md_doc_dom_8zh-cn.html','');});
 <div class="line"><span class="keyword">const</span> WValue locale(L<span class="stringliteral">&quot;ja&quot;</span>); <span class="comment">// Japanese</span></div>
 <div class="line"></div>
 <div class="line">MessageBoxW(hWnd, d[locale].GetString(), L<span class="stringliteral">&quot;Test&quot;</span>, MB_OK);</div>
-</div><!-- fragment --><h2><a class="anchor" id="InternalAllocator"></a>
-Allocator</h2>
+</div><!-- fragment --><h2><a class="anchor" id="Allocator"></a>
+分配器</h2>
 <p><code>Allocator</code> 定义当 <code>Document</code>/<code>Value</code> 分配或释放内存时使用那个分配类。<code>Document</code> 拥有或引用到一个 <code>Allocator</code> 实例。而为了节省内存，<code>Value</code> 没有这么做。</p>
 <p><code>GenericDocument</code> 的缺省分配器是 <code>MemoryPoolAllocator</code>。此分配器实际上会顺序地分配内存，并且不能逐一释放。当要解析一个 JSON 并生成 DOM，这种分配器是非常合适的。</p>
 <p>RapidJSON 还提供另一个分配器 <code>CrtAllocator</code>，当中 CRT 是 C 运行库（C RunTime library）的缩写。此分配器简单地读用标准的 <code>malloc()</code>/<code>realloc()</code>/<code>free()</code>。当我们需要许多增减操作，这种分配器会更为适合。然而这种分配器远远比 <code>MemoryPoolAllocator</code> 低效。</p>
