@@ -74,7 +74,7 @@ static void Verify(void(*f)(T, char*), char* (*g)(T, char*)) {
     VerifyValue<T>(std::numeric_limits<T>::max(), f, g);
 
     // 2^n - 1, 2^n, 10^n - 1, 10^n until overflow
-    for (uint32_t power = 2; power <= 10; power += 8) {
+    for (int power = 2; power <= 10; power += 8) {
         T i = 1, last;
         do {
             VerifyValue<T>(i - 1, f, g);
@@ -86,7 +86,7 @@ static void Verify(void(*f)(T, char*), char* (*g)(T, char*)) {
             last = i;
             if (i > static_cast<T>(std::numeric_limits<T>::max() / static_cast<T>(power)))
                 break;
-            i *= power;
+            i *= static_cast<T>(power);
         } while (last < i);
     }
 }

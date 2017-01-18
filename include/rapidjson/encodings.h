@@ -157,7 +157,7 @@ struct UTF8 {
         if (type >= 32) {
             *codepoint = 0;
         } else {
-            *codepoint = (0xFF >> type) & static_cast<unsigned char>(c);
+            *codepoint = (0xFFu >> type) & static_cast<unsigned char>(c);
         }
         bool result = true;
         switch (type) {
@@ -283,7 +283,7 @@ struct UTF16 {
             RAPIDJSON_ASSERT(codepoint <= 0x10FFFF);
             unsigned v = codepoint - 0x10000;
             os.Put(static_cast<typename OutputStream::Ch>((v >> 10) | 0xD800));
-            os.Put((v & 0x3FF) | 0xDC00);
+            os.Put(static_cast<typename OutputStream::Ch>((v & 0x3FF) | 0xDC00));
         }
     }
 
@@ -299,7 +299,7 @@ struct UTF16 {
             RAPIDJSON_ASSERT(codepoint <= 0x10FFFF);
             unsigned v = codepoint - 0x10000;
             PutUnsafe(os, static_cast<typename OutputStream::Ch>((v >> 10) | 0xD800));
-            PutUnsafe(os, (v & 0x3FF) | 0xDC00);
+            PutUnsafe(os, static_cast<typename OutputStream::Ch>((v & 0x3FF) | 0xDC00));
         }
     }
 

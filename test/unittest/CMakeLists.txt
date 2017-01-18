@@ -36,10 +36,9 @@ if(CCACHE_FOUND)
 		endif()
 endif(CCACHE_FOUND)
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default -Wfloat-equal")
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default -Wfloat-equal -Wimplicit-fallthrough -Weverything")
+set_property(DIRECTORY PROPERTY COMPILE_OPTIONS ${EXTRA_CXX_FLAGS})
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # If the user is running a newer version of Clang that includes the
     # -Wdouble-promotion, we will ignore that warning.
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 3.7)

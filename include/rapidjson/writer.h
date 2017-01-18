@@ -352,7 +352,7 @@ protected:
         char* end = internal::dtoa(d, buffer, maxDecimalPlaces_);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (char* p = buffer; p != end; ++p)
-            PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
+            PutUnsafe(*os_, static_cast<typename OutputStream::Ch>(*p));
         return true;
     }
 
