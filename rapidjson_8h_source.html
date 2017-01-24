@@ -650,7 +650,7 @@ $(document).ready(function(){initNavTree('rapidjson_8h_source.html','');});
 <div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;<span class="preprocessor">#ifndef RAPIDJSON_HAS_CXX11_RANGE_FOR</span></div>
 <div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;<span class="preprocessor">#if defined(__clang__)</span></div>
 <div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;<span class="preprocessor">#define RAPIDJSON_HAS_CXX11_RANGE_FOR __has_feature(cxx_range_for)</span></div>
-<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;<span class="preprocessor">#elif (defined(RAPIDJSON_GNUC) &amp;&amp; (RAPIDJSON_GNUC &gt;= RAPIDJSON_VERSION_CODE(4,3,0)) &amp;&amp; defined(__GXX_EXPERIMENTAL_CXX0X__)) || \</span></div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;<span class="preprocessor">#elif (defined(RAPIDJSON_GNUC) &amp;&amp; (RAPIDJSON_GNUC &gt;= RAPIDJSON_VERSION_CODE(4,6,0)) &amp;&amp; defined(__GXX_EXPERIMENTAL_CXX0X__)) || \</span></div>
 <div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;<span class="preprocessor">      (defined(_MSC_VER) &amp;&amp; _MSC_VER &gt;= 1700)</span></div>
 <div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;<span class="preprocessor">#define RAPIDJSON_HAS_CXX11_RANGE_FOR 1</span></div>
 <div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;<span class="preprocessor">#else</span></div>
