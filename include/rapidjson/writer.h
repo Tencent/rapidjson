@@ -297,7 +297,7 @@ protected:
         const char* end = internal::i32toa(i, buffer);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (const char* p = buffer; p != end; ++p)
-            PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
+            PutUnsafe(*os_, static_cast<typename OutputStream::Ch>(*p));
         return true;
     }
 
@@ -306,7 +306,7 @@ protected:
         const char* end = internal::u32toa(u, buffer);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (const char* p = buffer; p != end; ++p)
-            PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
+            PutUnsafe(*os_, static_cast<typename OutputStream::Ch>(*p));
         return true;
     }
 
@@ -315,7 +315,7 @@ protected:
         const char* end = internal::i64toa(i64, buffer);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (const char* p = buffer; p != end; ++p)
-            PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
+            PutUnsafe(*os_, static_cast<typename OutputStream::Ch>(*p));
         return true;
     }
 
@@ -324,7 +324,7 @@ protected:
         char* end = internal::u64toa(u64, buffer);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (char* p = buffer; p != end; ++p)
-            PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(*p));
+            PutUnsafe(*os_, static_cast<typename OutputStream::Ch>(*p));
         return true;
     }
 
@@ -357,7 +357,7 @@ protected:
     }
 
     bool WriteString(const Ch* str, SizeType length)  {
-        static const typename TargetEncoding::Ch hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+        static const typename OutputStream::Ch hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
         static const char escape[256] = {
 #define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
             //0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
@@ -413,7 +413,7 @@ protected:
             else if ((sizeof(Ch) == 1 || static_cast<unsigned>(c) < 256) && RAPIDJSON_UNLIKELY(escape[static_cast<unsigned char>(c)]))  {
                 is.Take();
                 PutUnsafe(*os_, '\\');
-                PutUnsafe(*os_, static_cast<typename TargetEncoding::Ch>(escape[static_cast<unsigned char>(c)]));
+                PutUnsafe(*os_, static_cast<typename OutputStream::Ch>(escape[static_cast<unsigned char>(c)]));
                 if (escape[static_cast<unsigned char>(c)] == 'u') {
                     PutUnsafe(*os_, '0');
                     PutUnsafe(*os_, '0');
