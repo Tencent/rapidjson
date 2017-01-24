@@ -1345,7 +1345,7 @@ $(document).ready(function(){initNavTree('schema_8h_source.html','');});
 <div class="line"><a name="l01263"></a><span class="lineno"> 1263</span>&#160;        <span class="keywordtype">char</span> buffer[21];</div>
 <div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160;        <span class="keywordtype">size_t</span> length = <span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>((<span class="keyword">sizeof</span>(<a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>) == 4 ? u32toa(index, buffer) : u64toa(index, buffer)) - buffer);</div>
 <div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160;        <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; length; i++)</div>
-<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;            *documentStack.template Push&lt;Ch&gt;() = buffer[i];</div>
+<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;            *documentStack.template Push&lt;Ch&gt;() = <span class="keyword">static_cast&lt;</span>Ch<span class="keyword">&gt;</span>(buffer[i]);</div>
 <div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;    }</div>
 <div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160;};</div>
 <div class="line"><a name="l01269"></a><span class="lineno"> 1269</span>&#160;</div>

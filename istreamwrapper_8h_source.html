@@ -136,7 +136,7 @@ $(document).ready(function(){initNavTree('istreamwrapper_8h_source.html','');});
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    Ch Peek()<span class="keyword"> const </span>{ </div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keyword">typename</span> StreamType::int_type c = stream_.peek();</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga5dc14176a9e71ace282404b0bcda57a1">RAPIDJSON_LIKELY</a>(c != StreamType::traits_type::eof()) ? <span class="keyword">static_cast&lt;</span>Ch<span class="keyword">&gt;</span>(c) : <span class="charliteral">&#39;\0&#39;</span>;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        <span class="keywordflow">return</span> <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga5dc14176a9e71ace282404b0bcda57a1">RAPIDJSON_LIKELY</a>(c != StreamType::traits_type::eof()) ? <span class="keyword">static_cast&lt;</span>Ch<span class="keyword">&gt;</span>(c) : static_cast&lt;Ch&gt;(<span class="charliteral">&#39;\0&#39;</span>);</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    }</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    Ch Take() { </div>

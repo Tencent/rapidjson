@@ -356,7 +356,7 @@ $(document).ready(function(){initNavTree('pointer_8h_source.html','');});
 <div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;        <span class="keywordflow">else</span> {</div>
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;            <a class="code" href="classrapidjson_1_1_generic_pointer.html#a850f78846c5548565f8395be5f3427b7">Ch</a> name[21];</div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;            <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt;= length; i++)</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;                name[i] = buffer[i];</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;                name[i] = static_cast&lt;Ch&gt;(buffer[i]);</div>
 <div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;            <a class="code" href="structrapidjson_1_1_generic_pointer_1_1_token.html">Token</a> token = { name, length, index };</div>
 <div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;            <span class="keywordflow">return</span> Append(token, allocator);</div>
 <div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;        }</div>
@@ -1111,8 +1111,8 @@ $(document).ready(function(){initNavTree('pointer_8h_source.html','');});
 <div class="line"><a name="l01029"></a><span class="lineno"> 1029</span>&#160;            <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> u = <span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span> <span class="keywordtype">char</span><span class="keyword">&gt;</span>(c);</div>
 <div class="line"><a name="l01030"></a><span class="lineno"> 1030</span>&#160;            <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> hexDigits[16] = { <span class="charliteral">&#39;0&#39;</span>, <span class="charliteral">&#39;1&#39;</span>, <span class="charliteral">&#39;2&#39;</span>, <span class="charliteral">&#39;3&#39;</span>, <span class="charliteral">&#39;4&#39;</span>, <span class="charliteral">&#39;5&#39;</span>, <span class="charliteral">&#39;6&#39;</span>, <span class="charliteral">&#39;7&#39;</span>, <span class="charliteral">&#39;8&#39;</span>, <span class="charliteral">&#39;9&#39;</span>, <span class="charliteral">&#39;A&#39;</span>, <span class="charliteral">&#39;B&#39;</span>, <span class="charliteral">&#39;C&#39;</span>, <span class="charliteral">&#39;D&#39;</span>, <span class="charliteral">&#39;E&#39;</span>, <span class="charliteral">&#39;F&#39;</span> };</div>
 <div class="line"><a name="l01031"></a><span class="lineno"> 1031</span>&#160;            os_.Put(<span class="charliteral">&#39;%&#39;</span>);</div>
-<div class="line"><a name="l01032"></a><span class="lineno"> 1032</span>&#160;            os_.Put(hexDigits[u &gt;&gt; 4]);</div>
-<div class="line"><a name="l01033"></a><span class="lineno"> 1033</span>&#160;            os_.Put(hexDigits[u &amp; 15]);</div>
+<div class="line"><a name="l01032"></a><span class="lineno"> 1032</span>&#160;            os_.Put(static_cast&lt;typename OutputStream::Ch&gt;(hexDigits[u &gt;&gt; 4]));</div>
+<div class="line"><a name="l01033"></a><span class="lineno"> 1033</span>&#160;            os_.Put(static_cast&lt;typename OutputStream::Ch&gt;(hexDigits[u &amp; 15]));</div>
 <div class="line"><a name="l01034"></a><span class="lineno"> 1034</span>&#160;        }</div>
 <div class="line"><a name="l01035"></a><span class="lineno"> 1035</span>&#160;    <span class="keyword">private</span>:</div>
 <div class="line"><a name="l01036"></a><span class="lineno"> 1036</span>&#160;        OutputStream&amp; os_;</div>

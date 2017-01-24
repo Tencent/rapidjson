@@ -770,8 +770,8 @@ $(document).ready(function(){initNavTree('regex_8h_source.html','');});
 <div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;            <span class="keywordtype">bool</span> matched = AddState(l, s.out);</div>
 <div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;            <span class="keywordflow">return</span> AddState(l, s.out1) || matched;</div>
 <div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;        }</div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (!(stateSet_[index &gt;&gt; 5] &amp; (1 &lt;&lt; (index &amp; 31)))) {</div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;            stateSet_[index &gt;&gt; 5] |= (1 &lt;&lt; (index &amp; 31));</div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (!(stateSet_[index &gt;&gt; 5] &amp; (1u &lt;&lt; (index &amp; 31)))) {</div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;            stateSet_[index &gt;&gt; 5] |= (1u &lt;&lt; (index &amp; 31));</div>
 <div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;            *l.template PushUnsafe&lt;SizeType&gt;() = index;</div>
 <div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;        }</div>
 <div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;        <span class="keywordflow">return</span> s.out == kRegexInvalidState; <span class="comment">// by using PushUnsafe() above, we can ensure s is not validated due to reallocation.</span></div>

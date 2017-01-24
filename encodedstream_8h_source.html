@@ -282,7 +282,7 @@ $(document).ready(function(){initNavTree('encodedstream_8h_source.html','');});
 <div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        <span class="comment">// xx xx xx xx  UTF-8</span></div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        <span class="keywordflow">if</span> (!hasBOM_) {</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;            <span class="keywordtype">unsigned</span> pattern = (c[0] ? 1 : 0) | (c[1] ? 2 : 0) | (c[2] ? 4 : 0) | (c[3] ? 8 : 0);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;            <span class="keywordtype">int</span> pattern = (c[0] ? 1 : 0) | (c[1] ? 2 : 0) | (c[2] ? 4 : 0) | (c[3] ? 8 : 0);</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;            <span class="keywordflow">switch</span> (pattern) {</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;            <span class="keywordflow">case</span> 0x08: type_ = <a class="code" href="namespacerapidjson.html#a4aacabc0f8cea1cd628f466d890773ebad6db204b848081468878ed58bc20ce8f">kUTF32BE</a>; <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;            <span class="keywordflow">case</span> 0x0A: type_ = <a class="code" href="namespacerapidjson.html#a4aacabc0f8cea1cd628f466d890773eba52c496755de96eee05275a423b36299d">kUTF16BE</a>; <span class="keywordflow">break</span>;</div>

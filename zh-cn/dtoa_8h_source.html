@@ -123,7 +123,7 @@ $(document).ready(function(){initNavTree('dtoa_8h_source.html','');});
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    }</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;}</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">unsigned</span> CountDecimalDigit32(uint32_t n) {</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> CountDecimalDigit32(uint32_t n) {</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="comment">// Simple pure C++ implementation was faster than __builtin_clz version in this situation.</span></div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keywordflow">if</span> (n &lt; 10) <span class="keywordflow">return</span> 1;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keywordflow">if</span> (n &lt; 100) <span class="keywordflow">return</span> 2;</div>
@@ -145,7 +145,7 @@ $(document).ready(function(){initNavTree('dtoa_8h_source.html','');});
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">const</span> DiyFp wp_w = Mp - W;</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    uint32_t p1 = <span class="keyword">static_cast&lt;</span>uint32_t<span class="keyword">&gt;</span>(Mp.f &gt;&gt; -one.e);</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    uint64_t p2 = Mp.f &amp; (one.f - 1);</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keywordtype">unsigned</span> kappa = CountDecimalDigit32(p1); <span class="comment">// kappa in [0, 9]</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keywordtype">int</span> kappa = CountDecimalDigit32(p1); <span class="comment">// kappa in [0, 9]</span></div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    *len = 0;</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keywordflow">while</span> (kappa &gt; 0) {</div>
@@ -184,8 +184,8 @@ $(document).ready(function(){initNavTree('dtoa_8h_source.html','');});
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        kappa--;</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        <span class="keywordflow">if</span> (p2 &lt; delta) {</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;            *K += kappa;</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;            <span class="keywordtype">int</span> index = -<span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(kappa);</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;            GrisuRound(buffer, *len, delta, p2, one.f, wp_w.f * (index &lt; 9 ? kPow10[-static_cast&lt;int&gt;(kappa)] : 0));</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;            <span class="keywordtype">int</span> index = -kappa;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;            GrisuRound(buffer, *len, delta, p2, one.f, wp_w.f * (index &lt; 9 ? kPow10[index] : 0));</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;            <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;        }</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    }</div>
