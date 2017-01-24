@@ -274,7 +274,7 @@ public:
         else {
             Ch name[21];
             for (size_t i = 0; i <= length; i++)
-                name[i] = buffer[i];
+                name[i] = static_cast<Ch>(buffer[i]);
             Token token = { name, length, index };
             return Append(token, allocator);
         }
@@ -1029,8 +1029,8 @@ private:
             unsigned char u = static_cast<unsigned char>(c);
             static const char hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
             os_.Put('%');
-            os_.Put(hexDigits[u >> 4]);
-            os_.Put(hexDigits[u & 15]);
+            os_.Put(static_cast<typename OutputStream::Ch>(hexDigits[u >> 4]));
+            os_.Put(static_cast<typename OutputStream::Ch>(hexDigits[u & 15]));
         }
     private:
         OutputStream& os_;

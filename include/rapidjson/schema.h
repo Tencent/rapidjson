@@ -1263,7 +1263,7 @@ struct TokenHelper {
         char buffer[21];
         size_t length = static_cast<size_t>((sizeof(SizeType) == 4 ? u32toa(index, buffer) : u64toa(index, buffer)) - buffer);
         for (size_t i = 0; i < length; i++)
-            *documentStack.template Push<Ch>() = buffer[i];
+            *documentStack.template Push<Ch>() = static_cast<Ch>(buffer[i]);
     }
 };
 

@@ -688,8 +688,8 @@ private:
             bool matched = AddState(l, s.out);
             return AddState(l, s.out1) || matched;
         }
-        else if (!(stateSet_[index >> 5] & (1 << (index & 31)))) {
-            stateSet_[index >> 5] |= (1 << (index & 31));
+        else if (!(stateSet_[index >> 5] & (1u << (index & 31)))) {
+            stateSet_[index >> 5] |= (1u << (index & 31));
             *l.template PushUnsafe<SizeType>() = index;
         }
         return s.out == kRegexInvalidState; // by using PushUnsafe() above, we can ensure s is not validated due to reallocation.
