@@ -331,7 +331,7 @@ $(document).ready(function(){initNavTree('prettywriter_8h_source.html','');});
 <div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keywordtype">void</span> WriteIndent()  {</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        <span class="keywordtype">size_t</span> count = (Base::level_stack_.GetSize() / <span class="keyword">sizeof</span>(<span class="keyword">typename</span> Base::Level)) * indentCharCount_;</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        <a class="code" href="namespacerapidjson.html#a1ac13bac5976fc06587e00fc0bcfb32a">PutN</a>(*Base::os_, static_cast&lt;typename TargetEncoding::Ch&gt;(indentChar_), count);</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;        <a class="code" href="namespacerapidjson.html#a1ac13bac5976fc06587e00fc0bcfb32a">PutN</a>(*Base::os_, static_cast&lt;typename OutputStream::Ch&gt;(indentChar_), count);</div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    }</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    Ch indentChar_;</div>
