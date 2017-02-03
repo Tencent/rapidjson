@@ -513,6 +513,68 @@ public:
         return Parse<kParseDefaultFlags>(is, handler);
     }
 
+    //! Initialize JSON text token-by-token parsing
+    /*!
+     */
+    void IterativeParseInit() {
+        parseResult_.Clear();
+        state_ = IterativeParsingStartState;
+    }
+    
+    //! Parse one token from JSON text
+    /*! \tparam InputStream Type of input stream, implementing Stream concept
+        \tparam Handler Type of handler, implementing Handler concept.
+        \param is Input stream to be parsed.
+        \param handler The handler to receive events.
+        \return Whether the parsing is successful.
+     */
+    template <unsigned parseFlags, typename InputStream, typename Handler>
+    ParseResult IterativeParseNext(InputStream& is, Handler& handler) {
+        while (is.Peek() != '\0') {
+            RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
+            SkipWhitespaceAndComments<parseFlags>(is);
+            
+            Token t = Tokenize(is.Peek());
+            IterativeParsingState n = Predict(state_, t);
+            IterativeParsingState d = Transit<parseFlags>(state_, t, n, is, handler);
+            
+            if (d == IterativeParsingErrorState) {
+                HandleError(state_, is);
+                return parseResult_;
+            }
+            
+            state_ = d;
+            
+            // Do not further consume streams if a root JSON has been parsed.
+            if (state_ == IterativeParsingFinishState) {
+                // If StopWhenDone is not set, and stray data is found post-root, flag an error.
+                if (!(parseFlags & kParseStopWhenDoneFlag)) {
+                    SkipWhitespaceAndComments<parseFlags>(is);
+                    if (is.Peek() != '\0')
+                        HandleError(state_, is);
+                }
+                return parseResult_;
+            }
+            
+            if (!IsIterativeParsingDelimiterState(n))
+                return parseResult_;
+        }
+        
+        // Handle the end of file.
+        if (state_ != IterativeParsingFinishState)
+            HandleError(state_, is);
+        
+        stack_.Clear();
+        return parseResult_;
+    }
+    
+    //! Check if token-by-token parsing JSON text is complete
+    /*! \return Whether the JSON has been fully decoded.
+     */
+    bool IterativeParseComplete() {
+        return IsIterativeParsingCompleteState(state_);
+    }
+
     //! Whether a parse error has occured in the last parsing.
     bool HasParseError() const { return parseResult_.IsError(); }
 
@@ -1803,44 +1865,37 @@ private:
         }
     }
 
+    RAPIDJSON_FORCEINLINE bool IsIterativeParsingDelimiterState(IterativeParsingState s) {
+        const unsigned int delimiterStateMask =
+            (1 << IterativeParsingKeyValueDelimiterState) |
+            (1 << IterativeParsingMemberDelimiterState) |
+            (1 << IterativeParsingElementDelimiterState);
+        
+        return (1 << s) & delimiterStateMask;
+    }
+    
+    RAPIDJSON_FORCEINLINE bool IsIterativeParsingCompleteState(IterativeParsingState s) {
+        const unsigned int completeStateMask =
+            (1 << IterativeParsingFinishState) |
+            (1 << IterativeParsingErrorState);
+        
+        return (1 << s) & completeStateMask;
+    }
+    
     template <unsigned parseFlags, typename InputStream, typename Handler>
     ParseResult IterativeParse(InputStream& is, Handler& handler) {
-        parseResult_.Clear();
-        ClearStackOnExit scope(*this);
-        IterativeParsingState state = IterativeParsingStartState;
-
-        SkipWhitespaceAndComments<parseFlags>(is);
-        RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
-        while (is.Peek() != '\0') {
-            Token t = Tokenize(is.Peek());
-            IterativeParsingState n = Predict(state, t);
-            IterativeParsingState d = Transit<parseFlags>(state, t, n, is, handler);
-
-            if (d == IterativeParsingErrorState) {
-                HandleError(state, is);
+        IterativeParseInit();
+        while (!IterativeParseComplete()) {
+            if (!IterativeParseNext<parseFlags>(is, handler))
                 break;
-            }
-
-            state = d;
-
-            // Do not further consume streams if a root JSON has been parsed.
-            if ((parseFlags & kParseStopWhenDoneFlag) && state == IterativeParsingFinishState)
-                break;
-
-            SkipWhitespaceAndComments<parseFlags>(is);
-            RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
         }
-
-        // Handle the end of file.
-        if (state != IterativeParsingFinishState)
-            HandleError(state, is);
-
         return parseResult_;
     }
 
     static const size_t kDefaultStackCapacity = 256;    //!< Default stack capacity in bytes for storing a single decoded string.
     internal::Stack<StackAllocator> stack_;  //!< A stack for storing decoded string temporarily during non-destructive parsing.
     ParseResult parseResult_;
+    IterativeParsingState state_;
 }; // class GenericReader
 
 //! Reader with UTF8 encoding and default allocator.
