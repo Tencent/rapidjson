@@ -1871,7 +1871,7 @@ private:
             (1 << IterativeParsingMemberDelimiterState) |
             (1 << IterativeParsingElementDelimiterState);
         
-        return (1 << s) & delimiterStateMask;
+        return !!((1 << s) & delimiterStateMask);
     }
     
     RAPIDJSON_FORCEINLINE bool IsIterativeParsingCompleteState(IterativeParsingState s) {
@@ -1879,7 +1879,7 @@ private:
             (1 << IterativeParsingFinishState) |
             (1 << IterativeParsingErrorState);
         
-        return (1 << s) & completeStateMask;
+        return !!((1 << s) & completeStateMask);
     }
     
     template <unsigned parseFlags, typename InputStream, typename Handler>
