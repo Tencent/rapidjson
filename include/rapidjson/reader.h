@@ -537,18 +537,17 @@ public:
             IterativeParsingState n = Predict(state_, t);
             IterativeParsingState d = Transit<parseFlags>(state_, t, n, is, handler);
             
-            if (d == IterativeParsingErrorState) {
-                HandleError(state_, is);
-                return false;
-            }
-            
-            state_ = d;
-            
-            // Do not further consume streams if we've parsed a complete object or hit an error.
-            if (IsIterativeParsingCompleteState(state_)) {
-                // If we hit an error, we are done.
-                if (HasParseError())
+            // If we've finished or hit an error...
+            if (IsIterativeParsingCompleteState(d)) {
+                // Report errors.
+                if (d == IterativeParsingErrorState) {
+                    HandleError(state_, is);
                     return false;
+                }
+            
+                // Transition to the finish state.
+                RAPIDJSON_ASSERT(d == IterativeParsingFinishState);
+                state_ = d;
                 
                 // If StopWhenDone is not set...
                 if (!(parseFlags & kParseStopWhenDoneFlag)) {
@@ -561,11 +560,14 @@ public:
                     }
                 }
                 
-                // We are done!
+                // Success! We are done!
                 return true;
             }
             
-            // If we found anything other than a delimiter, we invoked the handler, so we can return true now.
+            // Transition to the new state.
+            state_ = d;
+
+            // If we parsed anything other than a delimiter, we invoked the handler, so we can return true now.
             if (!IsIterativeParsingDelimiterState(n))
                 return true;
         }
