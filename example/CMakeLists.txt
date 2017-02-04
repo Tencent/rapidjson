@@ -18,6 +18,7 @@ set(EXAMPLES
     serialize
     simpledom
     simplereader
+    simplepullreader
     simplewriter
     tutorial)
     
