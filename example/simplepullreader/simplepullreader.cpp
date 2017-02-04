@@ -7,7 +7,9 @@ using namespace std;
 
 // If you can require C++11, you could use std::to_string here
 template <typename T> std::string stringify(T x) {
-    return (std::stringstream() << x).str();
+    std::stringstream ss;
+    ss << x;
+    return ss.str();
 }
 
 struct MyHandler {
