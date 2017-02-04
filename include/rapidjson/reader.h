@@ -530,7 +530,7 @@ public:
      */
     template <unsigned parseFlags, typename InputStream, typename Handler>
     bool IterativeParseNext(InputStream& is, Handler& handler) {
-        while (is.Peek() != '\0') {
+        while (RAPIDJSON_LIKELY(is.Peek() != '\0')) {
             SkipWhitespaceAndComments<parseFlags>(is);
             
             Token t = Tokenize(is.Peek());
@@ -538,7 +538,7 @@ public:
             IterativeParsingState d = Transit<parseFlags>(state_, t, n, is, handler);
             
             // If we've finished or hit an error...
-            if (IsIterativeParsingCompleteState(d)) {
+            if (RAPIDJSON_UNLIKELY(IsIterativeParsingCompleteState(d))) {
                 // Report errors.
                 if (d == IterativeParsingErrorState) {
                     HandleError(state_, is);
