@@ -69,10 +69,10 @@ TEST(JsonChecker, Reader) {
 
         GenericDocument<UTF8<>, CrtAllocator> document; // Use Crt allocator to check exception-safety (no memory leak)
         document.Parse(json);
-        EXPECT_TRUE(document.HasParseError());
+        EXPECT_TRUE(document.HasParseError()) << filename;
 
         document.Parse<kParseIterativeFlag>(json);
-        EXPECT_TRUE(document.HasParseError());
+        EXPECT_TRUE(document.HasParseError()) << filename;
 
         free(json);
     }
@@ -89,10 +89,10 @@ TEST(JsonChecker, Reader) {
 
         GenericDocument<UTF8<>, CrtAllocator> document; // Use Crt allocator to check exception-safety (no memory leak)
         document.Parse(json);
-        EXPECT_FALSE(document.HasParseError());
+        EXPECT_FALSE(document.HasParseError()) << filename;
 
         document.Parse<kParseIterativeFlag>(json);
-        EXPECT_FALSE(document.HasParseError());
+        EXPECT_FALSE(document.HasParseError()) << filename;
 
         free(json);
     }
