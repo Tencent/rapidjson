@@ -1892,11 +1892,36 @@ private:
     
     template <unsigned parseFlags, typename InputStream, typename Handler>
     ParseResult IterativeParse(InputStream& is, Handler& handler) {
-        IterativeParseInit();
-        while (!IterativeParseComplete()) {
-            if (!IterativeParseNext<parseFlags>(is, handler))
+        parseResult_.Clear();
+        ClearStackOnExit scope(*this);
+        IterativeParsingState state = IterativeParsingStartState;
+        
+        SkipWhitespaceAndComments<parseFlags>(is);
+        RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
+        while (is.Peek() != '\0') {
+            Token t = Tokenize(is.Peek());
+            IterativeParsingState n = Predict(state, t);
+            IterativeParsingState d = Transit<parseFlags>(state, t, n, is, handler);
+            
+            if (d == IterativeParsingErrorState) {
+                HandleError(state, is);
                 break;
+            }
+            
+            state = d;
+            
+            // Do not further consume streams if a root JSON has been parsed.
+            if ((parseFlags & kParseStopWhenDoneFlag) && state == IterativeParsingFinishState)
+                break;
+            
+            SkipWhitespaceAndComments<parseFlags>(is);
+            RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
         }
+        
+        // Handle the end of file.
+        if (state != IterativeParsingFinishState)
+            HandleError(state, is);
+        
         return parseResult_;
     }
 
