@@ -152,6 +152,35 @@ TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseIterativeInsitu_DummyHandler)) {
     }
 }
 
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseIterativePull_DummyHandler)) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        StringStream s(json_);
+        BaseReaderHandler<> h;
+        Reader reader;
+        reader.IterativeParseInit();
+        while (!reader.IterativeParseComplete()) {
+            if (!reader.IterativeParseNext<kParseDefaultFlags>(s, h))
+                break;
+        }
+        EXPECT_FALSE(reader.HasParseError());
+    }
+}
+
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseIterativePullInsitu_DummyHandler)) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        memcpy(temp_, json_, length_ + 1);
+        InsituStringStream s(temp_);
+        BaseReaderHandler<> h;
+        Reader reader;
+        reader.IterativeParseInit();
+        while (!reader.IterativeParseComplete()) {
+            if (!reader.IterativeParseNext<kParseDefaultFlags|kParseInsituFlag>(s, h))
+                break;
+        }
+        EXPECT_FALSE(reader.HasParseError());
+    }
+}
+
 TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_ValidateEncoding)) {
     for (size_t i = 0; i < kTrialCount; i++) {
         StringStream s(json_);
