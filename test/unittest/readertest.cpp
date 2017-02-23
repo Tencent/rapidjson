@@ -1833,9 +1833,9 @@ TEST(Reader, ParseNanAndInfinity) {
     TEST_NAN_INF("-Inf", -inf);
     TEST_NAN_INF("-Infinity", -inf);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NInf", 1);
-    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NaInf", 1);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NaInf", 2);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "INan", 1);
-    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "InNan", 1);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "InNan", 2);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "nan", 1);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-nan", 1);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NAN", 1);
