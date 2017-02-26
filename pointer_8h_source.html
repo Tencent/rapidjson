@@ -322,7 +322,7 @@ $(document).ready(function(){initNavTree('pointer_8h_source.html','');});
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    RAPIDJSON_DISABLEIF_RETURN((internal::NotExpr&lt;internal::IsSame&lt;<span class="keyword">typename</span> <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">internal::RemoveConst&lt;T&gt;::Type</a>, Ch&gt; &gt;), (<a class="code" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>))</div>
 <div class="line"><a name="l00242"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_generic_pointer.html#af2e3630aeaebb6628c2b1694a0595452">  242</a></span>&#160;    Append(T* name, <a class="code" href="classrapidjson_1_1_allocator.html">Allocator</a>* allocator = 0)<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        <span class="keywordflow">return</span> Append(name, StrLen(name), allocator);</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;        <span class="keywordflow">return</span> Append(name, internal::StrLen(name), allocator);</div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    }</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;</div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;<span class="preprocessor">#if RAPIDJSON_HAS_STDSTRING</span></div>
