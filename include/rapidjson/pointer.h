@@ -240,7 +240,7 @@ public:
     template <typename T>
     RAPIDJSON_DISABLEIF_RETURN((internal::NotExpr<internal::IsSame<typename internal::RemoveConst<T>::Type, Ch> >), (GenericPointer))
     Append(T* name, Allocator* allocator = 0) const {
-        return Append(name, StrLen(name), allocator);
+        return Append(name, internal::StrLen(name), allocator);
     }
 
 #if RAPIDJSON_HAS_STDSTRING
