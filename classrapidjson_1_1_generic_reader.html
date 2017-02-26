@@ -112,6 +112,17 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2bac14d193873d661d79ad000473a908"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result">ParseResult</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#a2bac14d193873d661d79ad000473a908">Parse</a> (InputStream &amp;is, <a class="el" href="classrapidjson_1_1_handler.html">Handler</a> &amp;handler)</td></tr>
 <tr class="memdesc:a2bac14d193873d661d79ad000473a908"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse JSON text (with <a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835">kParseDefaultFlags</a>)  <a href="#a2bac14d193873d661d79ad000473a908">More...</a><br /></td></tr>
 <tr class="separator:a2bac14d193873d661d79ad000473a908"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a90403a2c55dadf82fd2bb9d4c66b3280"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a90403a2c55dadf82fd2bb9d4c66b3280"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#a90403a2c55dadf82fd2bb9d4c66b3280">IterativeParseInit</a> ()</td></tr>
+<tr class="memdesc:a90403a2c55dadf82fd2bb9d4c66b3280"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize JSON text token-by-token parsing. <br /></td></tr>
+<tr class="separator:a90403a2c55dadf82fd2bb9d4c66b3280"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abac6611bec17167de50fede5cd5194ca"><td class="memTemplParams" colspan="2">template&lt;unsigned parseFlags, typename InputStream , typename Handler &gt; </td></tr>
+<tr class="memitem:abac6611bec17167de50fede5cd5194ca"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#abac6611bec17167de50fede5cd5194ca">IterativeParseNext</a> (InputStream &amp;is, <a class="el" href="classrapidjson_1_1_handler.html">Handler</a> &amp;handler)</td></tr>
+<tr class="memdesc:abac6611bec17167de50fede5cd5194ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse one token from JSON text.  <a href="#abac6611bec17167de50fede5cd5194ca">More...</a><br /></td></tr>
+<tr class="separator:abac6611bec17167de50fede5cd5194ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a60fa11ff60f71b3a466bbd962f35dfdb"><td class="memItemLeft" align="right" valign="top">RAPIDJSON_FORCEINLINE bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#a60fa11ff60f71b3a466bbd962f35dfdb">IterativeParseComplete</a> ()</td></tr>
+<tr class="memdesc:a60fa11ff60f71b3a466bbd962f35dfdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if token-by-token parsing JSON text is complete.  <a href="#a60fa11ff60f71b3a466bbd962f35dfdb">More...</a><br /></td></tr>
+<tr class="separator:a60fa11ff60f71b3a466bbd962f35dfdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a46ded2951b8fa395ed421989d66e71fe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a46ded2951b8fa395ed421989d66e71fe"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#a46ded2951b8fa395ed421989d66e71fe">HasParseError</a> () const </td></tr>
 <tr class="memdesc:a46ded2951b8fa395ed421989d66e71fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether a parse error has occured in the last parsing. <br /></td></tr>
@@ -195,6 +206,89 @@ template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllo
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a60fa11ff60f71b3a466bbd962f35dfdb"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllocator&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">RAPIDJSON_FORCEINLINE bool <a class="el" href="classrapidjson_1_1_generic_reader.html">rapidjson::GenericReader</a>&lt; SourceEncoding, TargetEncoding, StackAllocator &gt;::IterativeParseComplete </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check if token-by-token parsing JSON text is complete. </p>
+<dl class="section return"><dt>Returns</dt><dd>Whether the JSON has been fully decoded. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="abac6611bec17167de50fede5cd5194ca"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllocator&gt; </div>
+<div class="memtemplate">
+template&lt;unsigned parseFlags, typename InputStream , typename Handler &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classrapidjson_1_1_generic_reader.html">rapidjson::GenericReader</a>&lt; SourceEncoding, TargetEncoding, StackAllocator &gt;::IterativeParseNext </td>
+          <td>(</td>
+          <td class="paramtype">InputStream &amp;&#160;</td>
+          <td class="paramname"><em>is</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classrapidjson_1_1_handler.html">Handler</a> &amp;&#160;</td>
+          <td class="paramname"><em>handler</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Parse one token from JSON text. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">InputStream</td><td>Type of input stream, implementing <a class="el" href="classrapidjson_1_1_stream.html" title="Concept for reading and writing characters. ">Stream</a> concept </td></tr>
+    <tr><td class="paramname"><a class="el" href="classrapidjson_1_1_handler.html" title="Concept for receiving events from GenericReader upon parsing. The functions return true if no error o...">Handler</a></td><td>Type of handler, implementing <a class="el" href="classrapidjson_1_1_handler.html" title="Concept for receiving events from GenericReader upon parsing. The functions return true if no error o...">Handler</a> concept. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">is</td><td>Input stream to be parsed. </td></tr>
+    <tr><td class="paramname">handler</td><td>The handler to receive events. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether the parsing is successful. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="ac9c540b77de19661f6f45e04b9b0937b"></a>
 <div class="memitem">
 <div class="memproto">

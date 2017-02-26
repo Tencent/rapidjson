@@ -1,5 +1,8 @@
 var NAVTREEINDEX4 =
 {
+"structrapidjson_1_1_generic_insitu_string_stream.html#a2a94ae3504087a55c85c73772eaf4405":[14,0,0,17,10],
+"structrapidjson_1_1_generic_insitu_string_stream.html#a33114ed86002c6ed6f1ca0bbbe3d5141":[14,0,0,17,5],
+"structrapidjson_1_1_generic_insitu_string_stream.html#a3a7ed47ee193d1e5f850aa841b743631":[14,0,0,17,0],
 "structrapidjson_1_1_generic_insitu_string_stream.html#a5a17e183fec782bf9bc11d247ffbee73":[14,0,0,17,1],
 "structrapidjson_1_1_generic_insitu_string_stream.html#a6d611d9f5372d457373b90a711dd2717":[14,0,0,17,12],
 "structrapidjson_1_1_generic_insitu_string_stream.html#a75f19e02d6aa78478aab0d5a5c03c1c8":[14,0,0,17,8],
@@ -68,11 +71,11 @@ var NAVTREEINDEX4 =
 "structrapidjson_1_1_memory_stream.html#abf9f7cf51a5830ae45e24f5d55fdceaf":[14,0,0,33,0],
 "structrapidjson_1_1_memory_stream.html#ac0b4da6016e5ba6241604fd4258fb722":[14,0,0,33,13],
 "structrapidjson_1_1_stream_traits.html":[14,0,0,38],
-"structrapidjson_1_1_stream_traits.html#a3a11abaf56440885401e34830a819c53af6f7f81d1e208f1041e618b57e0d3828":[14,0,0,38,0],
+"structrapidjson_1_1_stream_traits.html#aea5a3f90ea4fd2a1b9c9c9954294474daf6f7f81d1e208f1041e618b57e0d3828":[14,0,0,38,0],
 "structrapidjson_1_1_stream_traits_3_01_generic_insitu_string_stream_3_01_encoding_01_4_01_4.html":[14,0,0,39],
-"structrapidjson_1_1_stream_traits_3_01_generic_insitu_string_stream_3_01_encoding_01_4_01_4.html#af17a82c2a14a192ef2e497aba82ad46bab943169f50f1fc0616fedc1dd2605201":[14,0,0,39,0],
+"structrapidjson_1_1_stream_traits_3_01_generic_insitu_string_stream_3_01_encoding_01_4_01_4.html#aa9b3b32a0ba57a7263455521508c9a84ab943169f50f1fc0616fedc1dd2605201":[14,0,0,39,0],
 "structrapidjson_1_1_stream_traits_3_01_generic_string_stream_3_01_encoding_01_4_01_4.html":[14,0,0,40],
-"structrapidjson_1_1_stream_traits_3_01_generic_string_stream_3_01_encoding_01_4_01_4.html#ad0861f3abdc5e583e711bc2679fe8f33a58160aabefa22129afe0dd6dce3285f9":[14,0,0,40,0],
+"structrapidjson_1_1_stream_traits_3_01_generic_string_stream_3_01_encoding_01_4_01_4.html#a421f511cdadd65681fe51ba0dde1b649a58160aabefa22129afe0dd6dce3285f9":[14,0,0,40,0],
 "structrapidjson_1_1_transcoder.html":[14,0,0,41],
 "structrapidjson_1_1_transcoder_3_01_encoding_00_01_encoding_01_4.html":[14,0,0,42],
 "structrapidjson_1_1_u_t_f16.html":[14,0,0,43],
