@@ -2010,7 +2010,7 @@ $(document).ready(function(){initNavTree('schema_8h_source.html','');});
 <div class="line"><a name="l01928"></a><span class="lineno"> 1928</span>&#160;    <span class="keyword">const</span> Context&amp; CurrentContext()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> *schemaStack_.template Top&lt;Context&gt;(); }</div>
 <div class="line"><a name="l01929"></a><span class="lineno"> 1929</span>&#160;</div>
 <div class="line"><a name="l01930"></a><span class="lineno"> 1930</span>&#160;    OutputHandler&amp; CreateNullHandler() {</div>
-<div class="line"><a name="l01931"></a><span class="lineno"> 1931</span>&#160;        <span class="keywordflow">return</span> *(nullHandler_ = <span class="keyword">static_cast&lt;</span>OutputHandler*<span class="keyword">&gt;</span>(GetStateAllocator().Malloc(<span class="keyword">sizeof</span>(OutputHandler))));</div>
+<div class="line"><a name="l01931"></a><span class="lineno"> 1931</span>&#160;        <span class="keywordflow">return</span> *(nullHandler_ = <span class="keyword">new</span> (GetStateAllocator().Malloc(<span class="keyword">sizeof</span>(OutputHandler))) OutputHandler);</div>
 <div class="line"><a name="l01932"></a><span class="lineno"> 1932</span>&#160;    }</div>
 <div class="line"><a name="l01933"></a><span class="lineno"> 1933</span>&#160;</div>
 <div class="line"><a name="l01934"></a><span class="lineno"> 1934</span>&#160;    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">size_t</span> kDefaultSchemaStackCapacity = 1024;</div>
