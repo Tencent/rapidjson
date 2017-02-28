@@ -880,7 +880,7 @@ public:
 #define RAPIDJSON_STRING_(name, ...) \
     static const ValueType& Get##name##String() {\
         static const Ch s[] = { __VA_ARGS__, '\0' };\
-        static const ValueType v(s, sizeof(s) / sizeof(Ch) - 1);\
+        static const ValueType v(s, static_cast<SizeType>(sizeof(s) / sizeof(Ch) - 1));\
         return v;\
     }
 
