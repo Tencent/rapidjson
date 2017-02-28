@@ -1928,7 +1928,7 @@ private:
     const Context& CurrentContext() const { return *schemaStack_.template Top<Context>(); }
 
     OutputHandler& CreateNullHandler() {
-        return *(nullHandler_ = static_cast<OutputHandler*>(GetStateAllocator().Malloc(sizeof(OutputHandler))));
+        return *(nullHandler_ = new (GetStateAllocator().Malloc(sizeof(OutputHandler))) OutputHandler);
     }
 
     static const size_t kDefaultSchemaStackCapacity = 1024;
