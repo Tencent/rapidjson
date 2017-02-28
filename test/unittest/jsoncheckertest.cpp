@@ -48,6 +48,24 @@ static char* ReadFile(const char* filename, size_t& length) {
     return json;
 }
 
+struct NoOpHandler {
+    bool Null() { return true; }
+    bool Bool(bool) { return true; }
+    bool Int(int) { return true; }
+    bool Uint(unsigned) { return true; }
+    bool Int64(int64_t) { return true; }
+    bool Uint64(uint64_t) { return true; }
+    bool Double(double) { return true; }
+    bool RawNumber(const char*, SizeType, bool) { return true; }
+    bool String(const char*, SizeType, bool) { return true; }
+    bool StartObject() { return true; }
+    bool Key(const char*, SizeType, bool) { return true; }
+    bool EndObject(SizeType) { return true; }
+    bool StartArray() { return true; }
+    bool EndArray(SizeType) { return true; }
+};
+
+
 TEST(JsonChecker, Reader) {
     char filename[256];
 
@@ -67,13 +85,26 @@ TEST(JsonChecker, Reader) {
             continue;
         }
 
+        // Test stack-based parsing.
         GenericDocument<UTF8<>, CrtAllocator> document; // Use Crt allocator to check exception-safety (no memory leak)
         document.Parse(json);
         EXPECT_TRUE(document.HasParseError()) << filename;
 
+        // Test iterative parsing.
         document.Parse<kParseIterativeFlag>(json);
         EXPECT_TRUE(document.HasParseError()) << filename;
 
+        // Test iterative pull-parsing.
+        Reader reader;
+        StringStream ss(json);
+        NoOpHandler h;
+        reader.IterativeParseInit();
+        while (!reader.IterativeParseComplete()) {
+            if (!reader.IterativeParseNext<kParseDefaultFlags>(ss, h))
+                break;
+        }
+        EXPECT_TRUE(reader.HasParseError()) << filename;
+        
         free(json);
     }
 
@@ -87,12 +118,25 @@ TEST(JsonChecker, Reader) {
             continue;
         }
 
+        // Test stack-based parsing.
         GenericDocument<UTF8<>, CrtAllocator> document; // Use Crt allocator to check exception-safety (no memory leak)
         document.Parse(json);
         EXPECT_FALSE(document.HasParseError()) << filename;
 
+        // Test iterative parsing.
         document.Parse<kParseIterativeFlag>(json);
         EXPECT_FALSE(document.HasParseError()) << filename;
+        
+        // Test iterative pull-parsing.
+        Reader reader;
+        StringStream ss(json);
+        NoOpHandler h;
+        reader.IterativeParseInit();
+        while (!reader.IterativeParseComplete()) {
+            if (!reader.IterativeParseNext<kParseDefaultFlags>(ss, h))
+                break;
+        }
+        EXPECT_FALSE(reader.HasParseError()) << filename;
 
         free(json);
     }
