@@ -192,7 +192,7 @@ Here is an example of iteratively parsing JSON, token by token:
 ~~~~~~~~~~cpp
     reader.IterativeParseInit();
     while (!reader.IterativeParseComplete()) {
-        reader.IterativeParseNext<kParseDefaultFlags>(ss, handler);
+        reader.IterativeParseNext<kParseDefaultFlags>(is, handler);
 		// Your handler has been called once.
     }
 ~~~~~~~~~~
