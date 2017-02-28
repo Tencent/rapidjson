@@ -207,6 +207,57 @@ TEST(PrettyWriter, RawValue) {
         buffer.GetString());
 }
 
+TEST(PrettyWriter, InvalidEventSequence) {
+    // {]
+    {
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        writer.StartObject();
+        EXPECT_THROW(writer.EndArray(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+    
+    // [}
+    {
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        writer.StartArray();
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+    
+    // { 1:
+    {
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        writer.StartObject();
+        EXPECT_THROW(writer.Int(1), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+    
+    // { 'a' }
+    {
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        writer.StartObject();
+        writer.Key("a");
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+    
+    // { 'a':'b','c' }
+    {
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        writer.StartObject();
+        writer.Key("a");
+        writer.String("b");
+        writer.Key("c");
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+}
+
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
 static PrettyWriter<StringBuffer> WriterGen(StringBuffer &target) {
