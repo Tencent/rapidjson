@@ -962,7 +962,7 @@ $(document).ready(function(){initNavTree('schema_8h_source.html','');});
 <div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;<span class="preprocessor">#define RAPIDJSON_STRING_(name, ...) \</span></div>
 <div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;<span class="preprocessor">    static const ValueType&amp; Get##name##String() {\</span></div>
 <div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;<span class="preprocessor">        static const Ch s[] = { __VA_ARGS__, &#39;\0&#39; };\</span></div>
-<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;<span class="preprocessor">        static const ValueType v(s, sizeof(s) / sizeof(Ch) - 1);\</span></div>
+<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;<span class="preprocessor">        static const ValueType v(s, static_cast&lt;SizeType&gt;(sizeof(s) / sizeof(Ch) - 1));\</span></div>
 <div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;<span class="preprocessor">        return v;\</span></div>
 <div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;<span class="preprocessor">    }</span></div>
 <div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;</div>
