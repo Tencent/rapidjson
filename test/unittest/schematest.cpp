@@ -1281,6 +1281,12 @@ TEST(SchemaValidatingWriter, Simple) {
     EXPECT_TRUE(validator.GetInvalidDocumentPointer() == SchemaDocument::PointerType(""));
 }
 
+TEST(Schema, Issue848) {
+    rapidjson::Document d;
+    rapidjson::SchemaDocument s(d);
+    rapidjson::GenericSchemaValidator<rapidjson::SchemaDocument, rapidjson::Document> v(s);
+}
+
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
 static SchemaDocument ReturnSchemaDocument() {
