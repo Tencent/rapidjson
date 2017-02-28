@@ -16,6 +16,7 @@
 #define RAPIDJSON_INTERNAL_STRFUNC_H_
 
 #include "../stream.h"
+#include <cwchar>
 
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
@@ -32,6 +33,16 @@ inline SizeType StrLen(const Ch* s) {
     const Ch* p = s;
     while (*p) ++p;
     return SizeType(p - s);
+}
+
+template <>
+inline SizeType StrLen(const char* s) {
+    return SizeType(std::strlen(s));
+}
+
+template <>
+inline SizeType StrLen(const wchar_t* s) {
+    return SizeType(std::wcslen(s));
 }
 
 //! Returns number of code points in a encoded string.
