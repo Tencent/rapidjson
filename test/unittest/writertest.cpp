@@ -544,3 +544,4 @@ TEST(Writer, MoveCtor) {
 #ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
+
