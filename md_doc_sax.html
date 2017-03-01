@@ -83,6 +83,7 @@ $(document).ready(function(){initNavTree('md_doc_sax.html','');});
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#Reader">Reader</a><ul><li class="level2"><a href="#Handler">Handler</a></li>
 <li class="level2"><a href="#GenericReader">GenericReader</a></li>
+<li class="level2"><a href="#TokenByTokenParsing">Token-by-Token Parsing</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#Writer">Writer</a><ul><li class="level2"><a href="#PrettyWriter">PrettyWriter</a></li>
@@ -97,7 +98,7 @@ $(document).ready(function(){initNavTree('md_doc_sax.html','');});
 <p>In RapidJSON, <code>Reader</code> (typedef of <code>GenericReader&lt;...&gt;</code>) is the SAX-style parser for JSON, and <code>Writer</code> (typedef of <code>GenericWriter&lt;...&gt;</code>) is the SAX-style generator for JSON.</p>
 <h1><a class="anchor" id="Reader"></a>
 Reader</h1>
-<p><code>Reader</code> parses a JSON from a stream. While it reads characters from the stream, it analyze the characters according to the syntax of JSON, and publish events to a handler.</p>
+<p><code>Reader</code> parses a JSON from a stream. While it reads characters from the stream, it analyzes the characters according to the syntax of JSON, and publishes events to a handler.</p>
 <p>For example, here is a JSON.</p>
 <div class="fragment"><div class="line">{</div>
 <div class="line">    <span class="stringliteral">&quot;hello&quot;</span>: <span class="stringliteral">&quot;world&quot;</span>,</div>
@@ -108,7 +109,7 @@ Reader</h1>
 <div class="line">    <span class="stringliteral">&quot;pi&quot;</span>: 3.1416,</div>
 <div class="line">    <span class="stringliteral">&quot;a&quot;</span>: [1, 2, 3, 4]</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>While a <code>Reader</code> parses this JSON, it publishes the following events to the handler sequentially:</p>
+</div><!-- fragment --><p>When a <code>Reader</code> parses this JSON, it publishes the following events to the handler sequentially:</p>
 <div class="fragment"><div class="line">StartObject()</div>
 <div class="line">Key(&quot;hello&quot;, 5, true)</div>
 <div class="line">String(&quot;world&quot;, 5, true)</div>
@@ -130,7 +131,7 @@ Reader</h1>
 <div class="line">Uint(4)</div>
 <div class="line">EndArray(4)</div>
 <div class="line">EndObject(7)</div>
-</div><!-- fragment --><p>These events can be easily matched with the JSON, except some event parameters need further explanation. Let's see the <code>simplereader</code> example which produces exactly the same output as above:</p>
+</div><!-- fragment --><p>These events can be easily matched with the JSON, but some event parameters need further explanation. Let's see the <code>simplereader</code> example which produces exactly the same output as above:</p>
 <div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="reader_8h.html">rapidjson/reader.h</a>&quot;</span></div>
 <div class="line"><span class="preprocessor">#include &lt;iostream&gt;</span></div>
 <div class="line"></div>
@@ -167,10 +168,10 @@ Reader</h1>
 <div class="line">    <a class="code" href="structrapidjson_1_1_generic_string_stream.html">StringStream</a> ss(json);</div>
 <div class="line">    reader.<a class="code" href="classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b">Parse</a>(ss, handler);</div>
 <div class="line">}</div>
-</div><!-- fragment --><p>Note that, RapidJSON uses template to statically bind the <code>Reader</code> type and the handler type, instead of using class with virtual functions. This paradigm can improve the performance by inlining functions.</p>
+</div><!-- fragment --><p>Note that RapidJSON uses templates to statically bind the <code>Reader</code> type and the handler type, instead of using classes with virtual functions. This paradigm can improve performance by inlining functions.</p>
 <h2><a class="anchor" id="Handler"></a>
 Handler</h2>
-<p>As the previous example showed, user needs to implement a handler, which consumes the events (function calls) from <code>Reader</code>. The handler must contain the following member functions.</p>
+<p>As shown in the previous example, the user needs to implement a handler which consumes the events (via function calls) from the <code>Reader</code>. The handler must contain the following member functions.</p>
 <div class="fragment"><div class="line"><span class="keyword">class </span>Handler {</div>
 <div class="line">    <span class="keywordtype">bool</span> Null();</div>
 <div class="line">    <span class="keywordtype">bool</span> Bool(<span class="keywordtype">bool</span> b);</div>
@@ -190,11 +191,11 @@ Handler</h2>
 </div><!-- fragment --><p><code>Null()</code> is called when the <code>Reader</code> encounters a JSON null value.</p>
 <p><code>Bool(bool)</code> is called when the <code>Reader</code> encounters a JSON true or false value.</p>
 <p>When the <code>Reader</code> encounters a JSON number, it chooses a suitable C++ type mapping. And then it calls <em>one</em> function out of <code>Int(int)</code>, <code>Uint(unsigned)</code>, <code>Int64(int64_t)</code>, <code>Uint64(uint64_t)</code> and <code>Double(double)</code>. If <code>kParseNumbersAsStrings</code> is enabled, <code>Reader</code> will always calls <code>RawNumber()</code> instead.</p>
-<p><code>String(const char* str, SizeType length, bool copy)</code> is called when the <code>Reader</code> encounters a string. The first parameter is pointer to the string. The second parameter is the length of the string (excluding the null terminator). Note that RapidJSON supports null character <code>\0</code> inside a string. If such situation happens, <code>strlen(str) &lt; length</code>. The last <code>copy</code> indicates whether the handler needs to make a copy of the string. For normal parsing, <code>copy = true</code>. Only when <em>insitu</em> parsing is used, <code>copy = false</code>. And beware that, the character type depends on the target encoding, which will be explained later.</p>
-<p>When the <code>Reader</code> encounters the beginning of an object, it calls <code>StartObject()</code>. An object in JSON is a set of name-value pairs. If the object contains members it first calls <code>Key()</code> for the name of member, and then calls functions depending on the type of the value. These calls of name-value pairs repeats until calling <code>EndObject(SizeType memberCount)</code>. Note that the <code>memberCount</code> parameter is just an aid for the handler, user may not need this parameter.</p>
-<p>Array is similar to object but simpler. At the beginning of an array, the <code>Reader</code> calls <code>BeginArary()</code>. If there is elements, it calls functions according to the types of element. Similarly, in the last call <code>EndArray(SizeType elementCount)</code>, the parameter <code>elementCount</code> is just an aid for the handler.</p>
-<p>Every handler functions returns a <code>bool</code>. Normally it should returns <code>true</code>. If the handler encounters an error, it can return <code>false</code> to notify event publisher to stop further processing.</p>
-<p>For example, when we parse a JSON with <code>Reader</code> and the handler detected that the JSON does not conform to the required schema, then the handler can return <code>false</code> and let the <code>Reader</code> stop further parsing. And the <code>Reader</code> will be in error state with error code <code>kParseErrorTermination</code>.</p>
+<p><code>String(const char* str, SizeType length, bool copy)</code> is called when the <code>Reader</code> encounters a string. The first parameter is pointer to the string. The second parameter is the length of the string (excluding the null terminator). Note that RapidJSON supports null character <code>\0</code> inside a string. If such situation happens, <code>strlen(str) &lt; length</code>. The last <code>copy</code> indicates whether the handler needs to make a copy of the string. For normal parsing, <code>copy = true</code>. Only when <em>insitu</em> parsing is used, <code>copy = false</code>. And be aware that the character type depends on the target encoding, which will be explained later.</p>
+<p>When the <code>Reader</code> encounters the beginning of an object, it calls <code>StartObject()</code>. An object in JSON is a set of name-value pairs. If the object contains members it first calls <code>Key()</code> for the name of member, and then calls functions depending on the type of the value. These calls of name-value pairs repeat until calling <code>EndObject(SizeType memberCount)</code>. Note that the <code>memberCount</code> parameter is just an aid for the handler; users who do not need this parameter may ignore it.</p>
+<p>Arrays are similar to objects, but simpler. At the beginning of an array, the <code>Reader</code> calls <code>BeginArary()</code>. If there is elements, it calls functions according to the types of element. Similarly, in the last call <code>EndArray(SizeType elementCount)</code>, the parameter <code>elementCount</code> is just an aid for the handler.</p>
+<p>Every handler function returns a <code>bool</code>. Normally it should return <code>true</code>. If the handler encounters an error, it can return <code>false</code> to notify the event publisher to stop further processing.</p>
+<p>For example, when we parse a JSON with <code>Reader</code> and the handler detects that the JSON does not conform to the required schema, the handler can return <code>false</code> and let the <code>Reader</code> stop further parsing. This will place the <code>Reader</code> in an error state, with error code <code>kParseErrorTermination</code>.</p>
 <h2><a class="anchor" id="GenericReader"></a>
 GenericReader</h2>
 <p>As mentioned before, <code>Reader</code> is a typedef of a template class <code>GenericReader</code>:</p>
@@ -208,21 +209,36 @@ GenericReader</h2>
 <div class="line"><span class="keyword">typedef</span> GenericReader&lt;UTF8&lt;&gt;, UTF8&lt;&gt; &gt; <a class="code" href="namespacerapidjson.html#ad5310edd1226f5b3ea82dc0d4d3740c6">Reader</a>;</div>
 <div class="line"></div>
 <div class="line">} <span class="comment">// namespace rapidjson</span></div>
-</div><!-- fragment --><p>The <code>Reader</code> uses UTF-8 as both source and target encoding. The source encoding means the encoding in the JSON stream. The target encoding means the encoding of the <code>str</code> parameter in <code>String()</code> calls. For example, to parse a UTF-8 stream and outputs UTF-16 string events, you can define a reader by:</p>
+</div><!-- fragment --><p>The <code>Reader</code> uses UTF-8 as both source and target encoding. The source encoding means the encoding in the JSON stream. The target encoding means the encoding of the <code>str</code> parameter in <code>String()</code> calls. For example, to parse a UTF-8 stream and output UTF-16 string events, you can define a reader by:</p>
 <div class="fragment"><div class="line">GenericReader&lt;UTF8&lt;&gt;, UTF16&lt;&gt; &gt; reader;</div>
-</div><!-- fragment --><p>Note that, the default character type of <code>UTF16</code> is <code>wchar_t</code>. So this <code>reader</code>needs to call <code>String(const wchar_t*, SizeType, bool)</code> of the handler.</p>
+</div><!-- fragment --><p>Note that, the default character type of <code>UTF16</code> is <code>wchar_t</code>. So this <code>reader</code> needs to call <code>String(const wchar_t*, SizeType, bool)</code> of the handler.</p>
 <p>The third template parameter <code>Allocator</code> is the allocator type for internal data structure (actually a stack).</p>
 <h2><a class="anchor" id=""></a>
 </h2>
-<p>The one and only one function of <code>Reader</code> is to parse JSON.</p>
+<p>The main function of <code>Reader</code> is used to parse JSON.</p>
 <div class="fragment"><div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> Handler&gt;</div>
 <div class="line"><span class="keywordtype">bool</span> Parse(InputStream&amp; is, Handler&amp; handler);</div>
 <div class="line"></div>
 <div class="line"><span class="comment">// with parseFlags = kDefaultParseFlags</span></div>
 <div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> Handler&gt;</div>
 <div class="line"><span class="keywordtype">bool</span> Parse(InputStream&amp; is, Handler&amp; handler);</div>
-</div><!-- fragment --><p>If an error occurs during parsing, it will return <code>false</code>. User can also calls <code>bool HasParseEror()</code>, <code>ParseErrorCode GetParseErrorCode()</code> and <code>size_t GetErrorOffset()</code> to obtain the error states. Actually <code>Document</code> uses these <code>Reader</code> functions to obtain parse errors. Please refer to <a class="el" href="md_doc_dom.html">DOM</a> for details about parse error.</p>
-<h1><a class="anchor" id="Writer"></a>
+</div><!-- fragment --><p>If an error occurs during parsing, it will return <code>false</code>. User can also call <code>bool HasParseError()</code>, <code>ParseErrorCode GetParseErrorCode()</code> and <code>size_t GetErrorOffset()</code> to obtain the error states. In fact, <code>Document</code> uses these <code>Reader</code> functions to obtain parse errors. Please refer to <a class="el" href="md_doc_dom.html">DOM</a> for details about parse errors.</p>
+<h2><a class="anchor" id="TokenByTokenParsing"></a>
+Token-by-Token Parsing</h2>
+<p>Some users may wish to parse a JSON input stream a single token at a time, instead of immediately parsing an entire document without stopping. To parse JSON this way, instead of calling <code>Parse</code>, you can use the <code>IterativeParse</code> set of functions:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> IterativeParseInit();</div>
+<div class="line"></div>
+<div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> Handler&gt;</div>
+<div class="line"><span class="keywordtype">bool</span> IterativeParseNext(InputStream&amp; is, Handler&amp; handler);</div>
+<div class="line"></div>
+<div class="line"><span class="keywordtype">bool</span> IterativeParseComplete();</div>
+</div><!-- fragment --><p>Here is an example of iteratively parsing JSON, token by token:</p>
+<div class="fragment"><div class="line">reader.IterativeParseInit();</div>
+<div class="line"><span class="keywordflow">while</span> (!reader.IterativeParseComplete()) {</div>
+<div class="line">    reader.IterativeParseNext&lt;<a class="code" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835">kParseDefaultFlags</a>&gt;(is, handler);</div>
+<div class="line">    <span class="comment">// Your handler has been called once.</span></div>
+<div class="line">}</div>
+</div><!-- fragment --><h1><a class="anchor" id="Writer"></a>
 Writer</h1>
 <p><code>Reader</code> converts (parses) JSON into events. <code>Writer</code> does exactly the opposite. It converts events into JSON.</p>
 <p><code>Writer</code> is very easy to use. If your application only need to converts some data into JSON, it may be a good choice to use <code>Writer</code> directly, instead of building a <code>Document</code> and then stringifying it with a <code>Writer</code>.</p>

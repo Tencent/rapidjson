@@ -86,7 +86,8 @@ var NAVTREE =
     [ "SAX", "md_doc_sax.html", [
       [ "Reader", "md_doc_sax.html#Reader", [
         [ "Handler", "md_doc_sax.html#Handler", null ],
-        [ "GenericReader", "md_doc_sax.html#GenericReader", null ]
+        [ "GenericReader", "md_doc_sax.html#GenericReader", null ],
+        [ "Token-by-Token Parsing", "md_doc_sax.html#TokenByTokenParsing", null ]
       ] ],
       [ "Writer", "md_doc_sax.html#Writer", [
         [ "PrettyWriter", "md_doc_sax.html#PrettyWriter", null ],
@@ -158,7 +159,7 @@ var NAVTREEINDEX =
 "classrapidjson_1_1_generic_object.html#ae38ccb43fb8bbd15ebcfbfb7ef02b6ce",
 "classrapidjson_1_1_generic_value.html#acf5019b9002ebfd66a1191d19e986c7b",
 "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga93fb983f78208d12c822376e1ea6d185",
-"structrapidjson_1_1_generic_insitu_string_stream.html#a2a94ae3504087a55c85c73772eaf4405"
+"structrapidjson_1_1_generic_insitu_string_stream.html#a136bffd9cb0f8dc4aa3b768f14c50546"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
