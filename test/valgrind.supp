@@ -1,5 +1,5 @@
 {
 	Suppress wcslen valgrind report
-	Memcheck:Addr8
+	Memcheck:Cond
 	fun:__wcslen_sse2
 }
