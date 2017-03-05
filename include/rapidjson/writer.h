@@ -16,6 +16,7 @@
 #define RAPIDJSON_WRITER_H_
 
 #include "stream.h"
+#include "internal/meta.h"
 #include "internal/stack.h"
 #include "internal/strfunc.h"
 #include "internal/dtoa.h"
@@ -198,7 +199,8 @@ public:
         return EndValue(WriteString(str, length));
     }
 
-    bool String(const Ch* str, SizeType length, bool copy = false) {
+    template <typename T>
+    bool String(const T* str, SizeType length, bool copy = false, RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) {
         RAPIDJSON_ASSERT(str != 0);
         (void)copy;
         Prefix(kStringType);
@@ -217,7 +219,8 @@ public:
         return WriteStartObject();
     }
 
-    bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy); }
+    template <typename T>
+    bool Key(const T* str, SizeType length, bool copy = false, RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) { return String(str, length, copy); }
 
     bool EndObject(SizeType memberCount = 0) {
         (void)memberCount;
@@ -247,8 +250,16 @@ public:
     //@{
 
     //! Simpler but slower overload.
-    bool String(const Ch* str) { return String(str, internal::StrLen(str)); }
-    bool Key(const Ch* str) { return Key(str, internal::StrLen(str)); }
+    template <typename T>
+    bool String(const T* const& str, RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) { return String(str, internal::StrLen(str)); }
+    template <typename T>
+    bool Key(const T* const& str, RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) { return Key(str, internal::StrLen(str)); }
+    
+    //! The compiler can give us the length of quoted strings for free.
+    template <typename T, size_t N>
+    bool String(const T (&str)[N], RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) { return String(str, N-1); }
+    template <typename T, size_t N>
+    bool Key(const T (&str)[N], RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) { return Key(str, N-1); }
 
     //@}
 
