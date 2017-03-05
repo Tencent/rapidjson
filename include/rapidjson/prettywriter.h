@@ -108,7 +108,7 @@ public:
     }
 
 	template <typename T>
-    bool String(const T* str, SizeType length, bool copy = false, RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) {
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) String(const T* str, SizeType length, bool copy = false) {
         RAPIDJSON_ASSERT(str != 0);
         (void)copy;
         PrettyPrefix(kStringType);
@@ -128,7 +128,7 @@ public:
     }
 
     template <typename T>
-    bool Key(const T* str, SizeType length, bool copy = false, RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) { return String(str, length, copy); }
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) Key(const T* str, SizeType length, bool copy = false) { return String(str, length, copy); }
 
 #if RAPIDJSON_HAS_STDSTRING
     bool Key(const std::basic_string<Ch>& str) {
@@ -187,18 +187,18 @@ public:
 
     //! Simpler but slower overload.
     template <typename T>
-    bool String(const T* const& str, RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) { return String(str, internal::StrLen(str)); }
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) String(const T* const& str) { return String(str, internal::StrLen(str)); }
     template <typename T>
-    bool Key(const T* const& str, RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) { return Key(str, internal::StrLen(str)); }
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) Key(const T* const& str) { return Key(str, internal::StrLen(str)); }
     
     //! The compiler can give us the length of quoted strings for free.
     template <typename T, size_t N>
-    bool String(const T (&str)[N], RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) {
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) String(const T (&str)[N]) {
         RAPIDJSON_ASSERT(str[N-1] == '\0'); // you must pass in a null-terminated string (quoted constant strings are always null-terminated)
         return String(str, N-1);
     }
     template <typename T, size_t N>
-    bool Key(const T (&str)[N], RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) {
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) Key(const T (&str)[N]) {
         RAPIDJSON_ASSERT(str[N-1] == '\0'); // you must pass in a null-terminated string (quoted constant strings are always null-terminated)
         return Key(str, N-1);
     }
