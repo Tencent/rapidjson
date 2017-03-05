@@ -193,9 +193,15 @@ public:
     
     //! The compiler can give us the length of quoted strings for free.
     template <typename T, size_t N>
-    bool String(const T (&str)[N], RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) { return String(str, N-1); }
+    bool String(const T (&str)[N], RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) {
+        RAPIDJSON_ASSERT(str[N-1] == '\0'); // you must pass in a null-terminated string (quoted constant strings are always null-terminated)
+        return String(str, N-1);
+    }
     template <typename T, size_t N>
-    bool Key(const T (&str)[N], RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) { return Key(str, N-1); }
+    bool Key(const T (&str)[N], RAPIDJSON_ENABLEIF((internal::IsSame<Ch, T>))) {
+        RAPIDJSON_ASSERT(str[N-1] == '\0'); // you must pass in a null-terminated string (quoted constant strings are always null-terminated)
+        return Key(str, N-1);
+    }
 
     //@}
 
