@@ -107,7 +107,8 @@ public:
         return Base::WriteString(str, length);
     }
 
-    bool String(const Ch* str, SizeType length, bool copy = false) {
+	template <typename T>
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) String(const T* str, SizeType length, bool copy = false) {
         RAPIDJSON_ASSERT(str != 0);
         (void)copy;
         PrettyPrefix(kStringType);
@@ -126,7 +127,8 @@ public:
         return Base::WriteStartObject();
     }
 
-    bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy); }
+    template <typename T>
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) Key(const T* str, SizeType length, bool copy = false) { return String(str, length, copy); }
 
 #if RAPIDJSON_HAS_STDSTRING
     bool Key(const std::basic_string<Ch>& str) {
@@ -184,8 +186,22 @@ public:
     //@{
 
     //! Simpler but slower overload.
-    bool String(const Ch* str) { return String(str, internal::StrLen(str)); }
-    bool Key(const Ch* str) { return Key(str, internal::StrLen(str)); }
+    template <typename T>
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) String(const T* const& str) { return String(str, internal::StrLen(str)); }
+    template <typename T>
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) Key(const T* const& str) { return Key(str, internal::StrLen(str)); }
+    
+    //! The compiler can give us the length of quoted strings for free.
+    template <typename T, size_t N>
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) String(const T (&str)[N]) {
+        RAPIDJSON_ASSERT(str[N-1] == '\0'); // you must pass in a null-terminated string (quoted constant strings are always null-terminated)
+        return String(str, N-1);
+    }
+    template <typename T, size_t N>
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) Key(const T (&str)[N]) {
+        RAPIDJSON_ASSERT(str[N-1] == '\0'); // you must pass in a null-terminated string (quoted constant strings are always null-terminated)
+        return Key(str, N-1);
+    }
 
     //@}
 
