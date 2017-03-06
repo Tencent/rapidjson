@@ -8,7 +8,7 @@ In RapidJSON, `Reader` (typedef of `GenericReader<...>`) is the SAX-style parser
 
 # Reader {#Reader}
 
-`Reader` parses a JSON from a stream. While it reads characters from the stream, it analyze the characters according to the syntax of JSON, and publish events to a handler.
+`Reader` parses a JSON from a stream. While it reads characters from the stream, it analyzes the characters according to the syntax of JSON, and publishes events to a handler.
 
 For example, here is a JSON.
 
@@ -24,7 +24,7 @@ For example, here is a JSON.
 }
 ~~~~~~~~~~
 
-While a `Reader` parses this JSON, it publishes the following events to the handler sequentially:
+When a `Reader` parses this JSON, it publishes the following events to the handler sequentially:
 
 ~~~~~~~~~~
 StartObject()
@@ -50,7 +50,7 @@ EndArray(4)
 EndObject(7)
 ~~~~~~~~~~
 
-These events can be easily matched with the JSON, except some event parameters need further explanation. Let's see the `simplereader` example which produces exactly the same output as above:
+These events can be easily matched with the JSON, but some event parameters need further explanation. Let's see the `simplereader` example which produces exactly the same output as above:
 
 ~~~~~~~~~~cpp
 #include "rapidjson/reader.h"
@@ -91,11 +91,11 @@ void main() {
 }
 ~~~~~~~~~~
 
-Note that, RapidJSON uses template to statically bind the `Reader` type and the handler type, instead of using class with virtual functions. This paradigm can improve the performance by inlining functions.
+Note that RapidJSON uses templates to statically bind the `Reader` type and the handler type, instead of using classes with virtual functions. This paradigm can improve performance by inlining functions.
 
 ## Handler {#Handler}
 
-As the previous example showed, user needs to implement a handler, which consumes the events (function calls) from `Reader`. The handler must contain the following member functions.
+As shown in the previous example, the user needs to implement a handler which consumes the events (via function calls) from the `Reader`. The handler must contain the following member functions.
 
 ~~~~~~~~~~cpp
 class Handler {
@@ -122,15 +122,15 @@ class Handler {
 
 When the `Reader` encounters a JSON number, it chooses a suitable C++ type mapping. And then it calls *one* function out of `Int(int)`, `Uint(unsigned)`, `Int64(int64_t)`, `Uint64(uint64_t)` and `Double(double)`. If `kParseNumbersAsStrings` is enabled, `Reader` will always calls `RawNumber()` instead.
 
-`String(const char* str, SizeType length, bool copy)` is called when the `Reader` encounters a string. The first parameter is pointer to the string. The second parameter is the length of the string (excluding the null terminator). Note that RapidJSON supports null character `\0` inside a string. If such situation happens, `strlen(str) < length`. The last `copy` indicates whether the handler needs to make a copy of the string. For normal parsing, `copy = true`. Only when *insitu* parsing is used, `copy = false`. And beware that, the character type depends on the target encoding, which will be explained later.
+`String(const char* str, SizeType length, bool copy)` is called when the `Reader` encounters a string. The first parameter is pointer to the string. The second parameter is the length of the string (excluding the null terminator). Note that RapidJSON supports null character `\0` inside a string. If such situation happens, `strlen(str) < length`. The last `copy` indicates whether the handler needs to make a copy of the string. For normal parsing, `copy = true`. Only when *insitu* parsing is used, `copy = false`. And be aware that the character type depends on the target encoding, which will be explained later.
 
-When the `Reader` encounters the beginning of an object, it calls `StartObject()`. An object in JSON is a set of name-value pairs. If the object contains members it first calls `Key()` for the name of member, and then calls functions depending on the type of the value. These calls of name-value pairs repeats until calling `EndObject(SizeType memberCount)`. Note that the `memberCount` parameter is just an aid for the handler, user may not need this parameter.
+When the `Reader` encounters the beginning of an object, it calls `StartObject()`. An object in JSON is a set of name-value pairs. If the object contains members it first calls `Key()` for the name of member, and then calls functions depending on the type of the value. These calls of name-value pairs repeat until calling `EndObject(SizeType memberCount)`. Note that the `memberCount` parameter is just an aid for the handler; users who do not need this parameter may ignore it.
 
-Array is similar to object but simpler. At the beginning of an array, the `Reader` calls `BeginArary()`. If there is elements, it calls functions according to the types of element. Similarly, in the last call `EndArray(SizeType elementCount)`, the parameter `elementCount` is just an aid for the handler.
+Arrays are similar to objects, but simpler. At the beginning of an array, the `Reader` calls `BeginArary()`. If there is elements, it calls functions according to the types of element. Similarly, in the last call `EndArray(SizeType elementCount)`, the parameter `elementCount` is just an aid for the handler.
 
-Every handler functions returns a `bool`. Normally it should returns `true`. If the handler encounters an error, it can return `false` to notify event publisher to stop further processing.
+Every handler function returns a `bool`. Normally it should return `true`. If the handler encounters an error, it can return `false` to notify the event publisher to stop further processing.
 
-For example, when we parse a JSON with `Reader` and the handler detected that the JSON does not conform to the required schema, then the handler can return `false` and let the `Reader` stop further parsing. And the `Reader` will be in error state with error code `kParseErrorTermination`.
+For example, when we parse a JSON with `Reader` and the handler detects that the JSON does not conform to the required schema, the handler can return `false` and let the `Reader` stop further parsing. This will place the `Reader` in an error state, with error code `kParseErrorTermination`.
 
 ## GenericReader {#GenericReader}
 
@@ -149,19 +149,19 @@ typedef GenericReader<UTF8<>, UTF8<> > Reader;
 } // namespace rapidjson
 ~~~~~~~~~~
 
-The `Reader` uses UTF-8 as both source and target encoding. The source encoding means the encoding in the JSON stream. The target encoding means the encoding of the `str` parameter in `String()` calls. For example, to parse a UTF-8 stream and outputs UTF-16 string events, you can define a reader by:
+The `Reader` uses UTF-8 as both source and target encoding. The source encoding means the encoding in the JSON stream. The target encoding means the encoding of the `str` parameter in `String()` calls. For example, to parse a UTF-8 stream and output UTF-16 string events, you can define a reader by:
 
 ~~~~~~~~~~cpp
 GenericReader<UTF8<>, UTF16<> > reader;
 ~~~~~~~~~~
 
-Note that, the default character type of `UTF16` is `wchar_t`. So this `reader`needs to call `String(const wchar_t*, SizeType, bool)` of the handler.
+Note that, the default character type of `UTF16` is `wchar_t`. So this `reader` needs to call `String(const wchar_t*, SizeType, bool)` of the handler.
 
 The third template parameter `Allocator` is the allocator type for internal data structure (actually a stack).
 
 ## Parsing {#SaxParsing}
 
-The one and only one function of `Reader` is to parse JSON. 
+The main function of `Reader` is used to parse JSON. 
 
 ~~~~~~~~~~cpp
 template <unsigned parseFlags, typename InputStream, typename Handler>
@@ -172,7 +172,30 @@ template <typename InputStream, typename Handler>
 bool Parse(InputStream& is, Handler& handler);
 ~~~~~~~~~~
 
-If an error occurs during parsing, it will return `false`. User can also calls `bool HasParseEror()`, `ParseErrorCode GetParseErrorCode()` and `size_t GetErrorOffset()` to obtain the error states. Actually `Document` uses these `Reader` functions to obtain parse errors. Please refer to [DOM](doc/dom.md) for details about parse error.
+If an error occurs during parsing, it will return `false`. User can also call `bool HasParseError()`, `ParseErrorCode GetParseErrorCode()` and `size_t GetErrorOffset()` to obtain the error states. In fact, `Document` uses these `Reader` functions to obtain parse errors. Please refer to [DOM](doc/dom.md) for details about parse errors.
+
+## Token-by-Token Parsing {#TokenByTokenParsing}
+
+Some users may wish to parse a JSON input stream a single token at a time, instead of immediately parsing an entire document without stopping. To parse JSON this way, instead of calling `Parse`, you can use the `IterativeParse` set of functions:
+
+~~~~~~~~~~cpp
+    void IterativeParseInit();
+	
+    template <unsigned parseFlags, typename InputStream, typename Handler>
+    bool IterativeParseNext(InputStream& is, Handler& handler);
+
+    bool IterativeParseComplete();
+~~~~~~~~~~
+
+Here is an example of iteratively parsing JSON, token by token:
+
+~~~~~~~~~~cpp
+    reader.IterativeParseInit();
+    while (!reader.IterativeParseComplete()) {
+        reader.IterativeParseNext<kParseDefaultFlags>(is, handler);
+		// Your handler has been called once.
+    }
+~~~~~~~~~~
 
 # Writer {#Writer}
 

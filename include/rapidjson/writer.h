@@ -16,6 +16,7 @@
 #define RAPIDJSON_WRITER_H_
 
 #include "stream.h"
+#include "internal/meta.h"
 #include "internal/stack.h"
 #include "internal/strfunc.h"
 #include "internal/dtoa.h"
@@ -198,7 +199,8 @@ public:
         return EndValue(WriteString(str, length));
     }
 
-    bool String(const Ch* str, SizeType length, bool copy = false) {
+    template <typename T>
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) String(const T* str, SizeType length, bool copy = false) {
         RAPIDJSON_ASSERT(str != 0);
         (void)copy;
         Prefix(kStringType);
@@ -217,12 +219,14 @@ public:
         return WriteStartObject();
     }
 
-    bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy); }
+    template <typename T>
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) Key(const T* str, SizeType length, bool copy = false) { return String(str, length, copy); }
 
     bool EndObject(SizeType memberCount = 0) {
         (void)memberCount;
-        RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level));
-        RAPIDJSON_ASSERT(!level_stack_.template Top<Level>()->inArray);
+        RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level)); // not inside an Object
+        RAPIDJSON_ASSERT(!level_stack_.template Top<Level>()->inArray); // currently inside an Array, not Object
+        RAPIDJSON_ASSERT(0 == level_stack_.template Top<Level>()->valueCount % 2); // Object has a Key without a Value
         level_stack_.template Pop<Level>(1);
         return EndValue(WriteEndObject());
     }
@@ -246,8 +250,22 @@ public:
     //@{
 
     //! Simpler but slower overload.
-    bool String(const Ch* str) { return String(str, internal::StrLen(str)); }
-    bool Key(const Ch* str) { return Key(str, internal::StrLen(str)); }
+    template <typename T>
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) String(const T* const& str) { return String(str, internal::StrLen(str)); }
+    template <typename T>
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) Key(const T* const& str) { return Key(str, internal::StrLen(str)); }
+    
+    //! The compiler can give us the length of quoted strings for free.
+    template <typename T, size_t N>
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) String(const T (&str)[N]) {
+        RAPIDJSON_ASSERT(str[N-1] == '\0'); // you must pass in a null-terminated string (quoted constant strings are always null-terminated)
+        return String(str, N-1);
+    }
+    template <typename T, size_t N>
+    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) Key(const T (&str)[N]) {
+        RAPIDJSON_ASSERT(str[N-1] == '\0'); // you must pass in a null-terminated string (quoted constant strings are always null-terminated)
+        return Key(str, N-1);
+    }
 
     //@}
 

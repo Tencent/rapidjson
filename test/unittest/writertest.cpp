@@ -442,6 +442,28 @@ TEST(Writer, InvalidEventSequence) {
         EXPECT_THROW(writer.Int(1), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
+
+    // { 'a' }
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.StartObject();
+        writer.Key("a");
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+
+    // { 'a':'b','c' }
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.StartObject();
+        writer.Key("a");
+        writer.String("b");
+        writer.Key("c");
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
 }
 
 TEST(Writer, NaN) {
