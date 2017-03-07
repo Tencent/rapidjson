@@ -13,8 +13,8 @@ template <typename T> std::string stringify(T x) {
 }
 
 struct MyHandler {
-    const char* type;
-    std::string data;
+    const char* type = NULL;
+    std::string data = "";
     
     bool Null() { type = "Null"; data.clear(); return true; }
     bool Bool(bool b) { type = "Bool:"; data = b? "true": "false"; return true; }
