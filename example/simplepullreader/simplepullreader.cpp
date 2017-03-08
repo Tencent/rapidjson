@@ -16,6 +16,14 @@ struct MyHandler {
     const char* type;
     std::string data;
     
+    MyHandler() : type(), data() { Null(); }
+    MyHandler(const MyHandler& cpy) : type(cpy.type),data(cpy.data) {}
+    MyHandler& operator=(const MyHandler& cpy) {
+	type = cpy.type;
+	data = cpy.data;
+	return *this;
+    }
+
     bool Null() { type = "Null"; data.clear(); return true; }
     bool Bool(bool b) { type = "Bool:"; data = b? "true": "false"; return true; }
     bool Int(int i) { type = "Int:"; data = stringify(i); return true; }
