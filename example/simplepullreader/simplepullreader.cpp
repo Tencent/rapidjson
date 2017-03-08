@@ -16,13 +16,7 @@ struct MyHandler {
     const char* type;
     std::string data;
     
-    MyHandler() : type(), data() { Null(); }
-    MyHandler(const MyHandler& cpy) : type(cpy.type),data(cpy.data) {}
-    MyHandler& operator=(const MyHandler& cpy) {
-	type = cpy.type;
-	data = cpy.data;
-	return *this;
-    }
+    MyHandler() : type(), data() {}
 
     bool Null() { type = "Null"; data.clear(); return true; }
     bool Bool(bool b) { type = "Bool:"; data = b? "true": "false"; return true; }
@@ -38,6 +32,9 @@ struct MyHandler {
     bool EndObject(SizeType memberCount) { type = "EndObject:"; data = stringify(memberCount); return true; }
     bool StartArray() { type = "StartArray"; data.clear(); return true; }
     bool EndArray(SizeType elementCount) { type = "EndArray:"; data = stringify(elementCount); return true; }
+private:
+    MyHandler(const MyHandler& noCopyConstruction);
+    MyHandler& operator=(const MyHandler& noAssignment);
 };
 
 int main() {
