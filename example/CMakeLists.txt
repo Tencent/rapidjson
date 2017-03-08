@@ -10,6 +10,7 @@ set(EXAMPLES
     filterkey
     filterkeydom
     jsonx
+    lookaheadparser
     messagereader
     parsebyparts
     pretty
