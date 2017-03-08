@@ -269,6 +269,7 @@ int LookaheadParser::PeekType() {
         case kExitingArray:
         case kExitingObject:
         case kError:
+        default:
             return -1;
     }
 }
