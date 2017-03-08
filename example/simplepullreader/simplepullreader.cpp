@@ -16,6 +16,8 @@ struct MyHandler {
     const char* type;
     std::string data;
     
+    MyHandler() : type(), data() {}
+
     bool Null() { type = "Null"; data.clear(); return true; }
     bool Bool(bool b) { type = "Bool:"; data = b? "true": "false"; return true; }
     bool Int(int i) { type = "Int:"; data = stringify(i); return true; }
@@ -30,6 +32,9 @@ struct MyHandler {
     bool EndObject(SizeType memberCount) { type = "EndObject:"; data = stringify(memberCount); return true; }
     bool StartArray() { type = "StartArray"; data.clear(); return true; }
     bool EndArray(SizeType elementCount) { type = "EndArray:"; data = stringify(elementCount); return true; }
+private:
+    MyHandler(const MyHandler& noCopyConstruction);
+    MyHandler& operator=(const MyHandler& noAssignment);
 };
 
 int main() {
