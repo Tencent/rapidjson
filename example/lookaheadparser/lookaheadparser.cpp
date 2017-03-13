@@ -78,7 +78,7 @@ protected:
     static const int parseFlags = kParseDefaultFlags | kParseInsituFlag;
 };
 
-LookaheadParserHandler::LookaheadParserHandler(char* str) : ss_(str) {
+LookaheadParserHandler::LookaheadParserHandler(char* str) : v_(), ss_(str) {
     r_.IterativeParseInit();
     ParseNext();
 }
