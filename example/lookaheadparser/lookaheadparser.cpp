@@ -139,50 +139,33 @@ bool LookaheadParser::EnterArray() {
 }
 
 const char* LookaheadParser::NextObjectKey() {
-    switch (st_) {
-        case kHasKey: {
-            const char* result = v_.GetString();
-            ParseNext();
-            return result;
-        }
-            
-        case kExitingObject:
-            ParseNext();
-            return 0;
-            
-        case kError:
-        case kHasNull:
-        case kHasBool:
-        case kHasNumber:
-        case kHasString:
-        case kEnteringObject:
-        case kEnteringArray:
-        case kExitingArray:
-            st_ = kError;
-            return 0;
+    if (st_ == kHasKey) {
+        const char* result = v_.GetString();
+        ParseNext();
+        return result;
     }
+    
+    if (st_ == kExitingObject) {
+        ParseNext();
+        return 0;
+    }
+    
+    st_ = kError;
+    return 0;
 }
 
 bool LookaheadParser::NextArrayValue() {
-    switch (st_) {
-        case kExitingArray:
-            ParseNext();
-            return false;
-            
-        case kError:
-        case kExitingObject:
-        case kHasKey:
-            st_ = kError;
-            return false;
-            
-        case kHasNull:
-        case kHasBool:
-        case kHasNumber:
-        case kHasString:
-        case kEnteringObject:
-        case kEnteringArray:
-            return true;
+    if (st_ == kExitingArray) {
+        ParseNext();
+        return false;
     }
+    
+    if (st_ == kError || st_ == kExitingObject || st_ == kHasKey) {
+        st_ = kError;
+        return false;
+    }
+
+    return true;
 }
 
 int LookaheadParser::GetInt() {
