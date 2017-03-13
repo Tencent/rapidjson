@@ -199,8 +199,7 @@ public:
         return EndValue(WriteString(str, length));
     }
 
-    template <typename T>
-    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) String(const T* str, SizeType length, bool copy = false) {
+    bool String(const Ch* str, SizeType length, bool copy = false) {
         RAPIDJSON_ASSERT(str != 0);
         (void)copy;
         Prefix(kStringType);
@@ -219,8 +218,7 @@ public:
         return WriteStartObject();
     }
 
-    template <typename T>
-    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) Key(const T* str, SizeType length, bool copy = false) { return String(str, length, copy); }
+    bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy); }
 
     bool EndObject(SizeType memberCount = 0) {
         (void)memberCount;
@@ -250,23 +248,9 @@ public:
     //@{
 
     //! Simpler but slower overload.
-    template <typename T>
-    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) String(const T* const& str) { return String(str, internal::StrLen(str)); }
-    template <typename T>
-    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) Key(const T* const& str) { return Key(str, internal::StrLen(str)); }
+    bool String(const Ch* const& str) { return String(str, internal::StrLen(str)); }
+    bool Key(const Ch* const& str) { return Key(str, internal::StrLen(str)); }
     
-    //! The compiler can give us the length of quoted strings for free.
-    template <typename T, size_t N>
-    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) String(const T (&str)[N]) {
-        RAPIDJSON_ASSERT(str[N-1] == '\0'); // you must pass in a null-terminated string (quoted constant strings are always null-terminated)
-        return String(str, N-1);
-    }
-    template <typename T, size_t N>
-    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame<Ch, T>), (bool)) Key(const T (&str)[N]) {
-        RAPIDJSON_ASSERT(str[N-1] == '\0'); // you must pass in a null-terminated string (quoted constant strings are always null-terminated)
-        return Key(str, N-1);
-    }
-
     //@}
 
     //! Write a raw JSON value.

@@ -100,6 +100,19 @@ TEST(Writer, String) {
 #endif
 }
 
+TEST(Writer, Issue_889) {
+    char buf[100] = "Hello";
+    
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    writer.StartArray();
+    writer.String(buf);
+    writer.EndArray();
+    
+    EXPECT_STREQ("[\"Hello\"]", buffer.GetString());
+    EXPECT_TRUE(writer.IsComplete()); \
+}
+
 TEST(Writer, ScanWriteUnescapedString) {
     const char json[] = "[\" \\\"0123456789ABCDEF\"]";
     //                       ^ scanning stops here.
