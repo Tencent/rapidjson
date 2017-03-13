@@ -58,6 +58,7 @@ protected:
 
 protected:
     enum LookaheadParsingState {
+        kInit,
         kError,
         kHasNull,
         kHasBool,
@@ -78,7 +79,7 @@ protected:
     static const int parseFlags = kParseDefaultFlags | kParseInsituFlag;
 };
 
-LookaheadParserHandler::LookaheadParserHandler(char* str) : v_(), ss_(str) {
+LookaheadParserHandler::LookaheadParserHandler(char* str) : v_(), st_(kInit), r_(), ss_(str) {
     r_.IterativeParseInit();
     ParseNext();
 }
@@ -145,12 +146,12 @@ const char* LookaheadParser::NextObjectKey() {
         return result;
     }
     
-    if (st_ == kExitingObject) {
-        ParseNext();
+    if (st_ != kExitingObject) {
+        st_ = kError;
         return 0;
     }
     
-    st_ = kError;
+    ParseNext();
     return 0;
 }
 
@@ -180,7 +181,7 @@ int LookaheadParser::GetInt() {
 }
 
 double LookaheadParser::GetDouble() {
-    if (st_ != kHasNumber || !v_.IsNumber()) {
+    if (st_ != kHasNumber) {
         st_  = kError;
         return 0.;
     }
@@ -223,27 +224,16 @@ const char* LookaheadParser::GetString() {
 
 void LookaheadParser::SkipOut(int depth) {
     do {
-        switch (st_) {
-            case kEnteringArray:
-            case kEnteringObject:
-                ++depth;
-                break;
-
-            case kExitingArray:
-            case kExitingObject:
-                --depth;
-                break;
-            
-            case kError:
-                return;
-                
-		    case kHasNull:
-		    case kHasBool:
-		    case kHasNumber:
-		    case kHasString:
-		    case kHasKey:
-                break;
+        if (st_ == kEnteringArray || st_ == kEnteringObject) {
+            ++depth;
         }
+        else if (st_ == kExitingArray || st_ == kExitingObject) {
+            --depth;
+        }
+        else if (st_ == kError) {
+            return;
+        }
+
         ParseNext();
     }
     while (depth > 0);
@@ -270,25 +260,19 @@ Value* LookaheadParser::PeekValue() {
 }
 
 int LookaheadParser::PeekType() {
-    switch (st_) {
-        case kHasNull:
-        case kHasBool:
-        case kHasNumber:
-        case kHasString:
-        case kHasKey:
-            return v_.GetType();
-        
-        case kEnteringArray:
-            return kArrayType;
-
-        case kEnteringObject:
-            return kObjectType;
-
-        case kExitingArray:
-        case kExitingObject:
-        case kError:
-            return -1;
+    if (st_ >= kHasNull && st_ <= kHasKey) {
+        return v_.GetType();
     }
+    
+    if (st_ == kEnteringArray) {
+        return kArrayType;
+    }
+    
+    if (st_ == kEnteringObject) {
+        return kObjectType;
+    }
+
+    return -1;
 }
 
 //-------------------------------------------------------------------------
