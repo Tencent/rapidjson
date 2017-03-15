@@ -152,7 +152,7 @@ public:
         (void)ret;
         RAPIDJSON_ASSERT(ret == true);
         if (Base::level_stack_.Empty()) // end of json text
-            Base::os_->Flush();
+            Base::Flush();
         return true;
     }
 
@@ -176,7 +176,7 @@ public:
         (void)ret;
         RAPIDJSON_ASSERT(ret == true);
         if (Base::level_stack_.Empty()) // end of json text
-            Base::os_->Flush();
+            Base::Flush();
         return true;
     }
 
