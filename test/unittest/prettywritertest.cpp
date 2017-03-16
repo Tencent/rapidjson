@@ -258,6 +258,20 @@ TEST(PrettyWriter, InvalidEventSequence) {
     }
 }
 
+TEST(PrettyWriter, Issue_889) {
+    char buf[100] = "Hello";
+    
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    writer.StartArray();
+    writer.String(buf);
+    writer.EndArray();
+    
+    EXPECT_STREQ("[\n    \"Hello\"\n]", buffer.GetString());
+    EXPECT_TRUE(writer.IsComplete()); \
+}
+
+
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
 static PrettyWriter<StringBuffer> WriterGen(StringBuffer &target) {
