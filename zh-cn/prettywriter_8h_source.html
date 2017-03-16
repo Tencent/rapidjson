@@ -189,197 +189,182 @@ $(document).ready(function(){initNavTree('prettywriter_8h_source.html','');});
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;        <span class="keywordflow">return</span> Base::WriteString(str, length);</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    }</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame&lt;Ch, T&gt;), (<span class="keywordtype">bool</span>)) String(const T* str, <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, <span class="keywordtype">bool</span> copy = false) {</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(str != 0);</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        (void)copy;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        PrettyPrefix(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4ad6379da3dc04b83a591992bfb9fabba7">kStringType</a>);</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        <span class="keywordflow">return</span> Base::WriteString(str, length);</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    }</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="preprocessor">#if RAPIDJSON_HAS_STDSTRING</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keywordtype">bool</span> String(<span class="keyword">const</span> std::basic_string&lt;Ch&gt;&amp; str) {</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        <span class="keywordflow">return</span> String(str.data(), <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>(str.size()));</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    }</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keywordtype">bool</span> StartObject() {</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        PrettyPrefix(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="keyword">new</span> (Base::level_stack_.template Push&lt;typename Base::Level&gt;()) <span class="keyword">typename</span> Base::Level(<span class="keyword">false</span>);</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        <span class="keywordflow">return</span> Base::WriteStartObject();</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    }</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame&lt;Ch, T&gt;), (<span class="keywordtype">bool</span>)) Key(const T* str, <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, <span class="keywordtype">bool</span> copy = false) { <span class="keywordflow">return</span> String(str, length, copy); }</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;<span class="preprocessor">#if RAPIDJSON_HAS_STDSTRING</span></div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="keywordtype">bool</span> Key(<span class="keyword">const</span> std::basic_string&lt;Ch&gt;&amp; str) {</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        <span class="keywordflow">return</span> Key(str.data(), <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>(str.size()));</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    }</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    </div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keywordtype">bool</span> EndObject(<a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> memberCount = 0) {</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        (void)memberCount;</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(Base::level_stack_.GetSize() &gt;= <span class="keyword">sizeof</span>(<span class="keyword">typename</span> Base::Level)); <span class="comment">// not inside an Object</span></div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(!Base::level_stack_.<span class="keyword">template</span> Top&lt;typename Base::Level&gt;()-&gt;inArray); <span class="comment">// currently inside an Array, not Object</span></div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(0 == Base::level_stack_.<span class="keyword">template</span> Top&lt;typename Base::Level&gt;()-&gt;valueCount % 2); <span class="comment">// Object has a Key without a Value</span></div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;       </div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        <span class="keywordtype">bool</span> empty = Base::level_stack_.template Pop&lt;typename Base::Level&gt;(1)-&gt;valueCount == 0;</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        <span class="keywordflow">if</span> (!empty) {</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;            Base::os_-&gt;Put(<span class="charliteral">&#39;\n&#39;</span>);</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;            WriteIndent();</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        }</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        <span class="keywordtype">bool</span> ret = Base::WriteEndObject();</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        (void)ret;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(ret == <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        <span class="keywordflow">if</span> (Base::level_stack_.Empty()) <span class="comment">// end of json text</span></div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;            Base::os_-&gt;Flush();</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    }</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="keywordtype">bool</span> StartArray() {</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        PrettyPrefix(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        <span class="keyword">new</span> (Base::level_stack_.template Push&lt;typename Base::Level&gt;()) <span class="keyword">typename</span> Base::Level(<span class="keyword">true</span>);</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;        <span class="keywordflow">return</span> Base::WriteStartArray();</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    }</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keywordtype">bool</span> EndArray(<a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> memberCount = 0) {</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        (void)memberCount;</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(Base::level_stack_.GetSize() &gt;= <span class="keyword">sizeof</span>(<span class="keyword">typename</span> Base::Level));</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(Base::level_stack_.<span class="keyword">template</span> Top&lt;typename Base::Level&gt;()-&gt;inArray);</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        <span class="keywordtype">bool</span> empty = Base::level_stack_.template Pop&lt;typename Base::Level&gt;(1)-&gt;valueCount == 0;</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        <span class="keywordflow">if</span> (!empty &amp;&amp; !(formatOptions_ &amp; kFormatSingleLineArray)) {</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;            Base::os_-&gt;Put(<span class="charliteral">&#39;\n&#39;</span>);</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;            WriteIndent();</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        }</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        <span class="keywordtype">bool</span> ret = Base::WriteEndArray();</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        (void)ret;</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(ret == <span class="keyword">true</span>);</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        <span class="keywordflow">if</span> (Base::level_stack_.Empty()) <span class="comment">// end of json text</span></div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;            Base::os_-&gt;Flush();</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    }</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="comment">    //@}</span></div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<span class="comment"></span><span class="comment"></span></div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="comment">    /*! @name Convenience extensions */</span><span class="comment"></span></div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<span class="comment">    //@{</span></div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;<span class="comment"></span><span class="comment"></span></div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;<span class="comment">    //! Simpler but slower overload.</span></div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00190"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_pretty_writer.html#add00cb7a4bf9019c838b1807980a0a9c">  190</a></span>&#160;    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame&lt;Ch, T&gt;), (<span class="keywordtype">bool</span>)) String(const T* const&amp; str) { <span class="keywordflow">return</span> <a class="code" href="classrapidjson_1_1_pretty_writer.html#add00cb7a4bf9019c838b1807980a0a9c">String</a>(str, internal::StrLen(str)); }</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame&lt;Ch, T&gt;), (<span class="keywordtype">bool</span>)) Key(const T* const&amp; str) { <span class="keywordflow">return</span> Key(str, internal::StrLen(str)); }</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="comment"></span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="comment">    //! The compiler can give us the length of quoted strings for free.</span></div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keywordtype">size_t</span> N&gt;</div>
-<div class="line"><a name="l00196"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_pretty_writer.html#a3a509cd1b5217bbc5e0f5babfcffa39d">  196</a></span>&#160;    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame&lt;Ch, T&gt;), (<span class="keywordtype">bool</span>)) String(const T (&amp;str)[N]) {</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(str[N-1] == <span class="charliteral">&#39;\0&#39;</span>); <span class="comment">// you must pass in a null-terminated string (quoted constant strings are always null-terminated)</span></div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        <span class="keywordflow">return</span> String(str, N-1);</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    }</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T, <span class="keywordtype">size_t</span> N&gt;</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    RAPIDJSON_ENABLEIF_RETURN((internal::IsSame&lt;Ch, T&gt;), (<span class="keywordtype">bool</span>)) Key(const T (&amp;str)[N]) {</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(str[N-1] == <span class="charliteral">&#39;\0&#39;</span>); <span class="comment">// you must pass in a null-terminated string (quoted constant strings are always null-terminated)</span></div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        <span class="keywordflow">return</span> Key(str, N-1);</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    }</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;<span class="comment">    //@}</span></div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="comment"></span><span class="comment"></span></div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;<span class="comment">    //! Write a raw JSON value.</span></div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;<span class="comment"></span><span class="comment">    /*!</span></div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;<span class="comment">        For user to write a stringified JSON as a value.</span></div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;<span class="comment">        \param json A well-formed JSON value. It should not contain null character within [0, length - 1] range.</span></div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;<span class="comment">        \param length Length of the json.</span></div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;<span class="comment">        \param type Type of the root of json.</span></div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;<span class="comment">        \note When using PrettyWriter::RawValue(), the result json may not be indented correctly.</span></div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;<span class="comment">    */</span></div>
-<div class="line"><a name="l00217"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_pretty_writer.html#a3136e3426a5d06e5da50f6e6aab8a5be">  217</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classrapidjson_1_1_pretty_writer.html#a3136e3426a5d06e5da50f6e6aab8a5be">RawValue</a>(<span class="keyword">const</span> Ch* json, <span class="keywordtype">size_t</span> length, <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> type) {</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(json != 0);</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        PrettyPrefix(type);</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        <span class="keywordflow">return</span> Base::WriteRawValue(json, length);</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    }</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="keywordtype">void</span> PrettyPrefix(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> type) {</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;        (void)type;</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;        <span class="keywordflow">if</span> (Base::level_stack_.GetSize() != 0) { <span class="comment">// this value is not at root</span></div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;            <span class="keyword">typename</span> Base::Level* level = Base::level_stack_.template Top&lt;typename Base::Level&gt;();</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;            <span class="keywordflow">if</span> (level-&gt;inArray) {</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;                <span class="keywordflow">if</span> (level-&gt;valueCount &gt; 0) {</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;                    Base::os_-&gt;Put(<span class="charliteral">&#39;,&#39;</span>); <span class="comment">// add comma if it is not the first element in array</span></div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;                    <span class="keywordflow">if</span> (formatOptions_ &amp; kFormatSingleLineArray)</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <span class="keywordtype">bool</span> String(<span class="keyword">const</span> Ch* str, <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, <span class="keywordtype">bool</span> copy = <span class="keyword">false</span>) {</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(str != 0);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;        (void)copy;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        PrettyPrefix(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4ad6379da3dc04b83a591992bfb9fabba7">kStringType</a>);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        <span class="keywordflow">return</span> Base::WriteString(str, length);</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    }</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="preprocessor">#if RAPIDJSON_HAS_STDSTRING</span></div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordtype">bool</span> String(<span class="keyword">const</span> std::basic_string&lt;Ch&gt;&amp; str) {</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        <span class="keywordflow">return</span> String(str.data(), <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>(str.size()));</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    }</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordtype">bool</span> StartObject() {</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        PrettyPrefix(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keyword">new</span> (Base::level_stack_.template Push&lt;typename Base::Level&gt;()) <span class="keyword">typename</span> Base::Level(<span class="keyword">false</span>);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="keywordflow">return</span> Base::WriteStartObject();</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    }</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordtype">bool</span> Key(<span class="keyword">const</span> Ch* str, <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, <span class="keywordtype">bool</span> copy = <span class="keyword">false</span>) { <span class="keywordflow">return</span> String(str, length, copy); }</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="preprocessor">#if RAPIDJSON_HAS_STDSTRING</span></div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordtype">bool</span> Key(<span class="keyword">const</span> std::basic_string&lt;Ch&gt;&amp; str) {</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        <span class="keywordflow">return</span> Key(str.data(), <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>(str.size()));</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    }</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    </div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="keywordtype">bool</span> EndObject(<a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> memberCount = 0) {</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        (void)memberCount;</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(Base::level_stack_.GetSize() &gt;= <span class="keyword">sizeof</span>(<span class="keyword">typename</span> Base::Level)); <span class="comment">// not inside an Object</span></div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(!Base::level_stack_.<span class="keyword">template</span> Top&lt;typename Base::Level&gt;()-&gt;inArray); <span class="comment">// currently inside an Array, not Object</span></div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(0 == Base::level_stack_.<span class="keyword">template</span> Top&lt;typename Base::Level&gt;()-&gt;valueCount % 2); <span class="comment">// Object has a Key without a Value</span></div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;       </div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        <span class="keywordtype">bool</span> empty = Base::level_stack_.template Pop&lt;typename Base::Level&gt;(1)-&gt;valueCount == 0;</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        <span class="keywordflow">if</span> (!empty) {</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;            Base::os_-&gt;Put(<span class="charliteral">&#39;\n&#39;</span>);</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;            WriteIndent();</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        }</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        <span class="keywordtype">bool</span> ret = Base::WriteEndObject();</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        (void)ret;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(ret == <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        <span class="keywordflow">if</span> (Base::level_stack_.Empty()) <span class="comment">// end of json text</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;            Base::os_-&gt;Flush();</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    }</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordtype">bool</span> StartArray() {</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        PrettyPrefix(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        <span class="keyword">new</span> (Base::level_stack_.template Push&lt;typename Base::Level&gt;()) <span class="keyword">typename</span> Base::Level(<span class="keyword">true</span>);</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        <span class="keywordflow">return</span> Base::WriteStartArray();</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    }</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordtype">bool</span> EndArray(<a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> memberCount = 0) {</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        (void)memberCount;</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(Base::level_stack_.GetSize() &gt;= <span class="keyword">sizeof</span>(<span class="keyword">typename</span> Base::Level));</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(Base::level_stack_.<span class="keyword">template</span> Top&lt;typename Base::Level&gt;()-&gt;inArray);</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        <span class="keywordtype">bool</span> empty = Base::level_stack_.template Pop&lt;typename Base::Level&gt;(1)-&gt;valueCount == 0;</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        <span class="keywordflow">if</span> (!empty &amp;&amp; !(formatOptions_ &amp; kFormatSingleLineArray)) {</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;            Base::os_-&gt;Put(<span class="charliteral">&#39;\n&#39;</span>);</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;            WriteIndent();</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        }</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;        <span class="keywordtype">bool</span> ret = Base::WriteEndArray();</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;        (void)ret;</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(ret == <span class="keyword">true</span>);</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        <span class="keywordflow">if</span> (Base::level_stack_.Empty()) <span class="comment">// end of json text</span></div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;            Base::os_-&gt;Flush();</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    }</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;<span class="comment">    //@}</span></div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;<span class="comment"></span><span class="comment"></span></div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="comment">    /*! @name Convenience extensions */</span><span class="comment"></span></div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<span class="comment">    //@{</span></div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="comment"></span><span class="comment"></span></div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<span class="comment">    //! Simpler but slower overload.</span></div>
+<div class="line"><a name="l00187"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_pretty_writer.html#a363c2280393e27e19bceb8d015c2832c">  187</a></span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> <a class="code" href="classrapidjson_1_1_pretty_writer.html#a363c2280393e27e19bceb8d015c2832c">String</a>(<span class="keyword">const</span> Ch* str) { <span class="keywordflow">return</span> <a class="code" href="classrapidjson_1_1_pretty_writer.html#a363c2280393e27e19bceb8d015c2832c">String</a>(str, internal::StrLen(str)); }</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordtype">bool</span> Key(<span class="keyword">const</span> Ch* str) { <span class="keywordflow">return</span> Key(str, internal::StrLen(str)); }</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="comment">    //@}</span></div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<span class="comment"></span><span class="comment"></span></div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<span class="comment">    //! Write a raw JSON value.</span></div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;<span class="comment"></span><span class="comment">    /*!</span></div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="comment">        For user to write a stringified JSON as a value.</span></div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;<span class="comment">        \param json A well-formed JSON value. It should not contain null character within [0, length - 1] range.</span></div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;<span class="comment">        \param length Length of the json.</span></div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;<span class="comment">        \param type Type of the root of json.</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="comment">        \note When using PrettyWriter::RawValue(), the result json may not be indented correctly.</span></div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;<span class="comment">    */</span></div>
+<div class="line"><a name="l00201"></a><span class="lineno"><a class="line" href="classrapidjson_1_1_pretty_writer.html#a3136e3426a5d06e5da50f6e6aab8a5be">  201</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classrapidjson_1_1_pretty_writer.html#a3136e3426a5d06e5da50f6e6aab8a5be">RawValue</a>(<span class="keyword">const</span> Ch* json, <span class="keywordtype">size_t</span> length, <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> type) {</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;        <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(json != 0);</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;        PrettyPrefix(type);</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        <span class="keywordflow">return</span> Base::WriteRawValue(json, length);</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    }</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="keywordtype">void</span> PrettyPrefix(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> type) {</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;        (void)type;</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        <span class="keywordflow">if</span> (Base::level_stack_.GetSize() != 0) { <span class="comment">// this value is not at root</span></div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;            <span class="keyword">typename</span> Base::Level* level = Base::level_stack_.template Top&lt;typename Base::Level&gt;();</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;            <span class="keywordflow">if</span> (level-&gt;inArray) {</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;                <span class="keywordflow">if</span> (level-&gt;valueCount &gt; 0) {</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;                    Base::os_-&gt;Put(<span class="charliteral">&#39;,&#39;</span>); <span class="comment">// add comma if it is not the first element in array</span></div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;                    <span class="keywordflow">if</span> (formatOptions_ &amp; kFormatSingleLineArray)</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;                        Base::os_-&gt;Put(<span class="charliteral">&#39; &#39;</span>);</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;                }</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;                <span class="keywordflow">if</span> (!(formatOptions_ &amp; kFormatSingleLineArray)) {</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;                    Base::os_-&gt;Put(<span class="charliteral">&#39;\n&#39;</span>);</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;                    WriteIndent();</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;                }</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;            }</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;            <span class="keywordflow">else</span> {  <span class="comment">// in object</span></div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;                <span class="keywordflow">if</span> (level-&gt;valueCount &gt; 0) {</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;                    <span class="keywordflow">if</span> (level-&gt;valueCount % 2 == 0) {</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;                        Base::os_-&gt;Put(<span class="charliteral">&#39;,&#39;</span>);</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;                        Base::os_-&gt;Put(<span class="charliteral">&#39;\n&#39;</span>);</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;                    }</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;                    <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;                        Base::os_-&gt;Put(<span class="charliteral">&#39;:&#39;</span>);</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;                        Base::os_-&gt;Put(<span class="charliteral">&#39; &#39;</span>);</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;                }</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;                <span class="keywordflow">if</span> (!(formatOptions_ &amp; kFormatSingleLineArray)) {</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;                    }</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;                }</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;                <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;                    Base::os_-&gt;Put(<span class="charliteral">&#39;\n&#39;</span>);</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;                    WriteIndent();</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;                }</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;            }</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;            <span class="keywordflow">else</span> {  <span class="comment">// in object</span></div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;                <span class="keywordflow">if</span> (level-&gt;valueCount &gt; 0) {</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;                    <span class="keywordflow">if</span> (level-&gt;valueCount % 2 == 0) {</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;                        Base::os_-&gt;Put(<span class="charliteral">&#39;,&#39;</span>);</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;                        Base::os_-&gt;Put(<span class="charliteral">&#39;\n&#39;</span>);</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;                    }</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;                    <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;                        Base::os_-&gt;Put(<span class="charliteral">&#39;:&#39;</span>);</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;                        Base::os_-&gt;Put(<span class="charliteral">&#39; &#39;</span>);</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;                    }</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;                }</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;                <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;                    Base::os_-&gt;Put(<span class="charliteral">&#39;\n&#39;</span>);</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;                <span class="keywordflow">if</span> (level-&gt;valueCount % 2 == 0)</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;                    WriteIndent();</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;            }</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;            <span class="keywordflow">if</span> (!level-&gt;inArray &amp;&amp; level-&gt;valueCount % 2 == 0)</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;                <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(type == <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4ad6379da3dc04b83a591992bfb9fabba7">kStringType</a>);  <span class="comment">// if it&#39;s in object, then even number should be a name</span></div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;            level-&gt;valueCount++;</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        }</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;        <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;            <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(!Base::hasRoot_);  <span class="comment">// Should only has one and only one root.</span></div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;            Base::hasRoot_ = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        }</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    }</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <span class="keywordtype">void</span> WriteIndent()  {</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        <span class="keywordtype">size_t</span> count = (Base::level_stack_.GetSize() / <span class="keyword">sizeof</span>(<span class="keyword">typename</span> Base::Level)) * indentCharCount_;</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;        <a class="code" href="namespacerapidjson.html#a1ac13bac5976fc06587e00fc0bcfb32a">PutN</a>(*Base::os_, static_cast&lt;typename OutputStream::Ch&gt;(indentChar_), count);</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    }</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;                <span class="keywordflow">if</span> (level-&gt;valueCount % 2 == 0)</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;                    WriteIndent();</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;            }</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;            <span class="keywordflow">if</span> (!level-&gt;inArray &amp;&amp; level-&gt;valueCount % 2 == 0)</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;                <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(type == <a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4ad6379da3dc04b83a591992bfb9fabba7">kStringType</a>);  <span class="comment">// if it&#39;s in object, then even number should be a name</span></div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;            level-&gt;valueCount++;</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;        }</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;        <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;            <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(!Base::hasRoot_);  <span class="comment">// Should only has one and only one root.</span></div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;            Base::hasRoot_ = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        }</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    }</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keywordtype">void</span> WriteIndent()  {</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;        <span class="keywordtype">size_t</span> count = (Base::level_stack_.GetSize() / <span class="keyword">sizeof</span>(<span class="keyword">typename</span> Base::Level)) * indentCharCount_;</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        <a class="code" href="namespacerapidjson.html#a1ac13bac5976fc06587e00fc0bcfb32a">PutN</a>(*Base::os_, static_cast&lt;typename OutputStream::Ch&gt;(indentChar_), count);</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    }</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    Ch indentChar_;</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="keywordtype">unsigned</span> indentCharCount_;</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <a class="code" href="namespacerapidjson.html#a084b31753ef2edefdeca8a5374eccc4b">PrettyFormatOptions</a> formatOptions_;</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    <span class="comment">// Prohibit copy constructor &amp; assignment operator.</span></div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    PrettyWriter(<span class="keyword">const</span> PrettyWriter&amp;);</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    PrettyWriter&amp; operator=(<span class="keyword">const</span> PrettyWriter&amp;);</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;};</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;RAPIDJSON_NAMESPACE_END</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;<span class="preprocessor">#if defined(__clang__)</span></div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;RAPIDJSON_DIAG_POP</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    Ch indentChar_;</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="keywordtype">unsigned</span> indentCharCount_;</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <a class="code" href="namespacerapidjson.html#a084b31753ef2edefdeca8a5374eccc4b">PrettyFormatOptions</a> formatOptions_;</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;<span class="preprocessor">#ifdef __GNUC__</span></div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;RAPIDJSON_DIAG_POP</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    <span class="comment">// Prohibit copy constructor &amp; assignment operator.</span></div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    PrettyWriter(<span class="keyword">const</span> PrettyWriter&amp;);</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    PrettyWriter&amp; operator=(<span class="keyword">const</span> PrettyWriter&amp;);</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;};</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;RAPIDJSON_NAMESPACE_END</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;<span class="preprocessor">#if defined(__clang__)</span></div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;RAPIDJSON_DIAG_POP</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;<span class="preprocessor">#ifdef __GNUC__</span></div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;RAPIDJSON_DIAG_POP</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_RAPIDJSON_H_</span></div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="preprocessor">#endif // RAPIDJSON_RAPIDJSON_H_</span></div>
 <div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4a80d9f25b083abce45edbfdd3ba006c8e"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a80d9f25b083abce45edbfdd3ba006c8e">rapidjson::kTrueType</a></div><div class="ttdoc">true </div><div class="ttdef"><b>Definition:</b> rapidjson.h:606</div></div>
+<div class="ttc" id="classrapidjson_1_1_pretty_writer_html_a363c2280393e27e19bceb8d015c2832c"><div class="ttname"><a href="classrapidjson_1_1_pretty_writer.html#a363c2280393e27e19bceb8d015c2832c">rapidjson::PrettyWriter::String</a></div><div class="ttdeci">bool String(const Ch *str)</div><div class="ttdoc">Simpler but slower overload. </div><div class="ttdef"><b>Definition:</b> prettywriter.h:187</div></div>
 <div class="ttc" id="namespacerapidjson_html_a084b31753ef2edefdeca8a5374eccc4b"><div class="ttname"><a href="namespacerapidjson.html#a084b31753ef2edefdeca8a5374eccc4b">rapidjson::PrettyFormatOptions</a></div><div class="ttdeci">PrettyFormatOptions</div><div class="ttdoc">Combination of PrettyWriter format flags. </div><div class="ttdef"><b>Definition:</b> prettywriter.h:35</div></div>
 <div class="ttc" id="namespacerapidjson_html_a084b31753ef2edefdeca8a5374eccc4ba64b0f8a37ab3125118682046ff06500f"><div class="ttname"><a href="namespacerapidjson.html#a084b31753ef2edefdeca8a5374eccc4ba64b0f8a37ab3125118682046ff06500f">rapidjson::kFormatSingleLineArray</a></div><div class="ttdoc">Format arrays on a single line. </div><div class="ttdef"><b>Definition:</b> prettywriter.h:37</div></div>
 <div class="ttc" id="namespacerapidjson_html_a44eb33eaa523e36d466b1ced64b85c84"><div class="ttname"><a href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">rapidjson::SizeType</a></div><div class="ttdeci">unsigned SizeType</div><div class="ttdoc">Size type (for string lengths, array sizes, etc.) </div><div class="ttdef"><b>Definition:</b> rapidjson.h:380</div></div>
 <div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4a9f2e7047832dce1029551b5de0f05607"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a9f2e7047832dce1029551b5de0f05607">rapidjson::kFalseType</a></div><div class="ttdoc">false </div><div class="ttdef"><b>Definition:</b> rapidjson.h:605</div></div>
 <div class="ttc" id="classrapidjson_1_1_pretty_writer_html"><div class="ttname"><a href="classrapidjson_1_1_pretty_writer.html">rapidjson::PrettyWriter</a></div><div class="ttdoc">Writer with indentation and spacing. </div><div class="ttdef"><b>Definition:</b> fwd.h:100</div></div>
-<div class="ttc" id="classrapidjson_1_1_pretty_writer_html_a3136e3426a5d06e5da50f6e6aab8a5be"><div class="ttname"><a href="classrapidjson_1_1_pretty_writer.html#a3136e3426a5d06e5da50f6e6aab8a5be">rapidjson::PrettyWriter::RawValue</a></div><div class="ttdeci">bool RawValue(const Ch *json, size_t length, Type type)</div><div class="ttdoc">Write a raw JSON value. </div><div class="ttdef"><b>Definition:</b> prettywriter.h:217</div></div>
+<div class="ttc" id="classrapidjson_1_1_pretty_writer_html_a3136e3426a5d06e5da50f6e6aab8a5be"><div class="ttname"><a href="classrapidjson_1_1_pretty_writer.html#a3136e3426a5d06e5da50f6e6aab8a5be">rapidjson::PrettyWriter::RawValue</a></div><div class="ttdeci">bool RawValue(const Ch *json, size_t length, Type type)</div><div class="ttdoc">Write a raw JSON value. </div><div class="ttdef"><b>Definition:</b> prettywriter.h:201</div></div>
 <div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">rapidjson::Type</a></div><div class="ttdeci">Type</div><div class="ttdoc">Type of JSON value. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:603</div></div>
 <div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">rapidjson::kObjectType</a></div><div class="ttdoc">object </div><div class="ttdef"><b>Definition:</b> rapidjson.h:607</div></div>
 <div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">rapidjson::kArrayType</a></div><div class="ttdoc">array </div><div class="ttdef"><b>Definition:</b> rapidjson.h:608</div></div>
@@ -393,7 +378,6 @@ $(document).ready(function(){initNavTree('prettywriter_8h_source.html','');});
 <div class="ttc" id="classrapidjson_1_1_pretty_writer_html_acde6176577f29869e28a4f3c4a251090"><div class="ttname"><a href="classrapidjson_1_1_pretty_writer.html#acde6176577f29869e28a4f3c4a251090">rapidjson::PrettyWriter::SetFormatOptions</a></div><div class="ttdeci">PrettyWriter &amp; SetFormatOptions(PrettyFormatOptions options)</div><div class="ttdoc">Set pretty writer formatting options. </div><div class="ttdef"><b>Definition:</b> prettywriter.h:85</div></div>
 <div class="ttc" id="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g_html_gabeba18d612187bad2ac62aed9276d47c"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a></div><div class="ttdeci">#define RAPIDJSON_ASSERT(x)</div><div class="ttdoc">Assertion. </div><div class="ttdef"><b>Definition:</b> rapidjson.h:402</div></div>
 <div class="ttc" id="namespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a">rapidjson::kNumberType</a></div><div class="ttdoc">number </div><div class="ttdef"><b>Definition:</b> rapidjson.h:610</div></div>
-<div class="ttc" id="classrapidjson_1_1_pretty_writer_html_add00cb7a4bf9019c838b1807980a0a9c"><div class="ttname"><a href="classrapidjson_1_1_pretty_writer.html#add00cb7a4bf9019c838b1807980a0a9c">rapidjson::PrettyWriter::String</a></div><div class="ttdeci">bool String(const T *const &amp;str)</div><div class="ttdoc">Simpler but slower overload. </div><div class="ttdef"><b>Definition:</b> prettywriter.h:190</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->
