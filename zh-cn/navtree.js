@@ -159,8 +159,8 @@ var NAVTREEINDEX =
 "allocators_8h_source.html",
 "classrapidjson_1_1_generic_object.html#ae38ccb43fb8bbd15ebcfbfb7ef02b6ce",
 "classrapidjson_1_1_generic_value.html#acf5019b9002ebfd66a1191d19e986c7b",
-"group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga93fb983f78208d12c822376e1ea6d185",
-"structrapidjson_1_1_generic_insitu_string_stream.html#a136bffd9cb0f8dc4aa3b768f14c50546"
+"group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga7f4e50c35dae3b015390daa6d48ce23c",
+"structrapidjson_1_1_generic_insitu_string_stream.html#a0f88ca6c2d9ccd0c201ddb37dae39298"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

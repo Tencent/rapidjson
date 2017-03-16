@@ -139,6 +139,9 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>GetMaxDecimalPlaces</b
 <tr class="memitem:a8acb89b2bbb1e5f384e6076b65044dbe"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#a8acb89b2bbb1e5f384e6076b65044dbe">RawValue</a> (const Ch *json, size_t length, <a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a> type)</td></tr>
 <tr class="memdesc:a8acb89b2bbb1e5f384e6076b65044dbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write a raw JSON value.  <a href="#a8acb89b2bbb1e5f384e6076b65044dbe">更多...</a><br /></td></tr>
 <tr class="separator:a8acb89b2bbb1e5f384e6076b65044dbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72cefd18d176bc12a53adb3185c51ca7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_writer.html#a72cefd18d176bc12a53adb3185c51ca7">Flush</a> ()</td></tr>
+<tr class="memdesc:a72cefd18d176bc12a53adb3185c51ca7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flush the output stream.  <a href="#a72cefd18d176bc12a53adb3185c51ca7">更多...</a><br /></td></tr>
+<tr class="separator:a72cefd18d176bc12a53adb3185c51ca7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Implementation of Handler</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><dl class="section see"><dt>参见</dt><dd><a class="el" href="classrapidjson_1_1_handler.html" title="Concept for receiving events from GenericReader upon parsing. The functions return true if no error o...">Handler</a> </dd></dl>
 </div></td></tr>
@@ -399,6 +402,34 @@ template&lt;typename OutputStream , typename SourceEncoding , typename TargetEnc
   </dd>
 </dl>
 <dl class="section return"><dt>返回</dt><dd>Whether it is succeed. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a72cefd18d176bc12a53adb3185c51ca7"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename OutputStream , typename SourceEncoding , typename TargetEncoding , typename StackAllocator , unsigned writeFlags&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer</a>&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;::Flush </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Flush the output stream. </p>
+<p>Allows the user to flush the output stream immediately. </p>
 
 </div>
 </div>
