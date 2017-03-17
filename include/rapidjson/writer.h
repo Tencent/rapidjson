@@ -267,6 +267,14 @@ public:
         return EndValue(WriteRawValue(json, length));
     }
 
+    //! Flush the output stream.
+    /*!
+        Allows the user to flush the output stream immediately.
+     */
+    void Flush() {
+        os_->Flush();
+    }
+
 protected:
     //! Information for each nested level
     struct Level {
@@ -473,7 +481,7 @@ protected:
     // Flush the value if it is the top level one.
     bool EndValue(bool ret) {
         if (RAPIDJSON_UNLIKELY(level_stack_.Empty()))   // end of json text
-            os_->Flush();
+            Flush();
         return ret;
     }
 
