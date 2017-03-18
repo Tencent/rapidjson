@@ -51,6 +51,7 @@ public:
     bool EndObject(SizeType) { st_ = kExitingObject; return true; }
     bool StartArray() { st_ = kEnteringArray; return true; }
     bool EndArray(SizeType) { st_ = kExitingArray; return true; }
+    virtual ~LookaheadParserHandler() { }
 
 protected:
     LookaheadParserHandler(char* str);
