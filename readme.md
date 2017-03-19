@@ -1,3 +1,11 @@
+This repository is a fork for RPM builds on Amazon Linux
+---------------------------------------------------------
+
+To build, run sudo ./build_rpm.sh
+
+Below is the original README.md
+
+
 ![](doc/logo/rapidjson.png)
 
 ![](https://img.shields.io/badge/release-v1.1.0-blue.png)
