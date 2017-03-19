@@ -20,7 +20,7 @@ Secondly, construct a `SchemaValidator` with the `SchemaDocument`. It is similar
 // ...
 
 Document sd;
-if (!sd.Parse(schemaJson).HasParseError()) {
+if (sd.Parse(schemaJson).HasParseError()) {
     // the schema is not a valid JSON.
     // ...       
 }
@@ -28,7 +28,7 @@ SchemaDocument schema(sd); // Compile a Document to SchemaDocument
 // sd is no longer needed here.
 
 Document d;
-if (!d.Parse(inputJson).HasParseError()) {
+if (d.Parse(inputJson).HasParseError()) {
     // the input is not a valid JSON.
     // ...       
 }
