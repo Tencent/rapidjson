@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md_doc_schema.html','');});
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> sd;</div>
-<div class="line"><span class="keywordflow">if</span> (!sd.Parse(schemaJson).HasParseError()) {</div>
+<div class="line"><span class="keywordflow">if</span> (sd.Parse(schemaJson).HasParseError()) {</div>
 <div class="line">    <span class="comment">// the schema is not a valid JSON.</span></div>
 <div class="line">    <span class="comment">// ...       </span></div>
 <div class="line">}</div>
@@ -99,7 +99,7 @@ $(document).ready(function(){initNavTree('md_doc_schema.html','');});
 <div class="line"><span class="comment">// sd is no longer needed here.</span></div>
 <div class="line"></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
-<div class="line"><span class="keywordflow">if</span> (!d.Parse(inputJson).HasParseError()) {</div>
+<div class="line"><span class="keywordflow">if</span> (d.Parse(inputJson).HasParseError()) {</div>
 <div class="line">    <span class="comment">// the input is not a valid JSON.</span></div>
 <div class="line">    <span class="comment">// ...       </span></div>
 <div class="line">}</div>
