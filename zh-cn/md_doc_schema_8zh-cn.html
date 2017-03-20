@@ -91,7 +91,7 @@ $(document).ready(function(){initNavTree('md_doc_schema_8zh-cn.html','');});
 <div class="line"><span class="comment">// ...</span></div>
 <div class="line"></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> sd;</div>
-<div class="line"><span class="keywordflow">if</span> (!sd.Parse(schemaJson).HasParseError()) {</div>
+<div class="line"><span class="keywordflow">if</span> (sd.Parse(schemaJson).HasParseError()) {</div>
 <div class="line">    <span class="comment">// 此 schema 不是合法的 JSON</span></div>
 <div class="line">    <span class="comment">// ...       </span></div>
 <div class="line">}</div>
@@ -99,7 +99,7 @@ $(document).ready(function(){initNavTree('md_doc_schema_8zh-cn.html','');});
 <div class="line"><span class="comment">// 之后不再需要 sd</span></div>
 <div class="line"></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
-<div class="line"><span class="keywordflow">if</span> (!d.Parse(inputJson).HasParseError()) {</div>
+<div class="line"><span class="keywordflow">if</span> (d.Parse(inputJson).HasParseError()) {</div>
 <div class="line">    <span class="comment">// 输入不是一个合法的 JSON</span></div>
 <div class="line">    <span class="comment">// ...       </span></div>
 <div class="line">}</div>
