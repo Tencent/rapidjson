@@ -20,7 +20,7 @@ RapidJSON 实现了一个 [JSON Schema Draft v4](http://json-schema.org/document
 // ...
 
 Document sd;
-if (!sd.Parse(schemaJson).HasParseError()) {
+if (sd.Parse(schemaJson).HasParseError()) {
     // 此 schema 不是合法的 JSON
     // ...       
 }
@@ -28,7 +28,7 @@ SchemaDocument schema(sd); // 把一个 Document 编译至 SchemaDocument
 // 之后不再需要 sd
 
 Document d;
-if (!d.Parse(inputJson).HasParseError()) {
+if (d.Parse(inputJson).HasParseError()) {
     // 输入不是一个合法的 JSON
     // ...       
 }
