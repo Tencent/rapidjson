@@ -401,6 +401,16 @@ TEST(Writer, InvalidEncoding) {
         static const UTF32<>::Ch s[] = { 0x110000, 0 }; // Out of U+0000 to U+10FFFF
         EXPECT_FALSE(writer.String(s));
     }
+
+    // Fail in decoding invalid ASCII control bytes
+    {
+        GenericStringBuffer<UTF16<> > buffer;
+        Writer<GenericStringBuffer<UTF16<> >, UTF8<>, UTF16<> > writer(buffer);
+        writer.StartArray();
+        EXPECT_FALSE(writer.String("\x01"));
+        EXPECT_FALSE(writer.String("\x1C"));
+        writer.EndArray();
+    }
 }
 
 TEST(Writer, ValidateEncoding) {
