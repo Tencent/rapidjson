@@ -401,16 +401,6 @@ TEST(Writer, InvalidEncoding) {
         static const UTF32<>::Ch s[] = { 0x110000, 0 }; // Out of U+0000 to U+10FFFF
         EXPECT_FALSE(writer.String(s));
     }
-
-    // Fail in decoding invalid ASCII control bytes
-    {
-        GenericStringBuffer<UTF16<> > buffer;
-        Writer<GenericStringBuffer<UTF16<> >, UTF8<>, UTF16<> > writer(buffer);
-        writer.StartArray();
-        EXPECT_FALSE(writer.String("\x01"));
-        EXPECT_FALSE(writer.String("\x1C"));
-        writer.EndArray();
-    }
 }
 
 TEST(Writer, ValidateEncoding) {
@@ -422,8 +412,10 @@ TEST(Writer, ValidateEncoding) {
         EXPECT_TRUE(writer.String("\xC2\xA2"));         // Cents sign U+00A2
         EXPECT_TRUE(writer.String("\xE2\x82\xAC"));     // Euro sign U+20AC
         EXPECT_TRUE(writer.String("\xF0\x9D\x84\x9E")); // G clef sign U+1D11E
+        EXPECT_TRUE(writer.String("\x01"));             // SOH control U+0001
+        EXPECT_TRUE(writer.String("\x1B"));             // Escape control U+001B
         writer.EndArray();
-        EXPECT_STREQ("[\"\x24\",\"\xC2\xA2\",\"\xE2\x82\xAC\",\"\xF0\x9D\x84\x9E\"]", buffer.GetString());
+        EXPECT_STREQ("[\"\x24\",\"\xC2\xA2\",\"\xE2\x82\xAC\",\"\xF0\x9D\x84\x9E\",\"\\u0001\",\"\\u001B\"]", buffer.GetString());
     }
 
     // Fail in decoding invalid UTF-8 sequence http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt

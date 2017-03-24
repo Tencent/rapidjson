@@ -955,7 +955,7 @@ private:
                 if (c == '\0')
                     RAPIDJSON_PARSE_ERROR(kParseErrorStringMissQuotationMark, is.Tell());
                 else
-                    RAPIDJSON_PARSE_ERROR(kParseErrorStringEscapeInvalid, is.Tell());
+                    RAPIDJSON_PARSE_ERROR(kParseErrorStringInvalidEncoding, is.Tell());
             }
             else {
                 size_t offset = is.Tell();
