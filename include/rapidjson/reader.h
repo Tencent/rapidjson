@@ -955,7 +955,7 @@ private:
                 if (c == '\0')
                     RAPIDJSON_PARSE_ERROR(kParseErrorStringMissQuotationMark, is.Tell());
                 else
-                    RAPIDJSON_PARSE_ERROR(kParseErrorStringEscapeInvalid, is.Tell());
+                    RAPIDJSON_PARSE_ERROR(kParseErrorStringInvalidEncoding, is.Tell());
             }
             else {
                 size_t offset = is.Tell();
@@ -990,7 +990,7 @@ private:
         // The rest of string using SIMD
         static const char dquote[16] = { '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"' };
         static const char bslash[16] = { '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\' };
-        static const char space[16]  = { 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19 };
+        static const char space[16]  = { 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F };
         const __m128i dq = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&dquote[0]));
         const __m128i bs = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&bslash[0]));
         const __m128i sp = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&space[0]));
@@ -999,7 +999,7 @@ private:
             const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
             const __m128i t1 = _mm_cmpeq_epi8(s, dq);
             const __m128i t2 = _mm_cmpeq_epi8(s, bs);
-            const __m128i t3 = _mm_cmpeq_epi8(_mm_max_epu8(s, sp), sp); // s < 0x20 <=> max(s, 0x19) == 0x19
+            const __m128i t3 = _mm_cmpeq_epi8(_mm_max_epu8(s, sp), sp); // s < 0x20 <=> max(s, 0x1F) == 0x1F
             const __m128i x = _mm_or_si128(_mm_or_si128(t1, t2), t3);
             unsigned short r = static_cast<unsigned short>(_mm_movemask_epi8(x));
             if (RAPIDJSON_UNLIKELY(r != 0)) {   // some of characters is escaped
@@ -1053,7 +1053,7 @@ private:
         // The rest of string using SIMD
         static const char dquote[16] = { '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"' };
         static const char bslash[16] = { '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\' };
-        static const char space[16] = { 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19 };
+        static const char space[16] = { 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F };
         const __m128i dq = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&dquote[0]));
         const __m128i bs = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&bslash[0]));
         const __m128i sp = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&space[0]));
@@ -1062,7 +1062,7 @@ private:
             const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
             const __m128i t1 = _mm_cmpeq_epi8(s, dq);
             const __m128i t2 = _mm_cmpeq_epi8(s, bs);
-            const __m128i t3 = _mm_cmpeq_epi8(_mm_max_epu8(s, sp), sp); // s < 0x20 <=> max(s, 0x19) == 0x19
+            const __m128i t3 = _mm_cmpeq_epi8(_mm_max_epu8(s, sp), sp); // s < 0x20 <=> max(s, 0x1F) == 0x1F
             const __m128i x = _mm_or_si128(_mm_or_si128(t1, t2), t3);
             unsigned short r = static_cast<unsigned short>(_mm_movemask_epi8(x));
             if (RAPIDJSON_UNLIKELY(r != 0)) {   // some of characters is escaped
@@ -1101,7 +1101,7 @@ private:
         // The rest of string using SIMD
         static const char dquote[16] = { '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"' };
         static const char bslash[16] = { '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\' };
-        static const char space[16] = { 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19 };
+        static const char space[16] = { 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F };
         const __m128i dq = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&dquote[0]));
         const __m128i bs = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&bslash[0]));
         const __m128i sp = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&space[0]));
@@ -1110,7 +1110,7 @@ private:
             const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
             const __m128i t1 = _mm_cmpeq_epi8(s, dq);
             const __m128i t2 = _mm_cmpeq_epi8(s, bs);
-            const __m128i t3 = _mm_cmpeq_epi8(_mm_max_epu8(s, sp), sp); // s < 0x20 <=> max(s, 0x19) == 0x19
+            const __m128i t3 = _mm_cmpeq_epi8(_mm_max_epu8(s, sp), sp); // s < 0x20 <=> max(s, 0x1F) == 0x1F
             const __m128i x = _mm_or_si128(_mm_or_si128(t1, t2), t3);
             unsigned short r = static_cast<unsigned short>(_mm_movemask_epi8(x));
             if (RAPIDJSON_UNLIKELY(r != 0)) {   // some of characters is escaped
