@@ -129,7 +129,7 @@ $(document).ready(function(){initNavTree('prettywriter_8h_source.html','');});
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> OutputStream, <span class="keyword">typename</span> SourceEncoding = UTF8&lt;&gt;, <span class="keyword">typename</span> TargetEncoding = UTF8&lt;&gt;, <span class="keyword">typename</span> StackAllocator = CrtAllocator, <span class="keywordtype">unsigned</span> writeFlags = kWriteDefaultFlags&gt;</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="keyword">class </span>PrettyWriter : <span class="keyword">public</span> Writer&lt;OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags&gt; {</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">typedef</span> Writer&lt;OutputStream, SourceEncoding, TargetEncoding, StackAllocator&gt; Base;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">typedef</span> Writer&lt;OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags&gt; Base;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">typedef</span> <span class="keyword">typename</span> Base::Ch Ch;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment">    //! Constructor</span></div>

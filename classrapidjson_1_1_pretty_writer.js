@@ -1,6 +1,6 @@
 var classrapidjson_1_1_pretty_writer =
 [
-    [ "Base", "classrapidjson_1_1_pretty_writer.html#a44d22256ee4c3a1e3c45bda59f280b5f", null ],
+    [ "Base", "classrapidjson_1_1_pretty_writer.html#a792881200bdf51add62117617e66bd49", null ],
     [ "Ch", "classrapidjson_1_1_pretty_writer.html#a74a38902073aa599c8bcc6a3ca6126d0", null ],
     [ "PrettyWriter", "classrapidjson_1_1_pretty_writer.html#a688d7ebf5c8015e423b7a970afc8e0a0", null ],
     [ "PrettyWriter", "classrapidjson_1_1_pretty_writer.html#a2872cf0f442e07fd823846432c0d3923", null ],
