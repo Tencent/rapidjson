@@ -2293,7 +2293,7 @@ public:
     template <unsigned parseFlags, typename SourceEncoding>
     GenericDocument& Parse(const typename SourceEncoding::Ch* str, size_t length) {
         RAPIDJSON_ASSERT(!(parseFlags & kParseInsituFlag));
-        MemoryStream ms(static_cast<const char*>(str), length * sizeof(typename SourceEncoding::Ch));
+        MemoryStream ms(reinterpret_cast<const char*>(str), length * sizeof(typename SourceEncoding::Ch));
         EncodedInputStream<SourceEncoding, MemoryStream> is(ms);
         ParseStream<parseFlags, SourceEncoding>(is);
         return *this;
