@@ -32,6 +32,8 @@
 #include <nmmintrin.h>
 #elif defined(RAPIDJSON_SSE2)
 #include <emmintrin.h>
+#elif defined(RAPIDJSON_NEON)
+#include <arm_neon.h>
 #endif
 
 #ifdef _MSC_VER
@@ -619,7 +621,75 @@ inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, siz
     is.src_ = p;
     return RAPIDJSON_LIKELY(is.Tell() < length);
 }
-#endif // defined(RAPIDJSON_SSE2) || defined(RAPIDJSON_SSE42)
+#elif defined(RAPIDJSON_NEON)
+template<>
+inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, size_t length) {
+    if (length < 16)
+        return RAPIDJSON_LIKELY(is.Tell() < length);
+
+    if (!RAPIDJSON_LIKELY(is.Tell() < length))
+        return false;
+
+    const char* p = is.src_;
+    const char* end = is.head_ + length;
+    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
+    const char* endAligned = reinterpret_cast<const char*>(reinterpret_cast<size_t>(end) & static_cast<size_t>(~15));
+    if (nextAligned > end)
+        return true;
+
+    while (p != nextAligned)
+        if (*p < 0x20 || *p == '\"' || *p == '\\') {
+            is.src_ = p;
+            return RAPIDJSON_LIKELY(is.Tell() < length);
+        }
+        else
+            os_->PutUnsafe(*p++);
+
+    // The rest of string using SIMD
+    const uint8x16_t s0 = vmovq_n_u8('"');
+    const uint8x16_t s1 = vmovq_n_u8('\\');
+    const uint8x16_t s2 = vmovq_n_u8('\b');
+    const uint8x16_t s3 = vmovq_n_u8(32);
+
+    for (; p != endAligned; p += 16) {
+        const uint8x16_t s = vld1q_u8(reinterpret_cast<const uint8_t *>(p));
+        uint8x16_t x = vceqq_u8(s, s0);
+        x = vorrq_u8(x, vceqq_u8(s, s1));
+        x = vorrq_u8(x, vceqq_u8(s, s2));
+        x = vorrq_u8(x, vcltq_u8(s, s3));
+
+        x = vrev64q_u8(x);                     // Rev in 64
+        uint64_t low = vgetq_lane_u64(reinterpret_cast<uint64x2_t>(x), 0);   // extract
+        uint64_t high = vgetq_lane_u64(reinterpret_cast<uint64x2_t>(x), 1);  // extract
+
+        SizeType len = 0;
+        bool escaped = false;
+        if (low == 0) {
+            if (high != 0) {
+                unsigned lz = (unsigned)__builtin_clzll(high);
+                len = 8 + (lz >> 3);
+                escaped = true;
+            }
+        } else {
+            unsigned lz = (unsigned)__builtin_clzll(low);
+            len = lz >> 3;
+            escaped = true;
+        }
+        if (RAPIDJSON_UNLIKELY(escaped)) {   // some of characters is escaped
+            char* q = reinterpret_cast<char*>(os_->PushUnsafe(len));
+            for (size_t i = 0; i < len; i++)
+                q[i] = p[i];
+
+            p += len;
+            break;
+        }
+        vst1q_u8(reinterpret_cast<uint8_t *>(os_->PushUnsafe(16)), s);
+    }
+
+    is.src_ = p;
+    return RAPIDJSON_LIKELY(is.Tell() < length);
+}
+#endif // RAPIDJSON_NEON
 
 RAPIDJSON_NAMESPACE_END
 

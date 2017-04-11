@@ -257,7 +257,7 @@
 
 3. 什是是 SIMD？它如何用于 RapidJSON？
 
-   [SIMD](http://en.wikipedia.org/wiki/SIMD) 指令可以在现代 CPU 中执行并行运算。RapidJSON 支持了 Intel 的 SSE2/SSE4.2 去加速跳过空白字符。在解析含缩进的 JSON 时，这能提升性能。只要定义名为 `RAPIDJSON_SSE2` 或 `RAPIDJSON_SSE42` 的宏，就能启动这个功能。然而，若在不支持这些指令集的机器上执行这些可执行文件，会导致崩溃。
+   [SIMD](http://en.wikipedia.org/wiki/SIMD) 指令可以在现代 CPU 中执行并行运算。RapidJSON 支持使用 Intel 的 SSE2/SSE4.2 和 ARM 的 Neon 来加速对空白符、制表符、回车符和换行符的过滤处理。在解析含缩进的 JSON 时，这能提升性能。只要定义名为 `RAPIDJSON_SSE2` ，`RAPIDJSON_SSE42` 或 `RAPIDJSON_NEON` 的宏，就能启动这个功能。然而，若在不支持这些指令集的机器上执行这些可执行文件，会导致崩溃。
 
 4. 它会消耗许多内存么？
 
