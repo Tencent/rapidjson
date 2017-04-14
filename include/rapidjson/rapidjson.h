@@ -49,6 +49,11 @@
 // token stringification
 #define RAPIDJSON_STRINGIFY(x) RAPIDJSON_DO_STRINGIFY(x)
 #define RAPIDJSON_DO_STRINGIFY(x) #x
+
+// token concatenation
+#define RAPIDJSON_JOIN(X, Y) RAPIDJSON_DO_JOIN(X, Y)
+#define RAPIDJSON_DO_JOIN(X, Y) RAPIDJSON_DO_JOIN2(X, Y)
+#define RAPIDJSON_DO_JOIN2(X, Y) X##Y
 //!@endcond
 
 /*! \def RAPIDJSON_MAJOR_VERSION
@@ -405,7 +410,15 @@ RAPIDJSON_NAMESPACE_END
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_STATIC_ASSERT
 
-// Adopt from boost
+// Prefer C++11 static_assert, if available
+#ifndef RAPIDJSON_STATIC_ASSERT
+#if __cplusplus >= 201103L || ( defined(_MSC_VER) && _MSC_VER >= 1800 )
+#define RAPIDJSON_STATIC_ASSERT(x) \
+   static_assert(x, RAPIDJSON_STRINGIFY(x))
+#endif // C++11
+#endif // RAPIDJSON_STATIC_ASSERT
+
+// Adopt C++03 implementation from boost
 #ifndef RAPIDJSON_STATIC_ASSERT
 #ifndef __clang__
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
@@ -415,10 +428,6 @@ template <bool x> struct STATIC_ASSERTION_FAILURE;
 template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
 template<int x> struct StaticAssertTest {};
 RAPIDJSON_NAMESPACE_END
-
-#define RAPIDJSON_JOIN(X, Y) RAPIDJSON_DO_JOIN(X, Y)
-#define RAPIDJSON_DO_JOIN(X, Y) RAPIDJSON_DO_JOIN2(X, Y)
-#define RAPIDJSON_DO_JOIN2(X, Y) X##Y
 
 #if defined(__GNUC__)
 #define RAPIDJSON_STATIC_ASSERT_UNUSED_ATTRIBUTE __attribute__((unused))
@@ -438,7 +447,7 @@ RAPIDJSON_NAMESPACE_END
     typedef ::RAPIDJSON_NAMESPACE::StaticAssertTest< \
       sizeof(::RAPIDJSON_NAMESPACE::STATIC_ASSERTION_FAILURE<bool(x) >)> \
     RAPIDJSON_JOIN(StaticAssertTypedef, __LINE__) RAPIDJSON_STATIC_ASSERT_UNUSED_ATTRIBUTE
-#endif
+#endif // RAPIDJSON_STATIC_ASSERT
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_LIKELY, RAPIDJSON_UNLIKELY
