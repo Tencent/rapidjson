@@ -508,7 +508,7 @@ $(document).ready(function(){initNavTree('rapidjson_8h_source.html','');});
 <div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;RAPIDJSON_NAMESPACE_BEGIN</div>
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">bool</span> x&gt; <span class="keyword">struct </span>STATIC_ASSERTION_FAILURE;</div>
 <div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;<span class="keyword">template</span> &lt;&gt; <span class="keyword">struct </span>STATIC_ASSERTION_FAILURE&lt;true&gt; { <span class="keyword">enum</span> { value = 1 }; };</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;<span class="keyword">template</span>&lt;<span class="keywordtype">int</span> x&gt; <span class="keyword">struct </span>StaticAssertTest {};</div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;<span class="keyword">template</span> &lt;<span class="keywordtype">size_t</span> x&gt; <span class="keyword">struct </span>StaticAssertTest {};</div>
 <div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;RAPIDJSON_NAMESPACE_END</div>
 <div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;</div>
 <div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;<span class="preprocessor">#if defined(__GNUC__)</span></div>
