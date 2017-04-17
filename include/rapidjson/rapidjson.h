@@ -426,7 +426,7 @@ RAPIDJSON_NAMESPACE_END
 RAPIDJSON_NAMESPACE_BEGIN
 template <bool x> struct STATIC_ASSERTION_FAILURE;
 template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
-template<int x> struct StaticAssertTest {};
+template <size_t x> struct StaticAssertTest {};
 RAPIDJSON_NAMESPACE_END
 
 #if defined(__GNUC__)
