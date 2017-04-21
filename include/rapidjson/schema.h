@@ -1789,7 +1789,7 @@ RAPIDJSON_MULTILINEMACRO_END
     }
 
     virtual void FreeState(void* p) {
-        return StateAllocator::Free(p);
+        StateAllocator::Free(p);
     }
 
 private:

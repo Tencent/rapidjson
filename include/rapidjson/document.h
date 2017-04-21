@@ -515,7 +515,7 @@ struct TypeHelper<ValueType, typename ValueType::Object> {
     static bool Is(const ValueType& v) { return v.IsObject(); }
     static ObjectType Get(ValueType& v) { return v.GetObject(); }
     static ValueType& Set(ValueType& v, ObjectType data) { return v = data; }
-    static ValueType& Set(ValueType& v, ObjectType data, typename ValueType::AllocatorType&) { v = data; }
+    static ValueType& Set(ValueType& v, ObjectType data, typename ValueType::AllocatorType&) { return v = data; }
 };
 
 template<typename ValueType> 
