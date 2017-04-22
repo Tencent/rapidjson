@@ -597,7 +597,7 @@ $(document).ready(function(){initNavTree('document_8h_source.html','');});
 <div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">bool</span> Is(<span class="keyword">const</span> ValueType&amp; v) { <span class="keywordflow">return</span> v.IsObject(); }</div>
 <div class="line"><a name="l00516"></a><span class="lineno">  516</span>&#160;    <span class="keyword">static</span> ObjectType Get(ValueType&amp; v) { <span class="keywordflow">return</span> v.GetObject(); }</div>
 <div class="line"><a name="l00517"></a><span class="lineno">  517</span>&#160;    <span class="keyword">static</span> ValueType&amp; Set(ValueType&amp; v, ObjectType data) { <span class="keywordflow">return</span> v = data; }</div>
-<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;    <span class="keyword">static</span> ValueType&amp; Set(ValueType&amp; v, ObjectType data, <span class="keyword">typename</span> ValueType::AllocatorType&amp;) { v = data; }</div>
+<div class="line"><a name="l00518"></a><span class="lineno">  518</span>&#160;    <span class="keyword">static</span> ValueType&amp; Set(ValueType&amp; v, ObjectType data, <span class="keyword">typename</span> ValueType::AllocatorType&amp;) { <span class="keywordflow">return</span> v = data; }</div>
 <div class="line"><a name="l00519"></a><span class="lineno">  519</span>&#160;};</div>
 <div class="line"><a name="l00520"></a><span class="lineno">  520</span>&#160;</div>
 <div class="line"><a name="l00521"></a><span class="lineno">  521</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> ValueType&gt; </div>

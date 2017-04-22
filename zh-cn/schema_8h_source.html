@@ -1194,8 +1194,8 @@ $(document).ready(function(){initNavTree('schema_8h_source.html','');});
 <div class="line"><a name="l01112"></a><span class="lineno"> 1112</span>&#160;                <span class="keywordflow">if</span> (exclusiveMaximum_ ? i &gt;= maximum_.GetInt64() : i &gt; maximum_.GetInt64())</div>
 <div class="line"><a name="l01113"></a><span class="lineno"> 1113</span>&#160;                    RAPIDJSON_INVALID_KEYWORD_RETURN(GetMaximumString());</div>
 <div class="line"><a name="l01114"></a><span class="lineno"> 1114</span>&#160;            }</div>
-<div class="line"><a name="l01115"></a><span class="lineno"> 1115</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (maximum_.IsUint64())</div>
-<div class="line"><a name="l01116"></a><span class="lineno"> 1116</span>&#160;                <span class="comment">/* do nothing */</span>; <span class="comment">// i &lt;= max(int64_t) &lt; maximum_.GetUint64()</span></div>
+<div class="line"><a name="l01115"></a><span class="lineno"> 1115</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (maximum_.IsUint64()) { }</div>
+<div class="line"><a name="l01116"></a><span class="lineno"> 1116</span>&#160;                <span class="comment">/* do nothing */</span> <span class="comment">// i &lt;= max(int64_t) &lt; maximum_.GetUint64()</span></div>
 <div class="line"><a name="l01117"></a><span class="lineno"> 1117</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (!CheckDoubleMaximum(context, static_cast&lt;double&gt;(i)))</div>
 <div class="line"><a name="l01118"></a><span class="lineno"> 1118</span>&#160;                <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a name="l01119"></a><span class="lineno"> 1119</span>&#160;        }</div>
@@ -1871,7 +1871,7 @@ $(document).ready(function(){initNavTree('schema_8h_source.html','');});
 <div class="line"><a name="l01789"></a><span class="lineno"> 1789</span>&#160;    }</div>
 <div class="line"><a name="l01790"></a><span class="lineno"> 1790</span>&#160;</div>
 <div class="line"><a name="l01791"></a><span class="lineno"> 1791</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> FreeState(<span class="keywordtype">void</span>* p) {</div>
-<div class="line"><a name="l01792"></a><span class="lineno"> 1792</span>&#160;        <span class="keywordflow">return</span> StateAllocator::Free(p);</div>
+<div class="line"><a name="l01792"></a><span class="lineno"> 1792</span>&#160;        StateAllocator::Free(p);</div>
 <div class="line"><a name="l01793"></a><span class="lineno"> 1793</span>&#160;    }</div>
 <div class="line"><a name="l01794"></a><span class="lineno"> 1794</span>&#160;</div>
 <div class="line"><a name="l01795"></a><span class="lineno"> 1795</span>&#160;<span class="keyword">private</span>:</div>
