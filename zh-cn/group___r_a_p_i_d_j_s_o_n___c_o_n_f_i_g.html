@@ -123,7 +123,7 @@ $(document).ready(function(){initNavTree('group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_
 <tr class="memdesc:ga93fb983f78208d12c822376e1ea6d185"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use only lower 48-bit address for some pointers.  <a href="#ga93fb983f78208d12c822376e1ea6d185">更多...</a><br /></td></tr>
 <tr class="separator:ga93fb983f78208d12c822376e1ea6d185"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga0ccf72f3ebc4b3306ab669f95ca5c64b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga0ccf72f3ebc4b3306ab669f95ca5c64b">RAPIDJSON_SIMD</a></td></tr>
-<tr class="memdesc:ga0ccf72f3ebc4b3306ab669f95ca5c64b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable SSE2/SSE4.2 optimization.  <a href="#ga0ccf72f3ebc4b3306ab669f95ca5c64b">更多...</a><br /></td></tr>
+<tr class="memdesc:ga0ccf72f3ebc4b3306ab669f95ca5c64b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable SSE2/SSE4.2/Neon optimization.  <a href="#ga0ccf72f3ebc4b3306ab669f95ca5c64b">更多...</a><br /></td></tr>
 <tr class="separator:ga0ccf72f3ebc4b3306ab669f95ca5c64b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga250603aa9e2a12429b25ba0c8108ad4f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga250603aa9e2a12429b25ba0c8108ad4f">RAPIDJSON_NO_SIZETYPEDEFINE</a></td></tr>
 <tr class="memdesc:ga250603aa9e2a12429b25ba0c8108ad4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">User-provided <code>SizeType</code> definition.  <a href="#ga250603aa9e2a12429b25ba0c8108ad4f">更多...</a><br /></td></tr>
@@ -349,14 +349,15 @@ $(document).ready(function(){initNavTree('group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_
       </table>
 </div><div class="memdoc">
 
-<p>Enable SSE2/SSE4.2 optimization. </p>
-<p>RapidJSON supports optimized implementations for some parsing operations based on the SSE2 or SSE4.2 SIMD extensions on modern Intel-compatible processors.</p>
-<p>To enable these optimizations, two different symbols can be defined; </p><div class="fragment"><div class="line"><span class="comment">// Enable SSE2 optimization.</span></div>
+<p>Enable SSE2/SSE4.2/Neon optimization. </p>
+<p>RapidJSON supports optimized implementations for some parsing operations based on the SSE2, SSE4.2 or NEon SIMD extensions on modern Intel or ARM compatible processors.</p>
+<p>To enable these optimizations, three different symbols can be defined; </p><div class="fragment"><div class="line"><span class="comment">// Enable SSE2 optimization.</span></div>
 <div class="line"><span class="preprocessor">#define RAPIDJSON_SSE2</span></div>
 <div class="line"></div>
 <div class="line"><span class="comment">// Enable SSE4.2 optimization.</span></div>
 <div class="line"><span class="preprocessor">#define RAPIDJSON_SSE42</span></div>
-</div><!-- fragment --><p><code>RAPIDJSON_SSE42</code> takes precedence, if both are defined.</p>
+</div><!-- fragment --><p>Enable ARM Neon optimization. #define RAPIDJSON_NEON </p>
+<p><code>RAPIDJSON_SSE42</code> takes precedence over SSE2, if both are defined.</p>
 <p>If any of these symbols is defined, RapidJSON defines the macro <code>RAPIDJSON_SIMD</code> to indicate the availability of the optimized code. </p>
 
 </div>

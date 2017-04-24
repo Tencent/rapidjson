@@ -317,14 +317,17 @@ MemoryPoolAllocator</h2>
 <div class="line">        s.Take();</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>但是，这需要对每个字符进行4次比较以及一些分支。这被发现是一个热点。</p>
-<p>为了加速这一处理，RapidJSON 使用 SIMD 来在一次迭代中比较16个字符和4个空格。目前 RapidJSON 只支持 SSE2 和 SSE4.2 指令。同时它也只会对 UTF-8 内存流启用，包括字符串流或 *原位* 解析。</p>
-<p>你可以通过在包含 <code><a class="el" href="rapidjson_8h.html" title="common definitions and configuration ">rapidjson.h</a></code> 之前定义 <code>RAPIDJSON_SSE2</code> 或 <code>RAPIDJSON_SSE42</code> 来启用这个优化。一些编译器可以检测这个设置，如 <code>perftest.h</code>：</p>
+<p>为了加速这一处理，RapidJSON 使用 SIMD 来在一次迭代中比较16个字符和4个空格。目前 RapidJSON 支持 SSE2 ， SSE4.2 和 ARM Neon 指令。同时它也只会对 UTF-8 内存流启用，包括字符串流或 *原位* 解析。</p>
+<p>你可以通过在包含 <code><a class="el" href="rapidjson_8h.html" title="common definitions and configuration ">rapidjson.h</a></code> 之前定义 <code>RAPIDJSON_SSE2</code> ， <code>RAPIDJSON_SSE42</code> 或 <code>RAPIDJSON_NEON</code> 来启用这个优化。一些编译器可以检测这个设置，如 <code>perftest.h</code>：</p>
 <div class="fragment"><div class="line"><span class="comment">// __SSE2__ 和 __SSE4_2__ 可被 gcc、clang 和 Intel 编译器识别：</span></div>
 <div class="line"><span class="comment">// 如果支持的话，我们在 gmake 中使用了 -march=native 来启用 -msse2 和 -msse4.2</span></div>
+<div class="line"><span class="comment">// 同样的， __ARM_NEON 被用于识别Neon</span></div>
 <div class="line"><span class="preprocessor">#if defined(__SSE4_2__)</span></div>
 <div class="line"><span class="preprocessor">#  define RAPIDJSON_SSE42</span></div>
 <div class="line"><span class="preprocessor">#elif defined(__SSE2__)</span></div>
 <div class="line"><span class="preprocessor">#  define RAPIDJSON_SSE2</span></div>
+<div class="line"><span class="preprocessor">#elif defined(__ARM_NEON)</span></div>
+<div class="line"><span class="preprocessor">#  define RAPIDJSON_NEON</span></div>
 <div class="line"><span class="preprocessor">#endif</span></div>
 </div><!-- fragment --><p>需要注意的是，这是编译期的设置。在不支持这些指令的机器上运行可执行文件会使它崩溃。</p>
 <h3>页面对齐问题</h3>
