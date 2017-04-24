@@ -256,7 +256,7 @@ Alternatively, if we don't want to explicitly refer to the root value of `addres
 
 3. What is SIMD? How it is applied in RapidJSON?
 
-   [SIMD](http://en.wikipedia.org/wiki/SIMD) instructions can perform parallel computation in modern CPUs. RapidJSON support Intel's SSE2/SSE4.2 to accelerate whitespace skipping. This improves performance of parsing indent formatted JSON. Define `RAPIDJSON_SSE2` or `RAPIDJSON_SSE42` macro to enable this feature. However, running the executable on a machine without such instruction set support will make it crash.
+   [SIMD](http://en.wikipedia.org/wiki/SIMD) instructions can perform parallel computation in modern CPUs. RapidJSON support Intel's SSE2/SSE4.2 and ARM's Neon to accelerate whitespace/tabspace/carriage-return/line-feed skipping. This improves performance of parsing indent formatted JSON. Define `RAPIDJSON_SSE2`, `RAPIDJSON_SSE42` or `RAPIDJSON_NEON` macro to enable this feature. However, running the executable on a machine without such instruction set support will make it crash.
 
 4. Does it consume a lot of memory?
 

@@ -325,17 +325,17 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
-// RAPIDJSON_SSE2/RAPIDJSON_SSE42/RAPIDJSON_SIMD
+// RAPIDJSON_SSE2/RAPIDJSON_SSE42/RAPIDJSON_NEON/RAPIDJSON_SIMD
 
 /*! \def RAPIDJSON_SIMD
     \ingroup RAPIDJSON_CONFIG
-    \brief Enable SSE2/SSE4.2 optimization.
+    \brief Enable SSE2/SSE4.2/Neon optimization.
 
     RapidJSON supports optimized implementations for some parsing operations
-    based on the SSE2 or SSE4.2 SIMD extensions on modern Intel-compatible
-    processors.
+    based on the SSE2, SSE4.2 or NEon SIMD extensions on modern Intel
+    or ARM compatible processors.
 
-    To enable these optimizations, two different symbols can be defined;
+    To enable these optimizations, three different symbols can be defined;
     \code
     // Enable SSE2 optimization.
     #define RAPIDJSON_SSE2
@@ -344,13 +344,17 @@
     #define RAPIDJSON_SSE42
     \endcode
 
-    \c RAPIDJSON_SSE42 takes precedence, if both are defined.
+    // Enable ARM Neon optimization.
+    #define RAPIDJSON_NEON
+    \endcode
+
+    \c RAPIDJSON_SSE42 takes precedence over SSE2, if both are defined.
 
     If any of these symbols is defined, RapidJSON defines the macro
     \c RAPIDJSON_SIMD to indicate the availability of the optimized code.
 */
 #if defined(RAPIDJSON_SSE2) || defined(RAPIDJSON_SSE42) \
-    || defined(RAPIDJSON_DOXYGEN_RUNNING)
+    || defined(RAPIDJSON_NEON) || defined(RAPIDJSON_DOXYGEN_RUNNING)
 #define RAPIDJSON_SIMD
 #endif
 
