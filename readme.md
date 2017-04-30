@@ -84,7 +84,7 @@ To generate user documentation and run tests please proceed with the steps below
 3. Change to `build` directory and run `cmake ..` command to configure your build. Windows users can do the same with cmake-gui application.
 4. On Windows, build the solution found in the build directory. On Linux, run `make` from the build directory.
 
-On successfull build you will find compiled test and example binaries in `bin`
+On successful build you will find compiled test and example binaries in `bin`
 directory. The generated documentation will be available in `doc/html`
 directory of the build tree. To run tests after finished build please run `make
 test` or `ctest` from your build tree. You can get detailed output using `ctest
