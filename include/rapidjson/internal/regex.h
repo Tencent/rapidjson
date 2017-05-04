@@ -29,6 +29,7 @@ RAPIDJSON_DIAG_OFF(implicit-fallthrough)
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
+RAPIDJSON_DIAG_OFF(implicit-fallthrough)
 #endif
 
 #ifdef _MSC_VER
