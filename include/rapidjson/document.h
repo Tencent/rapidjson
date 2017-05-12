@@ -1312,17 +1312,17 @@ public:
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     GenericValue& AddMember(GenericValue&& name, GenericValue&& value, Allocator& allocator) {
-        return AddMember(name, value, allocator);
+        return AddMember(std::move(name), std::move(value), allocator);
     }
     GenericValue& AddMember(GenericValue&& name, GenericValue& value, Allocator& allocator) {
-        return AddMember(name, value, allocator);
+        return AddMember(std::move(name), value, allocator);
     }
     GenericValue& AddMember(GenericValue& name, GenericValue&& value, Allocator& allocator) {
-        return AddMember(name, value, allocator);
+        return AddMember(name, std::move(value), allocator);
     }
     GenericValue& AddMember(StringRefType name, GenericValue&& value, Allocator& allocator) {
         GenericValue n(name);
-        return AddMember(n, value, allocator);
+        return AddMember(n, std::move(value), allocator);
     }
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
@@ -1598,7 +1598,7 @@ public:
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     GenericValue& PushBack(GenericValue&& value, Allocator& allocator) {
-        return PushBack(value, allocator);
+        return PushBack(std::move(value), allocator);
     }
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
