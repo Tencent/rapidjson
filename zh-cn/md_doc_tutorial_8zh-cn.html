@@ -327,7 +327,7 @@ Value 及 Document</h1>
 <img src="move3.png" alt="move3.png"/>
 <div class="caption">
 转移语义不需复制。</div></div>
-<p> 在 C++11 中这称为转移赋值操作（move assignment operator）。由于 RapidJSON 支持 C++03，它在赋值操作采用转移语义，其它修改形函数如 <code>AddMember()</code>, <code>PushBack()</code> 也采用转移语义。</p>
+<p> 在 C++11 中这称为转移赋值操作（move assignment operator）。由于 RapidJSON 支持 C++03，它在赋值操作采用转移语义，其它修改型函数如 <code>AddMember()</code>, <code>PushBack()</code> 也采用转移语义。</p>
 <h3><a class="anchor" id="TemporaryValues"></a>
 转移语义及临时值</h3>
 <p>有时候，我们想直接构造一个 Value 并传递给一个“转移”函数（如 <code>PushBack()</code>、<code>AddMember()</code>）。由于临时对象是不能转换为正常的 Value 引用，我们加入了一个方便的 <code>Move()</code> 函数：</p>
