@@ -343,7 +343,7 @@ Value o(kObjectType);
 
 ![转移语义不需复制。](diagram/move3.png)
 
-在 C++11 中这称为转移赋值操作（move assignment operator）。由于 RapidJSON 支持 C++03，它在赋值操作采用转移语义，其它修改形函数如 `AddMember()`, `PushBack()` 也采用转移语义。
+在 C++11 中这称为转移赋值操作（move assignment operator）。由于 RapidJSON 支持 C++03，它在赋值操作采用转移语义，其它修改型函数如 `AddMember()`, `PushBack()` 也采用转移语义。
 
 ### 转移语义及临时值 {#TemporaryValues}
 
