@@ -292,8 +292,7 @@ public:
     bool Pair(const std::basic_string<Ch>& key, int64_t  i64, bool keyCopy = false) {return Key(key,keyCopy) && Int64(i64);}
     bool Pair(const std::basic_string<Ch>& key, uint64_t u64, bool keyCopy = false) {return Key(key,keyCopy) && Uint64(u64);}
     
-    bool Pair(const std::basic_string<Ch>& key,               const std::basic_string<Ch>& str, bool valueCopy = false) {return Key(key) && String(str);}
-    bool Pair(const std::basic_string<Ch>& key, bool keyCopy, const std::basic_string<Ch>& str, bool valueCopy = false) {return Key(key) && String(str);}
+    bool Pair(const std::basic_string<Ch>& key, const std::basic_string<Ch>& str) {return Key(key) && String(str);}
 #endif
   //@}
 
