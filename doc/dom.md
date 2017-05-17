@@ -119,6 +119,7 @@ Parse flags                   | Meaning
 `kParseNumbersAsStringsFlag`  | Parse numerical type values as strings.
 `kParseTrailingCommasFlag`    | Allow trailing commas at the end of objects and arrays (relaxed JSON syntax).
 `kParseNanAndInfFlag`         | Allow parsing `NaN`, `Inf`, `Infinity`, `-Inf` and `-Infinity` as `double` values (relaxed JSON syntax).
+`kParsePartialFractionFlag`   | Allow parsing fractions that begin with a `.` (e.g. `.123` or `123.`).
 
 By using a non-type template parameter, instead of a function parameter, C++ compiler can generate code which is optimized for specified combinations, improving speed, and reducing code size (if only using a single specialization). The downside is the flags needed to be determined in compile-time.
 
