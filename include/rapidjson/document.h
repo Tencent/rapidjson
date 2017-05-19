@@ -615,10 +615,11 @@ public:
         \tparam SourceAllocator allocator of \c rhs
         \param rhs Value to copy from (read-only)
         \param allocator Allocator for allocating copied elements and buffers. Commonly use GenericDocument::GetAllocator().
+        \param copyConstStrings Force copying of constant strings (e.g. referencing an in-situ buffer)
         \see CopyFrom()
     */
     template <typename SourceAllocator>
-    GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator) {
+    GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator, bool copyConstStrings = false) {
         switch (rhs.GetType()) {
         case kObjectType: {
                 SizeType count = rhs.data_.o.size;
@@ -645,7 +646,7 @@ public:
             }
             break;
         case kStringType:
-            if (rhs.data_.f.flags == kConstStringFlag) {
+            if (rhs.data_.f.flags == kConstStringFlag && !copyConstStrings) {
                 data_.f.flags = rhs.data_.f.flags;
                 data_  = *reinterpret_cast<const Data*>(&rhs.data_);
             }
@@ -850,12 +851,13 @@ public:
         \tparam SourceAllocator Allocator type of \c rhs
         \param rhs Value to copy from (read-only)
         \param allocator Allocator to use for copying
+        \param copyConstStrings Force copying of constant strings (e.g. referencing an in-situ buffer)
      */
     template <typename SourceAllocator>
-    GenericValue& CopyFrom(const GenericValue<Encoding, SourceAllocator>& rhs, Allocator& allocator) {
+    GenericValue& CopyFrom(const GenericValue<Encoding, SourceAllocator>& rhs, Allocator& allocator, bool copyConstStrings = false) {
         RAPIDJSON_ASSERT(static_cast<void*>(this) != static_cast<void const*>(&rhs));
         this->~GenericValue();
-        new (this) GenericValue(rhs, allocator);
+        new (this) GenericValue(rhs, allocator, copyConstStrings);
         return *this;
     }
 
