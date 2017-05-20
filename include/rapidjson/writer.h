@@ -91,6 +91,7 @@ template<typename OutputStream, typename SourceEncoding = UTF8<>, typename Targe
 class Writer {
 public:
     typedef typename SourceEncoding::Ch Ch;
+    typedef SizeType size_type;
 
     static const int kDefaultMaxDecimalPlaces = 324;
 

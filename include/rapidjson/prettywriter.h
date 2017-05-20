@@ -49,6 +49,7 @@ class PrettyWriter : public Writer<OutputStream, SourceEncoding, TargetEncoding,
 public:
     typedef Writer<OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags> Base;
     typedef typename Base::Ch Ch;
+    typedef typename Base::size_type size_type;
 
     //! Constructor
     /*! \param os Output stream.
