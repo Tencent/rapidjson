@@ -620,28 +620,28 @@ struct AutoUTF {
 #define RAPIDJSON_ENCODINGS_FUNC(x) UTF8<Ch>::x, UTF16LE<Ch>::x, UTF16BE<Ch>::x, UTF32LE<Ch>::x, UTF32BE<Ch>::x
 
     template<typename OutputStream>
-    RAPIDJSON_FORCEINLINE static void Encode(OutputStream& os, unsigned codepoint) {
+    static RAPIDJSON_FORCEINLINE void Encode(OutputStream& os, unsigned codepoint) {
         typedef void (*EncodeFunc)(OutputStream&, unsigned);
         static const EncodeFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Encode) };
         (*f[os.GetType()])(os, codepoint);
     }
 
     template<typename OutputStream>
-    RAPIDJSON_FORCEINLINE static void EncodeUnsafe(OutputStream& os, unsigned codepoint) {
+    static RAPIDJSON_FORCEINLINE void EncodeUnsafe(OutputStream& os, unsigned codepoint) {
         typedef void (*EncodeFunc)(OutputStream&, unsigned);
         static const EncodeFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(EncodeUnsafe) };
         (*f[os.GetType()])(os, codepoint);
     }
 
     template <typename InputStream>
-    RAPIDJSON_FORCEINLINE static bool Decode(InputStream& is, unsigned* codepoint) {
+    static RAPIDJSON_FORCEINLINE bool Decode(InputStream& is, unsigned* codepoint) {
         typedef bool (*DecodeFunc)(InputStream&, unsigned*);
         static const DecodeFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Decode) };
         return (*f[is.GetType()])(is, codepoint);
     }
 
     template <typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
+    static RAPIDJSON_FORCEINLINE bool Validate(InputStream& is, OutputStream& os) {
         typedef bool (*ValidateFunc)(InputStream&, OutputStream&);
         static const ValidateFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Validate) };
         return (*f[is.GetType()])(is, os);
@@ -658,7 +658,7 @@ template<typename SourceEncoding, typename TargetEncoding>
 struct Transcoder {
     //! Take one Unicode codepoint from source encoding, convert it to target encoding and put it to the output stream.
     template<typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE static bool Transcode(InputStream& is, OutputStream& os) {
+    static RAPIDJSON_FORCEINLINE bool Transcode(InputStream& is, OutputStream& os) {
         unsigned codepoint;
         if (!SourceEncoding::Decode(is, &codepoint))
             return false;
@@ -667,7 +667,7 @@ struct Transcoder {
     }
 
     template<typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE static bool TranscodeUnsafe(InputStream& is, OutputStream& os) {
+    static RAPIDJSON_FORCEINLINE bool TranscodeUnsafe(InputStream& is, OutputStream& os) {
         unsigned codepoint;
         if (!SourceEncoding::Decode(is, &codepoint))
             return false;
@@ -677,7 +677,7 @@ struct Transcoder {
 
     //! Validate one Unicode codepoint from an encoded stream.
     template<typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
+    static RAPIDJSON_FORCEINLINE bool Validate(InputStream& is, OutputStream& os) {
         return Transcode(is, os);   // Since source/target encoding is different, must transcode.
     }
 };
@@ -690,19 +690,19 @@ inline void PutUnsafe(Stream& stream, typename Stream::Ch c);
 template<typename Encoding>
 struct Transcoder<Encoding, Encoding> {
     template<typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE static bool Transcode(InputStream& is, OutputStream& os) {
+    static RAPIDJSON_FORCEINLINE bool Transcode(InputStream& is, OutputStream& os) {
         os.Put(is.Take());  // Just copy one code unit. This semantic is different from primary template class.
         return true;
     }
     
     template<typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE static bool TranscodeUnsafe(InputStream& is, OutputStream& os) {
+    static RAPIDJSON_FORCEINLINE bool TranscodeUnsafe(InputStream& is, OutputStream& os) {
         PutUnsafe(os, is.Take());  // Just copy one code unit. This semantic is different from primary template class.
         return true;
     }
     
     template<typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE static bool Validate(InputStream& is, OutputStream& os) {
+    static RAPIDJSON_FORCEINLINE bool Validate(InputStream& is, OutputStream& os) {
         return Encoding::Validate(is, os);  // source/target encoding are the same
     }
 };
