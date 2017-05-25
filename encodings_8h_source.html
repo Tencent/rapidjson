@@ -702,28 +702,28 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;<span class="preprocessor">#define RAPIDJSON_ENCODINGS_FUNC(x) UTF8&lt;Ch&gt;::x, UTF16LE&lt;Ch&gt;::x, UTF16BE&lt;Ch&gt;::x, UTF32LE&lt;Ch&gt;::x, UTF32BE&lt;Ch&gt;::x</span></div>
 <div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;</div>
 <div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;    RAPIDJSON_FORCEINLINE <span class="keyword">static</span> <span class="keywordtype">void</span> Encode(OutputStream&amp; os, <span class="keywordtype">unsigned</span> codepoint) {</div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;    <span class="keyword">static</span> RAPIDJSON_FORCEINLINE <span class="keywordtype">void</span> Encode(OutputStream&amp; os, <span class="keywordtype">unsigned</span> codepoint) {</div>
 <div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;        <span class="keyword">typedef</span> void (*EncodeFunc)(OutputStream&amp;, unsigned);</div>
 <div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;        <span class="keyword">static</span> <span class="keyword">const</span> EncodeFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Encode) };</div>
 <div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;        (*f[os.GetType()])(os, codepoint);</div>
 <div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;    }</div>
 <div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;</div>
 <div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;    RAPIDJSON_FORCEINLINE <span class="keyword">static</span> <span class="keywordtype">void</span> EncodeUnsafe(OutputStream&amp; os, <span class="keywordtype">unsigned</span> codepoint) {</div>
+<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;    <span class="keyword">static</span> RAPIDJSON_FORCEINLINE <span class="keywordtype">void</span> EncodeUnsafe(OutputStream&amp; os, <span class="keywordtype">unsigned</span> codepoint) {</div>
 <div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;        <span class="keyword">typedef</span> void (*EncodeFunc)(OutputStream&amp;, unsigned);</div>
 <div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;        <span class="keyword">static</span> <span class="keyword">const</span> EncodeFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(EncodeUnsafe) };</div>
 <div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;        (*f[os.GetType()])(os, codepoint);</div>
 <div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;    }</div>
 <div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;</div>
 <div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputStream&gt;</div>
-<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;    RAPIDJSON_FORCEINLINE <span class="keyword">static</span> <span class="keywordtype">bool</span> Decode(InputStream&amp; is, <span class="keywordtype">unsigned</span>* codepoint) {</div>
+<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;    <span class="keyword">static</span> RAPIDJSON_FORCEINLINE <span class="keywordtype">bool</span> Decode(InputStream&amp; is, <span class="keywordtype">unsigned</span>* codepoint) {</div>
 <div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;        <span class="keyword">typedef</span> bool (*DecodeFunc)(InputStream&amp;, <span class="keywordtype">unsigned</span>*);</div>
 <div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;        <span class="keyword">static</span> <span class="keyword">const</span> DecodeFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Decode) };</div>
 <div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;        <span class="keywordflow">return</span> (*f[is.GetType()])(is, codepoint);</div>
 <div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;    }</div>
 <div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;</div>
 <div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;    RAPIDJSON_FORCEINLINE <span class="keyword">static</span> <span class="keywordtype">bool</span> Validate(InputStream&amp; is, OutputStream&amp; os) {</div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;    <span class="keyword">static</span> RAPIDJSON_FORCEINLINE <span class="keywordtype">bool</span> Validate(InputStream&amp; is, OutputStream&amp; os) {</div>
 <div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;        <span class="keyword">typedef</span> bool (*ValidateFunc)(InputStream&amp;, OutputStream&amp;);</div>
 <div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;        <span class="keyword">static</span> <span class="keyword">const</span> ValidateFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Validate) };</div>
 <div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;        <span class="keywordflow">return</span> (*f[is.GetType()])(is, os);</div>
@@ -740,7 +740,7 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00658"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_transcoder.html">  658</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_transcoder.html">Transcoder</a> {<span class="comment"></span></div>
 <div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;<span class="comment">    //! Take one Unicode codepoint from source encoding, convert it to target encoding and put it to the output stream.</span></div>
 <div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;<span class="comment"></span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line"><a name="l00661"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_transcoder.html#a3a1de7069d3cf7f1d4f4e2f96ceb7664">  661</a></span>&#160;    RAPIDJSON_FORCEINLINE <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="structrapidjson_1_1_transcoder.html#a3a1de7069d3cf7f1d4f4e2f96ceb7664">Transcode</a>(InputStream&amp; is, OutputStream&amp; os) {</div>
+<div class="line"><a name="l00661"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_transcoder.html#a3a1de7069d3cf7f1d4f4e2f96ceb7664">  661</a></span>&#160;    <span class="keyword">static</span> RAPIDJSON_FORCEINLINE <span class="keywordtype">bool</span> <a class="code" href="structrapidjson_1_1_transcoder.html#a3a1de7069d3cf7f1d4f4e2f96ceb7664">Transcode</a>(InputStream&amp; is, OutputStream&amp; os) {</div>
 <div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;        <span class="keywordtype">unsigned</span> codepoint;</div>
 <div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;        <span class="keywordflow">if</span> (!SourceEncoding::Decode(is, &amp;codepoint))</div>
 <div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
@@ -749,7 +749,7 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;    }</div>
 <div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;</div>
 <div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;    RAPIDJSON_FORCEINLINE <span class="keyword">static</span> <span class="keywordtype">bool</span> TranscodeUnsafe(InputStream&amp; is, OutputStream&amp; os) {</div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;    <span class="keyword">static</span> RAPIDJSON_FORCEINLINE <span class="keywordtype">bool</span> TranscodeUnsafe(InputStream&amp; is, OutputStream&amp; os) {</div>
 <div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;        <span class="keywordtype">unsigned</span> codepoint;</div>
 <div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;        <span class="keywordflow">if</span> (!SourceEncoding::Decode(is, &amp;codepoint))</div>
 <div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
@@ -759,7 +759,7 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;<span class="comment"></span></div>
 <div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;<span class="comment">    //! Validate one Unicode codepoint from an encoded stream.</span></div>
 <div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;<span class="comment"></span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line"><a name="l00680"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_transcoder.html#ae9178e512e99394a38785e73927140da">  680</a></span>&#160;    RAPIDJSON_FORCEINLINE <span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code" href="structrapidjson_1_1_transcoder.html#ae9178e512e99394a38785e73927140da">Validate</a>(InputStream&amp; is, OutputStream&amp; os) {</div>
+<div class="line"><a name="l00680"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_transcoder.html#ae9178e512e99394a38785e73927140da">  680</a></span>&#160;    <span class="keyword">static</span> RAPIDJSON_FORCEINLINE <span class="keywordtype">bool</span> <a class="code" href="structrapidjson_1_1_transcoder.html#ae9178e512e99394a38785e73927140da">Validate</a>(InputStream&amp; is, OutputStream&amp; os) {</div>
 <div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;        <span class="keywordflow">return</span> Transcode(is, os);   <span class="comment">// Since source/target encoding is different, must transcode.</span></div>
 <div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;    }</div>
 <div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;};</div>
@@ -772,19 +772,19 @@ $(document).ready(function(){initNavTree('encodings_8h_source.html','');});
 <div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;<span class="comment"></span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> Encoding&gt;</div>
 <div class="line"><a name="l00691"></a><span class="lineno"><a class="line" href="structrapidjson_1_1_transcoder_3_01_encoding_00_01_encoding_01_4.html">  691</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structrapidjson_1_1_transcoder.html">Transcoder</a>&lt;<a class="code" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="code" href="classrapidjson_1_1_encoding.html">Encoding</a>&gt; {</div>
 <div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;    RAPIDJSON_FORCEINLINE <span class="keyword">static</span> <span class="keywordtype">bool</span> Transcode(InputStream&amp; is, OutputStream&amp; os) {</div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;    <span class="keyword">static</span> RAPIDJSON_FORCEINLINE <span class="keywordtype">bool</span> Transcode(InputStream&amp; is, OutputStream&amp; os) {</div>
 <div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;        os.Put(is.Take());  <span class="comment">// Just copy one code unit. This semantic is different from primary template class.</span></div>
 <div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;    }</div>
 <div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;    </div>
 <div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;    RAPIDJSON_FORCEINLINE <span class="keyword">static</span> <span class="keywordtype">bool</span> TranscodeUnsafe(InputStream&amp; is, OutputStream&amp; os) {</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;    <span class="keyword">static</span> RAPIDJSON_FORCEINLINE <span class="keywordtype">bool</span> TranscodeUnsafe(InputStream&amp; is, OutputStream&amp; os) {</div>
 <div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;        <a class="code" href="namespacerapidjson.html#a0a774dcffe8ae07686f459ae017d2f20">PutUnsafe</a>(os, is.Take());  <span class="comment">// Just copy one code unit. This semantic is different from primary template class.</span></div>
 <div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;    }</div>
 <div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;    </div>
 <div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> OutputStream&gt;</div>
-<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;    RAPIDJSON_FORCEINLINE <span class="keyword">static</span> <span class="keywordtype">bool</span> Validate(InputStream&amp; is, OutputStream&amp; os) {</div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;    <span class="keyword">static</span> RAPIDJSON_FORCEINLINE <span class="keywordtype">bool</span> Validate(InputStream&amp; is, OutputStream&amp; os) {</div>
 <div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;        <span class="keywordflow">return</span> Encoding::Validate(is, os);  <span class="comment">// source/target encoding are the same</span></div>
 <div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;    }</div>
 <div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;};</div>
