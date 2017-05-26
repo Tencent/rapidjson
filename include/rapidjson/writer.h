@@ -259,8 +259,43 @@ public:
     //! Simpler but slower overload.
     bool String(const Ch* const& str) { return String(str, internal::StrLen(str)); }
     bool Key(const Ch* const& str) { return Key(str, internal::StrLen(str)); }
+
+    //! Writing pairs
+    bool PairNull(const Ch* key, SizeType keyLength, bool keyCopy = false) {return Key(key,keyLength,keyCopy) && Null();}
+    bool PairNull(const Ch* key,                     bool keyCopy = false) {return Key(key,keyCopy)           && Null();}
+  
+    bool Pair(const Ch* key, SizeType keyLength, bool     b,   bool keyCopy = false) {return Key(key,keyLength,keyCopy) && Bool(b);}
+    bool Pair(const Ch* key,                     bool     b,   bool keyCopy = false) {return Key(key,          keyCopy) && Bool(b);}
+    bool Pair(const Ch* key, SizeType keyLength, double   d,   bool keyCopy = false) {return Key(key,keyLength,keyCopy) && Double(d);}
+    bool Pair(const Ch* key,                     double   d,   bool keyCopy = false) {return Key(key,          keyCopy) && Double(d);}
+    bool Pair(const Ch* key, SizeType keyLength, int      i,   bool keyCopy = false) {return Key(key,keyLength,keyCopy) && Int(i);}
+    bool Pair(const Ch* key,                     int      i,   bool keyCopy = false) {return Key(key,          keyCopy) && Int(i);}
+    bool Pair(const Ch* key, SizeType keyLength, unsigned u,   bool keyCopy = false) {return Key(key,keyLength,keyCopy) && Uint(u);}
+    bool Pair(const Ch* key,                     unsigned u,   bool keyCopy = false) {return Key(key,          keyCopy) && Uint(u);}
+    bool Pair(const Ch* key, SizeType keyLength, int64_t  i64, bool keyCopy = false) {return Key(key,keyLength,keyCopy) && Int64(i64);}
+    bool Pair(const Ch* key,                     int64_t  i64, bool keyCopy = false) {return Key(key,          keyCopy) && Int64(i64);}
+    bool Pair(const Ch* key, SizeType keyLength, uint64_t u64, bool keyCopy = false) {return Key(key,keyLength,keyCopy) && Uint64(u64);}
+    bool Pair(const Ch* key,                     uint64_t u64, bool keyCopy = false) {return Key(key,          keyCopy) && Uint64(u64);}
+  
+    bool Pair(const Ch* key, SizeType keyLength,               const Ch* str, SizeType length, bool valueCopy = false) {return Key(key,keyLength,false)   && String(str,length,valueCopy);}
+    bool Pair(const Ch* key, SizeType keyLength, bool keyCopy, const Ch* str, SizeType length, bool valueCopy = false) {return Key(key,keyLength,keyCopy) && String(str,length,valueCopy);}
+    bool Pair(const Ch* key,                                   const Ch* str,                  bool valueCopy = false) {return Key(key,false)             && String(str,valueCopy);}
+    bool Pair(const Ch* key,                     bool keyCopy, const Ch* str,                  bool valueCopy = false) {return Key(key,keyCopy)           && String(str,valueCopy);}
+
+#if RAPIDJSON_HAS_STDSTRING
+    bool PairNull(const std::basic_string<Ch>& key, bool keyCopy = false) {return Key(key,keyCopy) && Null();}
     
-    //@}
+    bool Pair(const std::basic_string<Ch>& key, bool     b,   bool keyCopy = false) {return Key(key,keyCopy) && Bool(b);}
+    bool Pair(const std::basic_string<Ch>& key, double   d,   bool keyCopy = false) {return Key(key,keyCopy) && Double(d);}
+    bool Pair(const std::basic_string<Ch>& key, int      i,   bool keyCopy = false) {return Key(key,keyCopy) && Int(i);}
+    bool Pair(const std::basic_string<Ch>& key, unsigned u,   bool keyCopy = false) {return Key(key,keyCopy) && Uint(u);}
+    bool Pair(const std::basic_string<Ch>& key, int64_t  i64, bool keyCopy = false) {return Key(key,keyCopy) && Int64(i64);}
+    bool Pair(const std::basic_string<Ch>& key, uint64_t u64, bool keyCopy = false) {return Key(key,keyCopy) && Uint64(u64);}
+    
+    bool Pair(const std::basic_string<Ch>& key,               const std::basic_string<Ch>& str, bool valueCopy = false) {return Key(key,false)   && String(str,valueCopy);}
+    bool Pair(const std::basic_string<Ch>& key, bool keyCopy, const std::basic_string<Ch>& str, bool valueCopy = false) {return Key(key,keyCopy) && String(str,valueCopy);}
+#endif
+  //@}
 
     //! Write a raw JSON value.
     /*!
