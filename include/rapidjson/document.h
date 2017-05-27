@@ -626,8 +626,8 @@ public:
                 Member* lm = reinterpret_cast<Member*>(allocator.Malloc(count * sizeof(Member)));
                 const typename GenericValue<Encoding,SourceAllocator>::Member* rm = rhs.GetMembersPointer();
                 for (SizeType i = 0; i < count; i++) {
-                    new (&lm[i].name) GenericValue(rm[i].name, allocator);
-                    new (&lm[i].value) GenericValue(rm[i].value, allocator);
+                    new (&lm[i].name) GenericValue(rm[i].name, allocator, copyConstStrings);
+                    new (&lm[i].value) GenericValue(rm[i].value, allocator, copyConstStrings);
                 }
                 data_.f.flags = kObjectFlag;
                 data_.o.size = data_.o.capacity = count;
@@ -639,7 +639,7 @@ public:
                 GenericValue* le = reinterpret_cast<GenericValue*>(allocator.Malloc(count * sizeof(GenericValue)));
                 const GenericValue<Encoding,SourceAllocator>* re = rhs.GetElementsPointer();
                 for (SizeType i = 0; i < count; i++)
-                    new (&le[i]) GenericValue(re[i], allocator);
+                    new (&le[i]) GenericValue(re[i], allocator, copyConstStrings);
                 data_.f.flags = kArrayFlag;
                 data_.a.size = data_.a.capacity = count;
                 SetElementsPointer(le);
