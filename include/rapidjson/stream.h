@@ -110,10 +110,11 @@ template <typename Encoding>
 struct GenericStringStream {
     typedef typename Encoding::Ch Ch;
 
-    GenericStringStream(const Ch *src) : src_(src), head_(src) {}
+    GenericStringStream(const Ch *src) : src_(src), head_(src), end_(0) {}
+    GenericStringStream(const Ch *src, size_t len) : src_(src), head_(src), end_(src + len) {}
 
-    Ch Peek() const { return *src_; }
-    Ch Take() { return *src_++; }
+    Ch Peek() const { return (end_ && src_ >= end_) ? 0 : *src_; }
+    Ch Take() { return (end_ && src_ >= end_) ? 0 : *src_++; }
     size_t Tell() const { return static_cast<size_t>(src_ - head_); }
 
     Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
@@ -123,6 +124,7 @@ struct GenericStringStream {
 
     const Ch* src_;     //!< Current read position.
     const Ch* head_;    //!< Original head of the string.
+    const Ch* end_;     //!< End of string
 };
 
 template <typename Encoding>
