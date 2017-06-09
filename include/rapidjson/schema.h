@@ -783,8 +783,10 @@ public:
         if (patternProperties_) {
             context.patternPropertiesSchemaCount = 0;
             for (SizeType i = 0; i < patternPropertyCount_; i++)
-                if (patternProperties_[i].pattern && IsPatternMatch(patternProperties_[i].pattern, str, len))
+                if (patternProperties_[i].pattern && IsPatternMatch(patternProperties_[i].pattern, str, len)) {
                     context.patternPropertiesSchemas[context.patternPropertiesSchemaCount++] = patternProperties_[i].schema;
+                    context.valueSchema = typeless_;
+                }
         }
 
         SizeType index;

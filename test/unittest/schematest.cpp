@@ -1322,6 +1322,13 @@ TEST(SchemaValidator, Issue728_AllOfRef) {
     VALIDATE(s, "{\"key1\": \"abc\", \"key2\": \"def\"}", true);
 }
 
+TEST(SchemaValidator, Issue825) {
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"additionalProperties\": false, \"patternProperties\": {\"^i\": { \"type\": \"string\" } } }");
+    SchemaDocument s(sd);
+    VALIDATE(s, "{ \"item\": \"hello\" }", true);
+}
+
 #ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
