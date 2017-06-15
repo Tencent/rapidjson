@@ -78,7 +78,7 @@ inline Ch* StrDup(const Ch* str) {
 }
 
 inline FILE* TempFile(char *filename) {
-#ifdef _MSC_VER
+#ifdef __WIN32__
     filename = tmpnam(filename);
 
     // For Visual Studio, tmpnam() adds a backslash in front. Remove it.
