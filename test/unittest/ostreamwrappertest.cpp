@@ -69,14 +69,15 @@ static void TestFileStream() {
 
     const char* s = "Hello World!\n";
     {
-        ofstream ofs(filename, ios::out | ios::binary);
-        BasicOStreamWrapper<ofstream> osw(ofs);
+        FileStreamType ofs(filename, ios::out | ios::binary);
+        BasicOStreamWrapper<FileStreamType> osw(ofs);
         for (const char* p = s; *p; p++)
             osw.Put(*p);
         osw.Flush();
     }
 
     fp = fopen(filename, "r");
+	ASSERT_TRUE( fp != NULL );
     for (const char* p = s; *p; p++)
         EXPECT_EQ(*p, static_cast<char>(fgetc(fp)));
     fclose(fp);

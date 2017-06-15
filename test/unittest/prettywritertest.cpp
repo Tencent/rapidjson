@@ -167,6 +167,7 @@ TEST(PrettyWriter, OStreamWrapper) {
 TEST(PrettyWriter, FileWriteStream) {
     char filename[L_tmpnam];
     FILE* fp = TempFile(filename);
+    ASSERT_TRUE(fp!=NULL);
     char buffer[16];
     FileWriteStream os(fp, buffer, sizeof(buffer));
     PrettyWriter<FileWriteStream> writer(os);
