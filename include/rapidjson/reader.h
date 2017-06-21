@@ -754,7 +754,7 @@ private:
 
         for (SizeType memberCount = 0;;) {
             if (RAPIDJSON_UNLIKELY(is.Peek() != '"'))
-                RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
+                ;//RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
 
             ParseString<parseFlags>(is, handler, true);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
@@ -959,13 +959,16 @@ private:
         internal::StreamLocalCopy<InputStream> copy(is);
         InputStream& s(copy.s);
 
-        RAPIDJSON_ASSERT(s.Peek() == '\"');
-        s.Take();  // Skip '\"'
+        //RAPIDJSON_ASSERT(s.Peek() == '\"');
+        //s.Take();  // Skip '\"'
+		bool isPeek;
+		if ( isPeek = (s.Peek() == '\"') )
+			s.Take();  // Skip '\"'
 
         bool success = false;
         if (parseFlags & kParseInsituFlag) {
             typename InputStream::Ch *head = s.PutBegin();
-            ParseStringToStream<parseFlags, SourceEncoding, SourceEncoding>(s, s);
+            ParseStringToStream<parseFlags, SourceEncoding, SourceEncoding>(s, s, isPeek);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
             size_t length = s.PutEnd(head) - 1;
             RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
@@ -974,7 +977,7 @@ private:
         }
         else {
             StackStream<typename TargetEncoding::Ch> stackStream(stack_);
-            ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
+            ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream, isPeek);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
             SizeType length = static_cast<SizeType>(stackStream.Length()) - 1;
             const typename TargetEncoding::Ch* const str = stackStream.Pop();
@@ -987,7 +990,7 @@ private:
     // Parse string to an output is
     // This function handles the prefix/suffix double quotes, escaping, and optional encoding validation.
     template<unsigned parseFlags, typename SEncoding, typename TEncoding, typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE void ParseStringToStream(InputStream& is, OutputStream& os) {
+    RAPIDJSON_FORCEINLINE void ParseStringToStream(InputStream& is, OutputStream& os, bool isPeek = true) {
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 #define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
         static const char escape[256] = {
@@ -1033,8 +1036,11 @@ private:
                 else
                     RAPIDJSON_PARSE_ERROR(kParseErrorStringEscapeInvalid, escapeOffset);
             }
-            else if (RAPIDJSON_UNLIKELY(c == '"')) {    // Closing double quote
-                is.Take();
+            else if (RAPIDJSON_UNLIKELY( c == '"' || (!isPeek && (c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == ':')) )) {    // Closing double quote
+            //else if (RAPIDJSON_UNLIKELY(c == '"')) {    // Closing double quote
+            //    is.Take();
+				if (isPeek)
+					is.Take();
                 os.Put('\0');   // null-terminate the string
                 return;
             }

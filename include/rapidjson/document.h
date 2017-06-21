@@ -1098,7 +1098,19 @@ public:
     */
     template <typename SourceAllocator>
     GenericValue& operator[](const GenericValue<Encoding, SourceAllocator>& name) {
-        MemberIterator member = FindMember(name);
+		MemberIterator member = FindMember(name);
+// 		//add by Looky  object[number] to 'string'
+// 		MemberIterator member;
+// 		if (this->IsObject() && name.IsNumber())
+// 		{
+// 			//name.SetString()
+// 			Value strName(StringRef(name.GetString()) );
+// 			member = FindMember(strName);
+// 		}
+// 		else {
+// 			member = FindMember(name);
+// 		}
+
         if (member != MemberEnd())
             return member->value;
         else {
@@ -1546,8 +1558,17 @@ public:
         \see operator[](T*)
     */
     GenericValue& operator[](SizeType index) {
-        RAPIDJSON_ASSERT(IsArray());
-        RAPIDJSON_ASSERT(index < data_.a.size);
+		//RAPIDJSON_ASSERT(IsArray());
+		//RAPIDJSON_ASSERT(index < data_.a.size);
+		if (IsArray())
+			RAPIDJSON_ASSERT(index < data_.a.size);
+		else
+		{
+			RAPIDJSON_ASSERT(IsObject());
+			char strName[256];
+			itoa(index, strName, 10);
+			return (*this)[Value(StringRef(strName))];
+		}
         return GetElementsPointer()[index];
     }
     const GenericValue& operator[](SizeType index) const { return const_cast<GenericValue&>(*this)[index]; }
