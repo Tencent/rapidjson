@@ -82,9 +82,10 @@ $(document).ready(function(){initNavTree('index.html','');});
 <div class="contents">
 <div class="textblock"><div class="image">
 <img src="rapidjson.png" alt="rapidjson.png"/>
-</div>
-<div class="image">
-<img src="https://img.shields.io/badge/release-v1.1.0-blue.png" />
+<div class="caption">
+RapidJSON logo</div></div>
+ <div class="image">
+<img src="https://img.shields.io/badge/release-v1.1.0-blue.svg"  alt="Release version"/>
 </div>
 <h2>高效的 C++ JSON 解析／生成器，提供 SAX 及 DOM 风格 API</h2>
 <p>Tencent is pleased to support the open source community by making RapidJSON available.</p>
@@ -101,16 +102,16 @@ $(document).ready(function(){initNavTree('index.html','');});
 <h2>Build 状态</h2>
 <table class="doxtable">
 <tr>
-<th align="center"><a href="https://travis-ci.org/miloyip/rapidjson" title="Travis build status">Linux</a> </th><th align="center"><a href="https://ci.appveyor.com/project/miloyip/rapidjson/branch/master" title="AppVeyor build status">Windows</a> </th><th align="center"><a href="https://coveralls.io/r/miloyip/rapidjson?branch=master">Coveralls</a>  </th></tr>
+<th align="center"><a href="https://travis-ci.org/miloyip/rapidjson" title="Travis build status">Linux</a> </th><th align="center"><a href="https://ci.appveyor.com/project/miloyip/rapidjson/branch/master" title="AppVeyor build status">Windows</a> </th><th align="center"><a href="https://coveralls.io/r/miloyip/rapidjson?branch=master" title="Coveralls coverage">Coveralls</a>  </th></tr>
 <tr>
 <td align="center"><div class="image">
-<img src="https://travis-ci.org/miloyip/rapidjson.png?branch=master"  alt="lin-badge" title="Travis build status"/>
+<img src="https://travis-ci.org/miloyip/rapidjson.svg?branch=master"  alt="lin-badge" title="Travis build status"/>
 </div>
  </td><td align="center"><div class="image">
-<img src="https://ci.appveyor.com/api/projects/status/u658dcuwxo14a8m9/branch/master"  alt="win-badge" title="AppVeyor build status"/>
+<img src="https://ci.appveyor.com/api/projects/status/github/miloyip/rapidjson?branch=master&svg=true"  alt="win-badge" title="AppVeyor build status"/>
 </div>
  </td><td align="center"><div class="image">
-<img src="https://coveralls.io/repos/miloyip/rapidjson/badge.png?branch=master"  alt="cov-badge"/>
+<img src="https://coveralls.io/repos/miloyip/rapidjson/badge.svg?branch=master"  alt="cov-badge" title="Coveralls coverage"/>
 </div>
  </td></tr>
 </table>
@@ -126,8 +127,8 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p>在 <a class="el" href="md_doc_features_8zh-cn.html">这里</a> 可读取更多特点。</p>
 <p>JSON（JavaScript Object Notation）是一个轻量的数据交换格式。RapidJSON 应该完全遵从 RFC7159/ECMA-404，并支持可选的放宽语法。 关于 JSON 的更多信息可参考：</p><ul>
 <li><a href="http://json.org/">Introducing JSON</a></li>
-<li><a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159: The JavaScript Object Notation (JSON) Data Interchange Format</a></li>
-<li><a href="http://www.ecma-international.org/publications/standards/Ecma-404.htm">Standard ECMA-404: The JSON Data Interchange Format</a></li>
+<li><a href="https://tools.ietf.org/html/rfc7159">RFC7159: The JavaScript Object Notation (JSON) Data Interchange Format</a></li>
+<li><a href="https://www.ecma-international.org/publications/standards/Ecma-404.htm">Standard ECMA-404: The JSON Data Interchange Format</a></li>
 </ul>
 <h2>v1.1 中的亮点 (2016-8-25)</h2>
 <ul>
@@ -149,9 +150,9 @@ $(document).ready(function(){initNavTree('index.html','');});
 <h2>安装</h2>
 <p>RapidJSON 是只有头文件的 C++ 库。只需把 <code>include/rapidjson</code> 目录复制至系统或项目的 include 目录中。</p>
 <p>RapidJSON 依赖于以下软件：</p><ul>
-<li><a href="http://www.cmake.org">CMake</a> 作为通用生成工具</li>
-<li>(optional)<a href="http://www.doxygen.org">Doxygen</a> 用于生成文档</li>
-<li>(optional)<a href="https://code.google.com/p/googletest/">googletest</a> 用于单元及性能测试</li>
+<li><a href="https://cmake.org/">CMake</a> 作为通用生成工具</li>
+<li>(optional) <a href="http://www.doxygen.org">Doxygen</a> 用于生成文档</li>
+<li>(optional) <a href="https://github.com/google/googletest">googletest</a> 用于单元及性能测试</li>
 </ul>
 <p>生成测试及例子的步骤：</p>
 <ol type="1">
