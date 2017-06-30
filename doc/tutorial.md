@@ -2,7 +2,7 @@
 
 This tutorial introduces the basics of the Document Object Model(DOM) API.
 
-As shown in [Usage at a glance](@ref index), a JSON can be parsed into DOM, and then the DOM can be queried and modified easily, and finally be converted back to JSON.
+As shown in [Usage at a glance](../readme.md#usage-at-a-glance), a JSON can be parsed into DOM, and then the DOM can be queried and modified easily, and finally be converted back to JSON.
 
 [TOC]
 
@@ -55,7 +55,7 @@ printf("hello = %s\n", document["hello"].GetString());
 ~~~~~~~~~~
 
 ~~~~~~~~~~
-world
+hello = world
 ~~~~~~~~~~
 
 JSON true/false values are represented as `bool`.
@@ -65,7 +65,7 @@ printf("t = %s\n", document["t"].GetBool() ? "true" : "false");
 ~~~~~~~~~~
 
 ~~~~~~~~~~
-true
+t = true
 ~~~~~~~~~~
 
 JSON null can be queryed by `IsNull()`.
@@ -74,7 +74,7 @@ printf("n = %s\n", document["n"].IsNull() ? "null" : "?");
 ~~~~~~~~~~
 
 ~~~~~~~~~~
-null
+n = null
 ~~~~~~~~~~
 
 JSON number type represents all numeric values. However, C++ needs more specific type for manipulation.
@@ -526,11 +526,11 @@ Swapping two DOM trees is fast (constant time), despite the complexity of the tr
 
 This tutorial shows the basics of DOM tree query and manipulation. There are several important concepts in RapidJSON:
 
-1. [Streams](doc/stream.md) are channels for reading/writing JSON, which can be a in-memory string, or file stream, etc. User can also create their streams.
-2. [Encoding](doc/encoding.md) defines which character encoding is used in streams and memory. RapidJSON also provide Unicode conversion/validation internally.
-3. [DOM](doc/dom.md)'s basics are already covered in this tutorial. Uncover more advanced features such as *in situ* parsing, other parsing options and advanced usages.
-4. [SAX](doc/sax.md) is the foundation of parsing/generating facility in RapidJSON. Learn how to use `Reader`/`Writer` to implement even faster applications. Also try `PrettyWriter` to format the JSON.
-5. [Performance](doc/performance.md) shows some in-house and third-party benchmarks.
-6. [Internals](doc/internals.md) describes some internal designs and techniques of RapidJSON.
+1. [Streams](stream.md) are channels for reading/writing JSON, which can be a in-memory string, or file stream, etc. User can also create their streams.
+2. [Encoding](encoding.md) defines which character encoding is used in streams and memory. RapidJSON also provide Unicode conversion/validation internally.
+3. [DOM](dom.md)'s basics are already covered in this tutorial. Uncover more advanced features such as *in situ* parsing, other parsing options and advanced usages.
+4. [SAX](sax.md) is the foundation of parsing/generating facility in RapidJSON. Learn how to use `Reader`/`Writer` to implement even faster applications. Also try `PrettyWriter` to format the JSON.
+5. [Performance](performance.md) shows some in-house and third-party benchmarks.
+6. [Internals](internals.md) describes some internal designs and techniques of RapidJSON.
 
-You may also refer to the [FAQ](doc/faq.md), API documentation, examples and unit tests.
+You may also refer to the [FAQ](faq.md), API documentation, examples and unit tests.
