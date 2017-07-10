@@ -103,14 +103,14 @@ $(document).ready(function(){initNavTree('md_doc_tutorial.html','');});
 </ul>
 </div>
 <div class="textblock"><p>This tutorial introduces the basics of the Document Object Model(DOM) API.</p>
-<p>As shown in <a class="el" href="index.html">Usage at a glance</a>, a JSON can be parsed into DOM, and then the DOM can be queried and modified easily, and finally be converted back to JSON.</p>
+<p>As shown in <a class="el" href="index.html">Usage at a glance</a>, JSON can be parsed into a DOM, and then the DOM can be queried and modified easily, and finally be converted back to JSON.</p>
 <h1><a class="anchor" id="ValueDocument"></a>
 Value &amp; Document</h1>
 <p>Each JSON value is stored in a type called <code>Value</code>. A <code>Document</code>, representing the DOM, contains the root <code>Value</code> of the DOM tree. All public types and functions of RapidJSON are defined in the <code>rapidjson</code> namespace.</p>
 <h1><a class="anchor" id="QueryValue"></a>
 Query Value</h1>
 <p>In this section, we will use excerpt of <code>example/tutorial/tutorial.cpp</code>.</p>
-<p>Assumes we have a JSON stored in a C string (<code>const char* json</code>): </p><div class="fragment"><div class="line">{</div>
+<p>Assume we have the following JSON stored in a C string (<code>const char* json</code>): </p><div class="fragment"><div class="line">{</div>
 <div class="line">    <span class="stringliteral">&quot;hello&quot;</span>: <span class="stringliteral">&quot;world&quot;</span>,</div>
 <div class="line">    <span class="stringliteral">&quot;t&quot;</span>: true ,</div>
 <div class="line">    <span class="stringliteral">&quot;f&quot;</span>: <span class="keyword">false</span>,</div>
@@ -135,12 +135,12 @@ DOM in the tutorial</div></div>
 </div><!-- fragment --><p>Let's query whether a <code>"hello"</code> member exists in the root object. Since a <code>Value</code> can contain different types of value, we may need to verify its type and use suitable API to obtain the value. In this example, <code>"hello"</code> member associates with a JSON string. </p><div class="fragment"><div class="line">assert(document.HasMember(<span class="stringliteral">&quot;hello&quot;</span>));</div>
 <div class="line">assert(document[<span class="stringliteral">&quot;hello&quot;</span>].IsString());</div>
 <div class="line">printf(<span class="stringliteral">&quot;hello = %s\n&quot;</span>, document[<span class="stringliteral">&quot;hello&quot;</span>].GetString());</div>
-</div><!-- fragment --><div class="fragment"><div class="line">world</div>
+</div><!-- fragment --><div class="fragment"><div class="line">hello = world</div>
 </div><!-- fragment --><p>JSON true/false values are represented as <code>bool</code>. </p><div class="fragment"><div class="line">assert(document[<span class="stringliteral">&quot;t&quot;</span>].IsBool());</div>
 <div class="line">printf(<span class="stringliteral">&quot;t = %s\n&quot;</span>, document[<span class="stringliteral">&quot;t&quot;</span>].GetBool() ? <span class="stringliteral">&quot;true&quot;</span> : <span class="stringliteral">&quot;false&quot;</span>);</div>
-</div><!-- fragment --><div class="fragment"><div class="line"><span class="keyword">true</span></div>
-</div><!-- fragment --><p>JSON null can be queryed by <code>IsNull()</code>. </p><div class="fragment"><div class="line">printf(<span class="stringliteral">&quot;n = %s\n&quot;</span>, document[<span class="stringliteral">&quot;n&quot;</span>].IsNull() ? <span class="stringliteral">&quot;null&quot;</span> : <span class="stringliteral">&quot;?&quot;</span>);</div>
-</div><!-- fragment --><div class="fragment"><div class="line">null</div>
+</div><!-- fragment --><div class="fragment"><div class="line">t = <span class="keyword">true</span></div>
+</div><!-- fragment --><p>JSON null can be queryed with <code>IsNull()</code>. </p><div class="fragment"><div class="line">printf(<span class="stringliteral">&quot;n = %s\n&quot;</span>, document[<span class="stringliteral">&quot;n&quot;</span>].IsNull() ? <span class="stringliteral">&quot;null&quot;</span> : <span class="stringliteral">&quot;?&quot;</span>);</div>
+</div><!-- fragment --><div class="fragment"><div class="line">n = null</div>
 </div><!-- fragment --><p>JSON number type represents all numeric values. However, C++ needs more specific type for manipulation.</p>
 <div class="fragment"><div class="line">assert(document[<span class="stringliteral">&quot;i&quot;</span>].IsNumber());</div>
 <div class="line"></div>
@@ -164,12 +164,12 @@ DOM in the tutorial</div></div>
 <div class="line">a[2] = 3</div>
 <div class="line">a[3] = 4</div>
 </div><!-- fragment --><p>Note that, RapidJSON does not automatically convert values between JSON types. If a value is a string, it is invalid to call <code>GetInt()</code>, for example. In debug mode it will fail an assertion. In release mode, the behavior is undefined.</p>
-<p>In the following, details about querying individual types are discussed.</p>
+<p>In the following sections we discuss details about querying individual types.</p>
 <h2><a class="anchor" id="QueryArray"></a>
 Query Array</h2>
-<p>By default, <code>SizeType</code> is typedef of <code>unsigned</code>. In most systems, array is limited to store up to 2^32-1 elements.</p>
-<p>You may access the elements in array by integer literal, for example, <code>a[0]</code>, <code>a[1]</code>, <code>a[2]</code>.</p>
-<p>Array is similar to <code>std::vector</code>, instead of using indices, you may also use iterator to access all the elements. </p><div class="fragment"><div class="line"><span class="keywordflow">for</span> (Value::ConstValueIterator itr = a.Begin(); itr != a.End(); ++itr)</div>
+<p>By default, <code>SizeType</code> is typedef of <code>unsigned</code>. In most systems, an array is limited to store up to 2^32-1 elements.</p>
+<p>You may access the elements in an array by integer literal, for example, <code>a[0]</code>, <code>a[1]</code>, <code>a[2]</code>.</p>
+<p>Array is similar to <code>std::vector</code>: instead of using indices, you may also use iterator to access all the elements. </p><div class="fragment"><div class="line"><span class="keywordflow">for</span> (Value::ConstValueIterator itr = a.Begin(); itr != a.End(); ++itr)</div>
 <div class="line">    printf(<span class="stringliteral">&quot;%d &quot;</span>, itr-&gt;GetInt());</div>
 </div><!-- fragment --><p>And other familiar query functions:</p><ul>
 <li><code>SizeType Capacity() const</code></li>
@@ -181,7 +181,7 @@ Query Array</h2>
 <div class="line">    printf(<span class="stringliteral">&quot;%d &quot;</span>, v.GetInt());</div>
 </div><!-- fragment --><h2><a class="anchor" id="QueryObject"></a>
 Query Object</h2>
-<p>Similar to array, we can access all object members by iterator:</p>
+<p>Similar to Array, we can access all object members by iterator:</p>
 <div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* kTypeNames[] = </div>
 <div class="line">    { <span class="stringliteral">&quot;Null&quot;</span>, <span class="stringliteral">&quot;False&quot;</span>, <span class="stringliteral">&quot;True&quot;</span>, <span class="stringliteral">&quot;Object&quot;</span>, <span class="stringliteral">&quot;Array&quot;</span>, <span class="stringliteral">&quot;String&quot;</span>, <span class="stringliteral">&quot;Number&quot;</span> };</div>
 <div class="line"></div>
@@ -210,9 +210,9 @@ Query Object</h2>
 <div class="line">        m.name.GetString(), kTypeNames[m.value.GetType()]);</div>
 </div><!-- fragment --><h2><a class="anchor" id="QueryNumber"></a>
 Querying Number</h2>
-<p>JSON provide a single numerical type called Number. Number can be integer or real numbers. RFC 4627 says the range of Number is specified by parser.</p>
-<p>As C++ provides several integer and floating point number types, the DOM tries to handle these with widest possible range and good performance.</p>
-<p>When a Number is parsed, it is stored in the DOM as either one of the following type:</p>
+<p>JSON provides a single numerical type called Number. Number can be an integer or a real number. RFC 4627 says the range of Number is specified by the parser implementation.</p>
+<p>As C++ provides several integer and floating point number types, the DOM tries to handle these with the widest possible range and good performance.</p>
+<p>When a Number is parsed, it is stored in the DOM as one of the following types:</p>
 <table class="doxtable">
 <tr>
 <th>Type </th><th>Description  </th></tr>
@@ -227,7 +227,7 @@ Querying Number</h2>
 <tr>
 <td><code>double</code> </td><td>64-bit double precision floating point </td></tr>
 </table>
-<p>When querying a number, you can check whether the number can be obtained as target type:</p>
+<p>When querying a number, you can check whether the number can be obtained as the target type:</p>
 <table class="doxtable">
 <tr>
 <th>Checking </th><th>Obtaining  </th></tr>
@@ -244,13 +244,13 @@ Querying Number</h2>
 <tr>
 <td><code>bool IsDouble()</code> </td><td><code>double GetDouble()</code> </td></tr>
 </table>
-<p>Note that, an integer value may be obtained in various ways without conversion. For example, A value <code>x</code> containing 123 will make <code>x.IsInt() == x.IsUint() == x.IsInt64() == x.IsUint64() == true</code>. But a value <code>y</code> containing -3000000000 will only makes <code>x.IsInt64() == true</code>.</p>
-<p>When obtaining the numeric values, <code>GetDouble()</code> will convert internal integer representation to a <code>double</code>. Note that, <code>int</code> and <code>unsigned</code> can be safely convert to <code>double</code>, but <code>int64_t</code> and <code>uint64_t</code> may lose precision (since mantissa of <code>double</code> is only 52-bits).</p>
+<p>Note that, an integer value may be obtained in various ways without conversion. For example, A value <code>x</code> containing 123 will make <code>x.IsInt() == x.IsUint() == x.IsInt64() == x.IsUint64() == true</code>. But a value <code>y</code> containing -3000000000 will only make <code>x.IsInt64() == true</code>.</p>
+<p>When obtaining the numeric values, <code>GetDouble()</code> will convert internal integer representation to a <code>double</code>. Note that, <code>int</code> and <code>unsigned</code> can be safely converted to <code>double</code>, but <code>int64_t</code> and <code>uint64_t</code> may lose precision (since mantissa of <code>double</code> is only 52-bits).</p>
 <h2><a class="anchor" id="QueryString"></a>
 Query String</h2>
 <p>In addition to <code>GetString()</code>, the <code>Value</code> class also contains <code>GetStringLength()</code>. Here explains why.</p>
 <p>According to RFC 4627, JSON strings can contain Unicode character <code>U+0000</code>, which must be escaped as <code>"\\u0000"</code>. The problem is that, C/C++ often uses null-terminated string, which treats `<code>\0'</code> as the terminator symbol.</p>
-<p>To conform RFC 4627, RapidJSON supports string containing <code>U+0000</code>. If you need to handle this, you can use <code>GetStringLength()</code> API to obtain the correct length of string.</p>
+<p>To conform RFC 4627, RapidJSON supports string containing <code>U+0000</code>. If you need to handle this, you can use <code>GetStringLength()</code> to obtain the correct string length.</p>
 <p>For example, after parsing a the following JSON to <code>Document d</code>:</p>
 <div class="fragment"><div class="line">{ <span class="stringliteral">&quot;s&quot;</span> :  <span class="stringliteral">&quot;a\u0000b&quot;</span> }</div>
 </div><!-- fragment --><p> The correct length of the value <code>"a\\u0000b"</code> is 3. But <code>strlen()</code> returns 1.</p>
@@ -340,13 +340,13 @@ Move semantics and temporary values</h3>
 <div class="line">a.PushBack(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(42).Move(), allocator);   <span class="comment">// same as above</span></div>
 </div><!-- fragment --><h2><a class="anchor" id="CreateString"></a>
 Create String</h2>
-<p>RapidJSON provide two strategies for storing string.</p>
+<p>RapidJSON provides two strategies for storing string.</p>
 <ol type="1">
 <li>copy-string: allocates a buffer, and then copy the source data into it.</li>
 <li>const-string: simply store a pointer of string.</li>
 </ol>
-<p>Copy-string is always safe because it owns a copy of the data. Const-string can be used for storing string literal, and in-situ parsing which we will mentioned in Document section.</p>
-<p>To make memory allocation customizable, RapidJSON requires user to pass an instance of allocator, whenever an operation may require allocation. This design is needed to prevent storing a allocator (or Document) pointer per Value.</p>
+<p>Copy-string is always safe because it owns a copy of the data. Const-string can be used for storing a string literal, and for in-situ parsing which will be mentioned in the DOM section.</p>
+<p>To make memory allocation customizable, RapidJSON requires users to pass an instance of allocator, whenever an operation may require allocation. This design is needed to prevent storing a allocator (or Document) pointer per Value.</p>
 <p>Therefore, when we assign a copy-string, we call this overloaded <code>SetString()</code> with allocator:</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> document;</div>
 <div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> author;</div>
@@ -357,11 +357,11 @@ Create String</h2>
 <div class="line"><span class="comment">// author.GetString() still contains &quot;Milo Yip&quot; after buffer is destroyed</span></div>
 </div><!-- fragment --><p>In this example, we get the allocator from a <code>Document</code> instance. This is a common idiom when using RapidJSON. But you may use other instances of allocator.</p>
 <p>Besides, the above <code>SetString()</code> requires length. This can handle null characters within a string. There is another <code>SetString()</code> overloaded function without the length parameter. And it assumes the input is null-terminated and calls a <code>strlen()</code>-like function to obtain the length.</p>
-<p>Finally, for string literal or string with safe life-cycle can use const-string version of <code>SetString()</code>, which lacks allocator parameter. For string literals (or constant character arrays), simply passing the literal as parameter is safe and efficient:</p>
+<p>Finally, for a string literal or string with a safe life-cycle one can use the const-string version of <code>SetString()</code>, which lacks an allocator parameter. For string literals (or constant character arrays), simply passing the literal as parameter is safe and efficient:</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> s;</div>
 <div class="line">s.SetString(<span class="stringliteral">&quot;rapidjson&quot;</span>);    <span class="comment">// can contain null character, length derived at compile time</span></div>
 <div class="line">s = <span class="stringliteral">&quot;rapidjson&quot;</span>;             <span class="comment">// shortcut, same as above</span></div>
-</div><!-- fragment --><p>For character pointer, the RapidJSON requires to mark it as safe before using it without copying. This can be achieved by using the <code>StringRef</code> function:</p>
+</div><!-- fragment --><p>For a character pointer, RapidJSON requires it to be marked as safe before using it without copying. This can be achieved by using the <code>StringRef</code> function:</p>
 <div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span> * cstr = getenv(<span class="stringliteral">&quot;USER&quot;</span>);</div>
 <div class="line"><span class="keywordtype">size_t</span> cstr_len = ...;                 <span class="comment">// in case length is available</span></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> s;</div>
@@ -372,7 +372,7 @@ Create String</h2>
 <div class="line">s = <a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(cstr,cstr_len);          <span class="comment">// shortcut, same as above</span></div>
 </div><!-- fragment --><h2><a class="anchor" id="ModifyArray"></a>
 Modify Array</h2>
-<p>Value with array type provides similar APIs as <code>std::vector</code>.</p>
+<p>Value with array type provides an API similar to <code>std::vector</code>.</p>
 <ul>
 <li><code>Clear()</code></li>
 <li><code>Reserve(SizeType, Allocator&amp;)</code></li>
@@ -382,7 +382,7 @@ Modify Array</h2>
 <li><code>ValueIterator Erase(ConstValueIterator pos)</code></li>
 <li><code>ValueIterator Erase(ConstValueIterator first, ConstValueIterator last)</code></li>
 </ul>
-<p>Note that, <code>Reserve(...)</code> and <code>PushBack(...)</code> may allocate memory for the array elements, therefore require an allocator.</p>
+<p>Note that, <code>Reserve(...)</code> and <code>PushBack(...)</code> may allocate memory for the array elements, therefore requiring an allocator.</p>
 <p>Here is an example of <code>PushBack()</code>:</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
 <div class="line">Document::AllocatorType&amp; allocator = document.GetAllocator();</div>
@@ -392,7 +392,7 @@ Modify Array</h2>
 <div class="line"></div>
 <div class="line"><span class="comment">// Fluent interface</span></div>
 <div class="line">a.PushBack(<span class="stringliteral">&quot;Lua&quot;</span>, allocator).PushBack(<span class="stringliteral">&quot;Mio&quot;</span>, allocator);</div>
-</div><!-- fragment --><p>Differs from STL, <code>PushBack()</code>/<code>PopBack()</code> returns the array reference itself. This is called <em>fluent interface</em>.</p>
+</div><!-- fragment --><p>This API differs from STL in that <code>PushBack()</code>/<code>PopBack()</code> return the array reference itself. This is called <em>fluent interface</em>.</p>
 <p>If you want to add a non-constant string or a string without sufficient lifetime (see <a href="#CreateString">Create String</a>) to the array, you need to create a string Value by using the copy-string API. To avoid the need for an intermediate variable, you can use a <a href="#TemporaryValues">temporary value</a> in place:</p>
 <div class="fragment"><div class="line"><span class="comment">// in-place Value parameter</span></div>
 <div class="line">contact.PushBack(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<span class="stringliteral">&quot;copy&quot;</span>, document.GetAllocator()).Move(), <span class="comment">// copy string</span></div>
@@ -403,7 +403,7 @@ Modify Array</h2>
 <div class="line">contact.PushBack(val, document.GetAllocator());</div>
 </div><!-- fragment --><h2><a class="anchor" id="ModifyObject"></a>
 Modify Object</h2>
-<p>Object is a collection of key-value pairs (members). Each key must be a string value. To modify an object, either add or remove members. THe following APIs are for adding members:</p>
+<p>The Object class is a collection of key-value pairs (members). Each key must be a string value. To modify an object, either add or remove members. The following API is for adding members:</p>
 <ul>
 <li><code>Value&amp; AddMember(Value&amp;, Value&amp;, Allocator&amp; allocator)</code></li>
 <li><code>Value&amp; AddMember(StringRefType, Value&amp;, Allocator&amp;)</code></li>
@@ -413,7 +413,7 @@ Modify Object</h2>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> contact(kObject);</div>
 <div class="line">contact.AddMember(<span class="stringliteral">&quot;name&quot;</span>, <span class="stringliteral">&quot;Milo&quot;</span>, document.GetAllocator());</div>
 <div class="line">contact.AddMember(<span class="stringliteral">&quot;married&quot;</span>, <span class="keyword">true</span>, document.GetAllocator());</div>
-</div><!-- fragment --><p>The name parameter with <code>StringRefType</code> is similar to the interface of <code>SetString</code> function for string values. These overloads are used to avoid the need for copying the <code>name</code> string, as constant key names are very common in JSON objects.</p>
+</div><!-- fragment --><p>The name parameter with <code>StringRefType</code> is similar to the interface of the <code>SetString</code> function for string values. These overloads are used to avoid the need for copying the <code>name</code> string, since constant key names are very common in JSON objects.</p>
 <p>If you need to create a name from a non-constant string or a string without sufficient lifetime (see <a href="#CreateString">Create String</a>), you need to create a string Value by using the copy-string API. To avoid the need for an intermediate variable, you can use a <a href="#TemporaryValues">temporary value</a> in place:</p>
 <div class="fragment"><div class="line"><span class="comment">// in-place Value parameter</span></div>
 <div class="line">contact.AddMember(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<span class="stringliteral">&quot;copy&quot;</span>, document.GetAllocator()).Move(), <span class="comment">// copy string</span></div>
