@@ -117,7 +117,7 @@ public:
 #pragma GCC diagnostic pop
 #endif
 
-#define RAPIDJSON_ASSERT(x) if (!(x)) throw AssertException(RAPIDJSON_STRINGIFY(x))
+#define RAPIDJSON_ASSERT(x) (!(x) ? throw AssertException(RAPIDJSON_STRINGIFY(x)) : (void)0u)
 
 class Random {
 public:

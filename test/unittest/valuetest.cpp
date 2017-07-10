@@ -857,9 +857,46 @@ TEST(Value, String) {
 }
 
 // Issue 226: Value of string type should not point to NULL
-TEST(Value, SetStringNullException) {
-    Value v;
-    EXPECT_THROW(v.SetString(0, 0), AssertException);
+TEST(Value, SetStringNull) {
+
+    MemoryPoolAllocator<> allocator;
+    const char* nullPtr = 0;
+    {
+        // Construction with string type creates empty string
+        Value v(kStringType);
+        EXPECT_NE(v.GetString(), nullPtr); // non-null string returned
+        EXPECT_EQ(v.GetStringLength(), 0u);
+
+        // Construction from/setting to null without length not allowed
+        EXPECT_THROW(Value(StringRef(nullPtr)), AssertException);
+        EXPECT_THROW(Value(StringRef(nullPtr), allocator), AssertException);
+        EXPECT_THROW(v.SetString(nullPtr, allocator), AssertException);
+
+        // Non-empty length with null string is not allowed
+        EXPECT_THROW(v.SetString(nullPtr, 17u), AssertException);
+        EXPECT_THROW(v.SetString(nullPtr, 42u, allocator), AssertException);
+
+        // Setting to null string with empty length is allowed
+        v.SetString(nullPtr, 0u);
+        EXPECT_NE(v.GetString(), nullPtr); // non-null string returned
+        EXPECT_EQ(v.GetStringLength(), 0u);
+
+        v.SetNull();
+        v.SetString(nullPtr, 0u, allocator);
+        EXPECT_NE(v.GetString(), nullPtr); // non-null string returned
+        EXPECT_EQ(v.GetStringLength(), 0u);
+    }
+    // Construction with null string and empty length is allowed
+    {
+        Value v(nullPtr,0u);
+        EXPECT_NE(v.GetString(), nullPtr); // non-null string returned
+        EXPECT_EQ(v.GetStringLength(), 0u);
+    }
+    {
+        Value v(nullPtr, 0u, allocator);
+        EXPECT_NE(v.GetString(), nullPtr); // non-null string returned
+        EXPECT_EQ(v.GetStringLength(), 0u);
+    }
 }
 
 template <typename T, typename Allocator>
