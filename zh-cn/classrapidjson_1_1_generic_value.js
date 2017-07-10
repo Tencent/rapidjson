@@ -146,6 +146,7 @@ var classrapidjson_1_1_generic_value =
     [ "SetString", "classrapidjson_1_1_generic_value.html#aabb538578a3c1e60c86cda32d062bc1c", null ],
     [ "SetString", "classrapidjson_1_1_generic_value.html#ae6351043ec30d8a151b0a072cfbc46d5", null ],
     [ "SetString", "classrapidjson_1_1_generic_value.html#ab4babf200cac2dacb412a3ea279ddf5b", null ],
+    [ "SetString", "classrapidjson_1_1_generic_value.html#a9ba3d9d8a106d5b7e92fb49db897c21b", null ],
     [ "SetString", "classrapidjson_1_1_generic_value.html#a3e930bffb40a78e570e3deef461f0532", null ],
     [ "SetUint", "classrapidjson_1_1_generic_value.html#a0e173c8bb01a536c94529d4e3f9bfc67", null ],
     [ "SetUint64", "classrapidjson_1_1_generic_value.html#a8c89bdc7f8dd14e4ab974e587b99405a", null ],
