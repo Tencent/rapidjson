@@ -2,7 +2,7 @@ var searchData=
 [
   ['objectempty',['ObjectEmpty',['../classrapidjson_1_1_generic_value.html#a1f28a345c9b9c93c76abf695669e4378',1,'rapidjson::GenericValue']]],
   ['offset',['Offset',['../group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a056e5792c1554fbc05b5f1cc168d82ae',1,'rapidjson::ParseResult']]],
-  ['operator_20bool',['operator bool',['../group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ac8865f9231951740a99d3f3ab10f9a4e',1,'rapidjson::ParseResult']]],
+  ['operator_20booleantype',['operator BooleanType',['../group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a1743018526769d9b5b782fd7cffc9838',1,'rapidjson::ParseResult']]],
   ['operator_20const_20ch_20_2a',['operator const Ch *',['../structrapidjson_1_1_generic_string_ref.html#af535787e3593802222f7b3f3096beff0',1,'rapidjson::GenericStringRef']]],
   ['operator_20parseresult',['operator ParseResult',['../classrapidjson_1_1_generic_document.html#a0de48f0c884423b6fcfabc2e93942968',1,'rapidjson::GenericDocument']]],
   ['operator_21_3d',['operator!=',['../classrapidjson_1_1_generic_value.html#a0cb232adce79932c499c5f04cbc8dc54',1,'rapidjson::GenericValue::operator!=(const GenericValue&lt; Encoding, SourceAllocator &gt; &amp;rhs) const '],['../classrapidjson_1_1_generic_value.html#aff1711092a1278d36b8152f5520a686e',1,'rapidjson::GenericValue::operator!=(const Ch *rhs) const '],['../classrapidjson_1_1_generic_value.html#ad7e6ef7acbbfef57485b9f2dee620dbf',1,'rapidjson::GenericValue::operator!=(const T &amp;rhs) const '],['../classrapidjson_1_1_generic_pointer.html#a3e74f5b9c9fd3307f6ebac61a7131524',1,'rapidjson::GenericPointer::operator!=()']]],

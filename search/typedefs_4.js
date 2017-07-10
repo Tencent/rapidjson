@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['getparseerrorfunc',['GetParseErrorFunc',['../group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga4e77e464ec8abe1111ee581fc2cb00de',1,'rapidjson']]]
+  ['encodingtype',['EncodingType',['../classrapidjson_1_1_generic_value.html#a05906384808645a2e798d29a9b2d441d',1,'rapidjson::GenericValue::EncodingType()'],['../classrapidjson_1_1_generic_pointer.html#a399790c5fe8076d91a58c621c0c2a79e',1,'rapidjson::GenericPointer::EncodingType()']]]
 ];

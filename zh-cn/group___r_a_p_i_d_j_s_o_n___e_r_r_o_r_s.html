@@ -183,6 +183,11 @@ $(document).ready(function(){initNavTree('group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_
 <div class="line">}</div>
 </div><!-- fragment --> <dl class="section see"><dt>参见</dt><dd><a class="el" href="classrapidjson_1_1_generic_reader.html#ac9c540b77de19661f6f45e04b9b0937b" title="Parse JSON text. ">GenericReader::Parse</a>, <a class="el" href="classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c" title="Parse JSON text from a read-only string (with Encoding conversion) ">GenericDocument::Parse</a> </dd></dl>
 </div><table class="memberdecls">
+<tr><td colspan="2"><h3>Public 类型</h3></td></tr>
+<tr class="memitem:a59558cbb7ba917a1c3924d83ed2da0d9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a59558cbb7ba917a1c3924d83ed2da0d9"></a>
+typedef bool(ParseResult::*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a59558cbb7ba917a1c3924d83ed2da0d9">BooleanType</a> )() const </td></tr>
+<tr class="memdesc:a59558cbb7ba917a1c3924d83ed2da0d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">! Unspecified boolean type <br /></td></tr>
+<tr class="separator:a59558cbb7ba917a1c3924d83ed2da0d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><h3>Public 成员函数</h3></td></tr>
 <tr class="memitem:a0f03679d5fa2736d9e351541e767fac1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f03679d5fa2736d9e351541e767fac1"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a0f03679d5fa2736d9e351541e767fac1">ParseResult</a> ()</td></tr>
@@ -200,10 +205,10 @@ $(document).ready(function(){initNavTree('group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_
 size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a056e5792c1554fbc05b5f1cc168d82ae">Offset</a> () const </td></tr>
 <tr class="memdesc:a056e5792c1554fbc05b5f1cc168d82ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the error offset, if <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a5ab5548c7a7776f4da20eac09fe57c1b">IsError()</a>, 0 otherwise. <br /></td></tr>
 <tr class="separator:a056e5792c1554fbc05b5f1cc168d82ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac8865f9231951740a99d3f3ab10f9a4e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac8865f9231951740a99d3f3ab10f9a4e"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ac8865f9231951740a99d3f3ab10f9a4e">operator bool</a> () const </td></tr>
-<tr class="memdesc:ac8865f9231951740a99d3f3ab10f9a4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion to <code>bool</code>, returns <code>true</code>, iff !<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a5ab5548c7a7776f4da20eac09fe57c1b">IsError()</a>. <br /></td></tr>
-<tr class="separator:ac8865f9231951740a99d3f3ab10f9a4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1743018526769d9b5b782fd7cffc9838"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1743018526769d9b5b782fd7cffc9838"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a1743018526769d9b5b782fd7cffc9838">operator BooleanType</a> () const </td></tr>
+<tr class="memdesc:a1743018526769d9b5b782fd7cffc9838"><td class="mdescLeft">&#160;</td><td class="mdescRight">Explicit conversion to <code>bool</code>, returns <code>true</code>, iff !<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a5ab5548c7a7776f4da20eac09fe57c1b">IsError()</a>. <br /></td></tr>
+<tr class="separator:a1743018526769d9b5b782fd7cffc9838"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ab5548c7a7776f4da20eac09fe57c1b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5ab5548c7a7776f4da20eac09fe57c1b"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a5ab5548c7a7776f4da20eac09fe57c1b">IsError</a> () const </td></tr>
 <tr class="memdesc:a5ab5548c7a7776f4da20eac09fe57c1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether the result is an error. <br /></td></tr>
@@ -214,6 +219,12 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const
 <tr class="memitem:a11595b2d573f0299422678c5e3695479"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a11595b2d573f0299422678c5e3695479"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> code) const </td></tr>
 <tr class="separator:a11595b2d573f0299422678c5e3695479"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7766917944b27eec1ea2c2605f584ac5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7766917944b27eec1ea2c2605f584ac5"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (const <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result">ParseResult</a> &amp;that) const </td></tr>
+<tr class="separator:a7766917944b27eec1ea2c2605f584ac5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add4d4e2934a3b90cf6b6f765330e0d95"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="add4d4e2934a3b90cf6b6f765330e0d95"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> code) const </td></tr>
+<tr class="separator:add4d4e2934a3b90cf6b6f765330e0d95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a17c9f7f81675283393222658d613000f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a17c9f7f81675283393222658d613000f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a17c9f7f81675283393222658d613000f">Clear</a> ()</td></tr>
 <tr class="memdesc:a17c9f7f81675283393222658d613000f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset error code. <br /></td></tr>
@@ -226,6 +237,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="grou
 <tr class="memitem:a58c9982e833d1c74686506ac7449200c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a58c9982e833d1c74686506ac7449200c"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> code, const <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result">ParseResult</a> &amp;err)</td></tr>
 <tr class="separator:a58c9982e833d1c74686506ac7449200c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0498aebcfdd3d4a5dcb989ee29b93d4d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0498aebcfdd3d4a5dcb989ee29b93d4d"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator!=</b> (<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> code, const <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result">ParseResult</a> &amp;err)</td></tr>
+<tr class="separator:a0498aebcfdd3d4a5dcb989ee29b93d4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 
 </div>
