@@ -1,5 +1,5 @@
 sudo: required
-dist: precise
+dist: trusty
 
 language: cpp
 cache:
@@ -17,6 +17,8 @@ env:
     - secure: "HrsaCb+N66EG1HR+LWH1u51SjaJyRwJEDzqJGYMB7LJ/bfqb9mWKF1fLvZGk46W5t7TVaXRDD5KHFx9DPWvKn4gRUVkwTHEy262ah5ORh8M6n/6VVVajeV/AYt2C0sswdkDBDO4Xq+xy5gdw3G8s1A4Inbm73pUh+6vx+7ltBbk="
 
 before_install:
+    - sudo rm /etc/apt/sources.list.d/google-chrome.list
+    - sudo dpkg --add-architecture i386
     - sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
     - sudo apt-get update -qq
     - sudo apt-get install -y cmake valgrind g++-multilib libc6-dbg:i386
@@ -77,7 +79,7 @@ before_script:
       #   hack to avoid Valgrind bug (https://bugs.kde.org/show_bug.cgi?id=326469),
       #   exposed by merging PR#163 (using -march=native)
       #   TODO: Since this bug is already fixed. Remove this when valgrind can be upgraded.
-    - sed -i "s/-march=native//" CMakeLists.txt
+    # - sed -i "s/-march=native//" CMakeLists.txt
     - mkdir build
 
 script:
