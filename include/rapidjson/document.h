@@ -308,7 +308,7 @@ struct GenericStringRef {
      */
 #endif
     explicit GenericStringRef(const CharType* str)
-        : s(str), length(((RAPIDJSON_ASSERT(str != 0)), internal::StrLen(str))) {}
+        : s(str), length(NotNullStrLen(str)) {}
 
     //! Create constant string reference from pointer and length
 #ifndef __clang__ // -Wdocumentation
@@ -331,6 +331,11 @@ struct GenericStringRef {
     const SizeType length; //!< length of the string (excluding the trailing NULL terminator)
 
 private:
+    SizeType NotNullStrLen(const CharType* str) {
+        RAPIDJSON_ASSERT(str != 0);
+        return internal::StrLen(str);
+    }
+
     /// Empty string - used when passing in a NULL pointer
     static const Ch emptyString[];
 
