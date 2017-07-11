@@ -4,22 +4,23 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.7"/>
+<meta name="generator" content="Doxygen 1.8.13"/>
 <title>RapidJSON: rapidjson::GenericReader&lt; SourceEncoding, TargetEncoding, StackAllocator &gt; 模板类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
   $(document).ready(initResizable);
-  $(window).load(resizeHeight);
 </script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
@@ -42,7 +43,7 @@
           </span>
         </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.7 -->
+<!-- 制作者 Doxygen 1.8.13 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -66,7 +67,7 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_generic_reader.html
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(12)"><span class="SelectionMark">&#160;</span>页</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -94,9 +95,9 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_generic_reader.html
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public 类型</h2></td></tr>
-<tr class="memitem:a0781d19e8c6bc044d9cc5f5d3dde287e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0781d19e8c6bc044d9cc5f5d3dde287e"></a>
+<tr class="memitem:a0781d19e8c6bc044d9cc5f5d3dde287e"><td class="memItemLeft" align="right" valign="top"><a id="a0781d19e8c6bc044d9cc5f5d3dde287e"></a>
 typedef SourceEncoding::Ch&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#a0781d19e8c6bc044d9cc5f5d3dde287e">Ch</a></td></tr>
-<tr class="memdesc:a0781d19e8c6bc044d9cc5f5d3dde287e"><td class="mdescLeft">&#160;</td><td class="mdescRight">SourceEncoding character type. <br /></td></tr>
+<tr class="memdesc:a0781d19e8c6bc044d9cc5f5d3dde287e"><td class="mdescLeft">&#160;</td><td class="mdescRight">SourceEncoding character type <br /></td></tr>
 <tr class="separator:a0781d19e8c6bc044d9cc5f5d3dde287e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -112,38 +113,38 @@ Public 成员函数</h2></td></tr>
 <tr class="memitem:a2bac14d193873d661d79ad000473a908"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result">ParseResult</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#a2bac14d193873d661d79ad000473a908">Parse</a> (InputStream &amp;is, <a class="el" href="classrapidjson_1_1_handler.html">Handler</a> &amp;handler)</td></tr>
 <tr class="memdesc:a2bac14d193873d661d79ad000473a908"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse JSON text (with <a class="el" href="namespacerapidjson.html#a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835">kParseDefaultFlags</a>)  <a href="#a2bac14d193873d661d79ad000473a908">更多...</a><br /></td></tr>
 <tr class="separator:a2bac14d193873d661d79ad000473a908"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90403a2c55dadf82fd2bb9d4c66b3280"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a90403a2c55dadf82fd2bb9d4c66b3280"></a>
+<tr class="memitem:a90403a2c55dadf82fd2bb9d4c66b3280"><td class="memItemLeft" align="right" valign="top"><a id="a90403a2c55dadf82fd2bb9d4c66b3280"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#a90403a2c55dadf82fd2bb9d4c66b3280">IterativeParseInit</a> ()</td></tr>
-<tr class="memdesc:a90403a2c55dadf82fd2bb9d4c66b3280"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize JSON text token-by-token parsing. <br /></td></tr>
+<tr class="memdesc:a90403a2c55dadf82fd2bb9d4c66b3280"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize JSON text token-by-token parsing <br /></td></tr>
 <tr class="separator:a90403a2c55dadf82fd2bb9d4c66b3280"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abac6611bec17167de50fede5cd5194ca"><td class="memTemplParams" colspan="2">template&lt;unsigned parseFlags, typename InputStream , typename Handler &gt; </td></tr>
 <tr class="memitem:abac6611bec17167de50fede5cd5194ca"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#abac6611bec17167de50fede5cd5194ca">IterativeParseNext</a> (InputStream &amp;is, <a class="el" href="classrapidjson_1_1_handler.html">Handler</a> &amp;handler)</td></tr>
-<tr class="memdesc:abac6611bec17167de50fede5cd5194ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse one token from JSON text.  <a href="#abac6611bec17167de50fede5cd5194ca">更多...</a><br /></td></tr>
+<tr class="memdesc:abac6611bec17167de50fede5cd5194ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse one token from JSON text  <a href="#abac6611bec17167de50fede5cd5194ca">更多...</a><br /></td></tr>
 <tr class="separator:abac6611bec17167de50fede5cd5194ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60fa11ff60f71b3a466bbd962f35dfdb"><td class="memItemLeft" align="right" valign="top">RAPIDJSON_FORCEINLINE bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#a60fa11ff60f71b3a466bbd962f35dfdb">IterativeParseComplete</a> ()</td></tr>
-<tr class="memdesc:a60fa11ff60f71b3a466bbd962f35dfdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if token-by-token parsing JSON text is complete.  <a href="#a60fa11ff60f71b3a466bbd962f35dfdb">更多...</a><br /></td></tr>
+<tr class="memdesc:a60fa11ff60f71b3a466bbd962f35dfdb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if token-by-token parsing JSON text is complete  <a href="#a60fa11ff60f71b3a466bbd962f35dfdb">更多...</a><br /></td></tr>
 <tr class="separator:a60fa11ff60f71b3a466bbd962f35dfdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46ded2951b8fa395ed421989d66e71fe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a46ded2951b8fa395ed421989d66e71fe"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#a46ded2951b8fa395ed421989d66e71fe">HasParseError</a> () const </td></tr>
-<tr class="memdesc:a46ded2951b8fa395ed421989d66e71fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether a parse error has occured in the last parsing. <br /></td></tr>
-<tr class="separator:a46ded2951b8fa395ed421989d66e71fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40fd326bad7d7033f096b549cbf159db"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a40fd326bad7d7033f096b549cbf159db"></a>
-<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#a40fd326bad7d7033f096b549cbf159db">GetParseErrorCode</a> () const </td></tr>
-<tr class="memdesc:a40fd326bad7d7033f096b549cbf159db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> of last parsing. <br /></td></tr>
-<tr class="separator:a40fd326bad7d7033f096b549cbf159db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab907a36c410e96154c99797a6a0ce16d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab907a36c410e96154c99797a6a0ce16d"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#ab907a36c410e96154c99797a6a0ce16d">GetErrorOffset</a> () const </td></tr>
-<tr class="memdesc:ab907a36c410e96154c99797a6a0ce16d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the position of last parsing error in input, 0 otherwise. <br /></td></tr>
-<tr class="separator:ab907a36c410e96154c99797a6a0ce16d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac42370c3497a0e2b6973110f298e3a59"><td class="memItemLeft" align="right" valign="top"><a id="ac42370c3497a0e2b6973110f298e3a59"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#ac42370c3497a0e2b6973110f298e3a59">HasParseError</a> () const</td></tr>
+<tr class="memdesc:ac42370c3497a0e2b6973110f298e3a59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether a parse error has occured in the last parsing. <br /></td></tr>
+<tr class="separator:ac42370c3497a0e2b6973110f298e3a59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a042c621cf745c5ed3a6f5ff9418dd05e"><td class="memItemLeft" align="right" valign="top"><a id="a042c621cf745c5ed3a6f5ff9418dd05e"></a>
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#a042c621cf745c5ed3a6f5ff9418dd05e">GetParseErrorCode</a> () const</td></tr>
+<tr class="memdesc:a042c621cf745c5ed3a6f5ff9418dd05e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> of last parsing. <br /></td></tr>
+<tr class="separator:a042c621cf745c5ed3a6f5ff9418dd05e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab50019e0a715320f83b7610b83dcef8f"><td class="memItemLeft" align="right" valign="top"><a id="ab50019e0a715320f83b7610b83dcef8f"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_reader.html#ab50019e0a715320f83b7610b83dcef8f">GetErrorOffset</a> () const</td></tr>
+<tr class="memdesc:ab50019e0a715320f83b7610b83dcef8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the position of last parsing error in input, 0 otherwise. <br /></td></tr>
+<tr class="separator:ab50019e0a715320f83b7610b83dcef8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected 成员函数</h2></td></tr>
-<tr class="memitem:a544704abdce535d93ae0f45d0cf0bc0d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a544704abdce535d93ae0f45d0cf0bc0d"></a>
+<tr class="memitem:a544704abdce535d93ae0f45d0cf0bc0d"><td class="memItemLeft" align="right" valign="top"><a id="a544704abdce535d93ae0f45d0cf0bc0d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetParseError</b> (<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60">ParseErrorCode</a> code, size_t offset)</td></tr>
 <tr class="separator:a544704abdce535d93ae0f45d0cf0bc0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<div class="textblock"><h3>template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllocator&gt;<br />
+<div class="textblock"><h3>template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllocator = CrtAllocator&gt;<br />
 class rapidjson::GenericReader&lt; SourceEncoding, TargetEncoding, StackAllocator &gt;</h3>
 
 <p>SAX-style JSON parser. Use <a class="el" href="md_doc_sax_8zh-cn.html#Reader">Reader</a> for <a class="el" href="structrapidjson_1_1_u_t_f8.html" title="UTF-8 encoding. ">UTF8</a> encoding and default allocator. </p>
@@ -160,11 +161,13 @@ class rapidjson::GenericReader&lt; SourceEncoding, TargetEncoding, StackAllocato
   </dd>
 </dl>
 </div><h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="a56ab1065ea75167aeacb4802425bf57f"></a>
+<a id="a56ab1065ea75167aeacb4802425bf57f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a56ab1065ea75167aeacb4802425bf57f">&#9670;&nbsp;</a></span>GenericReader()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllocator&gt; </div>
+template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllocator = CrtAllocator&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -206,11 +209,13 @@ template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllo
 </div>
 </div>
 <h2 class="groupheader">成员函数说明</h2>
-<a class="anchor" id="a60fa11ff60f71b3a466bbd962f35dfdb"></a>
+<a id="a60fa11ff60f71b3a466bbd962f35dfdb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a60fa11ff60f71b3a466bbd962f35dfdb">&#9670;&nbsp;</a></span>IterativeParseComplete()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllocator&gt; </div>
+template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllocator = CrtAllocator&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -229,16 +234,18 @@ template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllo
 </table>
 </div><div class="memdoc">
 
-<p>Check if token-by-token parsing JSON text is complete. </p>
+<p>Check if token-by-token parsing JSON text is complete </p>
 <dl class="section return"><dt>返回</dt><dd>Whether the JSON has been fully decoded. </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="abac6611bec17167de50fede5cd5194ca"></a>
+<a id="abac6611bec17167de50fede5cd5194ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abac6611bec17167de50fede5cd5194ca">&#9670;&nbsp;</a></span>IterativeParseNext()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllocator&gt; </div>
+template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllocator = CrtAllocator&gt; </div>
 <div class="memtemplate">
 template&lt;unsigned parseFlags, typename InputStream , typename Handler &gt; </div>
 <table class="mlabels">
@@ -270,7 +277,7 @@ template&lt;unsigned parseFlags, typename InputStream , typename Handler &gt; </
 </table>
 </div><div class="memdoc">
 
-<p>Parse one token from JSON text. </p>
+<p>Parse one token from JSON text </p>
 <dl class="tparams"><dt>模板参数</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">InputStream</td><td>Type of input stream, implementing <a class="el" href="classrapidjson_1_1_stream.html" title="Concept for reading and writing characters. ">Stream</a> concept </td></tr>
@@ -289,11 +296,13 @@ template&lt;unsigned parseFlags, typename InputStream , typename Handler &gt; </
 
 </div>
 </div>
-<a class="anchor" id="ac9c540b77de19661f6f45e04b9b0937b"></a>
+<a id="ac9c540b77de19661f6f45e04b9b0937b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9c540b77de19661f6f45e04b9b0937b">&#9670;&nbsp;</a></span>Parse() <span class="overload">[1/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllocator&gt; </div>
+template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllocator = CrtAllocator&gt; </div>
 <div class="memtemplate">
 template&lt;unsigned parseFlags, typename InputStream , typename Handler &gt; </div>
 <table class="mlabels">
@@ -345,11 +354,13 @@ template&lt;unsigned parseFlags, typename InputStream , typename Handler &gt; </
 
 </div>
 </div>
-<a class="anchor" id="a2bac14d193873d661d79ad000473a908"></a>
+<a id="a2bac14d193873d661d79ad000473a908"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2bac14d193873d661d79ad000473a908">&#9670;&nbsp;</a></span>Parse() <span class="overload">[2/2]</span></h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllocator&gt; </div>
+template&lt;typename SourceEncoding, typename TargetEncoding, typename StackAllocator = CrtAllocator&gt; </div>
 <div class="memtemplate">
 template&lt;typename InputStream , typename Handler &gt; </div>
 <table class="mlabels">

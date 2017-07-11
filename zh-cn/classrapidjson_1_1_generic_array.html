@@ -4,22 +4,23 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.7"/>
-<title>RapidJSON: rapidjson::GenericArray&lt; bool, typename &gt; 模板类 参考</title>
+<meta name="generator" content="Doxygen 1.8.13"/>
+<title>RapidJSON: rapidjson::GenericArray&lt; Const, ValueT &gt; 模板类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
   $(document).ready(initResizable);
-  $(window).load(resizeHeight);
 </script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
@@ -42,7 +43,7 @@
           </span>
         </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.7 -->
+<!-- 制作者 Doxygen 1.8.13 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -66,7 +67,7 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_generic_array.html'
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(12)"><span class="SelectionMark">&#160;</span>页</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -82,7 +83,7 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_generic_array.html'
 <a href="#friends">友元</a> &#124;
 <a href="classrapidjson_1_1_generic_array-members.html">所有成员列表</a>  </div>
   <div class="headertitle">
-<div class="title">rapidjson::GenericArray&lt; bool, typename &gt; 模板类 参考</div>  </div>
+<div class="title">rapidjson::GenericArray&lt; Const, ValueT &gt; 模板类 参考</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -93,97 +94,93 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_generic_array.html'
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public 类型</h2></td></tr>
-<tr class="memitem:a8f15375c676103c3ad0dac92f3d17a90"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8f15375c676103c3ad0dac92f3d17a90"></a>
-typedef <a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a>&lt; true, <br class="typebreak" />
-ValueT &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>ConstArray</b></td></tr>
-<tr class="separator:a8f15375c676103c3ad0dac92f3d17a90"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af544f625293fc10256dad72172743ed3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af544f625293fc10256dad72172743ed3"></a>
-typedef <a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a>&lt; false, <br class="typebreak" />
-ValueT &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>Array</b></td></tr>
-<tr class="separator:af544f625293fc10256dad72172743ed3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a92a199e5417ad39a993e8d1c36b5aa3f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a92a199e5417ad39a993e8d1c36b5aa3f"></a>
+<tr class="memitem:a6f2b607cc4e648e5b250dea147843476"><td class="memItemLeft" align="right" valign="top"><a id="a6f2b607cc4e648e5b250dea147843476"></a>
+typedef <a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a>&lt; true, ValueT &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>ConstArray</b></td></tr>
+<tr class="separator:a6f2b607cc4e648e5b250dea147843476"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae82a8e56892743f606ae07da8f9a2f5a"><td class="memItemLeft" align="right" valign="top"><a id="ae82a8e56892743f606ae07da8f9a2f5a"></a>
+typedef <a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a>&lt; false, ValueT &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>Array</b></td></tr>
+<tr class="separator:ae82a8e56892743f606ae07da8f9a2f5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a417eefa7bd2a3d357e947e64044f0bd9"><td class="memItemLeft" align="right" valign="top"><a id="a417eefa7bd2a3d357e947e64044f0bd9"></a>
 typedef ValueT&#160;</td><td class="memItemRight" valign="bottom"><b>PlainType</b></td></tr>
-<tr class="separator:a92a199e5417ad39a993e8d1c36b5aa3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a217cd30de86c6088fd4235652f2d2dd1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a217cd30de86c6088fd4235652f2d2dd1"></a>
-typedef <br class="typebreak" />
-internal::MaybeAddConst&lt; Const, <br class="typebreak" />
-PlainType &gt;::<a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>ValueType</b></td></tr>
-<tr class="separator:a217cd30de86c6088fd4235652f2d2dd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36ac5aaa10bd2b76bd86818301e553a2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a36ac5aaa10bd2b76bd86818301e553a2"></a>
+<tr class="separator:a417eefa7bd2a3d357e947e64044f0bd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebd828a2f020262b41af908fbb28a571"><td class="memItemLeft" align="right" valign="top"><a id="aebd828a2f020262b41af908fbb28a571"></a>
+typedef internal::MaybeAddConst&lt; Const, PlainType &gt;::<a class="el" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4">Type</a>&#160;</td><td class="memItemRight" valign="bottom"><b>ValueType</b></td></tr>
+<tr class="separator:aebd828a2f020262b41af908fbb28a571"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae94140e6dbab05cd3918d3e75819dc0a"><td class="memItemLeft" align="right" valign="top"><a id="ae94140e6dbab05cd3918d3e75819dc0a"></a>
 typedef ValueType *&#160;</td><td class="memItemRight" valign="bottom"><b>ValueIterator</b></td></tr>
-<tr class="separator:a36ac5aaa10bd2b76bd86818301e553a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3547e50ff64b4cf3c747d8f5e3dae32b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3547e50ff64b4cf3c747d8f5e3dae32b"></a>
+<tr class="separator:ae94140e6dbab05cd3918d3e75819dc0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0308428814ba3ee5094114e2ccfa2572"><td class="memItemLeft" align="right" valign="top"><a id="a0308428814ba3ee5094114e2ccfa2572"></a>
 typedef const ValueT *&#160;</td><td class="memItemRight" valign="bottom"><b>ConstValueIterator</b></td></tr>
-<tr class="separator:a3547e50ff64b4cf3c747d8f5e3dae32b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad07fbe50d88d061dbe0c2c794db80a30"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad07fbe50d88d061dbe0c2c794db80a30"></a>
+<tr class="separator:a0308428814ba3ee5094114e2ccfa2572"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a82298d507b2b15c9d909c25a32f5afeb"><td class="memItemLeft" align="right" valign="top"><a id="a82298d507b2b15c9d909c25a32f5afeb"></a>
 typedef ValueType::AllocatorType&#160;</td><td class="memItemRight" valign="bottom"><b>AllocatorType</b></td></tr>
-<tr class="separator:ad07fbe50d88d061dbe0c2c794db80a30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa50b701c3115897bf0fd8bdf668235fe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa50b701c3115897bf0fd8bdf668235fe"></a>
+<tr class="separator:a82298d507b2b15c9d909c25a32f5afeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad52689025256c94097a0e7bb1c70620e"><td class="memItemLeft" align="right" valign="top"><a id="ad52689025256c94097a0e7bb1c70620e"></a>
 typedef ValueType::StringRefType&#160;</td><td class="memItemRight" valign="bottom"><b>StringRefType</b></td></tr>
-<tr class="separator:aa50b701c3115897bf0fd8bdf668235fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:ad52689025256c94097a0e7bb1c70620e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
-<tr class="memitem:a322ae35485b05197a24820bbd58b71aa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a322ae35485b05197a24820bbd58b71aa"></a>
+<tr class="memitem:ae59cd71ac1e26cc66ae0269991f82f26"><td class="memItemLeft" align="right" valign="top"><a id="ae59cd71ac1e26cc66ae0269991f82f26"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>GenericArray</b> (const <a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a> &amp;rhs)</td></tr>
-<tr class="separator:a322ae35485b05197a24820bbd58b71aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afcc807b170fa40a0e7a5d7eaba19cdb4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afcc807b170fa40a0e7a5d7eaba19cdb4"></a>
+<tr class="separator:ae59cd71ac1e26cc66ae0269991f82f26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9c9bffca8056d6b20b9f92334d35798"><td class="memItemLeft" align="right" valign="top"><a id="ab9c9bffca8056d6b20b9f92334d35798"></a>
 <a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a> &amp;rhs)</td></tr>
-<tr class="separator:afcc807b170fa40a0e7a5d7eaba19cdb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaaa24a40bd60cb89ef67e172d73f6eac"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaaa24a40bd60cb89ef67e172d73f6eac"></a>
-<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Size</b> () const </td></tr>
-<tr class="separator:aaaa24a40bd60cb89ef67e172d73f6eac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a88a62a594b5830293dacde8db609ba6a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a88a62a594b5830293dacde8db609ba6a"></a>
-<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Capacity</b> () const </td></tr>
-<tr class="separator:a88a62a594b5830293dacde8db609ba6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4cb1ce26601d5cce7d512c70abacc395"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4cb1ce26601d5cce7d512c70abacc395"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>Empty</b> () const </td></tr>
-<tr class="separator:a4cb1ce26601d5cce7d512c70abacc395"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcd89fca44ecf2a92118e4d46ead180a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adcd89fca44ecf2a92118e4d46ead180a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>Clear</b> () const </td></tr>
-<tr class="separator:adcd89fca44ecf2a92118e4d46ead180a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad607ccb1b90fbb73ce8c428a36b1f1a4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad607ccb1b90fbb73ce8c428a36b1f1a4"></a>
-ValueType &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator[]</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> index) const </td></tr>
-<tr class="separator:ad607ccb1b90fbb73ce8c428a36b1f1a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acde662d9993be651a69b9ccd188a2df7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acde662d9993be651a69b9ccd188a2df7"></a>
-ValueIterator&#160;</td><td class="memItemRight" valign="bottom"><b>Begin</b> () const </td></tr>
-<tr class="separator:acde662d9993be651a69b9ccd188a2df7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f01edc26dc5a8843dfc1c59579324a7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f01edc26dc5a8843dfc1c59579324a7"></a>
-ValueIterator&#160;</td><td class="memItemRight" valign="bottom"><b>End</b> () const </td></tr>
-<tr class="separator:a0f01edc26dc5a8843dfc1c59579324a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a52218e3b47904c19339aec9249e1c8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5a52218e3b47904c19339aec9249e1c8"></a>
-<a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Reserve</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> newCapacity, AllocatorType &amp;allocator) const </td></tr>
-<tr class="separator:a5a52218e3b47904c19339aec9249e1c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa6b6a24f9e2bb2b1f41972c949f6b54b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa6b6a24f9e2bb2b1f41972c949f6b54b"></a>
-<a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a>&#160;</td><td class="memItemRight" valign="bottom"><b>PushBack</b> (ValueType &amp;value, AllocatorType &amp;allocator) const </td></tr>
-<tr class="separator:aa6b6a24f9e2bb2b1f41972c949f6b54b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ab0b1e708e7a4a2eeb4714e5762ca19"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2ab0b1e708e7a4a2eeb4714e5762ca19"></a>
-<a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a>&#160;</td><td class="memItemRight" valign="bottom"><b>PushBack</b> (StringRefType value, AllocatorType &amp;allocator) const </td></tr>
-<tr class="separator:a2ab0b1e708e7a4a2eeb4714e5762ca19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a38b9056be3e83beb4de3332ecb8b3c8a"><td class="memTemplParams" colspan="2"><a class="anchor" id="a38b9056be3e83beb4de3332ecb8b3c8a"></a>
+<tr class="separator:ab9c9bffca8056d6b20b9f92334d35798"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0473410a03268bbc25cb6d95ecc9925"><td class="memItemLeft" align="right" valign="top"><a id="ad0473410a03268bbc25cb6d95ecc9925"></a>
+<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Size</b> () const</td></tr>
+<tr class="separator:ad0473410a03268bbc25cb6d95ecc9925"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78052c2a7bb54ee4ea7579df5eab480c"><td class="memItemLeft" align="right" valign="top"><a id="a78052c2a7bb54ee4ea7579df5eab480c"></a>
+<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Capacity</b> () const</td></tr>
+<tr class="separator:a78052c2a7bb54ee4ea7579df5eab480c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa816f9b2ab65c842c343e5dbe99d876"><td class="memItemLeft" align="right" valign="top"><a id="aaa816f9b2ab65c842c343e5dbe99d876"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>Empty</b> () const</td></tr>
+<tr class="separator:aaa816f9b2ab65c842c343e5dbe99d876"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b671cc963732398d9234cf01aa339ab"><td class="memItemLeft" align="right" valign="top"><a id="a1b671cc963732398d9234cf01aa339ab"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>Clear</b> () const</td></tr>
+<tr class="separator:a1b671cc963732398d9234cf01aa339ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3455ca0429fa330cb981c78fab473c0"><td class="memItemLeft" align="right" valign="top"><a id="ae3455ca0429fa330cb981c78fab473c0"></a>
+ValueType &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator[]</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> index) const</td></tr>
+<tr class="separator:ae3455ca0429fa330cb981c78fab473c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32299e51f24648e04757de26d952ffe7"><td class="memItemLeft" align="right" valign="top"><a id="a32299e51f24648e04757de26d952ffe7"></a>
+ValueIterator&#160;</td><td class="memItemRight" valign="bottom"><b>Begin</b> () const</td></tr>
+<tr class="separator:a32299e51f24648e04757de26d952ffe7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27e2a9f13adcca6e0f191495cdce9689"><td class="memItemLeft" align="right" valign="top"><a id="a27e2a9f13adcca6e0f191495cdce9689"></a>
+ValueIterator&#160;</td><td class="memItemRight" valign="bottom"><b>End</b> () const</td></tr>
+<tr class="separator:a27e2a9f13adcca6e0f191495cdce9689"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1110e43990424e416555541731f229f"><td class="memItemLeft" align="right" valign="top"><a id="ad1110e43990424e416555541731f229f"></a>
+<a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a>&#160;</td><td class="memItemRight" valign="bottom"><b>Reserve</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> newCapacity, AllocatorType &amp;allocator) const</td></tr>
+<tr class="separator:ad1110e43990424e416555541731f229f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0bcd130448a9d68303523df7b22dc452"><td class="memItemLeft" align="right" valign="top"><a id="a0bcd130448a9d68303523df7b22dc452"></a>
+<a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a>&#160;</td><td class="memItemRight" valign="bottom"><b>PushBack</b> (ValueType &amp;value, AllocatorType &amp;allocator) const</td></tr>
+<tr class="separator:a0bcd130448a9d68303523df7b22dc452"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a673eda4c52685461b5bbeccf2f2b5c88"><td class="memItemLeft" align="right" valign="top"><a id="a673eda4c52685461b5bbeccf2f2b5c88"></a>
+<a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a>&#160;</td><td class="memItemRight" valign="bottom"><b>PushBack</b> (StringRefType value, AllocatorType &amp;allocator) const</td></tr>
+<tr class="separator:a673eda4c52685461b5bbeccf2f2b5c88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d3851894eaea693572b934541ee3563"><td class="memTemplParams" colspan="2"><a id="a9d3851894eaea693572b934541ee3563"></a>
 template&lt;typename T &gt; </td></tr>
-<tr class="memitem:a38b9056be3e83beb4de3332ecb8b3c8a"><td class="memTemplItemLeft" align="right" valign="top">const <a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>PushBack</b> (T value, AllocatorType &amp;allocator) const </td></tr>
-<tr class="separator:a38b9056be3e83beb4de3332ecb8b3c8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61f0b8d0a91e9b48fcddb43bff9ab333"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a61f0b8d0a91e9b48fcddb43bff9ab333"></a>
-<a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a>&#160;</td><td class="memItemRight" valign="bottom"><b>PopBack</b> () const </td></tr>
-<tr class="separator:a61f0b8d0a91e9b48fcddb43bff9ab333"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a406fbe61840670c49b6d1e567f748e98"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a406fbe61840670c49b6d1e567f748e98"></a>
-ValueIterator&#160;</td><td class="memItemRight" valign="bottom"><b>Erase</b> (ConstValueIterator pos) const </td></tr>
-<tr class="separator:a406fbe61840670c49b6d1e567f748e98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adfd9f67611fbd6297acb5b8c70fadacd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adfd9f67611fbd6297acb5b8c70fadacd"></a>
-ValueIterator&#160;</td><td class="memItemRight" valign="bottom"><b>Erase</b> (ConstValueIterator first, ConstValueIterator last) const </td></tr>
-<tr class="separator:adfd9f67611fbd6297acb5b8c70fadacd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d3851894eaea693572b934541ee3563"><td class="memTemplItemLeft" align="right" valign="top">const <a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a> &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>PushBack</b> (T value, AllocatorType &amp;allocator) const</td></tr>
+<tr class="separator:a9d3851894eaea693572b934541ee3563"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50ccee2eea89c21fcd29363506e5ed3f"><td class="memItemLeft" align="right" valign="top"><a id="a50ccee2eea89c21fcd29363506e5ed3f"></a>
+<a class="el" href="classrapidjson_1_1_generic_array.html">GenericArray</a>&#160;</td><td class="memItemRight" valign="bottom"><b>PopBack</b> () const</td></tr>
+<tr class="separator:a50ccee2eea89c21fcd29363506e5ed3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13d2a18801a80add6e1bd9ad167822a5"><td class="memItemLeft" align="right" valign="top"><a id="a13d2a18801a80add6e1bd9ad167822a5"></a>
+ValueIterator&#160;</td><td class="memItemRight" valign="bottom"><b>Erase</b> (ConstValueIterator pos) const</td></tr>
+<tr class="separator:a13d2a18801a80add6e1bd9ad167822a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8fb2a13a98c62a284de0005850d624c"><td class="memItemLeft" align="right" valign="top"><a id="af8fb2a13a98c62a284de0005850d624c"></a>
+ValueIterator&#160;</td><td class="memItemRight" valign="bottom"><b>Erase</b> (ConstValueIterator first, ConstValueIterator last) const</td></tr>
+<tr class="separator:af8fb2a13a98c62a284de0005850d624c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 友元</h2></td></tr>
-<tr class="memitem:a899449e1a645b5e377af059fb61113d8"><td class="memTemplParams" colspan="2"><a class="anchor" id="a899449e1a645b5e377af059fb61113d8"></a>
+<tr class="memitem:a899449e1a645b5e377af059fb61113d8"><td class="memTemplParams" colspan="2"><a id="a899449e1a645b5e377af059fb61113d8"></a>
 template&lt;typename , typename &gt; </td></tr>
 <tr class="memitem:a899449e1a645b5e377af059fb61113d8"><td class="memTemplItemLeft" align="right" valign="top">class&#160;</td><td class="memTemplItemRight" valign="bottom"><b>GenericValue</b></td></tr>
 <tr class="separator:a899449e1a645b5e377af059fb61113d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
-<div class="textblock"><h3>template&lt;bool, typename&gt;<br />
-class rapidjson::GenericArray&lt; bool, typename &gt;</h3>
+<div class="textblock"><h3>template&lt;bool Const, typename ValueT&gt;<br />
+class rapidjson::GenericArray&lt; Const, ValueT &gt;</h3>
 
 <p>Helper class for accessing Value of array type. </p>
 <p>Instance of this helper class is obtained by <code>GenericValue::GetArray()</code>. In addition to all APIs for array type, it provides range-based for loop if <code>RAPIDJSON_HAS_CXX11_RANGE_FOR=1</code>. </p>

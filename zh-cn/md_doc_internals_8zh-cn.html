@@ -4,22 +4,23 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.7"/>
+<meta name="generator" content="Doxygen 1.8.13"/>
 <title>RapidJSON: 内部架构</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
   $(document).ready(initResizable);
-  $(window).load(resizeHeight);
 </script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
@@ -42,7 +43,7 @@
           </span>
         </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.7 -->
+<!-- 制作者 Doxygen 1.8.13 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -66,7 +67,7 @@ $(document).ready(function(){initNavTree('md_doc_internals_8zh-cn.html','');});
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(12)"><span class="SelectionMark">&#160;</span>页</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -273,25 +274,7 @@ $(document).ready(function(){initNavTree('md_doc_internals_8zh-cn.html','');});
 <p>这个优化可以减少字符串拷贝内存占用。它也改善了缓存一致性，并进一步提高了运行时性能。</p>
 <h1><a class="anchor" id="InternalAllocator"></a>
 分配器（Allocator）</h1>
-<p><code>Allocator</code> 是 RapidJSON 中的概念： </p><div class="fragment"><div class="line">concept Allocator {</div>
-<div class="line">    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> kNeedFree;    <span class="comment">//!&lt; 表明这个分配器是否需要调用 Free()。</span></div>
-<div class="line"><span class="comment"></span></div>
-<div class="line">    <span class="comment">// 申请内存块。</span></div>
-<div class="line">    <span class="comment">// \param size 内存块的大小，以字节记。</span></div>
-<div class="line">    <span class="comment">// \returns 指向内存块的指针。</span></div>
-<div class="line">    <span class="keywordtype">void</span>* Malloc(<span class="keywordtype">size_t</span> size);</div>
-<div class="line"></div>
-<div class="line">    <span class="comment">// 调整内存块的大小。</span></div>
-<div class="line">    <span class="comment">// \param originalPtr 当前内存块的指针。空指针是被允许的。</span></div>
-<div class="line">    <span class="comment">// \param originalSize 当前大小，以字节记。（设计问题：因为有些分配器可能不会记录它，显示的传递它可以节约内存。）</span></div>
-<div class="line">    <span class="comment">// \param newSize 新大小，以字节记。</span></div>
-<div class="line">    <span class="keywordtype">void</span>* Realloc(<span class="keywordtype">void</span>* originalPtr, <span class="keywordtype">size_t</span> originalSize, <span class="keywordtype">size_t</span> newSize);</div>
-<div class="line"></div>
-<div class="line">    <span class="comment">// 释放内存块。</span></div>
-<div class="line">    <span class="comment">// \param ptr 指向内存块的指针。空指针是被允许的。</span></div>
-<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> Free(<span class="keywordtype">void</span> *ptr);</div>
-<div class="line">};</div>
-</div><!-- fragment --><p>需要注意的是 <code>Malloc()</code> 和 <code>Realloc()</code> 是成员函数而 <code>Free()</code> 是静态成员函数。</p>
+<p><code>Allocator</code> 是 RapidJSON 中的概念： </p><div class="fragment"><div class="line">concept Allocator {</div><div class="line">    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> kNeedFree;    <span class="comment">//!&lt; 表明这个分配器是否需要调用 Free()。</span></div><div class="line"><span class="comment"></span></div><div class="line">    <span class="comment">// 申请内存块。</span></div><div class="line">    <span class="comment">// \param size 内存块的大小，以字节记。</span></div><div class="line">    <span class="comment">// \returns 指向内存块的指针。</span></div><div class="line">    <span class="keywordtype">void</span>* Malloc(<span class="keywordtype">size_t</span> size);</div><div class="line"></div><div class="line">    <span class="comment">// 调整内存块的大小。</span></div><div class="line">    <span class="comment">// \param originalPtr 当前内存块的指针。空指针是被允许的。</span></div><div class="line">    <span class="comment">// \param originalSize 当前大小，以字节记。（设计问题：因为有些分配器可能不会记录它，显示的传递它可以节约内存。）</span></div><div class="line">    <span class="comment">// \param newSize 新大小，以字节记。</span></div><div class="line">    <span class="keywordtype">void</span>* Realloc(<span class="keywordtype">void</span>* originalPtr, <span class="keywordtype">size_t</span> originalSize, <span class="keywordtype">size_t</span> newSize);</div><div class="line"></div><div class="line">    <span class="comment">// 释放内存块。</span></div><div class="line">    <span class="comment">// \param ptr 指向内存块的指针。空指针是被允许的。</span></div><div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> Free(<span class="keywordtype">void</span> *ptr);</div><div class="line">};</div></div><!-- fragment --><p>需要注意的是 <code>Malloc()</code> 和 <code>Realloc()</code> 是成员函数而 <code>Free()</code> 是静态成员函数。</p>
 <h2><a class="anchor" id="MemoryPoolAllocator"></a>
 MemoryPoolAllocator</h2>
 <p><code>MemoryPoolAllocator</code> 是 DOM 的默认内存分配器。它只申请内存而不释放内存。这对于构建 DOM 树非常合适。</p>
@@ -312,24 +295,10 @@ MemoryPoolAllocator</h2>
 <li>换行 (<code>U+000A</code>)</li>
 <li>回车 (<code>U+000D</code>)</li>
 </ol>
-<p>这是一份简单的实现： </p><div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a">SkipWhitespace</a>(InputStream&amp; s) {</div>
-<div class="line">    <span class="keywordflow">while</span> (s.Peek() == <span class="charliteral">&#39; &#39;</span> || s.Peek() == <span class="charliteral">&#39;\n&#39;</span> || s.Peek() == <span class="charliteral">&#39;\r&#39;</span> || s.Peek() == <span class="charliteral">&#39;\t&#39;</span>)</div>
-<div class="line">        s.Take();</div>
-<div class="line">}</div>
-</div><!-- fragment --><p>但是，这需要对每个字符进行4次比较以及一些分支。这被发现是一个热点。</p>
-<p>为了加速这一处理，RapidJSON 使用 SIMD 来在一次迭代中比较16个字符和4个空格。目前 RapidJSON 支持 SSE2 ， SSE4.2 和 ARM Neon 指令。同时它也只会对 UTF-8 内存流启用，包括字符串流或 *原位* 解析。</p>
+<p>这是一份简单的实现： </p><div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a">SkipWhitespace</a>(InputStream&amp; s) {</div><div class="line">    <span class="keywordflow">while</span> (s.Peek() == <span class="charliteral">&#39; &#39;</span> || s.Peek() == <span class="charliteral">&#39;\n&#39;</span> || s.Peek() == <span class="charliteral">&#39;\r&#39;</span> || s.Peek() == <span class="charliteral">&#39;\t&#39;</span>)</div><div class="line">        s.Take();</div><div class="line">}</div></div><!-- fragment --><p>但是，这需要对每个字符进行4次比较以及一些分支。这被发现是一个热点。</p>
+<p>为了加速这一处理，RapidJSON 使用 SIMD 来在一次迭代中比较16个字符和4个空格。目前 RapidJSON 支持 SSE2 ， SSE4.2 和 ARM Neon 指令。同时它也只会对 UTF-8 内存流启用，包括字符串流或 <em>原位</em> 解析。</p>
 <p>你可以通过在包含 <code><a class="el" href="rapidjson_8h.html" title="common definitions and configuration ">rapidjson.h</a></code> 之前定义 <code>RAPIDJSON_SSE2</code> ， <code>RAPIDJSON_SSE42</code> 或 <code>RAPIDJSON_NEON</code> 来启用这个优化。一些编译器可以检测这个设置，如 <code>perftest.h</code>：</p>
-<div class="fragment"><div class="line"><span class="comment">// __SSE2__ 和 __SSE4_2__ 可被 gcc、clang 和 Intel 编译器识别：</span></div>
-<div class="line"><span class="comment">// 如果支持的话，我们在 gmake 中使用了 -march=native 来启用 -msse2 和 -msse4.2</span></div>
-<div class="line"><span class="comment">// 同样的， __ARM_NEON 被用于识别Neon</span></div>
-<div class="line"><span class="preprocessor">#if defined(__SSE4_2__)</span></div>
-<div class="line"><span class="preprocessor">#  define RAPIDJSON_SSE42</span></div>
-<div class="line"><span class="preprocessor">#elif defined(__SSE2__)</span></div>
-<div class="line"><span class="preprocessor">#  define RAPIDJSON_SSE2</span></div>
-<div class="line"><span class="preprocessor">#elif defined(__ARM_NEON)</span></div>
-<div class="line"><span class="preprocessor">#  define RAPIDJSON_NEON</span></div>
-<div class="line"><span class="preprocessor">#endif</span></div>
-</div><!-- fragment --><p>需要注意的是，这是编译期的设置。在不支持这些指令的机器上运行可执行文件会使它崩溃。</p>
+<div class="fragment"><div class="line"><span class="comment">// __SSE2__ 和 __SSE4_2__ 可被 gcc、clang 和 Intel 编译器识别：</span></div><div class="line"><span class="comment">// 如果支持的话，我们在 gmake 中使用了 -march=native 来启用 -msse2 和 -msse4.2</span></div><div class="line"><span class="comment">// 同样的， __ARM_NEON 被用于识别Neon</span></div><div class="line"><span class="preprocessor">#if defined(__SSE4_2__)</span></div><div class="line"><span class="preprocessor">#  define RAPIDJSON_SSE42</span></div><div class="line"><span class="preprocessor">#elif defined(__SSE2__)</span></div><div class="line"><span class="preprocessor">#  define RAPIDJSON_SSE2</span></div><div class="line"><span class="preprocessor">#elif defined(__ARM_NEON)</span></div><div class="line"><span class="preprocessor">#  define RAPIDJSON_NEON</span></div><div class="line"><span class="preprocessor">#endif</span></div></div><!-- fragment --><p>需要注意的是，这是编译期的设置。在不支持这些指令的机器上运行可执行文件会使它崩溃。</p>
 <h3>页面对齐问题</h3>
 <p>在 RapidJSON 的早期版本中，被报告了<a href="https://code.google.com/archive/p/rapidjson/issues/104">一个问题</a>：<code>SkipWhitespace_SIMD()</code> 会罕见地导致崩溃（约五十万分之一的几率）。在调查之后，怀疑是 <code>_mm_loadu_si128()</code> 访问了 `'\0'` 之后的内存，并越过被保护的页面边界。</p>
 <p>在 <a href="http://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-optimization-manual.html">Intel® 64 and IA-32 Architectures Optimization Reference Manual</a> 中，章节 10.2.1：</p>
@@ -341,15 +310,7 @@ MemoryPoolAllocator</h2>
 <h2><a class="anchor" id="LocalStreamCopy"></a>
 局部流拷贝</h2>
 <p>在优化的过程中，我们发现一些编译器不能将访问流的一些成员数据放入局部变量或者寄存器中。测试结果显示，对于一些流类型，创建流的拷贝并将其用于内层循环中可以改善性能。例如，实际（非 SIMD）的 <code><a class="el" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a" title="Skip the JSON white spaces in a stream. ">SkipWhitespace()</a></code> 被实现为：</p>
-<div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream&gt;</div>
-<div class="line"><span class="keywordtype">void</span> <a class="code" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a">SkipWhitespace</a>(InputStream&amp; is) {</div>
-<div class="line">    internal::StreamLocalCopy&lt;InputStream&gt; copy(is);</div>
-<div class="line">    InputStream&amp; s(copy.s);</div>
-<div class="line"></div>
-<div class="line">    <span class="keywordflow">while</span> (s.Peek() == <span class="charliteral">&#39; &#39;</span> || s.Peek() == <span class="charliteral">&#39;\n&#39;</span> || s.Peek() == <span class="charliteral">&#39;\r&#39;</span> || s.Peek() == <span class="charliteral">&#39;\t&#39;</span>)</div>
-<div class="line">        s.Take();</div>
-<div class="line">}</div>
-</div><!-- fragment --><p>基于流的特征，<code>StreamLocalCopy</code> 会创建（或不创建）流对象的拷贝，在局部使用它并将流的状态拷贝回原来的流。</p>
+<div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream&gt;</div><div class="line"><span class="keywordtype">void</span> <a class="code" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a">SkipWhitespace</a>(InputStream&amp; is) {</div><div class="line">    internal::StreamLocalCopy&lt;InputStream&gt; copy(is);</div><div class="line">    InputStream&amp; s(copy.s);</div><div class="line"></div><div class="line">    <span class="keywordflow">while</span> (s.Peek() == <span class="charliteral">&#39; &#39;</span> || s.Peek() == <span class="charliteral">&#39;\n&#39;</span> || s.Peek() == <span class="charliteral">&#39;\r&#39;</span> || s.Peek() == <span class="charliteral">&#39;\t&#39;</span>)</div><div class="line">        s.Take();</div><div class="line">}</div></div><!-- fragment --><p>基于流的特征，<code>StreamLocalCopy</code> 会创建（或不创建）流对象的拷贝，在局部使用它并将流的状态拷贝回原来的流。</p>
 <h2><a class="anchor" id="ParsingDouble"></a>
 解析为双精度浮点数</h2>
 <p>将字符串解析为 <code>double</code> 并不简单。标准库函数 <code>strtod()</code> 可以胜任这项工作，但它比较缓慢。默认情况下，解析器使用默认的精度设置。这最多有 3<a href="http://en.wikipedia.org/wiki/Unit_in_the_last_place">ULP</a> 的误差，并实现在 <code>internal::StrtodNormalPrecision()</code> 中。</p>
@@ -378,18 +339,7 @@ MemoryPoolAllocator</h2>
 <p>迭代解析器是一个以非递归方式实现的递归下降的 LL(1) 解析器。</p>
 <h3><a class="anchor" id="IterativeParserGrammar"></a>
 语法</h3>
-<p>解析器使用的语法是基于严格 JSON 语法的： </p><div class="fragment"><div class="line">S -&gt; array | <span class="keywordtype">object</span></div>
-<div class="line">array -&gt; [ values ]</div>
-<div class="line"><span class="keywordtype">object</span> -&gt; { members }</div>
-<div class="line">values -&gt; non-empty-values | ε</div>
-<div class="line">non-empty-values -&gt; value addition-values</div>
-<div class="line">addition-values -&gt; ε | , non-empty-values</div>
-<div class="line">members -&gt; non-empty-members | ε</div>
-<div class="line">non-empty-members -&gt; member addition-members</div>
-<div class="line">addition-members -&gt; ε | , non-empty-members</div>
-<div class="line">member -&gt; STRING : value</div>
-<div class="line">value -&gt; STRING | NUMBER | NULL | BOOLEAN | <span class="keywordtype">object</span> | array</div>
-</div><!-- fragment --><p>注意到左因子被加入了非终结符的 <code>values</code> 和 <code>members</code> 来保证语法是 LL(1) 的。</p>
+<p>解析器使用的语法是基于严格 JSON 语法的： </p><div class="fragment"><div class="line">S -&gt; array | object</div><div class="line">array -&gt; [ values ]</div><div class="line">object -&gt; { members }</div><div class="line">values -&gt; non-empty-values | ε</div><div class="line">non-empty-values -&gt; value addition-values</div><div class="line">addition-values -&gt; ε | , non-empty-values</div><div class="line">members -&gt; non-empty-members | ε</div><div class="line">non-empty-members -&gt; member addition-members</div><div class="line">addition-members -&gt; ε | , non-empty-members</div><div class="line">member -&gt; STRING : value</div><div class="line">value -&gt; STRING | NUMBER | NULL | BOOLEAN | object | array</div></div><!-- fragment --><p>注意到左因子被加入了非终结符的 <code>values</code> 和 <code>members</code> 来保证语法是 LL(1) 的。</p>
 <h3><a class="anchor" id="IterativeParserParsingTable"></a>
 解析表</h3>
 <p>基于这份语法，我们可以构造 FIRST 和 FOLLOW 集合。</p>

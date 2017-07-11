@@ -6,14 +6,14 @@
 
 #MSearchBox {
     white-space : nowrap;
-    position: absolute;
     float: none;
-    display: inline;
     margin-top: 0px;
     right: 0px;
     width: 170px;
+    height: 24px;
     z-index: 102;
-    background-color: white;
+    display: inline;
+    position: absolute;
 }
 
 #MSearchBox .left
@@ -54,6 +54,7 @@
     color: #909090;
     outline: none;
     font: 9pt Arial, Verdana, sans-serif;
+    -webkit-border-radius: 0px;
 }
 
 #FSearchBox #MSearchField {
@@ -102,7 +103,7 @@
     left: 0; top: 0;
     border: 1px solid #90A5CE;
     background-color: #F9FAFC;
-    z-index: 1;
+    z-index: 10001;
     padding-top: 4px;
     padding-bottom: 4px;
     -moz-border-radius: 4px;
@@ -165,6 +166,7 @@ iframe#MSearchResults {
     left: 0; top: 0;
     border: 1px solid #000;
     background-color: #EEF1F7;
+    z-index:10000;
 }
 
 /* ----------------------------------- */

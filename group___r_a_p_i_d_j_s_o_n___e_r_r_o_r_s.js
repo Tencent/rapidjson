@@ -1,18 +1,18 @@
 var group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s =
 [
     [ "ParseResult", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result", [
-      [ "BooleanType", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a59558cbb7ba917a1c3924d83ed2da0d9", null ],
+      [ "BooleanType", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#aff2daa285445bba8f76578ea274e34a3", null ],
       [ "ParseResult", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a0f03679d5fa2736d9e351541e767fac1", null ],
       [ "ParseResult", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ad15710045513f13ba526753c4a2cb59b", null ],
       [ "Clear", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a17c9f7f81675283393222658d613000f", null ],
-      [ "Code", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a51cfd45c07e28aa4fdd78b55d86f0591", null ],
-      [ "IsError", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a5ab5548c7a7776f4da20eac09fe57c1b", null ],
-      [ "Offset", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a056e5792c1554fbc05b5f1cc168d82ae", null ],
-      [ "operator BooleanType", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a1743018526769d9b5b782fd7cffc9838", null ],
-      [ "operator!=", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a7766917944b27eec1ea2c2605f584ac5", null ],
-      [ "operator!=", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#add4d4e2934a3b90cf6b6f765330e0d95", null ],
-      [ "operator==", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a3d6e37872d7da5f4a4c41e724c8c5c5f", null ],
-      [ "operator==", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a11595b2d573f0299422678c5e3695479", null ],
+      [ "Code", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a3c6a1f7b7dc21363a255eb10a3c0e00e", null ],
+      [ "IsError", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ab6d87c6ce9c849f35e902fbe23f485c4", null ],
+      [ "Offset", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a85036788b0cfd1c676900de6f8260bd6", null ],
+      [ "operator BooleanType", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#af0936ace1dc9b674e9afb75ec6145b32", null ],
+      [ "operator!=", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ac58540d291311724829cac7ead1bae79", null ],
+      [ "operator!=", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a82fc3c16d5b670e8a86630c4feb730c1", null ],
+      [ "operator==", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a53e838c5114c4770b01ba5fb4fe2ec09", null ],
+      [ "operator==", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a512e065514f0c55c539ef70033a3f508", null ],
       [ "Set", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a40c0bd4d6c535c57acbb5c2e656bea38", null ],
       [ "operator!=", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a0498aebcfdd3d4a5dcb989ee29b93d4d", null ],
       [ "operator==", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#a58c9982e833d1c74686506ac7449200c", null ]
@@ -21,7 +21,7 @@ var group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s =
     [ "RAPIDJSON_ERROR_STRING", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabe2e1bd1349e5a7d6c1af78c05a98f0d", null ],
     [ "RAPIDJSON_PARSE_ERROR", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gae3689840fa6e89a241313f33b602f865", null ],
     [ "RAPIDJSON_PARSE_ERROR_NORETURN", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7f8c4265b2edda78568ae3338aaf1461", null ],
-    [ "GetParseErrorFunc", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga4e77e464ec8abe1111ee581fc2cb00de", null ],
+    [ "GetParseErrorFunc", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gac1bee7fdafeba5a85c27943fcde12882", null ],
     [ "ParseErrorCode", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60", [
       [ "kParseErrorNone", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a86a60b723dca32df5debab2c3db4235f", null ],
       [ "kParseErrorDocumentEmpty", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a06183076357ebd9eca228666f614c286", null ],

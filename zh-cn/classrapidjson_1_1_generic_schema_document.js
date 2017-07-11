@@ -9,6 +9,6 @@ var classrapidjson_1_1_generic_schema_document =
     [ "ValueType", "classrapidjson_1_1_generic_schema_document.html#a87eb1db271e7f57442802a5f4f6178f3", null ],
     [ "GenericSchemaDocument", "classrapidjson_1_1_generic_schema_document.html#ad200cc7bcb193c8568cdbda7b7fd0496", null ],
     [ "~GenericSchemaDocument", "classrapidjson_1_1_generic_schema_document.html#adf6f3372013227873ed392dee1e752bf", null ],
-    [ "GetRoot", "classrapidjson_1_1_generic_schema_document.html#af64ea17654ab0f1a91e382d422f91daf", null ],
+    [ "GetRoot", "classrapidjson_1_1_generic_schema_document.html#a8b2ac6de85dc9c1fb4f4d0be4aeb2d6a", null ],
     [ "GenericSchemaValidator", "classrapidjson_1_1_generic_schema_document.html#afcc03e6ba8f1a819e1a028c31ad38347", null ]
 ];

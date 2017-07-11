@@ -4,22 +4,23 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.7"/>
+<meta name="generator" content="Doxygen 1.8.13"/>
 <title>RapidJSON: 常见问题</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
   $(document).ready(initResizable);
-  $(window).load(resizeHeight);
 </script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
@@ -42,7 +43,7 @@
           </span>
         </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.7 -->
+<!-- 制作者 Doxygen 1.8.13 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -66,7 +67,7 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(12)"><span class="SelectionMark">&#160;</span>页</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -164,35 +165,13 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <p class="startli">调用 <code>SetXXX()</code> 方法 - 这些方法会调用析构函数，并重建空的 Object 或 Array:</p>
 </li>
 </ol>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
-<div class="line">...</div>
-<div class="line">d.SetObject();  <span class="comment">// clear and minimize</span></div>
-</div><!-- fragment --><p>另外，也可以参考在 <a href="https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Clear-and-minimize">C++ swap with temporary idiom</a> 中的一种等价的方法: </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>).Swap(d);</div>
-</div><!-- fragment --><p> 或者，使用这个稍微长一点的代码也能完成同样的事情: </p><div class="fragment"><div class="line">d.Swap(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>).Move()); </div>
-</div><!-- fragment --><ol type="1">
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div><div class="line">...</div><div class="line">d.SetObject();  <span class="comment">// clear and minimize</span></div></div><!-- fragment --><p>另外，也可以参考在 <a href="https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Clear-and-minimize">C++ swap with temporary idiom</a> 中的一种等价的方法: </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>).Swap(d);</div></div><!-- fragment --><p> 或者，使用这个稍微长一点的代码也能完成同样的事情: </p><div class="fragment"><div class="line">d.Swap(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>).Move()); </div></div><!-- fragment --><ol type="1">
 <li><p class="startli">如何将一个 <code>document</code> 节点插入到另一个 <code>document</code> 中？</p>
-<p class="startli">比如有以下两个 document(DOM): </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> person;</div>
-<div class="line">person.Parse(<span class="stringliteral">&quot;{\&quot;person\&quot;:{\&quot;name\&quot;:{\&quot;first\&quot;:\&quot;Adam\&quot;,\&quot;last\&quot;:\&quot;Thomas\&quot;}}}&quot;</span>);</div>
-<div class="line"></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> address;</div>
-<div class="line">address.Parse(<span class="stringliteral">&quot;{\&quot;address\&quot;:{\&quot;city\&quot;:\&quot;Moscow\&quot;,\&quot;street\&quot;:\&quot;Quiet\&quot;}}&quot;</span>);</div>
-</div><!-- fragment --><p> 假设我们希望将整个 <code>address</code> 插入到 <code>person</code> 中，作为其的一个子节点: </p><div class="fragment"><div class="line">{ <span class="stringliteral">&quot;person&quot;</span>: {</div>
-<div class="line">   <span class="stringliteral">&quot;name&quot;</span>: { <span class="stringliteral">&quot;first&quot;</span>: <span class="stringliteral">&quot;Adam&quot;</span>, <span class="stringliteral">&quot;last&quot;</span>: <span class="stringliteral">&quot;Thomas&quot;</span> },</div>
-<div class="line">   <span class="stringliteral">&quot;address&quot;</span>: { <span class="stringliteral">&quot;city&quot;</span>: <span class="stringliteral">&quot;Moscow&quot;</span>, <span class="stringliteral">&quot;street&quot;</span>: <span class="stringliteral">&quot;Quiet&quot;</span> }</div>
-<div class="line">   }</div>
-<div class="line">}</div>
-</div><!-- fragment --><p class="startli">在插入节点的过程中需要注意 <code>document</code> 和 <code>value</code> 的生命周期并且正确地使用 allocator 进行内存分配和管理。</p>
+<p class="startli">比如有以下两个 document(DOM): </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> person;</div><div class="line">person.Parse(<span class="stringliteral">&quot;{\&quot;person\&quot;:{\&quot;name\&quot;:{\&quot;first\&quot;:\&quot;Adam\&quot;,\&quot;last\&quot;:\&quot;Thomas\&quot;}}}&quot;</span>);</div><div class="line"></div><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> address;</div><div class="line">address.Parse(<span class="stringliteral">&quot;{\&quot;address\&quot;:{\&quot;city\&quot;:\&quot;Moscow\&quot;,\&quot;street\&quot;:\&quot;Quiet\&quot;}}&quot;</span>);</div></div><!-- fragment --><p> 假设我们希望将整个 <code>address</code> 插入到 <code>person</code> 中，作为其的一个子节点: </p><div class="fragment"><div class="line">{ &quot;person&quot;: {</div><div class="line">   &quot;name&quot;: { &quot;first&quot;: &quot;Adam&quot;, &quot;last&quot;: &quot;Thomas&quot; },</div><div class="line">   &quot;address&quot;: { &quot;city&quot;: &quot;Moscow&quot;, &quot;street&quot;: &quot;Quiet&quot; }</div><div class="line">   }</div><div class="line">}</div></div><!-- fragment --><p class="startli">在插入节点的过程中需要注意 <code>document</code> 和 <code>value</code> 的生命周期并且正确地使用 allocator 进行内存分配和管理。</p>
 <p class="startli">一个简单有效的方法就是修改上述 <code>address</code> 变量的定义，让其使用 <code>person</code> 的 allocator 初始化，然后将其添加到根节点。</p>
 </li>
 </ol>
-<div class="fragment"><div class="line">Documnet address(person.GetAllocator());</div>
-<div class="line">...</div>
-<div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(<span class="stringliteral">&quot;address&quot;</span>, address[<span class="stringliteral">&quot;address&quot;</span>], person.GetAllocator());</div>
-</div><!-- fragment --><p> 当然，如果你不想通过显式地写出 <code>address</code> 的 key 来得到其值，可以使用迭代器来实现: </p><div class="fragment"><div class="line"><span class="keyword">auto</span> addressRoot = address.MemberBegin();</div>
-<div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(addressRoot-&gt;name, addressRoot-&gt;value, person.GetAllocator());</div>
-</div><!-- fragment --><p>此外，还可以通过深拷贝 address document 来实现: </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> addressValue = <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(address[<span class="stringliteral">&quot;address&quot;</span>], person.GetAllocator());</div>
-<div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(<span class="stringliteral">&quot;address&quot;</span>, addressValue, person.GetAllocator());</div>
-</div><!-- fragment --><h2>Document/Value (DOM)</h2>
+<div class="fragment"><div class="line">Documnet address(person.GetAllocator());</div><div class="line">...</div><div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(<span class="stringliteral">&quot;address&quot;</span>, address[<span class="stringliteral">&quot;address&quot;</span>], person.GetAllocator());</div></div><!-- fragment --><p> 当然，如果你不想通过显式地写出 <code>address</code> 的 key 来得到其值，可以使用迭代器来实现: </p><div class="fragment"><div class="line"><span class="keyword">auto</span> addressRoot = address.MemberBegin();</div><div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(addressRoot-&gt;name, addressRoot-&gt;value, person.GetAllocator());</div></div><!-- fragment --><p>此外，还可以通过深拷贝 address document 来实现: </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> addressValue = <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(address[<span class="stringliteral">&quot;address&quot;</span>], person.GetAllocator());</div><div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(<span class="stringliteral">&quot;address&quot;</span>, addressValue, person.GetAllocator());</div></div><!-- fragment --><h2>Document/Value (DOM)</h2>
 <ol type="1">
 <li><p class="startli">什么是转移语义？为什么？</p>
 <p class="startli"><code>Value</code> 不用复制语义，而使用了转移语义。这是指，当把来源值赋值于目标值时，来源值的所有权会转移至目标值。</p>

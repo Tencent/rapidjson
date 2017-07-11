@@ -4,22 +4,23 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.7"/>
+<meta name="generator" content="Doxygen 1.8.13"/>
 <title>RapidJSON: DOM</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
   $(document).ready(initResizable);
-  $(window).load(resizeHeight);
 </script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
@@ -42,7 +43,7 @@
           </span>
         </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.7 -->
+<!-- 制作者 Doxygen 1.8.13 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -66,7 +67,7 @@ $(document).ready(function(){initNavTree('md_doc_dom_8zh-cn.html','');});
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(12)"><span class="SelectionMark">&#160;</span>页</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -99,46 +100,12 @@ $(document).ready(function(){initNavTree('md_doc_dom_8zh-cn.html','');});
 <h1><a class="anchor" id="Template"></a>
 模板</h1>
 <p>教程中使用了 <code>Value</code> 和 <code>Document</code> 类型。与 <code>std::string</code> 相似，这些类型其实是两个模板类的 <code>typedef</code>：</p>
-<div class="fragment"><div class="line"><span class="keyword">namespace </span>rapidjson {</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Encoding, <span class="keyword">typename</span> Allocator = MemoryPoolAllocator&lt;&gt; &gt;</div>
-<div class="line"><span class="keyword">class </span>GenericValue {</div>
-<div class="line">    <span class="comment">// ...</span></div>
-<div class="line">};</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Encoding, <span class="keyword">typename</span> Allocator = MemoryPoolAllocator&lt;&gt; &gt;</div>
-<div class="line"><span class="keyword">class </span>GenericDocument : <span class="keyword">public</span> GenericValue&lt;Encoding, Allocator&gt; {</div>
-<div class="line">    <span class="comment">// ...</span></div>
-<div class="line">};</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">typedef</span> GenericValue&lt;UTF8&lt;&gt; &gt; <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>;</div>
-<div class="line"><span class="keyword">typedef</span> GenericDocument&lt;UTF8&lt;&gt; &gt; <a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a>;</div>
-<div class="line"></div>
-<div class="line">} <span class="comment">// namespace rapidjson</span></div>
-</div><!-- fragment --><p>使用者可以自定义这些模板参数。</p>
+<div class="fragment"><div class="line"><span class="keyword">namespace </span><a class="code" href="namespacerapidjson.html">rapidjson</a> {</div><div class="line"></div><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Encoding, <span class="keyword">typename</span> Allocator = MemoryPoolAllocator&lt;&gt; &gt;</div><div class="line"><span class="keyword">class </span>GenericValue {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">};</div><div class="line"></div><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> Encoding, <span class="keyword">typename</span> Allocator = MemoryPoolAllocator&lt;&gt; &gt;</div><div class="line"><span class="keyword">class </span>GenericDocument : <span class="keyword">public</span> <a class="code" href="classrapidjson_1_1_generic_value.html#ad1f8199e65662e0d52a13a1577d4e4a5">GenericValue</a>&lt;Encoding, Allocator&gt; {</div><div class="line">    <span class="comment">// ...</span></div><div class="line">};</div><div class="line"></div><div class="line"><span class="keyword">typedef</span> GenericValue&lt;UTF8&lt;&gt; &gt; <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>;</div><div class="line"><span class="keyword">typedef</span> GenericDocument&lt;UTF8&lt;&gt; &gt; <a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a>;</div><div class="line"></div><div class="line">} <span class="comment">// namespace rapidjson</span></div></div><!-- fragment --><p>使用者可以自定义这些模板参数。</p>
 <h2><a class="anchor" id="Encoding"></a>
 编码</h2>
 <p><code>Encoding</code> 参数指明在内存中的 JSON String 使用哪种编码。可行的选项有 <code>UTF8</code>、<code>UTF16</code>、<code>UTF32</code>。要注意这 3 个类型其实也是模板类。<code>UTF8&lt;&gt;</code> 等同 <code>UTF8&lt;char&gt;</code>，这代表它使用 <code>char</code> 来存储字符串。更多细节可以参考 <a class="el" href="md_doc_encoding_8zh-cn.html">编码</a>。</p>
 <p>这里是一个例子。假设一个 Windows 应用软件希望查询存储于 JSON 中的本地化字符串。Windows 中含 Unicode 的函数使用 UTF-16（宽字符）编码。无论 JSON 文件使用哪种编码，我们都可以把字符串以 UTF-16 形式存储在内存。</p>
-<div class="fragment"><div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">typedef</span> <a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument&lt;UTF16&lt;&gt;</a> &gt; WDocument;</div>
-<div class="line"><span class="keyword">typedef</span> <a class="code" href="classrapidjson_1_1_generic_value.html">GenericValue&lt;UTF16&lt;&gt;</a> &gt; WValue;</div>
-<div class="line"></div>
-<div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;localization.json&quot;</span>, <span class="stringliteral">&quot;rb&quot;</span>); <span class="comment">// 非 Windows 平台使用 &quot;r&quot;</span></div>
-<div class="line"></div>
-<div class="line"><span class="keywordtype">char</span> readBuffer[256];</div>
-<div class="line"><a class="code" href="classrapidjson_1_1_file_read_stream.html">FileReadStream</a> bis(fp, readBuffer, <span class="keyword">sizeof</span>(readBuffer));</div>
-<div class="line"></div>
-<div class="line"><a class="code" href="classrapidjson_1_1_auto_u_t_f_input_stream.html">AutoUTFInputStream&lt;unsigned, FileReadStream&gt;</a> eis(bis);  <span class="comment">// 包装 bis 成 eis</span></div>
-<div class="line"></div>
-<div class="line">WDocument d;</div>
-<div class="line">d.ParseStream&lt;0, <a class="code" href="structrapidjson_1_1_auto_u_t_f.html">AutoUTF&lt;unsigned&gt;</a> &gt;(eis);</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">const</span> WValue locale(L<span class="stringliteral">&quot;ja&quot;</span>); <span class="comment">// Japanese</span></div>
-<div class="line"></div>
-<div class="line">MessageBoxW(hWnd, d[locale].GetString(), L<span class="stringliteral">&quot;Test&quot;</span>, MB_OK);</div>
-</div><!-- fragment --><h2><a class="anchor" id="Allocator"></a>
+<div class="fragment"><div class="line"><span class="keyword">using namespace </span><a class="code" href="namespacerapidjson.html">rapidjson</a>;</div><div class="line"></div><div class="line"><span class="keyword">typedef</span> <a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument&lt;UTF16&lt;&gt;</a> &gt; WDocument;</div><div class="line"><span class="keyword">typedef</span> <a class="code" href="classrapidjson_1_1_generic_value.html">GenericValue&lt;UTF16&lt;&gt;</a> &gt; WValue;</div><div class="line"></div><div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;localization.json&quot;</span>, <span class="stringliteral">&quot;rb&quot;</span>); <span class="comment">// 非 Windows 平台使用 &quot;r&quot;</span></div><div class="line"></div><div class="line"><span class="keywordtype">char</span> readBuffer[256];</div><div class="line"><a class="code" href="classrapidjson_1_1_file_read_stream.html">FileReadStream</a> bis(fp, readBuffer, <span class="keyword">sizeof</span>(readBuffer));</div><div class="line"></div><div class="line"><a class="code" href="classrapidjson_1_1_auto_u_t_f_input_stream.html">AutoUTFInputStream&lt;unsigned, FileReadStream&gt;</a> eis(bis);  <span class="comment">// 包装 bis 成 eis</span></div><div class="line"></div><div class="line">WDocument d;</div><div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>&lt;0, <a class="code" href="structrapidjson_1_1_auto_u_t_f.html">AutoUTF&lt;unsigned&gt;</a> &gt;(eis);</div><div class="line"></div><div class="line"><span class="keyword">const</span> WValue locale(L<span class="stringliteral">&quot;ja&quot;</span>); <span class="comment">// Japanese</span></div><div class="line"></div><div class="line">MessageBoxW(hWnd, d[locale].GetString(), L<span class="stringliteral">&quot;Test&quot;</span>, MB_OK);</div></div><!-- fragment --><h2><a class="anchor" id="Allocator"></a>
 分配器</h2>
 <p><code>Allocator</code> 定义当 <code>Document</code>/<code>Value</code> 分配或释放内存时使用那个分配类。<code>Document</code> 拥有或引用到一个 <code>Allocator</code> 实例。而为了节省内存，<code>Value</code> 没有这么做。</p>
 <p><code>GenericDocument</code> 的缺省分配器是 <code>MemoryPoolAllocator</code>。此分配器实际上会顺序地分配内存，并且不能逐一释放。当要解析一个 JSON 并生成 DOM，这种分配器是非常合适的。</p>
@@ -146,38 +113,7 @@ $(document).ready(function(){initNavTree('md_doc_dom_8zh-cn.html','');});
 <h1><a class="anchor" id="Parsing"></a>
 解析</h1>
 <p><code>Document</code> 提供几个解析函数。以下的 (1) 是根本的函数，其他都是调用 (1) 的协助函数。</p>
-<div class="fragment"><div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
-<div class="line"></div>
-<div class="line"><span class="comment">// (1) 根本</span></div>
-<div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> SourceEncoding, <span class="keyword">typename</span> InputStream&gt;</div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">GenericDocument::ParseStream</a>(InputStream&amp; is);</div>
-<div class="line"></div>
-<div class="line"><span class="comment">// (2) 使用流的编码</span></div>
-<div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> InputStream&gt;</div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">GenericDocument::ParseStream</a>(InputStream&amp; is);</div>
-<div class="line"></div>
-<div class="line"><span class="comment">// (3) 使用缺省标志</span></div>
-<div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputStream&gt;</div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">GenericDocument::ParseStream</a>(InputStream&amp; is);</div>
-<div class="line"></div>
-<div class="line"><span class="comment">// (4) 原位解析</span></div>
-<div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags&gt;</div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a7ba626bf84eb45a9bca0b7723bf47f3f">GenericDocument::ParseInsitu</a>(Ch* str);</div>
-<div class="line"></div>
-<div class="line"><span class="comment">// (5) 原位解析，使用缺省标志</span></div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a7ba626bf84eb45a9bca0b7723bf47f3f">GenericDocument::ParseInsitu</a>(Ch* str);</div>
-<div class="line"></div>
-<div class="line"><span class="comment">// (6) 正常解析一个字符串</span></div>
-<div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> SourceEncoding&gt;</div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c">GenericDocument::Parse</a>(<span class="keyword">const</span> Ch* str);</div>
-<div class="line"></div>
-<div class="line"><span class="comment">// (7) 正常解析一个字符串，使用 Document 的编码</span></div>
-<div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags&gt;</div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c">GenericDocument::Parse</a>(<span class="keyword">const</span> Ch* str);</div>
-<div class="line"></div>
-<div class="line"><span class="comment">// (8) 正常解析一个字符串，使用缺省标志</span></div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c">GenericDocument::Parse</a>(<span class="keyword">const</span> Ch* str);</div>
-</div><!-- fragment --><p><a class="el" href="md_doc_tutorial_8zh-cn.html">教程</a> 中的例使用 (8) 去正常解析字符串。而 <a class="el" href="md_doc_stream_8zh-cn.html">流</a> 的例子使用前 3 个函数。我们将稍后介绍原位（*In situ*） 解析。</p>
+<div class="fragment"><div class="line"><span class="keyword">using namespace </span><a class="code" href="namespacerapidjson.html">rapidjson</a>;</div><div class="line"></div><div class="line"><span class="comment">// (1) 根本</span></div><div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> SourceEncoding, <span class="keyword">typename</span> InputStream&gt;</div><div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">GenericDocument::ParseStream</a>(InputStream&amp; is);</div><div class="line"></div><div class="line"><span class="comment">// (2) 使用流的编码</span></div><div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> InputStream&gt;</div><div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">GenericDocument::ParseStream</a>(InputStream&amp; is);</div><div class="line"></div><div class="line"><span class="comment">// (3) 使用缺省标志</span></div><div class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputStream&gt;</div><div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">GenericDocument::ParseStream</a>(InputStream&amp; is);</div><div class="line"></div><div class="line"><span class="comment">// (4) 原位解析</span></div><div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags&gt;</div><div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a7ba626bf84eb45a9bca0b7723bf47f3f">GenericDocument::ParseInsitu</a>(Ch* str);</div><div class="line"></div><div class="line"><span class="comment">// (5) 原位解析，使用缺省标志</span></div><div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#a7ba626bf84eb45a9bca0b7723bf47f3f">GenericDocument::ParseInsitu</a>(Ch* str);</div><div class="line"></div><div class="line"><span class="comment">// (6) 正常解析一个字符串</span></div><div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags, <span class="keyword">typename</span> SourceEncoding&gt;</div><div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c">GenericDocument::Parse</a>(<span class="keyword">const</span> Ch* str);</div><div class="line"></div><div class="line"><span class="comment">// (7) 正常解析一个字符串，使用 Document 的编码</span></div><div class="line"><span class="keyword">template</span> &lt;<span class="keywordtype">unsigned</span> parseFlags&gt;</div><div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c">GenericDocument::Parse</a>(<span class="keyword">const</span> Ch* str);</div><div class="line"></div><div class="line"><span class="comment">// (8) 正常解析一个字符串，使用缺省标志</span></div><div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">GenericDocument</a>&amp; <a class="code" href="classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c">GenericDocument::Parse</a>(<span class="keyword">const</span> Ch* str);</div></div><!-- fragment --><p><a class="el" href="md_doc_tutorial_8zh-cn.html">教程</a> 中的例使用 (8) 去正常解析字符串。而 <a class="el" href="md_doc_stream_8zh-cn.html">流</a> 的例子使用前 3 个函数。我们将稍后介绍原位（*In situ*） 解析。</p>
 <p><code>parseFlags</code> 是以下位标置的组合：</p>
 <table class="doxtable">
 <tr>
@@ -250,18 +186,7 @@ $(document).ready(function(){initNavTree('md_doc_dom_8zh-cn.html','');});
 <p>错误的偏移量定义为从流开始至错误处的字符数量。目前 RapidJSON 不记录错误行号。</p>
 <p>要取得错误讯息，RapidJSON 在 <code><a class="el" href="en_8h_source.html">rapidjson/error/en.h</a></code> 中提供了英文错误讯息。使用者可以修改它用于其他语言环境，或使用一个自定义的本地化系统。</p>
 <p>以下是一个处理错误的例子。</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="document_8h.html">rapidjson/document.h</a>&quot;</span></div>
-<div class="line"><span class="preprocessor">#include &quot;rapidjson/error/en.h&quot;</span></div>
-<div class="line"></div>
-<div class="line"><span class="comment">// ...</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
-<div class="line"><span class="keywordflow">if</span> (d.Parse(json).HasParseError()) {</div>
-<div class="line">    fprintf(stderr, <span class="stringliteral">&quot;\nError(offset %u): %s\n&quot;</span>, </div>
-<div class="line">        (<span class="keywordtype">unsigned</span>)d.GetErrorOffset(),</div>
-<div class="line">        <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(d.GetParseErrorCode()));</div>
-<div class="line">    <span class="comment">// ...</span></div>
-<div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="InSituParsing"></a>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="document_8h.html">rapidjson/document.h</a>&quot;</span></div><div class="line"><span class="preprocessor">#include &quot;rapidjson/error/en.h&quot;</span></div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div><div class="line"><span class="keywordflow">if</span> (d.Parse(json).HasParseError()) {</div><div class="line">    fprintf(stderr, <span class="stringliteral">&quot;\nError(offset %u): %s\n&quot;</span>, </div><div class="line">        (<span class="keywordtype">unsigned</span>)d.GetErrorOffset(),</div><div class="line">        <a class="code" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">GetParseError_En</a>(d.GetParseErrorCode()));</div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><h2><a class="anchor" id="InSituParsing"></a>
 原位解析</h2>
 <p>根据 <a href="http://en.wikipedia.org/wiki/In_situ">维基百科</a>:</p>
 <blockquote class="doxtable">
@@ -270,38 +195,20 @@ $(document).ready(function(){initNavTree('md_doc_dom_8zh-cn.html','');});
 <blockquote class="doxtable">
 <p>翻译：*In situ*……是一个拉丁文片语，字面上的意思是指「现场」、「在位置」。在许多不同语境中，它描述一个事件发生的位置，意指「本地」、「现场」、「在处所」、「就位」。 …… （在计算机科学中）一个算法若称为原位算法，或在位算法，是指执行该算法所需的额外内存空间是 O(1) 的，换句话说，无论输入大小都只需要常数空间。例如，堆排序是一个原位排序算法。 </p>
 </blockquote>
-<p>在正常的解析过程中，对 JSON string 解码并复制至其他缓冲区是一个很大的开销。原位解析（*in situ* parsing）把这些 JSON string 直接解码于它原来存储的地方。由于解码后的 string 长度总是短于或等于原来储存于 JSON 的 string，所以这是可行的。在这个语境下，对 JSON string 进行解码是指处理转义符，如 <code>"\\n"</code>、<code>"\\u1234"</code> 等，以及在 string 末端加入空终止符号 (`'\0'`)。</p>
+<p>在正常的解析过程中，对 JSON string 解码并复制至其他缓冲区是一个很大的开销。原位解析（*in situ* parsing）把这些 JSON string 直接解码于它原来存储的地方。由于解码后的 string 长度总是短于或等于原来储存于 JSON 的 string，所以这是可行的。在这个语境下，对 JSON string 进行解码是指处理转义符，如 <code>"\n"</code>、<code>"\u1234"</code> 等，以及在 string 末端加入空终止符号 (`'\0'`)。</p>
 <p>以下的图比较正常及原位解析。JSON string 值包含指向解码后的字符串。</p>
 <div class="image">
 <img src="normalparsing.png" alt="normalparsing.png"/>
 <div class="caption">
 正常解析</div></div>
-<p> 在正常解析中，解码后的字符串被复制至全新分配的缓冲区中。<code>"\\\\n"</code>（2 个字符）被解码成 <code>"\\n"</code>（1 个字符）。<code>"\\\\u0073"</code>（6 个字符）被解码成 <code>"s"</code>（1 个字符）。</p>
+<p> 在正常解析中，解码后的字符串被复制至全新分配的缓冲区中。<code>"\\n"</code>（2 个字符）被解码成 <code>"\n"</code>（1 个字符）。<code>"\\u0073"</code>（6 个字符）被解码成 <code>"s"</code>（1 个字符）。</p>
 <div class="image">
 <img src="insituparsing.png" alt="insituparsing.png"/>
 <div class="caption">
 原位解析</div></div>
 <p> 原位解析直接修改了原来的 JSON。图中高亮了被更新的字符。若 JSON string 不含转义符，例如 <code>"msg"</code>，那么解析过程仅仅是以空字符代替结束双引号。</p>
 <p>由于原位解析修改了输入，其解析 API 需要 <code>char*</code> 而非 <code>const char*</code>。</p>
-<div class="fragment"><div class="line"><span class="comment">// 把整个文件读入 buffer</span></div>
-<div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;test.json&quot;</span>, <span class="stringliteral">&quot;r&quot;</span>);</div>
-<div class="line">fseek(fp, 0, SEEK_END);</div>
-<div class="line"><span class="keywordtype">size_t</span> filesize = (size_t)ftell(fp);</div>
-<div class="line">fseek(fp, 0, SEEK_SET);</div>
-<div class="line"><span class="keywordtype">char</span>* buffer = (<span class="keywordtype">char</span>*)malloc(filesize + 1);</div>
-<div class="line"><span class="keywordtype">size_t</span> readLength = fread(buffer, 1, filesize, fp);</div>
-<div class="line">buffer[readLength] = <span class="charliteral">&#39;\0&#39;</span>;</div>
-<div class="line">fclose(fp);</div>
-<div class="line"></div>
-<div class="line"><span class="comment">// 原位解析 buffer 至 d，buffer 内容会被修改。</span></div>
-<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
-<div class="line">d.ParseInsitu(buffer);</div>
-<div class="line"></div>
-<div class="line"><span class="comment">// 在此查询、修改 DOM……</span></div>
-<div class="line"></div>
-<div class="line">free(buffer);</div>
-<div class="line"><span class="comment">// 注意：在这个位置，d 可能含有指向已被释放的 buffer 的悬空指针</span></div>
-</div><!-- fragment --><p>JSON string 会被打上 const-string 的标志。但它们可能并非真正的「常数」。它的生命周期取决于存储 JSON 的缓冲区。</p>
+<div class="fragment"><div class="line"><span class="comment">// 把整个文件读入 buffer</span></div><div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;test.json&quot;</span>, <span class="stringliteral">&quot;r&quot;</span>);</div><div class="line">fseek(fp, 0, SEEK_END);</div><div class="line"><span class="keywordtype">size_t</span> filesize = (size_t)ftell(fp);</div><div class="line">fseek(fp, 0, SEEK_SET);</div><div class="line"><span class="keywordtype">char</span>* buffer = (<span class="keywordtype">char</span>*)malloc(filesize + 1);</div><div class="line"><span class="keywordtype">size_t</span> readLength = fread(buffer, 1, filesize, fp);</div><div class="line">buffer[readLength] = <span class="charliteral">&#39;\0&#39;</span>;</div><div class="line">fclose(fp);</div><div class="line"></div><div class="line"><span class="comment">// 原位解析 buffer 至 d，buffer 内容会被修改。</span></div><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div><div class="line">d.ParseInsitu(buffer);</div><div class="line"></div><div class="line"><span class="comment">// 在此查询、修改 DOM……</span></div><div class="line"></div><div class="line">free(buffer);</div><div class="line"><span class="comment">// 注意：在这个位置，d 可能含有指向已被释放的 buffer 的悬空指针</span></div></div><!-- fragment --><p>JSON string 会被打上 const-string 的标志。但它们可能并非真正的「常数」。它的生命周期取决于存储 JSON 的缓冲区。</p>
 <p>原位解析把分配开销及内存复制减至最小。通常这样做能改善缓存一致性，而这对现代计算机来说是一个重要的性能因素。</p>
 <p>原位解析有以下限制：</p>
 <ol type="1">
@@ -322,10 +229,7 @@ $(document).ready(function(){initNavTree('md_doc_dom_8zh-cn.html','');});
 <p>这里讨论一些 DOM API 的使用技巧。</p>
 <h2>把 DOM 作为 SAX 事件发表者</h2>
 <p>在 RapidJSON 中，利用 <code>Writer</code> 把 DOM 生成 JSON 的做法，看来有点奇怪。</p>
-<div class="fragment"><div class="line"><span class="comment">// ...</span></div>
-<div class="line">Writer&lt;StringBuffer&gt; writer(buffer);</div>
-<div class="line">d.Accept(writer);</div>
-</div><!-- fragment --><p>实际上，<code>Value::Accept()</code> 是负责发布该值相关的 SAX 事件至处理器的。通过这个设计，<code>Value</code> 及 <code>Writer</code> 解除了偶合。<code>Value</code> 可生成 SAX 事件，而 <code>Writer</code> 则可以处理这些事件。</p>
+<div class="fragment"><div class="line"><span class="comment">// ...</span></div><div class="line">Writer&lt;StringBuffer&gt; writer(buffer);</div><div class="line">d.Accept(writer);</div></div><!-- fragment --><p>实际上，<code>Value::Accept()</code> 是负责发布该值相关的 SAX 事件至处理器的。通过这个设计，<code>Value</code> 及 <code>Writer</code> 解除了偶合。<code>Value</code> 可生成 SAX 事件，而 <code>Writer</code> 则可以处理这些事件。</p>
 <p>使用者可以创建自定义的处理器，去把 DOM 转换成其它格式。例如，一个把 DOM 转换成 XML 的处理器。</p>
 <p>要知道更多关于 SAX 事件与处理器，可参阅 <a class="el" href="md_doc_sax_8zh-cn.html">SAX</a>。</p>
 <h2><a class="anchor" id="UserBuffer"></a>
@@ -334,14 +238,7 @@ $(document).ready(function(){initNavTree('md_doc_dom_8zh-cn.html','');});
 <p><code>MemoryPoolAllocator</code> 可以帮助这方面，它容许使用者提供一个缓冲区。该缓冲区可能置于程序堆栈，或是一个静态分配的「草稿缓冲区（scratch buffer）」（一个静态／全局的数组），用于储存临时数据。</p>
 <p><code>MemoryPoolAllocator</code> 会先用使用者缓冲区去解决分配请求。当使用者缓冲区用完，就会从基础分配器（缺省为 <code>CrtAllocator</code>）分配一块内存。</p>
 <p>以下是使用堆栈内存的例子，第一个分配器用于存储值，第二个用于解析时的临时缓冲。</p>
-<div class="fragment"><div class="line"><span class="keyword">typedef</span> GenericDocument&lt;UTF8&lt;&gt;, MemoryPoolAllocator&lt;&gt;, MemoryPoolAllocator&lt;&gt;&gt; DocumentType;</div>
-<div class="line"><span class="keywordtype">char</span> valueBuffer[4096];</div>
-<div class="line"><span class="keywordtype">char</span> parseBuffer[1024];</div>
-<div class="line">MemoryPoolAllocator&lt;&gt; valueAllocator(valueBuffer, <span class="keyword">sizeof</span>(valueBuffer));</div>
-<div class="line">MemoryPoolAllocator&lt;&gt; parseAllocator(parseBuffer, <span class="keyword">sizeof</span>(parseBuffer));</div>
-<div class="line">DocumentType d(&amp;valueAllocator, <span class="keyword">sizeof</span>(parseBuffer), &amp;parseAllocator);</div>
-<div class="line">d.Parse(json);</div>
-</div><!-- fragment --><p>若解析时分配总量少于 4096+1024 字节时，这段代码不会造成任何堆内存分配（经 <code>new</code> 或 <code>malloc()</code>）。</p>
+<div class="fragment"><div class="line"><span class="keyword">typedef</span> GenericDocument&lt;UTF8&lt;&gt;, MemoryPoolAllocator&lt;&gt;, MemoryPoolAllocator&lt;&gt;&gt; DocumentType;</div><div class="line"><span class="keywordtype">char</span> valueBuffer[4096];</div><div class="line"><span class="keywordtype">char</span> parseBuffer[1024];</div><div class="line">MemoryPoolAllocator&lt;&gt; valueAllocator(valueBuffer, <span class="keyword">sizeof</span>(valueBuffer));</div><div class="line">MemoryPoolAllocator&lt;&gt; parseAllocator(parseBuffer, <span class="keyword">sizeof</span>(parseBuffer));</div><div class="line">DocumentType d(&amp;valueAllocator, <span class="keyword">sizeof</span>(parseBuffer), &amp;parseAllocator);</div><div class="line">d.Parse(json);</div></div><!-- fragment --><p>若解析时分配总量少于 4096+1024 字节时，这段代码不会造成任何堆内存分配（经 <code>new</code> 或 <code>malloc()</code>）。</p>
 <p>使用者可以通过 <code>MemoryPoolAllocator::Size()</code> 查询当前已分的内存大小。那么使用者可以拟定使用者缓冲区的合适大小。 </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->

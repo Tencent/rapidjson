@@ -2,9 +2,9 @@ var classrapidjson_1_1_generic_reader =
 [
     [ "Ch", "classrapidjson_1_1_generic_reader.html#a0781d19e8c6bc044d9cc5f5d3dde287e", null ],
     [ "GenericReader", "classrapidjson_1_1_generic_reader.html#a56ab1065ea75167aeacb4802425bf57f", null ],
-    [ "GetErrorOffset", "classrapidjson_1_1_generic_reader.html#ab907a36c410e96154c99797a6a0ce16d", null ],
-    [ "GetParseErrorCode", "classrapidjson_1_1_generic_reader.html#a40fd326bad7d7033f096b549cbf159db", null ],
-    [ "HasParseError", "classrapidjson_1_1_generic_reader.html#a46ded2951b8fa395ed421989d66e71fe", null ],
+    [ "GetErrorOffset", "classrapidjson_1_1_generic_reader.html#ab50019e0a715320f83b7610b83dcef8f", null ],
+    [ "GetParseErrorCode", "classrapidjson_1_1_generic_reader.html#a042c621cf745c5ed3a6f5ff9418dd05e", null ],
+    [ "HasParseError", "classrapidjson_1_1_generic_reader.html#ac42370c3497a0e2b6973110f298e3a59", null ],
     [ "IterativeParseComplete", "classrapidjson_1_1_generic_reader.html#a60fa11ff60f71b3a466bbd962f35dfdb", null ],
     [ "IterativeParseInit", "classrapidjson_1_1_generic_reader.html#a90403a2c55dadf82fd2bb9d4c66b3280", null ],
     [ "IterativeParseNext", "classrapidjson_1_1_generic_reader.html#abac6611bec17167de50fede5cd5194ca", null ],

@@ -4,22 +4,23 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.7"/>
+<meta name="generator" content="Doxygen 1.8.13"/>
 <title>RapidJSON: rapidjson::SchemaValidatingReader&lt; parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator &gt; 模板类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
   $(document).ready(initResizable);
-  $(window).load(resizeHeight);
 </script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
@@ -42,7 +43,7 @@
           </span>
         </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.7 -->
+<!-- 制作者 Doxygen 1.8.13 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -66,7 +67,7 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_schema_validating_r
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(12)"><span class="SelectionMark">&#160;</span>页</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -92,38 +93,37 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_schema_validating_r
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public 类型</h2></td></tr>
-<tr class="memitem:a42c64d1ed25ffb2e70a35b9e43e0e564"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a42c64d1ed25ffb2e70a35b9e43e0e564"></a>
-typedef <br class="typebreak" />
-SchemaDocumentType::PointerType&#160;</td><td class="memItemRight" valign="bottom"><b>PointerType</b></td></tr>
+<tr class="memitem:a42c64d1ed25ffb2e70a35b9e43e0e564"><td class="memItemLeft" align="right" valign="top"><a id="a42c64d1ed25ffb2e70a35b9e43e0e564"></a>
+typedef SchemaDocumentType::PointerType&#160;</td><td class="memItemRight" valign="bottom"><b>PointerType</b></td></tr>
 <tr class="separator:a42c64d1ed25ffb2e70a35b9e43e0e564"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3507a4886ce6778fe1cae39ed5f0baaf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3507a4886ce6778fe1cae39ed5f0baaf"></a>
+<tr class="memitem:a3507a4886ce6778fe1cae39ed5f0baaf"><td class="memItemLeft" align="right" valign="top"><a id="a3507a4886ce6778fe1cae39ed5f0baaf"></a>
 typedef InputStream::Ch&#160;</td><td class="memItemRight" valign="bottom"><b>Ch</b></td></tr>
 <tr class="separator:a3507a4886ce6778fe1cae39ed5f0baaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public 成员函数</h2></td></tr>
 <tr class="memitem:a1e2bcc66cad23376241cd91e8bf8c706"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_schema_validating_reader.html#a1e2bcc66cad23376241cd91e8bf8c706">SchemaValidatingReader</a> (InputStream &amp;is, const SchemaDocumentType &amp;sd)</td></tr>
-<tr class="memdesc:a1e2bcc66cad23376241cd91e8bf8c706"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a1e2bcc66cad23376241cd91e8bf8c706">更多...</a><br /></td></tr>
+<tr class="memdesc:a1e2bcc66cad23376241cd91e8bf8c706"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor  <a href="#a1e2bcc66cad23376241cd91e8bf8c706">更多...</a><br /></td></tr>
 <tr class="separator:a1e2bcc66cad23376241cd91e8bf8c706"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb09230cc40b8dc5ba607de14d37dc42"><td class="memTemplParams" colspan="2"><a class="anchor" id="adb09230cc40b8dc5ba607de14d37dc42"></a>
+<tr class="memitem:adb09230cc40b8dc5ba607de14d37dc42"><td class="memTemplParams" colspan="2"><a id="adb09230cc40b8dc5ba607de14d37dc42"></a>
 template&lt;typename Handler &gt; </td></tr>
 <tr class="memitem:adb09230cc40b8dc5ba607de14d37dc42"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>operator()</b> (<a class="el" href="classrapidjson_1_1_handler.html">Handler</a> &amp;handler)</td></tr>
 <tr class="separator:adb09230cc40b8dc5ba607de14d37dc42"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac73cdab259f38f00af7862861a6e3c52"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac73cdab259f38f00af7862861a6e3c52"></a>
-const <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result">ParseResult</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetParseResult</b> () const </td></tr>
-<tr class="separator:ac73cdab259f38f00af7862861a6e3c52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84b5bb649a69e5da572ead36fb907b0e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a84b5bb649a69e5da572ead36fb907b0e"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsValid</b> () const </td></tr>
-<tr class="separator:a84b5bb649a69e5da572ead36fb907b0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa23c98c009967dec658bd2099f3c9418"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa23c98c009967dec658bd2099f3c9418"></a>
-const PointerType &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetInvalidSchemaPointer</b> () const </td></tr>
-<tr class="separator:aa23c98c009967dec658bd2099f3c9418"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af60e486b5ba0a826d443a111a4fbe87d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af60e486b5ba0a826d443a111a4fbe87d"></a>
-const Ch *&#160;</td><td class="memItemRight" valign="bottom"><b>GetInvalidSchemaKeyword</b> () const </td></tr>
-<tr class="separator:af60e486b5ba0a826d443a111a4fbe87d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86c9e433d8b540e54808fd54ac9c4be0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a86c9e433d8b540e54808fd54ac9c4be0"></a>
-const PointerType &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetInvalidDocumentPointer</b> () const </td></tr>
-<tr class="separator:a86c9e433d8b540e54808fd54ac9c4be0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a957147a03ad791aa12a0552320371a41"><td class="memItemLeft" align="right" valign="top"><a id="a957147a03ad791aa12a0552320371a41"></a>
+const <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result">ParseResult</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetParseResult</b> () const</td></tr>
+<tr class="separator:a957147a03ad791aa12a0552320371a41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a803e1eff3f4fa021e56c6583c45c9fb4"><td class="memItemLeft" align="right" valign="top"><a id="a803e1eff3f4fa021e56c6583c45c9fb4"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsValid</b> () const</td></tr>
+<tr class="separator:a803e1eff3f4fa021e56c6583c45c9fb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae90052ccece8e04e7a840dd61f7ac83c"><td class="memItemLeft" align="right" valign="top"><a id="ae90052ccece8e04e7a840dd61f7ac83c"></a>
+const PointerType &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetInvalidSchemaPointer</b> () const</td></tr>
+<tr class="separator:ae90052ccece8e04e7a840dd61f7ac83c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67bf36f1e4bf24a0760170ed199f592b"><td class="memItemLeft" align="right" valign="top"><a id="a67bf36f1e4bf24a0760170ed199f592b"></a>
+const Ch *&#160;</td><td class="memItemRight" valign="bottom"><b>GetInvalidSchemaKeyword</b> () const</td></tr>
+<tr class="separator:a67bf36f1e4bf24a0760170ed199f592b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00e8db597e8a55b5f8810707dda40dfa"><td class="memItemLeft" align="right" valign="top"><a id="a00e8db597e8a55b5f8810707dda40dfa"></a>
+const PointerType &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetInvalidDocumentPointer</b> () const</td></tr>
+<tr class="separator:a00e8db597e8a55b5f8810707dda40dfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
 <div class="textblock"><h3>template&lt;unsigned parseFlags, typename InputStream, typename SourceEncoding, typename SchemaDocumentType = SchemaDocument, typename StackAllocator = CrtAllocator&gt;<br />
@@ -142,7 +142,9 @@ class rapidjson::SchemaValidatingReader&lt; parseFlags, InputStream, SourceEncod
   </dd>
 </dl>
 </div><h2 class="groupheader">构造及析构函数说明</h2>
-<a class="anchor" id="a1e2bcc66cad23376241cd91e8bf8c706"></a>
+<a id="a1e2bcc66cad23376241cd91e8bf8c706"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1e2bcc66cad23376241cd91e8bf8c706">&#9670;&nbsp;</a></span>SchemaValidatingReader()</h2>
+
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
@@ -176,7 +178,7 @@ template&lt;unsigned parseFlags, typename InputStream , typename SourceEncoding 
 </table>
 </div><div class="memdoc">
 
-<p>Constructor. </p>
+<p>Constructor </p>
 <dl class="params"><dt>参数</dt><dd>
   <table class="params">
     <tr><td class="paramname">is</td><td>Input stream. </td></tr>

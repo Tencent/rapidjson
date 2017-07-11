@@ -4,22 +4,23 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.7"/>
+<meta name="generator" content="Doxygen 1.8.13"/>
 <title>RapidJSON: 编码</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
   $(document).ready(initResizable);
-  $(window).load(resizeHeight);
 </script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
@@ -42,7 +43,7 @@
           </span>
         </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.7 -->
+<!-- 制作者 Doxygen 1.8.13 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -66,7 +67,7 @@ $(document).ready(function(){initNavTree('md_doc_encoding_8zh-cn.html','');});
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(12)"><span class="SelectionMark">&#160;</span>页</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -121,36 +122,10 @@ Unicode 转换格式</h2>
 </ul>
 <p>对于 UTF-16 及 UTF-32 来说，字节序（endianness）是有影响的。在内存中，它们通常都是以该计算机的字节序来存储。然而，当要储存在文件中或在网上传输，我们需要指明字节序列的字节序，是小端（little endian, LE）还是大端（big-endian, BE）。</p>
 <p>RapidJSON 通过 <code><a class="el" href="encodings_8h_source.html">rapidjson/encodings.h</a></code> 中的 struct 去提供各种编码：</p>
-<div class="fragment"><div class="line"><span class="keyword">namespace </span>rapidjson {</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">char</span>&gt;</div>
-<div class="line"><span class="keyword">struct </span>UTF8;</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">wchar_t</span>&gt;</div>
-<div class="line"><span class="keyword">struct </span>UTF16;</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">wchar_t</span>&gt;</div>
-<div class="line"><span class="keyword">struct </span>UTF16LE;</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">wchar_t</span>&gt;</div>
-<div class="line"><span class="keyword">struct </span>UTF16BE;</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">unsigned</span>&gt;</div>
-<div class="line"><span class="keyword">struct </span>UTF32;</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">unsigned</span>&gt;</div>
-<div class="line"><span class="keyword">struct </span>UTF32LE;</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">unsigned</span>&gt;</div>
-<div class="line"><span class="keyword">struct </span>UTF32BE;</div>
-<div class="line"></div>
-<div class="line">} <span class="comment">// namespace rapidjson</span></div>
-</div><!-- fragment --><p>对于在内存中的文本，我们正常会使用 <code>UTF8</code>、<code>UTF16</code> 或 <code>UTF32</code>。对于处理经过 I/O 的文本，我们可使用 <code>UTF8</code>、<code>UTF16LE</code>、<code>UTF16BE</code>、<code>UTF32LE</code> 或 <code>UTF32BE</code>。</p>
+<div class="fragment"><div class="line"><span class="keyword">namespace </span><a class="code" href="namespacerapidjson.html">rapidjson</a> {</div><div class="line"></div><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">char</span>&gt;</div><div class="line"><span class="keyword">struct </span>UTF8;</div><div class="line"></div><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">wchar_t</span>&gt;</div><div class="line"><span class="keyword">struct </span>UTF16;</div><div class="line"></div><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">wchar_t</span>&gt;</div><div class="line"><span class="keyword">struct </span>UTF16LE;</div><div class="line"></div><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">wchar_t</span>&gt;</div><div class="line"><span class="keyword">struct </span>UTF16BE;</div><div class="line"></div><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">unsigned</span>&gt;</div><div class="line"><span class="keyword">struct </span>UTF32;</div><div class="line"></div><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">unsigned</span>&gt;</div><div class="line"><span class="keyword">struct </span>UTF32LE;</div><div class="line"></div><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> CharType = <span class="keywordtype">unsigned</span>&gt;</div><div class="line"><span class="keyword">struct </span>UTF32BE;</div><div class="line"></div><div class="line">} <span class="comment">// namespace rapidjson</span></div></div><!-- fragment --><p>对于在内存中的文本，我们正常会使用 <code>UTF8</code>、<code>UTF16</code> 或 <code>UTF32</code>。对于处理经过 I/O 的文本，我们可使用 <code>UTF8</code>、<code>UTF16LE</code>、<code>UTF16BE</code>、<code>UTF32LE</code> 或 <code>UTF32BE</code>。</p>
 <p>当使用 DOM 风格的 API，<code>GenericValue&lt;Encoding&gt;</code> 及 <code>GenericDocument&lt;Encoding&gt;</code> 里的 <code>Encoding</code> 模板参数是用于指明内存中存储的 JSON 字符串使用哪种编码。因此通常我们会在此参数中使用 <code>UTF8</code>、<code>UTF16</code> 或 <code>UTF32</code>。如何选择，视乎应用软件所使用的操作系统及其他程序库。例如，Windows API 使用 UTF-16 表示 Unicode 字符，而多数的 Linux 发行版本及应用软件则更喜欢 UTF-8。</p>
 <p>使用 UTF-16 的 DOM 声明例子：</p>
-<div class="fragment"><div class="line"><span class="keyword">typedef</span> GenericDocument&lt;UTF16&lt;&gt; &gt; WDocument;</div>
-<div class="line"><span class="keyword">typedef</span> GenericValue&lt;UTF16&lt;&gt; &gt; WValue;</div>
-</div><!-- fragment --><p>可以在 <a class="el" href="md_doc_stream_8zh-cn.html">DOM's Encoding</a> 一节看到更详细的使用例子。</p>
+<div class="fragment"><div class="line"><span class="keyword">typedef</span> GenericDocument&lt;UTF16&lt;&gt; &gt; WDocument;</div><div class="line"><span class="keyword">typedef</span> GenericValue&lt;UTF16&lt;&gt; &gt; WValue;</div></div><!-- fragment --><p>可以在 <a class="el" href="md_doc_stream_8zh-cn.html">DOM's Encoding</a> 一节看到更详细的使用例子。</p>
 <h2><a class="anchor" id="CharacterType"></a>
 字符类型</h2>
 <p>从之前的声明中可以看到，每个编码都有一个 <code>CharType</code> 模板参数。这可能比较容易混淆，实际上，每个 <code>CharType</code> 存储一个编码单元，而不是一个字符（码点）。如之前所谈及，在 UTF-8 中一个码点可能会编码成 1 至 4 个编码单元。</p>
@@ -164,14 +139,7 @@ AutoUTF</h2>
 ASCII</h2>
 <p>虽然 JSON 标准并未提及 <a href="http://en.wikipedia.org/wiki/ASCII">ASCII</a>，有时候我们希望写入 7 位的 ASCII JSON，以供未能处理 UTF-8 的应用程序使用。由于任 JSON 都可以把 Unicode 字符表示为 <code>\uXXXX</code> 转义序列，JSON 总是可用 ASCII 来编码。</p>
 <p>以下的例子把 UTF-8 的 DOM 写成 ASCII 的 JSON：</p>
-<div class="fragment"><div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> d; <span class="comment">// UTF8&lt;&gt;</span></div>
-<div class="line"><span class="comment">// ...</span></div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_string_buffer.html">StringBuffer</a> buffer;</div>
-<div class="line"><a class="code" href="classrapidjson_1_1_writer.html">Writer&lt;StringBuffer, Document::EncodingType, ASCII&lt;&gt;</a> &gt; writer(buffer);</div>
-<div class="line">d.Accept(writer);</div>
-<div class="line">std::cout &lt;&lt; buffer.GetString();</div>
-</div><!-- fragment --><p>ASCII 可用于输入流。当输入流包含大于 127 的字节，就会导致 <code>kParseErrorStringInvalidEncoding</code> 错误。</p>
+<div class="fragment"><div class="line"><span class="keyword">using namespace </span><a class="code" href="namespacerapidjson.html">rapidjson</a>;</div><div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> d; <span class="comment">// UTF8&lt;&gt;</span></div><div class="line"><span class="comment">// ...</span></div><div class="line"><a class="code" href="classrapidjson_1_1_generic_string_buffer.html">StringBuffer</a> buffer;</div><div class="line"><a class="code" href="classrapidjson_1_1_writer.html">Writer&lt;StringBuffer, Document::EncodingType, ASCII&lt;&gt;</a> &gt; writer(buffer);</div><div class="line">d.<a class="code" href="classrapidjson_1_1_generic_value.html#ad3ebfa73796f4db4836ec47c2261700c">Accept</a>(writer);</div><div class="line">std::cout &lt;&lt; buffer.GetString();</div></div><!-- fragment --><p>ASCII 可用于输入流。当输入流包含大于 127 的字节，就会导致 <code>kParseErrorStringInvalidEncoding</code> 错误。</p>
 <p>ASCII * 不能 * 用于内存（<code>Document</code> 的编码，或 <code>Reader</code> 的目标编码)，因为它不能表示 Unicode 码点。</p>
 <h1><a class="anchor" id="ValidationTranscoding"></a>
 校验及转码</h1>
@@ -181,26 +149,7 @@ ASCII</h2>
 转码器</h2>
 <p>虽然 RapidJSON 的编码功能是为 JSON 解析／生成而设计，使用者也可以“滥用”它们来为非 JSON 字符串转码。</p>
 <p>以下的例子把 UTF-8 字符串转码成 UTF-16：</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/encodings.h&quot;</span></div>
-<div class="line"></div>
-<div class="line"><span class="keyword">using namespace </span>rapidjson;</div>
-<div class="line"></div>
-<div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span>* s = <span class="stringliteral">&quot;...&quot;</span>; <span class="comment">// UTF-8 string</span></div>
-<div class="line"><a class="code" href="structrapidjson_1_1_generic_string_stream.html">StringStream</a> source(s);</div>
-<div class="line"><a class="code" href="classrapidjson_1_1_generic_string_buffer.html">GenericStringBuffer&lt;UTF16&lt;&gt;</a> &gt; target;</div>
-<div class="line"></div>
-<div class="line"><span class="keywordtype">bool</span> hasError = <span class="keyword">false</span>;</div>
-<div class="line"><span class="keywordflow">while</span> (source.Peek() != <span class="charliteral">&#39;\0&#39;</span>)</div>
-<div class="line">    <span class="keywordflow">if</span> (!<a class="code" href="structrapidjson_1_1_transcoder.html">Transcoder</a>&lt;<a class="code" href="structrapidjson_1_1_u_t_f8.html">UTF8&lt;&gt;</a>, <a class="code" href="structrapidjson_1_1_u_t_f16.html">UTF16&lt;&gt;</a> &gt;::Transcode(source, target)) {</div>
-<div class="line">        hasError = <span class="keyword">true</span>;</div>
-<div class="line">        <span class="keywordflow">break</span>;</div>
-<div class="line">    }</div>
-<div class="line"></div>
-<div class="line"><span class="keywordflow">if</span> (!hasError) {</div>
-<div class="line">    <span class="keyword">const</span> <span class="keywordtype">wchar_t</span>* t = target.GetString();</div>
-<div class="line">    <span class="comment">// ...</span></div>
-<div class="line">}</div>
-</div><!-- fragment --><p>你也可以用 <code>AutoUTF</code> 及对应的流来在运行时设置内源／目的之编码。 </p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/encodings.h&quot;</span></div><div class="line"></div><div class="line"><span class="keyword">using namespace </span><a class="code" href="namespacerapidjson.html">rapidjson</a>;</div><div class="line"></div><div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span>* s = <span class="stringliteral">&quot;...&quot;</span>; <span class="comment">// UTF-8 string</span></div><div class="line"><a class="code" href="structrapidjson_1_1_generic_string_stream.html">StringStream</a> source(s);</div><div class="line"><a class="code" href="classrapidjson_1_1_generic_string_buffer.html">GenericStringBuffer&lt;UTF16&lt;&gt;</a> &gt; target;</div><div class="line"></div><div class="line"><span class="keywordtype">bool</span> hasError = <span class="keyword">false</span>;</div><div class="line"><span class="keywordflow">while</span> (source.Peek() != <span class="charliteral">&#39;\0&#39;</span>)</div><div class="line">    <span class="keywordflow">if</span> (!<a class="code" href="structrapidjson_1_1_transcoder.html">Transcoder</a>&lt;<a class="code" href="structrapidjson_1_1_u_t_f8.html">UTF8&lt;&gt;</a>, <a class="code" href="structrapidjson_1_1_u_t_f16.html">UTF16&lt;&gt;</a> &gt;::Transcode(source, target)) {</div><div class="line">        hasError = <span class="keyword">true</span>;</div><div class="line">        <span class="keywordflow">break</span>;</div><div class="line">    }</div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (!hasError) {</div><div class="line">    <span class="keyword">const</span> <span class="keywordtype">wchar_t</span>* t = target.GetString();</div><div class="line">    <span class="comment">// ...</span></div><div class="line">}</div></div><!-- fragment --><p>你也可以用 <code>AutoUTF</code> 及对应的流来在运行时设置内源／目的之编码。 </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->

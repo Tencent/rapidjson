@@ -4,22 +4,23 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.7"/>
+<meta name="generator" content="Doxygen 1.8.13"/>
 <title>RapidJSON: 成员列表</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
 <link href="navtree.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
   $(document).ready(initResizable);
-  $(window).load(resizeHeight);
 </script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
-  $(document).ready(function() { searchBox.OnSelectItem(0); });
+  $(document).ready(function() { init_search(); });
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
@@ -42,7 +43,7 @@
           </span>
         </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.7 -->
+<!-- 制作者 Doxygen 1.8.13 -->
 <script type="text/javascript">
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
 </script>
@@ -66,7 +67,7 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_writer.html','');})
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>全部</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>类</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>命名空间</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>文件</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>函数</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>变量</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>类型定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>枚举</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>枚举值</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>友元</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>宏定义</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(11)"><span class="SelectionMark">&#160;</span>组</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(12)"><span class="SelectionMark">&#160;</span>页</a></div>
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -90,11 +91,11 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_writer.html','');})
   <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>EndObject</b>(SizeType memberCount=0) (定义于 <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a>)</td><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr bgcolor="#f0f0f0"><td class="entry"><b>EndValue</b>(bool ret) (定义于 <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a>)</td><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">protected</span></td></tr>
   <tr class="even"><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html#a72cefd18d176bc12a53adb3185c51ca7">Flush</a>()</td><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr bgcolor="#f0f0f0"><td class="entry"><b>GetMaxDecimalPlaces</b>() const  (定义于 <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a>)</td><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr bgcolor="#f0f0f0"><td class="entry"><b>GetMaxDecimalPlaces</b>() const (定义于 <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a>)</td><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>hasRoot_</b> (定义于 <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a>)</td><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td><td class="entry"><span class="mlabel">protected</span></td></tr>
   <tr bgcolor="#f0f0f0"><td class="entry"><b>Int</b>(int i) (定义于 <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a>)</td><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>Int64</b>(int64_t i64) (定义于 <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a>)</td><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html#a0cde8037db76f887cd9c557fd68630c5">IsComplete</a>() const </td><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html#a190d964d3e62155e87153e858a0b04da">IsComplete</a>() const</td><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
   <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>kDefaultLevelDepth</b> (定义于 <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a>)</td><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td><td class="entry"><span class="mlabel">protected</span><span class="mlabel">static</span></td></tr>
   <tr bgcolor="#f0f0f0"><td class="entry"><b>kDefaultMaxDecimalPlaces</b> (定义于 <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a>)</td><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td><td class="entry"><span class="mlabel">static</span></td></tr>
   <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>Key</b>(const Ch *str, SizeType length, bool copy=false) (定义于 <a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a>)</td><td class="entry"><a class="el" href="classrapidjson_1_1_writer.html">rapidjson::Writer&lt; OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>

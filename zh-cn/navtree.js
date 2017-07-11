@@ -1,171 +1,6 @@
-var NAVTREE =
-[
-  [ "RapidJSON", "index.html", [
-    [ "Change Log", "md__c_h_a_n_g_e_l_o_g.html", null ],
-    [ "特点", "md_doc_features_8zh-cn.html", null ],
-    [ "教程", "md_doc_tutorial_8zh-cn.html", [
-      [ "Value 及 Document", "md_doc_tutorial_8zh-cn.html#ValueDocument", null ],
-      [ "查询 Value", "md_doc_tutorial_8zh-cn.html#QueryValue", [
-        [ "查询 Array", "md_doc_tutorial_8zh-cn.html#QueryArray", null ],
-        [ "查询 Object", "md_doc_tutorial_8zh-cn.html#QueryObject", null ],
-        [ "查询 Number", "md_doc_tutorial_8zh-cn.html#QueryNumber", null ],
-        [ "查询 String", "md_doc_tutorial_8zh-cn.html#QueryString", null ]
-      ] ],
-      [ "创建／修改值", "md_doc_tutorial_8zh-cn.html#CreateModifyValues", [
-        [ "改变 Value 类型", "md_doc_tutorial_8zh-cn.html#ChangeValueType", null ],
-        [ "转移语义（Move Semantics）", "md_doc_tutorial_8zh-cn.html#MoveSemantics", [
-          [ "转移语义及临时值", "md_doc_tutorial_8zh-cn.html#TemporaryValues", null ]
-        ] ],
-        [ "创建 String", "md_doc_tutorial_8zh-cn.html#CreateString", null ],
-        [ "修改 Array", "md_doc_tutorial_8zh-cn.html#ModifyArray", null ],
-        [ "修改 Object", "md_doc_tutorial_8zh-cn.html#ModifyObject", null ],
-        [ "深复制 Value", "md_doc_tutorial_8zh-cn.html#DeepCopyValue", null ],
-        [ "交换 Value", "md_doc_tutorial_8zh-cn.html#SwapValues", null ]
-      ] ],
-      [ "下一部分", "md_doc_tutorial_8zh-cn.html#WhatsNext", null ]
-    ] ],
-    [ "Pointer", "md_doc_pointer_8zh-cn.html", [
-      [ "JSON Pointer", "md_doc_pointer_8zh-cn.html#JsonPointer", null ],
-      [ "基本使用方法", "md_doc_pointer_8zh-cn.html#BasicUsage", null ],
-      [ "辅助函数", "md_doc_pointer_8zh-cn.html#HelperFunctions", null ],
-      [ "解析 Pointer", "md_doc_pointer_8zh-cn.html#ResolvingPointer", null ],
-      [ "错误处理", "md_doc_pointer_8zh-cn.html#ErrorHandling", null ],
-      [ "URI 片段表示方式", "md_doc_pointer_8zh-cn.html#URIFragment", null ],
-      [ "使用者提供的 tokens", "md_doc_pointer_8zh-cn.html#UserSuppliedTokens", null ]
-    ] ],
-    [ "流", "md_doc_stream_8zh-cn.html", [
-      [ "内存流", "md_doc_stream_8zh-cn.html#MemoryStreams", [
-        [ "StringStream（输入）", "md_doc_stream_8zh-cn.html#StringStream", null ],
-        [ "StringBuffer（输出）", "md_doc_stream_8zh-cn.html#StringBuffer", null ]
-      ] ],
-      [ "文件流", "md_doc_stream_8zh-cn.html#FileStreams", [
-        [ "FileReadStream（输入）", "md_doc_stream_8zh-cn.html#FileReadStream", null ],
-        [ "FileWriteStream（输出）", "md_doc_stream_8zh-cn.html#FileWriteStream", null ]
-      ] ],
-      [ "iostream 包装类", "md_doc_stream_8zh-cn.html#iostreamWrapper", [
-        [ "IStreamWrapper", "md_doc_stream_8zh-cn.html#IStreamWrapper", null ],
-        [ "OStreamWrapper", "md_doc_stream_8zh-cn.html#OStreamWrapper", null ]
-      ] ],
-      [ "编码流", "md_doc_stream_8zh-cn.html#EncodedStreams", [
-        [ "EncodedInputStream", "md_doc_stream_8zh-cn.html#EncodedInputStream", null ],
-        [ "EncodedOutputStream", "md_doc_stream_8zh-cn.html#EncodedOutputStream", null ],
-        [ "AutoUTFInputStream", "md_doc_stream_8zh-cn.html#AutoUTFInputStream", null ],
-        [ "AutoUTFOutputStream", "md_doc_stream_8zh-cn.html#AutoUTFOutputStream", null ]
-      ] ],
-      [ "自定义流", "md_doc_stream_8zh-cn.html#CustomStream", [
-        [ "例子：istream 的包装类", "md_doc_stream_8zh-cn.html#ExampleIStreamWrapper", null ],
-        [ "例子：ostream 的包装类", "md_doc_stream_8zh-cn.html#ExampleOStreamWrapper", null ]
-      ] ],
-      [ "总结", "md_doc_stream_8zh-cn.html#Summary", null ]
-    ] ],
-    [ "编码", "md_doc_encoding_8zh-cn.html", [
-      [ "Unicode", "md_doc_encoding_8zh-cn.html#Unicode", [
-        [ "Unicode 转换格式", "md_doc_encoding_8zh-cn.html#UTF", null ],
-        [ "字符类型", "md_doc_encoding_8zh-cn.html#CharacterType", null ],
-        [ "AutoUTF", "md_doc_encoding_8zh-cn.html#AutoUTF", null ],
-        [ "ASCII", "md_doc_encoding_8zh-cn.html#ASCII", null ]
-      ] ],
-      [ "校验及转码", "md_doc_encoding_8zh-cn.html#ValidationTranscoding", [
-        [ "转码器", "md_doc_encoding_8zh-cn.html#Transcoder", null ]
-      ] ]
-    ] ],
-    [ "DOM", "md_doc_dom_8zh-cn.html", [
-      [ "模板", "md_doc_dom_8zh-cn.html#Template", [
-        [ "编码", "md_doc_dom_8zh-cn.html#Encoding", null ],
-        [ "分配器", "md_doc_dom_8zh-cn.html#Allocator", null ]
-      ] ],
-      [ "解析", "md_doc_dom_8zh-cn.html#Parsing", [
-        [ "解析错误", "md_doc_dom_8zh-cn.html#ParseError", null ],
-        [ "原位解析", "md_doc_dom_8zh-cn.html#InSituParsing", null ],
-        [ "转码与校验", "md_doc_dom_8zh-cn.html#TranscodingAndValidation", null ]
-      ] ],
-      [ "技巧", "md_doc_dom_8zh-cn.html#Techniques", [
-        [ "使用者缓冲区", "md_doc_dom_8zh-cn.html#UserBuffer", null ]
-      ] ]
-    ] ],
-    [ "SAX", "md_doc_sax_8zh-cn.html", [
-      [ "Reader", "md_doc_sax_8zh-cn.html#Reader", [
-        [ "处理器", "md_doc_sax_8zh-cn.html#Handler", null ],
-        [ "GenericReader", "md_doc_sax_8zh-cn.html#GenericReader", null ]
-      ] ],
-      [ "Writer", "md_doc_sax_8zh-cn.html#Writer", [
-        [ "PrettyWriter", "md_doc_sax_8zh-cn.html#PrettyWriter", null ],
-        [ "完整性及重置", "md_doc_sax_8zh-cn.html#CompletenessReset", null ],
-        [ "解析 JSON 至自定义结构", "md_doc_sax_8zh-cn.html#CustomDataStructure", null ],
-        [ "过滤 JSON", "md_doc_sax_8zh-cn.html#Filtering", null ]
-      ] ]
-    ] ],
-    [ "Schema", "md_doc_schema_8zh-cn.html", null ],
-    [ "性能", "md_doc_performance_8zh-cn.html", null ],
-    [ "内部架构", "md_doc_internals_8zh-cn.html", [
-      [ "架构", "md_doc_internals_8zh-cn.html#Architecture", null ],
-      [ "值（Value）", "md_doc_internals_8zh-cn.html#Value", [
-        [ "数据布局", "md_doc_internals_8zh-cn.html#DataLayout", null ],
-        [ "标志", "md_doc_internals_8zh-cn.html#Flags", null ],
-        [ "短字符串优化", "md_doc_internals_8zh-cn.html#ShortString", null ]
-      ] ],
-      [ "分配器（Allocator）", "md_doc_internals_8zh-cn.html#InternalAllocator", [
-        [ "MemoryPoolAllocator", "md_doc_internals_8zh-cn.html#MemoryPoolAllocator", null ]
-      ] ],
-      [ "解析优化", "md_doc_internals_8zh-cn.html#ParsingOptimization", [
-        [ "使用 SIMD 跳过空格", "md_doc_internals_8zh-cn.html#SkipwhitespaceWithSIMD", null ],
-        [ "局部流拷贝", "md_doc_internals_8zh-cn.html#LocalStreamCopy", null ],
-        [ "解析为双精度浮点数", "md_doc_internals_8zh-cn.html#ParsingDouble", null ]
-      ] ],
-      [ "生成优化", "md_doc_internals_8zh-cn.html#GenerationOptimization", [
-        [ "整数到字符串的转换", "md_doc_internals_8zh-cn.html#itoa", null ],
-        [ "双精度浮点数到字符串的转换", "md_doc_internals_8zh-cn.html#dtoa", null ]
-      ] ],
-      [ "解析器", "md_doc_internals_8zh-cn.html#Parser", [
-        [ "迭代解析", "md_doc_internals_8zh-cn.html#IterativeParser", [
-          [ "语法", "md_doc_internals_8zh-cn.html#IterativeParserGrammar", null ],
-          [ "解析表", "md_doc_internals_8zh-cn.html#IterativeParserParsingTable", null ],
-          [ "实现", "md_doc_internals_8zh-cn.html#IterativeParserImplementation", null ]
-        ] ]
-      ] ]
-    ] ],
-    [ "常见问题", "md_doc_faq_8zh-cn.html", null ],
-    [ "模块", "modules.html", "modules" ],
-    [ "命名空间成员", "namespacemembers.html", [
-      [ "全部", "namespacemembers.html", null ],
-      [ "函数", "namespacemembers_func.html", null ],
-      [ "类型定义", "namespacemembers_type.html", null ],
-      [ "枚举", "namespacemembers_enum.html", null ],
-      [ "枚举值", "namespacemembers_eval.html", null ]
-    ] ],
-    [ "类", null, [
-      [ "类列表", "annotated.html", "annotated" ],
-      [ "类继承关系", "hierarchy.html", "hierarchy" ],
-      [ "类成员", "functions.html", [
-        [ "全部", "functions.html", "functions_dup" ],
-        [ "函数", "functions_func.html", "functions_func" ],
-        [ "变量", "functions_vars.html", null ],
-        [ "类型定义", "functions_type.html", null ],
-        [ "相关函数", "functions_rela.html", null ]
-      ] ]
-    ] ],
-    [ "文件", null, [
-      [ "文件列表", "files.html", "files" ],
-      [ "文件成员", "globals.html", [
-        [ "全部", "globals.html", null ],
-        [ "宏定义", "globals_defs.html", null ]
-      ] ]
-    ] ]
-  ] ]
-];
-
-var NAVTREEINDEX =
-[
-"allocators_8h_source.html",
-"classrapidjson_1_1_generic_object.html#ae38ccb43fb8bbd15ebcfbfb7ef02b6ce",
-"classrapidjson_1_1_generic_value.html#acf5019b9002ebfd66a1191d19e986c7b",
-"group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga77005e892e6601599beaf421b0395c31",
-"structrapidjson_1_1_base_reader_handler.html#a9627844582969a7d79a2250bdb4f9ec0"
-];
-
-var SYNCONMSG = 'click to disable panel synchronisation';
-var SYNCOFFMSG = 'click to enable panel synchronisation';
 var navTreeSubIndices = new Array();
+var arrowDown = '&#9660;';
+var arrowRight = '&#9658;';
 
 function getData(varName)
 {
@@ -238,17 +73,17 @@ function cachedLink()
 
 function getScript(scriptName,func,show)
 {
-  var head = document.getElementsByTagName("head")[0]; 
+  var head = document.getElementsByTagName("head")[0];
   var script = document.createElement('script');
   script.id = scriptName;
   script.type = 'text/javascript';
-  script.onload = func; 
-  script.src = scriptName+'.js'; 
-  if ($.browser.msie && $.browser.version<=8) { 
+  script.onload = func;
+  script.src = scriptName+'.js';
+  if ($.browser.msie && $.browser.version<=8) {
     // script.onload does not work with older versions of IE
     script.onreadystatechange = function() {
-      if (script.readyState=='complete' || script.readyState=='loaded') { 
-        func(); if (show) showRoot(); 
+      if (script.readyState=='complete' || script.readyState=='loaded') {
+        func(); if (show) showRoot();
       }
     }
   }
@@ -261,18 +96,17 @@ function createIndent(o,domNode,node,level)
   var n = node;
   while (n.parentNode) { level++; n=n.parentNode; }
   if (node.childrenData) {
-    var imgNode = document.createElement("img");
+    var imgNode = document.createElement("span");
+    imgNode.className = 'arrow';
     imgNode.style.paddingLeft=(16*level).toString()+'px';
-    imgNode.width  = 16;
-    imgNode.height = 22;
-    imgNode.border = 0;
+    imgNode.innerHTML=arrowRight;
     node.plus_img = imgNode;
     node.expandToggle = document.createElement("a");
     node.expandToggle.href = "javascript:void(0)";
     node.expandToggle.onclick = function() {
       if (node.expanded) {
         $(node.getChildrenUL()).slideUp("fast");
-        node.plus_img.src = node.relpath+"ftv2pnode.png";
+        node.plus_img.innerHTML=arrowRight;
         node.expanded = false;
       } else {
         expandNode(o, node, false, false);
@@ -280,15 +114,13 @@ function createIndent(o,domNode,node,level)
     }
     node.expandToggle.appendChild(imgNode);
     domNode.appendChild(node.expandToggle);
-    imgNode.src = node.relpath+"ftv2pnode.png";
   } else {
     var span = document.createElement("span");
-    span.style.display = 'inline-block';
+    span.className = 'arrow';
     span.style.width   = 16*(level+1)+'px';
-    span.style.height  = '22px';
     span.innerHTML = '&#160;';
     domNode.appendChild(span);
-  } 
+  }
 }
 
 var animationInProgress = false;
@@ -362,7 +194,7 @@ function newNode(o, po, text, link, childrenData, lastNode)
       var aname = '#'+link.split('#')[1];
       var srcPage = stripPath(pathName());
       var targetPage = stripPath(link.split('#')[0]);
-      a.href = srcPage!=targetPage ? url : "javascript:void(0)"; 
+      a.href = srcPage!=targetPage ? url : "javascript:void(0)";
       a.onclick = function(){
         storeLink(link);
         if (!$(a).parent().parent().hasClass('selected'))
@@ -380,7 +212,7 @@ function newNode(o, po, text, link, childrenData, lastNode)
       a.onclick = function() { storeLink(link); }
     }
   } else {
-    if (childrenData != null) 
+    if (childrenData != null)
     {
       a.className = "nolink";
       a.href = "javascript:void(0)";
@@ -429,17 +261,13 @@ function expandNode(o, node, imm, showRoot)
     } else {
       if (!node.childrenVisited) {
         getNode(o, node);
-      } if (imm || ($.browser.msie && $.browser.version>8)) { 
+      } if (imm || ($.browser.msie && $.browser.version>8)) {
         // somehow slideDown jumps to the start of tree for IE9 :-(
         $(node.getChildrenUL()).show();
       } else {
         $(node.getChildrenUL()).slideDown("fast");
       }
-      if (node.isLast) {
-        node.plus_img.src = node.relpath+"ftv2mlastnode.png";
-      } else {
-        node.plus_img.src = node.relpath+"ftv2mnode.png";
-      }
+      node.plus_img.innerHTML = arrowDown;
       node.expanded = true;
     }
   }
@@ -508,11 +336,7 @@ function showNode(o, node, index, hash)
         getNode(o, node);
       }
       $(node.getChildrenUL()).css({'display':'block'});
-      if (node.isLast) {
-        node.plus_img.src = node.relpath+"ftv2mlastnode.png";
-      } else {
-        node.plus_img.src = node.relpath+"ftv2mnode.png";
-      }
+      node.plus_img.innerHTML = arrowDown;
       node.expanded = true;
       var n = node.children[o.breadcrumbs[index]];
       if (index+1<o.breadcrumbs.length) {
@@ -649,10 +473,9 @@ function initNavTree(toroot,relpath)
   o.node.relpath = relpath;
   o.node.expanded = false;
   o.node.isLast = true;
-  o.node.plus_img = document.createElement("img");
-  o.node.plus_img.src = relpath+"ftv2pnode.png";
-  o.node.plus_img.width = 16;
-  o.node.plus_img.height = 22;
+  o.node.plus_img = document.createElement("span");
+  o.node.plus_img.className = 'arrow';
+  o.node.plus_img.innerHTML = arrowRight;
 
   if (localStorageSupported()) {
     var navSync = $('#nav-sync');
