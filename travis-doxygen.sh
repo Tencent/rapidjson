@@ -4,10 +4,9 @@
 
 set -e
 
-DOXYGEN_VER=doxygen-1.8.7
+DOXYGEN_VER=doxygen-1.8.13
 DOXYGEN_TAR=${DOXYGEN_VER}.linux.bin.tar.gz
 DOXYGEN_URL="http://ftp.stack.nl/pub/users/dimitri/${DOXYGEN_TAR}"
-DOXYGEN_BIN="/usr/local/bin/doxygen"
 
 : ${GITHUB_REPO:="miloyip/rapidjson"}
 GITHUB_HOST="github.com"
@@ -66,7 +65,7 @@ gh_pages_prepare()
 	[ ! -d "html" ] || \
 		abort "Doxygen target directory already exists."
 	git --version
-	git clone -b gh-pages "${GITHUB_CLONE}" html
+	git clone --single-branch -b gh-pages "${GITHUB_CLONE}" html
 	cd html
 	# setup git config (with defaults)
 	git config user.name "${GIT_NAME-travis}"
