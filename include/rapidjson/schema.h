@@ -1594,7 +1594,7 @@ public:
         ownStateAllocator_(0),
         schemaStack_(allocator, schemaStackCapacity),
         documentStack_(allocator, documentStackCapacity),
-        outputHandler_(CreateNullHandler()),
+        outputHandler_(0),
         valid_(true)
 #if RAPIDJSON_SCHEMA_VERBOSE
         , depth_(0)
@@ -1622,8 +1622,7 @@ public:
         ownStateAllocator_(0),
         schemaStack_(allocator, schemaStackCapacity),
         documentStack_(allocator, documentStackCapacity),
-        outputHandler_(outputHandler),
-        nullHandler_(0),
+        outputHandler_(&outputHandler),
         valid_(true)
 #if RAPIDJSON_SCHEMA_VERBOSE
         , depth_(0)
@@ -1634,10 +1633,6 @@ public:
     //! Destructor.
     ~GenericSchemaValidator() {
         Reset();
-        if (nullHandler_) {
-            nullHandler_->~OutputHandler();
-            StateAllocator::Free(nullHandler_);
-        }
         RAPIDJSON_DELETE(ownStateAllocator_);
     }
 
@@ -1699,7 +1694,7 @@ RAPIDJSON_MULTILINEMACRO_END
     }
 
 #define RAPIDJSON_SCHEMA_HANDLE_END_(method, arg2)\
-    return valid_ = EndValue() && outputHandler_.method arg2
+    return valid_ = EndValue() && (!outputHandler_ || outputHandler_->method arg2)
 
 #define RAPIDJSON_SCHEMA_HANDLE_VALUE_(method, arg1, arg2) \
     RAPIDJSON_SCHEMA_HANDLE_BEGIN_   (method, arg1);\
@@ -1721,7 +1716,7 @@ RAPIDJSON_MULTILINEMACRO_END
     bool StartObject() {
         RAPIDJSON_SCHEMA_HANDLE_BEGIN_(StartObject, (CurrentContext()));
         RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(StartObject, ());
-        return valid_ = outputHandler_.StartObject();
+        return valid_ = !outputHandler_ || outputHandler_->StartObject();
     }
     
     bool Key(const Ch* str, SizeType len, bool copy) {
@@ -1729,7 +1724,7 @@ RAPIDJSON_MULTILINEMACRO_END
         AppendToken(str, len);
         if (!CurrentSchema().Key(CurrentContext(), str, len, copy)) return valid_ = false;
         RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(Key, (str, len, copy));
-        return valid_ = outputHandler_.Key(str, len, copy);
+        return valid_ = !outputHandler_ || outputHandler_->Key(str, len, copy);
     }
     
     bool EndObject(SizeType memberCount) { 
@@ -1742,7 +1737,7 @@ RAPIDJSON_MULTILINEMACRO_END
     bool StartArray() {
         RAPIDJSON_SCHEMA_HANDLE_BEGIN_(StartArray, (CurrentContext()));
         RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(StartArray, ());
-        return valid_ = outputHandler_.StartArray();
+        return valid_ = !outputHandler_ || outputHandler_->StartArray();
     }
     
     bool EndArray(SizeType elementCount) {
@@ -1815,7 +1810,7 @@ private:
         ownStateAllocator_(0),
         schemaStack_(allocator, schemaStackCapacity),
         documentStack_(allocator, documentStackCapacity),
-        outputHandler_(CreateNullHandler()),
+        outputHandler_(0),
         valid_(true)
 #if RAPIDJSON_SCHEMA_VERBOSE
         , depth_(depth)
@@ -1929,10 +1924,6 @@ private:
     Context& CurrentContext() { return *schemaStack_.template Top<Context>(); }
     const Context& CurrentContext() const { return *schemaStack_.template Top<Context>(); }
 
-    OutputHandler& CreateNullHandler() {
-        return *(nullHandler_ = new (GetStateAllocator().Malloc(sizeof(OutputHandler))) OutputHandler);
-    }
-
     static const size_t kDefaultSchemaStackCapacity = 1024;
     static const size_t kDefaultDocumentStackCapacity = 256;
     const SchemaDocumentType* schemaDocument_;
@@ -1941,8 +1932,7 @@ private:
     StateAllocator* ownStateAllocator_;
     internal::Stack<StateAllocator> schemaStack_;    //!< stack to store the current path of schema (BaseSchemaType *)
     internal::Stack<StateAllocator> documentStack_;  //!< stack to store the current path of validating document (Ch)
-    OutputHandler& outputHandler_;
-    OutputHandler* nullHandler_;
+    OutputHandler* outputHandler_;
     bool valid_;
 #if RAPIDJSON_SCHEMA_VERBOSE
     unsigned depth_;
