@@ -168,7 +168,7 @@ public:
     size_t Size() const {
         size_t size = 0;
         for (ChunkHeader* c = chunkHead_; c != 0; c = c->next)
-            size += c->size;
+            size += sizeof(ChunkHeader) + c->size;
         return size;
     }
 
