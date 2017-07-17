@@ -168,7 +168,7 @@ public:
     size_t Size() const {
         size_t size = 0;
         for (ChunkHeader* c = chunkHead_; c != 0; c = c->next)
-            size += RAPIDJSON_ALIGN(sizeof(ChunkHeader)) + c->size;
+            size += sizeof(ChunkHeader) + c->size;
         return size;
     }
 
@@ -178,11 +178,9 @@ public:
             return NULL;
 
         size = RAPIDJSON_ALIGN(size);
-        if (chunkHead_ == 0 || chunkHead_->size + size > chunkHead_->capacity) {
-            size = chunk_capacity_ > size ? chunk_capacity_ : size;
-            if (!AddChunk(size))
+        if (chunkHead_ == 0 || chunkHead_->size + size > chunkHead_->capacity)
+            if (!AddChunk(chunk_capacity_ > size ? chunk_capacity_ : size))
                 return NULL;
-        }
 
         void *buffer = reinterpret_cast<char *>(chunkHead_) + RAPIDJSON_ALIGN(sizeof(ChunkHeader)) + chunkHead_->size;
         chunkHead_->size += size;
