@@ -166,9 +166,9 @@ public:
     /*! \return total used bytes.
     */
     size_t Size() const {
-        size_t size = 0;
+        size_t size = RAPIDJSON_ALIGN(sizeof(ChunkHeader));
         for (ChunkHeader* c = chunkHead_; c != 0; c = c->next)
-            size += RAPIDJSON_ALIGN(sizeof(ChunkHeader)) + c->size;
+            size += c->size;
         return size;
     }
 
