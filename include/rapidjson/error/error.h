@@ -71,6 +71,7 @@ enum ParseErrorCode {
 
     kParseErrorObjectMissName,                  //!< Missing a name for object member.
     kParseErrorObjectMissColon,                 //!< Missing a colon after a name of object member.
+    kParseErrorObjectMissEqual,                 //!< Missing a equal after a name of object member (\sa kParseEqualReplaceColon).
     kParseErrorObjectMissCommaOrCurlyBracket,   //!< Missing a comma or '}' after an object member.
 
     kParseErrorArrayMissCommaOrSquareBracket,   //!< Missing a comma or ']' after an array element.

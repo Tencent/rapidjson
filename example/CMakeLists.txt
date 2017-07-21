@@ -21,6 +21,7 @@ set(EXAMPLES
     simplereader
     simplepullreader
     simplewriter
+    sjson
     tutorial)
     
 include_directories("../include/")

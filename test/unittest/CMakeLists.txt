@@ -20,6 +20,7 @@ set(UNITTEST_SOURCES
     regextest.cpp
 	schematest.cpp
 	simdtest.cpp
+	sjsontest.cpp
     strfunctest.cpp
     stringbuffertest.cpp
     strtodtest.cpp
