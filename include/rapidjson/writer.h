@@ -73,7 +73,7 @@ enum WriteFlag {
     kWriteEqualReplaceColon = 16,   //!< sjson: = is used to define key-value pairs instead of the colon :
     kWriteCommasOmitted = 32,       //!< sjson: Commas are optional in object and array definitions (spaces used instead).
     kWriteDefaultFlags = RAPIDJSON_WRITE_DEFAULT_FLAGS, //!< Default write flags. Can be customized by defining RAPIDJSON_WRITE_DEFAULT_FLAGS
-    kWriteDefaultSJSONFlags = kWriteImplicitTopLevel | kWriteOmitKeyQuotes | kWriteEqualReplaceColon | kWriteCommasOmitted //!< Default write flags for sjson. Since sjson reading is compatible json, these aren't strictly necessary.
+    kWriteSJSONDefaultFlags = kWriteImplicitTopLevel | kWriteOmitKeyQuotes | kWriteEqualReplaceColon | kWriteCommasOmitted //!< Default write flags for sjson. Since sjson reading is compatible json, these aren't strictly necessary.
 };
 
 //! JSON writer
