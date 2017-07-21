@@ -381,7 +381,7 @@ protected:
     }
 
     bool WriteString(const Ch* str, SizeType length, bool key = false)  {
-        (key); // avoid warning.
+        (void)key; // avoid warning.
         static const typename OutputStream::Ch hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
         static const char escape[256] = {
 #define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0

@@ -747,7 +747,7 @@ private:
     // Parse object: { string : value, ... }
     template<unsigned parseFlags, typename InputStream, typename Handler>
     void ParseObject(InputStream& is, Handler& handler, bool top_level = false) {
-        top_level; // avoid warning.
+        (void)top_level; // avoid warning.
         if (!((parseFlags & kParseImplicitTopLevel) && top_level)) {
             RAPIDJSON_ASSERT(is.Peek() == '{');
             is.Take();  // Skip '{'
