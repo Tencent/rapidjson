@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
         if (!strcmp(argv[i], "--sjson-output"))
             json_output = false;
         else if (!strcmp(argv[i], "--no-pretty"))
-            pretty_output = true;
+            pretty_output = false;
         else if (!strcmp(argv[i], "--help")) {
             fprintf(stdout, "--sjson-output  Output file is in written with sjson simplifications (not compatible with json-only readers).\n");
             fprintf(stdout, "--no-pretty     Output is condensed (otherwise, PrettyWriter is used).\n");
@@ -53,6 +53,7 @@ int main(int argc, char* argv[]) {
     if (!json_output) {
         if (pretty_output) {
             PrettyWriter<FileWriteStream, UTF8<>, UTF8<>, CrtAllocator, kWriteDefaultSJSONFlags> writer(os);
+            writer.SetFormatOptions(kFormatSingleLineArray);
             return performParsing(reader, writer, is);
         }
         else {
@@ -63,6 +64,7 @@ int main(int argc, char* argv[]) {
     else {
         if (pretty_output) {
             PrettyWriter<FileWriteStream> writer(os);
+            writer.SetFormatOptions(kFormatSingleLineArray);
             return performParsing(reader, writer, is);
         }
         else {
