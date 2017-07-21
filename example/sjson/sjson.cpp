@@ -17,7 +17,7 @@ using namespace rapidjson;
 template<typename ReaderType, typename WriterType> 
 int performParsing(ReaderType& reader, WriterType& writer, FileReadStream& is) {
     // JSON reader parse from the input stream and let writer generate the output.
-    if (!reader.Parse<kParseSJSONDefaultFlags>(is, writer)) {
+    if (reader.Parse<kParseSJSONDefaultFlags>(is, writer).IsError()) {
         fprintf(stderr, "\nError(%u): %s\n", static_cast<unsigned>(reader.GetErrorOffset()), GetParseError_En(reader.GetParseErrorCode()));
         return 1;
     }
@@ -52,12 +52,12 @@ int main(int argc, char* argv[]) {
 
     if (!json_output) {
         if (pretty_output) {
-            PrettyWriter<FileWriteStream, UTF8<>, UTF8<>, CrtAllocator, kWriteDefaultSJSONFlags> writer(os);
+            PrettyWriter<FileWriteStream, UTF8<>, UTF8<>, CrtAllocator, kWriteSJSONDefaultFlags> writer(os);
             writer.SetFormatOptions(kFormatSingleLineArray);
             return performParsing(reader, writer, is);
         }
         else {
-            Writer<FileWriteStream, UTF8<>, UTF8<>, CrtAllocator, kWriteDefaultSJSONFlags> writer(os);
+            Writer<FileWriteStream, UTF8<>, UTF8<>, CrtAllocator, kWriteSJSONDefaultFlags> writer(os);
             return performParsing(reader, writer, is);
         }
     }
