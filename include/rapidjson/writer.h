@@ -471,7 +471,7 @@ protected:
     }
     bool WriteEndObject()   
     { 
-        if (!(writeFlags & kWriteImplicitTopLevel) || level_stack_.GetSize() > sizeof(Level))
+        if (!(writeFlags & kWriteImplicitTopLevel) || level_stack_.GetSize() > 0)
             os_->Put('}');
         return true; 
     }
