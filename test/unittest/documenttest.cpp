@@ -290,6 +290,14 @@ TEST(Document, ParseStream_AutoUTFInputStream) {
     EXPECT_EQ(0, memcmp(bos.GetString(), bos2.GetString(), bos2.GetSize()));
 }
 
+TEST(Document, Assignment) {
+    Value x(1234);
+    Document d;
+    d = x;
+    EXPECT_TRUE(x.IsNull());    // move semantic
+    EXPECT_EQ(1234, d.GetInt());
+}
+
 TEST(Document, Swap) {
     Document d1;
     Document::AllocatorType& a = d1.GetAllocator();
@@ -300,7 +308,14 @@ TEST(Document, Swap) {
     o.SetObject().AddMember("a", 1, a);
 
     // Swap between Document and Value
-    // d1.Swap(o); // doesn't compile
+    d1.Swap(o);
+    EXPECT_TRUE(d1.IsObject());
+    EXPECT_TRUE(o.IsArray());
+
+    d1.Swap(o);
+    EXPECT_TRUE(d1.IsArray());
+    EXPECT_TRUE(o.IsObject());
+
     o.Swap(d1);
     EXPECT_TRUE(d1.IsObject());
     EXPECT_TRUE(o.IsArray());
