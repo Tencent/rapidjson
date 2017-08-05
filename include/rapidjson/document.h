@@ -2168,6 +2168,10 @@ public:
     }
 #endif
 
+    // Allow assignment from ValueType.
+    // Refer to Effective C++ 3rd Edition/Item 33: Avoid hiding inherited names.
+    using ValueType::operator=;
+
     //! Exchange the contents of this document with those of another.
     /*!
         \param rhs Another document.
@@ -2182,6 +2186,10 @@ public:
         internal::Swap(parseResult_, rhs.parseResult_);
         return *this;
     }
+
+    // Allow Swap from ValueType.
+    // Refer to Effective C++ 3rd Edition/Item 33: Avoid hiding inherited names.
+    using ValueType::Swap;
 
     //! free-standing swap function helper
     /*!
