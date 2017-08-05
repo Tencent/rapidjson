@@ -1,6 +1,6 @@
-![](doc/logo/rapidjson.png)
+![RapidJSON logo](doc/logo/rapidjson.png)
 
-![](https://img.shields.io/badge/release-v1.1.0-blue.png)
+![Release version](https://img.shields.io/badge/release-v1.1.0-blue.svg)
 
 ## 高效的 C++ JSON 解析／生成器，提供 SAX 及 DOM 风格 API
 
@@ -20,12 +20,12 @@ Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights 
 | :---------------: | :-----------------: | :-------------------: |
 | ![lin-badge]      | ![win-badge]        | ![cov-badge]          |
 
-[lin-badge]: https://travis-ci.org/miloyip/rapidjson.png?branch=master "Travis build status"
+[lin-badge]: https://travis-ci.org/miloyip/rapidjson.svg?branch=master "Travis build status"
 [lin-link]:  https://travis-ci.org/miloyip/rapidjson "Travis build status"
-[win-badge]: https://ci.appveyor.com/api/projects/status/u658dcuwxo14a8m9/branch/master "AppVeyor build status"
+[win-badge]: https://ci.appveyor.com/api/projects/status/github/miloyip/rapidjson?branch=master&svg=true "AppVeyor build status"
 [win-link]:  https://ci.appveyor.com/project/miloyip/rapidjson/branch/master "AppVeyor build status"
-[cov-badge]: https://coveralls.io/repos/miloyip/rapidjson/badge.png?branch=master
-[cov-link]:  https://coveralls.io/r/miloyip/rapidjson?branch=master
+[cov-badge]: https://coveralls.io/repos/miloyip/rapidjson/badge.svg?branch=master "Coveralls coverage"
+[cov-link]:  https://coveralls.io/r/miloyip/rapidjson?branch=master "Coveralls coverage"
 
 ## 简介
 
@@ -45,8 +45,8 @@ RapidJSON 是一个 C++ 的 JSON 解析器及生成器。它的灵感来自 [Rap
 
 JSON（JavaScript Object Notation）是一个轻量的数据交换格式。RapidJSON 应该完全遵从 RFC7159/ECMA-404，并支持可选的放宽语法。 关于 JSON 的更多信息可参考：
 * [Introducing JSON](http://json.org/)
-* [RFC7159: The JavaScript Object Notation (JSON) Data Interchange Format](http://www.ietf.org/rfc/rfc7159.txt)
-* [Standard ECMA-404: The JSON Data Interchange Format](http://www.ecma-international.org/publications/standards/Ecma-404.htm)
+* [RFC7159: The JavaScript Object Notation (JSON) Data Interchange Format](https://tools.ietf.org/html/rfc7159)
+* [Standard ECMA-404: The JSON Data Interchange Format](https://www.ecma-international.org/publications/standards/Ecma-404.htm)
 
 ## v1.1 中的亮点 (2016-8-25)
 
@@ -73,9 +73,9 @@ RapidJSON 是跨平台的。以下是一些曾测试的平台／编译器组合�
 RapidJSON 是只有头文件的 C++ 库。只需把 `include/rapidjson` 目录复制至系统或项目的 include 目录中。
 
 RapidJSON 依赖于以下软件：
-* [CMake](http://www.cmake.org) 作为通用生成工具
-* (optional)[Doxygen](http://www.doxygen.org) 用于生成文档
-* (optional)[googletest](https://code.google.com/p/googletest/) 用于单元及性能测试
+* [CMake](https://cmake.org/) 作为通用生成工具
+* (optional) [Doxygen](http://www.doxygen.org) 用于生成文档
+* (optional) [googletest](https://github.com/google/googletest) 用于单元及性能测试
 
 生成测试及例子的步骤：
 
@@ -131,22 +131,22 @@ int main() {
 还有许多 [例子](https://github.com/miloyip/rapidjson/tree/master/example) 可供参考：
 
 * DOM API
- * [tutorial](https://github.com/miloyip/rapidjson/blob/master/example/tutorial/tutorial.cpp): DOM API 的基本使用方法。
+  * [tutorial](https://github.com/miloyip/rapidjson/blob/master/example/tutorial/tutorial.cpp): DOM API 的基本使用方法。
 
 * SAX API
- * [simplereader](https://github.com/miloyip/rapidjson/blob/master/example/simplereader/simplereader.cpp): 使用 `Reader` 解析 JSON 时，打印所有 SAX 事件。
- * [condense](https://github.com/miloyip/rapidjson/blob/master/example/condense/condense.cpp): 移除 JSON 中所有空白符的命令行工具。
- * [pretty](https://github.com/miloyip/rapidjson/blob/master/example/pretty/pretty.cpp): 为 JSON 加入缩进与换行的命令行工具，当中使用了 `PrettyWriter`。
- * [capitalize](https://github.com/miloyip/rapidjson/blob/master/example/capitalize/capitalize.cpp): 把 JSON 中所有字符串改为大写的命令行工具。
- * [messagereader](https://github.com/miloyip/rapidjson/blob/master/example/messagereader/messagereader.cpp): 使用 SAX API 去解析一个 JSON 报文。
- * [serialize](https://github.com/miloyip/rapidjson/blob/master/example/serialize/serialize.cpp): 使用 SAX API 去序列化 C++ 对象，生成 JSON。
- * [jsonx](https://github.com/miloyip/rapidjson/blob/master/example/jsonx/jsonx.cpp): 实现了一个 `JsonxWriter`，它能把 SAX 事件写成 [JSONx](https://www-01.ibm.com/support/knowledgecenter/SS9H2Y_7.1.0/com.ibm.dp.doc/json_jsonx.html)（一种 XML）格式。这个例子是把 JSON 输入转换成 JSONx 格式的命令行工具。
+  * [simplereader](https://github.com/miloyip/rapidjson/blob/master/example/simplereader/simplereader.cpp): 使用 `Reader` 解析 JSON 时，打印所有 SAX 事件。
+  * [condense](https://github.com/miloyip/rapidjson/blob/master/example/condense/condense.cpp): 移除 JSON 中所有空白符的命令行工具。
+  * [pretty](https://github.com/miloyip/rapidjson/blob/master/example/pretty/pretty.cpp): 为 JSON 加入缩进与换行的命令行工具，当中使用了 `PrettyWriter`。
+  * [capitalize](https://github.com/miloyip/rapidjson/blob/master/example/capitalize/capitalize.cpp): 把 JSON 中所有字符串改为大写的命令行工具。
+  * [messagereader](https://github.com/miloyip/rapidjson/blob/master/example/messagereader/messagereader.cpp): 使用 SAX API 去解析一个 JSON 报文。
+  * [serialize](https://github.com/miloyip/rapidjson/blob/master/example/serialize/serialize.cpp): 使用 SAX API 去序列化 C++ 对象，生成 JSON。
+  * [jsonx](https://github.com/miloyip/rapidjson/blob/master/example/jsonx/jsonx.cpp): 实现了一个 `JsonxWriter`，它能把 SAX 事件写成 [JSONx](https://www-01.ibm.com/support/knowledgecenter/SS9H2Y_7.1.0/com.ibm.dp.doc/json_jsonx.html)（一种 XML）格式。这个例子是把 JSON 输入转换成 JSONx 格式的命令行工具。
 
 * Schema API
- * [schemavalidator](https://github.com/miloyip/rapidjson/blob/master/example/schemavalidator/schemavalidator.cpp): 使用 JSON Schema 去校验 JSON 的命令行工具。
- 
+  * [schemavalidator](https://github.com/miloyip/rapidjson/blob/master/example/schemavalidator/schemavalidator.cpp): 使用 JSON Schema 去校验 JSON 的命令行工具。
+
 * 进阶
- * [prettyauto](https://github.com/miloyip/rapidjson/blob/master/example/prettyauto/prettyauto.cpp): [pretty](https://github.com/miloyip/rapidjson/blob/master/example/pretty/pretty.cpp) 的修改版本，可自动处理任何 UTF 编码的 JSON。
- * [parsebyparts](https://github.com/miloyip/rapidjson/blob/master/example/parsebyparts/parsebyparts.cpp): 这例子中的 `AsyncDocumentParser` 类使用 C++ 线程来逐段解析 JSON。
- * [filterkey](https://github.com/miloyip/rapidjson/blob/master/example/filterkey/filterkey.cpp): 移取使用者指定的键值的命令行工具。
- * [filterkeydom](https://github.com/miloyip/rapidjson/blob/master/example/filterkey/filterkey.cpp): 如上的工具，但展示如何使用生成器（generator）去填充一个 `Document`。
+  * [prettyauto](https://github.com/miloyip/rapidjson/blob/master/example/prettyauto/prettyauto.cpp): [pretty](https://github.com/miloyip/rapidjson/blob/master/example/pretty/pretty.cpp) 的修改版本，可自动处理任何 UTF 编码的 JSON。
+  * [parsebyparts](https://github.com/miloyip/rapidjson/blob/master/example/parsebyparts/parsebyparts.cpp): 这例子中的 `AsyncDocumentParser` 类使用 C++ 线程来逐段解析 JSON。
+  * [filterkey](https://github.com/miloyip/rapidjson/blob/master/example/filterkey/filterkey.cpp): 移取使用者指定的键值的命令行工具。
+  * [filterkeydom](https://github.com/miloyip/rapidjson/blob/master/example/filterkey/filterkey.cpp): 如上的工具，但展示如何使用生成器（generator）去填充一个 `Document`。

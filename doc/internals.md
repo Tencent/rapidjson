@@ -183,17 +183,20 @@ void SkipWhitespace(InputStream& s) {
 
 However, this requires 4 comparisons and a few branching for each character. This was found to be a hot spot.
 
-To accelerate this process, SIMD was applied to compare 16 characters with 4 white spaces for each iteration. Currently RapidJSON only supports SSE2 and SSE4.2 instructions for this. And it is only activated for UTF-8 memory streams, including string stream or *in situ* parsing. 
+To accelerate this process, SIMD was applied to compare 16 characters with 4 white spaces for each iteration. Currently RapidJSON supports SSE2, SSE4.2 and ARM Neon instructions for this. And it is only activated for UTF-8 memory streams, including string stream or *in situ* parsing.
 
-To enable this optimization, need to define `RAPIDJSON_SSE2` or `RAPIDJSON_SSE42` before including `rapidjson.h`. Some compilers can detect the setting, as in `perftest.h`:
+To enable this optimization, need to define `RAPIDJSON_SSE2`, `RAPIDJSON_SSE42` or `RAPIDJSON_NEON` before including `rapidjson.h`. Some compilers can detect the setting, as in `perftest.h`:
 
 ~~~cpp
 // __SSE2__ and __SSE4_2__ are recognized by gcc, clang, and the Intel compiler.
 // We use -march=native with gmake to enable -msse2 and -msse4.2, if supported.
+// Likewise, __ARM_NEON is used to detect Neon.
 #if defined(__SSE4_2__)
 #  define RAPIDJSON_SSE42
 #elif defined(__SSE2__)
 #  define RAPIDJSON_SSE2
+#elif defined(__ARM_NEON)
+#  define RAPIDJSON_NEON
 #endif
 ~~~
 

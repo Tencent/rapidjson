@@ -2,7 +2,7 @@
 
 This tutorial introduces the basics of the Document Object Model(DOM) API.
 
-As shown in [Usage at a glance](@ref index), a JSON can be parsed into DOM, and then the DOM can be queried and modified easily, and finally be converted back to JSON.
+As shown in [Usage at a glance](@ref index), JSON can be parsed into a DOM, and then the DOM can be queried and modified easily, and finally be converted back to JSON.
 
 [TOC]
 
@@ -14,7 +14,7 @@ Each JSON value is stored in a type called `Value`. A `Document`, representing t
 
 In this section, we will use excerpt of `example/tutorial/tutorial.cpp`.
 
-Assumes we have a JSON stored in a C string (`const char* json`):
+Assume we have the following JSON stored in a C string (`const char* json`):
 ~~~~~~~~~~js
 {
     "hello": "world",
@@ -55,7 +55,7 @@ printf("hello = %s\n", document["hello"].GetString());
 ~~~~~~~~~~
 
 ~~~~~~~~~~
-world
+hello = world
 ~~~~~~~~~~
 
 JSON true/false values are represented as `bool`.
@@ -65,16 +65,16 @@ printf("t = %s\n", document["t"].GetBool() ? "true" : "false");
 ~~~~~~~~~~
 
 ~~~~~~~~~~
-true
+t = true
 ~~~~~~~~~~
 
-JSON null can be queryed by `IsNull()`.
+JSON null can be queryed with `IsNull()`.
 ~~~~~~~~~~cpp
 printf("n = %s\n", document["n"].IsNull() ? "null" : "?");
 ~~~~~~~~~~
 
 ~~~~~~~~~~
-null
+n = null
 ~~~~~~~~~~
 
 JSON number type represents all numeric values. However, C++ needs more specific type for manipulation.
@@ -115,15 +115,15 @@ a[3] = 4
 
 Note that, RapidJSON does not automatically convert values between JSON types. If a value is a string, it is invalid to call `GetInt()`, for example. In debug mode it will fail an assertion. In release mode, the behavior is undefined.
 
-In the following, details about querying individual types are discussed.
+In the following sections we discuss details about querying individual types.
 
 ## Query Array {#QueryArray}
 
-By default, `SizeType` is typedef of `unsigned`. In most systems, array is limited to store up to 2^32-1 elements.
+By default, `SizeType` is typedef of `unsigned`. In most systems, an array is limited to store up to 2^32-1 elements.
 
-You may access the elements in array by integer literal, for example, `a[0]`, `a[1]`, `a[2]`.
+You may access the elements in an array by integer literal, for example, `a[0]`, `a[1]`, `a[2]`.
 
-Array is similar to `std::vector`, instead of using indices, you may also use iterator to access all the elements.
+Array is similar to `std::vector`: instead of using indices, you may also use iterator to access all the elements.
 ~~~~~~~~~~cpp
 for (Value::ConstValueIterator itr = a.Begin(); itr != a.End(); ++itr)
     printf("%d ", itr->GetInt());
@@ -144,7 +144,7 @@ for (auto& v : a.GetArray())
 
 ## Query Object {#QueryObject}
 
-Similar to array, we can access all object members by iterator:
+Similar to Array, we can access all object members by iterator:
 
 ~~~~~~~~~~cpp
 static const char* kTypeNames[] = 
@@ -190,11 +190,11 @@ for (auto& m : document.GetObject())
 
 ## Querying Number {#QueryNumber}
 
-JSON provide a single numerical type called Number. Number can be integer or real numbers. RFC 4627 says the range of Number is specified by parser.
+JSON provides a single numerical type called Number. Number can be an integer or a real number. RFC 4627 says the range of Number is specified by the parser implementation.
 
-As C++ provides several integer and floating point number types, the DOM tries to handle these with widest possible range and good performance.
+As C++ provides several integer and floating point number types, the DOM tries to handle these with the widest possible range and good performance.
 
-When a Number is parsed, it is stored in the DOM as either one of the following type:
+When a Number is parsed, it is stored in the DOM as one of the following types:
 
 Type       | Description
 -----------|---------------------------------------
@@ -204,7 +204,7 @@ Type       | Description
 `int64_t`  | 64-bit signed integer
 `double`   | 64-bit double precision floating point
 
-When querying a number, you can check whether the number can be obtained as target type:
+When querying a number, you can check whether the number can be obtained as the target type:
 
 Checking          | Obtaining
 ------------------|---------------------
@@ -215,9 +215,9 @@ Checking          | Obtaining
 `bool IsInt64()`  | `int64_t GetInt64()`
 `bool IsDouble()` | `double GetDouble()`
 
-Note that, an integer value may be obtained in various ways without conversion. For example, A value `x` containing 123 will make `x.IsInt() == x.IsUint() == x.IsInt64() == x.IsUint64() == true`. But a value `y` containing -3000000000 will only makes `x.IsInt64() == true`.
+Note that, an integer value may be obtained in various ways without conversion. For example, A value `x` containing 123 will make `x.IsInt() == x.IsUint() == x.IsInt64() == x.IsUint64() == true`. But a value `y` containing -3000000000 will only make `x.IsInt64() == true`.
 
-When obtaining the numeric values, `GetDouble()` will convert internal integer representation to a `double`. Note that, `int` and `unsigned` can be safely convert to `double`, but `int64_t` and `uint64_t` may lose precision (since mantissa of `double` is only 52-bits).
+When obtaining the numeric values, `GetDouble()` will convert internal integer representation to a `double`. Note that, `int` and `unsigned` can be safely converted to `double`, but `int64_t` and `uint64_t` may lose precision (since mantissa of `double` is only 52-bits).
 
 ## Query String {#QueryString}
 
@@ -225,7 +225,7 @@ In addition to `GetString()`, the `Value` class also contains `GetStringLength()
 
 According to RFC 4627, JSON strings can contain Unicode character `U+0000`, which must be escaped as `"\u0000"`. The problem is that, C/C++ often uses null-terminated string, which treats ``\0'` as the terminator symbol.
 
-To conform RFC 4627, RapidJSON supports string containing `U+0000`. If you need to handle this, you can use `GetStringLength()` API to obtain the correct length of string.
+To conform RFC 4627, RapidJSON supports string containing `U+0000`. If you need to handle this, you can use `GetStringLength()` to obtain the correct string length.
 
 For example, after parsing a the following JSON to `Document d`:
 
@@ -360,14 +360,14 @@ a.PushBack(Value(42).Move(), allocator);   // same as above
 ~~~~~~~~~~
 
 ## Create String {#CreateString}
-RapidJSON provide two strategies for storing string.
+RapidJSON provides two strategies for storing string.
 
 1. copy-string: allocates a buffer, and then copy the source data into it.
 2. const-string: simply store a pointer of string.
 
-Copy-string is always safe because it owns a copy of the data. Const-string can be used for storing string literal, and in-situ parsing which we will mentioned in Document section.
+Copy-string is always safe because it owns a copy of the data. Const-string can be used for storing a string literal, and for in-situ parsing which will be mentioned in the DOM section.
 
-To make memory allocation customizable, RapidJSON requires user to pass an instance of allocator, whenever an operation may require allocation. This design is needed to prevent storing a allocator (or Document) pointer per Value.
+To make memory allocation customizable, RapidJSON requires users to pass an instance of allocator, whenever an operation may require allocation. This design is needed to prevent storing a allocator (or Document) pointer per Value.
 
 Therefore, when we assign a copy-string, we call this overloaded `SetString()` with allocator:
 
@@ -385,7 +385,7 @@ In this example, we get the allocator from a `Document` instance. This is a comm
 
 Besides, the above `SetString()` requires length. This can handle null characters within a string. There is another `SetString()` overloaded function without the length parameter. And it assumes the input is null-terminated and calls a `strlen()`-like function to obtain the length.
 
-Finally, for string literal or string with safe life-cycle can use const-string version of `SetString()`, which lacks allocator parameter.  For string literals (or constant character arrays), simply passing the literal as parameter is safe and efficient:
+Finally, for a string literal or string with a safe life-cycle one can use the const-string version of `SetString()`, which lacks an allocator parameter.  For string literals (or constant character arrays), simply passing the literal as parameter is safe and efficient:
 
 ~~~~~~~~~~cpp
 Value s;
@@ -393,7 +393,7 @@ s.SetString("rapidjson");    // can contain null character, length derived at co
 s = "rapidjson";             // shortcut, same as above
 ~~~~~~~~~~
 
-For character pointer, the RapidJSON requires to mark it as safe before using it without copying. This can be achieved by using the `StringRef` function:
+For a character pointer, RapidJSON requires it to be marked as safe before using it without copying. This can be achieved by using the `StringRef` function:
 
 ~~~~~~~~~cpp
 const char * cstr = getenv("USER");
@@ -408,7 +408,7 @@ s = StringRef(cstr,cstr_len);          // shortcut, same as above
 ~~~~~~~~~
 
 ## Modify Array {#ModifyArray}
-Value with array type provides similar APIs as `std::vector`.
+Value with array type provides an API similar to `std::vector`.
 
 * `Clear()`
 * `Reserve(SizeType, Allocator&)`
@@ -418,7 +418,7 @@ Value with array type provides similar APIs as `std::vector`.
 * `ValueIterator Erase(ConstValueIterator pos)`
 * `ValueIterator Erase(ConstValueIterator first, ConstValueIterator last)`
 
-Note that, `Reserve(...)` and `PushBack(...)` may allocate memory for the array elements, therefore require an allocator.
+Note that, `Reserve(...)` and `PushBack(...)` may allocate memory for the array elements, therefore requiring an allocator.
 
 Here is an example of `PushBack()`:
 
@@ -433,7 +433,7 @@ for (int i = 5; i <= 10; i++)
 a.PushBack("Lua", allocator).PushBack("Mio", allocator);
 ~~~~~~~~~~
 
-Differs from STL, `PushBack()`/`PopBack()` returns the array reference itself. This is called _fluent interface_.
+This API differs from STL in that `PushBack()`/`PopBack()` return the array reference itself. This is called _fluent interface_.
 
 If you want to add a non-constant string or a string without sufficient lifetime (see [Create String](#CreateString)) to the array, you need to create a string Value by using the copy-string API.  To avoid the need for an intermediate variable, you can use a [temporary value](#TemporaryValues) in place:
 
@@ -448,7 +448,7 @@ contact.PushBack(val, document.GetAllocator());
 ~~~~~~~~~~
 
 ## Modify Object {#ModifyObject}
-Object is a collection of key-value pairs (members). Each key must be a string value. To modify an object, either add or remove members. THe following APIs are for adding members:
+The Object class is a collection of key-value pairs (members). Each key must be a string value. To modify an object, either add or remove members. The following API is for adding members:
 
 * `Value& AddMember(Value&, Value&, Allocator& allocator)`
 * `Value& AddMember(StringRefType, Value&, Allocator&)`
@@ -462,7 +462,7 @@ contact.AddMember("name", "Milo", document.GetAllocator());
 contact.AddMember("married", true, document.GetAllocator());
 ~~~~~~~~~~
 
-The name parameter with `StringRefType` is similar to the interface of `SetString` function for string values. These overloads are used to avoid the need for copying the `name` string, as constant key names are very common in JSON objects.
+The name parameter with `StringRefType` is similar to the interface of the `SetString` function for string values. These overloads are used to avoid the need for copying the `name` string, since constant key names are very common in JSON objects.
 
 If you need to create a name from a non-constant string or a string without sufficient lifetime (see [Create String](#CreateString)), you need to create a string Value by using the copy-string API.  To avoid the need for an intermediate variable, you can use a [temporary value](#TemporaryValues) in place:
 

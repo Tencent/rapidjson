@@ -1281,6 +1281,12 @@ TEST(SchemaValidatingWriter, Simple) {
     EXPECT_TRUE(validator.GetInvalidDocumentPointer() == SchemaDocument::PointerType(""));
 }
 
+TEST(Schema, Issue848) {
+    rapidjson::Document d;
+    rapidjson::SchemaDocument s(d);
+    rapidjson::GenericSchemaValidator<rapidjson::SchemaDocument, rapidjson::Document> v(s);
+}
+
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
 static SchemaDocument ReturnSchemaDocument() {
@@ -1306,6 +1312,40 @@ TEST(SchemaValidator, Issue608) {
 
     VALIDATE(s, "{\"a\" : null, \"b\": null}", true);
     INVALIDATE(s, "{\"a\" : null, \"a\" : null}", "", "required", "");
+}
+
+// Fail to resolve $ref in allOf causes crash in SchemaValidator::StartObject()
+TEST(SchemaValidator, Issue728_AllOfRef) {
+    Document sd;
+    sd.Parse("{\"allOf\": [{\"$ref\": \"#/abc\"}]}");
+    SchemaDocument s(sd);
+    VALIDATE(s, "{\"key1\": \"abc\", \"key2\": \"def\"}", true);
+}
+
+TEST(SchemaValidator, Issue825) {
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"additionalProperties\": false, \"patternProperties\": {\"^i\": { \"type\": \"string\" } } }");
+    SchemaDocument s(sd);
+    VALIDATE(s, "{ \"item\": \"hello\" }", true);
+}
+
+TEST(SchemaValidator, Issue1017_allOfHandler) {
+    Document sd;
+    sd.Parse("{\"allOf\": [{\"type\": \"object\",\"properties\": {\"cyanArray2\": {\"type\": \"array\",\"items\": { \"type\": \"string\" }}}},{\"type\": \"object\",\"properties\": {\"blackArray\": {\"type\": \"array\",\"items\": { \"type\": \"string\" }}},\"required\": [ \"blackArray\" ]}]}");
+    SchemaDocument s(sd);
+    StringBuffer sb;
+    Writer<StringBuffer> writer(sb);
+    GenericSchemaValidator<SchemaDocument, Writer<StringBuffer> > validator(s, writer);
+    EXPECT_TRUE(validator.StartObject());
+    EXPECT_TRUE(validator.Key("cyanArray2", 10, false));
+    EXPECT_TRUE(validator.StartArray());    
+    EXPECT_TRUE(validator.EndArray(0));    
+    EXPECT_TRUE(validator.Key("blackArray", 10, false));
+    EXPECT_TRUE(validator.StartArray());    
+    EXPECT_TRUE(validator.EndArray(0));    
+    EXPECT_TRUE(validator.EndObject(0));
+    EXPECT_TRUE(validator.IsValid());
+    EXPECT_STREQ("{\"cyanArray2\":[],\"blackArray\":[]}", sb.GetString());
 }
 
 #ifdef __clang__

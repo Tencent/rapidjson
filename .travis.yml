@@ -1,5 +1,6 @@
 sudo: required
-dist: precise
+dist: trusty
+group: edge
 
 language: cpp
 cache:

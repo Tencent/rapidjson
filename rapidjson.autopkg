@@ -71,5 +71,7 @@ Changed
 	targets {
 		// We're trying to be standard about these sorts of thing. (Will help with config.h later :D)
 		//Defines += HAS_EQCORE;
+		// Fix creating the package with Raggles' fork of CoApp
+		Includes += "$(MSBuildThisFileDirectory)../..${d_include}";
 	};
 }

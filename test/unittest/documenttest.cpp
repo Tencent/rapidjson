@@ -128,8 +128,14 @@ TEST(Document, UnchangedOnParseError) {
     Document doc;
     doc.SetArray().PushBack(0, doc.GetAllocator());
 
+    ParseResult noError;
+    EXPECT_TRUE(noError);
+
     ParseResult err = doc.Parse("{]");
     EXPECT_TRUE(doc.HasParseError());
+    EXPECT_NE(err, noError);
+    EXPECT_NE(err.Code(), noError);
+    EXPECT_NE(noError, doc.GetParseError());
     EXPECT_EQ(err.Code(), doc.GetParseError());
     EXPECT_EQ(err.Offset(), doc.GetErrorOffset());
     EXPECT_TRUE(doc.IsArray());
@@ -138,6 +144,9 @@ TEST(Document, UnchangedOnParseError) {
     err = doc.Parse("{}");
     EXPECT_FALSE(doc.HasParseError());
     EXPECT_FALSE(err.IsError());
+    EXPECT_TRUE(err);
+    EXPECT_EQ(err, noError);
+    EXPECT_EQ(err.Code(), noError);
     EXPECT_EQ(err.Code(), doc.GetParseError());
     EXPECT_EQ(err.Offset(), doc.GetErrorOffset());
     EXPECT_TRUE(doc.IsObject());
@@ -488,15 +497,19 @@ TYPED_TEST(DocumentMove, MoveConstructorParseError) {
     a.Parse("{ 4 = 4]");
     ParseResult error(a.GetParseError(), a.GetErrorOffset());
     EXPECT_TRUE(a.HasParseError());
+    EXPECT_NE(error, noError);
+    EXPECT_NE(error.Code(), noError);
     EXPECT_NE(error.Code(), noError.Code());
     EXPECT_NE(error.Offset(), noError.Offset());
 
     D b(std::move(a));
     EXPECT_FALSE(a.HasParseError());
     EXPECT_TRUE(b.HasParseError());
+    EXPECT_EQ(a.GetParseError(), noError);
     EXPECT_EQ(a.GetParseError(), noError.Code());
-    EXPECT_EQ(b.GetParseError(), error.Code());
     EXPECT_EQ(a.GetErrorOffset(), noError.Offset());
+    EXPECT_EQ(b.GetParseError(), error);
+    EXPECT_EQ(b.GetParseError(), error.Code());
     EXPECT_EQ(b.GetErrorOffset(), error.Offset());
 
     D c(std::move(b));

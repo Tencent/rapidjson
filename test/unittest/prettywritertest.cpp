@@ -167,6 +167,7 @@ TEST(PrettyWriter, OStreamWrapper) {
 TEST(PrettyWriter, FileWriteStream) {
     char filename[L_tmpnam];
     FILE* fp = TempFile(filename);
+    ASSERT_TRUE(fp!=NULL);
     char buffer[16];
     FileWriteStream os(fp, buffer, sizeof(buffer));
     PrettyWriter<FileWriteStream> writer(os);
@@ -206,6 +207,114 @@ TEST(PrettyWriter, RawValue) {
         "}",
         buffer.GetString());
 }
+
+TEST(PrettyWriter, InvalidEventSequence) {
+    // {]
+    {
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        writer.StartObject();
+        EXPECT_THROW(writer.EndArray(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+    
+    // [}
+    {
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        writer.StartArray();
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+    
+    // { 1:
+    {
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        writer.StartObject();
+        EXPECT_THROW(writer.Int(1), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+    
+    // { 'a' }
+    {
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        writer.StartObject();
+        writer.Key("a");
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+    
+    // { 'a':'b','c' }
+    {
+        StringBuffer buffer;
+        PrettyWriter<StringBuffer> writer(buffer);
+        writer.StartObject();
+        writer.Key("a");
+        writer.String("b");
+        writer.Key("c");
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+}
+
+TEST(PrettyWriter, NaN) {
+    double nan = std::numeric_limits<double>::quiet_NaN();
+
+    EXPECT_TRUE(internal::Double(nan).IsNan());
+    StringBuffer buffer;
+    {
+        PrettyWriter<StringBuffer> writer(buffer);
+        EXPECT_FALSE(writer.Double(nan));
+    }
+    {
+        PrettyWriter<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(nan));
+        EXPECT_STREQ("NaN", buffer.GetString());
+    }
+    GenericStringBuffer<UTF16<> > buffer2;
+    PrettyWriter<GenericStringBuffer<UTF16<> > > writer2(buffer2);
+    EXPECT_FALSE(writer2.Double(nan));
+}
+
+TEST(PrettyWriter, Inf) {
+    double inf = std::numeric_limits<double>::infinity();
+
+    EXPECT_TRUE(internal::Double(inf).IsInf());
+    StringBuffer buffer;
+    {
+        PrettyWriter<StringBuffer> writer(buffer);
+        EXPECT_FALSE(writer.Double(inf));
+    }
+    {
+        PrettyWriter<StringBuffer> writer(buffer);
+        EXPECT_FALSE(writer.Double(-inf));
+    }
+    {
+        PrettyWriter<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(inf));
+    }
+    {
+        PrettyWriter<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(-inf));
+    }
+    EXPECT_STREQ("Infinity-Infinity", buffer.GetString());
+}
+
+TEST(PrettyWriter, Issue_889) {
+    char buf[100] = "Hello";
+    
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    writer.StartArray();
+    writer.String(buf);
+    writer.EndArray();
+    
+    EXPECT_STREQ("[\n    \"Hello\"\n]", buffer.GetString());
+    EXPECT_TRUE(writer.IsComplete()); \
+}
+
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 

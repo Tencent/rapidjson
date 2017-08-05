@@ -78,7 +78,7 @@ inline Ch* StrDup(const Ch* str) {
 }
 
 inline FILE* TempFile(char *filename) {
-#ifdef _MSC_VER
+#if defined(__WIN32__) || defined(_MSC_VER)
     filename = tmpnam(filename);
 
     // For Visual Studio, tmpnam() adds a backslash in front. Remove it.
@@ -117,7 +117,7 @@ public:
 #pragma GCC diagnostic pop
 #endif
 
-#define RAPIDJSON_ASSERT(x) if (!(x)) throw AssertException(RAPIDJSON_STRINGIFY(x))
+#define RAPIDJSON_ASSERT(x) (!(x) ? throw AssertException(RAPIDJSON_STRINGIFY(x)) : (void)0u)
 
 class Random {
 public:

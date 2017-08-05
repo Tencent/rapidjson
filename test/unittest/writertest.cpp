@@ -100,6 +100,19 @@ TEST(Writer, String) {
 #endif
 }
 
+TEST(Writer, Issue_889) {
+    char buf[100] = "Hello";
+    
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    writer.StartArray();
+    writer.String(buf);
+    writer.EndArray();
+    
+    EXPECT_STREQ("[\"Hello\"]", buffer.GetString());
+    EXPECT_TRUE(writer.IsComplete()); \
+}
+
 TEST(Writer, ScanWriteUnescapedString) {
     const char json[] = "[\" \\\"0123456789ABCDEF\"]";
     //                       ^ scanning stops here.
@@ -399,8 +412,10 @@ TEST(Writer, ValidateEncoding) {
         EXPECT_TRUE(writer.String("\xC2\xA2"));         // Cents sign U+00A2
         EXPECT_TRUE(writer.String("\xE2\x82\xAC"));     // Euro sign U+20AC
         EXPECT_TRUE(writer.String("\xF0\x9D\x84\x9E")); // G clef sign U+1D11E
+        EXPECT_TRUE(writer.String("\x01"));             // SOH control U+0001
+        EXPECT_TRUE(writer.String("\x1B"));             // Escape control U+001B
         writer.EndArray();
-        EXPECT_STREQ("[\"\x24\",\"\xC2\xA2\",\"\xE2\x82\xAC\",\"\xF0\x9D\x84\x9E\"]", buffer.GetString());
+        EXPECT_STREQ("[\"\x24\",\"\xC2\xA2\",\"\xE2\x82\xAC\",\"\xF0\x9D\x84\x9E\",\"\\u0001\",\"\\u001B\"]", buffer.GetString());
     }
 
     // Fail in decoding invalid UTF-8 sequence http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
@@ -440,6 +455,28 @@ TEST(Writer, InvalidEventSequence) {
         Writer<StringBuffer> writer(buffer);
         writer.StartObject();
         EXPECT_THROW(writer.Int(1), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+
+    // { 'a' }
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.StartObject();
+        writer.Key("a");
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+
+    // { 'a':'b','c' }
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.StartObject();
+        writer.Key("a");
+        writer.String("b");
+        writer.Key("c");
+        EXPECT_THROW(writer.EndObject(), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
 }

@@ -29,6 +29,9 @@ RAPIDJSON_DIAG_OFF(implicit-fallthrough)
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
+#if __GNUC__ >= 7
+RAPIDJSON_DIAG_OFF(implicit-fallthrough)
+#endif
 #endif
 
 #ifdef _MSC_VER
@@ -606,7 +609,7 @@ public:
     {
         RAPIDJSON_ASSERT(regex_.IsValid());
         if (!allocator_)
-            ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
+            ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
         stateSet_ = static_cast<unsigned*>(allocator_->Malloc(GetStateSetSize()));
         state0_.template Reserve<SizeType>(regex_.stateCount_);
         state1_.template Reserve<SizeType>(regex_.stateCount_);
@@ -688,8 +691,8 @@ private:
             bool matched = AddState(l, s.out);
             return AddState(l, s.out1) || matched;
         }
-        else if (!(stateSet_[index >> 5] & (1 << (index & 31)))) {
-            stateSet_[index >> 5] |= (1 << (index & 31));
+        else if (!(stateSet_[index >> 5] & (1u << (index & 31)))) {
+            stateSet_[index >> 5] |= (1u << (index & 31));
             *l.template PushUnsafe<SizeType>() = index;
         }
         return s.out == kRegexInvalidState; // by using PushUnsafe() above, we can ensure s is not validated due to reallocation.

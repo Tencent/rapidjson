@@ -14,7 +14,7 @@
 
 > (in §6) JSON may be represented using UTF-8, UTF-16, or UTF-32. When JSON is written in UTF-8, JSON is 8bit compatible.  When JSON is written in UTF-16 or UTF-32, the binary content-transfer-encoding must be used.
 > 
-> 翻译：JSON 可使用 UTF-8、UTF-16 或 UTF-18 表示。当 JSON 以 UTF-8 写入，该 JSON 是 8 位兼容的。当 JSON 以 UTF-16 或 UTF-32 写入，就必须使用二进制的内容传送编码。
+> 翻译：JSON 可使用 UTF-8、UTF-16 或 UTF-32 表示。当 JSON 以 UTF-8 写入，该 JSON 是 8 位兼容的。当 JSON 以 UTF-16 或 UTF-32 写入，就必须使用二进制的内容传送编码。
 
 RapidJSON 支持多种编码。它也能检查 JSON 的编码，以及在不同编码中进行转码。所有这些功能都是在内部实现，无需使用外部的程序库（如 [ICU](http://site.icu-project.org/)）。
 

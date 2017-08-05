@@ -777,7 +777,7 @@ INPUT                  = readme.zh-cn.md \
                          doc/sax.zh-cn.md \
                          doc/schema.zh-cn.md \
                          doc/performance.zh-cn.md \
-                         doc/internals.md \
+                         doc/internals.zh-cn.md \
                          doc/faq.zh-cn.md
 
 # This tag can be used to specify the character encoding of the source files

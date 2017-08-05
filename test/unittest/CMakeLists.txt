@@ -36,10 +36,9 @@ if(CCACHE_FOUND)
 		endif()
 endif(CCACHE_FOUND)
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default -Wfloat-equal")
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Weffc++ -Wswitch-default -Wfloat-equal -Wimplicit-fallthrough -Weverything")
+set_property(DIRECTORY PROPERTY COMPILE_OPTIONS ${EXTRA_CXX_FLAGS})
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # If the user is running a newer version of Clang that includes the
     # -Wdouble-promotion, we will ignore that warning.
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 3.7)
@@ -80,7 +79,7 @@ add_test(NAME unittest
 if(NOT MSVC)
     # Not running SIMD.* unit test cases for Valgrind
     add_test(NAME valgrind_unittest
-        COMMAND valgrind --leak-check=full --error-exitcode=1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest --gtest_filter=-SIMD.*
+        COMMAND valgrind --suppressions=${CMAKE_SOURCE_DIR}/test/valgrind.supp --leak-check=full --error-exitcode=1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest --gtest_filter=-SIMD.*
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
