@@ -290,14 +290,6 @@ TEST(Document, ParseStream_AutoUTFInputStream) {
     EXPECT_EQ(0, memcmp(bos.GetString(), bos2.GetString(), bos2.GetSize()));
 }
 
-TEST(Document, Assignment) {
-    Value x(1234);
-    Document d;
-    d = x;
-    EXPECT_TRUE(x.IsNull());    // move semantic
-    EXPECT_EQ(1234, d.GetInt());
-}
-
 TEST(Document, Swap) {
     Document d1;
     Document::AllocatorType& a = d1.GetAllocator();
@@ -667,13 +659,20 @@ TYPED_TEST(DocumentMove, MoveAssignmentStack) {
 
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
-// Issue 22: Memory corruption via operator=
+// Issue 22: Memory corruption via operator= from Document
 // Fixed by making unimplemented assignment operator private.
-//TEST(Document, Assignment) {
+// Prohibit assignment from Document, But allow assignment from Value
+TEST(Document, Assignment) {
 //  Document d1;
 //  Document d2;
 //  d1 = d2;
-//}
+
+    Value x(1234);
+    Document d;
+    d = x;
+    EXPECT_TRUE(x.IsNull());    // move semantic
+    EXPECT_EQ(1234, d.GetInt());
+}
 
 #ifdef __clang__
 RAPIDJSON_DIAG_POP
