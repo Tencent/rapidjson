@@ -300,7 +300,14 @@ TEST(Document, Swap) {
     o.SetObject().AddMember("a", 1, a);
 
     // Swap between Document and Value
-    // d1.Swap(o); // doesn't compile
+    d1.Swap(o);
+    EXPECT_TRUE(d1.IsObject());
+    EXPECT_TRUE(o.IsArray());
+
+    d1.Swap(o);
+    EXPECT_TRUE(d1.IsArray());
+    EXPECT_TRUE(o.IsObject());
+
     o.Swap(d1);
     EXPECT_TRUE(d1.IsObject());
     EXPECT_TRUE(o.IsArray());
