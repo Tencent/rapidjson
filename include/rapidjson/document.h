@@ -2168,9 +2168,6 @@ public:
     }
 #endif
 
-    // Allow assignment like a ValueType.
-    using ValueType::operator=;
-
     //! Exchange the contents of this document with those of another.
     /*!
         \param rhs Another document.
@@ -2186,7 +2183,8 @@ public:
         return *this;
     }
 
-    // Allow Swap from ValueType.
+    // Allow Swap with ValueType.
+    // Refer to Effective C++/Item 33: Avoid hiding inherited names.
     using ValueType::Swap;
 
     //! free-standing swap function helper
