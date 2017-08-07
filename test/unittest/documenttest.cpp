@@ -661,17 +661,25 @@ TYPED_TEST(DocumentMove, MoveAssignmentStack) {
 
 // Issue 22: Memory corruption via operator= from Document
 // Fixed by making unimplemented assignment operator private.
-// Prohibit assignment from Document, But allow assignment from Value
+// Prohibit assignment from Document.
+// But allow assignment from ValueType/int/double/..., like a ValueType
 TEST(Document, Assignment) {
 //  Document d1;
 //  Document d2;
 //  d1 = d2;
 
-    Value x(1234);
     Document d;
+
+    Value x(1234);
     d = x;
     EXPECT_TRUE(x.IsNull());    // move semantic
     EXPECT_EQ(1234, d.GetInt());
+
+    d = 1;
+    EXPECT_EQ(1, d.GetInt());
+
+    d = 12.34;
+    EXPECT_NEAR(12.34, d.GetDouble(), 0.0);
 }
 
 #ifdef __clang__

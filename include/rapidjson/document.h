@@ -2168,8 +2168,7 @@ public:
     }
 #endif
 
-    // Allow assignment from ValueType.
-    // Refer to Effective C++ 3rd Edition/Item 33: Avoid hiding inherited names.
+    // Allow assignment like a ValueType.
     using ValueType::operator=;
 
     //! Exchange the contents of this document with those of another.
@@ -2188,7 +2187,6 @@ public:
     }
 
     // Allow Swap from ValueType.
-    // Refer to Effective C++ 3rd Edition/Item 33: Avoid hiding inherited names.
     using ValueType::Swap;
 
     //! free-standing swap function helper
