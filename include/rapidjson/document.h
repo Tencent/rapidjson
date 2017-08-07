@@ -2184,7 +2184,7 @@ public:
     }
 
     // Allow Swap with ValueType.
-    // Refer to Effective C++/Item 33: Avoid hiding inherited names.
+    // Refer to Effective C++ 3rd Edition/Item 33: Avoid hiding inherited names.
     using ValueType::Swap;
 
     //! free-standing swap function helper
