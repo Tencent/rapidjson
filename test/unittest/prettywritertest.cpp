@@ -25,7 +25,7 @@ RAPIDJSON_DIAG_OFF(c++98-compat)
 
 using namespace rapidjson;
 
-static const char kJson[] = "{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3,-1],\"u64\":1234567890123456789,\"i64\":-1234567890123456789}";
+static const char kJson[] = "{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3,-1],\"b\":[[11,12],[21,22]],\"u64\":1234567890123456789,\"i64\":-1234567890123456789}";
 static const char kPrettyJson[] =
 "{\n"
 "    \"hello\": \"world\",\n"
@@ -40,6 +40,16 @@ static const char kPrettyJson[] =
 "        3,\n"
 "        -1\n"
 "    ],\n"
+"    \"b\": [\n"
+"        [\n"
+"            11,\n"
+"            12\n"
+"        ],\n"
+"        [\n"
+"            21,\n"
+"            22\n"
+"        ]\n"
+"    ],\n"
 "    \"u64\": 1234567890123456789,\n"
 "    \"i64\": -1234567890123456789\n"
 "}";
@@ -53,6 +63,22 @@ static const char kPrettyJson_FormatOptions_SLA[] =
 "    \"i\": 123,\n"
 "    \"pi\": 3.1416,\n"
 "    \"a\": [1, 2, 3, -1],\n"
+"    \"b\": [[11, 12], [21, 22]],\n"
+"    \"u64\": 1234567890123456789,\n"
+"    \"i64\": -1234567890123456789\n"
+"}";
+
+static const char kPrettyJson_FormatOptions_Pretty2D[] =
+"{\n"
+"    \"hello\": \"world\",\n"
+"    \"t\": true,\n"
+"    \"f\": false,\n"
+"    \"n\": null,\n"
+"    \"i\": 123,\n"
+"    \"pi\": 3.1416,\n"
+"    \"a\": [1, 2, 3, -1],\n"
+"    \"b\": [[11, 12], \n"
+"        [21, 22]],\n"
 "    \"u64\": 1234567890123456789,\n"
 "    \"i64\": -1234567890123456789\n"
 "}";
@@ -66,7 +92,7 @@ TEST(PrettyWriter, Basic) {
     EXPECT_STREQ(kPrettyJson, buffer.GetString());
 }
 
-TEST(PrettyWriter, FormatOptions) {
+TEST(PrettyWriter, FormatOptions_SLA) {
     StringBuffer buffer;
     PrettyWriter<StringBuffer> writer(buffer);
     writer.SetFormatOptions(kFormatSingleLineArray);
@@ -74,6 +100,16 @@ TEST(PrettyWriter, FormatOptions) {
     StringStream s(kJson);
     reader.Parse(s, writer);
     EXPECT_STREQ(kPrettyJson_FormatOptions_SLA, buffer.GetString());
+}
+
+TEST(PrettyWriter, FormatOptions_Pretty2D) {
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    writer.SetFormatOptions(kFormatPretty2DArray);
+    Reader reader;
+    StringStream s(kJson);
+    reader.Parse(s, writer);
+    EXPECT_STREQ(kPrettyJson_FormatOptions_Pretty2D, buffer.GetString());
 }
 
 TEST(PrettyWriter, SetIndent) {
@@ -96,6 +132,16 @@ TEST(PrettyWriter, SetIndent) {
         "\t\t2,\n"
         "\t\t3,\n"
         "\t\t-1\n"
+        "\t],\n"
+        "\t\"b\": [\n"
+        "\t\t[\n"
+        "\t\t\t11,\n"
+        "\t\t\t12\n"
+        "\t\t],\n"
+        "\t\t[\n"
+        "\t\t\t21,\n"
+        "\t\t\t22\n"
+        "\t\t]\n"
         "\t],\n"
         "\t\"u64\": 1234567890123456789,\n"
         "\t\"i64\": -1234567890123456789\n"

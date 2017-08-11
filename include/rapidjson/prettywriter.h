@@ -33,9 +33,13 @@ RAPIDJSON_NAMESPACE_BEGIN
 /*! \see PrettyWriter::SetFormatOptions
  */
 enum PrettyFormatOptions {
-    kFormatDefault = 0,         //!< Default pretty formatting.
-    kFormatSingleLineArray = 1  //!< Format arrays on a single line.
+    kFormatDefault         = 0,      //!< Default pretty formatting.
+    kFormatSingleLineArray = 1 << 0, //!< Format arrays on a single line.
+    kFormatPretty2DArray   = 1 << 1  //!< Format SingleLineArray in 1 array per line.
 };
+
+inline PrettyFormatOptions operator|(PrettyFormatOptions a,PrettyFormatOptions b)
+{return static_cast<PrettyFormatOptions>(static_cast<int>(a) | static_cast<int>(b));}
 
 //! Writer with indentation and spacing.
 /*!
@@ -56,15 +60,19 @@ public:
         \param levelDepth Initial capacity of stack.
     */
     explicit PrettyWriter(OutputStream& os, StackAllocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
-        Base(os, allocator, levelDepth), indentChar_(' '), indentCharCount_(4), formatOptions_(kFormatDefault) {}
-
+        Base(os, allocator, levelDepth), indentChar_(' '), indentCharCount_(4), formatOptions_(kFormatDefault), prevIndent_(0) {}
 
     explicit PrettyWriter(StackAllocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
-        Base(allocator, levelDepth), indentChar_(' '), indentCharCount_(4) {}
+        Base(allocator, levelDepth), indentChar_(' '), indentCharCount_(4), prevIndent_(0) {}
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     PrettyWriter(PrettyWriter&& rhs) :
-        Base(std::forward<PrettyWriter>(rhs)), indentChar_(rhs.indentChar_), indentCharCount_(rhs.indentCharCount_), formatOptions_(rhs.formatOptions_) {}
+        Base(std::forward<PrettyWriter>(rhs)),
+        indentChar_(rhs.indentChar_),
+        indentCharCount_(rhs.indentCharCount_),
+        formatOptions_(rhs.formatOptions_),
+        prevIndent_(rhs.prevIndent_)
+        {}
 #endif
 
     //! Set custom indentation.
@@ -166,7 +174,7 @@ public:
         RAPIDJSON_ASSERT(Base::level_stack_.template Top<typename Base::Level>()->inArray);
         bool empty = Base::level_stack_.template Pop<typename Base::Level>(1)->valueCount == 0;
 
-        if (!empty && !(formatOptions_ & kFormatSingleLineArray)) {
+        if (!empty && (formatOptions_ == kFormatDefault)) {
             Base::os_->Put('\n');
             WriteIndent();
         }
@@ -209,18 +217,24 @@ protected:
         (void)type;
         if (Base::level_stack_.GetSize() != 0) { // this value is not at root
             typename Base::Level* level = Base::level_stack_.template Top<typename Base::Level>();
-
             if (level->inArray) {
-                if (level->valueCount > 0) {
+                if (level->valueCount != 0){
                     Base::os_->Put(','); // add comma if it is not the first element in array
                     if (formatOptions_ & kFormatSingleLineArray)
                         Base::os_->Put(' ');
                 }
-
-                if (!(formatOptions_ & kFormatSingleLineArray)) {
+                if (formatOptions_ == kFormatDefault) {
                     Base::os_->Put('\n');
                     WriteIndent();
-                }
+		}
+		else if (formatOptions_ & kFormatPretty2DArray) {
+                         if (!(formatOptions_ & kFormatSingleLineArray))
+                             Base::os_->Put(' ');
+                         if (DepthinArrayChange(level->valueCount)) {
+                             Base::os_->Put('\n'); // limit arrays to 1 per line
+                             WriteIndent();
+                         }
+                     }
             }
             else {  // in object
                 if (level->valueCount > 0) {
@@ -249,14 +263,27 @@ protected:
         }
     }
 
-    void WriteIndent()  {
-        size_t count = (Base::level_stack_.GetSize() / sizeof(typename Base::Level)) * indentCharCount_;
-        PutN(*Base::os_, static_cast<typename OutputStream::Ch>(indentChar_), count);
+    void WriteIndent() const {
+        PutN(*Base::os_, static_cast<typename OutputStream::Ch>(indentChar_), CountIndent());
+    }
+
+    size_t CountIndent() const {
+        return (Base::level_stack_.GetSize() / sizeof(typename Base::Level)) * indentCharCount_;
+    }
+ 
+    bool DepthinArrayChange(size_t level) {
+        if (prevIndent_ != CountIndent()){
+            prevIndent_ = CountIndent();
+	    if(level==0) return false;
+            return true;
+        }
+        return false;
     }
 
     Ch indentChar_;
     unsigned indentCharCount_;
     PrettyFormatOptions formatOptions_;
+    size_t prevIndent_;
 
 private:
     // Prohibit copy constructor & assignment operator.
