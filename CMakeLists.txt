@@ -50,7 +50,7 @@ if(CCACHE_FOUND)
 endif(CCACHE_FOUND)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "powerpc" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ppc64" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ppc64le")
+    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "powerpc" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ppc64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ppc64le")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=native")
     else()
       #FIXME: x86 is -march=native, but doesn't mean every arch is this option. To keep original project's compatibility, I leave this except POWER.
@@ -80,7 +80,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         endif()
     endif()
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "powerpc" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ppc64" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ppc64le")
+    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "powerpc" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ppc64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ppc64le")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=native")
     else()
       #FIXME: x86 is -march=native, but doesn't mean every arch is this option. To keep original project's compatibility, I leave this except POWER.
