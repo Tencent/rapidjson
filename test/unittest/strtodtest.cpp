@@ -91,7 +91,7 @@ TEST(Strtod, CheckApproximationCase) {
     }
 
     // Remove common power of two factor from all three scaled values
-    int common_Exp2 = std::min(dS_Exp2, std::min(bS_Exp2, hS_Exp2));
+    int common_Exp2 = (std::min)(dS_Exp2, (std::min)(bS_Exp2, hS_Exp2));
     dS_Exp2 -= common_Exp2;
     bS_Exp2 -= common_Exp2;
     hS_Exp2 -= common_Exp2;

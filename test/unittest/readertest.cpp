@@ -415,7 +415,7 @@ TEST(Reader, ParseNumber_NormalPrecisionError) {
         uint64_t bias1 = e.ToBias();
         uint64_t bias2 = a.ToBias();
         double ulp = static_cast<double>(bias1 >= bias2 ? bias1 - bias2 : bias2 - bias1);
-        ulpMax = std::max(ulpMax, ulp);
+        ulpMax = (std::max)(ulpMax, ulp);
         ulpSum += ulp;
     }
     printf("ULP Average = %g, Max = %g \n", ulpSum / count, ulpMax);

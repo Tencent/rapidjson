@@ -70,8 +70,8 @@ template <typename T>
 static void Verify(void(*f)(T, char*), char* (*g)(T, char*)) {
     // Boundary cases
     VerifyValue<T>(0, f, g);
-    VerifyValue<T>(std::numeric_limits<T>::min(), f, g);
-    VerifyValue<T>(std::numeric_limits<T>::max(), f, g);
+    VerifyValue<T>((std::numeric_limits<T>::min)(), f, g);
+    VerifyValue<T>((std::numeric_limits<T>::max)(), f, g);
 
     // 2^n - 1, 2^n, 10^n - 1, 10^n until overflow
     for (int power = 2; power <= 10; power += 8) {
