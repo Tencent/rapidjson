@@ -605,7 +605,7 @@ public:
             kNullFlag, kFalseFlag, kTrueFlag, kObjectFlag, kArrayFlag, kShortStringFlag,
             kNumberAnyFlag
         };
-        RAPIDJSON_ASSERT(type <= kNumberType);
+        RAPIDJSON_ASSERT(type >= kNullType && type <= kNumberType);
         data_.f.flags = defaultFlags[type];
 
         // Use ShortString to store empty string.
