@@ -29,7 +29,7 @@
  * Single line (`// ...`) and multiple line (`/* ... */`) comments (`kParseCommentsFlag`). 
  * Trailing commas at the end of objects and arrays (`kParseTrailingCommasFlag`).
  * `NaN`, `Inf`, `Infinity`, `-Inf` and `-Infinity` as `double` values (`kParseNanAndInfFlag`)
-* [NPM compliant](http://github.com/miloyip/rapidjson/blob/master/doc/npm.md).
+* [NPM compliant](http://github.com/Tencent/rapidjson/blob/master/doc/npm.md).
 
 ## Unicode
 

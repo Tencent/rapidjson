@@ -18,7 +18,7 @@
 
 4. Is RapidJSON free?
 
-   Yes, it is free under MIT license. It can be used in commercial applications. Please check the details in [license.txt](https://github.com/miloyip/rapidjson/blob/master/license.txt).
+   Yes, it is free under MIT license. It can be used in commercial applications. Please check the details in [license.txt](https://github.com/Tencent/rapidjson/blob/master/license.txt).
 
 5. Is RapidJSON small? What are its dependencies? 
 
@@ -44,7 +44,7 @@
 
 10. How RapidJSON is tested?
 
-   RapidJSON contains a unit test suite for automatic testing. [Travis](https://travis-ci.org/miloyip/rapidjson/)(for Linux) and [AppVeyor](https://ci.appveyor.com/project/miloyip/rapidjson/)(for Windows) will compile and run the unit test suite for all modifications. The test process also uses Valgrind (in Linux) to detect memory leaks.
+   RapidJSON contains a unit test suite for automatic testing. [Travis](https://travis-ci.org/Tencent/rapidjson/)(for Linux) and [AppVeyor](https://ci.appveyor.com/project/Tencent/rapidjson/)(for Windows) will compile and run the unit test suite for all modifications. The test process also uses Valgrind (in Linux) to detect memory leaks.
 
 11. Is RapidJSON well documented?
 
@@ -70,7 +70,7 @@
 
 3. Does RapidJSON support relaxed syntax?
 
-   Currently no. RapidJSON only support the strict standardized format. Support on related syntax is under discussion in this [issue](https://github.com/miloyip/rapidjson/issues/36).
+   Currently no. RapidJSON only support the strict standardized format. Support on related syntax is under discussion in this [issue](https://github.com/Tencent/rapidjson/issues/36).
 
 ## DOM and SAX
 

@@ -214,7 +214,7 @@ void SkipWhitespace(InputStream& s) {
 
 对于 RapidJSON 来说，这显然是不可行的，因为 RapidJSON 不应当强迫用户进行内存对齐。
 
-为了修复这个问题，当前的代码会先按字节处理直到下一个对齐的地址。在这之后，使用对齐读取来进行 SIMD 处理。见 [#85](https://github.com/miloyip/rapidjson/issues/85)。
+为了修复这个问题，当前的代码会先按字节处理直到下一个对齐的地址。在这之后，使用对齐读取来进行 SIMD 处理。见 [#85](https://github.com/Tencent/rapidjson/issues/85)。
 
 ## 局部流拷贝 {#LocalStreamCopy}
 

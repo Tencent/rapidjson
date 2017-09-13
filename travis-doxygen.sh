@@ -8,7 +8,7 @@ DOXYGEN_VER=doxygen-1.8.13
 DOXYGEN_TAR=${DOXYGEN_VER}.linux.bin.tar.gz
 DOXYGEN_URL="http://ftp.stack.nl/pub/users/dimitri/${DOXYGEN_TAR}"
 
-: ${GITHUB_REPO:="miloyip/rapidjson"}
+: ${GITHUB_REPO:="Tencent/rapidjson"}
 GITHUB_HOST="github.com"
 GITHUB_CLONE="git://${GITHUB_HOST}/${GITHUB_REPO}"
 GITHUB_URL="https://${GITHUB_HOST}/${GITHUB_PUSH-${GITHUB_REPO}}"

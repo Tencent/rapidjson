@@ -14,7 +14,7 @@ env:
     - CCACHE_MAXSIZE=100M
     - ARCH_FLAGS_x86='-m32'        # #266: don't use SSE on 32-bit
     - ARCH_FLAGS_x86_64='-msse4.2' #       use SSE4.2 on 64-bit
-    - GITHUB_REPO='miloyip/rapidjson'
+    - GITHUB_REPO='Tencent/rapidjson'
     - secure: "HrsaCb+N66EG1HR+LWH1u51SjaJyRwJEDzqJGYMB7LJ/bfqb9mWKF1fLvZGk46W5t7TVaXRDD5KHFx9DPWvKn4gRUVkwTHEy262ah5ORh8M6n/6VVVajeV/AYt2C0sswdkDBDO4Xq+xy5gdw3G8s1A4Inbm73pUh+6vx+7ltBbk="
 
 before_install:

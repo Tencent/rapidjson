@@ -214,7 +214,7 @@ In [Intel® 64 and IA-32 Architectures Optimization Reference Manual
 
 This is not feasible as RapidJSON should not enforce such requirement.
 
-To fix this issue, currently the routine process bytes up to the next aligned address. After tha, use aligned read to perform SIMD processing. Also see [#85](https://github.com/miloyip/rapidjson/issues/85).
+To fix this issue, currently the routine process bytes up to the next aligned address. After tha, use aligned read to perform SIMD processing. Also see [#85](https://github.com/Tencent/rapidjson/issues/85).
 
 ## Local Stream Copy {#LocalStreamCopy}
 

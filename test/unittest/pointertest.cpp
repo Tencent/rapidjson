@@ -1488,7 +1488,7 @@ TEST(Pointer, Ambiguity) {
     }
 }
 
-// https://github.com/miloyip/rapidjson/issues/483
+// https://github.com/Tencent/rapidjson/issues/483
 namespace myjson {
 
 class MyAllocator

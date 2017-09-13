@@ -8,11 +8,11 @@ Tencent is pleased to support the open source community by making RapidJSON avai
 
 Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 
-* [RapidJSON GitHub](https://github.com/miloyip/rapidjson/)
+* [RapidJSON GitHub](https://github.com/Tencent/rapidjson/)
 * RapidJSON 文档
   * [English](http://rapidjson.org/)
   * [简体中文](http://rapidjson.org/zh-cn/)
-  * [GitBook](https://www.gitbook.com/book/miloyip/rapidjson/) 可下载 PDF/EPUB/MOBI，但不含 API 参考手册。
+  * [GitBook](https://www.gitbook.com/book/Tencent/rapidjson/) 可下载 PDF/EPUB/MOBI，但不含 API 参考手册。
 
 ## Build 状态
 
@@ -20,12 +20,12 @@ Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights 
 | :---------------: | :-----------------: | :-------------------: |
 | ![lin-badge]      | ![win-badge]        | ![cov-badge]          |
 
-[lin-badge]: https://travis-ci.org/miloyip/rapidjson.svg?branch=master "Travis build status"
-[lin-link]:  https://travis-ci.org/miloyip/rapidjson "Travis build status"
-[win-badge]: https://ci.appveyor.com/api/projects/status/github/miloyip/rapidjson?branch=master&svg=true "AppVeyor build status"
-[win-link]:  https://ci.appveyor.com/project/miloyip/rapidjson/branch/master "AppVeyor build status"
-[cov-badge]: https://coveralls.io/repos/miloyip/rapidjson/badge.svg?branch=master "Coveralls coverage"
-[cov-link]:  https://coveralls.io/r/miloyip/rapidjson?branch=master "Coveralls coverage"
+[lin-badge]: https://travis-ci.org/Tencent/rapidjson.svg?branch=master "Travis build status"
+[lin-link]:  https://travis-ci.org/Tencent/rapidjson "Travis build status"
+[win-badge]: https://ci.appveyor.com/api/projects/status/github/Tencent/rapidjson?branch=master&svg=true "AppVeyor build status"
+[win-link]:  https://ci.appveyor.com/project/Tencent/rapidjson/branch/master "AppVeyor build status"
+[cov-badge]: https://coveralls.io/repos/Tencent/rapidjson/badge.svg?branch=master "Coveralls coverage"
+[cov-link]:  https://coveralls.io/r/Tencent/rapidjson?branch=master "Coveralls coverage"
 
 ## 简介
 
@@ -128,25 +128,25 @@ int main() {
 
 ![simpledom](doc/diagram/simpledom.png)
 
-还有许多 [例子](https://github.com/miloyip/rapidjson/tree/master/example) 可供参考：
+还有许多 [例子](https://github.com/Tencent/rapidjson/tree/master/example) 可供参考：
 
 * DOM API
-  * [tutorial](https://github.com/miloyip/rapidjson/blob/master/example/tutorial/tutorial.cpp): DOM API 的基本使用方法。
+  * [tutorial](https://github.com/Tencent/rapidjson/blob/master/example/tutorial/tutorial.cpp): DOM API 的基本使用方法。
 
 * SAX API
-  * [simplereader](https://github.com/miloyip/rapidjson/blob/master/example/simplereader/simplereader.cpp): 使用 `Reader` 解析 JSON 时，打印所有 SAX 事件。
-  * [condense](https://github.com/miloyip/rapidjson/blob/master/example/condense/condense.cpp): 移除 JSON 中所有空白符的命令行工具。
-  * [pretty](https://github.com/miloyip/rapidjson/blob/master/example/pretty/pretty.cpp): 为 JSON 加入缩进与换行的命令行工具，当中使用了 `PrettyWriter`。
-  * [capitalize](https://github.com/miloyip/rapidjson/blob/master/example/capitalize/capitalize.cpp): 把 JSON 中所有字符串改为大写的命令行工具。
-  * [messagereader](https://github.com/miloyip/rapidjson/blob/master/example/messagereader/messagereader.cpp): 使用 SAX API 去解析一个 JSON 报文。
-  * [serialize](https://github.com/miloyip/rapidjson/blob/master/example/serialize/serialize.cpp): 使用 SAX API 去序列化 C++ 对象，生成 JSON。
-  * [jsonx](https://github.com/miloyip/rapidjson/blob/master/example/jsonx/jsonx.cpp): 实现了一个 `JsonxWriter`，它能把 SAX 事件写成 [JSONx](https://www-01.ibm.com/support/knowledgecenter/SS9H2Y_7.1.0/com.ibm.dp.doc/json_jsonx.html)（一种 XML）格式。这个例子是把 JSON 输入转换成 JSONx 格式的命令行工具。
+  * [simplereader](https://github.com/Tencent/rapidjson/blob/master/example/simplereader/simplereader.cpp): 使用 `Reader` 解析 JSON 时，打印所有 SAX 事件。
+  * [condense](https://github.com/Tencent/rapidjson/blob/master/example/condense/condense.cpp): 移除 JSON 中所有空白符的命令行工具。
+  * [pretty](https://github.com/Tencent/rapidjson/blob/master/example/pretty/pretty.cpp): 为 JSON 加入缩进与换行的命令行工具，当中使用了 `PrettyWriter`。
+  * [capitalize](https://github.com/Tencent/rapidjson/blob/master/example/capitalize/capitalize.cpp): 把 JSON 中所有字符串改为大写的命令行工具。
+  * [messagereader](https://github.com/Tencent/rapidjson/blob/master/example/messagereader/messagereader.cpp): 使用 SAX API 去解析一个 JSON 报文。
+  * [serialize](https://github.com/Tencent/rapidjson/blob/master/example/serialize/serialize.cpp): 使用 SAX API 去序列化 C++ 对象，生成 JSON。
+  * [jsonx](https://github.com/Tencent/rapidjson/blob/master/example/jsonx/jsonx.cpp): 实现了一个 `JsonxWriter`，它能把 SAX 事件写成 [JSONx](https://www-01.ibm.com/support/knowledgecenter/SS9H2Y_7.1.0/com.ibm.dp.doc/json_jsonx.html)（一种 XML）格式。这个例子是把 JSON 输入转换成 JSONx 格式的命令行工具。
 
 * Schema API
-  * [schemavalidator](https://github.com/miloyip/rapidjson/blob/master/example/schemavalidator/schemavalidator.cpp): 使用 JSON Schema 去校验 JSON 的命令行工具。
+  * [schemavalidator](https://github.com/Tencent/rapidjson/blob/master/example/schemavalidator/schemavalidator.cpp): 使用 JSON Schema 去校验 JSON 的命令行工具。
 
 * 进阶
-  * [prettyauto](https://github.com/miloyip/rapidjson/blob/master/example/prettyauto/prettyauto.cpp): [pretty](https://github.com/miloyip/rapidjson/blob/master/example/pretty/pretty.cpp) 的修改版本，可自动处理任何 UTF 编码的 JSON。
-  * [parsebyparts](https://github.com/miloyip/rapidjson/blob/master/example/parsebyparts/parsebyparts.cpp): 这例子中的 `AsyncDocumentParser` 类使用 C++ 线程来逐段解析 JSON。
-  * [filterkey](https://github.com/miloyip/rapidjson/blob/master/example/filterkey/filterkey.cpp): 移取使用者指定的键值的命令行工具。
-  * [filterkeydom](https://github.com/miloyip/rapidjson/blob/master/example/filterkey/filterkey.cpp): 如上的工具，但展示如何使用生成器（generator）去填充一个 `Document`。
+  * [prettyauto](https://github.com/Tencent/rapidjson/blob/master/example/prettyauto/prettyauto.cpp): [pretty](https://github.com/Tencent/rapidjson/blob/master/example/pretty/pretty.cpp) 的修改版本，可自动处理任何 UTF 编码的 JSON。
+  * [parsebyparts](https://github.com/Tencent/rapidjson/blob/master/example/parsebyparts/parsebyparts.cpp): 这例子中的 `AsyncDocumentParser` 类使用 C++ 线程来逐段解析 JSON。
+  * [filterkey](https://github.com/Tencent/rapidjson/blob/master/example/filterkey/filterkey.cpp): 移取使用者指定的键值的命令行工具。
+  * [filterkeydom](https://github.com/Tencent/rapidjson/blob/master/example/filterkey/filterkey.cpp): 如上的工具，但展示如何使用生成器（generator）去填充一个 `Document`。
