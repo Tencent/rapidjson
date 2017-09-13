@@ -27,7 +27,7 @@
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
-<div id="topbanner"><a href="https://github.com/miloyip/rapidjson" title="RapidJSON GitHub"><i class="githublogo"></i></a></div>
+<div id="topbanner"><a href="https://github.com/Tencent/rapidjson" title="RapidJSON GitHub"><i class="githublogo"></i></a></div>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
           <img id="MSearchSelect" src="search/mag_sel.png"
@@ -306,7 +306,7 @@ MemoryPoolAllocator</h2>
 <p>为了支持需要费对齐的128位 SIMD 内存访问的算法，调用者的内存缓冲区申请应当考虑添加一些填充空间，这样被调用的函数可以安全地将地址指针用于未对齐的128位 SIMD 内存操作。 在结合非对齐的 SIMD 内存操作中，最小的对齐大小应该等于 SIMD 寄存器的大小。 </p>
 </blockquote>
 <p>对于 RapidJSON 来说，这显然是不可行的，因为 RapidJSON 不应当强迫用户进行内存对齐。</p>
-<p>为了修复这个问题，当前的代码会先按字节处理直到下一个对齐的地址。在这之后，使用对齐读取来进行 SIMD 处理。见 <a href="https://github.com/miloyip/rapidjson/issues/85">#85</a>。</p>
+<p>为了修复这个问题，当前的代码会先按字节处理直到下一个对齐的地址。在这之后，使用对齐读取来进行 SIMD 处理。见 <a href="https://github.com/Tencent/rapidjson/issues/85">#85</a>。</p>
 <h2><a class="anchor" id="LocalStreamCopy"></a>
 局部流拷贝</h2>
 <p>在优化的过程中，我们发现一些编译器不能将访问流的一些成员数据放入局部变量或者寄存器中。测试结果显示，对于一些流类型，创建流的拷贝并将其用于内层循环中可以改善性能。例如，实际（非 SIMD）的 <code><a class="el" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a" title="Skip the JSON white spaces in a stream. ">SkipWhitespace()</a></code> 被实现为：</p>

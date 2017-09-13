@@ -27,7 +27,7 @@
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
-<div id="topbanner"><a href="https://github.com/miloyip/rapidjson" title="RapidJSON GitHub"><i class="githublogo"></i></a></div>
+<div id="topbanner"><a href="https://github.com/Tencent/rapidjson" title="RapidJSON GitHub"><i class="githublogo"></i></a></div>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
           <img id="MSearchSelect" src="search/mag_sel.png"
@@ -306,7 +306,7 @@ Skip Whitespaces with SIMD</h2>
 <p>To support algorithms requiring unaligned 128-bit SIMD memory accesses, memory buffer allocation by a caller function should consider adding some pad space so that a callee function can safely use the address pointer safely with unaligned 128-bit SIMD memory operations. The minimal padding size should be the width of the SIMD register that might be used in conjunction with unaligned SIMD memory access. </p>
 </blockquote>
 <p>This is not feasible as RapidJSON should not enforce such requirement.</p>
-<p>To fix this issue, currently the routine process bytes up to the next aligned address. After tha, use aligned read to perform SIMD processing. Also see <a href="https://github.com/miloyip/rapidjson/issues/85">#85</a>.</p>
+<p>To fix this issue, currently the routine process bytes up to the next aligned address. After tha, use aligned read to perform SIMD processing. Also see <a href="https://github.com/Tencent/rapidjson/issues/85">#85</a>.</p>
 <h2><a class="anchor" id="LocalStreamCopy"></a>
 Local Stream Copy</h2>
 <p>During optimization, it is found that some compilers cannot localize some member data access of streams into local variables or registers. Experimental results show that for some stream types, making a copy of the stream and used it in inner-loop can improve performance. For example, the actual (non-SIMD) implementation of <code><a class="el" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a" title="Skip the JSON white spaces in a stream. ">SkipWhitespace()</a></code> is implemented as:</p>
