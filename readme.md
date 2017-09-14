@@ -22,8 +22,8 @@ Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights 
 
 [lin-badge]: https://travis-ci.org/Tencent/rapidjson.svg?branch=master "Travis build status"
 [lin-link]:  https://travis-ci.org/Tencent/rapidjson "Travis build status"
-[win-badge]: https://ci.appveyor.com/api/projects/status/github/Tencent/rapidjson?branch=master&svg=true "AppVeyor build status"
-[win-link]:  https://ci.appveyor.com/project/Tencent/rapidjson/branch/master "AppVeyor build status"
+[win-badge]: https://ci.appveyor.com/api/projects/status/l6qulgqahcayidrf/branch/master?svg=true "AppVeyor build status"
+[win-link]:  https://ci.appveyor.com/project/miloyip/rapidjson-0fdqj/branch/master "AppVeyor build status"
 [cov-badge]: https://coveralls.io/repos/Tencent/rapidjson/badge.svg?branch=master "Coveralls coverage"
 [cov-link]:  https://coveralls.io/r/Tencent/rapidjson?branch=master "Coveralls coverage"
 
