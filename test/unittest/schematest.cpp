@@ -1071,6 +1071,12 @@ public:
             "jsonschema/remotes/folder/folderInteger.json",
             "draft-04/schema"
         };
+        const char* uris[kCount] = {
+            "http://localhost:1234/integer.json",
+            "http://localhost:1234/subSchemas.json",
+            "http://localhost:1234/folder/folderInteger.json",
+            "http://json-schema.org/draft-04/schema"
+        };
 
         for (size_t i = 0; i < kCount; i++) {
             sd_[i] = 0;
@@ -1087,7 +1093,7 @@ public:
                 MemoryPoolAllocator<> stackAllocator(stackBuffer, sizeof(stackBuffer));
                 DocumentType d(&documentAllocator_, 1024, &stackAllocator);
                 d.Parse(json);
-                sd_[i] = new SchemaDocumentType(d, 0, &schemaAllocator_);
+                sd_[i] = new SchemaDocumentType(d, uris[i], static_cast<SizeType>(strlen(uris[i])), 0, &schemaAllocator_);
                 MemoryPoolAllocator<>::Free(json);
             }
         };
@@ -1099,15 +1105,8 @@ public:
     }
 
     virtual const SchemaDocumentType* GetRemoteDocument(const char* uri, SizeType length) {
-        const char* uris[kCount] = {
-            "http://localhost:1234/integer.json",
-            "http://localhost:1234/subSchemas.json",
-            "http://localhost:1234/folder/folderInteger.json",
-            "http://json-schema.org/draft-04/schema"
-        };
-
         for (size_t i = 0; i < kCount; i++)
-            if (strncmp(uri, uris[i], length) == 0 && strlen(uris[i]) == length)
+            if (typename SchemaDocumentType::URIType(uri, length) == sd_[i]->GetURI())
                 return sd_[i];
         return 0;
     }
@@ -1196,7 +1195,7 @@ TEST(SchemaValidator, TestSuite) {
             else {
                 for (Value::ConstValueIterator schemaItr = d.Begin(); schemaItr != d.End(); ++schemaItr) {
                     {
-                        SchemaDocumentType schema((*schemaItr)["schema"], &provider, &schemaAllocator);
+                        SchemaDocumentType schema((*schemaItr)["schema"], filenames[i], static_cast<SizeType>(strlen(filenames[i])), &provider, &schemaAllocator);
                         GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > validator(schema, &validatorAllocator);
                         const char* description1 = (*schemaItr)["description"].GetString();
                         const Value& tests = (*schemaItr)["tests"];
@@ -1359,7 +1358,7 @@ TEST(SchemaValidator, Ref_remote) {
     RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
     Document sd;
     sd.Parse("{\"$ref\": \"http://localhost:1234/subSchemas.json#/integer\"}");
-    SchemaDocumentType s(sd, &provider);
+    SchemaDocumentType s(sd, 0, 0, &provider);
     typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
     typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
     INVALIDATE_(s, "null", "/integer", "type", "", SchemaValidatorType, PointerType);

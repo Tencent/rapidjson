@@ -349,6 +349,7 @@ public:
 
     Schema(SchemaDocumentType* schemaDocument, const PointerType& p, const ValueType& value, const ValueType& document, AllocatorType* allocator) :
         allocator_(allocator),
+        uri_(schemaDocument->GetURI(), *allocator),
         pointer_(p),
         typeless_(schemaDocument->GetTypeless()),
         enum_(),
@@ -595,6 +596,10 @@ public:
             AllocatorType::Free(pattern_);
         }
 #endif
+    }
+
+    const SValue& GetURI() const {
+        return uri_;
     }
 
     const PointerType& GetPointer() const {
@@ -1220,6 +1225,7 @@ private:
     };
 
     AllocatorType* allocator_;
+    SValue uri_;
     PointerType pointer_;
     const SchemaType* typeless_;
     uint64_t* enum_;
@@ -1330,6 +1336,7 @@ public:
     typedef typename EncodingType::Ch Ch;
     typedef internal::Schema<GenericSchemaDocument> SchemaType;
     typedef GenericPointer<ValueType, Allocator> PointerType;
+    typedef GenericValue<EncodingType, Allocator> URIType;
     friend class internal::Schema<GenericSchemaDocument>;
     template <typename, typename, typename>
     friend class GenericSchemaValidator;
@@ -1339,10 +1346,13 @@ public:
         Compile a JSON document into schema document.
 
         \param document A JSON document as source.
+        \param uri The base URI of this schema document for purposes of violation reporting.
+        \param uriLength Length of \c name, in code points.
         \param remoteProvider An optional remote schema document provider for resolving remote reference. Can be null.
         \param allocator An optional allocator instance for allocating memory. Can be null.
     */
-    explicit GenericSchemaDocument(const ValueType& document, IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) :
+    explicit GenericSchemaDocument(const ValueType& document, const Ch* uri = 0, SizeType uriLength = 0,
+        IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) :
         remoteProvider_(remoteProvider),
         allocator_(allocator),
         ownAllocator_(),
@@ -1354,8 +1364,11 @@ public:
         if (!allocator_)
             ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
 
+        Ch noUri[1] = {0};
+        uri_.SetString(uri ? uri : noUri, uriLength, *allocator_);
+
         typeless_ = static_cast<SchemaType*>(allocator_->Malloc(sizeof(SchemaType)));
-        new (typeless_) SchemaType(this, PointerType(), ValueType(kObjectType).Move(), ValueType(kObjectType).Move(), 0);
+        new (typeless_) SchemaType(this, PointerType(), ValueType(kObjectType).Move(), ValueType(kObjectType).Move(), allocator_);
 
         // Generate root schema, it will call CreateSchema() to create sub-schemas,
         // And call AddRefSchema() if there are $ref.
@@ -1393,7 +1406,8 @@ public:
         root_(rhs.root_),
         typeless_(rhs.typeless_),
         schemaMap_(std::move(rhs.schemaMap_)),
-        schemaRef_(std::move(rhs.schemaRef_))
+        schemaRef_(std::move(rhs.schemaRef_)),
+        uri_(std::move(rhs.uri_))
     {
         rhs.remoteProvider_ = 0;
         rhs.allocator_ = 0;
@@ -1414,6 +1428,8 @@ public:
 
         RAPIDJSON_DELETE(ownAllocator_);
     }
+
+    const URIType& GetURI() const { return uri_; }
 
     //! Get the root schema.
     const SchemaType& GetRoot() const { return *root_; }
@@ -1545,6 +1561,7 @@ private:
     SchemaType* typeless_;
     internal::Stack<Allocator> schemaMap_;  // Stores created Pointer -> Schemas
     internal::Stack<Allocator> schemaRef_;  // Stores Pointer from $ref and schema which holds the $ref
+    URIType uri_;
 };
 
 //! GenericSchemaDocument using Value type.
