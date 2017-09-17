@@ -119,15 +119,19 @@ TEST(SchemaValidator, Hasher) {
         sb.Clear();\
         validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);\
         printf("Invalid document: %s\n", sb.GetString());\
+        sb.Clear();\
+        Writer<StringBuffer> w(sb);\
+        validator.GetError().Accept(w);\
+        printf("Validation error: %s\n", sb.GetString());\
     }\
 }
 
-#define INVALIDATE(schema, json, invalidSchemaPointer, invalidSchemaKeyword, invalidDocumentPointer) \
+#define INVALIDATE(schema, json, invalidSchemaPointer, invalidSchemaKeyword, invalidDocumentPointer, error) \
 {\
-    INVALIDATE_(schema, json, invalidSchemaPointer, invalidSchemaKeyword, invalidDocumentPointer, SchemaValidator, Pointer) \
+    INVALIDATE_(schema, json, invalidSchemaPointer, invalidSchemaKeyword, invalidDocumentPointer, error, SchemaValidator, Pointer) \
 }
 
-#define INVALIDATE_(schema, json, invalidSchemaPointer, invalidSchemaKeyword, invalidDocumentPointer,\
+#define INVALIDATE_(schema, json, invalidSchemaPointer, invalidSchemaKeyword, invalidDocumentPointer, error, \
     SchemaValidatorType, PointerType) \
 {\
     SchemaValidatorType validator(schema);\
@@ -154,6 +158,15 @@ TEST(SchemaValidator, Hasher) {
         printf("GetInvalidDocumentPointer() Expected: %s Actual: %s\n", invalidDocumentPointer, sb.GetString());\
         ADD_FAILURE();\
     }\
+    Document e;\
+    e.Parse(error);\
+    if (validator.GetError() != e) {\
+        StringBuffer sb;\
+        Writer<StringBuffer> w(sb);\
+        validator.GetError().Accept(w);\
+        printf("GetError() Expected: %s Actual: %s\n", error, sb.GetString());\
+        ADD_FAILURE();\
+    }\
 }
 
 TEST(SchemaValidator, Typeless) {
@@ -173,7 +186,11 @@ TEST(SchemaValidator, MultiType) {
 
     VALIDATE(s, "42", true);
     VALIDATE(s, "\"Life, the universe, and everything\"", true);
-    INVALIDATE(s, "[\"Life\", \"the universe\", \"and everything\"]", "", "type", "");
+    INVALIDATE(s, "[\"Life\", \"the universe\", \"and everything\"]", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"string\", \"number\"], \"actual\": \"array\""
+        "}}");
 }
 
 TEST(SchemaValidator, Enum_Typed) {
@@ -182,7 +199,8 @@ TEST(SchemaValidator, Enum_Typed) {
     SchemaDocument s(sd);
 
     VALIDATE(s, "\"red\"", true);
-    INVALIDATE(s, "\"blue\"", "", "enum", "");
+    INVALIDATE(s, "\"blue\"", "", "enum", "",
+        "{ \"enum\": { \"instanceRef\": \"#\", \"schemaRef\": \"#\" }}");
 }
 
 TEST(SchemaValidator, Enum_Typless) {
@@ -193,7 +211,8 @@ TEST(SchemaValidator, Enum_Typless) {
     VALIDATE(s, "\"red\"", true);
     VALIDATE(s, "null", true);
     VALIDATE(s, "42", true);
-    INVALIDATE(s, "0", "", "enum", "");
+    INVALIDATE(s, "0", "", "enum", "",
+        "{ \"enum\": { \"instanceRef\": \"#\", \"schemaRef\": \"#\" }}");
 }
 
 TEST(SchemaValidator, Enum_InvalidType) {
@@ -202,7 +221,11 @@ TEST(SchemaValidator, Enum_InvalidType) {
     SchemaDocument s(sd);
 
     VALIDATE(s, "\"red\"", true);
-    INVALIDATE(s, "null", "", "type", "");
+    INVALIDATE(s, "null", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"string\"], \"actual\": \"null\""
+        "}}");
 }
 
 TEST(SchemaValidator, AllOf) {
@@ -212,7 +235,17 @@ TEST(SchemaValidator, AllOf) {
         SchemaDocument s(sd);
 
         VALIDATE(s, "\"ok\"", true);
-        INVALIDATE(s, "\"too long\"", "", "allOf", "");
+        INVALIDATE(s, "\"too long\"", "", "allOf", "",
+            "{ \"allOf\": {"
+            "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+            "    \"errors\": ["
+            "      {},"
+            "      { \"maxLength\": { "
+            "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/1\", "
+            "          \"expected\": 5, \"actual\": \"too long\""
+            "      }}"
+            "    ]"
+            "}}");
     }
     {
         Document sd;
@@ -220,7 +253,16 @@ TEST(SchemaValidator, AllOf) {
         SchemaDocument s(sd);
 
         VALIDATE(s, "\"No way\"", false);
-        INVALIDATE(s, "-1", "", "allOf", "");
+        INVALIDATE(s, "-1", "", "allOf", "",
+            "{ \"allOf\": {"
+            "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+            "    \"errors\": ["
+            "      { \"type\": { \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
+            "          \"expected\": [\"string\"], \"actual\": \"integer\""
+            "      }},"
+            "      {}"
+            "    ]"
+            "}}");
     }
 }
 
@@ -231,7 +273,20 @@ TEST(SchemaValidator, AnyOf) {
 
     VALIDATE(s, "\"Yes\"", true);
     VALIDATE(s, "42", true);
-    INVALIDATE(s, "{ \"Not a\": \"string or number\" }", "", "anyOf", "");
+    INVALIDATE(s, "{ \"Not a\": \"string or number\" }", "", "anyOf", "",
+        "{ \"anyOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\", "
+        "    \"errors\": ["
+        "      { \"type\": {"
+        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/anyOf/0\","
+        "          \"expected\": [\"string\"], \"actual\": \"object\""
+        "      }},"
+        "      { \"type\": {"
+        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/anyOf/1\","
+        "          \"expected\": [\"number\"], \"actual\": \"object\""
+        "      }}"
+        "    ]"
+        "}}");
 }
 
 TEST(SchemaValidator, OneOf) {
@@ -241,8 +296,22 @@ TEST(SchemaValidator, OneOf) {
 
     VALIDATE(s, "10", true);
     VALIDATE(s, "9", true);
-    INVALIDATE(s, "2", "", "oneOf", "");
-    INVALIDATE(s, "15", "", "oneOf", "");
+    INVALIDATE(s, "2", "", "oneOf", "",
+        "{ \"oneOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"errors\": ["
+        "      { \"multipleOf\": {"
+        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/oneOf/0\","
+        "          \"expected\": 5, \"actual\": 2"
+        "      }},"
+        "      { \"multipleOf\": {"
+        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/oneOf/1\","
+        "          \"expected\": 3, \"actual\": 2"
+        "      }}"
+        "    ]"
+        "}}");
+    INVALIDATE(s, "15", "", "oneOf", "",
+        "{ \"oneOf\": { \"instanceRef\": \"#\", \"schemaRef\": \"#\", \"errors\": [{}, {}]}}");
 }
 
 TEST(SchemaValidator, Not) {
@@ -252,7 +321,8 @@ TEST(SchemaValidator, Not) {
 
     VALIDATE(s, "42", true);
     VALIDATE(s, "{ \"key\": \"value\" }", true);
-    INVALIDATE(s, "\"I am a string\"", "", "not", "");
+    INVALIDATE(s, "\"I am a string\"", "", "not", "",
+        "{ \"not\": { \"instanceRef\": \"#\", \"schemaRef\": \"#\" }}");
 }
 
 TEST(SchemaValidator, Ref) {
@@ -316,7 +386,17 @@ TEST(SchemaValidator, Ref_AllOf) {
         "}");
     SchemaDocument s(sd);
 
-    INVALIDATE(s, "{\"shipping_address\": {\"street_address\": \"1600 Pennsylvania Avenue NW\", \"city\": \"Washington\", \"state\": \"DC\"} }", "/properties/shipping_address", "allOf", "/shipping_address");
+    INVALIDATE(s, "{\"shipping_address\": {\"street_address\": \"1600 Pennsylvania Avenue NW\", \"city\": \"Washington\", \"state\": \"DC\"} }", "/properties/shipping_address", "allOf", "/shipping_address",
+        "{ \"allOf\": {"
+        "    \"instanceRef\": \"#/shipping_address\","
+        "    \"schemaRef\": \"#/properties/shipping_address\","
+        "    \"errors\": ["
+        "      {},"
+        "      { \"required\": {"
+        "          \"instanceRef\": \"#/shipping_address\","
+        "          \"schemaRef\": \"#/properties/shipping_address/allOf/1\","
+        "          \"missing\": [\"type\"]"
+        "}}  ] }}");
     VALIDATE(s, "{\"shipping_address\": {\"street_address\": \"1600 Pennsylvania Avenue NW\", \"city\": \"Washington\", \"state\": \"DC\", \"type\": \"business\"} }", true);
 }
 
@@ -326,11 +406,31 @@ TEST(SchemaValidator, String) {
     SchemaDocument s(sd);
 
     VALIDATE(s, "\"I'm a string\"", true);
-    INVALIDATE(s, "42", "", "type", "");
-    INVALIDATE(s, "2147483648", "", "type", ""); // 2^31 can only be fit in unsigned
-    INVALIDATE(s, "-2147483649", "", "type", ""); // -2^31 - 1 can only be fit in int64_t
-    INVALIDATE(s, "4294967296", "", "type", ""); // 2^32 can only be fit in int64_t
-    INVALIDATE(s, "3.1415926", "", "type", "");
+    INVALIDATE(s, "42", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"string\"], \"actual\": \"integer\""
+        "}}");
+    INVALIDATE(s, "2147483648", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"string\"], \"actual\": \"integer\""
+        "}}"); // 2^31 can only be fit in unsigned
+    INVALIDATE(s, "-2147483649", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"string\"], \"actual\": \"integer\""
+        "}}"); // -2^31 - 1 can only be fit in int64_t
+    INVALIDATE(s, "4294967296", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"string\"], \"actual\": \"integer\""
+        "}}"); // 2^32 can only be fit in int64_t
+    INVALIDATE(s, "3.1415926", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"string\"], \"actual\": \"number\""
+        "}}");
 }
 
 TEST(SchemaValidator, String_LengthRange) {
@@ -338,10 +438,18 @@ TEST(SchemaValidator, String_LengthRange) {
     sd.Parse("{\"type\":\"string\",\"minLength\":2,\"maxLength\":3}");
     SchemaDocument s(sd);
 
-    INVALIDATE(s, "\"A\"", "", "minLength", "");
+    INVALIDATE(s, "\"A\"", "", "minLength", "",
+        "{ \"minLength\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 2, \"actual\": \"A\""
+        "}}");
     VALIDATE(s, "\"AB\"", true);
     VALIDATE(s, "\"ABC\"", true);
-    INVALIDATE(s, "\"ABCD\"", "", "maxLength", "");
+    INVALIDATE(s, "\"ABCD\"", "", "maxLength", "",
+        "{ \"maxLength\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 3, \"actual\": \"ABCD\""
+        "}}");
 }
 
 #if RAPIDJSON_SCHEMA_HAS_REGEX
@@ -352,8 +460,16 @@ TEST(SchemaValidator, String_Pattern) {
 
     VALIDATE(s, "\"555-1212\"", true);
     VALIDATE(s, "\"(888)555-1212\"", true);
-    INVALIDATE(s, "\"(888)555-1212 ext. 532\"", "", "pattern", "");
-    INVALIDATE(s, "\"(800)FLOWERS\"", "", "pattern", "");
+    INVALIDATE(s, "\"(888)555-1212 ext. 532\"", "", "pattern", "",
+        "{ \"pattern\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"actual\": \"(888)555-1212 ext. 532\""
+        "}}");
+    INVALIDATE(s, "\"(800)FLOWERS\"", "", "pattern", "",
+        "{ \"pattern\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"actual\": \"(800)FLOWERS\""
+        "}}");
 }
 
 TEST(SchemaValidator, String_Pattern_Invalid) {
@@ -378,8 +494,16 @@ TEST(SchemaValidator, Integer) {
     VALIDATE(s, "-2147483649", true); // -2^31 - 1 can only be fit in int64_t
     VALIDATE(s, "2147483648", true); // 2^31 can only be fit in unsigned
     VALIDATE(s, "4294967296", true); // 2^32 can only be fit in int64_t
-    INVALIDATE(s, "3.1415926", "", "type", "");
-    INVALIDATE(s, "\"42\"", "", "type", "");
+    INVALIDATE(s, "3.1415926", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"integer\"], \"actual\": \"number\""
+        "}}");
+    INVALIDATE(s, "\"42\"", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"integer\"], \"actual\": \"string\""
+        "}}");
 }
 
 TEST(SchemaValidator, Integer_Range) {
@@ -387,12 +511,24 @@ TEST(SchemaValidator, Integer_Range) {
     sd.Parse("{\"type\":\"integer\",\"minimum\":0,\"maximum\":100,\"exclusiveMaximum\":true}");
     SchemaDocument s(sd);
 
-    INVALIDATE(s, "-1", "", "minimum", "");
+    INVALIDATE(s, "-1", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 0, \"actual\": -1"
+        "}}");
     VALIDATE(s, "0", true);
     VALIDATE(s, "10", true);
     VALIDATE(s, "99", true);
-    INVALIDATE(s, "100", "", "maximum", "");
-    INVALIDATE(s, "101", "", "maximum", "");
+    INVALIDATE(s, "100", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 100, \"exclusiveMaximum\": true, \"actual\": 100"
+        "}}");
+    INVALIDATE(s, "101", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 100, \"exclusiveMaximum\": true, \"actual\": 101"
+        "}}");
 }
 
 TEST(SchemaValidator, Integer_Range64Boundary) {
@@ -400,7 +536,11 @@ TEST(SchemaValidator, Integer_Range64Boundary) {
     sd.Parse("{\"type\":\"integer\",\"minimum\":-9223372036854775807,\"maximum\":9223372036854775806}");
     SchemaDocument s(sd);
 
-    INVALIDATE(s, "-9223372036854775808", "", "minimum", "");
+    INVALIDATE(s, "-9223372036854775808", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": -9223372036854775807, \"actual\": -9223372036854775808"
+        "}}");
     VALIDATE(s, "-9223372036854775807", true);
     VALIDATE(s, "-2147483648", true); // int min
     VALIDATE(s, "0", true);
@@ -408,8 +548,16 @@ TEST(SchemaValidator, Integer_Range64Boundary) {
     VALIDATE(s, "2147483648", true);  // unsigned first
     VALIDATE(s, "4294967295", true);  // unsigned max
     VALIDATE(s, "9223372036854775806", true);
-    INVALIDATE(s, "9223372036854775807", "", "maximum", "");
-    INVALIDATE(s, "18446744073709551615", "", "maximum", "");   // uint64_t max
+    INVALIDATE(s, "9223372036854775807", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 9223372036854775806, \"actual\": 9223372036854775807"
+        "}}");
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 9223372036854775806, \"actual\": 18446744073709551615"
+        "}}");   // uint64_t max
 }
 
 TEST(SchemaValidator, Integer_RangeU64Boundary) {
@@ -417,16 +565,48 @@ TEST(SchemaValidator, Integer_RangeU64Boundary) {
     sd.Parse("{\"type\":\"integer\",\"minimum\":9223372036854775808,\"maximum\":18446744073709551614}");
     SchemaDocument s(sd);
 
-    INVALIDATE(s, "-9223372036854775808", "", "minimum", "");
-    INVALIDATE(s, "9223372036854775807", "", "minimum", "");
-    INVALIDATE(s, "-2147483648", "", "minimum", ""); // int min
-    INVALIDATE(s, "0", "", "minimum", "");
-    INVALIDATE(s, "2147483647", "", "minimum", "");  // int max
-    INVALIDATE(s, "2147483648", "", "minimum", "");  // unsigned first
-    INVALIDATE(s, "4294967295", "", "minimum", "");  // unsigned max
+    INVALIDATE(s, "-9223372036854775808", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 9223372036854775808, \"actual\": -9223372036854775808"
+        "}}");
+    INVALIDATE(s, "9223372036854775807", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 9223372036854775808, \"actual\": 9223372036854775807"
+        "}}");
+    INVALIDATE(s, "-2147483648", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 9223372036854775808, \"actual\": -2147483648"
+        "}}"); // int min
+    INVALIDATE(s, "0", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 9223372036854775808, \"actual\": 0"
+        "}}");
+    INVALIDATE(s, "2147483647", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 9223372036854775808, \"actual\": 2147483647"
+        "}}");  // int max
+    INVALIDATE(s, "2147483648", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 9223372036854775808, \"actual\": 2147483648"
+        "}}");  // unsigned first
+    INVALIDATE(s, "4294967295", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 9223372036854775808, \"actual\": 4294967295"
+        "}}");  // unsigned max
     VALIDATE(s, "9223372036854775808", true);
     VALIDATE(s, "18446744073709551614", true);
-    INVALIDATE(s, "18446744073709551615", "", "maximum", "");
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 18446744073709551614, \"actual\": 18446744073709551615"
+        "}}");
 }
 
 TEST(SchemaValidator, Integer_Range64BoundaryExclusive) {
@@ -434,10 +614,20 @@ TEST(SchemaValidator, Integer_Range64BoundaryExclusive) {
     sd.Parse("{\"type\":\"integer\",\"minimum\":-9223372036854775808,\"maximum\":18446744073709551615,\"exclusiveMinimum\":true,\"exclusiveMaximum\":true}");
     SchemaDocument s(sd);
 
-    INVALIDATE(s, "-9223372036854775808", "", "minimum", "");
+    INVALIDATE(s, "-9223372036854775808", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": -9223372036854775808, \"exclusiveMinimum\": true, "
+        "    \"actual\": -9223372036854775808"
+        "}}");
     VALIDATE(s, "-9223372036854775807", true);
     VALIDATE(s, "18446744073709551614", true);
-    INVALIDATE(s, "18446744073709551615", "", "maximum", "");
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 18446744073709551615, \"exclusiveMaximum\": true, "
+        "    \"actual\": 18446744073709551615"
+        "}}");
 }
 
 TEST(SchemaValidator, Integer_MultipleOf) {
@@ -449,8 +639,16 @@ TEST(SchemaValidator, Integer_MultipleOf) {
     VALIDATE(s, "10", true);
     VALIDATE(s, "-10", true);
     VALIDATE(s, "20", true);
-    INVALIDATE(s, "23", "", "multipleOf", "");
-    INVALIDATE(s, "-23", "", "multipleOf", "");
+    INVALIDATE(s, "23", "", "multipleOf", "",
+        "{ \"multipleOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 10, \"actual\": 23"
+        "}}");
+    INVALIDATE(s, "-23", "", "multipleOf", "",
+        "{ \"multipleOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 10, \"actual\": -23"
+        "}}");
 }
 
 TEST(SchemaValidator, Integer_MultipleOf64Boundary) {
@@ -460,7 +658,11 @@ TEST(SchemaValidator, Integer_MultipleOf64Boundary) {
 
     VALIDATE(s, "0", true);
     VALIDATE(s, "18446744073709551615", true);
-    INVALIDATE(s, "18446744073709551614", "", "multipleOf", "");
+    INVALIDATE(s, "18446744073709551614", "", "multipleOf", "",
+        "{ \"multipleOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 18446744073709551615, \"actual\": 18446744073709551614"
+        "}}");
 }
 
 TEST(SchemaValidator, Number_Range) {
@@ -468,15 +670,31 @@ TEST(SchemaValidator, Number_Range) {
     sd.Parse("{\"type\":\"number\",\"minimum\":0,\"maximum\":100,\"exclusiveMaximum\":true}");
     SchemaDocument s(sd);
 
-    INVALIDATE(s, "-1", "", "minimum", "");
+    INVALIDATE(s, "-1", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 0, \"actual\": -1"
+        "}}");
     VALIDATE(s, "0", true);
     VALIDATE(s, "0.1", true);
     VALIDATE(s, "10", true);
     VALIDATE(s, "99", true);
     VALIDATE(s, "99.9", true);
-    INVALIDATE(s, "100", "", "maximum", "");
-    INVALIDATE(s, "100.0", "", "maximum", "");
-    INVALIDATE(s, "101.5", "", "maximum", "");
+    INVALIDATE(s, "100", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 100, \"exclusiveMaximum\": true, \"actual\": 100"
+        "}}");
+    INVALIDATE(s, "100.0", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 100, \"exclusiveMaximum\": true, \"actual\": 100.0"
+        "}}");
+    INVALIDATE(s, "101.5", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 100, \"exclusiveMaximum\": true, \"actual\": 101.5"
+        "}}");
 }
 
 TEST(SchemaValidator, Number_RangeInt) {
@@ -484,19 +702,63 @@ TEST(SchemaValidator, Number_RangeInt) {
     sd.Parse("{\"type\":\"number\",\"minimum\":-100,\"maximum\":-1,\"exclusiveMaximum\":true}");
     SchemaDocument s(sd);
 
-    INVALIDATE(s, "-101", "", "minimum", "");
-    INVALIDATE(s, "-100.1", "", "minimum", "");
+    INVALIDATE(s, "-101", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": -100, \"actual\": -101"
+        "}}");
+    INVALIDATE(s, "-100.1", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": -100, \"actual\": -100.1"
+        "}}");
     VALIDATE(s, "-100", true);
     VALIDATE(s, "-2", true);
-    INVALIDATE(s, "-1", "", "maximum", "");
-    INVALIDATE(s, "-0.9", "", "maximum", "");
-    INVALIDATE(s, "0", "", "maximum", "");
-    INVALIDATE(s, "2147483647", "", "maximum", "");  // int max
-    INVALIDATE(s, "2147483648", "", "maximum", "");  // unsigned first
-    INVALIDATE(s, "4294967295", "", "maximum", "");  // unsigned max
-    INVALIDATE(s, "9223372036854775808", "", "maximum", "");
-    INVALIDATE(s, "18446744073709551614", "", "maximum", "");
-    INVALIDATE(s, "18446744073709551615", "", "maximum", "");
+    INVALIDATE(s, "-1", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": -1"
+        "}}");
+    INVALIDATE(s, "-0.9", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": -0.9"
+        "}}");
+    INVALIDATE(s, "0", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": 0"
+        "}}");
+    INVALIDATE(s, "2147483647", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": 2147483647"
+        "}}");  // int max
+    INVALIDATE(s, "2147483648", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": 2147483648"
+        "}}");  // unsigned first
+    INVALIDATE(s, "4294967295", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": 4294967295"
+        "}}");  // unsigned max
+    INVALIDATE(s, "9223372036854775808", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": 9223372036854775808"
+        "}}");
+    INVALIDATE(s, "18446744073709551614", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": 18446744073709551614"
+        "}}");
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": 18446744073709551615"
+        "}}");
 }
 
 TEST(SchemaValidator, Number_RangeDouble) {
@@ -504,23 +766,75 @@ TEST(SchemaValidator, Number_RangeDouble) {
     sd.Parse("{\"type\":\"number\",\"minimum\":0.1,\"maximum\":100.1,\"exclusiveMaximum\":true}");
     SchemaDocument s(sd);
 
-    INVALIDATE(s, "-9223372036854775808", "", "minimum", "");
-    INVALIDATE(s, "-2147483648", "", "minimum", ""); // int min
-    INVALIDATE(s, "-1", "", "minimum", "");
+    INVALIDATE(s, "-9223372036854775808", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 0.1, \"actual\": -9223372036854775808"
+        "}}");
+    INVALIDATE(s, "-2147483648", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 0.1, \"actual\": -2147483648"
+        "}}"); // int min
+    INVALIDATE(s, "-1", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 0.1, \"actual\": -1"
+        "}}");
     VALIDATE(s, "0.1", true);
     VALIDATE(s, "10", true);
     VALIDATE(s, "99", true);
     VALIDATE(s, "100", true);
-    INVALIDATE(s, "101", "", "maximum", "");
-    INVALIDATE(s, "101.5", "", "maximum", "");
-    INVALIDATE(s, "18446744073709551614", "", "maximum", "");
-    INVALIDATE(s, "18446744073709551615", "", "maximum", "");
-    INVALIDATE(s, "2147483647", "", "maximum", "");  // int max
-    INVALIDATE(s, "2147483648", "", "maximum", "");  // unsigned first
-    INVALIDATE(s, "4294967295", "", "maximum", "");  // unsigned max
-    INVALIDATE(s, "9223372036854775808", "", "maximum", "");
-    INVALIDATE(s, "18446744073709551614", "", "maximum", "");
-    INVALIDATE(s, "18446744073709551615", "", "maximum", "");
+    INVALIDATE(s, "101", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 101"
+        "}}");
+    INVALIDATE(s, "101.5", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 101.5"
+        "}}");
+    INVALIDATE(s, "18446744073709551614", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 18446744073709551614"
+        "}}");
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 18446744073709551615"
+        "}}");
+    INVALIDATE(s, "2147483647", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 2147483647"
+        "}}");  // int max
+    INVALIDATE(s, "2147483648", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 2147483648"
+        "}}");  // unsigned first
+    INVALIDATE(s, "4294967295", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 4294967295"
+        "}}");  // unsigned max
+    INVALIDATE(s, "9223372036854775808", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 9223372036854775808"
+        "}}");
+    INVALIDATE(s, "18446744073709551614", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 18446744073709551614"
+        "}}");
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 18446744073709551615"
+        "}}");
 }
 
 TEST(SchemaValidator, Number_RangeDoubleU64Boundary) {
@@ -528,15 +842,43 @@ TEST(SchemaValidator, Number_RangeDoubleU64Boundary) {
     sd.Parse("{\"type\":\"number\",\"minimum\":9223372036854775808.0,\"maximum\":18446744073709550000.0}");
     SchemaDocument s(sd);
 
-    INVALIDATE(s, "-9223372036854775808", "", "minimum", "");
-    INVALIDATE(s, "-2147483648", "", "minimum", ""); // int min
-    INVALIDATE(s, "0", "", "minimum", "");
-    INVALIDATE(s, "2147483647", "", "minimum", "");  // int max
-    INVALIDATE(s, "2147483648", "", "minimum", "");  // unsigned first
-    INVALIDATE(s, "4294967295", "", "minimum", "");  // unsigned max
+    INVALIDATE(s, "-9223372036854775808", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 9223372036854775808.0, \"actual\": -9223372036854775808"
+        "}}");
+    INVALIDATE(s, "-2147483648", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 9223372036854775808.0, \"actual\": -2147483648"
+        "}}"); // int min
+    INVALIDATE(s, "0", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 9223372036854775808.0, \"actual\": 0"
+        "}}");
+    INVALIDATE(s, "2147483647", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 9223372036854775808.0, \"actual\": 2147483647"
+        "}}");  // int max
+    INVALIDATE(s, "2147483648", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 9223372036854775808.0, \"actual\": 2147483648"
+        "}}");  // unsigned first
+    INVALIDATE(s, "4294967295", "", "minimum", "",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 9223372036854775808.0, \"actual\": 4294967295"
+        "}}");  // unsigned max
     VALIDATE(s, "9223372036854775808", true);
     VALIDATE(s, "18446744073709540000", true);
-    INVALIDATE(s, "18446744073709551615", "", "maximum", "");
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "",
+        "{ \"maximum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 18446744073709550000.0, \"actual\": 18446744073709551615"
+        "}}");
 }
 
 TEST(SchemaValidator, Number_MultipleOf) {
@@ -548,13 +890,33 @@ TEST(SchemaValidator, Number_MultipleOf) {
     VALIDATE(s, "10", true);
     VALIDATE(s, "-10", true);
     VALIDATE(s, "20", true);
-    INVALIDATE(s, "23", "", "multipleOf", "");
-    INVALIDATE(s, "-2147483648", "", "multipleOf", "");  // int min
+    INVALIDATE(s, "23", "", "multipleOf", "",
+        "{ \"multipleOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 10.0, \"actual\": 23"
+        "}}");
+    INVALIDATE(s, "-2147483648", "", "multipleOf", "",
+        "{ \"multipleOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 10.0, \"actual\": -2147483648"
+        "}}");  // int min
     VALIDATE(s, "-2147483640", true);
-    INVALIDATE(s, "2147483647", "", "multipleOf", "");  // int max
-    INVALIDATE(s, "2147483648", "", "multipleOf", "");  // unsigned first
+    INVALIDATE(s, "2147483647", "", "multipleOf", "",
+        "{ \"multipleOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 10.0, \"actual\": 2147483647"
+        "}}");  // int max
+    INVALIDATE(s, "2147483648", "", "multipleOf", "",
+        "{ \"multipleOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 10.0, \"actual\": 2147483648"
+        "}}");  // unsigned first
     VALIDATE(s, "2147483650", true);
-    INVALIDATE(s, "4294967295", "", "multipleOf", "");  // unsigned max
+    INVALIDATE(s, "4294967295", "", "multipleOf", "",
+        "{ \"multipleOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 10.0, \"actual\": 4294967295"
+        "}}");  // unsigned max
     VALIDATE(s, "4294967300", true);
 }
 
@@ -565,7 +927,11 @@ TEST(SchemaValidator, Number_MultipleOfOne) {
 
     VALIDATE(s, "42", true);
     VALIDATE(s, "42.0", true);
-    INVALIDATE(s, "3.1415926", "", "multipleOf", "");
+    INVALIDATE(s, "3.1415926", "", "multipleOf", "",
+        "{ \"multipleOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 1, \"actual\": 3.1415926"
+        "}}");
 }
 
 TEST(SchemaValidator, Object) {
@@ -575,8 +941,16 @@ TEST(SchemaValidator, Object) {
 
     VALIDATE(s, "{\"key\":\"value\",\"another_key\":\"another_value\"}", true);
     VALIDATE(s, "{\"Sun\":1.9891e30,\"Jupiter\":1.8986e27,\"Saturn\":5.6846e26,\"Neptune\":10.243e25,\"Uranus\":8.6810e25,\"Earth\":5.9736e24,\"Venus\":4.8685e24,\"Mars\":6.4185e23,\"Mercury\":3.3022e23,\"Moon\":7.349e22,\"Pluto\":1.25e22}", true);    
-    INVALIDATE(s, "[\"An\", \"array\", \"not\", \"an\", \"object\"]", "", "type", "");
-    INVALIDATE(s, "\"Not an object\"", "", "type", "");
+    INVALIDATE(s, "[\"An\", \"array\", \"not\", \"an\", \"object\"]", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"object\"], \"actual\": \"array\""
+        "}}");
+    INVALIDATE(s, "\"Not an object\"", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"object\"], \"actual\": \"string\""
+        "}}");
 }
 
 TEST(SchemaValidator, Object_Properties) {
@@ -594,7 +968,17 @@ TEST(SchemaValidator, Object_Properties) {
     SchemaDocument s(sd);
 
     VALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\" }", true);
-    INVALIDATE(s, "{ \"number\": \"1600\", \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\" }", "/properties/number", "type", "/number");
+    INVALIDATE(s, "{ \"number\": \"1600\", \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\" }", "/properties/number", "type", "/number",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#/number\", \"schemaRef\": \"#/properties/number\","
+        "    \"expected\": [\"number\"], \"actual\": \"string\""
+        "}}");
+    INVALIDATE(s, "{ \"number\": \"One\", \"street_name\": \"Microsoft\", \"street_type\": \"Way\" }",
+        "/properties/number", "type", "/number",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#/number\", \"schemaRef\": \"#/properties/number\","
+        "    \"expected\": [\"number\"], \"actual\": \"string\""
+        "}}"); // fail fast
     VALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\" }", true);
     VALIDATE(s, "{}", true);
     VALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\", \"direction\": \"NW\" }", true);
@@ -618,7 +1002,11 @@ TEST(SchemaValidator, Object_AdditionalPropertiesBoolean) {
     SchemaDocument s(sd);
 
     VALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\" }", true);
-    INVALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\", \"direction\": \"NW\" }", "", "additionalProperties", "/direction");
+    INVALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\", \"direction\": \"NW\" }", "", "additionalProperties", "/direction",
+        "{ \"additionalProperties\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"disallowed\": \"direction\""
+        "}}");
 }
 
 TEST(SchemaValidator, Object_AdditionalPropertiesObject) {
@@ -639,7 +1027,11 @@ TEST(SchemaValidator, Object_AdditionalPropertiesObject) {
 
     VALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\" }", true);
     VALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\", \"direction\": \"NW\" }", true);
-    INVALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\", \"office_number\": 201 }", "/additionalProperties", "type", "/office_number");
+    INVALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\", \"office_number\": 201 }", "/additionalProperties", "type", "/office_number",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#/office_number\", \"schemaRef\": \"#/additionalProperties\","
+        "    \"expected\": [\"string\"], \"actual\": \"integer\""
+        "}}");
 }
 
 TEST(SchemaValidator, Object_Required) {
@@ -659,7 +1051,16 @@ TEST(SchemaValidator, Object_Required) {
 
     VALIDATE(s, "{ \"name\": \"William Shakespeare\", \"email\" : \"bill@stratford-upon-avon.co.uk\" }", true);
     VALIDATE(s, "{ \"name\": \"William Shakespeare\", \"email\" : \"bill@stratford-upon-avon.co.uk\", \"address\" : \"Henley Street, Stratford-upon-Avon, Warwickshire, England\", \"authorship\" : \"in question\"}", true);
-    INVALIDATE(s, "{ \"name\": \"William Shakespeare\", \"address\" : \"Henley Street, Stratford-upon-Avon, Warwickshire, England\" }", "", "required", "");
+    INVALIDATE(s, "{ \"name\": \"William Shakespeare\", \"address\" : \"Henley Street, Stratford-upon-Avon, Warwickshire, England\" }", "", "required", "",
+        "{ \"required\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"missing\": [\"email\"]"
+        "}}");
+    INVALIDATE(s, "{}", "", "required", "",
+        "{ \"required\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"missing\": [\"name\", \"email\"]"
+        "}}");
 }
 
 
@@ -668,11 +1069,23 @@ TEST(SchemaValidator, Object_PropertiesRange) {
     sd.Parse("{\"type\":\"object\", \"minProperties\":2, \"maxProperties\":3}");
     SchemaDocument s(sd);
 
-    INVALIDATE(s, "{}", "", "minProperties", "");
-    INVALIDATE(s, "{\"a\":0}", "", "minProperties", "");
+    INVALIDATE(s, "{}", "", "minProperties", "",
+        "{ \"minProperties\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 2, \"actual\": 0"
+        "}}");
+    INVALIDATE(s, "{\"a\":0}", "", "minProperties", "",
+        "{ \"minProperties\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 2, \"actual\": 1"
+        "}}");
     VALIDATE(s, "{\"a\":0,\"b\":1}", true);
     VALIDATE(s, "{\"a\":0,\"b\":1,\"c\":2}", true);
-    INVALIDATE(s, "{\"a\":0,\"b\":1,\"c\":2,\"d\":3}", "", "maxProperties", "");
+    INVALIDATE(s, "{\"a\":0,\"b\":1,\"c\":2,\"d\":3}", "", "maxProperties", "",
+        "{ \"maxProperties\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\", "
+        "    \"expected\": 3, \"actual\": 4"
+        "}}");
 }
 
 TEST(SchemaValidator, Object_PropertyDependencies) {
@@ -683,19 +1096,25 @@ TEST(SchemaValidator, Object_PropertyDependencies) {
         "  \"properties\": {"
         "    \"name\": { \"type\": \"string\" },"
         "    \"credit_card\": { \"type\": \"number\" },"
+        "    \"cvv_code\": { \"type\": \"number\" },"
         "    \"billing_address\": { \"type\": \"string\" }"
         "  },"
         "  \"required\": [\"name\"],"
         "  \"dependencies\": {"
-        "    \"credit_card\": [\"billing_address\"]"
+        "    \"credit_card\": [\"cvv_code\", \"billing_address\"]"
         "  }"
         "}");
     SchemaDocument s(sd);
 
-    VALIDATE(s, "{ \"name\": \"John Doe\", \"credit_card\": 5555555555555555, \"billing_address\": \"555 Debtor's Lane\" }", true);
-    INVALIDATE(s, "{ \"name\": \"John Doe\", \"credit_card\": 5555555555555555 }", "", "dependencies", "");
+    VALIDATE(s, "{ \"name\": \"John Doe\", \"credit_card\": 5555555555555555, \"cvv_code\": 777, "
+        "\"billing_address\": \"555 Debtor's Lane\" }", true);
+    INVALIDATE(s, "{ \"name\": \"John Doe\", \"credit_card\": 5555555555555555 }", "", "dependencies", "",
+        "{ \"dependencies\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"errors\": {\"credit_card\": [\"cvv_code\", \"billing_address\"]}"
+        "}}");
     VALIDATE(s, "{ \"name\": \"John Doe\"}", true);
-    VALIDATE(s, "{ \"name\": \"John Doe\", \"billing_address\": \"555 Debtor's Lane\" }", true);
+    VALIDATE(s, "{ \"name\": \"John Doe\", \"cvv_code\": 777, \"billing_address\": \"555 Debtor's Lane\" }", true);
 }
 
 TEST(SchemaValidator, Object_SchemaDependencies) {
@@ -720,7 +1139,16 @@ TEST(SchemaValidator, Object_SchemaDependencies) {
     SchemaDocument s(sd);
 
     VALIDATE(s, "{\"name\": \"John Doe\", \"credit_card\" : 5555555555555555,\"billing_address\" : \"555 Debtor's Lane\"}", true);
-    INVALIDATE(s, "{\"name\": \"John Doe\", \"credit_card\" : 5555555555555555 }", "", "dependencies", "");
+    INVALIDATE(s, "{\"name\": \"John Doe\", \"credit_card\" : 5555555555555555 }", "", "dependencies", "",
+        "{ \"dependencies\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"errors\": {"
+        "      \"credit_card\": {"
+        "        \"required\": {"
+        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/dependencies/credit_card\","
+        "          \"missing\": [\"billing_address\"]"
+        "    } } }"
+        "}}");
     VALIDATE(s, "{\"name\": \"John Doe\", \"billing_address\" : \"555 Debtor's Lane\"}", true);
 }
 
@@ -739,9 +1167,75 @@ TEST(SchemaValidator, Object_PatternProperties) {
 
     VALIDATE(s, "{ \"S_25\": \"This is a string\" }", true);
     VALIDATE(s, "{ \"I_0\": 42 }", true);
-    INVALIDATE(s, "{ \"S_0\": 42 }", "", "patternProperties", "/S_0");
-    INVALIDATE(s, "{ \"I_42\": \"This is a string\" }", "", "patternProperties", "/I_42");
+    INVALIDATE(s, "{ \"S_0\": 42 }", "", "patternProperties", "/S_0",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#/S_0\", \"schemaRef\": \"#/patternProperties/%5ES_\","
+        "    \"expected\": [\"string\"], \"actual\": \"integer\""
+        "}}");
+    INVALIDATE(s, "{ \"I_42\": \"This is a string\" }", "", "patternProperties", "/I_42",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#/I_42\", \"schemaRef\": \"#/patternProperties/%5EI_\","
+        "    \"expected\": [\"integer\"], \"actual\": \"string\""
+        "}}");
     VALIDATE(s, "{ \"keyword\": \"value\" }", true);
+}
+
+TEST(SchemaValidator, Object_PattternProperties_ErrorConflict) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "  \"type\": \"object\","
+        "  \"patternProperties\": {"
+        "    \"^I_\": { \"multipleOf\": 5 },"
+        "    \"30$\": { \"multipleOf\": 6 }"
+        "  }"
+        "}");
+    SchemaDocument s(sd);
+
+    VALIDATE(s, "{ \"I_30\": 30 }", true);
+    INVALIDATE(s, "{ \"I_30\": 7 }", "", "patternProperties", "/I_30",
+        "{ \"multipleOf\": ["
+        "    {"
+        "      \"instanceRef\": \"#/I_30\", \"schemaRef\": \"#/patternProperties/%5EI_\","
+        "      \"expected\": 5, \"actual\": 7"
+        "    }, {"
+        "      \"instanceRef\": \"#/I_30\", \"schemaRef\": \"#/patternProperties/30%24\","
+        "      \"expected\": 6, \"actual\": 7"
+        "    }"
+        "]}");
+}
+
+TEST(SchemaValidator, Object_Properties_PatternProperties) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "  \"type\": \"object\","
+        "  \"properties\": {"
+        "    \"I_42\": { \"type\": \"integer\", \"minimum\": 73 }"
+        "  },"
+        "  \"patternProperties\": {"
+        "    \"^I_\": { \"type\": \"integer\", \"multipleOf\": 6 }"
+        "  }"
+        "}");
+    SchemaDocument s(sd);
+
+    VALIDATE(s, "{ \"I_6\": 6 }", true);
+    VALIDATE(s, "{ \"I_42\": 78 }", true);
+    INVALIDATE(s, "{ \"I_42\": 42 }", "", "patternProperties", "/I_42",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#/I_42\", \"schemaRef\": \"#/properties/I_42\","
+        "    \"expected\": 73, \"actual\": 42"
+        "}}");
+    INVALIDATE(s, "{ \"I_42\": 7 }", "", "patternProperties", "/I_42",
+        "{ \"minimum\": {"
+        "    \"instanceRef\": \"#/I_42\", \"schemaRef\": \"#/properties/I_42\","
+        "    \"expected\": 73, \"actual\": 7"
+        "  },"
+        "  \"multipleOf\": {"
+        "    \"instanceRef\": \"#/I_42\", \"schemaRef\": \"#/patternProperties/%5EI_\","
+        "    \"expected\": 6, \"actual\": 7"
+        "  }"
+        "}");
 }
 
 TEST(SchemaValidator, Object_PatternProperties_AdditionalProperties) {
@@ -762,7 +1256,11 @@ TEST(SchemaValidator, Object_PatternProperties_AdditionalProperties) {
 
     VALIDATE(s, "{ \"builtin\": 42 }", true);
     VALIDATE(s, "{ \"keyword\": \"value\" }", true);
-    INVALIDATE(s, "{ \"keyword\": 42 }", "/additionalProperties", "type", "/keyword");
+    INVALIDATE(s, "{ \"keyword\": 42 }", "/additionalProperties", "type", "/keyword",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#/keyword\", \"schemaRef\": \"#/additionalProperties\","
+        "    \"expected\": [\"string\"], \"actual\": \"integer\""
+        "}}");
 }
 #endif
 
@@ -773,7 +1271,11 @@ TEST(SchemaValidator, Array) {
 
     VALIDATE(s, "[1, 2, 3, 4, 5]", true);
     VALIDATE(s, "[3, \"different\", { \"types\" : \"of values\" }]", true);
-    INVALIDATE(s, "{\"Not\": \"an array\"}", "", "type", "");
+    INVALIDATE(s, "{\"Not\": \"an array\"}", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"array\"], \"actual\": \"object\""
+        "}}");
 }
 
 TEST(SchemaValidator, Array_ItemsList) {
@@ -788,7 +1290,11 @@ TEST(SchemaValidator, Array_ItemsList) {
     SchemaDocument s(sd);
 
     VALIDATE(s, "[1, 2, 3, 4, 5]", true);
-    INVALIDATE(s, "[1, 2, \"3\", 4, 5]", "/items", "type", "/2");
+    INVALIDATE(s, "[1, 2, \"3\", 4, 5]", "/items", "type", "/2",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#/2\", \"schemaRef\": \"#/items\","
+        "    \"expected\": [\"number\"], \"actual\": \"string\""
+        "}}");
     VALIDATE(s, "[]", true);
 }
 
@@ -817,8 +1323,18 @@ TEST(SchemaValidator, Array_ItemsTuple) {
     SchemaDocument s(sd);
 
     VALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\", \"NW\"]", true);
-    INVALIDATE(s, "[24, \"Sussex\", \"Drive\"]", "/items/2", "enum", "/2");
-    INVALIDATE(s, "[\"Palais de l'Elysee\"]", "/items/0", "type", "/0");
+    INVALIDATE(s, "[24, \"Sussex\", \"Drive\"]", "/items/2", "enum", "/2",
+        "{ \"enum\": { \"instanceRef\": \"#/2\", \"schemaRef\": \"#/items/2\" }}");
+    INVALIDATE(s, "[\"Palais de l'Elysee\"]", "/items/0", "type", "/0",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#/0\", \"schemaRef\": \"#/items/0\","
+        "    \"expected\": [\"number\"], \"actual\": \"string\""
+        "}}");
+    INVALIDATE(s, "[\"Twenty-four\", \"Sussex\", \"Drive\"]", "/items/0", "type", "/0",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#/0\", \"schemaRef\": \"#/items/0\","
+        "    \"expected\": [\"number\"], \"actual\": \"string\""
+        "}}"); // fail fast
     VALIDATE(s, "[10, \"Downing\", \"Street\"]", true);
     VALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\", \"NW\", \"Washington\"]", true);
 }
@@ -850,7 +1366,11 @@ TEST(SchemaValidator, Array_AdditionalItmes) {
 
     VALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\", \"NW\"]", true);
     VALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\"]", true);
-    INVALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\", \"NW\", \"Washington\"]", "", "items", "/4");
+    INVALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\", \"NW\", \"Washington\"]", "", "items", "/4",
+        "{ \"additionalItems\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"disallowed\": 4"
+        "}}");
 }
 
 TEST(SchemaValidator, Array_ItemsRange) {
@@ -858,11 +1378,23 @@ TEST(SchemaValidator, Array_ItemsRange) {
     sd.Parse("{\"type\": \"array\",\"minItems\": 2,\"maxItems\" : 3}");
     SchemaDocument s(sd);
 
-    INVALIDATE(s, "[]", "", "minItems", "");
-    INVALIDATE(s, "[1]", "", "minItems", "");
+    INVALIDATE(s, "[]", "", "minItems", "",
+        "{ \"minItems\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 2, \"actual\": 0"
+        "}}");
+    INVALIDATE(s, "[1]", "", "minItems", "",
+        "{ \"minItems\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 2, \"actual\": 1"
+        "}}");
     VALIDATE(s, "[1, 2]", true);
     VALIDATE(s, "[1, 2, 3]", true);
-    INVALIDATE(s, "[1, 2, 3, 4]", "", "maxItems", "");
+    INVALIDATE(s, "[1, 2, 3, 4]", "", "maxItems", "",
+        "{ \"maxItems\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 3, \"actual\": 4"
+        "}}");
 }
 
 TEST(SchemaValidator, Array_UniqueItems) {
@@ -871,7 +1403,16 @@ TEST(SchemaValidator, Array_UniqueItems) {
     SchemaDocument s(sd);
 
     VALIDATE(s, "[1, 2, 3, 4, 5]", true);
-    INVALIDATE(s, "[1, 2, 3, 3, 4]", "", "uniqueItems", "/3");
+    INVALIDATE(s, "[1, 2, 3, 3, 4]", "", "uniqueItems", "/3",
+        "{ \"uniqueItems\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"duplicates\": [2, 3]"
+        "}}");
+    INVALIDATE(s, "[1, 2, 3, 3, 3]", "", "uniqueItems", "/3",
+        "{ \"uniqueItems\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"duplicates\": [2, 3]"
+        "}}"); // fail fast
     VALIDATE(s, "[]", true);
 }
 
@@ -882,8 +1423,16 @@ TEST(SchemaValidator, Boolean) {
 
     VALIDATE(s, "true", true);
     VALIDATE(s, "false", true);
-    INVALIDATE(s, "\"true\"", "", "type", "");
-    INVALIDATE(s, "0", "", "type", "");
+    INVALIDATE(s, "\"true\"", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"boolean\"], \"actual\": \"string\""
+        "}}");
+    INVALIDATE(s, "0", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"boolean\"], \"actual\": \"integer\""
+        "}}");
 }
 
 TEST(SchemaValidator, Null) {
@@ -892,9 +1441,21 @@ TEST(SchemaValidator, Null) {
     SchemaDocument s(sd);
 
     VALIDATE(s, "null", true);
-    INVALIDATE(s, "false", "", "type", "");
-    INVALIDATE(s, "0", "", "type", "");
-    INVALIDATE(s, "\"\"", "", "type", "");
+    INVALIDATE(s, "false", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"null\"], \"actual\": \"boolean\""
+        "}}");
+    INVALIDATE(s, "0", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"null\"], \"actual\": \"integer\""
+        "}}");
+    INVALIDATE(s, "\"\"", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"null\"], \"actual\": \"string\""
+        "}}");
 }
 
 // Additional tests
@@ -905,8 +1466,16 @@ TEST(SchemaValidator, ObjectInArray) {
     SchemaDocument s(sd);
 
     VALIDATE(s, "[\"a\"]", true);
-    INVALIDATE(s, "[1]", "/items", "type", "/0");
-    INVALIDATE(s, "[{}]", "/items", "type", "/0");
+    INVALIDATE(s, "[1]", "/items", "type", "/0",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#/0\", \"schemaRef\": \"#/items\","
+        "    \"expected\": [\"string\"], \"actual\": \"integer\""
+        "}}");
+    INVALIDATE(s, "[{}]", "/items", "type", "/0",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#/0\", \"schemaRef\": \"#/items\","
+        "    \"expected\": [\"string\"], \"actual\": \"object\""
+        "}}");
 }
 
 TEST(SchemaValidator, MultiTypeInObject) {
@@ -924,7 +1493,11 @@ TEST(SchemaValidator, MultiTypeInObject) {
 
     VALIDATE(s, "{ \"tel\": 999 }", true);
     VALIDATE(s, "{ \"tel\": \"123-456\" }", true);
-    INVALIDATE(s, "{ \"tel\": true }", "/properties/tel", "type", "/tel");
+    INVALIDATE(s, "{ \"tel\": true }", "/properties/tel", "type", "/tel",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#/tel\", \"schemaRef\": \"#/properties/tel\","
+        "    \"expected\": [\"string\", \"integer\"], \"actual\": \"boolean\""
+        "}}");
 }
 
 TEST(SchemaValidator, MultiTypeWithObject) {
@@ -942,7 +1515,11 @@ TEST(SchemaValidator, MultiTypeWithObject) {
 
     VALIDATE(s, "\"Hello\"", true);
     VALIDATE(s, "{ \"tel\": 999 }", true);
-    INVALIDATE(s, "{ \"tel\": \"fail\" }", "/properties/tel", "type", "/tel");
+    INVALIDATE(s, "{ \"tel\": \"fail\" }", "/properties/tel", "type", "/tel",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#/tel\", \"schemaRef\": \"#/properties/tel\","
+        "    \"expected\": [\"integer\"], \"actual\": \"string\""
+        "}}");
 }
 
 TEST(SchemaValidator, AllOf_Nested) {
@@ -959,11 +1536,88 @@ TEST(SchemaValidator, AllOf_Nested) {
 
     VALIDATE(s, "\"ok\"", true);
     VALIDATE(s, "\"OK\"", true);
-    INVALIDATE(s, "\"okay\"", "", "allOf", "");
-    INVALIDATE(s, "\"o\"", "", "allOf", "");
-    INVALIDATE(s, "\"n\"", "", "allOf", "");
-    INVALIDATE(s, "\"too long\"", "", "allOf", "");
-    INVALIDATE(s, "123", "", "allOf", "");
+    INVALIDATE(s, "\"okay\"", "", "allOf", "",
+        "{ \"allOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"errors\": ["
+        "      {}, "
+        "      {}, "
+        "      { \"allOf\": {"
+        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2\","
+        "          \"errors\": ["
+        "            {}, "
+        "            { \"enum\": {"
+        "                \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\""
+        "}}  ] }}  ] }}");
+    INVALIDATE(s, "\"o\"", "", "allOf", "",
+        "{ \"allOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"errors\": ["
+        "      { \"minLength\": {"
+        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
+        "          \"expected\": 2, \"actual\": \"o\""
+        "      }},"
+        "      {},"
+        "      {}"
+        "    ]"
+        "}}");
+    INVALIDATE(s, "\"n\"", "", "allOf", "",
+        "{ \"allOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"errors\": ["
+        "      { \"minLength\": {"
+        "        \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
+        "        \"expected\": 2, \"actual\": \"n\""
+        "      }},"
+        "      {}, "
+        "      { \"allOf\": {"
+        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2\","
+        "          \"errors\": ["
+        "            { \"enum\": {"
+        "              \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/0\""
+        "            }},"
+        "            { \"enum\": {"
+        "              \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\""
+        "}}  ] }}  ] }}");
+    INVALIDATE(s, "\"too long\"", "", "allOf", "",
+        "{ \"allOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"errors\": ["
+        "      {}, "
+        "      { \"maxLength\": {"
+        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/1\","
+        "          \"expected\": 5, \"actual\": \"too long\""
+        "      }},"
+        "      { \"allOf\": {"
+        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2\","
+        "          \"errors\": ["
+        "            { \"enum\": {"
+        "                \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/0\""
+        "            }},"
+        "            { \"enum\": {"
+        "                \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\""
+        "}}  ] }}  ] }}");
+    INVALIDATE(s, "123", "", "allOf", "",
+        "{ \"allOf\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"errors\": ["
+        "      { \"type\": {"
+        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
+        "          \"expected\": [\"string\"], \"actual\": \"integer\""
+        "      }},"
+        "      { \"type\": {"
+        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/1\","
+        "          \"expected\": [\"string\"], \"actual\": \"integer\""
+        "      }},"
+        "      { \"allOf\": {"
+        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2\","
+        "          \"errors\": ["
+        "            { \"enum\": {"
+        "                \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/0\""
+        "            }}, "
+        "            { \"enum\": {"
+        "                \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\""
+        "}}  ] }}  ] }}");
 }
 
 TEST(SchemaValidator, EscapedPointer) {
@@ -976,7 +1630,11 @@ TEST(SchemaValidator, EscapedPointer) {
         "  }"
         "}");
     SchemaDocument s(sd);
-    INVALIDATE(s, "{\"~/\":true}", "/properties/~0~1", "type", "/~0~1");
+    INVALIDATE(s, "{\"~/\":true}", "/properties/~0~1", "type", "/~0~1",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#/~0~1\", \"schemaRef\": \"#/properties/~0~1\","
+        "    \"expected\": [\"number\"], \"actual\": \"boolean\""
+        "}}");
 }
 
 template <typename Allocator>
@@ -1026,6 +1684,10 @@ TEST(SchemaValidator, ValidateMetaSchema) {
         sb.Clear();
         validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);
         printf("Invalid document: %s\n", sb.GetString());
+        sb.Clear();
+        Writer<StringBuffer> w(sb);
+        validator.GetError().Accept(w);
+        printf("Validation error: %s\n", sb.GetString());
         ADD_FAILURE();
     }
     CrtAllocator::Free(json);
@@ -1053,6 +1715,10 @@ TEST(SchemaValidator, ValidateMetaSchema_UTF16) {
         sb.Clear();
         validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);
         wprintf(L"Invalid document: %ls\n", sb.GetString());
+        sb.Clear();
+        Writer<GenericStringBuffer<UTF16<> >, UTF16<> > w(sb);
+        validator.GetError().Accept(w);
+        printf("Validation error: %ls\n", sb.GetString());
         ADD_FAILURE();
     }
     CrtAllocator::Free(json);
@@ -1260,6 +1926,15 @@ TEST(SchemaValidatingReader, Invalid) {
     EXPECT_TRUE(reader.GetInvalidSchemaPointer() == SchemaDocument::PointerType(""));
     EXPECT_TRUE(reader.GetInvalidDocumentPointer() == SchemaDocument::PointerType(""));
     EXPECT_TRUE(d.IsNull());
+    Document e;
+    e.Parse(
+        "{ \"maxLength\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 3, \"actual\": \"ABCD\""
+        "}}");
+    if (e != reader.GetError()) {
+        ADD_FAILURE();
+    }
 }
 
 TEST(SchemaValidatingWriter, Simple) {
@@ -1284,6 +1959,13 @@ TEST(SchemaValidatingWriter, Simple) {
     EXPECT_FALSE(validator.IsValid());
     EXPECT_TRUE(validator.GetInvalidSchemaPointer() == SchemaDocument::PointerType(""));
     EXPECT_TRUE(validator.GetInvalidDocumentPointer() == SchemaDocument::PointerType(""));
+    Document e;
+    e.Parse(
+        "{ \"maxLength\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": 3, \"actual\": \"ABCD\""
+        "}}");
+    EXPECT_EQ(e, validator.GetError());
 }
 
 TEST(Schema, Issue848) {
@@ -1305,7 +1987,11 @@ TEST(Schema, Issue552) {
     SchemaDocument s = ReturnSchemaDocument();
     VALIDATE(s, "42", true);
     VALIDATE(s, "\"Life, the universe, and everything\"", true);
-    INVALIDATE(s, "[\"Life\", \"the universe\", \"and everything\"]", "", "type", "");
+    INVALIDATE(s, "[\"Life\", \"the universe\", \"and everything\"]", "", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"string\", \"number\"], \"actual\": \"array\""
+        "}}");
 }
 
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
@@ -1316,7 +2002,11 @@ TEST(SchemaValidator, Issue608) {
     SchemaDocument s(sd);
 
     VALIDATE(s, "{\"a\" : null, \"b\": null}", true);
-    INVALIDATE(s, "{\"a\" : null, \"a\" : null}", "", "required", "");
+    INVALIDATE(s, "{\"a\" : null, \"a\" : null}", "", "required", "",
+        "{ \"required\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"missing\": [\"b\"]"
+        "}}");
 }
 
 // Fail to resolve $ref in allOf causes crash in SchemaValidator::StartObject()
@@ -1361,7 +2051,13 @@ TEST(SchemaValidator, Ref_remote) {
     SchemaDocumentType s(sd, 0, 0, &provider);
     typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
     typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
-    INVALIDATE_(s, "null", "/integer", "type", "", SchemaValidatorType, PointerType);
+    INVALIDATE_(s, "null", "/integer", "type", "",
+        "{ \"type\": {"
+        "    \"instanceRef\": \"#\","
+        "    \"schemaRef\": \"http://localhost:1234/subSchemas.json#/integer\","
+        "    \"expected\": [\"integer\"], \"actual\": \"null\""
+        "}}",
+        SchemaValidatorType, PointerType);
 }
 
 #ifdef __clang__
