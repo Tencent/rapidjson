@@ -6,6 +6,7 @@
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/schema.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/prettywriter.h"
 
 using namespace rapidjson;
 
@@ -67,6 +68,11 @@ int main(int argc, char *argv[]) {
         sb.Clear();
         validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);
         fprintf(stderr, "Invalid document: %s\n", sb.GetString());
+        // Detailed violation report is available as a JSON value
+        sb.Clear();
+        PrettyWriter<StringBuffer> w(sb);
+        validator.GetError().Accept(w);
+        fprintf(stderr, "Error report:\n%s\n", sb.GetString());
         return EXIT_FAILURE;
     }
 }
