@@ -349,6 +349,7 @@ public:
 
     Schema(SchemaDocumentType* schemaDocument, const PointerType& p, const ValueType& value, const ValueType& document, AllocatorType* allocator) :
         allocator_(allocator),
+        pointer_(p),
         typeless_(schemaDocument->GetTypeless()),
         enum_(),
         enumCount_(),
@@ -594,6 +595,10 @@ public:
             AllocatorType::Free(pattern_);
         }
 #endif
+    }
+
+    const PointerType& GetPointer() const {
+        return pointer_;
     }
 
     bool BeginValue(Context& context) const {
@@ -1215,6 +1220,7 @@ private:
     };
 
     AllocatorType* allocator_;
+    PointerType pointer_;
     const SchemaType* typeless_;
     uint64_t* enum_;
     SizeType enumCount_;
@@ -1650,7 +1656,7 @@ public:
 
     //! Gets the JSON pointer pointed to the invalid schema.
     PointerType GetInvalidSchemaPointer() const {
-        return schemaStack_.Empty() ? PointerType() : schemaDocument_->GetPointer(&CurrentSchema());
+        return schemaStack_.Empty() ? PointerType() : CurrentSchema().GetPointer();
     }
 
     //! Gets the keyword of invalid schema.
