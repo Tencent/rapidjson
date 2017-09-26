@@ -115,7 +115,7 @@ public:
     typedef typename Encoding::Ch Ch;
     size_t line_;
     size_t col_;
-    GenericStreamWrapper(InputStream& is): is_(is), line_(1), col_(0) {}
+    GenericStreamWrapper(InputStream& is): line_(1), col_(0), is_(is) {}
     
     Ch Peek() const { return is_.Peek(); }
     
@@ -133,11 +133,17 @@ public:
     size_t Tell() { return is_.Tell(); }
     
     Ch* PutBegin() { return is_.PutBegin(); }
-    void Put(Ch ch) { return is_.Put(ch); }
-    void Flush() { return is_.Flush(); }
-    size_t PutEnd(Ch* ch) { is_.PutEnd(ch); }	
+    void Put(Ch ch) { is_.Put(ch); }
+    void Flush() { is_.Flush(); }
+    size_t PutEnd(Ch* ch) { return is_.PutEnd(ch); }	
     
-    const Ch* Peek4() const { is_.Peek4(); }
+    // wrapper for MemoryStream
+    const Ch* Peek4() const { return is_.Peek4(); }
+    
+    // wrapper for AutoUTFInputStream
+    UTFType GetType() const { return is_.GetType(); }
+    bool HasBOM() const { return is_.HasBOM(); }
+
 private:
     InputStream& is_;
 };

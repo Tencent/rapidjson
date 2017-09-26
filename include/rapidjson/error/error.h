@@ -108,9 +108,9 @@ struct ParseResult {
     typedef bool (ParseResult::*BooleanType)() const;
 public:
     //! Default constructor, no error.
-    ParseResult() : code_(kParseErrorNone), offset_(0) {}
+    ParseResult() : code_(kParseErrorNone), offset_(0), line_(0), col_(0) {}
     //! Constructor to set an error.
-    ParseResult(ParseErrorCode code, size_t offset) : code_(code), offset_(offset) {}
+    ParseResult(ParseErrorCode code, size_t offset) : code_(code), offset_(offset), line_(0), col_(0) {}
 
     //! Get the error code.
     ParseErrorCode Code() const { return code_; }
