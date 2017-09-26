@@ -2219,14 +2219,17 @@ public:
         \return The document itself for fluent API.
     */
     template <unsigned parseFlags, typename SourceEncoding, typename InputStream>
-    GenericDocument& ParseStream(InputStream& is) {
+    GenericDocument& ParseStream(InputStream& is_) {
         GenericReader<SourceEncoding, Encoding, StackAllocator> reader(
             stack_.HasAllocator() ? &stack_.GetAllocator() : 0);
         ClearStackOnExit scope(*this);
+        GenericStreamWrapper<InputStream, SourceEncoding> is(is_);
         parseResult_ = reader.template Parse<parseFlags>(is, *this);
         if (parseResult_) {
             RAPIDJSON_ASSERT(stack_.GetSize() == sizeof(ValueType)); // Got one and only one root object
             ValueType::operator=(*stack_.template Pop<ValueType>(1));// Move value from stack to document
+        } else {
+            parseResult_.SetPos(is.line_, is.col_);
         }
         return *this;
     }
@@ -2355,6 +2358,12 @@ public:
 
     //! Get the position of last parsing error in input, 0 otherwise.
     size_t GetErrorOffset() const { return parseResult_.Offset(); }
+    
+    //! Get the position of last parsing error in input, 0 otherwise.
+    size_t GetErrorLine() const { return parseResult_.Line(); }
+    
+    //! Get the position of last parsing error in input, 0 otherwise.
+    size_t GetErrorColumn() const { return parseResult_.Col(); }    
 
     //! Implicit conversion to get the last parse result
 #ifndef __clang // -Wdocumentation

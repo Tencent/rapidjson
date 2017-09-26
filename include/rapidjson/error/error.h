@@ -116,6 +116,10 @@ public:
     ParseErrorCode Code() const { return code_; }
     //! Get the error offset, if \ref IsError(), 0 otherwise.
     size_t Offset() const { return offset_; }
+    //! Get the position of line number if error exists.
+    size_t Line() const { return line_; }
+    //! Get the position of column number if error exists.
+    size_t Col() const { return col_; }
 
     //! Explicit conversion to \c bool, returns \c true, iff !\ref IsError().
     operator BooleanType() const { return !IsError() ? &ParseResult::IsError : NULL; }
@@ -134,10 +138,14 @@ public:
     void Clear() { Set(kParseErrorNone); }
     //! Update error code and offset.
     void Set(ParseErrorCode code, size_t offset = 0) { code_ = code; offset_ = offset; }
+    //! Update line number and column number of the error position
+    void SetPos(size_t line, size_t col) { line_ = line; col_ = col; }
 
 private:
     ParseErrorCode code_;
     size_t offset_;
+    size_t line_;
+    size_t col_;
 };
 
 //! Function pointer type of GetParseError().

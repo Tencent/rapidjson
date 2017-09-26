@@ -101,6 +101,48 @@ inline void PutN(Stream& stream, Ch c, size_t n) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// GenericStreamWrapper
+
+//! A Stream Wrapper
+/*! \tThis string stream is designed for counting line and column number 
+    \tof the error (if exists) position, while just forwarding any received 
+    \tmessage to the origin stream. 
+    \note implements Stream concept
+*/
+template <typename InputStream, typename Encoding>
+class GenericStreamWrapper {
+public:
+    typedef typename Encoding::Ch Ch;
+    size_t line_;
+    size_t col_;
+    GenericStreamWrapper(InputStream& is): is_(is), line_(1), col_(0) {}
+    
+    Ch Peek() const { return is_.Peek(); }
+    
+    // counting line and column number
+    Ch Take() {
+        Ch ch = is_.Take();
+        if(ch == '\n') {
+            line_ ++;
+            col_ = 0;
+        } else {
+            col_ ++;
+        }
+        return ch;
+    }
+    size_t Tell() { return is_.Tell(); }
+    
+    Ch* PutBegin() { return is_.PutBegin(); }
+    void Put(Ch ch) { return is_.Put(ch); }
+    void Flush() { return is_.Flush(); }
+    size_t PutEnd(Ch* ch) { is_.PutEnd(ch); }	
+    
+    const Ch* Peek4() const { is_.Peek4(); }
+private:
+    InputStream& is_;
+};
+
+///////////////////////////////////////////////////////////////////////////////
 // StringStream
 
 //! Read-only string stream.
