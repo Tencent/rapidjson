@@ -109,6 +109,12 @@ inline void PutN(Stream& stream, Ch c, size_t n) {
     \tmessage to the origin stream. 
     \note implements Stream concept
 */
+
+#if defined(_MSC_VER) && _MSC_VER <= 1700
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4702)  // disable unreachable code
+#endif
+
 template <typename InputStream, typename Encoding>
 class GenericStreamWrapper {
 public:
@@ -135,7 +141,7 @@ public:
     Ch* PutBegin() { return is_.PutBegin(); }
     void Put(Ch ch) { is_.Put(ch); }
     void Flush() { is_.Flush(); }
-    size_t PutEnd(Ch* ch) { return is_.PutEnd(ch); }	
+    size_t PutEnd(Ch* ch) { return is_.PutEnd(ch); }
     
     // wrapper for MemoryStream
     const Ch* Peek4() const { return is_.Peek4(); }
@@ -146,7 +152,16 @@ public:
 
 private:
     InputStream& is_;
+
+    // elimante vs2010-2013 C4512 warning by 
+    // prohibiting copy constructor & assignment operator. 
+    GenericStreamWrapper& operator=(const GenericStreamWrapper &);
+    GenericStreamWrapper(const GenericStreamWrapper&);
 };
+
+#if defined(_MSC_VER) && _MSC_VER <= 1700
+RAPIDJSON_DIAG_POP
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // StringStream
