@@ -104,40 +104,28 @@ inline void PutN(Stream& stream, Ch c, size_t n) {
 // GenericStreamWrapper
 
 //! A Stream Wrapper
-/*! \tThis string stream is designed for counting line and column number 
-    \tof the error (if exists) position, while just forwarding any received 
-    \tmessage to the origin stream. 
+/*! \tThis string stream is a wrapper for any stream by just forwarding any 
+    \treceived message to the origin stream.
     \note implements Stream concept
 */
 
-#if defined(_MSC_VER) && _MSC_VER <= 1700
+#if defined(_MSC_VER) && _MSC_VER <= 1800
 RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(4702)  // disable unreachable code
+RAPIDJSON_DIAG_OFF(4702)  // unreachable code
+RAPIDJSON_DIAG_OFF(4512)  // assignment operator could not be generated
 #endif
 
-template <typename InputStream, typename Encoding>
+template <typename InputStream, typename Encoding = UTF8<> >
 class GenericStreamWrapper {
 public:
     typedef typename Encoding::Ch Ch;
     size_t line_;
     size_t col_;
-    GenericStreamWrapper(InputStream& is): line_(1), col_(0), is_(is) {}
+    GenericStreamWrapper(InputStream& is): is_(is) {}
     
     Ch Peek() const { return is_.Peek(); }
-    
-    // counting line and column number
-    Ch Take() {
-        Ch ch = is_.Take();
-        if(ch == '\n') {
-            line_ ++;
-            col_ = 0;
-        } else {
-            col_ ++;
-        }
-        return ch;
-    }
+    Ch Take() { return is_.Take(); }
     size_t Tell() { return is_.Tell(); }
-    
     Ch* PutBegin() { return is_.PutBegin(); }
     void Put(Ch ch) { is_.Put(ch); }
     void Flush() { is_.Flush(); }
@@ -150,16 +138,11 @@ public:
     UTFType GetType() const { return is_.GetType(); }
     bool HasBOM() const { return is_.HasBOM(); }
 
-private:
+protected:
     InputStream& is_;
-
-    // elimante vs2010-2013 C4512 warning by 
-    // prohibiting copy constructor & assignment operator. 
-    GenericStreamWrapper& operator=(const GenericStreamWrapper &);
-    GenericStreamWrapper(const GenericStreamWrapper&);
 };
 
-#if defined(_MSC_VER) && _MSC_VER <= 1700
+#if defined(_MSC_VER) && _MSC_VER <= 1800
 RAPIDJSON_DIAG_POP
 #endif
 
