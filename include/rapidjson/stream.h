@@ -1,5 +1,5 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
-// 
+//
 // Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
@@ -7,9 +7,9 @@
 //
 // http://opensource.org/licenses/MIT
 //
-// Unless required by applicable law or agreed to in writing, software distributed 
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// Unless required by applicable law or agreed to in writing, software distributed
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
 #include "rapidjson.h"
@@ -104,7 +104,7 @@ inline void PutN(Stream& stream, Ch c, size_t n) {
 // GenericStreamWrapper
 
 //! A Stream Wrapper
-/*! \tThis string stream is a wrapper for any stream by just forwarding any 
+/*! \tThis string stream is a wrapper for any stream by just forwarding any
     \treceived message to the origin stream.
     \note implements Stream concept
 */
@@ -119,10 +119,8 @@ template <typename InputStream, typename Encoding = UTF8<> >
 class GenericStreamWrapper {
 public:
     typedef typename Encoding::Ch Ch;
-    size_t line_;
-    size_t col_;
     GenericStreamWrapper(InputStream& is): is_(is) {}
-    
+
     Ch Peek() const { return is_.Peek(); }
     Ch Take() { return is_.Take(); }
     size_t Tell() { return is_.Tell(); }
@@ -130,10 +128,10 @@ public:
     void Put(Ch ch) { is_.Put(ch); }
     void Flush() { is_.Flush(); }
     size_t PutEnd(Ch* ch) { return is_.PutEnd(ch); }
-    
+
     // wrapper for MemoryStream
     const Ch* Peek4() const { return is_.Peek4(); }
-    
+
     // wrapper for AutoUTFInputStream
     UTFType GetType() const { return is_.GetType(); }
     bool HasBOM() const { return is_.HasBOM(); }
