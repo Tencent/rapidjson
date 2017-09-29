@@ -17,6 +17,17 @@
 
 #include "stream.h"
 
+#if defined(__GNUC__)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(effc++)
+#endif
+
+#if defined(_MSC_VER) && _MSC_VER <= 1800
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4702)  // unreachable code
+RAPIDJSON_DIAG_OFF(4512)  // assignment operator could not be generated
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 
@@ -29,9 +40,9 @@ class CursorStreamWrapper : public GenericStreamWrapper<InputStream, Encoding> {
 public:
     typedef typename Encoding::Ch Ch;
 
-    CursorStreamWrapper(InputStream& is): 
+    CursorStreamWrapper(InputStream& is):
         GenericStreamWrapper<InputStream, Encoding>(is), line_(1), col_(0) {}
-    
+
     // counting line and column number
     Ch Take() {
         Ch ch = this->is_.Take();
@@ -53,6 +64,14 @@ private:
     size_t line_;   //!< Current Line
     size_t col_;    //!< Current Column
 };
+
+#if defined(_MSC_VER) && _MSC_VER <= 1800
+RAPIDJSON_DIAG_POP
+#endif
+
+#if defined(__GNUC__)
+RAPIDJSON_DIAG_POP
+#endif
 
 RAPIDJSON_NAMESPACE_END
 
