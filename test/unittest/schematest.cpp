@@ -236,15 +236,9 @@ TEST(SchemaValidator, AllOf) {
 
         VALIDATE(s, "\"ok\"", true);
         INVALIDATE(s, "\"too long\"", "", "allOf", "",
-            "{ \"allOf\": {"
-            "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
-            "    \"errors\": ["
-            "      {},"
-            "      { \"maxLength\": { "
-            "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/1\", "
-            "          \"expected\": 5, \"actual\": \"too long\""
-            "      }}"
-            "    ]"
+            "{ \"maxLength\": { "
+            "    \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/1\", "
+            "    \"expected\": 5, \"actual\": \"too long\""
             "}}");
     }
     {
@@ -254,14 +248,8 @@ TEST(SchemaValidator, AllOf) {
 
         VALIDATE(s, "\"No way\"", false);
         INVALIDATE(s, "-1", "", "allOf", "",
-            "{ \"allOf\": {"
-            "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
-            "    \"errors\": ["
-            "      { \"type\": { \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
-            "          \"expected\": [\"string\"], \"actual\": \"integer\""
-            "      }},"
-            "      {}"
-            "    ]"
+            "{ \"type\": { \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
+            "    \"expected\": [\"string\"], \"actual\": \"integer\""
             "}}");
     }
 }
@@ -387,16 +375,11 @@ TEST(SchemaValidator, Ref_AllOf) {
     SchemaDocument s(sd);
 
     INVALIDATE(s, "{\"shipping_address\": {\"street_address\": \"1600 Pennsylvania Avenue NW\", \"city\": \"Washington\", \"state\": \"DC\"} }", "/properties/shipping_address", "allOf", "/shipping_address",
-        "{ \"allOf\": {"
+        "{ \"required\": {"
         "    \"instanceRef\": \"#/shipping_address\","
-        "    \"schemaRef\": \"#/properties/shipping_address\","
-        "    \"errors\": ["
-        "      {},"
-        "      { \"required\": {"
-        "          \"instanceRef\": \"#/shipping_address\","
-        "          \"schemaRef\": \"#/properties/shipping_address/allOf/1\","
-        "          \"missing\": [\"type\"]"
-        "}}  ] }}");
+        "    \"schemaRef\": \"#/properties/shipping_address/allOf/1\","
+        "    \"missing\": [\"type\"]"
+        "}}");
     VALIDATE(s, "{\"shipping_address\": {\"street_address\": \"1600 Pennsylvania Avenue NW\", \"city\": \"Washington\", \"state\": \"DC\", \"type\": \"business\"} }", true);
 }
 
@@ -1537,87 +1520,48 @@ TEST(SchemaValidator, AllOf_Nested) {
     VALIDATE(s, "\"ok\"", true);
     VALIDATE(s, "\"OK\"", true);
     INVALIDATE(s, "\"okay\"", "", "allOf", "",
-        "{ \"allOf\": {"
-        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
-        "    \"errors\": ["
-        "      {}, "
-        "      {}, "
-        "      { \"allOf\": {"
-        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2\","
-        "          \"errors\": ["
-        "            {}, "
-        "            { \"enum\": {"
-        "                \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\""
-        "}}  ] }}  ] }}");
+        "{ \"enum\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\""
+        "}}");
     INVALIDATE(s, "\"o\"", "", "allOf", "",
-        "{ \"allOf\": {"
-        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
-        "    \"errors\": ["
-        "      { \"minLength\": {"
-        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
-        "          \"expected\": 2, \"actual\": \"o\""
-        "      }},"
-        "      {},"
-        "      {}"
-        "    ]"
+        "{ \"minLength\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
+        "    \"expected\": 2, \"actual\": \"o\""
         "}}");
     INVALIDATE(s, "\"n\"", "", "allOf", "",
-        "{ \"allOf\": {"
-        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
-        "    \"errors\": ["
-        "      { \"minLength\": {"
-        "        \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
-        "        \"expected\": 2, \"actual\": \"n\""
-        "      }},"
-        "      {}, "
-        "      { \"allOf\": {"
-        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2\","
-        "          \"errors\": ["
-        "            { \"enum\": {"
-        "              \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/0\""
-        "            }},"
-        "            { \"enum\": {"
-        "              \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\""
-        "}}  ] }}  ] }}");
+        "{ \"minLength\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
+        "    \"expected\": 2, \"actual\": \"n\""
+        "  },"
+        "  \"enum\": ["
+        "    {\"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/0\"},"
+        "    {\"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\"}"
+        "  ]"
+        "}")
     INVALIDATE(s, "\"too long\"", "", "allOf", "",
-        "{ \"allOf\": {"
-        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
-        "    \"errors\": ["
-        "      {}, "
-        "      { \"maxLength\": {"
-        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/1\","
-        "          \"expected\": 5, \"actual\": \"too long\""
-        "      }},"
-        "      { \"allOf\": {"
-        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2\","
-        "          \"errors\": ["
-        "            { \"enum\": {"
-        "                \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/0\""
-        "            }},"
-        "            { \"enum\": {"
-        "                \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\""
-        "}}  ] }}  ] }}");
+        "{ \"maxLength\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/1\","
+        "    \"expected\": 5, \"actual\": \"too long\""
+        "  },"
+        "  \"enum\": ["
+        "    {\"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/0\"},"
+        "    {\"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\"}"
+        "  ]"
+        "}");
     INVALIDATE(s, "123", "", "allOf", "",
-        "{ \"allOf\": {"
-        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
-        "    \"errors\": ["
-        "      { \"type\": {"
-        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
-        "          \"expected\": [\"string\"], \"actual\": \"integer\""
-        "      }},"
-        "      { \"type\": {"
-        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/1\","
-        "          \"expected\": [\"string\"], \"actual\": \"integer\""
-        "      }},"
-        "      { \"allOf\": {"
-        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2\","
-        "          \"errors\": ["
-        "            { \"enum\": {"
-        "                \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/0\""
-        "            }}, "
-        "            { \"enum\": {"
-        "                \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\""
-        "}}  ] }}  ] }}");
+        "{ \"type\": ["
+        "    { \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
+        "      \"expected\": [\"string\"], \"actual\": \"integer\""
+        "    },"
+        "    { \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/1\","
+        "      \"expected\": [\"string\"], \"actual\": \"integer\""
+        "    }"
+        "  ],"
+        "  \"enum\": ["
+        "    {\"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/0\"},"
+        "    {\"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\"}"
+        "  ]"
+        "}");
 }
 
 TEST(SchemaValidator, EscapedPointer) {

@@ -2011,7 +2011,9 @@ public:
         AddCurrentError(SchemaType::GetTypeString());
     }
     void NotAllOf(ISchemaValidator** subvalidators, SizeType count) {
-        AddErrorArray(SchemaType::GetAllOfString(), subvalidators, count);
+        for (SizeType i = 0; i < count; ++i) {
+            MergeError(static_cast<GenericSchemaValidator*>(subvalidators[i])->GetError());
+        }
     }
     void NoneOf(ISchemaValidator** subvalidators, SizeType count) {
         AddErrorArray(SchemaType::GetAnyOfString(), subvalidators, count);
