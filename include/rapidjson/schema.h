@@ -935,7 +935,7 @@ private:
     };
 
 #if RAPIDJSON_SCHEMA_USE_INTERNALREGEX
-        typedef internal::GenericRegex<EncodingType> RegexType;
+        typedef internal::GenericRegex<EncodingType, AllocatorType> RegexType;
 #elif RAPIDJSON_SCHEMA_USE_STDREGEX
         typedef std::basic_regex<Ch> RegexType;
 #else
@@ -995,7 +995,7 @@ private:
     template <typename ValueType>
     RegexType* CreatePattern(const ValueType& value) {
         if (value.IsString()) {
-            RegexType* r = new (allocator_->Malloc(sizeof(RegexType))) RegexType(value.GetString());
+            RegexType* r = new (allocator_->Malloc(sizeof(RegexType))) RegexType(value.GetString(), allocator_);
             if (!r->IsValid()) {
                 r->~RegexType();
                 AllocatorType::Free(r);
