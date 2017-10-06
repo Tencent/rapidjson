@@ -355,6 +355,7 @@ public:
         not_(),
         type_((1 << kTotalSchemaType) - 1), // typeless
         validatorCount_(),
+        notValidatorIndex_(),
         properties_(),
         additionalPropertiesSchema_(),
         patternProperties_(),
@@ -409,11 +410,9 @@ public:
                 }
             }
 
-        if (schemaDocument) {
-            AssignIfExist(allOf_, *schemaDocument, p, value, GetAllOfString(), document);
-            AssignIfExist(anyOf_, *schemaDocument, p, value, GetAnyOfString(), document);
-            AssignIfExist(oneOf_, *schemaDocument, p, value, GetOneOfString(), document);
-        }
+        AssignIfExist(allOf_, *schemaDocument, p, value, GetAllOfString(), document);
+        AssignIfExist(anyOf_, *schemaDocument, p, value, GetAnyOfString(), document);
+        AssignIfExist(oneOf_, *schemaDocument, p, value, GetOneOfString(), document);
 
         if (const ValueType* v = GetMember(value, GetNotString())) {
             schemaDocument->CreateSchema(&not_, p.Append(GetNotString(), allocator_), *v, document);
