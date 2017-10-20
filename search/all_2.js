@@ -10,5 +10,6 @@ var searchData=
   ['copyfrom',['CopyFrom',['../classrapidjson_1_1_generic_value.html#ad9399a2a69444c44a9db2f63c3aa3eae',1,'rapidjson::GenericValue']]],
   ['create',['Create',['../classrapidjson_1_1_generic_pointer.html#ad0b5b67c57572e81689762094ac8c856',1,'rapidjson::GenericPointer::Create(ValueType &amp;root, typename ValueType::AllocatorType &amp;allocator, bool *alreadyExist=0) const'],['../classrapidjson_1_1_generic_pointer.html#adc4bf5a3892f5626a8517f90c88e4b7f',1,'rapidjson::GenericPointer::Create(GenericDocument&lt; EncodingType, typename ValueType::AllocatorType, stackAllocator &gt; &amp;document, bool *alreadyExist=0) const']]],
   ['crtallocator',['CrtAllocator',['../classrapidjson_1_1_crt_allocator.html',1,'rapidjson']]],
+  ['cursorstreamwrapper',['CursorStreamWrapper',['../classrapidjson_1_1_cursor_stream_wrapper.html',1,'rapidjson']]],
   ['change_20log',['Change Log',['../md__c_h_a_n_g_e_l_o_g.html',1,'']]]
 ];

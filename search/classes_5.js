@@ -11,6 +11,7 @@ var searchData=
   ['genericreader',['GenericReader',['../classrapidjson_1_1_generic_reader.html',1,'rapidjson']]],
   ['genericschemadocument',['GenericSchemaDocument',['../classrapidjson_1_1_generic_schema_document.html',1,'rapidjson']]],
   ['genericschemavalidator',['GenericSchemaValidator',['../classrapidjson_1_1_generic_schema_validator.html',1,'rapidjson']]],
+  ['genericstreamwrapper',['GenericStreamWrapper',['../classrapidjson_1_1_generic_stream_wrapper.html',1,'rapidjson']]],
   ['genericstringbuffer',['GenericStringBuffer',['../classrapidjson_1_1_generic_string_buffer.html',1,'rapidjson']]],
   ['genericstringref',['GenericStringRef',['../structrapidjson_1_1_generic_string_ref.html',1,'rapidjson']]],
   ['genericstringstream',['GenericStringStream',['../structrapidjson_1_1_generic_string_stream.html',1,'rapidjson']]],

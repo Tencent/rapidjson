@@ -23,6 +23,9 @@ var hierarchy =
     [ "rapidjson::GenericPointer< ValueType, Allocator >", "classrapidjson_1_1_generic_pointer.html", null ],
     [ "rapidjson::GenericReader< SourceEncoding, TargetEncoding, StackAllocator >", "classrapidjson_1_1_generic_reader.html", null ],
     [ "rapidjson::GenericSchemaDocument< ValueT, Allocator >", "classrapidjson_1_1_generic_schema_document.html", null ],
+    [ "rapidjson::GenericStreamWrapper< InputStream, Encoding >", "classrapidjson_1_1_generic_stream_wrapper.html", [
+      [ "rapidjson::CursorStreamWrapper< InputStream, Encoding >", "classrapidjson_1_1_cursor_stream_wrapper.html", null ]
+    ] ],
     [ "rapidjson::GenericStringBuffer< Encoding, Allocator >", "classrapidjson_1_1_generic_string_buffer.html", null ],
     [ "rapidjson::GenericStringRef< CharType >", "structrapidjson_1_1_generic_string_ref.html", null ],
     [ "rapidjson::GenericStringStream< Encoding >", "structrapidjson_1_1_generic_string_stream.html", null ],
