@@ -8,7 +8,7 @@ RapidJSON implemented a JSON Schema validator for [JSON Schema Draft v4](http://
 
 [TOC]
 
-# Basic Usage
+# Basic Usage {#BasicUsage}
 
 First of all, you need to parse a JSON Schema into `Document`, and then compile the `Document` into a `SchemaDocument`.
 
@@ -52,11 +52,11 @@ Some notes:
 * One `SchemaDocment` can be referenced by multiple `SchemaValidator`s. It will not be modified by `SchemaValidator`s.
 * A `SchemaValidator` may be reused to validate multiple documents. To run it for other documents, call `validator.Reset()` first.
 
-# Validation during parsing/serialization
+# Validation during parsing/serialization {#ParsingSerialization}
 
 Unlike most JSON Schema validator implementations, RapidJSON provides a SAX-based schema validator. Therefore, you can parse a JSON from a stream while validating it on the fly. If the validator encounters a JSON value that invalidates the supplied schema, the parsing will be terminated immediately. This design is especially useful for parsing large JSON files.
 
-## DOM parsing
+## DOM parsing {#DomParsing}
 
 For using DOM in parsing, `Document` needs some preparation and finalizing tasks, in addition to receiving SAX events, thus it needs some work to route the reader, validator and the document. `SchemaValidatingReader` is a helper class that doing such work.
 
@@ -97,7 +97,7 @@ if (!reader.GetParseResult()) {
 }
 ~~~
 
-## SAX parsing
+## SAX parsing {#SaxParsing}
 
 For using SAX in parsing, it is much simpler. If it only need to validate the JSON without further processing, it is simply:
 
@@ -126,7 +126,7 @@ if (!reader.Parse(ss, validator)) {
 }
 ~~~
 
-## Serialization
+## Serialization {#Serialization}
 
 It is also possible to do validation during serializing. This can ensure the result JSON is valid according to the JSON schema.
 
@@ -144,7 +144,7 @@ if (!d.Accept(validator)) {
 
 Of course, if your application only needs SAX-style serialization, it can simply send SAX events to `SchemaValidator` instead of `Writer`.
 
-# Remote Schema
+# Remote Schema {#RemoteSchema}
 
 JSON Schema supports [`$ref` keyword](http://spacetelescope.github.io/understanding-json-schema/structuring.html), which is a [JSON pointer](doc/pointer.md) referencing to a local or remote schema. Local pointer is prefixed with `#`, while remote pointer is an relative or absolute URI. For example:
 
@@ -168,7 +168,7 @@ MyRemoteSchemaDocumentProvider provider;
 SchemaDocument schema(sd, &provider);
 ~~~
 
-# Conformance
+# Conformance {#Conformance}
 
 RapidJSON passed 262 out of 263 tests in [JSON Schema Test Suite](https://github.com/json-schema/JSON-Schema-Test-Suite) (Json Schema draft 4).
 
@@ -176,7 +176,7 @@ The failed test is "changed scope ref invalid" of "change resolution scope" in `
 
 Besides, the `format` schema keyword for string values is ignored, since it is not required by the specification.
 
-## Regular Expression
+## Regular Expression {#RegEx}
 
 The schema keyword `pattern` and `patternProperties` uses regular expression to match the required pattern.
 
@@ -211,7 +211,7 @@ RapidJSON implemented a simple NFA regular expression engine, which is used by d
 
 For C++11 compiler, it is also possible to use the `std::regex` by defining `RAPIDJSON_SCHEMA_USE_INTERNALREGEX=0` and `RAPIDJSON_SCHEMA_USE_STDREGEX=1`. If your schemas do not need `pattern` and `patternProperties`, you can set both macros to zero to disable this feature, which will reduce some code size.
 
-# Performance
+# Performance {#Performance}
 
 Most C++ JSON libraries do not yet support JSON Schema. So we tried to evaluate the performance of RapidJSON's JSON Schema validator according to [json-schema-benchmark](https://github.com/ebdrup/json-schema-benchmark), which tests 11 JavaScript libraries running on Node.js.
 
