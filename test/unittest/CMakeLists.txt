@@ -3,6 +3,7 @@ include(CheckCXXCompilerFlag)
 set(UNITTEST_SOURCES
 	allocatorstest.cpp
     bigintegertest.cpp
+	cursorstreamwrappertest.cpp
     documenttest.cpp
     dtoatest.cpp
     encodedstreamtest.cpp
