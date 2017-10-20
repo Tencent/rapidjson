@@ -355,6 +355,7 @@ public:
         not_(),
         type_((1 << kTotalSchemaType) - 1), // typeless
         validatorCount_(),
+        notValidatorIndex_(),
         properties_(),
         additionalPropertiesSchema_(),
         patternProperties_(),
