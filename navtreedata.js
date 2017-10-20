@@ -100,7 +100,17 @@ var NAVTREE =
         [ "Filtering of JSON", "md_doc_sax.html#Filtering", null ]
       ] ]
     ] ],
-    [ "Schema", "md_doc_schema.html", null ],
+    [ "Schema", "md_doc_schema.html", [
+      [ "Validation during parsing/serialization", "md_doc_schema.html#ParsingSerialization", [
+        [ "DOM parsing", "md_doc_schema.html#DomParsing", null ],
+        [ "Serialization", "md_doc_schema.html#Serialization", null ]
+      ] ],
+      [ "Remote Schema", "md_doc_schema.html#RemoteSchema", null ],
+      [ "Conformance", "md_doc_schema.html#Conformance", [
+        [ "Regular Expression", "md_doc_schema.html#RegEx", null ]
+      ] ],
+      [ "Performance", "md_doc_schema.html#Performance", null ]
+    ] ],
     [ "Performance", "md_doc_performance.html", null ],
     [ "Internals", "md_doc_internals.html", [
       [ "Architecture", "md_doc_internals.html#Architecture", null ],
@@ -165,7 +175,7 @@ var NAVTREEINDEX =
 "classrapidjson_1_1_generic_object.html#af5d1661531777782d90249fe5ee748cb",
 "classrapidjson_1_1_generic_value.html#ac51a3b3046aaa12aa1d88ac876a28cec",
 "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga6a2b1695c13e77ae425e3cbac980ccb5",
-"structrapidjson_1_1_base_reader_handler.html#a2932a8ecbb1997dda305f4dbef32ab0d"
+"structrapidjson_1_1_auto_u_t_f.html#a8ba58f529fad9b33dc419b12ee13844d"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

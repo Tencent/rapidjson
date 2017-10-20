@@ -99,7 +99,17 @@ var NAVTREE =
         [ "过滤 JSON", "md_doc_sax_8zh-cn.html#Filtering", null ]
       ] ]
     ] ],
-    [ "Schema", "md_doc_schema_8zh-cn.html", null ],
+    [ "Schema", "md_doc_schema_8zh-cn.html", [
+      [ "在解析／生成时进行校验", "md_doc_schema_8zh-cn.html#ParsingSerialization", [
+        [ "DOM 解析", "md_doc_schema_8zh-cn.html#DomParsing", null ],
+        [ "生成", "md_doc_schema_8zh-cn.html#Serialization", null ]
+      ] ],
+      [ "远程 Schema", "md_doc_schema_8zh-cn.html#RemoteSchema", null ],
+      [ "标准的符合程度", "md_doc_schema_8zh-cn.html#Conformance", [
+        [ "正则表达式", "md_doc_schema_8zh-cn.html#RegEx", null ]
+      ] ],
+      [ "性能", "md_doc_schema_8zh-cn.html#Performance", null ]
+    ] ],
     [ "性能", "md_doc_performance_8zh-cn.html", null ],
     [ "内部架构", "md_doc_internals_8zh-cn.html", [
       [ "架构", "md_doc_internals_8zh-cn.html#Architecture", null ],
@@ -164,7 +174,7 @@ var NAVTREEINDEX =
 "classrapidjson_1_1_generic_object.html#af5d1661531777782d90249fe5ee748cb",
 "classrapidjson_1_1_generic_value.html#ac51a3b3046aaa12aa1d88ac876a28cec",
 "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga6a2b1695c13e77ae425e3cbac980ccb5",
-"structrapidjson_1_1_base_reader_handler.html#a2f3d3bec89a751cdcf7a4236dbc6b26d"
+"structrapidjson_1_1_auto_u_t_f.html#aa9095b9e85767361f9a0ae5527dba101a15b55b712f9e34d146fb236e5a89e06e"
 ];
 
 var SYNCONMSG = '点击 关闭 面板同步';
