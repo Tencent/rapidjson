@@ -234,6 +234,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#a8b7e47c57a20d0de0cd19eee799ebd88">MemberCount</a> () const</td></tr>
 <tr class="memdesc:a8b7e47c57a20d0de0cd19eee799ebd88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of members in the object. <br /></td></tr>
 <tr class="separator:a8b7e47c57a20d0de0cd19eee799ebd88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2a406c67f2d6a7849f0c167025827b2"><td class="memItemLeft" align="right" valign="top"><a id="af2a406c67f2d6a7849f0c167025827b2"></a>
+<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#af2a406c67f2d6a7849f0c167025827b2">MemberCapacity</a> () const</td></tr>
+<tr class="memdesc:af2a406c67f2d6a7849f0c167025827b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the capacity of object. <br /></td></tr>
+<tr class="separator:af2a406c67f2d6a7849f0c167025827b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f4835373e05abae52b91e1c6b7ec92c"><td class="memItemLeft" align="right" valign="top"><a id="a1f4835373e05abae52b91e1c6b7ec92c"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#a1f4835373e05abae52b91e1c6b7ec92c">ObjectEmpty</a> () const</td></tr>
 <tr class="memdesc:a1f4835373e05abae52b91e1c6b7ec92c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether the object is empty. <br /></td></tr>
@@ -273,6 +277,9 @@ const <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a
 <tr class="memitem:adb109ae9f12615efadf9277cb5e9c4ee"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_value.html#aca5596987335016c1a7c2a9467baf80b">MemberIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#adb109ae9f12615efadf9277cb5e9c4ee">MemberEnd</a> ()</td></tr>
 <tr class="memdesc:adb109ae9f12615efadf9277cb5e9c4ee"><td class="mdescLeft">&#160;</td><td class="mdescRight"><em>Past-the-end</em> member iterator  <a href="#adb109ae9f12615efadf9277cb5e9c4ee">More...</a><br /></td></tr>
 <tr class="separator:adb109ae9f12615efadf9277cb5e9c4ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9131d6e49ac5a6bf8000d851381e4a25"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#a9131d6e49ac5a6bf8000d851381e4a25">MemberReserve</a> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> newCapacity, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &amp;allocator)</td></tr>
+<tr class="memdesc:a9131d6e49ac5a6bf8000d851381e4a25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Request the object to have enough capacity to store members.  <a href="#a9131d6e49ac5a6bf8000d851381e4a25">More...</a><br /></td></tr>
+<tr class="separator:a9131d6e49ac5a6bf8000d851381e4a25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa78e2eb30c6b918826eccf03f04f166b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_value.html#aa78e2eb30c6b918826eccf03f04f166b">HasMember</a> (const <a class="el" href="classrapidjson_1_1_generic_value.html#adcdbc7fa85a9a41b78966d7e0dcc2ac4">Ch</a> *name) const</td></tr>
 <tr class="memdesc:aa78e2eb30c6b918826eccf03f04f166b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether a member exists in the object.  <a href="#aa78e2eb30c6b918826eccf03f04f166b">More...</a><br /></td></tr>
 <tr class="separator:aa78e2eb30c6b918826eccf03f04f166b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -2354,6 +2361,55 @@ template&lt;typename Encoding, typename Allocator = MemoryPoolAllocator&lt;&gt;&
 
 <p><em>Past-the-end</em> member iterator </p>
 <dl class="section pre"><dt>Precondition</dt><dd>IsObject() == true </dd></dl>
+
+</div>
+</div>
+<a id="a9131d6e49ac5a6bf8000d851381e4a25"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9131d6e49ac5a6bf8000d851381e4a25">&#9670;&nbsp;</a></span>MemberReserve()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Encoding, typename Allocator = MemoryPoolAllocator&lt;&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a>&amp; <a class="el" href="classrapidjson_1_1_generic_value.html">rapidjson::GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;::MemberReserve </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>&#160;</td>
+          <td class="paramname"><em>newCapacity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &amp;&#160;</td>
+          <td class="paramname"><em>allocator</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Request the object to have enough capacity to store members. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">newCapacity</td><td>The capacity that the object at least need to have. </td></tr>
+    <tr><td class="paramname">allocator</td><td><a class="el" href="classrapidjson_1_1_allocator.html" title="Concept for allocating, resizing and freeing memory block. ">Allocator</a> for reallocating memory. It must be the same one as used before. Commonly use <a class="el" href="classrapidjson_1_1_generic_document.html#ad92c6cd025d411258d1f2ad890e2ee3f" title="Get the allocator of this document. ">GenericDocument::GetAllocator()</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The value itself for fluent API. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Linear time complexity. </dd></dl>
 
 </div>
 </div>

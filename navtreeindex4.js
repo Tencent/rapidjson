@@ -1,5 +1,9 @@
 var NAVTREEINDEX4 =
 {
+"structrapidjson_1_1_base_reader_handler.html#a2932a8ecbb1997dda305f4dbef32ab0d":[14,0,0,5,0],
+"structrapidjson_1_1_base_reader_handler.html#a2f3d3bec89a751cdcf7a4236dbc6b26d":[14,0,0,5,13],
+"structrapidjson_1_1_base_reader_handler.html#a6216b7af34bbae857ff06363f5b13f5d":[14,0,0,5,6],
+"structrapidjson_1_1_base_reader_handler.html#a76b043fefd5fac0faadf3846995af6f5":[14,0,0,5,16],
 "structrapidjson_1_1_base_reader_handler.html#a7de3a16b56209aa2aa56a42591c426cb":[14,0,0,5,7],
 "structrapidjson_1_1_base_reader_handler.html#a823c816871a8dd881019ee8526b517cb":[14,0,0,5,10],
 "structrapidjson_1_1_base_reader_handler.html#a8fc75176ec793217d40d5a8de049cdb3":[14,0,0,5,5],
