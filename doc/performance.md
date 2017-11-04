@@ -1,6 +1,6 @@
 # Performance
 
-There is a [native JSON benchmark collection] [1] which evaluates speed, memory usage and code size of various operations among 37 JSON libaries.
+There is a [native JSON benchmark collection] [1] which evaluates speed, memory usage and code size of various operations among 37 JSON libraries.
 
 [1]: https://github.com/miloyip/nativejson-benchmark
 

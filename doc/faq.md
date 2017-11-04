@@ -116,7 +116,7 @@
    ~~~~~~~~~~cpp
    Value(kObjectType).Swap(d);
    ~~~~~~~~~~
-   or equivalent, but sightly longer to type:
+   or equivalent, but slightly longer to type:
    ~~~~~~~~~~cpp
    d.Swap(Value(kObjectType).Move()); 
    ~~~~~~~~~~
@@ -140,11 +140,11 @@
    }
    ~~~~~~~~~~
 
-   The most important requirement to take care of document and value life-cycle as well as consistent memory managent using the right allocator during the value transfer.
+   The most important requirement to take care of document and value life-cycle as well as consistent memory management using the right allocator during the value transfer.
    
    Simple yet most efficient way to achieve that is to modify the `address` definition above to initialize it with allocator of the `person` document, then we just add the root member of the value:
    ~~~~~~~~~~cpp
-   Documnet address(person.GetAllocator());
+   Document address(person.GetAllocator());
    ...
    person["person"].AddMember("address", address["address"], person.GetAllocator());
    ~~~~~~~~~~
@@ -174,7 +174,7 @@ Alternatively, if we don't want to explicitly refer to the root value of `addres
 
 3. Why do I need to provide the length of string?
 
-   Since C string is null-terminated, the length of string needs to be computed via `strlen()`, with linear runtime complexity. This incurs an unncessary overhead of many operations, if the user already knows the length of string.
+   Since C string is null-terminated, the length of string needs to be computed via `strlen()`, with linear runtime complexity. This incurs an unnecessary overhead of many operations, if the user already knows the length of string.
 
    Also, RapidJSON can handle `\u0000` (null character) within a string. If a string contains null characters, `strlen()` cannot return the true length of it. In such case user must provide the length of string explicitly.
 
@@ -204,7 +204,7 @@ Alternatively, if we don't want to explicitly refer to the root value of `addres
 
 2. Can it validate the encoding?
 
-   Yes, just pass `kParseValidateEncodingFlag` to `Parse()`. If there is invalid encoding in the stream, it wil generate `kParseErrorStringInvalidEncoding` error.
+   Yes, just pass `kParseValidateEncodingFlag` to `Parse()`. If there is invalid encoding in the stream, it will generate `kParseErrorStringInvalidEncoding` error.
 
 3. What is surrogate pair? Does RapidJSON support it?
 
@@ -248,7 +248,7 @@ Alternatively, if we don't want to explicitly refer to the root value of `addres
 
 1. Is RapidJSON really fast?
 
-   Yes. It may be the fastest open source JSON library. There is a [benchmark](https://github.com/miloyip/nativejson-benchmark) for evaluating performance of C/C++ JSON libaries.
+   Yes. It may be the fastest open source JSON library. There is a [benchmark](https://github.com/miloyip/nativejson-benchmark) for evaluating performance of C/C++ JSON libraries.
 
 2. Why is it fast?
 
@@ -262,13 +262,13 @@ Alternatively, if we don't want to explicitly refer to the root value of `addres
 
    The design of RapidJSON aims at reducing memory footprint.
 
-   In the SAX API, `Reader` consumes memory portional to maximum depth of JSON tree, plus maximum length of JSON string.
+   In the SAX API, `Reader` consumes memory proportional to maximum depth of JSON tree, plus maximum length of JSON string.
 
    In the DOM API, each `Value` consumes exactly 16/24 bytes for 32/64-bit architecture respectively. RapidJSON also uses a special memory allocator to minimize overhead of allocations.
 
 5. What is the purpose of being high performance?
 
-   Some applications need to process very large JSON files. Some server-side applications need to process huge amount of JSONs. Being high performance can improve both latency and throuput. In a broad sense, it will also save energy.
+   Some applications need to process very large JSON files. Some server-side applications need to process huge amount of JSONs. Being high performance can improve both latency and throughput. In a broad sense, it will also save energy.
 
 ## Gossip
 

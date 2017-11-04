@@ -126,7 +126,7 @@ When the `Reader` encounters a JSON number, it chooses a suitable C++ type mappi
 
 When the `Reader` encounters the beginning of an object, it calls `StartObject()`. An object in JSON is a set of name-value pairs. If the object contains members it first calls `Key()` for the name of member, and then calls functions depending on the type of the value. These calls of name-value pairs repeat until calling `EndObject(SizeType memberCount)`. Note that the `memberCount` parameter is just an aid for the handler; users who do not need this parameter may ignore it.
 
-Arrays are similar to objects, but simpler. At the beginning of an array, the `Reader` calls `BeginArary()`. If there is elements, it calls functions according to the types of element. Similarly, in the last call `EndArray(SizeType elementCount)`, the parameter `elementCount` is just an aid for the handler.
+Arrays are similar to objects, but simpler. At the beginning of an array, the `Reader` calls `BeginArray()`. If there is elements, it calls functions according to the types of element. Similarly, in the last call `EndArray(SizeType elementCount)`, the parameter `elementCount` is just an aid for the handler.
 
 Every handler function returns a `bool`. Normally it should return `true`. If the handler encounters an error, it can return `false` to notify the event publisher to stop further processing.
 

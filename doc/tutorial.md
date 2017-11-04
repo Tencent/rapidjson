@@ -68,7 +68,7 @@ printf("t = %s\n", document["t"].GetBool() ? "true" : "false");
 t = true
 ~~~~~~~~~~
 
-JSON null can be queryed with `IsNull()`.
+JSON null can be queried with `IsNull()`.
 ~~~~~~~~~~cpp
 printf("n = %s\n", document["n"].IsNull() ? "null" : "?");
 ~~~~~~~~~~
