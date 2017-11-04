@@ -49,7 +49,7 @@ if (!d.Accept(validator)) {
 
 Some notes:
 
-* One `SchemaDocment` can be referenced by multiple `SchemaValidator`s. It will not be modified by `SchemaValidator`s.
+* One `SchemaDocument` can be referenced by multiple `SchemaValidator`s. It will not be modified by `SchemaValidator`s.
 * A `SchemaValidator` may be reused to validate multiple documents. To run it for other documents, call `validator.Reset()` first.
 
 # Validation during parsing/serialization {#ParsingSerialization}

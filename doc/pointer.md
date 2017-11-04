@@ -211,7 +211,7 @@ p.Stringify(sb);
 std::cout << sb.GetString() << std::endl;
 ~~~
 
-It can also stringify to URI fragment reprsentation by `StringifyUriFragment()`.
+It can also stringify to URI fragment representation by `StringifyUriFragment()`.
 
 # User-Supplied Tokens {#UserSuppliedTokens}
 

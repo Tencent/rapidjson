@@ -241,7 +241,7 @@ Some techniques about using DOM API is discussed here.
 
 ## DOM as SAX Event Publisher
 
-In RapidJSON, stringifying a DOM with `Writer` may be look a little bit weired.
+In RapidJSON, stringifying a DOM with `Writer` may be look a little bit weird.
 
 ~~~~~~~~~~cpp
 // ...

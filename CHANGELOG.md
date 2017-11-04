@@ -140,7 +140,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 * Redo all documentation (English, Simplified Chinese)
 
 ### Changed
-* Copyright ownership transfered to THL A29 Limited (a Tencent company).
+* Copyright ownership transferred to THL A29 Limited (a Tencent company).
 * Migrating from Premake to CMAKE (#192)
 * Resolve all warning reports
 
