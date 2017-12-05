@@ -162,7 +162,7 @@ URI Fragment Representation</h1>
 <p>RapidJSON fully support URI fragment representation. It automatically detects the pound sign during parsing.</p>
 <h1>Stringify</h1>
 <p>You may also stringify a <code>Pointer</code> to a string or other output streams. This can be done by:</p>
-<div class="fragment"><div class="line">Pointer p(...);</div><div class="line">StringBuffer sb;</div><div class="line">p.Stringify(sb);</div><div class="line">std::cout &lt;&lt; sb.GetString() &lt;&lt; std::endl;</div></div><!-- fragment --><p>It can also stringify to URI fragment reprsentation by <code>StringifyUriFragment()</code>.</p>
+<div class="fragment"><div class="line">Pointer p(...);</div><div class="line">StringBuffer sb;</div><div class="line">p.Stringify(sb);</div><div class="line">std::cout &lt;&lt; sb.GetString() &lt;&lt; std::endl;</div></div><!-- fragment --><p>It can also stringify to URI fragment representation by <code>StringifyUriFragment()</code>.</p>
 <h1><a class="anchor" id="UserSuppliedTokens"></a>
 User-Supplied Tokens</h1>
 <p>If a pointer will be resolved multiple times, it should be constructed once, and then apply it to different DOMs or in different times. This reduce time and memory allocation for constructing <code>Pointer</code> multiple times.</p>

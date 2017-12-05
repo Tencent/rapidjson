@@ -225,7 +225,7 @@ Transcoding and Validation</h2>
 Techniques</h1>
 <p>Some techniques about using DOM API is discussed here.</p>
 <h2>DOM as SAX Event Publisher</h2>
-<p>In RapidJSON, stringifying a DOM with <code>Writer</code> may be look a little bit weired.</p>
+<p>In RapidJSON, stringifying a DOM with <code>Writer</code> may be look a little bit weird.</p>
 <div class="fragment"><div class="line"><span class="comment">// ...</span></div><div class="line">Writer&lt;StringBuffer&gt; writer(buffer);</div><div class="line">d.Accept(writer);</div></div><!-- fragment --><p>Actually, <code>Value::Accept()</code> is responsible for publishing SAX events about the value to the handler. With this design, <code>Value</code> and <code>Writer</code> are decoupled. <code>Value</code> can generate SAX events, and <code>Writer</code> can handle those events.</p>
 <p>User may create custom handlers for transforming the DOM into other formats. For example, a handler which converts the DOM into XML.</p>
 <p>For more about SAX events and handler, please refer to <a class="el" href="md_doc_sax.html">SAX</a>.</p>
