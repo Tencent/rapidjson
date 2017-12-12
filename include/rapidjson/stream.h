@@ -18,6 +18,7 @@
 #define RAPIDJSON_STREAM_H_
 
 #include "encodings.h"
+#include <string>
 
 RAPIDJSON_NAMESPACE_BEGIN
 
@@ -154,10 +155,10 @@ template <typename Encoding>
 struct GenericStringStream {
     typedef typename Encoding::Ch Ch;
 
-    GenericStringStream(const Ch *src) : src_(src), head_(src) {}
+    GenericStringStream(const Ch *src, const int maxlen = -1) : src_(src), head_(src), maxlen_(maxlen) {}
 
-    Ch Peek() const { return *src_; }
-    Ch Take() { return *src_++; }
+    Ch Peek() const { if(maxlen_ < 0 || Tell() < maxlen_) { return *src_; } else { return std::char_traits<Ch>::eof(); } }
+    Ch Take() { if(maxlen_ < 0 || Tell() < maxlen_) { return *src_++; } else { return std::char_traits<Ch>::eof(); } }
     size_t Tell() const { return static_cast<size_t>(src_ - head_); }
 
     Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
@@ -167,6 +168,7 @@ struct GenericStringStream {
 
     const Ch* src_;     //!< Current read position.
     const Ch* head_;    //!< Original head of the string.
+    const int maxlen_;
 };
 
 template <typename Encoding>
