@@ -18,6 +18,7 @@ var hierarchy =
     [ "rapidjson::GenericArray< Const, ValueT >", "classrapidjson_1_1_generic_array.html", null ],
     [ "rapidjson::GenericInsituStringStream< Encoding >", "structrapidjson_1_1_generic_insitu_string_stream.html", null ],
     [ "rapidjson::GenericMember< Encoding, Allocator >", "structrapidjson_1_1_generic_member.html", null ],
+    [ "rapidjson::GenericMemberIterator< Const, Encoding, Allocator >", "classrapidjson_1_1_generic_member_iterator.html", null ],
     [ "rapidjson::GenericMemoryBuffer< Allocator >", "structrapidjson_1_1_generic_memory_buffer.html", null ],
     [ "rapidjson::GenericObject< Const, ValueT >", "classrapidjson_1_1_generic_object.html", null ],
     [ "rapidjson::GenericPointer< ValueType, Allocator >", "classrapidjson_1_1_generic_pointer.html", null ],
@@ -41,9 +42,6 @@ var hierarchy =
     ] ],
     [ "rapidjson::internal::ISchemaValidator", null, [
       [ "rapidjson::GenericSchemaValidator< SchemaDocumentType, OutputHandler, StateAllocator >", "classrapidjson_1_1_generic_schema_validator.html", null ]
-    ] ],
-    [ "iterator", null, [
-      [ "rapidjson::GenericMemberIterator< Const, Encoding, Allocator >", "classrapidjson_1_1_generic_member_iterator.html", null ]
     ] ],
     [ "rapidjson::Writer< OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags >::Level", "structrapidjson_1_1_writer_1_1_level.html", null ],
     [ "rapidjson::MemoryPoolAllocator< BaseAllocator >", "classrapidjson_1_1_memory_pool_allocator.html", null ],
