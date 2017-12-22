@@ -25,7 +25,7 @@ RAPIDJSON_DIAG_OFF(unreachable-code)
 
 RAPIDJSON_NAMESPACE_BEGIN
 
-//! Wrapper of C file stream for input using fread().
+//! Wrapper of C file stream for output using fwrite().
 /*!
     \note implements Stream concept
 */
