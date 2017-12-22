@@ -544,7 +544,8 @@ public:
     /*! \param stackAllocator Optional allocator for allocating stack memory. (Only use for non-destructive parsing)
         \param stackCapacity stack capacity in bytes for storing a single decoded string.  (Only use for non-destructive parsing)
     */
-    GenericReader(StackAllocator* stackAllocator = 0, size_t stackCapacity = kDefaultStackCapacity) : stack_(stackAllocator, stackCapacity), parseResult_() {}
+    GenericReader(StackAllocator* stackAllocator = 0, size_t stackCapacity = kDefaultStackCapacity) :
+        stack_(stackAllocator, stackCapacity), parseResult_(), state_(IterativeParsingStartState) {}
 
     //! Parse JSON text.
     /*! \tparam parseFlags Combination of \ref ParseFlag.
