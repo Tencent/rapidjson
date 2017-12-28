@@ -128,7 +128,7 @@ And the `InputStream` is type of input stream.
 
 ## Parse Error {#ParseError}
 
-When the parse processing succeeded, the `Document` contains the parse results. When there is an error, the original DOM is *unchanged*. And the error state of parsing can be obtained by `bool HasParseError()`,  `ParseErrorCode GetParseError()` and `size_t GetParseOffset()`.
+When the parse processing succeeded, the `Document` contains the parse results. When there is an error, the original DOM is *unchanged*. And the error state of parsing can be obtained by `bool HasParseError()`,  `ParseErrorCode GetParseError()` and `size_t GetErrorOffset()`.
 
 Parse Error Code                            | Description
 --------------------------------------------|---------------------------------------------------
