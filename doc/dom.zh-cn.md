@@ -128,7 +128,7 @@ GenericDocument& GenericDocument::Parse(const Ch* str);
 
 ## 解析错误 {#ParseError}
 
-当解析过程顺利完成，`Document` 便会含有解析结果。当过程出现错误，原来的 DOM 会*维持不变*。可使用 `bool HasParseError()`、`ParseErrorCode GetParseError()` 及 `size_t GetParseOffset()` 获取解析的错误状态。
+当解析过程顺利完成，`Document` 便会含有解析结果。当过程出现错误，原来的 DOM 会*维持不变*。可使用 `bool HasParseError()`、`ParseErrorCode GetParseError()` 及 `size_t GetErrorOffset()` 获取解析的错误状态。
 
 解析错误代号                                | 描述
 --------------------------------------------|---------------------------------------------------
