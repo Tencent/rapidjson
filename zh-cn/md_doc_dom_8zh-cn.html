@@ -146,7 +146,7 @@ $(document).ready(function(){initNavTree('md_doc_dom_8zh-cn.html','');});
 <p>此外 <code>InputStream</code> 是输入流的类型。</p>
 <h2><a class="anchor" id="ParseError"></a>
 解析错误</h2>
-<p>当解析过程顺利完成，<code>Document</code> 便会含有解析结果。当过程出现错误，原来的 DOM 会*维持不变*。可使用 <code>bool HasParseError()</code>、<code>ParseErrorCode GetParseError()</code> 及 <code>size_t GetParseOffset()</code> 获取解析的错误状态。</p>
+<p>当解析过程顺利完成，<code>Document</code> 便会含有解析结果。当过程出现错误，原来的 DOM 会*维持不变*。可使用 <code>bool HasParseError()</code>、<code>ParseErrorCode GetParseError()</code> 及 <code>size_t GetErrorOffset()</code> 获取解析的错误状态。</p>
 <table class="doxtable">
 <tr>
 <th>解析错误代号 </th><th>描述  </th></tr>
