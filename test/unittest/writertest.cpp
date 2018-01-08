@@ -538,6 +538,18 @@ TEST(Writer, RawValue) {
     EXPECT_STREQ("{\"a\":1,\"raw\":[\"Hello\\nWorld\", 123.456]}", buffer.GetString());
 }
 
+TEST(Writer, RawNumber) {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    writer.StartArray();
+    const char number[] = "3.14159";
+    writer.RawNumber(number, 4);
+    writer.RawNumber(number, static_cast<SizeType>(strlen(number)));
+    writer.EndArray();
+    EXPECT_TRUE(writer.IsComplete());
+    EXPECT_STREQ("[3.14,3.14159]", buffer.GetString());
+}
+
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 static Writer<StringBuffer> WriterGen(StringBuffer &target) {
     Writer<StringBuffer> writer(target);
