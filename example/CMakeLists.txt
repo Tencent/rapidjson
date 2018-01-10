@@ -32,6 +32,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 endif()
 
+add_executable(archivertest archiver/archiver.cpp archiver/archivertest.cpp)
+
 foreach (example ${EXAMPLES})
     add_executable(${example} ${example}/${example}.cpp)
 endforeach()
