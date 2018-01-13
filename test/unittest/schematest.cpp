@@ -124,14 +124,20 @@ TEST(SchemaValidator, Hasher) {
 
 #define INVALIDATE(schema, json, invalidSchemaPointer, invalidSchemaKeyword, invalidDocumentPointer) \
 {\
-    SchemaValidator validator(schema);\
+    INVALIDATE_(schema, json, invalidSchemaPointer, invalidSchemaKeyword, invalidDocumentPointer, SchemaValidator, Pointer) \
+}
+
+#define INVALIDATE_(schema, json, invalidSchemaPointer, invalidSchemaKeyword, invalidDocumentPointer,\
+    SchemaValidatorType, PointerType) \
+{\
+    SchemaValidatorType validator(schema);\
     Document d;\
     /*printf("\n%s\n", json);*/\
     d.Parse(json);\
     EXPECT_FALSE(d.HasParseError());\
     EXPECT_FALSE(d.Accept(validator));\
     EXPECT_FALSE(validator.IsValid());\
-    if (validator.GetInvalidSchemaPointer() != Pointer(invalidSchemaPointer)) {\
+    if (validator.GetInvalidSchemaPointer() != PointerType(invalidSchemaPointer)) {\
         StringBuffer sb;\
         validator.GetInvalidSchemaPointer().Stringify(sb);\
         printf("GetInvalidSchemaPointer() Expected: %s Actual: %s\n", invalidSchemaPointer, sb.GetString());\
@@ -142,7 +148,7 @@ TEST(SchemaValidator, Hasher) {
         printf("GetInvalidSchemaKeyword() Expected: %s Actual %s\n", invalidSchemaKeyword, validator.GetInvalidSchemaKeyword());\
         ADD_FAILURE();\
     }\
-    if (validator.GetInvalidDocumentPointer() != Pointer(invalidDocumentPointer)) {\
+    if (validator.GetInvalidDocumentPointer() != PointerType(invalidDocumentPointer)) {\
         StringBuffer sb;\
         validator.GetInvalidDocumentPointer().Stringify(sb);\
         printf("GetInvalidDocumentPointer() Expected: %s Actual: %s\n", invalidDocumentPointer, sb.GetString());\
@@ -1346,6 +1352,17 @@ TEST(SchemaValidator, Issue1017_allOfHandler) {
     EXPECT_TRUE(validator.EndObject(0));
     EXPECT_TRUE(validator.IsValid());
     EXPECT_STREQ("{\"cyanArray2\":[],\"blackArray\":[]}", sb.GetString());
+}
+
+TEST(SchemaValidator, Ref_remote) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
+    Document sd;
+    sd.Parse("{\"$ref\": \"http://localhost:1234/subSchemas.json#/integer\"}");
+    SchemaDocumentType s(sd, &provider);
+    typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    INVALIDATE_(s, "null", "/integer", "type", "", SchemaValidatorType, PointerType);
 }
 
 #ifdef __clang__
