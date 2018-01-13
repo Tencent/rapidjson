@@ -45,7 +45,7 @@ RAPIDJSON_DIAG_OFF(terminate) // ignore throwing RAPIDJSON_ASSERT in RAPIDJSON_N
 #endif // __GNUC__
 
 #ifndef RAPIDJSON_NOMEMBERITERATORCLASS
-#include <iterator> // std::iterator, std::random_access_iterator_tag
+#include <iterator> // std::random_access_iterator_tag
 #endif
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
@@ -98,16 +98,13 @@ struct GenericMember {
     \see GenericMember, GenericValue::MemberIterator, GenericValue::ConstMemberIterator
  */
 template <bool Const, typename Encoding, typename Allocator>
-class GenericMemberIterator
-    : public std::iterator<std::random_access_iterator_tag
-        , typename internal::MaybeAddConst<Const,GenericMember<Encoding,Allocator> >::Type> {
+class GenericMemberIterator {
 
     friend class GenericValue<Encoding,Allocator>;
     template <bool, typename, typename> friend class GenericMemberIterator;
 
     typedef GenericMember<Encoding,Allocator> PlainType;
     typedef typename internal::MaybeAddConst<Const,PlainType>::Type ValueType;
-    typedef std::iterator<std::random_access_iterator_tag,ValueType> BaseType;
 
 public:
     //! Iterator type itself
@@ -117,12 +114,21 @@ public:
     //! Non-constant iterator type
     typedef GenericMemberIterator<false,Encoding,Allocator> NonConstIterator;
 
+    /** \name std::iterator_traits support */
+    //@{
+    typedef ValueType      value_type;
+    typedef ValueType *    pointer;
+    typedef ValueType &    reference;
+    typedef std::ptrdiff_t difference_type;
+    typedef std::random_access_iterator_tag iterator_category;
+    //@}
+
     //! Pointer to (const) GenericMember
-    typedef typename BaseType::pointer         Pointer;
+    typedef pointer         Pointer;
     //! Reference to (const) GenericMember
-    typedef typename BaseType::reference       Reference;
+    typedef reference       Reference;
     //! Signed integer type (e.g. \c ptrdiff_t)
-    typedef typename BaseType::difference_type DifferenceType;
+    typedef difference_type DifferenceType;
 
     //! Default constructor (singular value)
     /*! Creates an iterator pointing to no element.
@@ -1070,6 +1076,9 @@ public:
     //! Get the number of members in the object.
     SizeType MemberCount() const { RAPIDJSON_ASSERT(IsObject()); return data_.o.size; }
 
+    //! Get the capacity of object.
+    SizeType MemberCapacity() const { RAPIDJSON_ASSERT(IsObject()); return data_.o.capacity; }
+
     //! Check whether the object is empty.
     bool ObjectEmpty() const { RAPIDJSON_ASSERT(IsObject()); return data_.o.size == 0; }
 
@@ -1137,6 +1146,21 @@ public:
     //! \em Past-the-end member iterator
     /*! \pre IsObject() == true */
     MemberIterator MemberEnd()              { RAPIDJSON_ASSERT(IsObject()); return MemberIterator(GetMembersPointer() + data_.o.size); }
+
+    //! Request the object to have enough capacity to store members.
+    /*! \param newCapacity  The capacity that the object at least need to have.
+        \param allocator    Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
+        \return The value itself for fluent API.
+        \note Linear time complexity.
+    */
+    GenericValue& MemberReserve(SizeType newCapacity, Allocator &allocator) {
+        RAPIDJSON_ASSERT(IsObject());
+        if (newCapacity > data_.o.capacity) {
+            SetMembersPointer(reinterpret_cast<Member*>(allocator.Realloc(GetMembersPointer(), data_.o.capacity * sizeof(Member), newCapacity * sizeof(Member))));
+            data_.o.capacity = newCapacity;
+        }
+        return *this;
+    }
 
     //! Check whether a member exists in the object.
     /*!
@@ -1243,17 +1267,8 @@ public:
         RAPIDJSON_ASSERT(name.IsString());
 
         ObjectData& o = data_.o;
-        if (o.size >= o.capacity) {
-            if (o.capacity == 0) {
-                o.capacity = kDefaultObjectCapacity;
-                SetMembersPointer(reinterpret_cast<Member*>(allocator.Malloc(o.capacity * sizeof(Member))));
-            }
-            else {
-                SizeType oldCapacity = o.capacity;
-                o.capacity += (oldCapacity + 1) / 2; // grow by factor 1.5
-                SetMembersPointer(reinterpret_cast<Member*>(allocator.Realloc(GetMembersPointer(), oldCapacity * sizeof(Member), o.capacity * sizeof(Member))));
-            }
-        }
+        if (o.size >= o.capacity)
+            MemberReserve(o.capacity == 0 ? kDefaultObjectCapacity : (o.capacity + (o.capacity + 1) / 2), allocator);
         Member* members = GetMembersPointer();
         members[o.size].name.RawAssign(name);
         members[o.size].value.RawAssign(value);
@@ -2548,6 +2563,7 @@ public:
     ~GenericObject() {}
 
     SizeType MemberCount() const { return value_.MemberCount(); }
+    SizeType MemberCapacity() const { return value_.MemberCapacity(); }
     bool ObjectEmpty() const { return value_.ObjectEmpty(); }
     template <typename T> ValueType& operator[](T* name) const { return value_[name]; }
     template <typename SourceAllocator> ValueType& operator[](const GenericValue<EncodingType, SourceAllocator>& name) const { return value_[name]; }
@@ -2556,6 +2572,7 @@ public:
 #endif
     MemberIterator MemberBegin() const { return value_.MemberBegin(); }
     MemberIterator MemberEnd() const { return value_.MemberEnd(); }
+    GenericObject MemberReserve(SizeType newCapacity, AllocatorType &allocator) const { value_.MemberReserve(newCapacity, allocator); return *this; }
     bool HasMember(const Ch* name) const { return value_.HasMember(name); }
 #if RAPIDJSON_HAS_STDSTRING
     bool HasMember(const std::basic_string<Ch>& name) const { return value_.HasMember(name); }

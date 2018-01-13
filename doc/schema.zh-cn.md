@@ -8,7 +8,7 @@ RapidJSON 实现了一个 [JSON Schema Draft v4](http://json-schema.org/document
 
 [TOC]
 
-## 基本用法
+# 基本用法 {#BasicUsage}
 
 首先，你要把 JSON Schema 解析成 `Document`，再把它编译成一个 `SchemaDocument`。
 
@@ -52,11 +52,11 @@ if (!d.Accept(validator)) {
 * 一个 `SchemaDocment` 能被多个 `SchemaValidator` 引用。它不会被 `SchemaValidator` 修改。
 * 可以重复使用一个 `SchemaValidator` 来校验多个文件。在校验其他文件前，须先调用 `validator.Reset()`。
 
-## 在解析／生成时进行校验
+# 在解析／生成时进行校验 {#ParsingSerialization}
 
 与大部分 JSON Schema 校验器有所不同，RapidJSON 提供了一个基于 SAX 的 schema 校验器实现。因此，你可以在输入流解析 JSON 的同时进行校验。若校验器遇到一个与 schema 不符的值，就会立即终止解析。这设计对于解析大型 JSON 文件时特别有用。
 
-### DOM 解析
+## DOM 解析 {#DomParsing}
 
 在使用 DOM 进行解析时，`Document` 除了接收 SAX 事件外，还需做一些准备及结束工作，因此，为了连接 `Reader`、`SchemaValidator` 和 `Document` 要做多一点事情。`SchemaValidatingReader` 是一个辅助类去做那些工作。
 
@@ -97,7 +97,7 @@ if (!reader.GetParseResult()) {
 }
 ~~~
 
-### SAX 解析
+## SAX 解析 {#SaxParsing}
 
 使用 SAX 解析时，情况就简单得多。若只需要校验 JSON 而无需进一步处理，那么仅需要：
 
@@ -126,7 +126,7 @@ if (!reader.Parse(ss, validator)) {
 }
 ~~~
 
-### 生成
+## 生成 {#Serialization}
 
 我们也可以在生成（serialization）的时候进行校验。这能确保输出的 JSON 符合一个 JSON Schema。
 
@@ -144,7 +144,7 @@ if (!d.Accept(validator)) {
 
 当然，如果你的应用仅需要 SAX 风格的生成，那么只需要把 SAX 事件由原来发送到 `Writer`，改为发送到 `SchemaValidator`。
 
-## 远程 Schema
+# 远程 Schema {#RemoteSchema}
 
 JSON Schema 支持 [`$ref` 关键字](http://spacetelescope.github.io/understanding-json-schema/structuring.html)，它是一个 [JSON pointer](doc/pointer.zh-cn.md) 引用至一个本地（local）或远程（remote） schema。本地指针的首字符是 `#`，而远程指针是一个相对或绝对 URI。例如：
 
@@ -168,7 +168,7 @@ MyRemoteSchemaDocumentProvider provider;
 SchemaDocument schema(sd, &provider);
 ~~~
 
-## 标准的符合程度
+# 标准的符合程度 {#Conformance}
 
 RapidJSON 通过了 [JSON Schema Test Suite](https://github.com/json-schema/JSON-Schema-Test-Suite) (Json Schema draft 4) 中 263 个测试的 262 个。
 
@@ -176,7 +176,7 @@ RapidJSON 通过了 [JSON Schema Test Suite](https://github.com/json-schema/JSON
 
 除此以外，关于字符串类型的 `format` schema 关键字也会被忽略，因为标准中并没需求必须实现。
 
-### 正则表达式
+## 正则表达式 {#RegEx}
 
 `pattern` 及 `patternProperties` 这两个 schema 关键字使用了正则表达式去匹配所需的模式。
 
@@ -211,7 +211,7 @@ RapidJSON 实现了一个简单的 NFA 正则表达式引擎，并预设使用�
 
 对于使用 C++11 编译器的使用者，也可使用 `std::regex`，只需定义 `RAPIDJSON_SCHEMA_USE_INTERNALREGEX=0` 及 `RAPIDJSON_SCHEMA_USE_STDREGEX=1`。若你的 schema 无需使用 `pattern` 或 `patternProperties`，可以把两个宏都设为零，以禁用此功能，这样做可节省一些代码体积。
 
-## 性能
+# 性能 {#Performance}
 
 大部分 C++ JSON 库都未支持 JSON Schema。因此我们尝试按照 [json-schema-benchmark](https://github.com/ebdrup/json-schema-benchmark) 去评估 RapidJSON 的 JSON Schema 校验器。该评测测试了 11 个运行在 node.js 上的 JavaScript 库。
 

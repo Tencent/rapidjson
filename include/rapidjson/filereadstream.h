@@ -68,7 +68,7 @@ private:
             ++current_;
         else if (!eof_) {
             count_ += readCount_;
-            readCount_ = fread(buffer_, 1, bufferSize_, fp_);
+            readCount_ = std::fread(buffer_, 1, bufferSize_, fp_);
             bufferLast_ = buffer_ + readCount_ - 1;
             current_ = buffer_;
 

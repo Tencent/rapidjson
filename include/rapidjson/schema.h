@@ -26,7 +26,7 @@
 #define RAPIDJSON_SCHEMA_USE_INTERNALREGEX 0
 #endif
 
-#if !RAPIDJSON_SCHEMA_USE_INTERNALREGEX && !defined(RAPIDJSON_SCHEMA_USE_STDREGEX) && (__cplusplus >=201103L || (defined(_MSC_VER) && _MSC_VER >= 1800))
+#if !RAPIDJSON_SCHEMA_USE_INTERNALREGEX && defined(RAPIDJSON_SCHEMA_USE_STDREGEX) && (__cplusplus >=201103L || (defined(_MSC_VER) && _MSC_VER >= 1800))
 #define RAPIDJSON_SCHEMA_USE_STDREGEX 1
 #else
 #define RAPIDJSON_SCHEMA_USE_STDREGEX 0
@@ -418,6 +418,7 @@ public:
         not_(),
         type_((1 << kTotalSchemaType) - 1), // typeless
         validatorCount_(),
+        notValidatorIndex_(),
         properties_(),
         additionalPropertiesSchema_(),
         patternProperties_(),
@@ -1063,7 +1064,7 @@ private:
     };
 
 #if RAPIDJSON_SCHEMA_USE_INTERNALREGEX
-        typedef internal::GenericRegex<EncodingType> RegexType;
+        typedef internal::GenericRegex<EncodingType, AllocatorType> RegexType;
 #elif RAPIDJSON_SCHEMA_USE_STDREGEX
         typedef std::basic_regex<Ch> RegexType;
 #else
@@ -1123,7 +1124,7 @@ private:
     template <typename ValueType>
     RegexType* CreatePattern(const ValueType& value) {
         if (value.IsString()) {
-            RegexType* r = new (allocator_->Malloc(sizeof(RegexType))) RegexType(value.GetString());
+            RegexType* r = new (allocator_->Malloc(sizeof(RegexType))) RegexType(value.GetString(), allocator_);
             if (!r->IsValid()) {
                 r->~RegexType();
                 AllocatorType::Free(r);

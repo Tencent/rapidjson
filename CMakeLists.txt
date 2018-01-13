@@ -35,6 +35,8 @@ option(RAPIDJSON_BUILD_CXX11 "Build rapidjson with C++11 (gcc/clang)" ON)
 option(RAPIDJSON_BUILD_ASAN "Build rapidjson with address sanitizer (gcc/clang)" OFF)
 option(RAPIDJSON_BUILD_UBSAN "Build rapidjson with undefined behavior sanitizer (gcc/clang)" OFF)
 
+option(RAPIDJSON_ENABLE_INSTRUMENTATION_OPT "Build rapidjson with -march or -mcpu options" ON)
+
 option(RAPIDJSON_HAS_STDSTRING "" OFF)
 if(RAPIDJSON_HAS_STDSTRING)
     add_definitions(-DRAPIDJSON_HAS_STDSTRING)
@@ -50,11 +52,13 @@ if(CCACHE_FOUND)
 endif(CCACHE_FOUND)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "powerpc" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ppc64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ppc64le")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=native")
-    else()
-      #FIXME: x86 is -march=native, but doesn't mean every arch is this option. To keep original project's compatibility, I leave this except POWER.
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+    if(${RAPIDJSON_ENABLE_INSTRUMENTATION_OPT})
+        if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "powerpc" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ppc64" OR "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ppc64le")
+          set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=native")
+        else()
+          #FIXME: x86 is -march=native, but doesn't mean every arch is this option. To keep original project's compatibility, I leave this except POWER.
+          set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+        endif()
     endif()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")
     set(EXTRA_CXX_FLAGS -Weffc++ -Wswitch-default -Wfloat-equal -Wconversion -Wsign-conversion)
@@ -181,6 +185,8 @@ EXPORT( PACKAGE ${PROJECT_NAME} )
 # ... for the build tree
 SET( CONFIG_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 SET( CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR})
+SET( ${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_SOURCE_DIR}/include" )
+
 CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY )
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
