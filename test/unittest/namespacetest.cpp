@@ -12,6 +12,10 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
+// Not throwing exception for this test
+#include <cassert>
+#define RAPIDJSON_ASSERT(x) assert(x)
+
 #include "unittest.h"
 
 // test another instantiation of RapidJSON in a different namespace 
