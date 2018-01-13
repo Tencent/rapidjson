@@ -70,11 +70,11 @@ template <typename T>
 static void Verify(void(*f)(T, char*), char* (*g)(T, char*)) {
     // Boundary cases
     VerifyValue<T>(0, f, g);
-    VerifyValue<T>(std::numeric_limits<T>::min(), f, g);
-    VerifyValue<T>(std::numeric_limits<T>::max(), f, g);
+    VerifyValue<T>((std::numeric_limits<T>::min)(), f, g);
+    VerifyValue<T>((std::numeric_limits<T>::max)(), f, g);
 
     // 2^n - 1, 2^n, 10^n - 1, 10^n until overflow
-    for (uint32_t power = 2; power <= 10; power += 8) {
+    for (int power = 2; power <= 10; power += 8) {
         T i = 1, last;
         do {
             VerifyValue<T>(i - 1, f, g);
@@ -84,7 +84,9 @@ static void Verify(void(*f)(T, char*), char* (*g)(T, char*)) {
                 VerifyValue<T>(Traits<T>::Negate(i + 1), f, g);
             }
             last = i;
-            i *= power;
+            if (i > static_cast<T>(std::numeric_limits<T>::max() / static_cast<T>(power)))
+                break;
+            i *= static_cast<T>(power);
         } while (last < i);
     }
 }
@@ -93,7 +95,7 @@ static void u32toa_naive(uint32_t value, char* buffer) {
     char temp[10];
     char *p = temp;
     do {
-        *p++ = char(value % 10) + '0';
+        *p++ = static_cast<char>(char(value % 10) + '0');
         value /= 10;
     } while (value > 0);
 
@@ -117,7 +119,7 @@ static void u64toa_naive(uint64_t value, char* buffer) {
     char temp[20];
     char *p = temp;
     do {
-        *p++ = char(value % 10) + '0';
+        *p++ = static_cast<char>(char(value % 10) + '0');
         value /= 10;
     } while (value > 0);
 

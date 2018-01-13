@@ -18,6 +18,12 @@
 #include "rapidjson/reader.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/memorybuffer.h"
+
+#ifdef __clang__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(c++98-compat)
+#endif
 
 using namespace rapidjson;
 
@@ -94,6 +100,32 @@ TEST(Writer, String) {
 #endif
 }
 
+TEST(Writer, Issue_889) {
+    char buf[100] = "Hello";
+    
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    writer.StartArray();
+    writer.String(buf);
+    writer.EndArray();
+    
+    EXPECT_STREQ("[\"Hello\"]", buffer.GetString());
+    EXPECT_TRUE(writer.IsComplete()); \
+}
+
+TEST(Writer, ScanWriteUnescapedString) {
+    const char json[] = "[\" \\\"0123456789ABCDEF\"]";
+    //                       ^ scanning stops here.
+    char buffer2[sizeof(json) + 32];
+
+    // Use different offset to test different alignments
+    for (int i = 0; i < 32; i++) {
+        char* p = buffer2 + i;
+        memcpy(p, json, sizeof(json));
+        TEST_ROUNDTRIP(p);
+    }
+}
+
 TEST(Writer, Double) {
     TEST_ROUNDTRIP("[1.2345,1.2345678,0.123456789012,1234567.8]");
     TEST_ROUNDTRIP("0.0");
@@ -107,35 +139,59 @@ TEST(Writer, Double) {
 
 }
 
+// UTF8 -> TargetEncoding -> UTF8
+template <typename TargetEncoding>
+void TestTranscode(const char* json) {
+    StringStream s(json);
+    GenericStringBuffer<TargetEncoding> buffer;
+    Writer<GenericStringBuffer<TargetEncoding>, UTF8<>, TargetEncoding> writer(buffer);
+    Reader reader;
+    reader.Parse(s, writer);
+
+    StringBuffer buffer2;
+    Writer<StringBuffer> writer2(buffer2);
+    GenericReader<TargetEncoding, UTF8<> > reader2;
+    GenericStringStream<TargetEncoding> s2(buffer.GetString());
+    reader2.Parse(s2, writer2);
+
+    EXPECT_STREQ(json, buffer2.GetString());
+}
+
 TEST(Writer, Transcode) {
     const char json[] = "{\"hello\":\"world\",\"t\":true,\"f\":false,\"n\":null,\"i\":123,\"pi\":3.1416,\"a\":[1,2,3],\"dollar\":\"\x24\",\"cents\":\"\xC2\xA2\",\"euro\":\"\xE2\x82\xAC\",\"gclef\":\"\xF0\x9D\x84\x9E\"}";
 
     // UTF8 -> UTF16 -> UTF8
-    {
-        StringStream s(json);
-        StringBuffer buffer;
-        Writer<StringBuffer, UTF16<>, UTF8<> > writer(buffer);
-        GenericReader<UTF8<>, UTF16<> > reader;
-        reader.Parse(s, writer);
-        EXPECT_STREQ(json, buffer.GetString());
-    }
+    TestTranscode<UTF8<> >(json);
 
-    // UTF8 -> UTF8 -> ASCII -> UTF8 -> UTF8
-    {
+    // UTF8 -> ASCII -> UTF8
+    TestTranscode<ASCII<> >(json);
+
+    // UTF8 -> UTF16 -> UTF8
+    TestTranscode<UTF16<> >(json);
+
+    // UTF8 -> UTF32 -> UTF8
+    TestTranscode<UTF32<> >(json);
+
+    // UTF8 -> AutoUTF -> UTF8
+    UTFType types[] = { kUTF8, kUTF16LE , kUTF16BE, kUTF32LE , kUTF32BE };
+    for (size_t i = 0; i < 5; i++) {
         StringStream s(json);
-        StringBuffer buffer;
-        Writer<StringBuffer, UTF8<>, ASCII<> > writer(buffer);
+        MemoryBuffer buffer;
+        AutoUTFOutputStream<unsigned, MemoryBuffer> os(buffer, types[i], true);
+        Writer<AutoUTFOutputStream<unsigned, MemoryBuffer>, UTF8<>, AutoUTF<unsigned> > writer(os);
         Reader reader;
         reader.Parse(s, writer);
 
         StringBuffer buffer2;
         Writer<StringBuffer> writer2(buffer2);
-        GenericReader<ASCII<>, UTF8<> > reader2;
-        StringStream s2(buffer.GetString());
-        reader2.Parse(s2, writer2);
+        GenericReader<AutoUTF<unsigned>, UTF8<> > reader2;
+        MemoryStream s2(buffer.GetBuffer(), buffer.GetSize());
+        AutoUTFInputStream<unsigned, MemoryStream> is(s2);
+        reader2.Parse(is, writer2);
 
         EXPECT_STREQ(json, buffer2.GetString());
     }
+
 }
 
 #include <sstream>
@@ -356,8 +412,10 @@ TEST(Writer, ValidateEncoding) {
         EXPECT_TRUE(writer.String("\xC2\xA2"));         // Cents sign U+00A2
         EXPECT_TRUE(writer.String("\xE2\x82\xAC"));     // Euro sign U+20AC
         EXPECT_TRUE(writer.String("\xF0\x9D\x84\x9E")); // G clef sign U+1D11E
+        EXPECT_TRUE(writer.String("\x01"));             // SOH control U+0001
+        EXPECT_TRUE(writer.String("\x1B"));             // Escape control U+001B
         writer.EndArray();
-        EXPECT_STREQ("[\"\x24\",\"\xC2\xA2\",\"\xE2\x82\xAC\",\"\xF0\x9D\x84\x9E\"]", buffer.GetString());
+        EXPECT_STREQ("[\"\x24\",\"\xC2\xA2\",\"\xE2\x82\xAC\",\"\xF0\x9D\x84\x9E\",\"\\u0001\",\"\\u001B\"]", buffer.GetString());
     }
 
     // Fail in decoding invalid UTF-8 sequence http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
@@ -399,21 +457,52 @@ TEST(Writer, InvalidEventSequence) {
         EXPECT_THROW(writer.Int(1), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
+
+    // { 'a' }
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.StartObject();
+        writer.Key("a");
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
+
+    // { 'a':'b','c' }
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.StartObject();
+        writer.Key("a");
+        writer.String("b");
+        writer.Key("c");
+        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_FALSE(writer.IsComplete());
+    }
 }
 
-extern double zero; // clang -Wmissing-variable-declarations
-double zero = 0.0;	// Use global variable to prevent compiler warning
-
 TEST(Writer, NaN) {
-    double nan = zero / zero;
+    double nan = std::numeric_limits<double>::quiet_NaN();
+
     EXPECT_TRUE(internal::Double(nan).IsNan());
     StringBuffer buffer;
-    Writer<StringBuffer> writer(buffer);
-    EXPECT_FALSE(writer.Double(nan));
+    {
+        Writer<StringBuffer> writer(buffer);
+        EXPECT_FALSE(writer.Double(nan));
+    }
+    {
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(nan));
+        EXPECT_STREQ("NaN", buffer.GetString());
+    }
+    GenericStringBuffer<UTF16<> > buffer2;
+    Writer<GenericStringBuffer<UTF16<> > > writer2(buffer2);
+    EXPECT_FALSE(writer2.Double(nan));
 }
 
 TEST(Writer, Inf) {
-    double inf = 1.0 / zero;
+    double inf = std::numeric_limits<double>::infinity();
+
     EXPECT_TRUE(internal::Double(inf).IsInf());
     StringBuffer buffer;
     {
@@ -424,6 +513,15 @@ TEST(Writer, Inf) {
         Writer<StringBuffer> writer(buffer);
         EXPECT_FALSE(writer.Double(-inf));
     }
+    {
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(inf));
+    }
+    {
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(-inf));
+    }
+    EXPECT_STREQ("Infinity-Infinity", buffer.GetString());
 }
 
 TEST(Writer, RawValue) {
@@ -439,3 +537,25 @@ TEST(Writer, RawValue) {
     EXPECT_TRUE(writer.IsComplete());
     EXPECT_STREQ("{\"a\":1,\"raw\":[\"Hello\\nWorld\", 123.456]}", buffer.GetString());
 }
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+static Writer<StringBuffer> WriterGen(StringBuffer &target) {
+    Writer<StringBuffer> writer(target);
+    writer.StartObject();
+    writer.Key("a");
+    writer.Int(1);
+    return writer;
+}
+
+TEST(Writer, MoveCtor) {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(WriterGen(buffer));
+    writer.EndObject();
+    EXPECT_TRUE(writer.IsComplete());
+    EXPECT_STREQ("{\"a\":1}", buffer.GetString());
+}
+#endif
+
+#ifdef __clang__
+RAPIDJSON_DIAG_POP
+#endif

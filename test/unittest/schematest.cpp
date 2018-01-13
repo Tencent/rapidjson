@@ -51,6 +51,11 @@ TEST(SchemaValidator, Hasher) {
     TEST_HASHER("false", "null", false);
 
     TEST_HASHER("1", "1", true);
+    TEST_HASHER("2147483648", "2147483648", true); // 2^31 can only be fit in unsigned
+    TEST_HASHER("-2147483649", "-2147483649", true); // -2^31 - 1 can only be fit in int64_t
+    TEST_HASHER("2147483648", "2147483648", true); // 2^31 can only be fit in unsigned
+    TEST_HASHER("4294967296", "4294967296", true); // 2^32 can only be fit in int64_t
+    TEST_HASHER("9223372036854775808", "9223372036854775808", true); // 2^63 can only be fit in uint64_t
     TEST_HASHER("1.5", "1.5", true);
     TEST_HASHER("1", "1.0", true);
     TEST_HASHER("1", "-1", false);
@@ -106,7 +111,7 @@ TEST(SchemaValidator, Hasher) {
     EXPECT_FALSE(d.HasParseError());\
     EXPECT_TRUE(expected == d.Accept(validator));\
     EXPECT_TRUE(expected == validator.IsValid());\
-    if (expected && !validator.IsValid()) {\
+    if ((expected) && !validator.IsValid()) {\
         StringBuffer sb;\
         validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);\
         printf("Invalid schema: %s\n", sb.GetString());\
@@ -316,6 +321,10 @@ TEST(SchemaValidator, String) {
 
     VALIDATE(s, "\"I'm a string\"", true);
     INVALIDATE(s, "42", "", "type", "");
+    INVALIDATE(s, "2147483648", "", "type", ""); // 2^31 can only be fit in unsigned
+    INVALIDATE(s, "-2147483649", "", "type", ""); // -2^31 - 1 can only be fit in int64_t
+    INVALIDATE(s, "4294967296", "", "type", ""); // 2^32 can only be fit in int64_t
+    INVALIDATE(s, "3.1415926", "", "type", "");
 }
 
 TEST(SchemaValidator, String_LengthRange) {
@@ -340,6 +349,16 @@ TEST(SchemaValidator, String_Pattern) {
     INVALIDATE(s, "\"(888)555-1212 ext. 532\"", "", "pattern", "");
     INVALIDATE(s, "\"(800)FLOWERS\"", "", "pattern", "");
 }
+
+TEST(SchemaValidator, String_Pattern_Invalid) {
+    Document sd;
+    sd.Parse("{\"type\":\"string\",\"pattern\":\"a{0}\"}"); // TODO: report regex is invalid somehow
+    SchemaDocument s(sd);
+
+    VALIDATE(s, "\"\"", true);
+    VALIDATE(s, "\"a\"", true);
+    VALIDATE(s, "\"aa\"", true);
+}
 #endif
 
 TEST(SchemaValidator, Integer) {
@@ -349,6 +368,10 @@ TEST(SchemaValidator, Integer) {
 
     VALIDATE(s, "42", true);
     VALIDATE(s, "-1", true);
+    VALIDATE(s, "2147483648", true); // 2^31 can only be fit in unsigned
+    VALIDATE(s, "-2147483649", true); // -2^31 - 1 can only be fit in int64_t
+    VALIDATE(s, "2147483648", true); // 2^31 can only be fit in unsigned
+    VALIDATE(s, "4294967296", true); // 2^32 can only be fit in int64_t
     INVALIDATE(s, "3.1415926", "", "type", "");
     INVALIDATE(s, "\"42\"", "", "type", "");
 }
@@ -368,11 +391,34 @@ TEST(SchemaValidator, Integer_Range) {
 
 TEST(SchemaValidator, Integer_Range64Boundary) {
     Document sd;
-    sd.Parse("{\"type\":\"integer\",\"minimum\":-9223372036854775807,\"maximum\":18446744073709551614}");
+    sd.Parse("{\"type\":\"integer\",\"minimum\":-9223372036854775807,\"maximum\":9223372036854775806}");
     SchemaDocument s(sd);
 
     INVALIDATE(s, "-9223372036854775808", "", "minimum", "");
     VALIDATE(s, "-9223372036854775807", true);
+    VALIDATE(s, "-2147483648", true); // int min
+    VALIDATE(s, "0", true);
+    VALIDATE(s, "2147483647", true);  // int max
+    VALIDATE(s, "2147483648", true);  // unsigned first
+    VALIDATE(s, "4294967295", true);  // unsigned max
+    VALIDATE(s, "9223372036854775806", true);
+    INVALIDATE(s, "9223372036854775807", "", "maximum", "");
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "");   // uint64_t max
+}
+
+TEST(SchemaValidator, Integer_RangeU64Boundary) {
+    Document sd;
+    sd.Parse("{\"type\":\"integer\",\"minimum\":9223372036854775808,\"maximum\":18446744073709551614}");
+    SchemaDocument s(sd);
+
+    INVALIDATE(s, "-9223372036854775808", "", "minimum", "");
+    INVALIDATE(s, "9223372036854775807", "", "minimum", "");
+    INVALIDATE(s, "-2147483648", "", "minimum", ""); // int min
+    INVALIDATE(s, "0", "", "minimum", "");
+    INVALIDATE(s, "2147483647", "", "minimum", "");  // int max
+    INVALIDATE(s, "2147483648", "", "minimum", "");  // unsigned first
+    INVALIDATE(s, "4294967295", "", "minimum", "");  // unsigned max
+    VALIDATE(s, "9223372036854775808", true);
     VALIDATE(s, "18446744073709551614", true);
     INVALIDATE(s, "18446744073709551615", "", "maximum", "");
 }
@@ -418,10 +464,73 @@ TEST(SchemaValidator, Number_Range) {
 
     INVALIDATE(s, "-1", "", "minimum", "");
     VALIDATE(s, "0", true);
+    VALIDATE(s, "0.1", true);
     VALIDATE(s, "10", true);
     VALIDATE(s, "99", true);
+    VALIDATE(s, "99.9", true);
     INVALIDATE(s, "100", "", "maximum", "");
+    INVALIDATE(s, "100.0", "", "maximum", "");
+    INVALIDATE(s, "101.5", "", "maximum", "");
+}
+
+TEST(SchemaValidator, Number_RangeInt) {
+    Document sd;
+    sd.Parse("{\"type\":\"number\",\"minimum\":-100,\"maximum\":-1,\"exclusiveMaximum\":true}");
+    SchemaDocument s(sd);
+
+    INVALIDATE(s, "-101", "", "minimum", "");
+    INVALIDATE(s, "-100.1", "", "minimum", "");
+    VALIDATE(s, "-100", true);
+    VALIDATE(s, "-2", true);
+    INVALIDATE(s, "-1", "", "maximum", "");
+    INVALIDATE(s, "-0.9", "", "maximum", "");
+    INVALIDATE(s, "0", "", "maximum", "");
+    INVALIDATE(s, "2147483647", "", "maximum", "");  // int max
+    INVALIDATE(s, "2147483648", "", "maximum", "");  // unsigned first
+    INVALIDATE(s, "4294967295", "", "maximum", "");  // unsigned max
+    INVALIDATE(s, "9223372036854775808", "", "maximum", "");
+    INVALIDATE(s, "18446744073709551614", "", "maximum", "");
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "");
+}
+
+TEST(SchemaValidator, Number_RangeDouble) {
+    Document sd;
+    sd.Parse("{\"type\":\"number\",\"minimum\":0.1,\"maximum\":100.1,\"exclusiveMaximum\":true}");
+    SchemaDocument s(sd);
+
+    INVALIDATE(s, "-9223372036854775808", "", "minimum", "");
+    INVALIDATE(s, "-2147483648", "", "minimum", ""); // int min
+    INVALIDATE(s, "-1", "", "minimum", "");
+    VALIDATE(s, "0.1", true);
+    VALIDATE(s, "10", true);
+    VALIDATE(s, "99", true);
+    VALIDATE(s, "100", true);
     INVALIDATE(s, "101", "", "maximum", "");
+    INVALIDATE(s, "101.5", "", "maximum", "");
+    INVALIDATE(s, "18446744073709551614", "", "maximum", "");
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "");
+    INVALIDATE(s, "2147483647", "", "maximum", "");  // int max
+    INVALIDATE(s, "2147483648", "", "maximum", "");  // unsigned first
+    INVALIDATE(s, "4294967295", "", "maximum", "");  // unsigned max
+    INVALIDATE(s, "9223372036854775808", "", "maximum", "");
+    INVALIDATE(s, "18446744073709551614", "", "maximum", "");
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "");
+}
+
+TEST(SchemaValidator, Number_RangeDoubleU64Boundary) {
+    Document sd;
+    sd.Parse("{\"type\":\"number\",\"minimum\":9223372036854775808.0,\"maximum\":18446744073709550000.0}");
+    SchemaDocument s(sd);
+
+    INVALIDATE(s, "-9223372036854775808", "", "minimum", "");
+    INVALIDATE(s, "-2147483648", "", "minimum", ""); // int min
+    INVALIDATE(s, "0", "", "minimum", "");
+    INVALIDATE(s, "2147483647", "", "minimum", "");  // int max
+    INVALIDATE(s, "2147483648", "", "minimum", "");  // unsigned first
+    INVALIDATE(s, "4294967295", "", "minimum", "");  // unsigned max
+    VALIDATE(s, "9223372036854775808", true);
+    VALIDATE(s, "18446744073709540000", true);
+    INVALIDATE(s, "18446744073709551615", "", "maximum", "");
 }
 
 TEST(SchemaValidator, Number_MultipleOf) {
@@ -434,6 +543,13 @@ TEST(SchemaValidator, Number_MultipleOf) {
     VALIDATE(s, "-10", true);
     VALIDATE(s, "20", true);
     INVALIDATE(s, "23", "", "multipleOf", "");
+    INVALIDATE(s, "-2147483648", "", "multipleOf", "");  // int min
+    VALIDATE(s, "-2147483640", true);
+    INVALIDATE(s, "2147483647", "", "multipleOf", "");  // int max
+    INVALIDATE(s, "2147483648", "", "multipleOf", "");  // unsigned first
+    VALIDATE(s, "2147483650", true);
+    INVALIDATE(s, "4294967295", "", "multipleOf", "");  // unsigned max
+    VALIDATE(s, "4294967300", true);
 }
 
 TEST(SchemaValidator, Number_MultipleOfOne) {
@@ -844,6 +960,19 @@ TEST(SchemaValidator, AllOf_Nested) {
     INVALIDATE(s, "123", "", "allOf", "");
 }
 
+TEST(SchemaValidator, EscapedPointer) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "  \"type\": \"object\","
+        "  \"properties\": {"
+        "    \"~/\": { \"type\": \"number\" }"
+        "  }"
+        "}");
+    SchemaDocument s(sd);
+    INVALIDATE(s, "{\"~/\":true}", "/properties/~0~1", "type", "/~0~1");
+}
+
 template <typename Allocator>
 static char* ReadFile(const char* filename, Allocator& allocator) {
     const char *paths[] = {
@@ -972,7 +1101,7 @@ public:
         };
 
         for (size_t i = 0; i < kCount; i++)
-            if (strncmp(uri, uris[i], length) == 0)
+            if (strncmp(uri, uris[i], length) == 0 && strlen(uris[i]) == length)
                 return sd_[i];
         return 0;
     }
@@ -1152,6 +1281,12 @@ TEST(SchemaValidatingWriter, Simple) {
     EXPECT_TRUE(validator.GetInvalidDocumentPointer() == SchemaDocument::PointerType(""));
 }
 
+TEST(Schema, Issue848) {
+    rapidjson::Document d;
+    rapidjson::SchemaDocument s(d);
+    rapidjson::GenericSchemaValidator<rapidjson::SchemaDocument, rapidjson::Document> v(s);
+}
+
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
 static SchemaDocument ReturnSchemaDocument() {
@@ -1169,6 +1304,49 @@ TEST(Schema, Issue552) {
 }
 
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
+TEST(SchemaValidator, Issue608) {
+    Document sd;
+    sd.Parse("{\"required\": [\"a\", \"b\"] }");
+    SchemaDocument s(sd);
+
+    VALIDATE(s, "{\"a\" : null, \"b\": null}", true);
+    INVALIDATE(s, "{\"a\" : null, \"a\" : null}", "", "required", "");
+}
+
+// Fail to resolve $ref in allOf causes crash in SchemaValidator::StartObject()
+TEST(SchemaValidator, Issue728_AllOfRef) {
+    Document sd;
+    sd.Parse("{\"allOf\": [{\"$ref\": \"#/abc\"}]}");
+    SchemaDocument s(sd);
+    VALIDATE(s, "{\"key1\": \"abc\", \"key2\": \"def\"}", true);
+}
+
+TEST(SchemaValidator, Issue825) {
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"additionalProperties\": false, \"patternProperties\": {\"^i\": { \"type\": \"string\" } } }");
+    SchemaDocument s(sd);
+    VALIDATE(s, "{ \"item\": \"hello\" }", true);
+}
+
+TEST(SchemaValidator, Issue1017_allOfHandler) {
+    Document sd;
+    sd.Parse("{\"allOf\": [{\"type\": \"object\",\"properties\": {\"cyanArray2\": {\"type\": \"array\",\"items\": { \"type\": \"string\" }}}},{\"type\": \"object\",\"properties\": {\"blackArray\": {\"type\": \"array\",\"items\": { \"type\": \"string\" }}},\"required\": [ \"blackArray\" ]}]}");
+    SchemaDocument s(sd);
+    StringBuffer sb;
+    Writer<StringBuffer> writer(sb);
+    GenericSchemaValidator<SchemaDocument, Writer<StringBuffer> > validator(s, writer);
+    EXPECT_TRUE(validator.StartObject());
+    EXPECT_TRUE(validator.Key("cyanArray2", 10, false));
+    EXPECT_TRUE(validator.StartArray());    
+    EXPECT_TRUE(validator.EndArray(0));    
+    EXPECT_TRUE(validator.Key("blackArray", 10, false));
+    EXPECT_TRUE(validator.StartArray());    
+    EXPECT_TRUE(validator.EndArray(0));    
+    EXPECT_TRUE(validator.EndObject(0));
+    EXPECT_TRUE(validator.IsValid());
+    EXPECT_STREQ("{\"cyanArray2\":[],\"blackArray\":[]}", sb.GetString());
+}
 
 #ifdef __clang__
 RAPIDJSON_DIAG_POP

@@ -35,6 +35,7 @@ int main(int argc, char **argv) {
 
 #ifdef _MSC_VER
     _CrtMemState memoryState = { 0 };
+    (void)memoryState;
     _CrtMemCheckpoint(&memoryState);
     //_CrtSetBreakAlloc(X);
     //void *testWhetherMemoryLeakDetectionWorks = malloc(1);

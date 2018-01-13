@@ -267,7 +267,7 @@ static unsigned inline decode(unsigned* state, unsigned* codep, unsigned byte) {
 
     *codep = (*state != UTF8_ACCEPT) ?
         (byte & 0x3fu) | (*codep << 6) :
-    (0xff >> type) & (byte);
+    (0xffu >> type) & (byte);
 
     *state = utf8d[256 + *state + type];
     return *state;
@@ -302,8 +302,9 @@ TEST(EncodingsTest, UTF8) {
                         decodedCount++;
                     }
 
-                if (*encodedStr)                // This decoder cannot handle U+0000
+                if (*encodedStr) {                  // This decoder cannot handle U+0000
                     EXPECT_EQ(1u, decodedCount);    // Should only contain one code point
+                }
 
                 EXPECT_EQ(UTF8_ACCEPT, state);
                 if (UTF8_ACCEPT != state)
@@ -420,6 +421,31 @@ TEST(EncodingsTest, UTF32) {
                 EXPECT_TRUE(result);
                 EXPECT_EQ(0, StrCmp(encodedStr, os2.GetString()));
             }
+        }
+    }
+}
+
+TEST(EncodingsTest, ASCII) {
+    StringBuffer os, os2;
+    for (unsigned codepoint = 0; codepoint < 128; codepoint++) {
+        os.Clear();
+        ASCII<>::Encode(os, codepoint);
+        const ASCII<>::Ch* encodedStr = os.GetString();
+        {
+            StringStream is(encodedStr);
+            unsigned decodedCodepoint;
+            bool result = ASCII<>::Decode(is, &decodedCodepoint);
+            if (!result || codepoint != decodedCodepoint)
+                std::cout << std::hex << codepoint << " " << decodedCodepoint << std::endl;
+        }
+
+        // Validate
+        {
+            StringStream is(encodedStr);
+            os2.Clear();
+            bool result = ASCII<>::Validate(is, os2);
+            EXPECT_TRUE(result);
+            EXPECT_EQ(0, StrCmp(encodedStr, os2.GetString()));
         }
     }
 }

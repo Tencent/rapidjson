@@ -1,7 +1,8 @@
 // Example of parsing JSON to document by parts.
 
 // Using C++11 threads
-#if __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1700)
+// Temporarily disable for clang (older version) due to incompatibility with libstdc++
+#if (__cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1700)) && !defined(__clang__)
 
 #include "rapidjson/document.h"
 #include "rapidjson/error/en.h"
@@ -20,12 +21,15 @@ public:
     AsyncDocumentParser(Document& d)
         : stream_(*this)
         , d_(d)
-        , parseThread_(&AsyncDocumentParser::Parse, this)
+        , parseThread_()
         , mutex_()
         , notEmpty_()
         , finish_()
         , completed_()
-    {}
+    {
+        // Create and execute thread after all member variables are initialized.
+        parseThread_ = std::thread(&AsyncDocumentParser::Parse, this);
+    }
 
     ~AsyncDocumentParser() {
         if (!parseThread_.joinable())

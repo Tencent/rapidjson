@@ -1,3 +1,15 @@
-get_filename_component(RAPIDJSON_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-set(RAPIDJSON_INCLUDE_DIRS "@INCLUDE_INSTALL_DIR@")
-message(STATUS "RapidJSON found. Headers: ${RAPIDJSON_INCLUDE_DIRS}")
+################################################################################
+# RapidJSON source dir
+set( RapidJSON_SOURCE_DIR "@CONFIG_SOURCE_DIR@")
+
+################################################################################
+# RapidJSON build dir
+set( RapidJSON_DIR "@CONFIG_DIR@")
+
+################################################################################
+# Compute paths
+get_filename_component(RapidJSON_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+set( RapidJSON_INCLUDE_DIR  "@RapidJSON_INCLUDE_DIR@" )
+set( RapidJSON_INCLUDE_DIRS  "@RapidJSON_INCLUDE_DIR@" )
+message(STATUS "RapidJSON found. Headers: ${RapidJSON_INCLUDE_DIRS}")

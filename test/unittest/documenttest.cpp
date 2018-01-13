@@ -128,8 +128,14 @@ TEST(Document, UnchangedOnParseError) {
     Document doc;
     doc.SetArray().PushBack(0, doc.GetAllocator());
 
+    ParseResult noError;
+    EXPECT_TRUE(noError);
+
     ParseResult err = doc.Parse("{]");
     EXPECT_TRUE(doc.HasParseError());
+    EXPECT_NE(err, noError);
+    EXPECT_NE(err.Code(), noError);
+    EXPECT_NE(noError, doc.GetParseError());
     EXPECT_EQ(err.Code(), doc.GetParseError());
     EXPECT_EQ(err.Offset(), doc.GetErrorOffset());
     EXPECT_TRUE(doc.IsArray());
@@ -138,6 +144,9 @@ TEST(Document, UnchangedOnParseError) {
     err = doc.Parse("{}");
     EXPECT_FALSE(doc.HasParseError());
     EXPECT_FALSE(err.IsError());
+    EXPECT_TRUE(err);
+    EXPECT_EQ(err, noError);
+    EXPECT_EQ(err.Code(), noError);
     EXPECT_EQ(err.Code(), doc.GetParseError());
     EXPECT_EQ(err.Offset(), doc.GetErrorOffset());
     EXPECT_TRUE(doc.IsObject());
@@ -291,7 +300,14 @@ TEST(Document, Swap) {
     o.SetObject().AddMember("a", 1, a);
 
     // Swap between Document and Value
-    // d1.Swap(o); // doesn't compile
+    d1.Swap(o);
+    EXPECT_TRUE(d1.IsObject());
+    EXPECT_TRUE(o.IsArray());
+
+    d1.Swap(o);
+    EXPECT_TRUE(d1.IsArray());
+    EXPECT_TRUE(o.IsObject());
+
     o.Swap(d1);
     EXPECT_TRUE(d1.IsObject());
     EXPECT_TRUE(o.IsArray());
@@ -447,10 +463,10 @@ TYPED_TEST_CASE(DocumentMove, MoveAllocatorTypes);
 
 TYPED_TEST(DocumentMove, MoveConstructor) {
     typedef TypeParam Allocator;
-    typedef GenericDocument<UTF8<>, Allocator> Document;
+    typedef GenericDocument<UTF8<>, Allocator> D;
     Allocator allocator;
 
-    Document a(&allocator);
+    D a(&allocator);
     a.Parse("[\"one\", \"two\", \"three\"]");
     EXPECT_FALSE(a.HasParseError());
     EXPECT_TRUE(a.IsArray());
@@ -458,7 +474,7 @@ TYPED_TEST(DocumentMove, MoveConstructor) {
     EXPECT_EQ(&a.GetAllocator(), &allocator);
 
     // Document b(a); // does not compile (!is_copy_constructible)
-    Document b(std::move(a));
+    D b(std::move(a));
     EXPECT_TRUE(a.IsNull());
     EXPECT_TRUE(b.IsArray());
     EXPECT_EQ(3u, b.Size());
@@ -471,7 +487,7 @@ TYPED_TEST(DocumentMove, MoveConstructor) {
     EXPECT_EQ(2u, b.MemberCount());
 
     // Document c = a; // does not compile (!is_copy_constructible)
-    Document c = std::move(b);
+    D c = std::move(b);
     EXPECT_TRUE(b.IsNull());
     EXPECT_TRUE(c.IsObject());
     EXPECT_EQ(2u, c.MemberCount());
@@ -481,25 +497,29 @@ TYPED_TEST(DocumentMove, MoveConstructor) {
 
 TYPED_TEST(DocumentMove, MoveConstructorParseError) {
     typedef TypeParam Allocator;
-    typedef GenericDocument<UTF8<>, Allocator> Document;
+    typedef GenericDocument<UTF8<>, Allocator> D;
 
     ParseResult noError;
-    Document a;
+    D a;
     a.Parse("{ 4 = 4]");
     ParseResult error(a.GetParseError(), a.GetErrorOffset());
     EXPECT_TRUE(a.HasParseError());
+    EXPECT_NE(error, noError);
+    EXPECT_NE(error.Code(), noError);
     EXPECT_NE(error.Code(), noError.Code());
     EXPECT_NE(error.Offset(), noError.Offset());
 
-    Document b(std::move(a));
+    D b(std::move(a));
     EXPECT_FALSE(a.HasParseError());
     EXPECT_TRUE(b.HasParseError());
+    EXPECT_EQ(a.GetParseError(), noError);
     EXPECT_EQ(a.GetParseError(), noError.Code());
-    EXPECT_EQ(b.GetParseError(), error.Code());
     EXPECT_EQ(a.GetErrorOffset(), noError.Offset());
+    EXPECT_EQ(b.GetParseError(), error);
+    EXPECT_EQ(b.GetParseError(), error.Code());
     EXPECT_EQ(b.GetErrorOffset(), error.Offset());
 
-    Document c(std::move(b));
+    D c(std::move(b));
     EXPECT_FALSE(b.HasParseError());
     EXPECT_TRUE(c.HasParseError());
     EXPECT_EQ(b.GetParseError(), noError.Code());
@@ -540,10 +560,10 @@ TYPED_TEST(DocumentMove, MoveConstructorStack) {
 
 TYPED_TEST(DocumentMove, MoveAssignment) {
     typedef TypeParam Allocator;
-    typedef GenericDocument<UTF8<>, Allocator> Document;
+    typedef GenericDocument<UTF8<>, Allocator> D;
     Allocator allocator;
 
-    Document a(&allocator);
+    D a(&allocator);
     a.Parse("[\"one\", \"two\", \"three\"]");
     EXPECT_FALSE(a.HasParseError());
     EXPECT_TRUE(a.IsArray());
@@ -551,7 +571,7 @@ TYPED_TEST(DocumentMove, MoveAssignment) {
     EXPECT_EQ(&a.GetAllocator(), &allocator);
 
     // Document b; b = a; // does not compile (!is_copy_assignable)
-    Document b;
+    D b;
     b = std::move(a);
     EXPECT_TRUE(a.IsNull());
     EXPECT_TRUE(b.IsArray());
@@ -565,7 +585,7 @@ TYPED_TEST(DocumentMove, MoveAssignment) {
     EXPECT_EQ(2u, b.MemberCount());
 
     // Document c; c = a; // does not compile (see static_assert)
-    Document c;
+    D c;
     c = std::move(b);
     EXPECT_TRUE(b.IsNull());
     EXPECT_TRUE(c.IsObject());
@@ -576,17 +596,17 @@ TYPED_TEST(DocumentMove, MoveAssignment) {
 
 TYPED_TEST(DocumentMove, MoveAssignmentParseError) {
     typedef TypeParam Allocator;
-    typedef GenericDocument<UTF8<>, Allocator> Document;
+    typedef GenericDocument<UTF8<>, Allocator> D;
 
     ParseResult noError;
-    Document a;
+    D a;
     a.Parse("{ 4 = 4]");
     ParseResult error(a.GetParseError(), a.GetErrorOffset());
     EXPECT_TRUE(a.HasParseError());
     EXPECT_NE(error.Code(), noError.Code());
     EXPECT_NE(error.Offset(), noError.Offset());
 
-    Document b;
+    D b;
     b = std::move(a);
     EXPECT_FALSE(a.HasParseError());
     EXPECT_TRUE(b.HasParseError());
@@ -595,7 +615,7 @@ TYPED_TEST(DocumentMove, MoveAssignmentParseError) {
     EXPECT_EQ(a.GetErrorOffset(), noError.Offset());
     EXPECT_EQ(b.GetErrorOffset(), error.Offset());
 
-    Document c;
+    D c;
     c = std::move(b);
     EXPECT_FALSE(b.HasParseError());
     EXPECT_TRUE(c.HasParseError());
@@ -612,9 +632,9 @@ TYPED_TEST(DocumentMove, MoveAssignmentParseError) {
 TYPED_TEST(DocumentMove, MoveAssignmentStack) {
     typedef TypeParam Allocator;
     typedef UTF8<> Encoding;
-    typedef GenericDocument<Encoding, Allocator> Document;
+    typedef GenericDocument<Encoding, Allocator> D;
 
-    Document a;
+    D a;
     size_t defaultCapacity = a.GetStackCapacity();
 
     // Trick Document into getting GetStackCapacity() to return non-zero
@@ -625,12 +645,12 @@ TYPED_TEST(DocumentMove, MoveAssignmentStack) {
     size_t capacity = a.GetStackCapacity();
     EXPECT_GT(capacity, 0u);
 
-    Document b;
+    D b;
     b = std::move(a);
     EXPECT_EQ(a.GetStackCapacity(), defaultCapacity);
     EXPECT_EQ(b.GetStackCapacity(), capacity);
 
-    Document c;
+    D c;
     c = std::move(b);
     EXPECT_EQ(b.GetStackCapacity(), defaultCapacity);
     EXPECT_EQ(c.GetStackCapacity(), capacity);

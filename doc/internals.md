@@ -114,7 +114,7 @@ Number is a bit more complicated. For normal integer values, it can contains `kI
 
 ## Short-String Optimization {#ShortString}
 
- Kosta (@Kosta-Github) provided a very neat short-string optimization. The optimization idea is given as follow. Excluding the `flags_`, a `Value` has 12 or 16 bytes (32-bit or 64-bit) for storing actual data. Instead of storing a pointer to a string, it is possible to store short strings in these space internally. For encoding with 1-byte character type (e.g. `char`), it can store maximum 11 or 15 characters string inside the `Value` type.
+ [Kosta](https://github.com/Kosta-Github) provided a very neat short-string optimization. The optimization idea is given as follow. Excluding the `flags_`, a `Value` has 12 or 16 bytes (32-bit or 64-bit) for storing actual data. Instead of storing a pointer to a string, it is possible to store short strings in these space internally. For encoding with 1-byte character type (e.g. `char`), it can store maximum 11 or 15 characters string inside the `Value` type.
 
 | ShortString (Ch=char) |                                   |32-bit|64-bit|
 |---------------------|-------------------------------------|:----:|:----:|
@@ -126,7 +126,7 @@ A special technique is applied. Instead of storing the length of string directly
 
 This optimization can reduce memory usage for copy-string. It can also improve cache-coherence thus improve runtime performance.
 
-# Allocator {#Allocator}
+# Allocator {#InternalAllocator}
 
 `Allocator` is a concept in RapidJSON:
 ~~~cpp
@@ -158,7 +158,7 @@ Note that `Malloc()` and `Realloc()` are member functions but `Free()` is static
 
 Internally, it allocates chunks of memory from the base allocator (by default `CrtAllocator`) and stores the chunks as a singly linked list. When user requests an allocation, it allocates memory from the following order:
 
-1. User supplied buffer if it is available. (See [User Buffer section in DOM](dom.md))
+1. User supplied buffer if it is available. (See [User Buffer section in DOM](doc/dom.md))
 2. If user supplied buffer is full, use the current memory chunk.
 3. If the current block is full, allocate a new block of memory.
 
@@ -183,17 +183,20 @@ void SkipWhitespace(InputStream& s) {
 
 However, this requires 4 comparisons and a few branching for each character. This was found to be a hot spot.
 
-To accelerate this process, SIMD was applied to compare 16 characters with 4 white spaces for each iteration. Currently RapidJSON only supports SSE2 and SSE4.2 instructions for this. And it is only activated for UTF-8 memory streams, including string stream or *in situ* parsing. 
+To accelerate this process, SIMD was applied to compare 16 characters with 4 white spaces for each iteration. Currently RapidJSON supports SSE2, SSE4.2 and ARM Neon instructions for this. And it is only activated for UTF-8 memory streams, including string stream or *in situ* parsing.
 
-To enable this optimization, need to define `RAPIDJSON_SSE2` or `RAPIDJSON_SSE42` before including `rapidjson.h`. Some compilers can detect the setting, as in `perftest.h`:
+To enable this optimization, need to define `RAPIDJSON_SSE2`, `RAPIDJSON_SSE42` or `RAPIDJSON_NEON` before including `rapidjson.h`. Some compilers can detect the setting, as in `perftest.h`:
 
 ~~~cpp
 // __SSE2__ and __SSE4_2__ are recognized by gcc, clang, and the Intel compiler.
 // We use -march=native with gmake to enable -msse2 and -msse4.2, if supported.
+// Likewise, __ARM_NEON is used to detect Neon.
 #if defined(__SSE4_2__)
 #  define RAPIDJSON_SSE42
 #elif defined(__SSE2__)
 #  define RAPIDJSON_SSE2
+#elif defined(__ARM_NEON)
+#  define RAPIDJSON_NEON
 #endif
 ~~~
 
@@ -211,7 +214,7 @@ In [Intel® 64 and IA-32 Architectures Optimization Reference Manual
 
 This is not feasible as RapidJSON should not enforce such requirement.
 
-To fix this issue, currently the routine process bytes up to the next aligned address. After tha, use aligned read to perform SIMD processing. Also see [#85](https://github.com/miloyip/rapidjson/issues/85).
+To fix this issue, currently the routine process bytes up to the next aligned address. After tha, use aligned read to perform SIMD processing. Also see [#85](https://github.com/Tencent/rapidjson/issues/85).
 
 ## Local Stream Copy {#LocalStreamCopy}
 

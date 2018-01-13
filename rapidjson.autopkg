@@ -1,14 +1,14 @@
 nuget {
-	//Usage:  Write-NuGetPackage rapidjson.autopkg -defines:MYVERSION=1.0.2
+	//Usage:  Write-NuGetPackage rapidjson.autopkg -defines:MYVERSION=1.1.0
 	//Be sure you are running Powershell 3.0 and have the CoApp powershell extensions installed properly.
 	nuspec {
 		id = rapidjson;
 		version : ${MYVERSION};
 		title: "rapidjson";
-		authors: {"https://github.com/miloyip/rapidjson/releases/tag/v1.0.2"};
+		authors: {"https://github.com/Tencent/rapidjson/releases/tag/v1.1.0"};
 		owners: {"@lsantos (github)"};
-		licenseUrl: "https://github.com/miloyip/rapidjson/blob/master/license.txt";
-		projectUrl: "https://github.com/miloyip/rapidjson/";
+		licenseUrl: "https://github.com/Tencent/rapidjson/blob/master/license.txt";
+		projectUrl: "https://github.com/Tencent/rapidjson/";
 		iconUrl: "https://cdn1.iconfinder.com/data/icons/fatcow/32x32/json.png";
 		requireLicenseAcceptance:false;
 		summary: @"A fast JSON parser/generator for C++ with both SAX/DOM style API";
@@ -71,5 +71,7 @@ Changed
 	targets {
 		// We're trying to be standard about these sorts of thing. (Will help with config.h later :D)
 		//Defines += HAS_EQCORE;
+		// Fix creating the package with Raggles' fork of CoApp
+		Includes += "$(MSBuildThisFileDirectory)../..${d_include}";
 	};
 }

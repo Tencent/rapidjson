@@ -19,7 +19,7 @@ digraph {
 
 		node [shape=Mrecord, style=filled, colorscheme=spectral7]
 
-		c1 [label="{contact:array|}", fillcolor=4]
+		c1 [label="{contacts:array|}", fillcolor=4]
 		c11 [label="{|}"]
 		c12 [label="{|}"]
 		c13 [shape=none, label="...", style="solid"]
@@ -42,13 +42,13 @@ digraph {
 
 		node [shape=Mrecord, style=filled, colorscheme=spectral7]
 
-		c2 [label="{contact:null|}", fillcolor=1]
+		c2 [label="{contacts:null|}", fillcolor=1]
 		c3 [label="{array|}", fillcolor=4]
 		c21 [label="{|}"]
 		c22 [label="{|}"]
 		c23 [shape="none", label="...", style="solid"]
 		o2 [label="{o:object|}", fillcolor=3]
-		cs [label="{string|\"contact\"}", fillcolor=5]
+		cs [label="{string|\"contacts\"}", fillcolor=5]
 		c2 -> o2 [style="dashed", constraint=false, label="AddMember", style=invis]
 
 		edge [arrowhead=vee]

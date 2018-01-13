@@ -28,6 +28,8 @@
 #define SIMD_SUFFIX(name) name##_SSE2
 #elif defined(RAPIDJSON_SSE42)
 #define SIMD_SUFFIX(name) name##_SSE42
+#elif defined(RAPIDJSON_NEON)
+#define SIMD_SUFFIX(name) name##_NEON
 #else
 #define SIMD_SUFFIX(name) name
 #endif
@@ -149,6 +151,35 @@ TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseIterativeInsitu_DummyHandler)) {
         BaseReaderHandler<> h;
         Reader reader;
         EXPECT_TRUE(reader.Parse<kParseIterativeFlag|kParseInsituFlag>(s, h));
+    }
+}
+
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseIterativePull_DummyHandler)) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        StringStream s(json_);
+        BaseReaderHandler<> h;
+        Reader reader;
+        reader.IterativeParseInit();
+        while (!reader.IterativeParseComplete()) {
+            if (!reader.IterativeParseNext<kParseDefaultFlags>(s, h))
+                break;
+        }
+        EXPECT_FALSE(reader.HasParseError());
+    }
+}
+
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseIterativePullInsitu_DummyHandler)) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        memcpy(temp_, json_, length_ + 1);
+        InsituStringStream s(temp_);
+        BaseReaderHandler<> h;
+        Reader reader;
+        reader.IterativeParseInit();
+        while (!reader.IterativeParseComplete()) {
+            if (!reader.IterativeParseNext<kParseDefaultFlags|kParseInsituFlag>(s, h))
+                break;
+        }
+        EXPECT_FALSE(reader.HasParseError());
     }
 }
 

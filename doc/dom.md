@@ -116,6 +116,9 @@ Parse flags                   | Meaning
 `kParseStopWhenDoneFlag`      | After parsing a complete JSON root from stream, stop further processing the rest of stream. When this flag is used, parser will not generate `kParseErrorDocumentRootNotSingular` error. Using this flag for parsing multiple JSONs in the same stream.
 `kParseFullPrecisionFlag`     | Parse number in full precision (slower). If this flag is not set, the normal precision (faster) is used. Normal precision has maximum 3 [ULP](http://en.wikipedia.org/wiki/Unit_in_the_last_place) error.
 `kParseCommentsFlag`          | Allow one-line `// ...` and multi-line `/* ... */` comments (relaxed JSON syntax).
+`kParseNumbersAsStringsFlag`  | Parse numerical type values as strings.
+`kParseTrailingCommasFlag`    | Allow trailing commas at the end of objects and arrays (relaxed JSON syntax).
+`kParseNanAndInfFlag`         | Allow parsing `NaN`, `Inf`, `Infinity`, `-Inf` and `-Infinity` as `double` values (relaxed JSON syntax).
 
 By using a non-type template parameter, instead of a function parameter, C++ compiler can generate code which is optimized for specified combinations, improving speed, and reducing code size (if only using a single specialization). The downside is the flags needed to be determined in compile-time.
 
@@ -125,7 +128,7 @@ And the `InputStream` is type of input stream.
 
 ## Parse Error {#ParseError}
 
-When the parse processing succeeded, the `Document` contains the parse results. When there is an error, the original DOM is *unchanged*. And the error state of parsing can be obtained by `bool HasParseError()`,  `ParseErrorCode GetParseError()` and `size_t GetParseOffset()`.
+When the parse processing succeeded, the `Document` contains the parse results. When there is an error, the original DOM is *unchanged*. And the error state of parsing can be obtained by `bool HasParseError()`,  `ParseErrorCode GetParseError()` and `size_t GetErrorOffset()`.
 
 Parse Error Code                            | Description
 --------------------------------------------|---------------------------------------------------
@@ -161,7 +164,7 @@ Document d;
 if (d.Parse(json).HasParseError()) {
     fprintf(stderr, "\nError(offset %u): %s\n", 
         (unsigned)d.GetErrorOffset(),
-        GetParseError_En(d.GetParseErrorCode()));
+        GetParseError_En(d.GetParseError()));
     // ...
 }
 ~~~~~~~~~~
@@ -238,7 +241,7 @@ Some techniques about using DOM API is discussed here.
 
 ## DOM as SAX Event Publisher
 
-In RapidJSON, stringifying a DOM with `Writer` may be look a little bit weired.
+In RapidJSON, stringifying a DOM with `Writer` may be look a little bit weird.
 
 ~~~~~~~~~~cpp
 // ...

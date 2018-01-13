@@ -441,8 +441,8 @@ TEST(Pointer, Stringify) {
 }
 
 // Construct a Pointer with static tokens, no dynamic allocation involved.
-#define NAME(s) { s, sizeof(s) / sizeof(s[0]) - 1, kPointerInvalidIndex }
-#define INDEX(i) { #i, sizeof(#i) - 1, i }
+#define NAME(s) { s, static_cast<SizeType>(sizeof(s) / sizeof(s[0]) - 1), kPointerInvalidIndex }
+#define INDEX(i) { #i, static_cast<SizeType>(sizeof(#i) - 1), i }
 
 static const Pointer::Token kTokens[] = { NAME("foo"), INDEX(0) }; // equivalent to "/foo/0"
 
@@ -1488,7 +1488,7 @@ TEST(Pointer, Ambiguity) {
     }
 }
 
-// https://github.com/miloyip/rapidjson/issues/483
+// https://github.com/Tencent/rapidjson/issues/483
 namespace myjson {
 
 class MyAllocator

@@ -12,6 +12,9 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
+#ifndef RAPIDJSON_ISTREAMWRAPPER_H_
+#define RAPIDJSON_ISTREAMWRAPPER_H_
+
 #include "stream.h"
 #include <iosfwd>
 
@@ -51,7 +54,7 @@ public:
 
     Ch Peek() const { 
         typename StreamType::int_type c = stream_.peek();
-        return RAPIDJSON_LIKELY(c != StreamType::traits_type::eof()) ? static_cast<Ch>(c) : '\0';
+        return RAPIDJSON_LIKELY(c != StreamType::traits_type::eof()) ? static_cast<Ch>(c) : static_cast<Ch>('\0');
     }
 
     Ch Take() { 
@@ -108,3 +111,5 @@ RAPIDJSON_DIAG_POP
 #endif
 
 RAPIDJSON_NAMESPACE_END
+
+#endif // RAPIDJSON_ISTREAMWRAPPER_H_
