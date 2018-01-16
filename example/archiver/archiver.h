@@ -89,6 +89,9 @@ public:
     static const bool IsWriter = !IsReader;
 
 private:
+    JsonReader(const JsonReader&);
+    JsonReader& operator=(const JsonReader&);
+
     void Next();
 
     // PIMPL
@@ -131,6 +134,9 @@ public:
     static const bool IsWriter = !IsReader;
 
 private:
+    JsonWriter(const JsonWriter&);
+    JsonWriter& operator=(const JsonWriter&);
+
     // PIMPL idiom
     void* mWriter;      ///< JSON writer.
     void* mStream;      ///< Stream buffer.
