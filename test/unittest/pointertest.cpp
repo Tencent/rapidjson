@@ -462,7 +462,8 @@ TEST(Pointer, ConstructorWithToken) {
 
 TEST(Pointer, CopyConstructor) {
     {
-        Pointer p("/foo/0");
+        CrtAllocator allocator;
+        Pointer p("/foo/0", &allocator);
         Pointer q(p);
         EXPECT_TRUE(q.IsValid());
         EXPECT_EQ(2u, q.GetTokenCount());
@@ -471,6 +472,7 @@ TEST(Pointer, CopyConstructor) {
         EXPECT_EQ(1u, q.GetTokens()[1].length);
         EXPECT_STREQ("0", q.GetTokens()[1].name);
         EXPECT_EQ(0u, q.GetTokens()[1].index);
+        EXPECT_EQ(&p.GetAllocator(), &q.GetAllocator());
     }
 
     // Static tokens
@@ -489,7 +491,8 @@ TEST(Pointer, CopyConstructor) {
 
 TEST(Pointer, Assignment) {
     {
-        Pointer p("/foo/0");
+        CrtAllocator allocator;
+        Pointer p("/foo/0", &allocator);
         Pointer q;
         q = p;
         EXPECT_TRUE(q.IsValid());
@@ -499,6 +502,7 @@ TEST(Pointer, Assignment) {
         EXPECT_EQ(1u, q.GetTokens()[1].length);
         EXPECT_STREQ("0", q.GetTokens()[1].name);
         EXPECT_EQ(0u, q.GetTokens()[1].index);
+        EXPECT_NE(&p.GetAllocator(), &q.GetAllocator());
         q = q;
         EXPECT_TRUE(q.IsValid());
         EXPECT_EQ(2u, q.GetTokenCount());
@@ -507,6 +511,7 @@ TEST(Pointer, Assignment) {
         EXPECT_EQ(1u, q.GetTokens()[1].length);
         EXPECT_STREQ("0", q.GetTokens()[1].name);
         EXPECT_EQ(0u, q.GetTokens()[1].index);
+        EXPECT_NE(&p.GetAllocator(), &q.GetAllocator());
     }
 
     // Static tokens
