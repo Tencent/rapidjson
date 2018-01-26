@@ -68,6 +68,7 @@ enum WriteFlag {
     kWriteNoFlags = 0,              //!< No flags are set.
     kWriteValidateEncodingFlag = 1, //!< Validate encoding of JSON strings.
     kWriteNanAndInfFlag = 2,        //!< Allow writing of Infinity, -Infinity and NaN.
+    kWriteSkipInvalidCodePoint = 4, //!< Allow writing with skiping invalid codepoint.
     kWriteDefaultFlags = RAPIDJSON_WRITE_DEFAULT_FLAGS  //!< Default write flags. Can be customized by defining RAPIDJSON_WRITE_DEFAULT_FLAGS
 };
 
@@ -401,8 +402,12 @@ protected:
             if (!TargetEncoding::supportUnicode && static_cast<unsigned>(c) >= 0x80) {
                 // Unicode escaping
                 unsigned codepoint;
-                if (RAPIDJSON_UNLIKELY(!SourceEncoding::Decode(is, &codepoint)))
+                if (RAPIDJSON_UNLIKELY(!SourceEncoding::Decode(is, &codepoint))) {
+                    if(writeFlags & kWriteSkipInvalidCodePoint) {
+                        continue;
+                    }
                     return false;
+                }         
                 PutUnsafe(*os_, '\\');
                 PutUnsafe(*os_, 'u');
                 if (codepoint <= 0xD7FF || (codepoint >= 0xE000 && codepoint <= 0xFFFF)) {
