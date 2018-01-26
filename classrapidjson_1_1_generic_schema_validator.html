@@ -110,9 +110,18 @@ typedef SchemaDocumentType::PointerType&#160;</td><td class="memItemRight" valig
 <tr class="memitem:abaea0f74722261f6dde0db65594efdfe"><td class="memItemLeft" align="right" valign="top"><a id="abaea0f74722261f6dde0db65594efdfe"></a>
 typedef SchemaType::EncodingType&#160;</td><td class="memItemRight" valign="bottom"><b>EncodingType</b></td></tr>
 <tr class="separator:abaea0f74722261f6dde0db65594efdfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a545e4e19bd9419d908bc21e1a7a6170d"><td class="memItemLeft" align="right" valign="top"><a id="a545e4e19bd9419d908bc21e1a7a6170d"></a>
+typedef SchemaType::SValue&#160;</td><td class="memItemRight" valign="bottom"><b>SValue</b></td></tr>
+<tr class="separator:a545e4e19bd9419d908bc21e1a7a6170d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5b7093443e29cf66eb7cf47f3d8583d"><td class="memItemLeft" align="right" valign="top"><a id="ab5b7093443e29cf66eb7cf47f3d8583d"></a>
 typedef EncodingType::Ch&#160;</td><td class="memItemRight" valign="bottom"><b>Ch</b></td></tr>
 <tr class="separator:ab5b7093443e29cf66eb7cf47f3d8583d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6d33bab73e771af8c06f2b05e878350"><td class="memItemLeft" align="right" valign="top"><a id="af6d33bab73e771af8c06f2b05e878350"></a>
+typedef <a class="el" href="structrapidjson_1_1_generic_string_ref.html">GenericStringRef</a>&lt; Ch &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>StringRefType</b></td></tr>
+<tr class="separator:af6d33bab73e771af8c06f2b05e878350"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14216aea798d69f102987c1aae36e897"><td class="memItemLeft" align="right" valign="top"><a id="a14216aea798d69f102987c1aae36e897"></a>
+typedef <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a>&lt; EncodingType, StateAllocator &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>ValueType</b></td></tr>
+<tr class="separator:a14216aea798d69f102987c1aae36e897"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -134,6 +143,13 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_validator.html#ad32a9ad31dbb588edaaf038ab053275b">IsValid</a> () const</td></tr>
 <tr class="memdesc:ad32a9ad31dbb588edaaf038ab053275b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the current state is valid. <br /></td></tr>
 <tr class="separator:ad32a9ad31dbb588edaaf038ab053275b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a422c16457e512835b0d0f64ec1c81ba2"><td class="memItemLeft" align="right" valign="top"><a id="a422c16457e512835b0d0f64ec1c81ba2"></a>
+<a class="el" href="classrapidjson_1_1_generic_value.html">ValueType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_validator.html#a422c16457e512835b0d0f64ec1c81ba2">GetError</a> ()</td></tr>
+<tr class="memdesc:a422c16457e512835b0d0f64ec1c81ba2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the error object. <br /></td></tr>
+<tr class="separator:a422c16457e512835b0d0f64ec1c81ba2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6c2d3f031bbb29c88e3ac798897402e"><td class="memItemLeft" align="right" valign="top"><a id="aa6c2d3f031bbb29c88e3ac798897402e"></a>
+const <a class="el" href="classrapidjson_1_1_generic_value.html">ValueType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetError</b> () const</td></tr>
+<tr class="separator:aa6c2d3f031bbb29c88e3ac798897402e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3238efb9d9144c2d6577362d8dc5f61b"><td class="memItemLeft" align="right" valign="top"><a id="a3238efb9d9144c2d6577362d8dc5f61b"></a>
 PointerType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_validator.html#a3238efb9d9144c2d6577362d8dc5f61b">GetInvalidSchemaPointer</a> () const</td></tr>
 <tr class="memdesc:a3238efb9d9144c2d6577362d8dc5f61b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the JSON pointer pointed to the invalid schema. <br /></td></tr>
@@ -146,6 +162,117 @@ const Ch *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href
 PointerType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_validator.html#a60dfb4a89593c8d3ca4c89a6202feb52">GetInvalidDocumentPointer</a> () const</td></tr>
 <tr class="memdesc:a60dfb4a89593c8d3ca4c89a6202feb52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the JSON pointer pointed to the invalid value. <br /></td></tr>
 <tr class="separator:a60dfb4a89593c8d3ca4c89a6202feb52"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72ead044f5f0625933acd9e9fab260ec"><td class="memItemLeft" align="right" valign="top"><a id="a72ead044f5f0625933acd9e9fab260ec"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>NotMultipleOf</b> (int64_t actual, const SValue &amp;expected)</td></tr>
+<tr class="separator:a72ead044f5f0625933acd9e9fab260ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a218886c7c3eed96395818b41a0f17b33"><td class="memItemLeft" align="right" valign="top"><a id="a218886c7c3eed96395818b41a0f17b33"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>NotMultipleOf</b> (uint64_t actual, const SValue &amp;expected)</td></tr>
+<tr class="separator:a218886c7c3eed96395818b41a0f17b33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af98e1fd5a37d420c8488fc5a2663a15a"><td class="memItemLeft" align="right" valign="top"><a id="af98e1fd5a37d420c8488fc5a2663a15a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>NotMultipleOf</b> (double actual, const SValue &amp;expected)</td></tr>
+<tr class="separator:af98e1fd5a37d420c8488fc5a2663a15a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f1a7ccc6396e1cd055cc8b346f4162f"><td class="memItemLeft" align="right" valign="top"><a id="a2f1a7ccc6396e1cd055cc8b346f4162f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>AboveMaximum</b> (int64_t actual, const SValue &amp;expected, bool exclusive)</td></tr>
+<tr class="separator:a2f1a7ccc6396e1cd055cc8b346f4162f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af87d73fa2e72133825a119bbcd5f1de9"><td class="memItemLeft" align="right" valign="top"><a id="af87d73fa2e72133825a119bbcd5f1de9"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>AboveMaximum</b> (uint64_t actual, const SValue &amp;expected, bool exclusive)</td></tr>
+<tr class="separator:af87d73fa2e72133825a119bbcd5f1de9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4a839a437fc02ed3d7d1acc3a7be1f6"><td class="memItemLeft" align="right" valign="top"><a id="ab4a839a437fc02ed3d7d1acc3a7be1f6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>AboveMaximum</b> (double actual, const SValue &amp;expected, bool exclusive)</td></tr>
+<tr class="separator:ab4a839a437fc02ed3d7d1acc3a7be1f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b5920ec7704fb3551d7f4b611198ff2"><td class="memItemLeft" align="right" valign="top"><a id="a9b5920ec7704fb3551d7f4b611198ff2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>BelowMinimum</b> (int64_t actual, const SValue &amp;expected, bool exclusive)</td></tr>
+<tr class="separator:a9b5920ec7704fb3551d7f4b611198ff2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa381c23453915ea2787902db40ca929b"><td class="memItemLeft" align="right" valign="top"><a id="aa381c23453915ea2787902db40ca929b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>BelowMinimum</b> (uint64_t actual, const SValue &amp;expected, bool exclusive)</td></tr>
+<tr class="separator:aa381c23453915ea2787902db40ca929b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3dbb6a1341589665bcd2ddb290c0f02d"><td class="memItemLeft" align="right" valign="top"><a id="a3dbb6a1341589665bcd2ddb290c0f02d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>BelowMinimum</b> (double actual, const SValue &amp;expected, bool exclusive)</td></tr>
+<tr class="separator:a3dbb6a1341589665bcd2ddb290c0f02d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0acaa633e474a66d3739abde902f74d1"><td class="memItemLeft" align="right" valign="top"><a id="a0acaa633e474a66d3739abde902f74d1"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>TooLong</b> (const Ch *str, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> expected)</td></tr>
+<tr class="separator:a0acaa633e474a66d3739abde902f74d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed41fec37abd2543621b0838718436cd"><td class="memItemLeft" align="right" valign="top"><a id="aed41fec37abd2543621b0838718436cd"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>TooShort</b> (const Ch *str, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> expected)</td></tr>
+<tr class="separator:aed41fec37abd2543621b0838718436cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbe41f171df306367f4bfdae24619a4a"><td class="memItemLeft" align="right" valign="top"><a id="abbe41f171df306367f4bfdae24619a4a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DoesNotMatch</b> (const Ch *str, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length)</td></tr>
+<tr class="separator:abbe41f171df306367f4bfdae24619a4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4bd946cbdce3e9207aa58f204b0abd0"><td class="memItemLeft" align="right" valign="top"><a id="ab4bd946cbdce3e9207aa58f204b0abd0"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DisallowedItem</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> index)</td></tr>
+<tr class="separator:ab4bd946cbdce3e9207aa58f204b0abd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96614fd25cd28294486f9212d49807eb"><td class="memItemLeft" align="right" valign="top"><a id="a96614fd25cd28294486f9212d49807eb"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>TooFewItems</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> actualCount, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> expectedCount)</td></tr>
+<tr class="separator:a96614fd25cd28294486f9212d49807eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17d9808adb5cdd5e9a253b309b10b570"><td class="memItemLeft" align="right" valign="top"><a id="a17d9808adb5cdd5e9a253b309b10b570"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>TooManyItems</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> actualCount, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> expectedCount)</td></tr>
+<tr class="separator:a17d9808adb5cdd5e9a253b309b10b570"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ad5d50a8df51dd51012bd3a525b0366"><td class="memItemLeft" align="right" valign="top"><a id="a7ad5d50a8df51dd51012bd3a525b0366"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DuplicateItems</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> index1, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> index2)</td></tr>
+<tr class="separator:a7ad5d50a8df51dd51012bd3a525b0366"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acbaaa6d63ebdd11b8526fe4c7d6ba3cf"><td class="memItemLeft" align="right" valign="top"><a id="acbaaa6d63ebdd11b8526fe4c7d6ba3cf"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>TooManyProperties</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> actualCount, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> expectedCount)</td></tr>
+<tr class="separator:acbaaa6d63ebdd11b8526fe4c7d6ba3cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7c129bc7d97e65c23e8d6733c331a9d"><td class="memItemLeft" align="right" valign="top"><a id="aa7c129bc7d97e65c23e8d6733c331a9d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>TooFewProperties</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> actualCount, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> expectedCount)</td></tr>
+<tr class="separator:aa7c129bc7d97e65c23e8d6733c331a9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2689c5db02a0f47bc986393c6a3f4ce"><td class="memItemLeft" align="right" valign="top"><a id="ae2689c5db02a0f47bc986393c6a3f4ce"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>StartMissingProperties</b> ()</td></tr>
+<tr class="separator:ae2689c5db02a0f47bc986393c6a3f4ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd199b291d3c02f7d3030c4b3e90a928"><td class="memItemLeft" align="right" valign="top"><a id="acd199b291d3c02f7d3030c4b3e90a928"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>AddMissingProperty</b> (const SValue &amp;name)</td></tr>
+<tr class="separator:acd199b291d3c02f7d3030c4b3e90a928"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a981efd4aab86914496aa4f6f5b343c41"><td class="memItemLeft" align="right" valign="top"><a id="a981efd4aab86914496aa4f6f5b343c41"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>EndMissingProperties</b> ()</td></tr>
+<tr class="separator:a981efd4aab86914496aa4f6f5b343c41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d77aa3f5e4c266966e11b9eead3f0d2"><td class="memItemLeft" align="right" valign="top"><a id="a7d77aa3f5e4c266966e11b9eead3f0d2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>PropertyViolations</b> (ISchemaValidator **subvalidators, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> count)</td></tr>
+<tr class="separator:a7d77aa3f5e4c266966e11b9eead3f0d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a531df83a842c2c1b1a1ffa935f5f0dbd"><td class="memItemLeft" align="right" valign="top"><a id="a531df83a842c2c1b1a1ffa935f5f0dbd"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DisallowedProperty</b> (const Ch *name, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> length)</td></tr>
+<tr class="separator:a531df83a842c2c1b1a1ffa935f5f0dbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a980ede674d2e3383266ce3f11e998ff2"><td class="memItemLeft" align="right" valign="top"><a id="a980ede674d2e3383266ce3f11e998ff2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>StartDependencyErrors</b> ()</td></tr>
+<tr class="separator:a980ede674d2e3383266ce3f11e998ff2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b376874448fc49abb14f88044ea6cde"><td class="memItemLeft" align="right" valign="top"><a id="a4b376874448fc49abb14f88044ea6cde"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>StartMissingDependentProperties</b> ()</td></tr>
+<tr class="separator:a4b376874448fc49abb14f88044ea6cde"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22ea103b7b3bd7df5ea053104e5e3a9d"><td class="memItemLeft" align="right" valign="top"><a id="a22ea103b7b3bd7df5ea053104e5e3a9d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>AddMissingDependentProperty</b> (const SValue &amp;targetName)</td></tr>
+<tr class="separator:a22ea103b7b3bd7df5ea053104e5e3a9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a963f399f141c67f08f786034a91da582"><td class="memItemLeft" align="right" valign="top"><a id="a963f399f141c67f08f786034a91da582"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>EndMissingDependentProperties</b> (const SValue &amp;sourceName)</td></tr>
+<tr class="separator:a963f399f141c67f08f786034a91da582"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d80c62575eee529152cfac08dc07b3e"><td class="memItemLeft" align="right" valign="top"><a id="a6d80c62575eee529152cfac08dc07b3e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>AddDependencySchemaError</b> (const SValue &amp;sourceName, ISchemaValidator *subvalidator)</td></tr>
+<tr class="separator:a6d80c62575eee529152cfac08dc07b3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea5bba6aaf0847e58c3787e91baf2674"><td class="memItemLeft" align="right" valign="top"><a id="aea5bba6aaf0847e58c3787e91baf2674"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>EndDependencyErrors</b> ()</td></tr>
+<tr class="separator:aea5bba6aaf0847e58c3787e91baf2674"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5dd6854ff499756cc6f5bc20b24b5feb"><td class="memItemLeft" align="right" valign="top"><a id="a5dd6854ff499756cc6f5bc20b24b5feb"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DisallowedValue</b> ()</td></tr>
+<tr class="separator:a5dd6854ff499756cc6f5bc20b24b5feb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6032d1e04492a898ff2134006bd9d675"><td class="memItemLeft" align="right" valign="top"><a id="a6032d1e04492a898ff2134006bd9d675"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>StartDisallowedType</b> ()</td></tr>
+<tr class="separator:a6032d1e04492a898ff2134006bd9d675"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeedf35fabd022f1d1587fed1dd21e437"><td class="memItemLeft" align="right" valign="top"><a id="aeedf35fabd022f1d1587fed1dd21e437"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>AddExpectedType</b> (const typename SchemaType::ValueType &amp;expectedType)</td></tr>
+<tr class="separator:aeedf35fabd022f1d1587fed1dd21e437"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa87900ec83ae291f945ef182c1d76cbf"><td class="memItemLeft" align="right" valign="top"><a id="aa87900ec83ae291f945ef182c1d76cbf"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>EndDisallowedType</b> (const typename SchemaType::ValueType &amp;actualType)</td></tr>
+<tr class="separator:aa87900ec83ae291f945ef182c1d76cbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebba45126e811820315b5da35d365275"><td class="memItemLeft" align="right" valign="top"><a id="aebba45126e811820315b5da35d365275"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>NotAllOf</b> (ISchemaValidator **subvalidators, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> count)</td></tr>
+<tr class="separator:aebba45126e811820315b5da35d365275"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4e282836f2d48711151c0a7b90b4484"><td class="memItemLeft" align="right" valign="top"><a id="ae4e282836f2d48711151c0a7b90b4484"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>NoneOf</b> (ISchemaValidator **subvalidators, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> count)</td></tr>
+<tr class="separator:ae4e282836f2d48711151c0a7b90b4484"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d9182430d8866e5ca3061a82cf8f823"><td class="memItemLeft" align="right" valign="top"><a id="a9d9182430d8866e5ca3061a82cf8f823"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>NotOneOf</b> (ISchemaValidator **subvalidators, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> count)</td></tr>
+<tr class="separator:a9d9182430d8866e5ca3061a82cf8f823"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73838d75ed8f38e20f3b6798b4a56db5"><td class="memItemLeft" align="right" valign="top"><a id="a73838d75ed8f38e20f3b6798b4a56db5"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>Disallowed</b> ()</td></tr>
+<tr class="separator:a73838d75ed8f38e20f3b6798b4a56db5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefcbbbdba183ef7b13347aa3b4f352bd"><td class="memItemLeft" align="right" valign="top"><a id="aefcbbbdba183ef7b13347aa3b4f352bd"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>Null</b> ()</td></tr>
 <tr class="separator:aefcbbbdba183ef7b13347aa3b4f352bd"><td class="memSeparator" colspan="2">&#160;</td></tr>

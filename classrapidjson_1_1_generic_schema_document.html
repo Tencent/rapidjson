@@ -116,16 +116,22 @@ typedef internal::Schema&lt; <a class="el" href="classrapidjson_1_1_generic_sche
 <tr class="memitem:a61540c0f8aa542760ae03257a0e6dab7"><td class="memItemLeft" align="right" valign="top"><a id="a61540c0f8aa542760ae03257a0e6dab7"></a>
 typedef <a class="el" href="classrapidjson_1_1_generic_pointer.html">GenericPointer</a>&lt; ValueType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>PointerType</b></td></tr>
 <tr class="separator:a61540c0f8aa542760ae03257a0e6dab7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72e8240701d707953bfd806cddc995b6"><td class="memItemLeft" align="right" valign="top"><a id="a72e8240701d707953bfd806cddc995b6"></a>
+typedef <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a>&lt; EncodingType, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>URIType</b></td></tr>
+<tr class="separator:a72e8240701d707953bfd806cddc995b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad200cc7bcb193c8568cdbda7b7fd0496"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_document.html#ad200cc7bcb193c8568cdbda7b7fd0496">GenericSchemaDocument</a> (const ValueType &amp;document, <a class="el" href="classrapidjson_1_1_i_generic_remote_schema_document_provider.html">IRemoteSchemaDocumentProviderType</a> *remoteProvider=0, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> *allocator=0)</td></tr>
-<tr class="memdesc:ad200cc7bcb193c8568cdbda7b7fd0496"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#ad200cc7bcb193c8568cdbda7b7fd0496">More...</a><br /></td></tr>
-<tr class="separator:ad200cc7bcb193c8568cdbda7b7fd0496"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeebf51ef6353f6a01d6f6618da6d0865"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_document.html#aeebf51ef6353f6a01d6f6618da6d0865">GenericSchemaDocument</a> (const ValueType &amp;document, const Ch *uri=0, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> uriLength=0, <a class="el" href="classrapidjson_1_1_i_generic_remote_schema_document_provider.html">IRemoteSchemaDocumentProviderType</a> *remoteProvider=0, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> *allocator=0)</td></tr>
+<tr class="memdesc:aeebf51ef6353f6a01d6f6618da6d0865"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#aeebf51ef6353f6a01d6f6618da6d0865">More...</a><br /></td></tr>
+<tr class="separator:aeebf51ef6353f6a01d6f6618da6d0865"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf6f3372013227873ed392dee1e752bf"><td class="memItemLeft" align="right" valign="top"><a id="adf6f3372013227873ed392dee1e752bf"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_document.html#adf6f3372013227873ed392dee1e752bf">~GenericSchemaDocument</a> ()</td></tr>
 <tr class="memdesc:adf6f3372013227873ed392dee1e752bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
 <tr class="separator:adf6f3372013227873ed392dee1e752bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55b013a5f3f213d198ac0205ba6ea9b0"><td class="memItemLeft" align="right" valign="top"><a id="a55b013a5f3f213d198ac0205ba6ea9b0"></a>
+const <a class="el" href="classrapidjson_1_1_generic_value.html">URIType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetURI</b> () const</td></tr>
+<tr class="separator:a55b013a5f3f213d198ac0205ba6ea9b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8b2ac6de85dc9c1fb4f4d0be4aeb2d6a"><td class="memItemLeft" align="right" valign="top"><a id="a8b2ac6de85dc9c1fb4f4d0be4aeb2d6a"></a>
 const SchemaType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_document.html#a8b2ac6de85dc9c1fb4f4d0be4aeb2d6a">GetRoot</a> () const</td></tr>
 <tr class="memdesc:a8b2ac6de85dc9c1fb4f4d0be4aeb2d6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the root schema. <br /></td></tr>
@@ -153,8 +159,8 @@ class rapidjson::GenericSchemaDocument&lt; ValueT, Allocator &gt;</h3>
   </dd>
 </dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ad200cc7bcb193c8568cdbda7b7fd0496"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad200cc7bcb193c8568cdbda7b7fd0496">&#9670;&nbsp;</a></span>GenericSchemaDocument()</h2>
+<a id="aeebf51ef6353f6a01d6f6618da6d0865"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeebf51ef6353f6a01d6f6618da6d0865">&#9670;&nbsp;</a></span>GenericSchemaDocument()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -169,6 +175,18 @@ template&lt;typename ValueT , typename Allocator  = CrtAllocator&gt; </div>
           <td>(</td>
           <td class="paramtype">const ValueType &amp;&#160;</td>
           <td class="paramname"><em>document</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Ch *&#160;</td>
+          <td class="paramname"><em>uri</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>&#160;</td>
+          <td class="paramname"><em>uriLength</em> = <code>0</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -200,6 +218,8 @@ template&lt;typename ValueT , typename Allocator  = CrtAllocator&gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">document</td><td>A JSON document as source. </td></tr>
+    <tr><td class="paramname">uri</td><td>The base URI of this schema document for purposes of violation reporting. </td></tr>
+    <tr><td class="paramname">uriLength</td><td>Length of <code>name</code>, in code points. </td></tr>
     <tr><td class="paramname">remoteProvider</td><td>An optional remote schema document provider for resolving remote reference. Can be null. </td></tr>
     <tr><td class="paramname">allocator</td><td>An optional allocator instance for allocating memory. Can be null. </td></tr>
   </table>

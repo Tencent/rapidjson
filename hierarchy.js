@@ -33,7 +33,10 @@ var hierarchy =
     [ "rapidjson::GenericValue< Encoding, Allocator >", "classrapidjson_1_1_generic_value.html", [
       [ "rapidjson::GenericDocument< Encoding, Allocator, StackAllocator >", "classrapidjson_1_1_generic_document.html", null ]
     ] ],
+    [ "rapidjson::GenericValue< EncodingType, Allocator >", "classrapidjson_1_1_generic_value.html", null ],
+    [ "rapidjson::GenericValue< EncodingType, StateAllocator >", "classrapidjson_1_1_generic_value.html", null ],
     [ "rapidjson::GenericValue< rapidjson::Encoding, rapidjson::Allocator >", "classrapidjson_1_1_generic_value.html", null ],
+    [ "rapidjson::GenericValue< SourceEncoding, StackAllocator >", "classrapidjson_1_1_generic_value.html", null ],
     [ "rapidjson::Handler", "classrapidjson_1_1_handler.html", null ],
     [ "rapidjson::GenericValue< Encoding, Allocator >::Number::I", "structrapidjson_1_1_generic_value_1_1_number_1_1_i.html", null ],
     [ "rapidjson::IGenericRemoteSchemaDocumentProvider< SchemaDocumentType >", "classrapidjson_1_1_i_generic_remote_schema_document_provider.html", null ],
@@ -41,6 +44,9 @@ var hierarchy =
       [ "rapidjson::GenericSchemaValidator< SchemaDocumentType, OutputHandler, StateAllocator >", "classrapidjson_1_1_generic_schema_validator.html", null ]
     ] ],
     [ "rapidjson::internal::ISchemaValidator", null, [
+      [ "rapidjson::GenericSchemaValidator< SchemaDocumentType, OutputHandler, StateAllocator >", "classrapidjson_1_1_generic_schema_validator.html", null ]
+    ] ],
+    [ "rapidjson::internal::IValidationErrorHandler< SchemaDocumentType::SchemaType >", null, [
       [ "rapidjson::GenericSchemaValidator< SchemaDocumentType, OutputHandler, StateAllocator >", "classrapidjson_1_1_generic_schema_validator.html", null ]
     ] ],
     [ "rapidjson::Writer< OutputStream, SourceEncoding, TargetEncoding, StackAllocator, writeFlags >::Level", "structrapidjson_1_1_writer_1_1_level.html", null ],

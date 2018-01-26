@@ -101,15 +101,45 @@ var NAVTREE =
       ] ]
     ] ],
     [ "Schema", "md_doc_schema.html", [
-      [ "Validation during parsing/serialization", "md_doc_schema.html#ParsingSerialization", [
-        [ "DOM parsing", "md_doc_schema.html#DomParsing", null ],
+      [ "Basic Usage", "md_doc_schema.html#Basic", null ],
+      [ "Validation during parsing/serialization", "md_doc_schema.html#Fused", [
+        [ "DOM parsing", "md_doc_schema.html#DOM", null ],
+        [ "SAX parsing", "md_doc_schema.html#SAX", null ],
         [ "Serialization", "md_doc_schema.html#Serialization", null ]
       ] ],
-      [ "Remote Schema", "md_doc_schema.html#RemoteSchema", null ],
+      [ "Remote Schema", "md_doc_schema.html#Remote", null ],
       [ "Conformance", "md_doc_schema.html#Conformance", [
-        [ "Regular Expression", "md_doc_schema.html#RegEx", null ]
+        [ "Regular Expression", "md_doc_schema.html#Regex", null ]
       ] ],
-      [ "Performance", "md_doc_schema.html#Performance", null ]
+      [ "Performance", "md_doc_schema.html#Performance", null ],
+      [ "Schema violation reporting", "md_doc_schema.html#Reporting", [
+        [ "General provisions", "md_doc_schema.html#ReportingGeneral", null ],
+        [ "Validation keywords for numbers", "md_doc_schema.html#Numbers", [
+          [ "multipleOf", "md_doc_schema.html#multipleof", null ],
+          [ "maximum", "md_doc_schema.html#maximum", null ],
+          [ "minimum", "md_doc_schema.html#minimum", null ]
+        ] ],
+        [ "Validation keywords for strings", "md_doc_schema.html#Strings", [
+          [ "maxLength", "md_doc_schema.html#maxLength", null ],
+          [ "minLength", "md_doc_schema.html#minLength", null ],
+          [ "pattern", "md_doc_schema.html#pattern", null ]
+        ] ],
+        [ "Validation keywords for arrays", "md_doc_schema.html#Arrays", [
+          [ "additionalItems", "md_doc_schema.html#additionalItems", null ],
+          [ "maxItems and minItems", "md_doc_schema.html#maxItems-minItems", null ],
+          [ "uniqueItems", "md_doc_schema.html#uniqueItems", null ],
+          [ "maxProperties and minProperties", "md_doc_schema.html#maxProperties-minProperties", null ],
+          [ "required", "md_doc_schema.html#required", null ],
+          [ "additionalProperties", "md_doc_schema.html#additionalProperties", null ],
+          [ "dependencies", "md_doc_schema.html#dependencies", null ]
+        ] ],
+        [ "Validation keywords for any instance type", "md_doc_schema.html#AnyTypes", [
+          [ "enum", "md_doc_schema.html#enum", null ],
+          [ "type", "md_doc_schema.html#type", null ],
+          [ "allOf, anyOf, and oneOf", "md_doc_schema.html#allOf-anyOf-oneOf", null ],
+          [ "not", "md_doc_schema.html#not", null ]
+        ] ]
+      ] ]
     ] ],
     [ "Performance", "md_doc_performance.html", null ],
     [ "Internals", "md_doc_internals.html", [
@@ -173,9 +203,9 @@ var NAVTREEINDEX =
 [
 "allocators_8h_source.html",
 "classrapidjson_1_1_generic_object.html#acd045fbc7ffebf7902244fb1034b8751",
-"classrapidjson_1_1_generic_value.html#aa1ab35be7c796a75dec562844a1917e6",
-"functions_n.html",
-"reader_8h.html#a6efb0f4d2a6f81477a59718d42e9464a"
+"classrapidjson_1_1_generic_value.html#a5d47340c96346c5028fee4c9068d783d",
+"error_8h.html#gga7d3acf640886b1f2552dc8c4cd6dea60a636209a2e516fbdb4db5ad0a83a6b386",
+"md_doc_stream.html#CustomStream"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

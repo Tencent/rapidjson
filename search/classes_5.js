@@ -16,5 +16,8 @@ var searchData=
   ['genericstringref',['GenericStringRef',['../structrapidjson_1_1_generic_string_ref.html',1,'rapidjson']]],
   ['genericstringstream',['GenericStringStream',['../structrapidjson_1_1_generic_string_stream.html',1,'rapidjson']]],
   ['genericvalue',['GenericValue',['../classrapidjson_1_1_generic_value.html',1,'rapidjson']]],
-  ['genericvalue_3c_20rapidjson_3a_3aencoding_2c_20rapidjson_3a_3aallocator_20_3e',['GenericValue&lt; rapidjson::Encoding, rapidjson::Allocator &gt;',['../classrapidjson_1_1_generic_value.html',1,'rapidjson']]]
+  ['genericvalue_3c_20encodingtype_2c_20allocator_20_3e',['GenericValue&lt; EncodingType, Allocator &gt;',['../classrapidjson_1_1_generic_value.html',1,'rapidjson']]],
+  ['genericvalue_3c_20encodingtype_2c_20stateallocator_20_3e',['GenericValue&lt; EncodingType, StateAllocator &gt;',['../classrapidjson_1_1_generic_value.html',1,'rapidjson']]],
+  ['genericvalue_3c_20rapidjson_3a_3aencoding_2c_20rapidjson_3a_3aallocator_20_3e',['GenericValue&lt; rapidjson::Encoding, rapidjson::Allocator &gt;',['../classrapidjson_1_1_generic_value.html',1,'rapidjson']]],
+  ['genericvalue_3c_20sourceencoding_2c_20stackallocator_20_3e',['GenericValue&lt; SourceEncoding, StackAllocator &gt;',['../classrapidjson_1_1_generic_value.html',1,'rapidjson']]]
 ];

@@ -82,21 +82,51 @@ $(document).ready(function(){initNavTree('md_doc_schema.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#ParsingSerialization">Validation during parsing/serialization</a><ul><li class="level2"><a href="#DomParsing">DOM parsing</a></li>
+<ul><li class="level1"><a href="#Basic">Basic Usage</a></li>
+<li class="level1"><a href="#Fused">Validation during parsing/serialization</a><ul><li class="level2"><a href="#DOM">DOM parsing</a></li>
+<li class="level2"><a href="#SAX">SAX parsing</a></li>
 <li class="level2"><a href="#Serialization">Serialization</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#RemoteSchema">Remote Schema</a></li>
-<li class="level1"><a href="#Conformance">Conformance</a><ul><li class="level2"><a href="#RegEx">Regular Expression</a></li>
+<li class="level1"><a href="#Remote">Remote Schema</a></li>
+<li class="level1"><a href="#Conformance">Conformance</a><ul><li class="level2"><a href="#Regex">Regular Expression</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#Performance">Performance</a></li>
+<li class="level1"><a href="#Reporting">Schema violation reporting</a><ul><li class="level2"><a href="#ReportingGeneral">General provisions</a></li>
+<li class="level2"><a href="#Numbers">Validation keywords for numbers</a><ul><li class="level3"><a href="#multipleof">multipleOf</a></li>
+<li class="level3"><a href="#maximum">maximum</a></li>
+<li class="level3"><a href="#minimum">minimum</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#Strings">Validation keywords for strings</a><ul><li class="level3"><a href="#maxLength">maxLength</a></li>
+<li class="level3"><a href="#minLength">minLength</a></li>
+<li class="level3"><a href="#pattern">pattern</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#Arrays">Validation keywords for arrays</a><ul><li class="level3"><a href="#additionalItems">additionalItems</a></li>
+<li class="level3"><a href="#maxItems-minItems">maxItems and minItems</a></li>
+<li class="level3"><a href="#uniqueItems">uniqueItems</a></li>
+<li class="level3"><a href="#maxProperties-minProperties">maxProperties and minProperties</a></li>
+<li class="level3"><a href="#required">required</a></li>
+<li class="level3"><a href="#additionalProperties">additionalProperties</a></li>
+<li class="level3"><a href="#dependencies">dependencies</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#AnyTypes">Validation keywords for any instance type</a><ul><li class="level3"><a href="#enum">enum</a></li>
+<li class="level3"><a href="#type">type</a></li>
+<li class="level3"><a href="#allOf-anyOf-oneOf">allOf, anyOf, and oneOf</a></li>
+<li class="level3"><a href="#not">not</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 <div class="textblock"><p>(This feature was released in v1.1.0)</p>
 <p>JSON Schema is a draft standard for describing the format of JSON data. The schema itself is also JSON data. By validating a JSON structure with JSON Schema, your code can safely access the DOM without manually checking types, or whether a key exists, etc. It can also ensure that the serialized JSON conform to a specified schema.</p>
 <p>RapidJSON implemented a JSON Schema validator for <a href="http://json-schema.org/documentation.html">JSON Schema Draft v4</a>. If you are not familiar with JSON Schema, you may refer to <a href="http://spacetelescope.github.io/understanding-json-schema/">Understanding JSON Schema</a>.</p>
-<h1><a class="anchor" id="BasicUsage"></a>
+<h1><a class="anchor" id="Basic"></a>
 Basic Usage</h1>
 <p>First of all, you need to parse a JSON Schema into <code>Document</code>, and then compile the <code>Document</code> into a <code>SchemaDocument</code>.</p>
 <p>Secondly, construct a <code>SchemaValidator</code> with the <code>SchemaDocument</code>. It is similar to a <code>Writer</code> in the sense of handling SAX events. So, you can use <code>document.Accept(validator)</code> to validate a document, and then check the validity.</p>
@@ -105,14 +135,14 @@ Basic Usage</h1>
 <li>One <code>SchemaDocument</code> can be referenced by multiple <code>SchemaValidator</code>s. It will not be modified by <code>SchemaValidator</code>s.</li>
 <li>A <code>SchemaValidator</code> may be reused to validate multiple documents. To run it for other documents, call <code>validator.Reset()</code> first.</li>
 </ul>
-<h1><a class="anchor" id="ParsingSerialization"></a>
+<h1><a class="anchor" id="Fused"></a>
 Validation during parsing/serialization</h1>
 <p>Unlike most JSON Schema validator implementations, RapidJSON provides a SAX-based schema validator. Therefore, you can parse a JSON from a stream while validating it on the fly. If the validator encounters a JSON value that invalidates the supplied schema, the parsing will be terminated immediately. This design is especially useful for parsing large JSON files.</p>
-<h2><a class="anchor" id="DomParsing"></a>
+<h2><a class="anchor" id="DOM"></a>
 DOM parsing</h2>
 <p>For using DOM in parsing, <code>Document</code> needs some preparation and finalizing tasks, in addition to receiving SAX events, thus it needs some work to route the reader, validator and the document. <code>SchemaValidatingReader</code> is a helper class that doing such work.</p>
-<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/filereadstream.h&quot;</span></div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"><a class="code" href="namespacerapidjson.html#a52bbb5d64d1319495089e1713a0653cf">SchemaDocument</a> schema(sd); <span class="comment">// Compile a Document to SchemaDocument</span></div><div class="line"></div><div class="line"><span class="comment">// Use reader to parse the JSON</span></div><div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;big.json&quot;</span>, <span class="stringliteral">&quot;r&quot;</span>);</div><div class="line">FileReadStream is(fp, buffer, <span class="keyword">sizeof</span>(buffer));</div><div class="line"></div><div class="line"><span class="comment">// Parse JSON from reader, validate the SAX events, and store in d.</span></div><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div><div class="line">SchemaValidatingReader&lt;kParseDefaultFlags, FileReadStream, UTF8&lt;&gt; &gt; reader(is, schema);</div><div class="line">d.Populate(reader);</div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (!reader.GetParseResult()) {</div><div class="line">    <span class="comment">// Not a valid JSON</span></div><div class="line">    <span class="comment">// When reader.GetParseResult().Code() == kParseErrorTermination,</span></div><div class="line">    <span class="comment">// it may be terminated by:</span></div><div class="line">    <span class="comment">// (1) the validator found that the JSON is invalid according to schema; or</span></div><div class="line">    <span class="comment">// (2) the input stream has I/O error.</span></div><div class="line"></div><div class="line">    <span class="comment">// Check the validation result</span></div><div class="line">    <span class="keywordflow">if</span> (!reader.IsValid()) {</div><div class="line">        <span class="comment">// Input JSON is invalid according to the schema</span></div><div class="line">        <span class="comment">// Output diagnostic information</span></div><div class="line">        <a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> sb;</div><div class="line">        reader.GetInvalidSchemaPointer().StringifyUriFragment(sb);</div><div class="line">        printf(<span class="stringliteral">&quot;Invalid schema: %s\n&quot;</span>, sb.GetString());</div><div class="line">        printf(<span class="stringliteral">&quot;Invalid keyword: %s\n&quot;</span>, reader.GetInvalidSchemaKeyword());</div><div class="line">        sb.Clear();</div><div class="line">        reader.GetInvalidDocumentPointer().StringifyUriFragment(sb);</div><div class="line">        printf(<span class="stringliteral">&quot;Invalid document: %s\n&quot;</span>, sb.GetString());</div><div class="line">    }</div><div class="line">}</div></div><!-- fragment --><h2><a class="anchor" id="SaxParsing"></a>
-Parsing</h2>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/filereadstream.h&quot;</span></div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"><a class="code" href="namespacerapidjson.html#a52bbb5d64d1319495089e1713a0653cf">SchemaDocument</a> schema(sd); <span class="comment">// Compile a Document to SchemaDocument</span></div><div class="line"></div><div class="line"><span class="comment">// Use reader to parse the JSON</span></div><div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;big.json&quot;</span>, <span class="stringliteral">&quot;r&quot;</span>);</div><div class="line">FileReadStream is(fp, buffer, <span class="keyword">sizeof</span>(buffer));</div><div class="line"></div><div class="line"><span class="comment">// Parse JSON from reader, validate the SAX events, and store in d.</span></div><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div><div class="line">SchemaValidatingReader&lt;kParseDefaultFlags, FileReadStream, UTF8&lt;&gt; &gt; reader(is, schema);</div><div class="line">d.Populate(reader);</div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (!reader.GetParseResult()) {</div><div class="line">    <span class="comment">// Not a valid JSON</span></div><div class="line">    <span class="comment">// When reader.GetParseResult().Code() == kParseErrorTermination,</span></div><div class="line">    <span class="comment">// it may be terminated by:</span></div><div class="line">    <span class="comment">// (1) the validator found that the JSON is invalid according to schema; or</span></div><div class="line">    <span class="comment">// (2) the input stream has I/O error.</span></div><div class="line"></div><div class="line">    <span class="comment">// Check the validation result</span></div><div class="line">    <span class="keywordflow">if</span> (!reader.IsValid()) {</div><div class="line">        <span class="comment">// Input JSON is invalid according to the schema</span></div><div class="line">        <span class="comment">// Output diagnostic information</span></div><div class="line">        <a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> sb;</div><div class="line">        reader.GetInvalidSchemaPointer().StringifyUriFragment(sb);</div><div class="line">        printf(<span class="stringliteral">&quot;Invalid schema: %s\n&quot;</span>, sb.GetString());</div><div class="line">        printf(<span class="stringliteral">&quot;Invalid keyword: %s\n&quot;</span>, reader.GetInvalidSchemaKeyword());</div><div class="line">        sb.Clear();</div><div class="line">        reader.GetInvalidDocumentPointer().StringifyUriFragment(sb);</div><div class="line">        printf(<span class="stringliteral">&quot;Invalid document: %s\n&quot;</span>, sb.GetString());</div><div class="line">    }</div><div class="line">}</div></div><!-- fragment --><h2><a class="anchor" id="SAX"></a>
+SAX parsing</h2>
 <p>For using SAX in parsing, it is much simpler. If it only need to validate the JSON without further processing, it is simply:</p>
 <div class="fragment"><div class="line">SchemaValidator validator(schema);</div><div class="line">Reader reader;</div><div class="line">if (!reader.Parse(stream, validator)) {</div><div class="line">    if (!validator.IsValid()) {</div><div class="line">        // ...    </div><div class="line">    }</div><div class="line">}</div></div><!-- fragment --><p>This is exactly the method used in the <a href="example/schemavalidator/schemavalidator.cpp">schemavalidator</a> example. The distinct advantage is low memory usage, no matter how big the JSON was (the memory usage depends on the complexity of the schema).</p>
 <p>If you need to handle the SAX events further, then you need to use the template class <code>GenericSchemaValidator</code> to set the output handler of the validator:</p>
@@ -120,7 +150,7 @@ Parsing</h2>
 Serialization</h2>
 <p>It is also possible to do validation during serializing. This can ensure the result JSON is valid according to the JSON schema.</p>
 <div class="fragment"><div class="line">StringBuffer sb;</div><div class="line">Writer&lt;StringBuffer&gt; writer(sb);</div><div class="line">GenericSchemaValidator&lt;SchemaDocument, Writer&lt;StringBuffer&gt; &gt; validator(s, writer);</div><div class="line">if (!d.Accept(validator)) {</div><div class="line">    // Some problem during Accept(), it may be validation or encoding issues.</div><div class="line">    if (!validator.IsValid()) {</div><div class="line">        // ...</div><div class="line">    }</div><div class="line">}</div></div><!-- fragment --><p>Of course, if your application only needs SAX-style serialization, it can simply send SAX events to <code>SchemaValidator</code> instead of <code>Writer</code>.</p>
-<h1><a class="anchor" id="RemoteSchema"></a>
+<h1><a class="anchor" id="Remote"></a>
 Remote Schema</h1>
 <p>JSON Schema supports <a href="http://spacetelescope.github.io/understanding-json-schema/structuring.html"><code>$ref</code> keyword</a>, which is a <a class="el" href="md_doc_pointer.html">JSON pointer</a> referencing to a local or remote schema. Local pointer is prefixed with <code>#</code>, while remote pointer is an relative or absolute URI. For example:</p>
 <div class="fragment"><div class="line">{ &quot;$ref&quot;: &quot;definitions.json#/address&quot; }</div></div><!-- fragment --><p>As <code>SchemaDocument</code> does not know how to resolve such URI, it needs a user-provided <code>IRemoteSchemaDocumentProvider</code> instance to do so.</p>
@@ -129,7 +159,7 @@ Conformance</h1>
 <p>RapidJSON passed 262 out of 263 tests in <a href="https://github.com/json-schema/JSON-Schema-Test-Suite">JSON Schema Test Suite</a> (Json Schema draft 4).</p>
 <p>The failed test is "changed scope ref invalid" of "change resolution scope" in <code>refRemote.json</code>. It is due to that <code>id</code> schema keyword and URI combining function are not implemented.</p>
 <p>Besides, the <code>format</code> schema keyword for string values is ignored, since it is not required by the specification.</p>
-<h2><a class="anchor" id="RegEx"></a>
+<h2><a class="anchor" id="Regex"></a>
 Regular Expression</h2>
 <p>The schema keyword <code>pattern</code> and <code>patternProperties</code> uses regular expression to match the required pattern.</p>
 <p>RapidJSON implemented a simple NFA regular expression engine, which is used by default. It supports the following syntax.</p>
@@ -219,7 +249,140 @@ Performance</h1>
 <tr>
 <td><a href="https://github.com/natesilva/jayschema"><code>jayschema</code></a></td><td align="center">0.1%</td><td align="center">21 (± 1.14%) </td></tr>
 </table>
-<p>That is, RapidJSON is about 1.5x faster than the fastest JavaScript library (ajv). And 1400x faster than the slowest one. </p>
+<p>That is, RapidJSON is about 1.5x faster than the fastest JavaScript library (ajv). And 1400x faster than the slowest one.</p>
+<h1><a class="anchor" id="Reporting"></a>
+Schema violation reporting</h1>
+<p>(Unreleased as of 2017-09-20)</p>
+<p>When validating an instance against a JSON Schema, it is often desirable to report not only whether the instance is valid, but also the ways in which it violates the schema.</p>
+<p>The <code>SchemaValidator</code> class collects errors encountered during validation into a JSON <code>Value</code>. This error object can then be accessed as <code>validator.GetError()</code>.</p>
+<p>The structure of the error object is subject to change in future versions of RapidJSON, as there is no standard schema for violations. The details below this point are provisional only.</p>
+<h2><a class="anchor" id="ReportingGeneral"></a>
+General provisions</h2>
+<p>Validation of an instance value against a schema produces an error value. The error value is always an object. An empty object <code>{}</code> indicates the instance is valid.</p>
+<ul>
+<li>The name of each member corresponds to the JSON Schema keyword that is violated.</li>
+<li>The value is either an object describing a single violation, or an array of such objects.</li>
+</ul>
+<p>Each violation object contains two string-valued members named <code>instanceRef</code> and <code>schemaRef</code>. <code>instanceRef</code> contains the URI fragment serialization of a JSON Pointer to the instance subobject in which the violation was detected. <code>schemaRef</code> contains the URI of the schema and the fragment serialization of a JSON Pointer to the subschema that was violated.</p>
+<p>Individual violation objects can contain other keyword-specific members. These are detailed further.</p>
+<p>For example, validating this instance:</p>
+<div class="fragment"><div class="line">{&quot;numbers&quot;: [1, 2, &quot;3&quot;, 4, 5]}</div></div><!-- fragment --><p>against this schema:</p>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;type&quot;: &quot;object&quot;,</div><div class="line">  &quot;properties&quot;: {</div><div class="line">    &quot;numbers&quot;: {&quot;$ref&quot;: &quot;numbers.schema.json&quot;}</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><p>where <code>numbers.schema.json</code> refers (via a suitable <code>IRemoteSchemaDocumentProvider</code>) to this schema:</p>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;type&quot;: &quot;array&quot;,</div><div class="line">  &quot;items&quot;: {&quot;type&quot;: &quot;number&quot;}</div><div class="line">}</div></div><!-- fragment --><p>produces the following error object:</p>
+<div class="fragment"><div class="line">{</div><div class="line">  &quot;type&quot;: {</div><div class="line">    &quot;instanceRef&quot;: &quot;#/numbers/2&quot;,</div><div class="line">    &quot;schemaRef&quot;: &quot;numbers.schema.json#/items&quot;,</div><div class="line">    &quot;expected&quot;: [&quot;number&quot;],</div><div class="line">    &quot;actual&quot;: &quot;string&quot;</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --><h2><a class="anchor" id="Numbers"></a>
+Validation keywords for numbers</h2>
+<h3><a class="anchor" id="multipleof"></a>
+multipleOf</h3>
+<ul>
+<li><code>expected</code>: required number strictly greater than 0. The value of the <code>multipleOf</code> keyword specified in the schema.</li>
+<li><code>actual</code>: required number. The instance value.</li>
+</ul>
+<h3><a class="anchor" id="maximum"></a>
+maximum</h3>
+<ul>
+<li><code>expected</code>: required number. The value of the <code>maximum</code> keyword specified in the schema.</li>
+<li><code>exclusiveMaximum</code>: optional boolean. This will be true if the schema specified <code>"exclusiveMaximum": true</code>, and will be omitted otherwise.</li>
+<li><code>actual</code>: required number. The instance value.</li>
+</ul>
+<h3><a class="anchor" id="minimum"></a>
+minimum</h3>
+<ul>
+<li><code>expected</code>: required number. The value of the <code>minimum</code> keyword specified in the schema.</li>
+<li><code>exclusiveMinimum</code>: optional boolean. This will be true if the schema specified <code>"exclusiveMinimum": true</code>, and will be omitted otherwise.</li>
+<li><code>actual</code>: required number. The instance value.</li>
+</ul>
+<h2><a class="anchor" id="Strings"></a>
+Validation keywords for strings</h2>
+<h3><a class="anchor" id="maxLength"></a>
+maxLength</h3>
+<ul>
+<li><code>expected</code>: required number greater than or equal to 0. The value of the <code>maxLength</code> keyword specified in the schema.</li>
+<li><code>actual</code>: required string. The instance value.</li>
+</ul>
+<h3><a class="anchor" id="minLength"></a>
+minLength</h3>
+<ul>
+<li><code>expected</code>: required number greater than or equal to 0. The value of the <code>minLength</code> keyword specified in the schema.</li>
+<li><code>actual</code>: required string. The instance value.</li>
+</ul>
+<h3><a class="anchor" id="pattern"></a>
+pattern</h3>
+<ul>
+<li><code>actual</code>: required string. The instance value.</li>
+</ul>
+<p>(The expected pattern is not reported because the internal representation in <code>SchemaDocument</code> does not store the pattern in original string form.)</p>
+<h2><a class="anchor" id="Arrays"></a>
+Validation keywords for arrays</h2>
+<h3><a class="anchor" id="additionalItems"></a>
+additionalItems</h3>
+<p>This keyword is reported when the value of <code>items</code> schema keyword is an array, the value of <code>additionalItems</code> is <code>false</code>, and the instance is an array with more items than specified in the <code>items</code> array.</p>
+<ul>
+<li><code>disallowed</code>: required integer greater than or equal to 0. The index of the first item that has no corresponding schema.</li>
+</ul>
+<h3><a class="anchor" id="maxItems-minItems"></a>
+maxItems and minItems</h3>
+<ul>
+<li><code>expected</code>: required integer greater than or equal to 0. The value of <code>maxItems</code> (respectively, <code>minItems</code>) specified in the schema.</li>
+<li><code>actual</code>: required integer greater than or equal to 0. Number of items in the instance array.</li>
+</ul>
+<h3><a class="anchor" id="uniqueItems"></a>
+uniqueItems</h3>
+<ul>
+<li><code>duplicates</code>: required array whose items are integers greater than or equal to 0. Indices of items of the instance that are equal.</li>
+</ul>
+<p>(RapidJSON only reports the first two equal items, for performance reasons.)</p>
+<h2>Validation keywords for objects</h2>
+<h3><a class="anchor" id="maxProperties-minProperties"></a>
+maxProperties and minProperties</h3>
+<ul>
+<li><code>expected</code>: required integer greater than or equal to 0. The value of <code>maxProperties</code> (respectively, <code>minProperties</code>) specified in the schema.</li>
+<li><code>actual</code>: required integer greater than or equal to 0. Number of properties in the instance object.</li>
+</ul>
+<h3><a class="anchor" id="required"></a>
+required</h3>
+<ul>
+<li><code>missing</code>: required array of one or more unique strings. The names of properties that are listed in the value of the <code>required</code> schema keyword but not present in the instance object.</li>
+</ul>
+<h3><a class="anchor" id="additionalProperties"></a>
+additionalProperties</h3>
+<p>This keyword is reported when the schema specifies <code>additionalProperties: false</code> and the name of a property of the instance is neither listed in the <code>properties</code> keyword nor matches any regular expression in the <code>patternProperties</code> keyword.</p>
+<ul>
+<li><code>disallowed</code>: required string. Name of the offending property of the instance.</li>
+</ul>
+<p>(For performance reasons, RapidJSON only reports the first such property encountered.)</p>
+<h3><a class="anchor" id="dependencies"></a>
+dependencies</h3>
+<ul>
+<li><code>errors</code>: required object with one or more properties. Names and values of its properties are described below.</li>
+</ul>
+<p>Recall that JSON Schema Draft 04 supports <em>schema dependencies</em>, where presence of a named <em>controlling</em> property requires the instance object to be valid against a subschema, and <em>property dependencies</em>, where presence of a controlling property requires other <em>dependent</em> properties to be also present.</p>
+<p>For a violated schema dependency, <code>errors</code> will contain a property with the name of the controlling property and its value will be the error object produced by validating the instance object against the dependent schema.</p>
+<p>For a violated property dependency, <code>errors</code> will contain a property with the name of the controlling property and its value will be an array of one or more unique strings listing the missing dependent properties.</p>
+<h2><a class="anchor" id="AnyTypes"></a>
+Validation keywords for any instance type</h2>
+<h3><a class="anchor" id="enum"></a>
+enum</h3>
+<p>This keyword has no additional properties beyond <code>instanceRef</code> and <code>schemaRef</code>.</p>
+<ul>
+<li>The allowed values are not listed because <code>SchemaDocument</code> does not store them in original form.</li>
+<li>The violating value is not reported because it might be unwieldy.</li>
+</ul>
+<p>If you need to report these details to your users, you can access the necessary information by following <code>instanceRef</code> and <code>schemaRef</code>.</p>
+<h3><a class="anchor" id="type"></a>
+type</h3>
+<ul>
+<li><code>expected</code>: required array of one or more unique strings, each of which is one of the seven primitive types defined by the JSON Schema Draft 04 Core specification. Lists the types allowed by the <code>type</code> schema keyword.</li>
+<li><code>actual</code>: required string, also one of seven primitive types. The primitive type of the instance.</li>
+</ul>
+<h3><a class="anchor" id="allOf-anyOf-oneOf"></a>
+allOf, anyOf, and oneOf</h3>
+<ul>
+<li><code>errors</code>: required array of at least one object. There will be as many items as there are subschemas in the <code>allOf</code>, <code>anyOf</code> or <code>oneOf</code> schema keyword, respectively. Each item will be the error value produced by validating the instance against the corresponding subschema.</li>
+</ul>
+<p>For <code>allOf</code>, at least one error value will be non-empty. For <code>anyOf</code>, all error values will be non-empty. For <code>oneOf</code>, either all error values will be non-empty, or more than one will be empty.</p>
+<h3><a class="anchor" id="not"></a>
+not</h3>
+<p>This keyword has no additional properties apart from <code>instanceRef</code> and <code>schemaRef</code>. </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->
