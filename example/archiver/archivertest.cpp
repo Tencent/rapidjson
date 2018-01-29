@@ -11,9 +11,9 @@ struct Student {
     double height;
     bool canSwim;
 
-    Student() : name{}, age{}, height{}, canSwim{} {}
+    Student() : name(), age(), height(), canSwim() {}
     Student(const std::string &name, unsigned age, double height, bool canSwim)
-        : name{name}, age{age}, height{height}, canSwim{canSwim} {}
+        : name(name), age(age), height(height), canSwim(canSwim) {}
 };
 
 template <typename Archiver>
@@ -35,7 +35,7 @@ void test1() {
 
     // Serialize
     {
-        Student s{ "Lua", 9, 150.5, true };
+        Student s = { "Lua", 9, 150.5, true };
 
         JsonWriter writer;
         writer & s;
@@ -45,7 +45,7 @@ void test1() {
 
     // Deserialize
     {
-        Student s{};
+        Student s = {};
         JsonReader reader(json.c_str());
         reader & s;
         std::cout << s << std::endl;
@@ -93,11 +93,11 @@ void test2() {
 
     // Serialize
     {
-        Group g{};
+        Group g = {};
         g.groupName = "Rainbow";
 
-        Student s1{ "Lua", 9, 150.5, true };
-        Student s2{ "Mio", 7, 120.0, false };
+        Student s1 = { "Lua", 9, 150.5, true };
+        Student s2 = { "Mio", 7, 120.0, false };
         g.students.push_back(s1);
         g.students.push_back(s2);
 
@@ -111,7 +111,7 @@ void test2() {
     {
         Group g{};
         JsonReader reader(json.c_str());
-        // reader & g;
+        reader & g;
         std::cout << g << std::endl;
     }
 }
@@ -128,8 +128,8 @@ public:
     virtual void Print(std::ostream& os) const = 0;
 
 protected:
-    Shape() : x_{}, y_{} {}
-    Shape(double x, double y) : x_{x}, y_{y} {}
+    Shape() : x_(), y_() {}
+    Shape(double x, double y) : x_(x), y_(y) {}
 
     template <typename Archiver>
     friend Archiver& operator&(Archiver& ar, Shape& s);
@@ -146,8 +146,8 @@ Archiver& operator&(Archiver& ar, Shape& s) {
 
 class Circle : public Shape {
 public:
-    Circle() : Shape{}, radius_{} {}
-    Circle(double x, double y, double radius) : Shape{x, y}, radius_{radius} {}
+    Circle() : Shape(), radius_() {}
+    Circle(double x, double y, double radius) : Shape(x, y), radius_(radius) {}
     ~Circle() {}
 
     const char* GetType() const { return "Circle"; }
@@ -172,8 +172,8 @@ Archiver& operator&(Archiver& ar, Circle& c) {
 
 class Box : public Shape {
 public:
-    Box() : Shape{}, width_{}, height_{} {}
-    Box(double x, double y, double width, double height) : Shape{x, y}, width_{width}, height_{height} {}
+    Box() : Shape(), width_(), height_() {}
+    Box(double x, double y, double width, double height) : Shape(x, y), width_(width), height_(height) {}
     ~Box() {}
 
     const char* GetType() const { return "Box"; }
@@ -199,7 +199,7 @@ Archiver& operator&(Archiver& ar, Box& b) {
 
 class Canvas {
 public:
-    Canvas() : shapes_{} {}
+    Canvas() : shapes_() {}
     ~Canvas() { Clear(); }
 
     void Clear() {
