@@ -35,7 +35,7 @@ void test1() {
 
     // Serialize
     {
-        Student s = { "Lua", 9, 150.5, true };
+        Student s("Lua", 9, 150.5, true);
 
         JsonWriter writer;
         writer & s;
@@ -45,7 +45,7 @@ void test1() {
 
     // Deserialize
     {
-        Student s = {};
+        Student s;
         JsonReader reader(json.c_str());
         reader & s;
         std::cout << s << std::endl;
@@ -96,8 +96,8 @@ void test2() {
         Group g = {};
         g.groupName = "Rainbow";
 
-        Student s1 = { "Lua", 9, 150.5, true };
-        Student s2 = { "Mio", 7, 120.0, false };
+        Student s1("Lua", 9, 150.5, true);
+        Student s2("Mio", 7, 120.0, false);
         g.students.push_back(s1);
         g.students.push_back(s2);
 
@@ -109,7 +109,7 @@ void test2() {
 
     // Deserialize
     {
-        Group g{};
+        Group g = {};
         JsonReader reader(json.c_str());
         reader & g;
         std::cout << g << std::endl;
