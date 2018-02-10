@@ -6,6 +6,22 @@
 // Test1: simple object
 
 struct Student {
+    Student()
+      : name(),
+        age(0),
+        height(0.0),
+        canSwim(false)
+    {}
+
+    Student(const std::string& name,
+            unsigned age,
+            double height,
+            bool canSwim)
+      : name(name),
+        age(age),
+        height(height),
+        canSwim(canSwim)
+    {}
     std::string name;
     unsigned age;
     double height;
@@ -31,7 +47,7 @@ void test1() {
 
     // Serialize
     {
-        Student s = { "Lua", 9, 150.5, true };
+        Student s { "Lua", 9, 150.5, true };
 
         JsonWriter writer;
         writer & s;
@@ -50,10 +66,14 @@ void test1() {
 
 //////////////////////////////////////////////////////////////////////////////
 // Test2: std::vector <=> JSON array
-// 
+//
 // You can map a JSON array to other data structures as well
 
 struct Group {
+    Group()
+      : groupName(),
+        students()
+    {}
     std::string groupName;
     std::vector<Student> students;
 };
@@ -61,7 +81,7 @@ struct Group {
 template <typename Archiver>
 Archiver& operator&(Archiver& ar, Group& g) {
     ar.StartObject();
-    
+
     ar.Member("groupName");
     ar & g.groupName;
 
@@ -124,7 +144,7 @@ public:
     virtual void Print(std::ostream& os) const = 0;
 
 protected:
-    Shape() {}
+    Shape() : x_(), y_() {}
     Shape(double x, double y) : x_(x), y_(y) {}
 
     template <typename Archiver>
@@ -142,7 +162,7 @@ Archiver& operator&(Archiver& ar, Shape& s) {
 
 class Circle : public Shape {
 public:
-    Circle() {}
+    Circle() : Shape(), radius_() {}
     Circle(double x, double y, double radius) : Shape(x, y), radius_(radius) {}
     ~Circle() {}
 
@@ -168,7 +188,7 @@ Archiver& operator&(Archiver& ar, Circle& c) {
 
 class Box : public Shape {
 public:
-    Box() {}
+    Box() : Shape(), width_(), height_() {}
     Box(double x, double y, double width, double height) : Shape(x, y), width_(width), height_(height) {}
     ~Box() {}
 
@@ -195,16 +215,16 @@ Archiver& operator&(Archiver& ar, Box& b) {
 
 class Canvas {
 public:
-    Canvas() {}
+    Canvas() : shapes_() {}
     ~Canvas() { Clear(); }
-    
+
     void Clear() {
         for (std::vector<Shape*>::iterator itr = shapes_.begin(); itr != shapes_.end(); ++itr)
             delete *itr;
     }
 
     void AddShape(Shape* shape) { shapes_.push_back(shape); }
-    
+
     void Print(std::ostream& os) {
         for (std::vector<Shape*>::iterator itr = shapes_.begin(); itr != shapes_.end(); ++itr) {
             (*itr)->Print(os);
