@@ -74,7 +74,7 @@ public:
     bool HasMember(const char* name) const;
     JsonReader& EndObject();
 
-    JsonReader& StartArray(size_t* size = nullptr);
+    JsonReader& StartArray(size_t* size = 0);
     JsonReader& EndArray();
 
     JsonReader& operator&(bool& b);

@@ -6,6 +6,11 @@
 // Test1: simple object
 
 struct Student {
+    Student() : name(), age(), height(), canSwim() {}
+    Student(const std::string name, unsigned age, double height, bool canSwim) :
+        name(name), age(age), height(height), canSwim(canSwim)
+    {}
+
     std::string name;
     unsigned age;
     double height;
@@ -31,7 +36,7 @@ void test1() {
 
     // Serialize
     {
-        Student s = { "Lua", 9, 150.5, true };
+        Student s("Lua", 9, 150.5, true);
 
         JsonWriter writer;
         writer & s;
@@ -54,6 +59,7 @@ void test1() {
 // You can map a JSON array to other data structures as well
 
 struct Group {
+    Group() : groupName(), students() {}
     std::string groupName;
     std::vector<Student> students;
 };
@@ -124,7 +130,7 @@ public:
     virtual void Print(std::ostream& os) const = 0;
 
 protected:
-    Shape() {}
+    Shape() : x_(), y_() {}
     Shape(double x, double y) : x_(x), y_(y) {}
 
     template <typename Archiver>
@@ -142,7 +148,7 @@ Archiver& operator&(Archiver& ar, Shape& s) {
 
 class Circle : public Shape {
 public:
-    Circle() {}
+    Circle() : radius_() {}
     Circle(double x, double y, double radius) : Shape(x, y), radius_(radius) {}
     ~Circle() {}
 
@@ -168,7 +174,7 @@ Archiver& operator&(Archiver& ar, Circle& c) {
 
 class Box : public Shape {
 public:
-    Box() {}
+    Box() : width_(), height_() {}
     Box(double x, double y, double width, double height) : Shape(x, y), width_(width), height_(height) {}
     ~Box() {}
 
@@ -195,7 +201,7 @@ Archiver& operator&(Archiver& ar, Box& b) {
 
 class Canvas {
 public:
-    Canvas() {}
+    Canvas() : shapes_() {}
     ~Canvas() { Clear(); }
     
     void Clear() {
