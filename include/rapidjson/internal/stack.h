@@ -100,7 +100,7 @@ public:
     void ShrinkToFit() { 
         if (Empty()) {
             // If the stack is empty, completely deallocate the memory.
-            Allocator::Free(stack_);
+            Allocator::Free(stack_); // NOLINT (+clang-analyzer-unix.Malloc)
             stack_ = 0;
             stackTop_ = 0;
             stackEnd_ = 0;
