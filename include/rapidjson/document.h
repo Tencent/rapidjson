@@ -1300,7 +1300,7 @@ public:
         \note This overload is needed to avoid clashes with the generic primitive type AddMember(GenericValue&,T,Allocator&) overload below.
         \note Amortized Constant time complexity.
     */
-    GenericValue& AddMember(GenericValue& name, std::basic_string<Ch>& value, Allocator& allocator) {
+    GenericValue& AddMember(GenericValue& name, const std::basic_string<Ch>& value, Allocator& allocator) {
         GenericValue v(value, allocator);
         return AddMember(name, v, allocator);
     }
