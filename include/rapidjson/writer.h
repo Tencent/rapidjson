@@ -460,9 +460,14 @@ protected:
 
     bool WriteRawValue(const Ch* json, size_t length) {
         PutReserve(*os_, length);
-        for (size_t i = 0; i < length; i++) {
-            RAPIDJSON_ASSERT(json[i] != '\0');
-            PutUnsafe(*os_, json[i]);
+        GenericStringStream<SourceEncoding> is(json);
+        while (RAPIDJSON_LIKELY(is.Tell() < length)) {
+            const Ch c = is.Peek();
+            RAPIDJSON_ASSERT(c != '\0');
+            if (RAPIDJSON_UNLIKELY(!(writeFlags & kWriteValidateEncodingFlag ? 
+                Transcoder<SourceEncoding, TargetEncoding>::Validate(is, *os_) :
+                Transcoder<SourceEncoding, TargetEncoding>::TranscodeUnsafe(is, *os_))))
+                return false;
         }
         return true;
     }
