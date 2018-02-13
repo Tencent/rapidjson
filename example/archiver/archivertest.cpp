@@ -98,8 +98,8 @@ void test2() {
         Group g;
         g.groupName = "Rainbow";
 
-        Student s1 = { "Lua", 9, 150.5, true };
-        Student s2 = { "Mio", 7, 120.0, false };
+        Student s1("Lua", 9, 150.5, true);
+        Student s2("Mio", 7, 120.0, false);
         g.students.push_back(s1);
         g.students.push_back(s2);
 
