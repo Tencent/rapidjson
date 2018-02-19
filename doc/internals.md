@@ -28,7 +28,7 @@ Both SAX and DOM APIs depends on 3 additional concepts: `Allocator`, `Encoding` 
 
 ## Data Layout {#DataLayout}
 
-`Value` is a [variant type](http://en.wikipedia.org/wiki/Variant_type). In RapidJSON's context, an instance of `Value` can contain 1 of 6 JSON value types. This is possible by using `union`. Each `Value` contains two members: `union Data data_` and a`unsigned flags_`. The `flags_` indiciates the JSON type, and also additional information. 
+`Value` is a [variant type](http://en.wikipedia.org/wiki/Variant_type). In RapidJSON's context, an instance of `Value` can contain 1 of 6 JSON value types. This is possible by using `union`. Each `Value` contains two members: `union Data data_` and a`unsigned flags_`. The `flags_` indicates the JSON type, and also additional information. 
 
 The following tables show the data layout of each type. The 32-bit/64-bit columns indicates the size of the field in bytes.
 
@@ -101,7 +101,7 @@ The following tables show the data layout of each type. The 32-bit/64-bit column
 
 Here are some notes:
 * To reduce memory consumption for 64-bit architecture, `SizeType` is typedef as `unsigned` instead of `size_t`.
-* Zero padding for 32-bit number may be placed after or before the actual type, according to the endianess. This makes possible for interpreting a 32-bit integer as a 64-bit integer, without any conversion.
+* Zero padding for 32-bit number may be placed after or before the actual type, according to the endianness. This makes possible for interpreting a 32-bit integer as a 64-bit integer, without any conversion.
 * An `Int` is always an `Int64`, but the converse is not always true.
 
 ## Flags {#Flags}

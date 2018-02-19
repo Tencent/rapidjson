@@ -128,7 +128,7 @@ IF(UNIX OR CYGWIN)
 ELSEIF(WIN32)
     SET(_CMAKE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/cmake")
 ENDIF()
-SET(CMAKE_INSTALL_DIR "${_CMAKE_INSTALL_DIR}" CACHE PATH "The directory cmake fiels are installed in")
+SET(CMAKE_INSTALL_DIR "${_CMAKE_INSTALL_DIR}" CACHE PATH "The directory cmake files are installed in")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 

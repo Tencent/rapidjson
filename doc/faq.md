@@ -236,7 +236,7 @@ Alternatively, if we don't want to explicitly refer to the root value of `addres
 
 4. What is BOM? How RapidJSON handle it?
 
-   [Byte order mark (BOM)](http://en.wikipedia.org/wiki/Byte_order_mark) sometimes reside at the beginning of file/stream to indiciate the UTF encoding type of it.
+   [Byte order mark (BOM)](http://en.wikipedia.org/wiki/Byte_order_mark) sometimes reside at the beginning of file/stream to indicate the UTF encoding type of it.
 
    RapidJSON's `EncodedInputStream` can detect/consume BOM. `EncodedOutputStream` can optionally write a BOM. See [Encoded Streams](doc/stream.md) for example.
 

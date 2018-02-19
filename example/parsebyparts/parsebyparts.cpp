@@ -143,7 +143,7 @@ int main() {
         AsyncDocumentParser<> parser(d);
 
         const char json1[] = " { \"hello\" : \"world\", \"t\" : tr";
-        //const char json1[] = " { \"hello\" : \"world\", \"t\" : trX"; // Fot test parsing error
+        //const char json1[] = " { \"hello\" : \"world\", \"t\" : trX"; // For test parsing error
         const char json2[] = "ue, \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.14";
         const char json3[] = "16, \"a\":[1, 2, 3, 4] } ";
 

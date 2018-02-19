@@ -48,7 +48,7 @@ Changed
 	
 	dependencies {
 		packages : {
-			//TODO:  Add dependecies here in [pkg.name]/[version] form per newline		
+			//TODO:  Add dependencies here in [pkg.name]/[version] form per newline		
 			//zlib/[1.2.8],			
 		};
 	}
