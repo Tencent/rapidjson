@@ -97,7 +97,7 @@ private:
     // PIMPL
     void* mDocument;              ///< DOM result of parsing.
     void* mStack;                 ///< Stack for iterating the DOM
-    bool mError;                  ///< Whether an error is occured.
+    bool mError;                  ///< Whether an error has occurred.
 };
 
 class JsonWriter {

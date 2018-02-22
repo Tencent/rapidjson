@@ -432,7 +432,7 @@ bool Writer1<rapidjson::StringBuffer>::WriteUint(unsigned u) {
     return true;
 }
 
-// Using digits LUT to reduce divsion/modulo
+// Using digits LUT to reduce division/modulo
 template<typename OutputStream>
 class Writer2 {
 public:
@@ -616,7 +616,7 @@ inline bool Writer3<rapidjson::InsituStringStream>::WriteUint64(uint64_t u) {
     return true;
 }
 
-// Using digits LUT to reduce divsion/modulo, two passes
+// Using digits LUT to reduce division/modulo, two passes
 template<typename OutputStream>
 class Writer4 {
 public:

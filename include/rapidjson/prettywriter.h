@@ -39,7 +39,7 @@ enum PrettyFormatOptions {
 
 //! Writer with indentation and spacing.
 /*!
-    \tparam OutputStream Type of ouptut os.
+    \tparam OutputStream Type of output os.
     \tparam SourceEncoding Encoding of source string.
     \tparam TargetEncoding Encoding of output stream.
     \tparam StackAllocator Type of allocator for allocating memory of stack.
