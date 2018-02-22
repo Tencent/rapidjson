@@ -131,7 +131,7 @@ Value</h1>
 <p><code>Value</code> (actually a typedef of <code>GenericValue&lt;UTF8&lt;&gt;&gt;</code>) is the core of DOM API. This section describes the design of it.</p>
 <h2><a class="anchor" id="DataLayout"></a>
 Data Layout</h2>
-<p><code>Value</code> is a <a href="http://en.wikipedia.org/wiki/Variant_type">variant type</a>. In RapidJSON's context, an instance of <code>Value</code> can contain 1 of 6 JSON value types. This is possible by using <code>union</code>. Each <code>Value</code> contains two members: <code>union Data data_</code> and a<code>unsigned flags_</code>. The <code>flags_</code> indiciates the JSON type, and also additional information.</p>
+<p><code>Value</code> is a <a href="http://en.wikipedia.org/wiki/Variant_type">variant type</a>. In RapidJSON's context, an instance of <code>Value</code> can contain 1 of 6 JSON value types. This is possible by using <code>union</code>. Each <code>Value</code> contains two members: <code>union Data data_</code> and a<code>unsigned flags_</code>. The <code>flags_</code> indicates the JSON type, and also additional information.</p>
 <p>The following tables show the data layout of each type. The 32-bit/64-bit columns indicates the size of the field in bytes.</p>
 <table class="doxtable">
 <tr>
@@ -249,7 +249,7 @@ Data Layout</h2>
 </table>
 <p>Here are some notes:</p><ul>
 <li>To reduce memory consumption for 64-bit architecture, <code>SizeType</code> is typedef as <code>unsigned</code> instead of <code>size_t</code>.</li>
-<li>Zero padding for 32-bit number may be placed after or before the actual type, according to the endianess. This makes possible for interpreting a 32-bit integer as a 64-bit integer, without any conversion.</li>
+<li>Zero padding for 32-bit number may be placed after or before the actual type, according to the endianness. This makes possible for interpreting a 32-bit integer as a 64-bit integer, without any conversion.</li>
 <li>An <code>Int</code> is always an <code>Int64</code>, but the converse is not always true.</li>
 </ul>
 <h2><a class="anchor" id="Flags"></a>
