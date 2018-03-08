@@ -499,7 +499,7 @@ TEST(Value, Uint) {
     RAPIDJSON_STATIC_ASSERT(sizeof(unsigned long) == sizeof(unsigned));
     z.SetUint(1234);
     EXPECT_TRUE(z.Is<unsigned long>());
-    EXPECT_EQ(1234ul, z.Get<unsigned>());
+    EXPECT_EQ(1234ul, z.Get<unsigned long>());
 #endif
 }
 
