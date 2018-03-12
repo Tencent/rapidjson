@@ -1860,7 +1860,12 @@ public:
 
     //! Gets the JSON pointer pointed to the invalid value.
     PointerType GetInvalidDocumentPointer() const {
-        return documentStack_.Empty() ? PointerType() : PointerType(documentStack_.template Bottom<Ch>(), documentStack_.GetSize() / sizeof(Ch));
+        if (documentStack_.Empty()) {
+            return PointerType();
+        }
+        else {
+            return PointerType(documentStack_.template Bottom<Ch>(), documentStack_.GetSize() / sizeof(Ch));
+        }
     }
 
     void NotMultipleOf(int64_t actual, const SValue& expected) {
