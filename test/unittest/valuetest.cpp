@@ -443,9 +443,12 @@ TEST(Value, Int) {
 #ifdef _MSC_VER
     // long as int on MSC platforms
     RAPIDJSON_STATIC_ASSERT(sizeof(long) == sizeof(int));
-    z.SetInt(1234);
+    z.SetInt(2222);
     EXPECT_TRUE(z.Is<long>());
-    EXPECT_EQ(1234l, z.Get<long>());
+    EXPECT_EQ(2222l, z.Get<long>());
+    EXPECT_EQ(3333l, z.Set(3333l).Get<long>());
+    EXPECT_EQ(4444l, z.Set<long>(4444l).Get<long>());
+    EXPECT_TRUE(z.IsInt());
 #endif
 }
 
@@ -497,9 +500,12 @@ TEST(Value, Uint) {
 #ifdef _MSC_VER
     // unsigned long as unsigned on MSC platforms
     RAPIDJSON_STATIC_ASSERT(sizeof(unsigned long) == sizeof(unsigned));
-    z.SetUint(1234);
+    z.SetUint(2222);
     EXPECT_TRUE(z.Is<unsigned long>());
-    EXPECT_EQ(1234ul, z.Get<unsigned long>());
+    EXPECT_EQ(2222ul, z.Get<unsigned long>());
+    EXPECT_EQ(3333ul, z.Set(3333ul).Get<unsigned long>());
+    EXPECT_EQ(4444ul, z.Set<unsigned long>(4444ul).Get<unsigned long>());
+    EXPECT_TRUE(x.IsUint());
 #endif
 }
 
