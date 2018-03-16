@@ -42,6 +42,7 @@ d.Parse(json);
 
 ~~~~~~~~~~cpp
 #include "rapidjson/stringbuffer.h"
+#include <rapidjson/writer.h>
 
 StringBuffer buffer;
 Writer<StringBuffer> writer(buffer);
@@ -98,6 +99,7 @@ fclose(fp);
 
 ~~~~~~~~~~cpp
 #include "rapidjson/filewritestream.h"
+#include <rapidjson/writer.h>
 #include <cstdio>
 
 using namespace rapidjson;
@@ -215,6 +217,7 @@ fclose(fp);
 ~~~~~~~~~~cpp
 #include "rapidjson/filewritestream.h"  // FileWriteStream
 #include "rapidjson/encodedstream.h"    // EncodedOutputStream
+#include <rapidjson/writer.h>
 #include <cstdio>
 
 Document d;         // Document 为 GenericDocument<UTF8<> > 

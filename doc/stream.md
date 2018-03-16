@@ -42,6 +42,7 @@ Note that, `StringStream` is a typedef of `GenericStringStream<UTF8<> >`, user m
 
 ~~~~~~~~~~cpp
 #include "rapidjson/stringbuffer.h"
+#include <rapidjson/writer.h>
 
 StringBuffer buffer;
 Writer<StringBuffer> writer(buffer);
@@ -98,6 +99,7 @@ Apart from reading file, user can also use `FileReadStream` to read `stdin`.
 
 ~~~~~~~~~~cpp
 #include "rapidjson/filewritestream.h"
+#include <rapidjson/writer.h>
 #include <cstdio>
 
 using namespace rapidjson;
@@ -215,6 +217,7 @@ fclose(fp);
 ~~~~~~~~~~cpp
 #include "rapidjson/filewritestream.h"  // FileWriteStream
 #include "rapidjson/encodedstream.h"    // EncodedOutputStream
+#include <rapidjson/writer.h>
 #include <cstdio>
 
 Document d;         // Document is GenericDocument<UTF8<> > 
