@@ -445,6 +445,7 @@ TEST(Value, Int) {
     EXPECT_FALSE(z.IsFloat());
 
     // Templated functions
+    z = 5678;
     EXPECT_TRUE(z.Is<int>());
     EXPECT_EQ(5678, z.Get<int>());
     EXPECT_EQ(5679, z.Set(5679).Get<int>());
@@ -512,6 +513,7 @@ TEST(Value, Uint) {
     EXPECT_FALSE(z.IsFloat());
 
     // Templated functions
+    z = 2147483648u;    // 2^31, cannot cast as int
     EXPECT_TRUE(z.Is<unsigned>());
     EXPECT_EQ(2147483648u, z.Get<unsigned>());
     EXPECT_EQ(2147483649u, z.Set(2147483649u).Get<unsigned>());
@@ -595,6 +597,7 @@ TEST(Value, Int64) {
     EXPECT_FALSE(z.IsFloat());
 
     // Templated functions
+    z.SetInt64(i);
     EXPECT_TRUE(z.Is<int64_t>());
     EXPECT_EQ(i, z.Get<int64_t>());
 #if 0 // signed integer underflow is undefined behaviour
@@ -659,6 +662,7 @@ TEST(Value, Uint64) {
     EXPECT_FALSE(z.IsFloat());
 
     // Templated functions
+    z.SetUint64(u);
     EXPECT_TRUE(z.Is<uint64_t>());
     EXPECT_EQ(u, z.Get<uint64_t>());
     EXPECT_EQ(u + 1, z.Set(u + 1).Get<uint64_t>());
