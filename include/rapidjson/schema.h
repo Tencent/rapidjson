@@ -1673,6 +1673,7 @@ private:
                                 if (const SchemaType* sc = remoteDocument->GetSchema(pointer)) {
                                     if (schema)
                                         *schema = sc;
+                                    new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(source, const_cast<SchemaType*>(sc), false, allocator_);
                                     return true;
                                 }
                             }
