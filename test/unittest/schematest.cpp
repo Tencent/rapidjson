@@ -2011,7 +2011,7 @@ TEST(SchemaValidator, Ref_remote_issue1210) {
           SchemaDocumentProvider(SchemaDocument** collection) : collection(collection) { }
           virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
             int i = 0;
-            while (collection[i] && typename SchemaDocument::URIType(uri, length) != collection[i]->GetURI()) ++i;
+            while (collection[i] && SchemaDocument::URIType(uri, length) != collection[i]->GetURI()) ++i;
             return collection[i];
           }
     };
