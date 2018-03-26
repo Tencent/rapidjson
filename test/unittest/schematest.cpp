@@ -2015,7 +2015,7 @@ TEST(SchemaValidator, Ref_remote_issue1210) {
             return collection[i];
           }
     };
-    SchemaDocument* collection[] { 0, 0, 0 };
+    SchemaDocument* collection[] = { 0, 0, 0 };
     SchemaDocumentProvider provider(collection);
 
     Document x, y, z;
