@@ -20,7 +20,7 @@
 #include <sstream>
 #include <fstream>
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4702) // unreachable code
 #endif
@@ -176,6 +176,6 @@ TEST(IStreamWrapper, wfstream) {
 
 #endif
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__clang__)
 RAPIDJSON_DIAG_POP
 #endif

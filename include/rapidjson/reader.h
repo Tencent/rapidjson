@@ -37,17 +37,15 @@
 #include <arm_neon.h>
 #endif
 
-#ifdef _MSC_VER
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
-RAPIDJSON_DIAG_OFF(4702)  // unreachable code
-#endif
-
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(old-style-cast)
 RAPIDJSON_DIAG_OFF(padded)
 RAPIDJSON_DIAG_OFF(switch-enum)
+#elif defined(_MSC_VER)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4127)  // conditional expression is constant
+RAPIDJSON_DIAG_OFF(4702)  // unreachable code
 #endif
 
 #ifdef __GNUC__
@@ -2206,16 +2204,12 @@ typedef GenericReader<UTF8<>, UTF8<> > Reader;
 
 RAPIDJSON_NAMESPACE_END
 
-#ifdef __clang__
+#if defined(__clang__) || defined(_MSC_VER)
 RAPIDJSON_DIAG_POP
 #endif
 
 
 #ifdef __GNUC__
-RAPIDJSON_DIAG_POP
-#endif
-
-#ifdef _MSC_VER
 RAPIDJSON_DIAG_POP
 #endif
 

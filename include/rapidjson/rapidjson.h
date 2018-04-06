@@ -433,7 +433,7 @@ template <> struct STATIC_ASSERTION_FAILURE<true> { enum { value = 1 }; };
 template <size_t x> struct StaticAssertTest {};
 RAPIDJSON_NAMESPACE_END
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) || defined(__clang__)
 #define RAPIDJSON_STATIC_ASSERT_UNUSED_ATTRIBUTE __attribute__((unused))
 #else
 #define RAPIDJSON_STATIC_ASSERT_UNUSED_ATTRIBUTE 

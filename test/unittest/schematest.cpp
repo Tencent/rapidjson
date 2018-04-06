@@ -20,6 +20,9 @@
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(variadic-macros)
+#elif defined(_MSC_VER)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4822) // local class member function does not have a body
 #endif
 
 using namespace rapidjson;
@@ -2007,6 +2010,10 @@ TEST(SchemaValidator, Ref_remote) {
 TEST(SchemaValidator, Ref_remote_issue1210) {
     class SchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
         SchemaDocument** collection;
+
+        SchemaDocumentProvider(const SchemaDocumentProvider&);
+        SchemaDocumentProvider& operator=(const SchemaDocumentProvider&);
+
         public:
           SchemaDocumentProvider(SchemaDocument** collection) : collection(collection) { }
           virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
@@ -2033,6 +2040,6 @@ TEST(SchemaValidator, Ref_remote_issue1210) {
     VALIDATE(sx, "{\"country\":\"US\"}", true);
 }
 
-#ifdef __clang__
+#if defined(_MSC_VER) || defined(__clang__)
 RAPIDJSON_DIAG_POP
 #endif
