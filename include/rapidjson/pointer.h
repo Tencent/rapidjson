@@ -21,9 +21,7 @@
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(switch-enum)
-#endif
-
-#ifdef _MSC_VER
+#elif defined(_MSC_VER)
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
 #endif
@@ -1352,11 +1350,7 @@ bool EraseValueByPointer(T& root, const CharType(&source)[N]) {
 
 RAPIDJSON_NAMESPACE_END
 
-#ifdef __clang__
-RAPIDJSON_DIAG_POP
-#endif
-
-#ifdef _MSC_VER
+#if defined(__clang__) || defined(_MSC_VER)
 RAPIDJSON_DIAG_POP
 #endif
 

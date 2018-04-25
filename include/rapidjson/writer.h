@@ -36,16 +36,14 @@
 #include <arm_neon.h>
 #endif
 
-#ifdef _MSC_VER
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
-#endif
-
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(padded)
 RAPIDJSON_DIAG_OFF(unreachable-code)
 RAPIDJSON_DIAG_OFF(c++98-compat)
+#elif defined(_MSC_VER)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -705,11 +703,7 @@ inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, siz
 
 RAPIDJSON_NAMESPACE_END
 
-#ifdef _MSC_VER
-RAPIDJSON_DIAG_POP
-#endif
-
-#ifdef __clang__
+#if defined(_MSC_VER) || defined(__clang__)
 RAPIDJSON_DIAG_POP
 #endif
 
