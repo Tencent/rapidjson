@@ -673,7 +673,7 @@ public:
     //! Check if token-by-token parsing JSON text is complete
     /*! \return Whether the JSON has been fully decoded.
      */
-    RAPIDJSON_FORCEINLINE bool IterativeParseComplete() {
+    RAPIDJSON_FORCEINLINE bool IterativeParseComplete() const {
         return IsIterativeParsingCompleteState(state_);
     }
 
@@ -1785,7 +1785,7 @@ private:
         kTokenCount
     };
 
-    RAPIDJSON_FORCEINLINE Token Tokenize(Ch c) {
+    RAPIDJSON_FORCEINLINE Token Tokenize(Ch c) const {
 
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 #define N NumberToken
@@ -1812,7 +1812,7 @@ private:
             return NumberToken;
     }
 
-    RAPIDJSON_FORCEINLINE IterativeParsingState Predict(IterativeParsingState state, Token token) {
+    RAPIDJSON_FORCEINLINE IterativeParsingState Predict(IterativeParsingState state, Token token) const {
         // current state x one lookahead token -> new state
         static const char G[cIterativeParsingStateCount][kTokenCount] = {
             // Finish(sink state)
@@ -2151,11 +2151,11 @@ private:
         }
     }
 
-    RAPIDJSON_FORCEINLINE bool IsIterativeParsingDelimiterState(IterativeParsingState s) {
+    RAPIDJSON_FORCEINLINE bool IsIterativeParsingDelimiterState(IterativeParsingState s) const {
         return s >= IterativeParsingElementDelimiterState;
     }
     
-    RAPIDJSON_FORCEINLINE bool IsIterativeParsingCompleteState(IterativeParsingState s) {
+    RAPIDJSON_FORCEINLINE bool IsIterativeParsingCompleteState(IterativeParsingState s) const {
         return s <= IterativeParsingErrorState;
     }
     
