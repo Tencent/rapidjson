@@ -729,11 +729,12 @@ public:
                 break;
 
             case kObjectFlag:
-                for (MemberIterator m = MemberBegin(); m != MemberEnd(); ++m)
-                    m->~Member();
-                Allocator::Free(GetMembersPointer());
-                break;
-
+                {
+                    for (MemberIterator m = MemberBegin(); m != MemberEnd(); ++m)
+                        m->~Member();
+                    Allocator::Free(GetMembersPointer());
+                    break;
+                }
             case kCopyStringFlag:
                 Allocator::Free(const_cast<Ch*>(GetStringPointer()));
                 break;
@@ -1772,6 +1773,7 @@ public:
         case kTrueType:     return handler.Bool(true);
 
         case kObjectType:
+          {
             if (RAPIDJSON_UNLIKELY(!handler.StartObject()))
                 return false;
             for (ConstMemberIterator m = MemberBegin(); m != MemberEnd(); ++m) {
@@ -1782,15 +1784,18 @@ public:
                     return false;
             }
             return handler.EndObject(data_.o.size);
+          }
 
         case kArrayType:
+          {
             if (RAPIDJSON_UNLIKELY(!handler.StartArray()))
                 return false;
             for (const GenericValue* v = Begin(); v != End(); ++v)
                 if (RAPIDJSON_UNLIKELY(!v->Accept(handler)))
                     return false;
             return handler.EndArray(data_.a.size);
-    
+          }
+
         case kStringType:
             return handler.String(GetString(), GetStringLength(), (data_.f.flags & kCopyFlag) != 0);
     

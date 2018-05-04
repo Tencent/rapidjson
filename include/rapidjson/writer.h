@@ -44,6 +44,11 @@ RAPIDJSON_DIAG_OFF(padded)
 RAPIDJSON_DIAG_OFF(unreachable-code)
 #endif
 
+#ifdef __hpux
+// disable warning unreachable-code
+#pragma diag_suppress 2111
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
