@@ -97,6 +97,6 @@ script:
       -DCMAKE_CXX_COMPILER=$CXX_COMPILER
       ..)
   - cd build
-  - make tests -j 2
-  - make examples -j 2
+  - make tests -kj 2
+  - make examples -kj 2
   - ctest -j 2 -V `[ "$CONF" = "release" ] || echo "-E perftest"`
