@@ -99,6 +99,7 @@ struct DiyFp {
     }
 
     DiyFp Normalize() const {
+        RAPIDJSON_ASSERT(f != 0); // https://stackoverflow.com/a/26809183/291737
 #if defined(_MSC_VER) && defined(_M_AMD64)
         unsigned long index;
         _BitScanReverse64(&index, f);
