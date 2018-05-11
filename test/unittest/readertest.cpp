@@ -208,7 +208,7 @@ static void TestParseDouble() {
 
     TEST_DOUBLE(fullPrecision, "0.0", 0.0);
     TEST_DOUBLE(fullPrecision, "-0.0", -0.0); // For checking issue #289
-//    TEST_DOUBLE(fullPrecision, "0e100", 0.0); // For checking issue #1249
+    TEST_DOUBLE(fullPrecision, "0e100", 0.0); // For checking issue #1249
     TEST_DOUBLE(fullPrecision, "1.0", 1.0);
     TEST_DOUBLE(fullPrecision, "-1.0", -1.0);
     TEST_DOUBLE(fullPrecision, "1.5", 1.5);
@@ -246,7 +246,7 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "1e-214748364", 0.0);
     TEST_DOUBLE(fullPrecision, "1e-21474836311", 0.0);
     TEST_DOUBLE(fullPrecision, "0.017976931348623157e+310", 1.7976931348623157e+308); // Max double in another form
-//    TEST_DOUBLE(fullPrecision, "128.74836467836484838364836483643636483648e-336", 0.0); // Issue #1251
+    TEST_DOUBLE(fullPrecision, "128.74836467836484838364836483643636483648e-336", 0.0); // Issue #1251
 
     // Since
     // abs((2^-1022 - 2^-1074) - 2.2250738585072012e-308) = 3.109754131239141401123495768877590405345064751974375599... x 10^-324
