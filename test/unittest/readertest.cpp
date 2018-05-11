@@ -207,7 +207,7 @@ static void TestParseDouble() {
 
     TEST_DOUBLE(fullPrecision, "0.0", 0.0);
     TEST_DOUBLE(fullPrecision, "-0.0", -0.0); // For checking issue #289
-    TEST_DOUBLE(fullPrecision, "0e100", 0.0); // Normalize() must not invoke __builtin_clzll(0)
+    TEST_DOUBLE(fullPrecision, "0e100", 0.0); // For checking issue #1249
     TEST_DOUBLE(fullPrecision, "1.0", 1.0);
     TEST_DOUBLE(fullPrecision, "-1.0", -1.0);
     TEST_DOUBLE(fullPrecision, "1.5", 1.5);
