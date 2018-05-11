@@ -183,17 +183,20 @@ void SkipWhitespace(InputStream& s) {
 
 但是，这需要对每个字符进行4次比较以及一些分支。这被发现是一个热点。
 
-为了加速这一处理，RapidJSON 使用 SIMD 来在一次迭代中比较16个字符和4个空格。目前 RapidJSON 只支持 SSE2 和 SSE4.2 指令。同时它也只会对 UTF-8 内存流启用，包括字符串流或 *原位* 解析。
+为了加速这一处理，RapidJSON 使用 SIMD 来在一次迭代中比较16个字符和4个空格。目前 RapidJSON 支持 SSE2 ， SSE4.2 和 ARM Neon 指令。同时它也只会对 UTF-8 内存流启用，包括字符串流或 *原位* 解析。
 
-你可以通过在包含 `rapidjson.h` 之前定义 `RAPIDJSON_SSE2` 或 `RAPIDJSON_SSE42` 来启用这个优化。一些编译器可以检测这个设置，如 `perftest.h`：
+你可以通过在包含 `rapidjson.h` 之前定义 `RAPIDJSON_SSE2` ， `RAPIDJSON_SSE42` 或 `RAPIDJSON_NEON` 来启用这个优化。一些编译器可以检测这个设置，如 `perftest.h`：
 
 ~~~cpp
 // __SSE2__ 和 __SSE4_2__ 可被 gcc、clang 和 Intel 编译器识别：
 // 如果支持的话，我们在 gmake 中使用了 -march=native 来启用 -msse2 和 -msse4.2
+// 同样的， __ARM_NEON 被用于识别Neon
 #if defined(__SSE4_2__)
 #  define RAPIDJSON_SSE42
 #elif defined(__SSE2__)
 #  define RAPIDJSON_SSE2
+#elif defined(__ARM_NEON)
+#  define RAPIDJSON_NEON
 #endif
 ~~~
 
@@ -211,7 +214,7 @@ void SkipWhitespace(InputStream& s) {
 
 对于 RapidJSON 来说，这显然是不可行的，因为 RapidJSON 不应当强迫用户进行内存对齐。
 
-为了修复这个问题，当前的代码会先按字节处理直到下一个对齐的地址。在这之后，使用对齐读取来进行 SIMD 处理。见 [#85](https://github.com/miloyip/rapidjson/issues/85)。
+为了修复这个问题，当前的代码会先按字节处理直到下一个对齐的地址。在这之后，使用对齐读取来进行 SIMD 处理。见 [#85](https://github.com/Tencent/rapidjson/issues/85)。
 
 ## 局部流拷贝 {#LocalStreamCopy}
 

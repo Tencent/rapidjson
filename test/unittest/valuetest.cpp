@@ -439,6 +439,17 @@ TEST(Value, Int) {
     EXPECT_EQ(5678, z.Get<int>());
     EXPECT_EQ(5679, z.Set(5679).Get<int>());
     EXPECT_EQ(5680, z.Set<int>(5680).Get<int>());
+
+#ifdef _MSC_VER
+    // long as int on MSC platforms
+    RAPIDJSON_STATIC_ASSERT(sizeof(long) == sizeof(int));
+    z.SetInt(2222);
+    EXPECT_TRUE(z.Is<long>());
+    EXPECT_EQ(2222l, z.Get<long>());
+    EXPECT_EQ(3333l, z.Set(3333l).Get<long>());
+    EXPECT_EQ(4444l, z.Set<long>(4444l).Get<long>());
+    EXPECT_TRUE(z.IsInt());
+#endif
 }
 
 TEST(Value, Uint) {
@@ -485,6 +496,17 @@ TEST(Value, Uint) {
     EXPECT_EQ(2147483648u, z.Get<unsigned>());
     EXPECT_EQ(2147483649u, z.Set(2147483649u).Get<unsigned>());
     EXPECT_EQ(2147483650u, z.Set<unsigned>(2147483650u).Get<unsigned>());
+
+#ifdef _MSC_VER
+    // unsigned long as unsigned on MSC platforms
+    RAPIDJSON_STATIC_ASSERT(sizeof(unsigned long) == sizeof(unsigned));
+    z.SetUint(2222);
+    EXPECT_TRUE(z.Is<unsigned long>());
+    EXPECT_EQ(2222ul, z.Get<unsigned long>());
+    EXPECT_EQ(3333ul, z.Set(3333ul).Get<unsigned long>());
+    EXPECT_EQ(4444ul, z.Set<unsigned long>(4444ul).Get<unsigned long>());
+    EXPECT_TRUE(x.IsUint());
+#endif
 }
 
 TEST(Value, Int64) {
@@ -857,9 +879,46 @@ TEST(Value, String) {
 }
 
 // Issue 226: Value of string type should not point to NULL
-TEST(Value, SetStringNullException) {
-    Value v;
-    EXPECT_THROW(v.SetString(0, 0), AssertException);
+TEST(Value, SetStringNull) {
+
+    MemoryPoolAllocator<> allocator;
+    const char* nullPtr = 0;
+    {
+        // Construction with string type creates empty string
+        Value v(kStringType);
+        EXPECT_NE(v.GetString(), nullPtr); // non-null string returned
+        EXPECT_EQ(v.GetStringLength(), 0u);
+
+        // Construction from/setting to null without length not allowed
+        EXPECT_THROW(Value(StringRef(nullPtr)), AssertException);
+        EXPECT_THROW(Value(StringRef(nullPtr), allocator), AssertException);
+        EXPECT_THROW(v.SetString(nullPtr, allocator), AssertException);
+
+        // Non-empty length with null string is not allowed
+        EXPECT_THROW(v.SetString(nullPtr, 17u), AssertException);
+        EXPECT_THROW(v.SetString(nullPtr, 42u, allocator), AssertException);
+
+        // Setting to null string with empty length is allowed
+        v.SetString(nullPtr, 0u);
+        EXPECT_NE(v.GetString(), nullPtr); // non-null string returned
+        EXPECT_EQ(v.GetStringLength(), 0u);
+
+        v.SetNull();
+        v.SetString(nullPtr, 0u, allocator);
+        EXPECT_NE(v.GetString(), nullPtr); // non-null string returned
+        EXPECT_EQ(v.GetStringLength(), 0u);
+    }
+    // Construction with null string and empty length is allowed
+    {
+        Value v(nullPtr,0u);
+        EXPECT_NE(v.GetString(), nullPtr); // non-null string returned
+        EXPECT_EQ(v.GetStringLength(), 0u);
+    }
+    {
+        Value v(nullPtr, 0u, allocator);
+        EXPECT_NE(v.GetString(), nullPtr); // non-null string returned
+        EXPECT_EQ(v.GetStringLength(), 0u);
+    }
 }
 
 template <typename T, typename Allocator>

@@ -28,7 +28,7 @@ Both SAX and DOM APIs depends on 3 additional concepts: `Allocator`, `Encoding` 
 
 ## Data Layout {#DataLayout}
 
-`Value` is a [variant type](http://en.wikipedia.org/wiki/Variant_type). In RapidJSON's context, an instance of `Value` can contain 1 of 6 JSON value types. This is possible by using `union`. Each `Value` contains two members: `union Data data_` and a`unsigned flags_`. The `flags_` indiciates the JSON type, and also additional information. 
+`Value` is a [variant type](http://en.wikipedia.org/wiki/Variant_type). In RapidJSON's context, an instance of `Value` can contain 1 of 6 JSON value types. This is possible by using `union`. Each `Value` contains two members: `union Data data_` and a`unsigned flags_`. The `flags_` indicates the JSON type, and also additional information. 
 
 The following tables show the data layout of each type. The 32-bit/64-bit columns indicates the size of the field in bytes.
 
@@ -101,7 +101,7 @@ The following tables show the data layout of each type. The 32-bit/64-bit column
 
 Here are some notes:
 * To reduce memory consumption for 64-bit architecture, `SizeType` is typedef as `unsigned` instead of `size_t`.
-* Zero padding for 32-bit number may be placed after or before the actual type, according to the endianess. This makes possible for interpreting a 32-bit integer as a 64-bit integer, without any conversion.
+* Zero padding for 32-bit number may be placed after or before the actual type, according to the endianness. This makes possible for interpreting a 32-bit integer as a 64-bit integer, without any conversion.
 * An `Int` is always an `Int64`, but the converse is not always true.
 
 ## Flags {#Flags}
@@ -183,17 +183,20 @@ void SkipWhitespace(InputStream& s) {
 
 However, this requires 4 comparisons and a few branching for each character. This was found to be a hot spot.
 
-To accelerate this process, SIMD was applied to compare 16 characters with 4 white spaces for each iteration. Currently RapidJSON only supports SSE2 and SSE4.2 instructions for this. And it is only activated for UTF-8 memory streams, including string stream or *in situ* parsing. 
+To accelerate this process, SIMD was applied to compare 16 characters with 4 white spaces for each iteration. Currently RapidJSON supports SSE2, SSE4.2 and ARM Neon instructions for this. And it is only activated for UTF-8 memory streams, including string stream or *in situ* parsing.
 
-To enable this optimization, need to define `RAPIDJSON_SSE2` or `RAPIDJSON_SSE42` before including `rapidjson.h`. Some compilers can detect the setting, as in `perftest.h`:
+To enable this optimization, need to define `RAPIDJSON_SSE2`, `RAPIDJSON_SSE42` or `RAPIDJSON_NEON` before including `rapidjson.h`. Some compilers can detect the setting, as in `perftest.h`:
 
 ~~~cpp
 // __SSE2__ and __SSE4_2__ are recognized by gcc, clang, and the Intel compiler.
 // We use -march=native with gmake to enable -msse2 and -msse4.2, if supported.
+// Likewise, __ARM_NEON is used to detect Neon.
 #if defined(__SSE4_2__)
 #  define RAPIDJSON_SSE42
 #elif defined(__SSE2__)
 #  define RAPIDJSON_SSE2
+#elif defined(__ARM_NEON)
+#  define RAPIDJSON_NEON
 #endif
 ~~~
 
@@ -211,7 +214,7 @@ In [Intel® 64 and IA-32 Architectures Optimization Reference Manual
 
 This is not feasible as RapidJSON should not enforce such requirement.
 
-To fix this issue, currently the routine process bytes up to the next aligned address. After tha, use aligned read to perform SIMD processing. Also see [#85](https://github.com/miloyip/rapidjson/issues/85).
+To fix this issue, currently the routine process bytes up to the next aligned address. After tha, use aligned read to perform SIMD processing. Also see [#85](https://github.com/Tencent/rapidjson/issues/85).
 
 ## Local Stream Copy {#LocalStreamCopy}
 

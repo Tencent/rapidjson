@@ -233,7 +233,7 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "1e-10000", 0.0);                                    // must underflow
     TEST_DOUBLE(fullPrecision, "18446744073709551616", 18446744073709551616.0);     // 2^64 (max of uint64_t + 1, force to use double)
     TEST_DOUBLE(fullPrecision, "-9223372036854775809", -9223372036854775809.0);     // -2^63 - 1(min of int64_t + 1, force to use double)
-    TEST_DOUBLE(fullPrecision, "0.9868011474609375", 0.9868011474609375);           // https://github.com/miloyip/rapidjson/issues/120
+    TEST_DOUBLE(fullPrecision, "0.9868011474609375", 0.9868011474609375);           // https://github.com/Tencent/rapidjson/issues/120
     TEST_DOUBLE(fullPrecision, "123e34", 123e34);                                   // Fast Path Cases In Disguise
     TEST_DOUBLE(fullPrecision, "45913141877270640000.0", 45913141877270640000.0);
     TEST_DOUBLE(fullPrecision, "2.2250738585072011e-308", 2.2250738585072011e-308); // http://www.exploringbinary.com/php-hangs-on-numeric-value-2-2250738585072011e-308/
@@ -415,7 +415,7 @@ TEST(Reader, ParseNumber_NormalPrecisionError) {
         uint64_t bias1 = e.ToBias();
         uint64_t bias2 = a.ToBias();
         double ulp = static_cast<double>(bias1 >= bias2 ? bias1 - bias2 : bias2 - bias1);
-        ulpMax = std::max(ulpMax, ulp);
+        ulpMax = (std::max)(ulpMax, ulp);
         ulpSum += ulp;
     }
     printf("ULP Average = %g, Max = %g \n", ulpSum / count, ulpMax);
@@ -725,6 +725,8 @@ TEST(Reader, ParseString_Error) {
 
     // Malform ASCII sequence
     TEST_STRINGENCODING_ERROR(ASCII<>, UTF8<>, char, ARRAY('[', '\"', char(0x80u), '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(ASCII<>, UTF8<>, char, ARRAY('[', '\"', char(0x01u), '\"', ']', '\0'));
+    TEST_STRINGENCODING_ERROR(ASCII<>, UTF8<>, char, ARRAY('[', '\"', char(0x1Cu), '\"', ']', '\0'));
 
 #undef ARRAY
 #undef TEST_STRINGARRAY_ERROR

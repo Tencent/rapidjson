@@ -2,6 +2,11 @@
 #include "rapidjson/document.h"
 #include <iostream>
 
+RAPIDJSON_DIAG_PUSH
+#ifdef __GNUC__
+RAPIDJSON_DIAG_OFF(effc++)
+#endif
+
 // This example demonstrates JSON token-by-token parsing with an API that is
 // more direct; you don't need to design your logic around a handler object and
 // callbacks. Instead, you retrieve values from the JSON stream by calling
@@ -341,3 +346,5 @@ int main() {
     
     return 0;
 }
+
+RAPIDJSON_DIAG_POP

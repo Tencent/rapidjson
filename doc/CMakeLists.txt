@@ -10,11 +10,13 @@ ELSE()
     CONFIGURE_FILE(Doxyfile.in Doxyfile @ONLY)
     CONFIGURE_FILE(Doxyfile.zh-cn.in Doxyfile.zh-cn @ONLY)
 
+    file(GLOB DOXYFILES ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile*)
+    
     add_custom_command(OUTPUT html
         COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
         COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile.zh-cn
         COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/html
-        DEPENDS ${MARKDOWN_DOC} ${SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile*
+        DEPENDS ${MARKDOWN_DOC} ${SOURCES} ${DOXYFILES}
         WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/../
         )
 

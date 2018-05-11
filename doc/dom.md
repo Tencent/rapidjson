@@ -128,7 +128,7 @@ And the `InputStream` is type of input stream.
 
 ## Parse Error {#ParseError}
 
-When the parse processing succeeded, the `Document` contains the parse results. When there is an error, the original DOM is *unchanged*. And the error state of parsing can be obtained by `bool HasParseError()`,  `ParseErrorCode GetParseError()` and `size_t GetParseOffset()`.
+When the parse processing succeeded, the `Document` contains the parse results. When there is an error, the original DOM is *unchanged*. And the error state of parsing can be obtained by `bool HasParseError()`,  `ParseErrorCode GetParseError()` and `size_t GetErrorOffset()`.
 
 Parse Error Code                            | Description
 --------------------------------------------|---------------------------------------------------
@@ -241,7 +241,7 @@ Some techniques about using DOM API is discussed here.
 
 ## DOM as SAX Event Publisher
 
-In RapidJSON, stringifying a DOM with `Writer` may be look a little bit weired.
+In RapidJSON, stringifying a DOM with `Writer` may be look a little bit weird.
 
 ~~~~~~~~~~cpp
 // ...

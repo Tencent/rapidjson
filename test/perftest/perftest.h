@@ -24,10 +24,13 @@
 
 // __SSE2__ and __SSE4_2__ are recognized by gcc, clang, and the Intel compiler.
 // We use -march=native with gmake to enable -msse2 and -msse4.2, if supported.
+// Likewise, __ARM_NEON is used to detect Neon.
 #if defined(__SSE4_2__)
 #  define RAPIDJSON_SSE42
 #elif defined(__SSE2__)
 #  define RAPIDJSON_SSE2
+#elif defined(__ARM_NEON)
+#  define RAPIDJSON_NEON
 #endif
 
 #define RAPIDJSON_HAS_STDSTRING 1

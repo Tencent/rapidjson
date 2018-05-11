@@ -13,12 +13,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/miloyip/rapidjson.git"
+    "url": "git+https://github.com/Tencent/rapidjson.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/miloyip/rapidjson/issues"
+    "url": "https://github.com/Tencent/rapidjson/issues"
   },
-  "homepage": "https://github.com/miloyip/rapidjson#readme"
+  "homepage": "https://github.com/Tencent/rapidjson#readme"
 }

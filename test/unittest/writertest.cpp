@@ -412,8 +412,10 @@ TEST(Writer, ValidateEncoding) {
         EXPECT_TRUE(writer.String("\xC2\xA2"));         // Cents sign U+00A2
         EXPECT_TRUE(writer.String("\xE2\x82\xAC"));     // Euro sign U+20AC
         EXPECT_TRUE(writer.String("\xF0\x9D\x84\x9E")); // G clef sign U+1D11E
+        EXPECT_TRUE(writer.String("\x01"));             // SOH control U+0001
+        EXPECT_TRUE(writer.String("\x1B"));             // Escape control U+001B
         writer.EndArray();
-        EXPECT_STREQ("[\"\x24\",\"\xC2\xA2\",\"\xE2\x82\xAC\",\"\xF0\x9D\x84\x9E\"]", buffer.GetString());
+        EXPECT_STREQ("[\"\x24\",\"\xC2\xA2\",\"\xE2\x82\xAC\",\"\xF0\x9D\x84\x9E\",\"\\u0001\",\"\\u001B\"]", buffer.GetString());
     }
 
     // Fail in decoding invalid UTF-8 sequence http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
@@ -534,6 +536,43 @@ TEST(Writer, RawValue) {
     writer.EndObject();
     EXPECT_TRUE(writer.IsComplete());
     EXPECT_STREQ("{\"a\":1,\"raw\":[\"Hello\\nWorld\", 123.456]}", buffer.GetString());
+}
+
+TEST(Write, RawValue_Issue1152) {
+    {
+        GenericStringBuffer<UTF32<> > sb;
+        Writer<GenericStringBuffer<UTF32<> >, UTF8<>, UTF32<> > writer(sb);
+        writer.RawValue("null", 4, kNullType);
+        EXPECT_TRUE(writer.IsComplete());
+        const unsigned *out = sb.GetString();
+        EXPECT_EQ(static_cast<unsigned>('n'), out[0]);
+        EXPECT_EQ(static_cast<unsigned>('u'), out[1]);
+        EXPECT_EQ(static_cast<unsigned>('l'), out[2]);
+        EXPECT_EQ(static_cast<unsigned>('l'), out[3]);
+        EXPECT_EQ(static_cast<unsigned>(0  ), out[4]);
+    }
+
+    {
+        GenericStringBuffer<UTF8<> > sb;
+        Writer<GenericStringBuffer<UTF8<> >, UTF16<>, UTF8<> > writer(sb);
+        writer.RawValue(L"null", 4, kNullType);
+        EXPECT_TRUE(writer.IsComplete());
+        EXPECT_STREQ("null", sb.GetString());
+    }
+
+    {
+        // Fail in transcoding
+        GenericStringBuffer<UTF16<> > buffer;
+        Writer<GenericStringBuffer<UTF16<> >, UTF8<>, UTF16<> > writer(buffer);
+        EXPECT_FALSE(writer.RawValue("\"\xfe\"", 3, kStringType));
+    }
+
+    {
+        // Fail in encoding validation
+        StringBuffer buffer;
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteValidateEncodingFlag> writer(buffer);
+        EXPECT_FALSE(writer.RawValue("\"\xfe\"", 3, kStringType));
+    }
 }
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS

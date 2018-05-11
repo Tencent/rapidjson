@@ -24,16 +24,17 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(padded)
 RAPIDJSON_DIAG_OFF(switch-enum)
 RAPIDJSON_DIAG_OFF(implicit-fallthrough)
+#elif defined(_MSC_VER)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
 #endif
 
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
+#if __GNUC__ >= 7
+RAPIDJSON_DIAG_OFF(implicit-fallthrough)
 #endif
-
-#ifdef _MSC_VER
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
 #endif
 
 #ifndef RAPIDJSON_REGEX_VERBOSE
@@ -720,11 +721,11 @@ typedef GenericRegexSearch<Regex> RegexSearch;
 } // namespace internal
 RAPIDJSON_NAMESPACE_END
 
-#ifdef __clang__
+#ifdef __GNUC__
 RAPIDJSON_DIAG_POP
 #endif
 
-#ifdef _MSC_VER
+#if defined(__clang__) || defined(_MSC_VER)
 RAPIDJSON_DIAG_POP
 #endif
 

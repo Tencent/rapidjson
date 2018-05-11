@@ -32,11 +32,8 @@
 #include <nmmintrin.h>
 #elif defined(RAPIDJSON_SSE2)
 #include <emmintrin.h>
-#endif
-
-#ifdef _MSC_VER
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
+#elif defined(RAPIDJSON_NEON)
+#include <arm_neon.h>
 #endif
 
 #ifdef __clang__
@@ -44,6 +41,9 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(padded)
 RAPIDJSON_DIAG_OFF(unreachable-code)
 RAPIDJSON_DIAG_OFF(c++98-compat)
+#elif defined(_MSC_VER)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -220,6 +220,13 @@ public:
 
     bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy); }
 
+#if RAPIDJSON_HAS_STDSTRING
+    bool Key(const std::basic_string<Ch>& str)
+    {
+      return Key(str.data(), SizeType(str.size()));
+    }
+#endif
+	
     bool EndObject(SizeType memberCount = 0) {
         (void)memberCount;
         RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level)); // not inside an Object
@@ -451,9 +458,14 @@ protected:
 
     bool WriteRawValue(const Ch* json, size_t length) {
         PutReserve(*os_, length);
-        for (size_t i = 0; i < length; i++) {
-            RAPIDJSON_ASSERT(json[i] != '\0');
-            PutUnsafe(*os_, json[i]);
+        GenericStringStream<SourceEncoding> is(json);
+        while (RAPIDJSON_LIKELY(is.Tell() < length)) {
+            const Ch c = is.Peek();
+            RAPIDJSON_ASSERT(c != '\0');
+            if (RAPIDJSON_UNLIKELY(!(writeFlags & kWriteValidateEncodingFlag ? 
+                Transcoder<SourceEncoding, TargetEncoding>::Validate(is, *os_) :
+                Transcoder<SourceEncoding, TargetEncoding>::TranscodeUnsafe(is, *os_))))
+                return false;
         }
         return true;
     }
@@ -585,7 +597,7 @@ inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, siz
     // The rest of string using SIMD
     static const char dquote[16] = { '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"', '\"' };
     static const char bslash[16] = { '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\', '\\' };
-    static const char space[16]  = { 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19, 0x19 };
+    static const char space[16]  = { 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F, 0x1F };
     const __m128i dq = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&dquote[0]));
     const __m128i bs = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&bslash[0]));
     const __m128i sp = _mm_loadu_si128(reinterpret_cast<const __m128i *>(&space[0]));
@@ -594,7 +606,7 @@ inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, siz
         const __m128i s = _mm_load_si128(reinterpret_cast<const __m128i *>(p));
         const __m128i t1 = _mm_cmpeq_epi8(s, dq);
         const __m128i t2 = _mm_cmpeq_epi8(s, bs);
-        const __m128i t3 = _mm_cmpeq_epi8(_mm_max_epu8(s, sp), sp); // s < 0x20 <=> max(s, 0x19) == 0x19
+        const __m128i t3 = _mm_cmpeq_epi8(_mm_max_epu8(s, sp), sp); // s < 0x20 <=> max(s, 0x1F) == 0x1F
         const __m128i x = _mm_or_si128(_mm_or_si128(t1, t2), t3);
         unsigned short r = static_cast<unsigned short>(_mm_movemask_epi8(x));
         if (RAPIDJSON_UNLIKELY(r != 0)) {   // some of characters is escaped
@@ -619,15 +631,79 @@ inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, siz
     is.src_ = p;
     return RAPIDJSON_LIKELY(is.Tell() < length);
 }
-#endif // defined(RAPIDJSON_SSE2) || defined(RAPIDJSON_SSE42)
+#elif defined(RAPIDJSON_NEON)
+template<>
+inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, size_t length) {
+    if (length < 16)
+        return RAPIDJSON_LIKELY(is.Tell() < length);
+
+    if (!RAPIDJSON_LIKELY(is.Tell() < length))
+        return false;
+
+    const char* p = is.src_;
+    const char* end = is.head_ + length;
+    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 15) & static_cast<size_t>(~15));
+    const char* endAligned = reinterpret_cast<const char*>(reinterpret_cast<size_t>(end) & static_cast<size_t>(~15));
+    if (nextAligned > end)
+        return true;
+
+    while (p != nextAligned)
+        if (*p < 0x20 || *p == '\"' || *p == '\\') {
+            is.src_ = p;
+            return RAPIDJSON_LIKELY(is.Tell() < length);
+        }
+        else
+            os_->PutUnsafe(*p++);
+
+    // The rest of string using SIMD
+    const uint8x16_t s0 = vmovq_n_u8('"');
+    const uint8x16_t s1 = vmovq_n_u8('\\');
+    const uint8x16_t s2 = vmovq_n_u8('\b');
+    const uint8x16_t s3 = vmovq_n_u8(32);
+
+    for (; p != endAligned; p += 16) {
+        const uint8x16_t s = vld1q_u8(reinterpret_cast<const uint8_t *>(p));
+        uint8x16_t x = vceqq_u8(s, s0);
+        x = vorrq_u8(x, vceqq_u8(s, s1));
+        x = vorrq_u8(x, vceqq_u8(s, s2));
+        x = vorrq_u8(x, vcltq_u8(s, s3));
+
+        x = vrev64q_u8(x);                     // Rev in 64
+        uint64_t low = vgetq_lane_u64(reinterpret_cast<uint64x2_t>(x), 0);   // extract
+        uint64_t high = vgetq_lane_u64(reinterpret_cast<uint64x2_t>(x), 1);  // extract
+
+        SizeType len = 0;
+        bool escaped = false;
+        if (low == 0) {
+            if (high != 0) {
+                unsigned lz = (unsigned)__builtin_clzll(high);
+                len = 8 + (lz >> 3);
+                escaped = true;
+            }
+        } else {
+            unsigned lz = (unsigned)__builtin_clzll(low);
+            len = lz >> 3;
+            escaped = true;
+        }
+        if (RAPIDJSON_UNLIKELY(escaped)) {   // some of characters is escaped
+            char* q = reinterpret_cast<char*>(os_->PushUnsafe(len));
+            for (size_t i = 0; i < len; i++)
+                q[i] = p[i];
+
+            p += len;
+            break;
+        }
+        vst1q_u8(reinterpret_cast<uint8_t *>(os_->PushUnsafe(16)), s);
+    }
+
+    is.src_ = p;
+    return RAPIDJSON_LIKELY(is.Tell() < length);
+}
+#endif // RAPIDJSON_NEON
 
 RAPIDJSON_NAMESPACE_END
 
-#ifdef _MSC_VER
-RAPIDJSON_DIAG_POP
-#endif
-
-#ifdef __clang__
+#if defined(_MSC_VER) || defined(__clang__)
 RAPIDJSON_DIAG_POP
 #endif
 

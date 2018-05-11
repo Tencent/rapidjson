@@ -52,6 +52,19 @@ concept Allocator {
 \endcode
 */
 
+
+/*! \def RAPIDJSON_ALLOCATOR_DEFUALT_CHUNK_CAPACITY
+    \ingroup RAPIDJSON_CONFIG
+    \brief User-defined kDefaultChunkCapacity definition.
+
+    User can define this as any \c size that is a power of 2.
+*/
+
+#ifndef RAPIDJSON_ALLOCATOR_DEFAULT_CHUNK_CAPACITY
+#define RAPIDJSON_ALLOCATOR_DEFAULT_CHUNK_CAPACITY (64 * 1024)
+#endif
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // CrtAllocator
 
@@ -248,7 +261,7 @@ private:
             return false;
     }
 
-    static const int kDefaultChunkCapacity = 64 * 1024; //!< Default chunk capacity.
+    static const int kDefaultChunkCapacity = RAPIDJSON_ALLOCATOR_DEFAULT_CHUNK_CAPACITY; //!< Default chunk capacity.
 
     //! Chunk header for perpending to each chunk.
     /*! Chunks are stored as a singly linked list.

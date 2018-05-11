@@ -1,4 +1,4 @@
-// JSON to JSONx conversion exmaple, using SAX API.
+// JSON to JSONx conversion example, using SAX API.
 // JSONx is an IBM standard format to represent JSON as XML.
 // https://www-01.ibm.com/support/knowledgecenter/SS9H2Y_7.1.0/com.ibm.dp.doc/json_jsonx.html
 // This example parses JSON text from stdin with validation, 

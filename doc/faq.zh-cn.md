@@ -18,7 +18,7 @@
 
 4. RapidJSON 是免费的么？
 
-   是的，它在 MIT 特許條款下免费。它可用于商业软件。详情请参看 [license.txt](https://github.com/miloyip/rapidjson/blob/master/license.txt)。
+   是的，它在 MIT 特許條款下免费。它可用于商业软件。详情请参看 [license.txt](https://github.com/Tencent/rapidjson/blob/master/license.txt)。
 
 5. RapidJSON 很小么？它有何依赖？
 
@@ -44,7 +44,7 @@
 
 10. RapidJSON 是如何被测试的？
 
-   RapidJSON 包含一组单元测试去执行自动测试。[Travis](https://travis-ci.org/miloyip/rapidjson/)（供 Linux 平台）及 [AppVeyor](https://ci.appveyor.com/project/miloyip/rapidjson/)（供 Windows 平台）会对所有修改进行编译及执行单元测试。在 Linux 下还会使用 Valgrind 去检测内存泄漏。
+   RapidJSON 包含一组单元测试去执行自动测试。[Travis](https://travis-ci.org/Tencent/rapidjson/)（供 Linux 平台）及 [AppVeyor](https://ci.appveyor.com/project/Tencent/rapidjson/)（供 Windows 平台）会对所有修改进行编译及执行单元测试。在 Linux 下还会使用 Valgrind 去检测内存泄漏。
 
 11. RapidJSON 是否有完整的文档？
 
@@ -70,7 +70,7 @@
 
 3. RapidJSON 是否支持宽松的语法？
 
-   现时不支持。RapidJSON 只支持严格的标准格式。宽松语法现时在这 [issue](https://github.com/miloyip/rapidjson/issues/36) 中进行讨论。
+   现时不支持。RapidJSON 只支持严格的标准格式。宽松语法现时在这 [issue](https://github.com/Tencent/rapidjson/issues/36) 中进行讨论。
 
 ## DOM 与 SAX
 
@@ -257,7 +257,7 @@
 
 3. 什是是 SIMD？它如何用于 RapidJSON？
 
-   [SIMD](http://en.wikipedia.org/wiki/SIMD) 指令可以在现代 CPU 中执行并行运算。RapidJSON 支持了 Intel 的 SSE2/SSE4.2 去加速跳过空白字符。在解析含缩进的 JSON 时，这能提升性能。只要定义名为 `RAPIDJSON_SSE2` 或 `RAPIDJSON_SSE42` 的宏，就能启动这个功能。然而，若在不支持这些指令集的机器上执行这些可执行文件，会导致崩溃。
+   [SIMD](http://en.wikipedia.org/wiki/SIMD) 指令可以在现代 CPU 中执行并行运算。RapidJSON 支持使用 Intel 的 SSE2/SSE4.2 和 ARM 的 Neon 来加速对空白符、制表符、回车符和换行符的过滤处理。在解析含缩进的 JSON 时，这能提升性能。只要定义名为 `RAPIDJSON_SSE2` ，`RAPIDJSON_SSE42` 或 `RAPIDJSON_NEON` 的宏，就能启动这个功能。然而，若在不支持这些指令集的机器上执行这些可执行文件，会导致崩溃。
 
 4. 它会消耗许多内存么？
 
