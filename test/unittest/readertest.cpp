@@ -184,6 +184,27 @@ TEST(Reader, ParseNumber_Integer) {
 #undef TEST_INTEGER
 }
 
+TEST(Reader, TestIssue1255) {
+    const char* str =
+        "6223372036854775296.1701512723685473547372536854755293372036854685477"
+        "529752233737201701512337200972013723685473123372036872036854236854737"
+        "247372368372367752975258547752975254729752547372368737201701512354737"
+        "83723677529752585477247372368372368547354737253685475529752\x03\xe8"
+        "18 9\xce";
+    const double x = 6223372036854775296.17;
+  
+    StringStream s(str);
+    ParseDoubleHandler h;
+    Reader reader;
+    ASSERT_EQ(kParseErrorDocumentRootNotSingular, reader.Parse<kParseFullPrecisionFlag>(s, h).Code());
+    EXPECT_EQ(1u, h.step_);
+    internal::Double e(x), a(h.actual_);
+    EXPECT_EQ(e.Uint64Value(), a.Uint64Value());
+    if (e.Uint64Value() != a.Uint64Value()) {
+        printf("  String: %s\n  Actual: %.17g\nExpected: %.17g\n", str, h.actual_, x);
+    }
+}
+
 template<bool fullPrecision>
 static void TestParseDouble() {
 #define TEST_DOUBLE(fullPrecision, str, x) \
