@@ -263,10 +263,12 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "2.2250738585072011e-308", 2.2250738585072011e-308); // http://www.exploringbinary.com/php-hangs-on-numeric-value-2-2250738585072011e-308/
     TEST_DOUBLE(fullPrecision, "1e-00011111111111", 0.0);                           // Issue #313
     TEST_DOUBLE(fullPrecision, "-1e-00011111111111", -0.0);
-    TEST_DOUBLE(fullPrecision, "1e-214748363", 0.0);                                  // Maximum supported negative exponent
+    TEST_DOUBLE(fullPrecision, "1e-214748363", 0.0);                                // Maximum supported negative exponent
     TEST_DOUBLE(fullPrecision, "1e-214748364", 0.0);
     TEST_DOUBLE(fullPrecision, "1e-21474836311", 0.0);
     TEST_DOUBLE(fullPrecision, "0.017976931348623157e+310", 1.7976931348623157e+308); // Max double in another form
+    TEST_DOUBLE(fullPrecision, "8847432036854773723683723677529854735473725368547554755293372036854685477529752529337203685468547770151233720097201372368547312337203687203685423685123372036872036854737247372368372367752975258547752975254729752547372368737201701512354737837236737247372368772473723683723456789012E66",
+              std::numeric_limits<double>::infinity());                             // For checking issue #1259
 
     // Since
     // abs((2^-1022 - 2^-1074) - 2.2250738585072012e-308) = 3.109754131239141401123495768877590405345064751974375599... x 10^-324
