@@ -1632,9 +1632,18 @@ private:
             if (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
                 exp = static_cast<int>(s.Take() - '0');
                 if (expMinus) {
+                    // (exp + expFrac) must not underflow int => we're detecting when -exp gets
+                    // dangerously close to INT_MIN (a pessimistic next digit 9 would push it into
+                    // underflow territory):
+                    //
+                    //        -(exp * 10 + 9) + expFrac >= INT_MIN
+                    //   <=>  exp <= (expFrac - INT_MIN - 9) / 10
+                    RAPIDJSON_ASSERT(expFrac <= 0);
+                    int maxExp = (expFrac + 2147483639) / 10;
+
                     while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
                         exp = exp * 10 + static_cast<int>(s.Take() - '0');
-                        if (exp >= 214748364) {                         // Issue #313: prevent overflow exponent
+                        if (RAPIDJSON_UNLIKELY(exp > maxExp)) {
                             while (RAPIDJSON_UNLIKELY(s.Peek() >= '0' && s.Peek() <= '9'))  // Consume the rest of exponent
                                 s.Take();
                         }
