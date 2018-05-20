@@ -242,6 +242,7 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "1e-214748363", 0.0);                                  // Maximum supported negative exponent
     TEST_DOUBLE(fullPrecision, "1e-214748364", 0.0);
     TEST_DOUBLE(fullPrecision, "1e-21474836311", 0.0);
+    TEST_DOUBLE(fullPrecision, "1.00000000001e-2147483638", 0.0);
     TEST_DOUBLE(fullPrecision, "0.017976931348623157e+310", 1.7976931348623157e+308); // Max double in another form
 
     // Since
