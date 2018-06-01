@@ -441,7 +441,7 @@ public:
         maxLength_(~SizeType(0)),
         exclusiveMinimum_(false),
         exclusiveMaximum_(false),
-        defaultValue_()
+        defaultValueLength_(0)
     {
         typedef typename SchemaDocumentType::ValueType ValueType;
         typedef typename ValueType::ConstValueIterator ConstValueIterator;
@@ -640,7 +640,7 @@ public:
         // Default
         if (const ValueType* v = GetMember(value, GetDefaultValueString()))
             if (v->IsString())
-                defaultValue_ = v->GetString();
+                defaultValueLength_ = v->GetStringLength();
 
     }
 
@@ -942,14 +942,9 @@ public:
         if (hasRequired_) {
             context.error_handler.StartMissingProperties();
             for (SizeType index = 0; index < propertyCount_; index++)
-                if (properties_[index].required && !context.propertyExist[index]){
-                    if (properties_[index].schema->defaultValue_.empty() || properties_[index].schema->defaultValue_ == "" ){
+                if (properties_[index].required && !context.propertyExist[index])
+                    if (properties_[index].schema->defaultValueLength_ == 0 )
                         context.error_handler.AddMissingProperty(properties_[index].name);
-                    } else {
-                        // std::cout << "default value of " << properties_[index].name.GetString()
-                        //             <<  " is:" << properties_[index].schema->defaultValue_ << "\n";
-                    }
-                }
             if (context.error_handler.EndMissingProperties())
                 RAPIDJSON_INVALID_KEYWORD_RETURN(GetRequiredString());
         }
@@ -1441,7 +1436,7 @@ private:
     bool exclusiveMinimum_;
     bool exclusiveMaximum_;
     
-    std::string defaultValue_;
+    SizeType defaultValueLength_;
 };
 
 template<typename Stack, typename Ch>

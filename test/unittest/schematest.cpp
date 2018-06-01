@@ -1049,6 +1049,33 @@ TEST(SchemaValidator, Object_Required) {
         "}}");
 }
 
+TEST(SchemaValidator, Object_Required_PassWithDefault) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "    \"type\": \"object\","
+        "    \"properties\" : {"
+        "        \"name\":      { \"type\": \"string\", \"default\": \"William Shakespeare\" },"
+        "        \"email\" : { \"type\": \"string\", \"default\": \"\" },"
+        "        \"address\" : { \"type\": \"string\" },"
+        "        \"telephone\" : { \"type\": \"string\" }"
+        "    },"
+        "    \"required\":[\"name\", \"email\"]"
+        "}");
+    SchemaDocument s(sd);
+
+    VALIDATE(s, "{ \"email\" : \"bill@stratford-upon-avon.co.uk\", \"address\" : \"Henley Street, Stratford-upon-Avon, Warwickshire, England\", \"authorship\" : \"in question\"}", true);
+    INVALIDATE(s, "{ \"name\": \"William Shakespeare\", \"address\" : \"Henley Street, Stratford-upon-Avon, Warwickshire, England\" }", "", "required", "",
+        "{ \"required\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"missing\": [\"email\"]"
+        "}}");
+    INVALIDATE(s, "{}", "", "required", "",
+        "{ \"required\": {"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"missing\": [\"email\"]"
+        "}}");
+}
 
 TEST(SchemaValidator, Object_PropertiesRange) {
     Document sd;
