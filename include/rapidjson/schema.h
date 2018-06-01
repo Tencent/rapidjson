@@ -440,7 +440,8 @@ public:
         minLength_(0),
         maxLength_(~SizeType(0)),
         exclusiveMinimum_(false),
-        exclusiveMaximum_(false)
+        exclusiveMaximum_(false),
+        defaultValue_()
     {
         typedef typename SchemaDocumentType::ValueType ValueType;
         typedef typename ValueType::ConstValueIterator ConstValueIterator;
@@ -635,6 +636,12 @@ public:
         if (const ValueType* v = GetMember(value, GetMultipleOfString()))
             if (v->IsNumber() && v->GetDouble() > 0.0)
                 multipleOf_.CopyFrom(*v, *allocator_);
+
+        // Default
+        if (const ValueType* v = GetMember(value, GetDefaultValueString()))
+            if (v->IsString())
+                defaultValue_ = v->GetString();
+
     }
 
     ~Schema() {
@@ -935,8 +942,14 @@ public:
         if (hasRequired_) {
             context.error_handler.StartMissingProperties();
             for (SizeType index = 0; index < propertyCount_; index++)
-                if (properties_[index].required && !context.propertyExist[index])
-                    context.error_handler.AddMissingProperty(properties_[index].name);
+                if (properties_[index].required && !context.propertyExist[index]){
+                    if (properties_[index].schema->defaultValue_.empty() || properties_[index].schema->defaultValue_ == "" ){
+                        context.error_handler.AddMissingProperty(properties_[index].name);
+                    } else {
+                        // std::cout << "default value of " << properties_[index].name.GetString()
+                        //             <<  " is:" << properties_[index].schema->defaultValue_ << "\n";
+                    }
+                }
             if (context.error_handler.EndMissingProperties())
                 RAPIDJSON_INVALID_KEYWORD_RETURN(GetRequiredString());
         }
@@ -1046,6 +1059,7 @@ public:
     RAPIDJSON_STRING_(ExclusiveMinimum, 'e', 'x', 'c', 'l', 'u', 's', 'i', 'v', 'e', 'M', 'i', 'n', 'i', 'm', 'u', 'm')
     RAPIDJSON_STRING_(ExclusiveMaximum, 'e', 'x', 'c', 'l', 'u', 's', 'i', 'v', 'e', 'M', 'a', 'x', 'i', 'm', 'u', 'm')
     RAPIDJSON_STRING_(MultipleOf, 'm', 'u', 'l', 't', 'i', 'p', 'l', 'e', 'O', 'f')
+    RAPIDJSON_STRING_(DefaultValue, 'd', 'e', 'f', 'a', 'u', 'l', 't')
 
 #undef RAPIDJSON_STRING_
 
@@ -1426,6 +1440,8 @@ private:
     SValue multipleOf_;
     bool exclusiveMinimum_;
     bool exclusiveMaximum_;
+    
+    std::string defaultValue_;
 };
 
 template<typename Stack, typename Ch>
