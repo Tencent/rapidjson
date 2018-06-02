@@ -440,7 +440,8 @@ public:
         minLength_(0),
         maxLength_(~SizeType(0)),
         exclusiveMinimum_(false),
-        exclusiveMaximum_(false)
+        exclusiveMaximum_(false),
+        defaultValueLength_(0)
     {
         typedef typename SchemaDocumentType::ValueType ValueType;
         typedef typename ValueType::ConstValueIterator ConstValueIterator;
@@ -635,6 +636,12 @@ public:
         if (const ValueType* v = GetMember(value, GetMultipleOfString()))
             if (v->IsNumber() && v->GetDouble() > 0.0)
                 multipleOf_.CopyFrom(*v, *allocator_);
+
+        // Default
+        if (const ValueType* v = GetMember(value, GetDefaultValueString()))
+            if (v->IsString())
+                defaultValueLength_ = v->GetStringLength();
+
     }
 
     ~Schema() {
@@ -936,7 +943,8 @@ public:
             context.error_handler.StartMissingProperties();
             for (SizeType index = 0; index < propertyCount_; index++)
                 if (properties_[index].required && !context.propertyExist[index])
-                    context.error_handler.AddMissingProperty(properties_[index].name);
+                    if (properties_[index].schema->defaultValueLength_ == 0 )
+                        context.error_handler.AddMissingProperty(properties_[index].name);
             if (context.error_handler.EndMissingProperties())
                 RAPIDJSON_INVALID_KEYWORD_RETURN(GetRequiredString());
         }
@@ -1046,6 +1054,7 @@ public:
     RAPIDJSON_STRING_(ExclusiveMinimum, 'e', 'x', 'c', 'l', 'u', 's', 'i', 'v', 'e', 'M', 'i', 'n', 'i', 'm', 'u', 'm')
     RAPIDJSON_STRING_(ExclusiveMaximum, 'e', 'x', 'c', 'l', 'u', 's', 'i', 'v', 'e', 'M', 'a', 'x', 'i', 'm', 'u', 'm')
     RAPIDJSON_STRING_(MultipleOf, 'm', 'u', 'l', 't', 'i', 'p', 'l', 'e', 'O', 'f')
+    RAPIDJSON_STRING_(DefaultValue, 'd', 'e', 'f', 'a', 'u', 'l', 't')
 
 #undef RAPIDJSON_STRING_
 
@@ -1426,6 +1435,8 @@ private:
     SValue multipleOf_;
     bool exclusiveMinimum_;
     bool exclusiveMaximum_;
+    
+    SizeType defaultValueLength_;
 };
 
 template<typename Stack, typename Ch>
