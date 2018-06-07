@@ -629,7 +629,7 @@ public:
             kNullFlag, kFalseFlag, kTrueFlag, kObjectFlag, kArrayFlag, kShortStringFlag,
             kNumberAnyFlag
         };
-        RAPIDJSON_ASSERT(type >= kNullType && type <= kNumberType);
+        RAPIDJSON_NOEXCEPT_ASSERT(type >= kNullType && type <= kNumberType);
         data_.f.flags = defaultFlags[type];
 
         // Use ShortString to store empty string.
@@ -831,9 +831,10 @@ public:
     /*! \param rhs Source of the assignment. It will become a null value after assignment.
     */
     GenericValue& operator=(GenericValue& rhs) RAPIDJSON_NOEXCEPT {
-        RAPIDJSON_ASSERT(this != &rhs);
-        this->~GenericValue();
-        RawAssign(rhs);
+        if (this != &rhs) {
+            this->~GenericValue();
+            RawAssign(rhs);
+        }
         return *this;
     }
 

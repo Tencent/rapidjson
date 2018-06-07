@@ -592,6 +592,19 @@ RAPIDJSON_NAMESPACE_END
 //!@endcond
 
 ///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_NOEXCEPT_ASSERT
+
+#ifdef RAPIDJSON_ASSERT_THROWS
+#if RAPIDJSON_HAS_CXX11_NOEXCEPT
+#define RAPIDJSON_NOEXCEPT_ASSERT(x)
+#else
+#define RAPIDJSON_NOEXCEPT_ASSERT(x) RAPIDJSON_ASSERT(x)
+#endif // RAPIDJSON_HAS_CXX11_NOEXCEPT
+#else
+#define RAPIDJSON_NOEXCEPT_ASSERT(x) RAPIDJSON_ASSERT(x)
+#endif // RAPIDJSON_ASSERT_THROWS
+
+///////////////////////////////////////////////////////////////////////////////
 // new/delete
 
 #ifndef RAPIDJSON_NEW
