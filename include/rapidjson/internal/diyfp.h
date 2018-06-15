@@ -20,6 +20,7 @@
 #define RAPIDJSON_DIYFP_H_
 
 #include "../rapidjson.h"
+#include <limits>
 
 #if defined(_MSC_VER) && defined(_M_AMD64) && !defined(__INTEL_COMPILER)
 #include <intrin.h>
@@ -146,7 +147,10 @@ struct DiyFp {
             // Underflow.
             return 0.0;
         }
-        RAPIDJSON_ASSERT(e < kDpMaxExponent);
+        if (e >= kDpMaxExponent) {
+            // Overflow.
+            return std::numeric_limits<double>::infinity();
+        }
         const uint64_t be = (e == kDpDenormalExponent && (f & kDpHiddenBit) == 0) ? 0 :
             static_cast<uint64_t>(e + kDpExponentBias);
         u.u64 = (f & kDpSignificandMask) | (be << kDpSignificandSize);
