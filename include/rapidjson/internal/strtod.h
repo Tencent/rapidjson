@@ -165,7 +165,7 @@ inline bool StrtodDiyFp(const char* decimals, int dLen, int dExp, double* result
         int adjustment = dExp - actualExp;
         RAPIDJSON_ASSERT(adjustment >= 1 && adjustment < 8);
         v = v * kPow10[adjustment - 1];
-        if (dLen + adjustment > 19u) // has more digits than decimal digits in 64-bit
+        if (dLen + adjustment > 19) // has more digits than decimal digits in 64-bit
             error += kUlp / 2;
     }
 
