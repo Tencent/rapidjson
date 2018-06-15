@@ -392,6 +392,15 @@ static void TestParseDouble() {
         "83723677529752585477247372368372368547354737253685475529752",
         6223372036854775808.0);
 
+
+    TEST_DOUBLE(fullPrecision, "1e-325", 0.0);
+    TEST_DOUBLE(fullPrecision, "1e-324", 0.0);
+    TEST_DOUBLE(fullPrecision, "2e-324", 0.0);
+    TEST_DOUBLE(fullPrecision, "2.4703282292062327e-324", 0.0);
+    TEST_DOUBLE(fullPrecision, "2.4703282292062328e-324", 2.4703282292062328e-324);
+    TEST_DOUBLE(fullPrecision, "2.48e-324", 2.48e-324);
+    TEST_DOUBLE(fullPrecision, "2.5e-324", 2.5e-324);
+
 #undef TEST_DOUBLE
 }
 
@@ -1346,20 +1355,20 @@ TEST(Reader, IterativePullParsing_General) {
             handler.LOG_DOUBLE,
             handler.LOG_ENDARRAY | 7
         };
-        
+
         StringStream is("[1, {\"k\": [1, 2]}, null, false, true, \"string\", 1.2]");
         Reader reader;
-        
+
         reader.IterativeParseInit();
         while (!reader.IterativeParseComplete()) {
             size_t oldLogCount = handler.LogCount;
             EXPECT_TRUE(oldLogCount < sizeof(e) / sizeof(int)) << "overrun";
-            
+
             EXPECT_TRUE(reader.IterativeParseNext<kParseDefaultFlags>(is, handler)) << "parse fail";
             EXPECT_EQ(handler.LogCount, oldLogCount + 1) << "handler should be invoked exactly once each time";
             EXPECT_EQ(e[oldLogCount], handler.Logs[oldLogCount]) << "wrong event returned";
         }
-        
+
         EXPECT_FALSE(reader.HasParseError());
         EXPECT_EQ(sizeof(e) / sizeof(int), handler.LogCount) << "handler invoked wrong number of times";
 
