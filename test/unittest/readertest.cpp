@@ -377,6 +377,21 @@ static void TestParseDouble() {
             d = d.Value() * 0.5;
         }
     }
+
+    // Issue 1249
+    TEST_DOUBLE(fullPrecision, "0e100", 0.0);
+
+    // Issue 1251
+    TEST_DOUBLE(fullPrecision, "128.74836467836484838364836483643636483648e-336", 0.0);
+
+    // Issue 1256
+    TEST_DOUBLE(fullPrecision,
+        "6223372036854775296.1701512723685473547372536854755293372036854685477"
+        "529752233737201701512337200972013723685473123372036872036854236854737"
+        "247372368372367752975258547752975254729752547372368737201701512354737"
+        "83723677529752585477247372368372368547354737253685475529752",
+        6223372036854775808.0);
+
 #undef TEST_DOUBLE
 }
 
@@ -443,7 +458,7 @@ TEST(Reader, ParseNumber_Error) {
         for (int i = 1; i < 310; i++)
             n1e309[i] = '0';
         n1e309[310] = '\0';
-        TEST_NUMBER_ERROR(kParseErrorNumberTooBig, n1e309, 0, 309);
+        TEST_NUMBER_ERROR(kParseErrorNumberTooBig, n1e309, 0, 310);
     }
     TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e309", 0, 5);
 
@@ -454,6 +469,25 @@ TEST(Reader, ParseNumber_Error) {
     // Miss exponent in number.
     TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e", 2, 2);
     TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e_", 2, 2);
+
+    // Issue 849
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1.8e308", 0, 7);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "5e308", 0, 5);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e309", 0, 5);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1.0e310", 0, 7);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1.00e310", 0, 8);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "-1.8e308", 0, 8);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "-1e309", 0, 6);
+
+    // Issue 1253
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "2e308", 0, 5);
+
+    // Issue 1259
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig,
+        "88474320368547737236837236775298547354737253685475547552933720368546854775297525"
+        "29337203685468547770151233720097201372368547312337203687203685423685123372036872"
+        "03685473724737236837236775297525854775297525472975254737236873720170151235473783"
+        "7236737247372368772473723683723456789012E66", 0, 283);
 
 #undef TEST_NUMBER_ERROR
 }
