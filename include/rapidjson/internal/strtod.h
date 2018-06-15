@@ -233,12 +233,14 @@ inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t 
     while (*decimals == '0' && length > 1) {
         length--;
         decimals++;
+        RAPIDJSON_ASSERT(decimalPosition > 0);
         decimalPosition--;
     }
 
     // Trim trailing zeros
     while (decimals[length - 1] == '0' && length > 1) {
         length--;
+        RAPIDJSON_ASSERT(decimalPosition > 0);
         decimalPosition--;
         exp++;
     }
@@ -248,6 +250,7 @@ inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t 
     if (static_cast<int>(length) > kMaxDecimalDigit) {
         int delta = (static_cast<int>(length) - kMaxDecimalDigit);
         exp += delta;
+        RAPIDJSON_ASSERT(decimalPosition > static_cast<unsigned>(delta));
         decimalPosition -= static_cast<unsigned>(delta);
         length = kMaxDecimalDigit;
     }

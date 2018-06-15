@@ -141,6 +141,9 @@ struct DiyFp {
             double d;
             uint64_t u64;
         }u;
+        RAPIDJSON_ASSERT(f <= kDpHiddenBit + kDpSignificandMask);
+        RAPIDJSON_ASSERT(e >= kDpDenormalExponent);
+        RAPIDJSON_ASSERT(e < kDpMaxExponent);
         const uint64_t be = (e == kDpDenormalExponent && (f & kDpHiddenBit) == 0) ? 0 : 
             static_cast<uint64_t>(e + kDpExponentBias);
         u.u64 = (f & kDpSignificandMask) | (be << kDpSignificandSize);
@@ -220,6 +223,7 @@ inline DiyFp GetCachedPowerByIndex(size_t index) {
         641,   667,   694,   720,   747,   774,   800,   827,   853,   880,
         907,   933,   960,   986,  1013,  1039,  1066
     };
+    RAPIDJSON_ASSERT(index < 87);
     return DiyFp(kCachedPowers_F[index], kCachedPowers_E[index]);
 }
     
@@ -238,10 +242,11 @@ inline DiyFp GetCachedPower(int e, int* K) {
 }
 
 inline DiyFp GetCachedPower10(int exp, int *outExp) {
-     unsigned index = (static_cast<unsigned>(exp) + 348u) / 8u;
-     *outExp = -348 + static_cast<int>(index) * 8;
-     return GetCachedPowerByIndex(index);
- }
+    RAPIDJSON_ASSERT(exp >= -348);
+    unsigned index = static_cast<unsigned>(exp + 348) / 8u;
+    *outExp = -348 + static_cast<int>(index) * 8;
+    return GetCachedPowerByIndex(index);
+}
 
 #ifdef __GNUC__
 RAPIDJSON_DIAG_POP
