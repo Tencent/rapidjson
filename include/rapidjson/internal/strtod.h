@@ -20,6 +20,7 @@
 #include "diyfp.h"
 #include "pow10.h"
 #include <climits>
+#include <limits>
 
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
@@ -260,15 +261,21 @@ inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t 
     }
 
     // Trim right-most digits
-    const int kMaxDecimalDigit = 780;
+    const int kMaxDecimalDigit = 767 + 1;
     if (dLen > kMaxDecimalDigit) {
         dExp += dLen - kMaxDecimalDigit;
         dLen = kMaxDecimalDigit;
     }
 
-    // If too small, underflow to zero
-    if (dLen + dExp < -324)
+    // If too small, underflow to zero.
+    // Any x <= 10^-324 is interpreted as zero.
+    if (dLen + dExp <= -324)
         return 0.0;
+
+    // If too large, overflow to infinity.
+    // Any x >= 10^309 is interpreted as +infinity.
+    if (dLen + dExp > 309)
+        return std::numeric_limits<double>::infinity();
 
     if (StrtodDiyFp(decimals, dLen, dExp, &result))
         return result;
