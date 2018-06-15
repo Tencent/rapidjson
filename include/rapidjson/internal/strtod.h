@@ -242,15 +242,19 @@ inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t 
     RAPIDJSON_ASSERT(dExp <= INT_MAX - dLen);
 
     // Trim leading zeros
-    while (*decimals == '0' && dLen > 1) {
+    while (dLen > 0 && *decimals == '0') {
         dLen--;
         decimals++;
     }
 
     // Trim trailing zeros
-    while (decimals[dLen - 1] == '0' && dLen > 1) {
+    while (dLen > 0 && decimals[dLen - 1] == '0') {
         dLen--;
         dExp++;
+    }
+
+    if (dLen == 0) { // Buffer only contains zeros.
+        return 0.0;
     }
 
     // Trim right-most digits
