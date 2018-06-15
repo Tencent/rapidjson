@@ -1700,7 +1700,8 @@ private:
                else
                    d = internal::StrtodNormalPrecision(d, p);
 
-               if (d == std::numeric_limits<double>::infinity()) {
+               // Use > max, instead of == inf, to fix bogus warning -Wfloat-equal
+               if (d > std::numeric_limits<double>::max()) {
                    // Overflow
                    // TODO: internal::StrtodX should report overflow (or underflow)
                    RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, startOffset);
