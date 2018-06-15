@@ -19,6 +19,7 @@
 #include "biginteger.h"
 #include "diyfp.h"
 #include "pow10.h"
+#include <limits>
 
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
@@ -228,18 +229,18 @@ inline double StrtodFullPrecision(double d, int p, const char* decimals, size_t 
     if (StrtodFast(d, p, &result))
         return result;
 
-    RAPIDJSON_ASSERT(length <= INT_MAX);
+    RAPIDJSON_ASSERT(length <= std::numeric_limits<int>::max());
     int dLen = static_cast<int>(length);
 
     RAPIDJSON_ASSERT(length >= decimalPosition);
-    RAPIDJSON_ASSERT(length - decimalPosition <= INT_MAX);
+    RAPIDJSON_ASSERT(length - decimalPosition <= std::numeric_limits<int>::max());
     int dExpAdjust = static_cast<int>(length - decimalPosition);
 
-    RAPIDJSON_ASSERT(exp >= INT_MIN + dExpAdjust);
+    RAPIDJSON_ASSERT(exp >= std::numeric_limits<int>::min() + dExpAdjust);
     int dExp = exp - dExpAdjust;
 
     // Make sure length+dExp does not overflow
-    RAPIDJSON_ASSERT(dExp <= INT_MAX - dLen);
+    RAPIDJSON_ASSERT(dExp <= std::numeric_limits<int>::max() - dLen);
 
     // Trim leading zeros
     while (dLen > 0 && *decimals == '0') {
