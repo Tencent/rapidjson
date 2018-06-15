@@ -205,7 +205,8 @@ inline bool StrtodDiyFp(const char* decimals, int dLen, int dExp, double* result
 }
 
 inline double StrtodBigInteger(double approx, const char* decimals, int length, int dExp) {
-    const BigInteger dInt(decimals, length);
+    RAPIDJSON_ASSERT(length >= 0);
+    const BigInteger dInt(decimals, static_cast<unsigned>(length));
     Double a(approx);
     int cmp = CheckWithinHalfULP(a.Value(), dInt, dExp);
     if (cmp < 0)
