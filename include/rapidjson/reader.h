@@ -1561,8 +1561,6 @@ private:
         // Force double for big integer
         if (useDouble) {
             while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
-                if (RAPIDJSON_UNLIKELY(d >= 1.7976931348623157e307)) // DBL_MAX / 10.0
-                    RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, startOffset);
                 d = d * 10 + (s.TakePush() - '0');
             }
         }
@@ -1701,6 +1699,12 @@ private:
                    d = internal::StrtodFullPrecision(d, p, decimal, length, decimalPosition, exp);
                else
                    d = internal::StrtodNormalPrecision(d, p);
+
+               if (d == std::numeric_limits<double>::infinity()) {
+                   // Overflow
+                   // TODO: internal::StrtodX should report overflow (or underflow)
+                   RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, startOffset);
+               }
 
                cont = handler.Double(minus ? -d : d);
            }
