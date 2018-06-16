@@ -397,9 +397,9 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "1e-324", 0.0);
     TEST_DOUBLE(fullPrecision, "2e-324", 0.0);
     TEST_DOUBLE(fullPrecision, "2.4703282292062327e-324", 0.0);
-    TEST_DOUBLE(fullPrecision, "2.4703282292062328e-324", 2.4703282292062328e-324);
-    TEST_DOUBLE(fullPrecision, "2.48e-324", 2.48e-324);
-    TEST_DOUBLE(fullPrecision, "2.5e-324", 2.5e-324);
+    TEST_DOUBLE(fullPrecision, "2.4703282292062328e-324", 5e-324);
+    TEST_DOUBLE(fullPrecision, "2.48e-324",5e-324);
+    TEST_DOUBLE(fullPrecision, "2.5e-324", 5e-324);
 
 #if 0
     // Test (length + exponent) overflow
