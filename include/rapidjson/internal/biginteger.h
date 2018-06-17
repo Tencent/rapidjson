@@ -133,7 +133,7 @@ public:
         RAPIDJSON_ASSERT(count_ + offset <= kCapacity);
 
         if (interShift == 0) {
-            std::memmove(&digits_[count_ - 1 + offset], &digits_[count_ - 1], count_ * sizeof(Type));
+            std::memmove(digits_ + offset, digits_, count_ * sizeof(Type));
             count_ += offset;
         }
         else {
