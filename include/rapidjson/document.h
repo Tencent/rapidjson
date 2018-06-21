@@ -487,7 +487,7 @@ struct TypeHelper<ValueType, uint64_t> {
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, double> {
-    static bool Is(const ValueType& v) { return v.IsDouble(); }
+    static bool Is(const ValueType& v) { return v.IsNumber(); }
     static double Get(const ValueType& v) { return v.GetDouble(); }
     static ValueType& Set(ValueType& v, double data) { return v.SetDouble(data); }
     static ValueType& Set(ValueType& v, double data, typename ValueType::AllocatorType&) { return v.SetDouble(data); }
@@ -495,7 +495,7 @@ struct TypeHelper<ValueType, double> {
 
 template<typename ValueType> 
 struct TypeHelper<ValueType, float> {
-    static bool Is(const ValueType& v) { return v.IsFloat(); }
+    static bool Is(const ValueType& v) { return v.IsNumber(); }
     static float Get(const ValueType& v) { return v.GetFloat(); }
     static ValueType& Set(ValueType& v, float data) { return v.SetFloat(data); }
     static ValueType& Set(ValueType& v, float data, typename ValueType::AllocatorType&) { return v.SetFloat(data); }

@@ -434,7 +434,18 @@ TEST(Value, Int) {
     z = 5678;
     EXPECT_EQ(5678, z.GetInt());
 
+    z.SetInt(1234);
+    EXPECT_EQ(1234.0, z.GetDouble());
+    EXPECT_EQ(1234.0f, z.GetFloat());
+    EXPECT_EQ(1234.0, z.Get<double>());
+    EXPECT_EQ(1234.0f, z.Get<float>());
+    EXPECT_TRUE(z.Is<double>());
+    EXPECT_TRUE(z.Is<float>());
+    EXPECT_FALSE(z.IsDouble());
+    EXPECT_FALSE(z.IsFloat());
+
     // Templated functions
+    z = 5678;
     EXPECT_TRUE(z.Is<int>());
     EXPECT_EQ(5678, z.Get<int>());
     EXPECT_EQ(5679, z.Set(5679).Get<int>());
@@ -491,7 +502,18 @@ TEST(Value, Uint) {
     EXPECT_FALSE(z.IsInt());
     EXPECT_TRUE(z.IsInt64());   // Issue 41: Incorrect parsing of unsigned int number types
 
+    z.SetUint(1234);
+    EXPECT_EQ(1234.0, z.GetDouble());
+    EXPECT_EQ(1234.0f, z.GetFloat());
+    EXPECT_EQ(1234.0, z.Get<double>());
+    EXPECT_EQ(1234.0f, z.Get<float>());
+    EXPECT_TRUE(z.Is<double>());
+    EXPECT_TRUE(z.Is<float>());
+    EXPECT_FALSE(z.IsDouble());
+    EXPECT_FALSE(z.IsFloat());
+
     // Templated functions
+    z = 2147483648u;    // 2^31, cannot cast as int
     EXPECT_TRUE(z.Is<unsigned>());
     EXPECT_EQ(2147483648u, z.Get<unsigned>());
     EXPECT_EQ(2147483649u, z.Set(2147483649u).Get<unsigned>());
@@ -564,7 +586,18 @@ TEST(Value, Int64) {
     z.SetInt64(i);
     EXPECT_DOUBLE_EQ(-9223372036854775808.0, z.GetDouble());
 
+	z.SetInt64(1234);
+    EXPECT_EQ(1234.0, z.GetDouble());
+    EXPECT_EQ(1234.0f, z.GetFloat());
+    EXPECT_EQ(1234.0, z.Get<double>());
+    EXPECT_EQ(1234.0f, z.Get<float>());
+    EXPECT_TRUE(z.Is<double>());
+    EXPECT_TRUE(z.Is<float>());
+    EXPECT_FALSE(z.IsDouble());
+    EXPECT_FALSE(z.IsFloat());
+
     // Templated functions
+    z.SetInt64(i);
     EXPECT_TRUE(z.Is<int64_t>());
     EXPECT_EQ(i, z.Get<int64_t>());
 #if 0 // signed integer underflow is undefined behaviour
@@ -618,7 +651,18 @@ TEST(Value, Uint64) {
     EXPECT_EQ(u, z.GetUint64()); // Issue 48
     EXPECT_DOUBLE_EQ(9223372036854775808.0, z.GetDouble());
 
+    z.SetUint64(1234);
+    EXPECT_EQ(1234.0, z.GetDouble());
+    EXPECT_EQ(1234.0f, z.GetFloat());
+    EXPECT_EQ(1234.0, z.Get<double>());
+    EXPECT_EQ(1234.0f, z.Get<float>());
+    EXPECT_TRUE(z.Is<double>());
+    EXPECT_TRUE(z.Is<float>());
+    EXPECT_FALSE(z.IsDouble());
+    EXPECT_FALSE(z.IsFloat());
+
     // Templated functions
+    z.SetUint64(u);
     EXPECT_TRUE(z.Is<uint64_t>());
     EXPECT_EQ(u, z.Get<uint64_t>());
     EXPECT_EQ(u + 1, z.Set(u + 1).Get<uint64_t>());
