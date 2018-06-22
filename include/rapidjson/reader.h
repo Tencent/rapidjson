@@ -1579,8 +1579,6 @@ private:
             if (RAPIDJSON_UNLIKELY(!(s.Peek() >= '0' && s.Peek() <= '9'))) {
                 if (!(parseFlags & kParsePartialFractionFlag))
                     RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, s.Tell());
-                else if (!(s.Peek() == ',' || s.Peek() == '}' || s.Peek() == ']' || s.Peek() == '\0' || s.Peek() == 'e' || s.Peek() == 'E'))
-                    RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
             }
 
             if (!useDouble) {
