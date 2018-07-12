@@ -211,9 +211,8 @@ inline char* u64toa(uint64_t value, char* buffer) {
             *buffer++ = cDigitsLut[d3 + 1];
         if (value >= kTen9)
             *buffer++ = cDigitsLut[d4];
-        if (value >= kTen8)
-            *buffer++ = cDigitsLut[d4 + 1];
 
+        *buffer++ = cDigitsLut[d4 + 1];
         *buffer++ = cDigitsLut[d5];
         *buffer++ = cDigitsLut[d5 + 1];
         *buffer++ = cDigitsLut[d6];
