@@ -464,7 +464,7 @@ public:
                 enum_ = static_cast<uint64_t*>(allocator_->Malloc(sizeof(uint64_t) * v->Size()));
                 for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr) {
                     typedef Hasher<EncodingType, MemoryPoolAllocator<> > EnumHasherType;
-                    char buffer[256 + 24];
+                    char buffer[256u + 24];
                     MemoryPoolAllocator<> hasherAllocator(buffer, sizeof(buffer));
                     EnumHasherType h(&hasherAllocator, 256);
                     itr->Accept(h);

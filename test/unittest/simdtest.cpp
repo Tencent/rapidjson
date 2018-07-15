@@ -109,8 +109,8 @@ struct ScanCopyUnescapedStringHandler : BaseReaderHandler<UTF8<>, ScanCopyUnesca
 
 template <unsigned parseFlags, typename StreamType>
 void TestScanCopyUnescapedString() {
-    char buffer[1024 + 5 + 32];
-    char backup[1024 + 5 + 32];
+    char buffer[1024u + 5 + 32];
+    char backup[1024u + 5 + 32];
 
     // Test "ABCDABCD...\\"
     for (size_t offset = 0; offset < 32; offset++) {
