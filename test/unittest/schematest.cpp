@@ -1762,7 +1762,7 @@ private:
     typename DocumentType::AllocatorType documentAllocator_;
     typename SchemaDocumentType::AllocatorType schemaAllocator_;
     char documentBuffer_[16384];
-    char schemaBuffer_[128 * 1024];
+    char schemaBuffer_[128u * 1024];
 };
 
 TEST(SchemaValidator, TestSuite) {
