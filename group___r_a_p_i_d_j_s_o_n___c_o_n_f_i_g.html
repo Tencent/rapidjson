@@ -117,7 +117,7 @@ Macros</h2></td></tr>
 <tr class="memitem:gaba2445f582142cf918e74c2d22d1aa07"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaba2445f582142cf918e74c2d22d1aa07">RAPIDJSON_ENDIAN</a></td></tr>
 <tr class="memdesc:gaba2445f582142cf918e74c2d22d1aa07"><td class="mdescLeft">&#160;</td><td class="mdescRight">Endianness of the machine.  <a href="#gaba2445f582142cf918e74c2d22d1aa07">More...</a><br /></td></tr>
 <tr class="separator:gaba2445f582142cf918e74c2d22d1aa07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga583915242504c7fdb36e826f02f76242"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a>(x)&#160;&#160;&#160;(((x) + 3u) &amp; ~3u)</td></tr>
+<tr class="memitem:ga583915242504c7fdb36e826f02f76242"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242">RAPIDJSON_ALIGN</a>(x)&#160;&#160;&#160;(((x) + static_cast&lt;size_t&gt;(7u)) &amp; ~static_cast&lt;size_t&gt;(7u))</td></tr>
 <tr class="memdesc:ga583915242504c7fdb36e826f02f76242"><td class="mdescLeft">&#160;</td><td class="mdescRight">Data alignment of the machine.  <a href="#ga583915242504c7fdb36e826f02f76242">More...</a><br /></td></tr>
 <tr class="separator:ga583915242504c7fdb36e826f02f76242"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga93fb983f78208d12c822376e1ea6d185"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga93fb983f78208d12c822376e1ea6d185">RAPIDJSON_48BITPOINTER_OPTIMIZATION</a>&#160;&#160;&#160;0</td></tr>
@@ -179,7 +179,7 @@ Macros</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">x</td><td>)</td>
-          <td>&#160;&#160;&#160;(((x) + 3u) &amp; ~3u)</td>
+          <td>&#160;&#160;&#160;(((x) + static_cast&lt;size_t&gt;(7u)) &amp; ~static_cast&lt;size_t&gt;(7u))</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -191,7 +191,7 @@ Macros</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>Some machines require strict data alignment. Currently the default uses 4 bytes alignment on 32-bit platforms and 8 bytes alignment for 64-bit platforms. User can customize by defining the RAPIDJSON_ALIGN function macro. </p>
+<p>Some machines require strict data alignment. The default is 8 bytes. User can customize by defining the RAPIDJSON_ALIGN function macro. </p>
 
 </div>
 </div>
