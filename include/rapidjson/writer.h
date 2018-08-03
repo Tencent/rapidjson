@@ -66,7 +66,12 @@ enum WriteFlag {
     kWriteNoFlags = 0,              //!< No flags are set.
     kWriteValidateEncodingFlag = 1, //!< Validate encoding of JSON strings.
     kWriteNanAndInfFlag = 2,        //!< Allow writing of Infinity, -Infinity and NaN.
-    kWriteDefaultFlags = RAPIDJSON_WRITE_DEFAULT_FLAGS  //!< Default write flags. Can be customized by defining RAPIDJSON_WRITE_DEFAULT_FLAGS
+    kWriteImplicitTopLevel = 4,     //!< sjson: Do not write top-level object brackets.
+    kWriteOmitKeyQuotes = 8,        //!< sjson: Omit quotes around keys (except if they contain spaces or equal)
+    kWriteEqualReplaceColon = 16,   //!< sjson: = is used to define key-value pairs instead of the colon :
+    kWriteCommasOmitted = 32,       //!< sjson: Commas are optional in object and array definitions (spaces used instead).
+    kWriteDefaultFlags = RAPIDJSON_WRITE_DEFAULT_FLAGS, //!< Default write flags. Can be customized by defining RAPIDJSON_WRITE_DEFAULT_FLAGS
+    kWriteSJSONDefaultFlags = kWriteImplicitTopLevel | kWriteOmitKeyQuotes | kWriteEqualReplaceColon | kWriteCommasOmitted //!< Default write flags for sjson. Since sjson reading is compatible json, these aren't strictly necessary.
 };
 
 //! JSON writer
@@ -199,11 +204,11 @@ public:
         return EndValue(WriteString(str, length));
     }
 
-    bool String(const Ch* str, SizeType length, bool copy = false) {
+    bool String(const Ch* str, SizeType length, bool copy = false, bool key = false) {
         RAPIDJSON_ASSERT(str != 0);
         (void)copy;
         Prefix(kStringType);
-        return EndValue(WriteString(str, length));
+        return EndValue(WriteString(str, length, key));
     }
 
 #if RAPIDJSON_HAS_STDSTRING
@@ -218,7 +223,7 @@ public:
         return WriteStartObject();
     }
 
-    bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy); }
+    bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy, true); }
 
 #if RAPIDJSON_HAS_STDSTRING
     bool Key(const std::basic_string<Ch>& str)
@@ -373,7 +378,8 @@ protected:
         return true;
     }
 
-    bool WriteString(const Ch* str, SizeType length)  {
+    bool WriteString(const Ch* str, SizeType length, bool key = false)  {
+        (void)key; // avoid warning.
         static const typename OutputStream::Ch hexDigits[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
         static const char escape[256] = {
 #define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -388,11 +394,13 @@ protected:
         };
 
         if (TargetEncoding::supportUnicode)
-            PutReserve(*os_, 2 + length * 6); // "\uxxxx..."
+            PutReserve(*os_, ((!(writeFlags & kWriteOmitKeyQuotes) || key) ? 2 : 0) + length* 6); // "\uxxxx..."
         else
-            PutReserve(*os_, 2 + length * 12);  // "\uxxxx\uyyyy..."
+            PutReserve(*os_, ((!(writeFlags & kWriteOmitKeyQuotes) || key) ? 2 : 0) + length * 12);  // "\uxxxx\uyyyy..."
 
-        PutUnsafe(*os_, '\"');
+        if (!(writeFlags & kWriteOmitKeyQuotes) || !key)
+            PutUnsafe(*os_, '\"');
+
         GenericStringStream<SourceEncoding> is(str);
         while (ScanWriteUnescapedString(is, length)) {
             const Ch c = is.Peek();
@@ -443,7 +451,9 @@ protected:
                 Transcoder<SourceEncoding, TargetEncoding>::TranscodeUnsafe(is, *os_))))
                 return false;
         }
-        PutUnsafe(*os_, '\"');
+
+        if (!(writeFlags & kWriteOmitKeyQuotes) || !key)
+            PutUnsafe(*os_, '\"');
         return true;
     }
 
@@ -451,8 +461,18 @@ protected:
         return RAPIDJSON_LIKELY(is.Tell() < length);
     }
 
-    bool WriteStartObject() { os_->Put('{'); return true; }
-    bool WriteEndObject()   { os_->Put('}'); return true; }
+    bool WriteStartObject() 
+    { 
+        if (!(writeFlags & kWriteImplicitTopLevel) || level_stack_.GetSize() > sizeof(Level))
+            os_->Put('{'); 
+        return true; 
+    }
+    bool WriteEndObject()   
+    { 
+        if (!(writeFlags & kWriteImplicitTopLevel) || level_stack_.GetSize() > 0)
+            os_->Put('}');
+        return true; 
+    }
     bool WriteStartArray()  { os_->Put('['); return true; }
     bool WriteEndArray()    { os_->Put(']'); return true; }
 
@@ -475,10 +495,17 @@ protected:
         if (RAPIDJSON_LIKELY(level_stack_.GetSize() != 0)) { // this value is not at root
             Level* level = level_stack_.template Top<Level>();
             if (level->valueCount > 0) {
-                if (level->inArray) 
-                    os_->Put(','); // add comma if it is not the first element in array
-                else  // in object
-                    os_->Put((level->valueCount % 2 == 0) ? ',' : ':');
+                if (level->inArray)
+                    if (writeFlags & kWriteCommasOmitted)
+                        os_->Put(' ');
+                    else
+                        os_->Put(','); // add comma if it is not the first element in array
+                else { // in object
+                    if ((level->valueCount % 2 == 0))
+                        os_->Put((writeFlags & kWriteCommasOmitted) ? ' ' : ',');
+                    else
+                        os_->Put((writeFlags & kWriteEqualReplaceColon) ? '=' : ':');
+                }
             }
             if (!level->inArray && level->valueCount % 2 == 0)
                 RAPIDJSON_ASSERT(type == kStringType);  // if it's in object, then even number should be a name

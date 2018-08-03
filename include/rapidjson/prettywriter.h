@@ -107,11 +107,11 @@ public:
         return Base::WriteString(str, length);
     }
 
-    bool String(const Ch* str, SizeType length, bool copy = false) {
+    bool String(const Ch* str, SizeType length, bool copy = false, bool key = false) {
         RAPIDJSON_ASSERT(str != 0);
         (void)copy;
         PrettyPrefix(kStringType);
-        return Base::WriteString(str, length);
+        return Base::WriteString(str, length, key);
     }
 
 #if RAPIDJSON_HAS_STDSTRING
@@ -126,7 +126,7 @@ public:
         return Base::WriteStartObject();
     }
 
-    bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy); }
+    bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy, true); }
 
 #if RAPIDJSON_HAS_STDSTRING
     bool Key(const std::basic_string<Ch>& str) {
@@ -212,7 +212,9 @@ protected:
 
             if (level->inArray) {
                 if (level->valueCount > 0) {
-                    Base::os_->Put(','); // add comma if it is not the first element in array
+                    if (!(writeFlags & kWriteCommasOmitted))
+                        Base::os_->Put(','); // add comma if it is not the first element in array
+
                     if (formatOptions_ & kFormatSingleLineArray)
                         Base::os_->Put(' ');
                 }
@@ -225,11 +227,12 @@ protected:
             else {  // in object
                 if (level->valueCount > 0) {
                     if (level->valueCount % 2 == 0) {
-                        Base::os_->Put(',');
+                        if (!(writeFlags & kWriteCommasOmitted))
+                            Base::os_->Put(',');
                         Base::os_->Put('\n');
                     }
                     else {
-                        Base::os_->Put(':');
+                        Base::os_->Put((writeFlags & kWriteEqualReplaceColon) ? '=' : ':');
                         Base::os_->Put(' ');
                     }
                 }
@@ -251,6 +254,8 @@ protected:
 
     void WriteIndent()  {
         size_t count = (Base::level_stack_.GetSize() / sizeof(typename Base::Level)) * indentCharCount_;
+        if ((writeFlags & kWriteImplicitTopLevel) && count > 0)
+            count -= indentCharCount_;
         PutN(*Base::os_, static_cast<typename OutputStream::Ch>(indentChar_), count);
     }
 

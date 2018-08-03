@@ -24,6 +24,7 @@
 #include "internal/stack.h"
 #include "internal/strtod.h"
 #include <limits>
+#include <locale>
 
 #if defined(RAPIDJSON_SIMD) && defined(_MSC_VER)
 #include <intrin.h>
@@ -153,7 +154,12 @@ enum ParseFlag {
     kParseNumbersAsStringsFlag = 64,    //!< Parse all numbers (ints/doubles) as strings.
     kParseTrailingCommasFlag = 128, //!< Allow trailing commas at the end of objects and arrays.
     kParseNanAndInfFlag = 256,      //!< Allow parsing NaN, Inf, Infinity, -Inf and -Infinity as doubles.
-    kParseDefaultFlags = RAPIDJSON_PARSE_DEFAULT_FLAGS  //!< Default parse flags. Can be customized by defining RAPIDJSON_PARSE_DEFAULT_FLAGS
+    kParseEqualReplaceColon = 512,  //!< sjson: = is used to define key-value pairs instead of the colon :.
+    kParseImplicitTopLevel = 1024,  //!< sjson: Each SJSON file is always interpreted as a definition for a single object.
+    kParseKeyQuotesOptional = 2048, //!< sjson: Quotes around string keys in key-value pairs are optional, unless you need the key to contain either spaces or the equal sign =.
+    kParseCommasOptional = 4096,    //!< sjson: Commas are optional in object and array definitions.
+    kParseDefaultFlags = RAPIDJSON_PARSE_DEFAULT_FLAGS,  //!< Default parse flags. Can be customized by defining RAPIDJSON_PARSE_DEFAULT_FLAGS
+    kParseSJSONDefaultFlags = kParseCommentsFlag | kParseEqualReplaceColon | kParseImplicitTopLevel | kParseKeyQuotesOptional | kParseCommasOptional //!< Default flags for parsing sjson. The supplied flags are required, but others could be added.
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -570,8 +576,12 @@ public:
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
         }
         else {
-            ParseValue<parseFlags>(is, handler);
-            RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
+            if (parseFlags & kParseImplicitTopLevel) {
+                ParseObject<parseFlags>(is, handler, true);
+            } else {
+                ParseValue<parseFlags>(is, handler);
+                RAPIDJSON_PARSE_ERROR_EARLY_RETURN(parseResult_);
+            }
 
             if (!(parseFlags & kParseStopWhenDoneFlag)) {
                 SkipWhitespaceAndComments<parseFlags>(is);
@@ -735,10 +745,12 @@ private:
 
     // Parse object: { string : value, ... }
     template<unsigned parseFlags, typename InputStream, typename Handler>
-    void ParseObject(InputStream& is, Handler& handler) {
-        RAPIDJSON_ASSERT(is.Peek() == '{');
-        is.Take();  // Skip '{'
-
+    void ParseObject(InputStream& is, Handler& handler, bool top_level = false) {
+        (void)top_level; // avoid warning.
+        if (!((parseFlags & kParseImplicitTopLevel) && top_level)) {
+            RAPIDJSON_ASSERT(is.Peek() == '{');
+            is.Take();  // Skip '{'
+        }
         if (RAPIDJSON_UNLIKELY(!handler.StartObject()))
             RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
 
@@ -752,7 +764,7 @@ private:
         }
 
         for (SizeType memberCount = 0;;) {
-            if (RAPIDJSON_UNLIKELY(is.Peek() != '"'))
+            if (RAPIDJSON_UNLIKELY(is.Peek() != '"') && !(parseFlags & kParseKeyQuotesOptional))
                 RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissName, is.Tell());
 
             ParseString<parseFlags>(is, handler, true);
@@ -761,8 +773,16 @@ private:
             SkipWhitespaceAndComments<parseFlags>(is);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
 
-            if (RAPIDJSON_UNLIKELY(!Consume(is, ':')))
-                RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissColon, is.Tell());
+            if (parseFlags & kParseEqualReplaceColon) {
+                switch (is.Peek()) {
+                    case '=': case ':': is.Take(); break;
+                    default: RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissEqual, is.Tell()); break;
+                }
+            } 
+            else {
+                if (RAPIDJSON_UNLIKELY(!Consume(is, ':')))
+                    RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissColon, is.Tell());
+            }
 
             SkipWhitespaceAndComments<parseFlags>(is);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
@@ -787,7 +807,17 @@ private:
                         RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
                     return;
                 default:
-                    RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell()); break; // This useless break is only for making warning and coverage happy
+                    if (!(((parseFlags & kParseImplicitTopLevel) && top_level) ||
+                          (parseFlags & kParseCommasOptional))) {
+                        RAPIDJSON_PARSE_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, is.Tell());
+                    }
+                    // EOF with implicit top-level.
+                    if (parseFlags & kParseImplicitTopLevel && top_level && !is.Peek()) {
+                        if (RAPIDJSON_UNLIKELY(!handler.EndObject(memberCount)))
+                            RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+                        return;
+                    }
+                    break; // This useless break is only for making warning and coverage happy
             }
 
             if (parseFlags & kParseTrailingCommasFlag) {
@@ -835,6 +865,9 @@ private:
                 if (RAPIDJSON_UNLIKELY(!handler.EndArray(elementCount)))
                     RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
                 return;
+            }
+            else if (parseFlags & kParseCommasOptional) {
+
             }
             else
                 RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell());
@@ -958,13 +991,21 @@ private:
         internal::StreamLocalCopy<InputStream> copy(is);
         InputStream& s(copy.s);
 
-        RAPIDJSON_ASSERT(s.Peek() == '\"');
-        s.Take();  // Skip '\"'
+        bool end_quote = true;
+        if (isKey && (parseFlags & kParseKeyQuotesOptional)) {
+            if (s.Peek() == '\"')
+                s.Take(); // Skip '\"'
+            else
+                end_quote = false;
+        } else {
+            RAPIDJSON_ASSERT(s.Peek() == '\"');
+            s.Take();  // Skip '\"'
+        }
 
         bool success = false;
         if (parseFlags & kParseInsituFlag) {
             typename InputStream::Ch *head = s.PutBegin();
-            ParseStringToStream<parseFlags, SourceEncoding, SourceEncoding>(s, s);
+            ParseStringToStream<parseFlags, SourceEncoding, SourceEncoding>(s, s, end_quote);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
             size_t length = s.PutEnd(head) - 1;
             RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
@@ -973,7 +1014,7 @@ private:
         }
         else {
             StackStream<typename TargetEncoding::Ch> stackStream(stack_);
-            ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
+            ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream, end_quote);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
             SizeType length = static_cast<SizeType>(stackStream.Length()) - 1;
             const typename TargetEncoding::Ch* const str = stackStream.Pop();
@@ -986,7 +1027,7 @@ private:
     // Parse string to an output is
     // This function handles the prefix/suffix double quotes, escaping, and optional encoding validation.
     template<unsigned parseFlags, typename SEncoding, typename TEncoding, typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE void ParseStringToStream(InputStream& is, OutputStream& os) {
+    RAPIDJSON_FORCEINLINE void ParseStringToStream(InputStream& is, OutputStream& os, bool end_quote = true) {
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 #define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
         static const char escape[256] = {
@@ -1035,6 +1076,11 @@ private:
             else if (RAPIDJSON_UNLIKELY(c == '"')) {    // Closing double quote
                 is.Take();
                 os.Put('\0');   // null-terminate the string
+                return;
+            }
+            else if (!end_quote && (c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == 0 || ((parseFlags & kParseEqualReplaceColon) ? c == '=' : c == ':'))) {
+                // if no end quote is expected, a space or delimiter (= or :) will end the string
+                os.Put('\0');
                 return;
             }
             else if (RAPIDJSON_UNLIKELY(static_cast<unsigned>(c) < 0x20)) { // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
