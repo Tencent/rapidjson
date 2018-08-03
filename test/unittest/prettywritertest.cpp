@@ -339,6 +339,17 @@ TEST(PrettyWriter, MoveCtor) {
 }
 #endif
 
+TEST(PrettyWriter, Issue_1336) {
+    char buf[100] = "Hello";
+
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    writer.String(buf);
+
+    EXPECT_STREQ("\"Hello\"", buffer.GetString());
+    EXPECT_TRUE(writer.IsComplete()); \
+}
+
 #ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
