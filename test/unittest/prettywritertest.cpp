@@ -339,6 +339,35 @@ TEST(PrettyWriter, MoveCtor) {
 }
 #endif
 
+TEST(PrettyWriter, Issue_1336) {
+#define T(meth, val, expected)                          \
+    {                                                   \
+        StringBuffer buffer;                            \
+        PrettyWriter<StringBuffer> writer(buffer);      \
+        writer.meth(val);                               \
+                                                        \
+        EXPECT_STREQ(expected, buffer.GetString());     \
+        EXPECT_TRUE(writer.IsComplete());               \
+    }
+
+    T(Bool, false, "false");
+    T(Bool, true, "true");
+    T(Int, 0, "0");
+    T(Uint, 0, "0");
+    T(Int64, 0, "0");
+    T(Uint64, 0, "0");
+    T(Double, 0, "0.0");
+    T(String, "Hello", "\"Hello\"");
+#undef T
+
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    writer.Null();
+
+    EXPECT_STREQ("null", buffer.GetString());
+    EXPECT_TRUE(writer.IsComplete());
+}
+
 #ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
