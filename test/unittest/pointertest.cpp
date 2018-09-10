@@ -634,13 +634,13 @@ TEST(Pointer, Get) {
     EXPECT_TRUE(Pointer("/abc").Get(d) == 0);
     size_t unresolvedTokenIndex;
     EXPECT_TRUE(Pointer("/foo/2").Get(d, &unresolvedTokenIndex) == 0); // Out of boundary
-    EXPECT_EQ(1, unresolvedTokenIndex);
+    EXPECT_EQ(1u, unresolvedTokenIndex);
     EXPECT_TRUE(Pointer("/foo/a").Get(d, &unresolvedTokenIndex) == 0); // "/foo" is an array, cannot query by "a"
-    EXPECT_EQ(1, unresolvedTokenIndex);
+    EXPECT_EQ(1u, unresolvedTokenIndex);
     EXPECT_TRUE(Pointer("/foo/0/0").Get(d, &unresolvedTokenIndex) == 0); // "/foo/0" is an string, cannot further query
-    EXPECT_EQ(2, unresolvedTokenIndex);
+    EXPECT_EQ(2u, unresolvedTokenIndex);
     EXPECT_TRUE(Pointer("/foo/0/a").Get(d, &unresolvedTokenIndex) == 0); // "/foo/0" is an string, cannot further query
-    EXPECT_EQ(2, unresolvedTokenIndex);
+    EXPECT_EQ(2u, unresolvedTokenIndex);
 }
 
 TEST(Pointer, GetWithDefault) {
@@ -959,13 +959,13 @@ TEST(Pointer, GetValueByPointer) {
 
     size_t unresolvedTokenIndex;
     EXPECT_TRUE(GetValueByPointer(d, "/foo/2", &unresolvedTokenIndex) == 0); // Out of boundary
-    EXPECT_EQ(1, unresolvedTokenIndex);
+    EXPECT_EQ(1u, unresolvedTokenIndex);
     EXPECT_TRUE(GetValueByPointer(d, "/foo/a", &unresolvedTokenIndex) == 0); // "/foo" is an array, cannot query by "a"
-    EXPECT_EQ(1, unresolvedTokenIndex);
+    EXPECT_EQ(1u, unresolvedTokenIndex);
     EXPECT_TRUE(GetValueByPointer(d, "/foo/0/0", &unresolvedTokenIndex) == 0); // "/foo/0" is an string, cannot further query
-    EXPECT_EQ(2, unresolvedTokenIndex);
+    EXPECT_EQ(2u, unresolvedTokenIndex);
     EXPECT_TRUE(GetValueByPointer(d, "/foo/0/a", &unresolvedTokenIndex) == 0); // "/foo/0" is an string, cannot further query
-    EXPECT_EQ(2, unresolvedTokenIndex);
+    EXPECT_EQ(2u, unresolvedTokenIndex);
 
     // const version
     const Value& v = d;
@@ -973,13 +973,13 @@ TEST(Pointer, GetValueByPointer) {
     EXPECT_EQ(&d["foo"][0], GetValueByPointer(v, "/foo/0"));
 
     EXPECT_TRUE(GetValueByPointer(v, "/foo/2", &unresolvedTokenIndex) == 0); // Out of boundary
-    EXPECT_EQ(1, unresolvedTokenIndex);
+    EXPECT_EQ(1u, unresolvedTokenIndex);
     EXPECT_TRUE(GetValueByPointer(v, "/foo/a", &unresolvedTokenIndex) == 0); // "/foo" is an array, cannot query by "a"
-    EXPECT_EQ(1, unresolvedTokenIndex);
+    EXPECT_EQ(1u, unresolvedTokenIndex);
     EXPECT_TRUE(GetValueByPointer(v, "/foo/0/0", &unresolvedTokenIndex) == 0); // "/foo/0" is an string, cannot further query
-    EXPECT_EQ(2, unresolvedTokenIndex);
+    EXPECT_EQ(2u, unresolvedTokenIndex);
     EXPECT_TRUE(GetValueByPointer(v, "/foo/0/a", &unresolvedTokenIndex) == 0); // "/foo/0" is an string, cannot further query
-    EXPECT_EQ(2, unresolvedTokenIndex);
+    EXPECT_EQ(2u, unresolvedTokenIndex);
 
 }
 

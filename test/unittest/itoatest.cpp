@@ -1,5 +1,5 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
-// 
+//
 // Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
@@ -7,9 +7,9 @@
 //
 // http://opensource.org/licenses/MIT
 //
-// Unless required by applicable law or agreed to in writing, software distributed 
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// Unless required by applicable law or agreed to in writing, software distributed
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
 #include "unittest.h"
@@ -61,7 +61,7 @@ static void VerifyValue(T value, void(*f)(T, char*), char* (*g)(T, char*)) {
 
     f(value, buffer1);
     *g(value, buffer2) = '\0';
-    
+
 
     EXPECT_STREQ(buffer1, buffer2);
 }
@@ -79,12 +79,12 @@ static void Verify(void(*f)(T, char*), char* (*g)(T, char*)) {
         do {
             VerifyValue<T>(i - 1, f, g);
             VerifyValue<T>(i, f, g);
-            if (std::numeric_limits<T>::min() < 0) {
+            if ((std::numeric_limits<T>::min)() < 0) {
                 VerifyValue<T>(Traits<T>::Negate(i), f, g);
                 VerifyValue<T>(Traits<T>::Negate(i + 1), f, g);
             }
             last = i;
-            if (i > static_cast<T>(std::numeric_limits<T>::max() / static_cast<T>(power)))
+            if (i > static_cast<T>((std::numeric_limits<T>::max)() / static_cast<T>(power)))
                 break;
             i *= static_cast<T>(power);
         } while (last < i);

@@ -26,11 +26,11 @@ using namespace rapidjson;
 TEST(Value, Size) {
     if (sizeof(SizeType) == 4) {
 #if RAPIDJSON_48BITPOINTER_OPTIMIZATION
-        EXPECT_EQ(16, sizeof(Value));
+        EXPECT_EQ(16u, sizeof(Value));
 #elif RAPIDJSON_64BIT
-        EXPECT_EQ(24, sizeof(Value));
+        EXPECT_EQ(24u, sizeof(Value));
 #else
-        EXPECT_EQ(16, sizeof(Value));
+        EXPECT_EQ(16u, sizeof(Value));
 #endif
     }
 }
@@ -1135,10 +1135,10 @@ TEST(Value, ArrayHelper) {
         a.PushBack(1, allocator);
 
         Value::Array a2(a); // copy constructor
-        EXPECT_EQ(1, a2.Size());
+        EXPECT_EQ(1u, a2.Size());
 
         Value::Array a3 = a;
-        EXPECT_EQ(1, a3.Size());
+        EXPECT_EQ(1u, a3.Size());
 
         Value::ConstArray y = static_cast<const Value&>(x).GetArray();
         (void)y;
@@ -1175,7 +1175,7 @@ TEST(Value, ArrayHelper) {
         y.PushBack(123, allocator);
         x.PushBack(y.GetArray(), allocator);    // Implicit constructor to convert Array to GenericValue
 
-        EXPECT_EQ(1, x.Size());
+        EXPECT_EQ(1u, x.Size());
         EXPECT_EQ(123, x[0][0].GetInt());
         EXPECT_TRUE(y.IsArray());
         EXPECT_TRUE(y.Empty());
@@ -1424,7 +1424,7 @@ static void TestObject(T& x, Allocator& allocator) {
     for (; itr != x.MemberEnd(); ++itr) {
         size_t i = static_cast<size_t>((itr - x.MemberBegin())) + 1;
         EXPECT_STREQ(itr->name.GetString(), keys[i]);
-        EXPECT_EQ(i, itr->value[0].GetInt());
+        EXPECT_EQ(static_cast<int>(i), itr->value[0].GetInt());
     }
 
     // Erase the last
@@ -1435,7 +1435,7 @@ static void TestObject(T& x, Allocator& allocator) {
     for (; itr != x.MemberEnd(); ++itr) {
         size_t i = static_cast<size_t>(itr - x.MemberBegin()) + 1;
         EXPECT_STREQ(itr->name.GetString(), keys[i]);
-        EXPECT_EQ(i, itr->value[0].GetInt());
+        EXPECT_EQ(static_cast<int>(i), itr->value[0].GetInt());
     }
 
     // Erase the middle
@@ -1447,7 +1447,7 @@ static void TestObject(T& x, Allocator& allocator) {
         size_t i = static_cast<size_t>(itr - x.MemberBegin());
         i += (i < 4) ? 1 : 2;
         EXPECT_STREQ(itr->name.GetString(), keys[i]);
-        EXPECT_EQ(i, itr->value[0].GetInt());
+        EXPECT_EQ(static_cast<int>(i), itr->value[0].GetInt());
     }
 
     // EraseMember(ConstMemberIterator, ConstMemberIterator)
@@ -1516,10 +1516,10 @@ TEST(Value, ObjectHelper) {
         o.AddMember("1", 1, allocator);
 
         Value::Object o2(o); // copy constructor
-        EXPECT_EQ(1, o2.MemberCount());
+        EXPECT_EQ(1u, o2.MemberCount());
 
         Value::Object o3 = o;
-        EXPECT_EQ(1, o3.MemberCount());
+        EXPECT_EQ(1u, o3.MemberCount());
 
         Value::ConstObject y = static_cast<const Value&>(x).GetObject();
         (void)y;
