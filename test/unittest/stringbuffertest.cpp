@@ -41,11 +41,11 @@ TEST(StringBuffer, Put) {
 
 TEST(StringBuffer, PutN_Issue672) {
     GenericStringBuffer<UTF8<>, MemoryPoolAllocator<> > buffer;
-    EXPECT_EQ(0, buffer.GetSize());
-    EXPECT_EQ(0, buffer.GetLength());
+    EXPECT_EQ(0u, buffer.GetSize());
+    EXPECT_EQ(0u, buffer.GetLength());
     rapidjson::PutN(buffer, ' ', 1);
-    EXPECT_EQ(1, buffer.GetSize());
-    EXPECT_EQ(1, buffer.GetLength());
+    EXPECT_EQ(1u, buffer.GetSize());
+    EXPECT_EQ(1u, buffer.GetLength());
 }
 
 TEST(StringBuffer, Clear) {
