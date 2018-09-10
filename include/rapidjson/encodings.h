@@ -350,6 +350,10 @@ struct UTF16LE : UTF16<CharType> {
     template <typename InputByteStream>
     static CharType Take(InputByteStream& is) {
         RAPIDJSON_STATIC_ASSERT(sizeof(typename InputByteStream::Ch) == 1);
+#if defined(_MSC_VER) && _MSC_VER >= 1910 && defined(_M_IX86)
+        // VS2017 x86 couldn't generate the correct binary without this volatile
+        volatile
+#endif
         unsigned c = static_cast<uint8_t>(is.Take());
         c |= static_cast<unsigned>(static_cast<uint8_t>(is.Take())) << 8;
         return static_cast<CharType>(c);
