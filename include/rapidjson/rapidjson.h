@@ -603,14 +603,6 @@ RAPIDJSON_NAMESPACE_END
     Defaults to C \c assert() (as \ref RAPIDJSON_ASSERT), if \c noexcept is
     supported, and to \ref RAPIDJSON_ASSERT otherwise.
  */
-#ifndef RAPIDJSON_NOEXCEPT_ASSERT
-#if RAPIDJSON_HAS_CXX11_NOEXCEPT
-#include <cassert>
-#define RAPIDJSON_NOEXCEPT_ASSERT(x) assert(x)
-#else
-#define RAPIDJSON_NOEXCEPT_ASSERT(x) RAPIDJSON_ASSERT(x)
-#endif // RAPIDJSON_HAS_CXX11_NOEXCEPT
-#endif // RAPIDJSON_NOEXCEPT_ASSERT
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NOEXCEPT_ASSERT
