@@ -37,9 +37,6 @@ RAPIDJSON_DIAG_OFF(4244) // conversion from kXxxFlags to 'uint16_t', possible lo
 
 #ifdef __GNUC__
 RAPIDJSON_DIAG_OFF(effc++)
-#if __GNUC__ >= 6
-RAPIDJSON_DIAG_OFF(terminate) // ignore throwing RAPIDJSON_ASSERT in RAPIDJSON_NOEXCEPT functions
-#endif
 #endif // __GNUC__
 
 #ifndef RAPIDJSON_NOMEMBERITERATORCLASS
@@ -625,7 +622,7 @@ public:
         \note Default content for number is zero.
     */
     explicit GenericValue(Type type) RAPIDJSON_NOEXCEPT : data_() {
-        static const uint16_t defaultFlags[7] = {
+        static const uint16_t defaultFlags[] = {
             kNullFlag, kFalseFlag, kTrueFlag, kObjectFlag, kArrayFlag, kShortStringFlag,
             kNumberAnyFlag
         };
@@ -831,7 +828,7 @@ public:
     /*! \param rhs Source of the assignment. It will become a null value after assignment.
     */
     GenericValue& operator=(GenericValue& rhs) RAPIDJSON_NOEXCEPT {
-        if (this != &rhs) {
+        if (RAPIDJSON_LIKELY(this != &rhs)) {
             this->~GenericValue();
             RawAssign(rhs);
         }

@@ -593,6 +593,17 @@ RAPIDJSON_NAMESPACE_END
 
 //!@endcond
 
+//! Assertion (in non-throwing contexts).
+ /*! \ingroup RAPIDJSON_CONFIG
+    Some functions provide a \c noexcept guarantee, if the compiler supports it.
+    In these cases, the \ref RAPIDJSON_ASSERT macro cannot be overridden to
+    throw an exception.  This macro adds a separate customization point for
+    such cases.
+
+    Defaults to C \c assert() (as \ref RAPIDJSON_ASSERT), if \c noexcept is
+    supported, and to \ref RAPIDJSON_ASSERT otherwise.
+ */
+
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NOEXCEPT_ASSERT
 
