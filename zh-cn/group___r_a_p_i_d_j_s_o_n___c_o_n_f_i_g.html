@@ -138,6 +138,9 @@ $(document).ready(function(){initNavTree('group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_
 <tr class="memitem:ga6a2b1695c13e77ae425e3cbac980ccb5"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga6a2b1695c13e77ae425e3cbac980ccb5">RAPIDJSON_UNLIKELY</a>(x)&#160;&#160;&#160;(x)</td></tr>
 <tr class="memdesc:ga6a2b1695c13e77ae425e3cbac980ccb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compiler branching hint for expression with low probability to be true.  <a href="#ga6a2b1695c13e77ae425e3cbac980ccb5">更多...</a><br /></td></tr>
 <tr class="separator:ga6a2b1695c13e77ae425e3cbac980ccb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2b2a0d9143aa4fb31205a85b34c43952"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga2b2a0d9143aa4fb31205a85b34c43952">RAPIDJSON_NOEXCEPT_ASSERT</a>(x)&#160;&#160;&#160;<a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(x)</td></tr>
+<tr class="memdesc:ga2b2a0d9143aa4fb31205a85b34c43952"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assertion (in non-throwing contexts).  <a href="#ga2b2a0d9143aa4fb31205a85b34c43952">更多...</a><br /></td></tr>
+<tr class="separator:ga2b2a0d9143aa4fb31205a85b34c43952"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga77005e892e6601599beaf421b0395c31"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga77005e892e6601599beaf421b0395c31">RAPIDJSON_PARSE_DEFAULT_FLAGS</a>&#160;&#160;&#160;kParseNoFlags</td></tr>
 <tr class="memdesc:ga77005e892e6601599beaf421b0395c31"><td class="mdescLeft">&#160;</td><td class="mdescRight">User-defined kParseDefaultFlags definition.  <a href="#ga77005e892e6601599beaf421b0395c31">更多...</a><br /></td></tr>
 <tr class="separator:ga77005e892e6601599beaf421b0395c31"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -332,6 +335,28 @@ $(document).ready(function(){initNavTree('group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_
 
 <p>User-provided <code>SizeType</code> definition. </p>
 <p>In order to avoid using 32-bit size types for indexing strings and arrays, define this preprocessor symbol and provide the type <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84" title="Size type (for string lengths, array sizes, etc.) ">rapidjson::SizeType</a> before including RapidJSON: </p><div class="fragment"><div class="line"><span class="preprocessor">#define RAPIDJSON_NO_SIZETYPEDEFINE</span></div><div class="line"><span class="keyword">namespace </span><a class="code" href="namespacerapidjson.html">rapidjson</a> { typedef ::std::size_t <a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>; }</div><div class="line"><span class="preprocessor">#include &quot;rapidjson/...&quot;</span></div></div><!-- fragment --><dl class="section see"><dt>参见</dt><dd><a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84" title="Size type (for string lengths, array sizes, etc.) ">rapidjson::SizeType</a> </dd></dl>
+
+</div>
+</div>
+<a id="ga2b2a0d9143aa4fb31205a85b34c43952"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga2b2a0d9143aa4fb31205a85b34c43952">&#9670;&nbsp;</a></span>RAPIDJSON_NOEXCEPT_ASSERT</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RAPIDJSON_NOEXCEPT_ASSERT</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">x</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(x)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Assertion (in non-throwing contexts). </p>
+<p>Some functions provide a <code>noexcept</code> guarantee, if the compiler supports it. In these cases, the <a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a> macro cannot be overridden to throw an exception. This macro adds a separate customization point for such cases.</p>
+<p>Defaults to C <code>assert()</code> (as <a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>), if <code>noexcept</code> is supported, and to <a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a> otherwise. </p>
 
 </div>
 </div>

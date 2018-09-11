@@ -1,5 +1,7 @@
 var NAVTREEINDEX4 =
 {
+"md_doc_stream.html#AutoUTFInputStream":[4,3,2],
+"md_doc_stream.html#AutoUTFOutputStream":[4,3,3],
 "md_doc_stream.html#CustomStream":[4,4],
 "md_doc_stream.html#EncodedInputStream":[4,3,0],
 "md_doc_stream.html#EncodedOutputStream":[4,3,1],
@@ -50,7 +52,6 @@ var NAVTREEINDEX4 =
 "prettywriter_8h_source.html":[15,0,0,0,15],
 "rapidjson_8h.html":[15,0,0,0,16],
 "rapidjson_8h.html#a113598c4750b3aab4de2782ff1865ed4":[15,0,0,0,16,19],
-"rapidjson_8h.html#a2b2a0d9143aa4fb31205a85b34c43952":[15,0,0,0,16,17],
 "rapidjson_8h.html#a44eb33eaa523e36d466b1ced64b85c84":[15,0,0,0,16,25],
 "rapidjson_8h.html#a52c941c3fdd646527cdcd42aa846a28a":[15,0,0,0,16,5],
 "rapidjson_8h.html#a93973847cb99354b6b5bb5605aa7fe52":[15,0,0,0,16,1],

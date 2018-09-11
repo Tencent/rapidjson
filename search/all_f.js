@@ -22,6 +22,7 @@ var searchData=
   ['rapidjson_5fnew',['RAPIDJSON_NEW',['../rapidjson_8h.html#abdc7cd7902748ffe6626d71c59a73c3b',1,'rapidjson.h']]],
   ['rapidjson_5fno_5fint64define',['RAPIDJSON_NO_INT64DEFINE',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga7f4e50c35dae3b015390daa6d48ce23c',1,'rapidjson.h']]],
   ['rapidjson_5fno_5fsizetypedefine',['RAPIDJSON_NO_SIZETYPEDEFINE',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga250603aa9e2a12429b25ba0c8108ad4f',1,'rapidjson.h']]],
+  ['rapidjson_5fnoexcept_5fassert',['RAPIDJSON_NOEXCEPT_ASSERT',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga2b2a0d9143aa4fb31205a85b34c43952',1,'rapidjson.h']]],
   ['rapidjson_5fparse_5fdefault_5fflags',['RAPIDJSON_PARSE_DEFAULT_FLAGS',['../group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga77005e892e6601599beaf421b0395c31',1,'reader.h']]],
   ['rapidjson_5fparse_5ferror',['RAPIDJSON_PARSE_ERROR',['../group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gae3689840fa6e89a241313f33b602f865',1,'reader.h']]],
   ['rapidjson_5fparse_5ferror_5fnoreturn',['RAPIDJSON_PARSE_ERROR_NORETURN',['../group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7f8c4265b2edda78568ae3338aaf1461',1,'reader.h']]],
