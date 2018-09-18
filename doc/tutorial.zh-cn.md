@@ -294,7 +294,7 @@ Value a(kArrayType);
 
 ## 转移语义（Move Semantics） {#MoveSemantics}
 
-在设计 RapidJSON 时有一个非常特别的决定，就是 Value 赋值并不是把来源 Value 复制至目的 Value，而是把把来源 Value 转移（move）至目的 Value。例如：
+在设计 RapidJSON 时有一个非常特别的决定，就是 Value 赋值并不是把来源 Value 复制至目的 Value，而是把来源 Value 转移（move）至目的 Value。例如：
 
 ~~~~~~~~~~cpp
 Value a(123);
@@ -383,7 +383,8 @@ memset(buffer, 0, sizeof(buffer));
 
 另外，上面的 `SetString()` 需要长度参数。这个 API 能处理含有空字符的字符串。另一个 `SetString()` 重载函数没有长度参数，它假设输入是空字符结尾的，并会调用类似 `strlen()` 的函数去获取长度。
 
-最后，对于字符串字面量或有安全生命周期的字符串，可以使用 const-string 版本的 `SetString()`，它没有 allocator 参数。对于字符串家面量（或字符数组常量），只需简单地传递字面量，又安全又高效：
+最后，对于字符串字面量或有安全生命周期的字符串，可以使用 const-string 版本的 `SetString()`，它没有
+allocator 参数。对于字符串字面量（或字符数组常量），只需简单地传递字面量，又安全又高效：
 
 ~~~~~~~~~~cpp
 Value s;
