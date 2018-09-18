@@ -23,6 +23,8 @@
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/encodedstream.h"
 #include "rapidjson/memorystream.h"
+#include "rapidjson/istreamwrapper.h"
+#include <fstream>
 
 #ifdef RAPIDJSON_SSE2
 #define SIMD_SUFFIX(name) name##_SSE2
@@ -448,6 +450,16 @@ TEST_F(RapidJson, FileReadStream) {
         while (s.Take() != '\0')
             ;
         fclose(fp);
+    }
+}
+
+TEST_F(RapidJson, BasicIStreamWrapper) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        std::ifstream iss (filename_, std::ios::in | std::ios::binary);
+        char buffer[65536];
+        BasicIStreamWrapper<std::ifstream> is(iss, buffer, sizeof(buffer));
+        while (is.Take() != '\0')
+            ;
     }
 }
 
