@@ -145,7 +145,7 @@
    一个简单有效的方法就是修改上述 `address` 变量的定义，让其使用 `person` 的 allocator 初始化，然后将其添加到根节点。
 
    ~~~~~~~~~~cpp
-   Documnet address(person.GetAllocator());
+   Documnet address(&person.GetAllocator());
    ...
    person["person"].AddMember("address", address["address"], person.GetAllocator());
    ~~~~~~~~~~
