@@ -1975,6 +1975,17 @@ TEST(Reader, NumbersAsStrings) {
         Reader reader;
         EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
     }
+    {
+        char n1e319[321];   // '1' followed by 319 '0'
+        n1e319[0] = '1';
+        for (int i = 1; i < 320; i++)
+            n1e319[i] = '0';
+        n1e319[320] = '\0';
+        StringStream s(n1e319);
+        NumbersAsStringsHandler h(n1e319);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+    }
 }
 
 template <unsigned extraFlags>
