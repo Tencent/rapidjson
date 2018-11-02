@@ -1811,6 +1811,196 @@ TEST(SchemaValidator, EscapedPointer) {
         "}}");
 }
 
+TEST(SchemaValidator, SchemaPointer) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "  \"swagger\": \"2.0\","
+        "  \"paths\": {"
+        "    \"/some/path\": {"
+        "      \"post\": {"
+        "        \"parameters\": ["
+        "          {"
+        "            \"in\": \"body\","
+        "            \"name\": \"body\","
+        "            \"schema\": {"
+        "              \"properties\": {"
+        "                \"a\": {"
+        "                  \"$ref\": \"#/definitions/Prop_a\""
+        "                },"
+        "                \"b\": {"
+        "                  \"type\": \"integer\""
+        "                }"
+        "              },"
+        "              \"type\": \"object\""
+        "            }"
+        "          }"
+        "        ],"
+        "        \"responses\": {"
+        "          \"200\": {"
+        "            \"schema\": {"
+        "              \"$ref\": \"#/definitions/Resp_200\""
+        "            }"
+        "          }"
+        "        }"
+        "      }"
+        "    }"
+        "  },"
+        "  \"definitions\": {"
+        "    \"Prop_a\": {"
+        "      \"properties\": {"
+        "        \"c\": {"
+        "          \"enum\": ["
+        "            \"C1\","
+        "            \"C2\","
+        "            \"C3\""
+        "          ],"
+        "          \"type\": \"string\""
+        "        },"
+        "        \"d\": {"
+        "          \"$ref\": \"#/definitions/Prop_d\""
+        "        },"
+        "        \"s\": {"
+        "          \"type\": \"string\""
+        "        }"
+        "      },"
+        "      \"required\": [\"c\"],"
+        "      \"type\": \"object\""
+        "    },"
+        "    \"Prop_d\": {"
+        "      \"properties\": {"
+        "        \"a\": {"
+        "          \"$ref\": \"#/definitions/Prop_a\""
+        "        },"
+        "        \"c\": {"
+        "          \"$ref\": \"#/definitions/Prop_a/properties/c\""
+        "        }"
+        "      },"
+        "      \"type\": \"object\""
+        "    },"
+        "    \"Resp_200\": {"
+        "      \"properties\": {"
+        "        \"e\": {"
+        "          \"type\": \"string\""
+        "        },"
+        "        \"f\": {"
+        "          \"type\": \"boolean\""
+        "        },"
+        "        \"cyclic_source\": {"
+        "          \"$ref\": \"#/definitions/Resp_200/properties/cyclic_target\""
+        "        },"
+        "        \"cyclic_target\": {"
+        "          \"$ref\": \"#/definitions/Resp_200/properties/cyclic_source\""
+        "        }"
+        "      },"
+        "      \"type\": \"object\""
+        "    }"
+        "  }"
+        "}");
+
+    Pointer p1("#/paths/~1some~1path/post/parameters/0/schema");
+    SchemaDocument s1(sd, NULL, 0, NULL, NULL, &p1);
+    VALIDATE(s1,
+        "{"
+        "  \"a\": {"
+        "    \"c\": \"C1\","
+        "    \"d\": {"
+        "      \"a\": {"
+        "        \"c\": \"C2\""
+        "      },"
+        "      \"c\": \"C3\""
+        "    }"
+        "  },"
+        "  \"b\": 123"
+        "}",
+        true);
+    INVALIDATE(s1,
+        "{"
+        "  \"a\": {"
+        "    \"c\": \"C1\","
+        "    \"d\": {"
+        "      \"a\": {"
+        "        \"c\": \"C2\""
+        "      },"
+        "      \"c\": \"C3\""
+        "    }"
+        "  },"
+        "  \"b\": \"should be an int\""
+        "}",
+        "#/paths/~1some~1path/post/parameters/0/schema/properties/b", "type", "#/b",
+        "{\"type\": {"
+        "    \"expected\":[\"integer\"],"
+        "    \"actual\":\"string\","
+        "    \"errorCode\":20,"
+        "    \"instanceRef\":\"#/b\","
+        "    \"schemaRef\":\"#/paths/~1some~1path/post/parameters/0/schema/properties/b\""
+        "}}");
+    INVALIDATE(s1,
+        "{"
+        "  \"a\": {"
+        "    \"c\": \"C1\","
+        "    \"d\": {"
+        "      \"a\": {"
+        "        \"c\": \"should be within enum\""
+        "      },"
+        "      \"c\": \"C3\""
+        "    }"
+        "  },"
+        "  \"b\": 123"
+        "}",
+        "#/definitions/Prop_a/properties/c", "enum", "#/a/d/a/c",
+        "{\"enum\": {"
+        "    \"errorCode\":19,"
+        "    \"instanceRef\":\"#/a/d/a/c\","
+        "    \"schemaRef\":\"#/definitions/Prop_a/properties/c\""
+        "}}");
+    INVALIDATE(s1,
+        "{"
+        "  \"a\": {"
+        "    \"c\": \"C1\","
+        "    \"d\": {"
+        "      \"a\": {"
+        "        \"s\": \"required 'c' is missing\""
+        "      }"
+        "    }"
+        "  },"
+        "  \"b\": 123"
+        "}",
+        "#/definitions/Prop_a", "required", "#/a/d/a",
+        "{\"required\": {"
+        "    \"missing\":[\"c\"],"
+        "    \"errorCode\":15,"
+        "    \"instanceRef\":\"#/a/d/a\","
+        "    \"schemaRef\":\"#/definitions/Prop_a\""
+        "}}");
+
+    Pointer p2("#/paths/~1some~1path/post/responses/200/schema");
+    SchemaDocument s2(sd, NULL, 0, NULL, NULL, &p2);
+    VALIDATE(s2,
+        "{ \"e\": \"some string\", \"f\": false }",
+        true);
+    INVALIDATE(s2,
+        "{ \"e\": true, \"f\": false }",
+        "#/definitions/Resp_200/properties/e", "type", "#/e",
+        "{\"type\": {"
+        "    \"expected\":[\"string\"],"
+        "    \"actual\":\"boolean\","
+        "    \"errorCode\":20,"
+        "    \"instanceRef\":\"#/e\","
+        "    \"schemaRef\":\"#/definitions/Resp_200/properties/e\""
+        "}}");
+    INVALIDATE(s2,
+        "{ \"e\": \"some string\", \"f\": 123 }",
+        "#/definitions/Resp_200/properties/f", "type", "#/f",
+        "{\"type\": {"
+        "    \"expected\":[\"boolean\"],"
+        "    \"actual\":\"integer\","
+        "    \"errorCode\":20,"
+        "    \"instanceRef\":\"#/f\","
+        "    \"schemaRef\":\"#/definitions/Resp_200/properties/f\""
+        "}}");
+}
+
 template <typename Allocator>
 static char* ReadFile(const char* filename, Allocator& allocator) {
     const char *paths[] = {
