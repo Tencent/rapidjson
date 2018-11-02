@@ -1602,12 +1602,14 @@ public:
         \param allocator An optional allocator instance for allocating memory. Can be null.
     */
     explicit GenericSchemaDocument(const ValueType& document, const Ch* uri = 0, SizeType uriLength = 0,
-        IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) :
+            IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0,
+            const PointerType* pointer = 0) :
         remoteProvider_(remoteProvider),
         allocator_(allocator),
         ownAllocator_(),
         root_(),
         typeless_(),
+        parseWholeDocument_(pointer.GetTokenCount() == 0),
         schemaMap_(allocator, kInitialSchemaMapSize),
         schemaRef_(allocator, kInitialSchemaRefSize)
     {
@@ -1620,9 +1622,15 @@ public:
         typeless_ = static_cast<SchemaType*>(allocator_->Malloc(sizeof(SchemaType)));
         new (typeless_) SchemaType(this, PointerType(), ValueType(kObjectType).Move(), ValueType(kObjectType).Move(), allocator_);
 
-        // Generate root schema, it will call CreateSchema() to create sub-schemas,
+        // Generate root schema, it will call CreateSchema() to create (sub-)schema(s),
         // And call AddRefSchema() if there are $ref.
-        CreateSchemaRecursive(&root_, PointerType(), document, document);
+        root_ = typeless_;
+        if (!pointer) {
+            CreateSchemaRecursive(&root_, PointerType(), document, document);
+        }
+        else if (const ValueType* v = pointer->Get(document)) {
+            CreateSchema(&root_, *pointer, *v, document);
+        }
 
         // Resolve $ref
         while (!schemaRef_.Empty()) {
@@ -1711,13 +1719,8 @@ private:
     };
 
     void CreateSchemaRecursive(const SchemaType** schema, const PointerType& pointer, const ValueType& v, const ValueType& document) {
-        if (schema)
-            *schema = typeless_;
-
         if (v.GetType() == kObjectType) {
-            const SchemaType* s = GetSchema(pointer);
-            if (!s)
-                CreateSchema(schema, pointer, v, document);
+            CreateSchema(schema, pointer, v, document);
 
             for (typename ValueType::ConstMemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr)
                 CreateSchemaRecursive(0, pointer.Append(itr->name, allocator_), itr->value, document);
@@ -1730,7 +1733,11 @@ private:
     void CreateSchema(const SchemaType** schema, const PointerType& pointer, const ValueType& v, const ValueType& document) {
         RAPIDJSON_ASSERT(pointer.IsValid());
         if (v.IsObject()) {
-            if (!HandleRefSchema(pointer, schema, v, document)) {
+            if (const SchemaType* sc = GetSchema(pointer)) {
+                if (schema)
+                    *schema = sc;
+            }
+            else if (!HandleRefSchema(pointer, schema, v, document)) {
                 SchemaType* s = new (allocator_->Malloc(sizeof(SchemaType))) SchemaType(this, pointer, v, document, allocator_);
                 new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(pointer, s, true, allocator_);
                 if (schema)
@@ -1770,13 +1777,24 @@ private:
                         }
                     }
                 }
-                else if (s[i] == '#') { // Local reference, defer resolution
+                else if (s[i] == '#') { // Local reference
                     PointerType pointer(&s[i], len - i, allocator_);
                     if (pointer.IsValid()) {
-                        if (const ValueType* nv = pointer.Get(document))
+                        const ValueType* nv = pointer.Get(document);
+                        if (nv && nv->IsObject()) {
                             if (HandleRefSchema(source, schema, *nv, document))
                                 return true;
 
+                            if (!parseWholeDocument_) {
+                                SchemaType* sc = new (allocator_->Malloc(sizeof(SchemaType))) SchemaType(this, pointer, *nv, document, allocator_);
+                                new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(pointer, sc, true, allocator_);
+                                if (schema)
+                                    *schema = sc;
+                                return true;
+                            }
+                        }
+
+                        // Defer resolution
                         new (schemaRef_.template Push<SchemaRefEntry>()) SchemaRefEntry(source, pointer, schema, allocator_);
                         return true;
                     }
@@ -1810,6 +1828,7 @@ private:
     Allocator *ownAllocator_;
     const SchemaType* root_;                //!< Root schema.
     SchemaType* typeless_;
+    bool parseWholeDocument_;
     internal::Stack<Allocator> schemaMap_;  // Stores created Pointer -> Schemas
     internal::Stack<Allocator> schemaRef_;  // Stores Pointer from $ref and schema which holds the $ref
     URIType uri_;
