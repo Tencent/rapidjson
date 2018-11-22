@@ -460,8 +460,7 @@ protected:
         PutReserve(*os_, length);
         GenericStringStream<SourceEncoding> is(json);
         while (RAPIDJSON_LIKELY(is.Tell() < length)) {
-            const Ch c = is.Peek();
-            RAPIDJSON_ASSERT(c != '\0');
+            RAPIDJSON_ASSERT(is.Peek() != '\0');
             if (RAPIDJSON_UNLIKELY(!(writeFlags & kWriteValidateEncodingFlag ? 
                 Transcoder<SourceEncoding, TargetEncoding>::Validate(is, *os_) :
                 Transcoder<SourceEncoding, TargetEncoding>::TranscodeUnsafe(is, *os_))))
