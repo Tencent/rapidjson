@@ -503,7 +503,7 @@ TEST(Pointer, Assignment) {
         EXPECT_STREQ("0", q.GetTokens()[1].name);
         EXPECT_EQ(0u, q.GetTokens()[1].index);
         EXPECT_NE(&p.GetAllocator(), &q.GetAllocator());
-        q = q;
+        q = static_cast<const Pointer &>(q);
         EXPECT_TRUE(q.IsValid());
         EXPECT_EQ(2u, q.GetTokenCount());
         EXPECT_EQ(3u, q.GetTokens()[0].length);
