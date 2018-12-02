@@ -448,10 +448,7 @@ public:
         typedef typename ValueType::ConstValueIterator ConstValueIterator;
         typedef typename ValueType::ConstMemberIterator ConstMemberIterator;
 
-        if (!value.IsObject()) {
-            valid_ = false;
-            return;
-        }
+        RAPIDJSON_ASSERT(value.IsObject());
 
         if (const ValueType* v = GetMember(value, GetTypeString())) {
             type_ = 0;
@@ -465,9 +462,7 @@ public:
         }
 
         if (const ValueType* v = GetMember(value, GetEnumString())) {
-            if (!v->IsArray())
-                valid_ = false;
-            else if (v->Size() > 0) {
+            if (v->IsArray() && v->Size() > 0) {
                 enum_ = static_cast<uint64_t*>(allocator_->Malloc(sizeof(uint64_t) * v->Size()));
                 for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr) {
                     typedef Hasher<EncodingType, MemoryPoolAllocator<> > EnumHasherType;
@@ -478,6 +473,8 @@ public:
                     enum_[enumCount_++] = h.GetHashCode();
                 }
             }
+            else
+                valid_ = false;
         }
 
         AssignIfExist(allOf_, *schemaDocument, p, value, GetAllOfString(), document);
@@ -509,7 +506,7 @@ public:
                     properties = 0;
                 }
             }
-            
+
             if (required) {
                 if (required->IsArray()) {
                     for (ConstValueIterator itr = required->Begin(); itr != required->End(); ++itr) {
@@ -529,15 +526,14 @@ public:
                 if (dependencies->IsObject()) {
                     for (ConstMemberIterator itr = dependencies->MemberBegin(); itr != dependencies->MemberEnd(); ++itr) {
                         AddUniqueElement(allProperties, itr->name);
-                        if (!itr->value.IsArray())
-                            valid_ = false;
-                        else
+                        if (itr->value.IsArray()) {
                             for (ConstValueIterator i = itr->value.Begin(); i != itr->value.End(); ++i) {
                                 if (i->IsString())
                                     AddUniqueElement(allProperties, *i);
                                 else
                                     valid_ = false;
                             }
+                        }
                     }
                 }
                 else {
@@ -561,10 +557,9 @@ public:
             PointerType q = p.Append(GetPropertiesString(), allocator_);
             for (ConstMemberIterator itr = properties->MemberBegin(); itr != properties->MemberEnd(); ++itr) {
                 SizeType index;
-                if (FindPropertyIndex(itr->name, &index))
-                    valid_ &= schemaDocument->CreateSchema(&properties_[index].schema, q.Append(itr->name, allocator_), itr->value, document);
-                else
-                    valid_ = false;
+                bool found = FindPropertyIndex(itr->name, &index);
+                RAPIDJSON_ASSERT(found); (void)found;
+                valid_ &= schemaDocument->CreateSchema(&properties_[index].schema, q.Append(itr->name, allocator_), itr->value, document);
             }
         }
 
@@ -591,12 +586,10 @@ public:
             for (ConstValueIterator itr = required->Begin(); itr != required->End(); ++itr)
                 if (itr->IsString()) {
                     SizeType index;
-                    if (FindPropertyIndex(*itr, &index)) {
-                        properties_[index].required = true;
-                        hasRequired_ = true;
-                    }
-                    else
-                        valid_ = false;
+                    bool found = FindPropertyIndex(*itr, &index);
+                    RAPIDJSON_ASSERT(found); (void)found;
+                    properties_[index].required = true;
+                    hasRequired_ = true;
                 }
         }
 
@@ -605,24 +598,25 @@ public:
             hasDependencies_ = true;
             for (ConstMemberIterator itr = dependencies->MemberBegin(); itr != dependencies->MemberEnd(); ++itr) {
                 SizeType sourceIndex;
-                if (FindPropertyIndex(itr->name, &sourceIndex)) {
-                    if (itr->value.IsArray()) {
-                        properties_[sourceIndex].dependencies = static_cast<bool*>(allocator_->Malloc(sizeof(bool) * propertyCount_));
-                        std::memset(properties_[sourceIndex].dependencies, 0, sizeof(bool)* propertyCount_);
-                        for (ConstValueIterator targetItr = itr->value.Begin(); targetItr != itr->value.End(); ++targetItr) {
-                            SizeType targetIndex;
-                            if (FindPropertyIndex(*targetItr, &targetIndex))
-                                properties_[sourceIndex].dependencies[targetIndex] = true;
-                            else
-                                valid_ = false;
+                bool found = FindPropertyIndex(itr->name, &sourceIndex);
+                RAPIDJSON_ASSERT(found); (void)found;
+                if (itr->value.IsArray()) {
+                    properties_[sourceIndex].dependencies = static_cast<bool*>(allocator_->Malloc(sizeof(bool) * propertyCount_));
+                    std::memset(properties_[sourceIndex].dependencies, 0, sizeof(bool)* propertyCount_);
+                    for (ConstValueIterator targetItr = itr->value.Begin(); targetItr != itr->value.End(); ++targetItr) {
+                        SizeType targetIndex;
+                        if (targetItr->IsString()) {
+                            bool found = FindPropertyIndex(*targetItr, &targetIndex);
+                            RAPIDJSON_ASSERT(found); (void)found;
+                            properties_[sourceIndex].dependencies[targetIndex] = true;
                         }
                     }
-                    else {
-                        hasSchemaDependencies_ = true;
-                        valid_ &= schemaDocument->CreateSchema(&properties_[sourceIndex].dependenciesSchema, q.Append(itr->name, allocator_), itr->value, document);
-                        properties_[sourceIndex].dependenciesValidatorIndex = validatorCount_;
-                        validatorCount_++;
-                    }
+                }
+                else if (itr->value.IsObject()) {
+                    hasSchemaDependencies_ = true;
+                    valid_ &= schemaDocument->CreateSchema(&properties_[sourceIndex].dependenciesSchema, q.Append(itr->name, allocator_), itr->value, document);
+                    properties_[sourceIndex].dependenciesValidatorIndex = validatorCount_;
+                    validatorCount_++;
                 }
                 else
                     valid_ = false;
@@ -658,10 +652,8 @@ public:
         if (const ValueType* v = GetMember(value, GetAdditionalItemsString())) {
             if (v->IsBool())
                 additionalItems_ = v->GetBool();
-            else if (v->IsObject())
-                valid_ &= schemaDocument->CreateSchema(&additionalItemsSchema_, p.Append(GetAdditionalItemsString(), allocator_), *v, document);
             else
-                valid_ = false;
+                valid_ &= schemaDocument->CreateSchema(&additionalItemsSchema_, p.Append(GetAdditionalItemsString(), allocator_), *v, document);
         }
 
         AssignIfExist(uniqueItems_, value, GetUniqueItemsString());
@@ -1187,9 +1179,7 @@ private:
 
     void AssignIfExist(SchemaArray& out, SchemaDocumentType& schemaDocument, const PointerType& p, const ValueType& value, const ValueType& name, const ValueType& document) {
         if (const ValueType* v = GetMember(value, name)) {
-            if (!v->IsArray())
-                valid_ = false;
-            else if (v->Size() > 0) {
+            if (v->IsArray() && v->Size() > 0) {
                 PointerType q = p.Append(name, allocator_);
                 out.count = v->Size();
                 out.schemas = static_cast<const Schema**>(allocator_->Malloc(out.count * sizeof(const Schema*)));
@@ -1199,6 +1189,8 @@ private:
                 out.begin = validatorCount_;
                 validatorCount_ += out.count;
             }
+            else
+                valid_ = false;
         }
     }
 

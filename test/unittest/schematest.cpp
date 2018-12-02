@@ -2067,6 +2067,212 @@ TEST(SchemaValidator, Ref_remote_issue1210) {
     VALIDATE(sx, "{\"country\":\"US\"}", true);
 }
 
+TEST(Schema, InvalidParsing) {
+    // "type" is a string
+    Document d_bad_type;
+    d_bad_type.Parse("{ \"type\": true }");
+    EXPECT_FALSE(d_bad_type.HasParseError());
+    SchemaDocument sd_bad_type(d_bad_type);
+    EXPECT_FALSE(sd_bad_type.IsValid());
+
+    // "enum" is a non empty array
+    Document d_bad_enum, d_bad_enum_empty;
+    d_bad_enum.Parse("{ \"enum\" : \"not a string\" }");
+    EXPECT_FALSE(d_bad_enum.HasParseError());
+    SchemaDocument sd_bad_enum(d_bad_enum);
+    EXPECT_FALSE(sd_bad_enum.IsValid());
+    d_bad_enum_empty.Parse("{ \"enum\" : [] }");
+    EXPECT_FALSE(d_bad_enum_empty.HasParseError());
+    SchemaDocument sd_bad_enum_empty(d_bad_enum_empty);
+    EXPECT_FALSE(sd_bad_enum_empty.IsValid());
+
+    // "allOf" is a non empty array
+    Document d_bad_allOf, d_bad_allOf_empty;
+    d_bad_allOf.Parse("{ \"allOf\": { \"type\": \"string\" } }");
+    EXPECT_FALSE(d_bad_allOf.HasParseError());
+    SchemaDocument sd_bad_allOf(d_bad_allOf);
+    EXPECT_FALSE(sd_bad_allOf.IsValid());
+    d_bad_allOf_empty.Parse("{ \"allOf\" : [] }");
+    EXPECT_FALSE(d_bad_allOf_empty.HasParseError());
+    SchemaDocument sd_bad_allOf_empty(d_bad_allOf_empty);
+    EXPECT_FALSE(sd_bad_allOf_empty.IsValid());
+
+    // "anyOf" is a non empty array
+    Document d_bad_anyOf, d_bad_anyOf_empty;
+    d_bad_anyOf.Parse("{ \"anyOf\": { \"type\": \"string\" } }");
+    EXPECT_FALSE(d_bad_anyOf.HasParseError());
+    SchemaDocument sd_bad_anyOf(d_bad_anyOf);
+    EXPECT_FALSE(sd_bad_anyOf.IsValid());
+    d_bad_anyOf_empty.Parse("{ \"anyOf\" : [] }");
+    EXPECT_FALSE(d_bad_anyOf_empty.HasParseError());
+    SchemaDocument sd_bad_anyOf_empty(d_bad_anyOf_empty);
+    EXPECT_FALSE(sd_bad_anyOf_empty.IsValid());
+
+    // "oneOf" is a non empty array
+    Document d_bad_oneOf, d_bad_oneOf_empty;
+    d_bad_oneOf.Parse("{ \"oneOf\": { \"type\": \"string\" } }");
+    EXPECT_FALSE(d_bad_oneOf.HasParseError());
+    SchemaDocument sd_bad_oneOf(d_bad_oneOf);
+    EXPECT_FALSE(sd_bad_oneOf.IsValid());
+    d_bad_oneOf_empty.Parse("{ \"oneOf\" : [] }");
+    EXPECT_FALSE(d_bad_oneOf_empty.HasParseError());
+    SchemaDocument sd_bad_oneOf_empty(d_bad_oneOf_empty);
+    EXPECT_FALSE(sd_bad_oneOf_empty.IsValid());
+
+    // "not" is an object/schema
+    Document d_bad_not;
+    d_bad_not.Parse("{\"not\": [ { \"type\": \"string\" } ] }");
+    EXPECT_FALSE(d_bad_not.HasParseError());
+    SchemaDocument sd_bad_not(d_bad_not);
+    EXPECT_FALSE(sd_bad_not.IsValid());
+
+    // "properties" is an object/schema
+    Document d_bad_properties;
+    d_bad_properties.Parse("{ \"type\": \"object\", \"properties\": [ \"a\", \"b\" ] }");
+    EXPECT_FALSE(d_bad_properties.HasParseError());
+    SchemaDocument sd_bad_properties(d_bad_properties);
+    EXPECT_FALSE(sd_bad_properties.IsValid());
+
+    // "required" is an array of strings
+    Document d_bad_required, d_bad_required_string;
+    d_bad_required.Parse("{ \"type\": \"object\", \"properties\": { \"a\": { \"type\": \"string\" }, \"b\": { \"type\": \"string\" } }, \"required\": \"a\" }");
+    EXPECT_FALSE(d_bad_required.HasParseError());
+    SchemaDocument sd_bad_required(d_bad_required);
+    EXPECT_FALSE(sd_bad_required.IsValid());
+    d_bad_required_string.Parse("{ \"type\": \"object\", \"properties\": { \"a\": { \"type\": \"string\" }, \"b\": { \"type\": \"string\" } }, \"required\": [ \"a\", 10 ] }");
+    EXPECT_FALSE(d_bad_required_string.HasParseError());
+    SchemaDocument sd_bad_required_string(d_bad_required_string);
+    EXPECT_FALSE(sd_bad_required_string.IsValid());
+
+    // "dependencies" is an object whose values are arrays of strings, or an object/schema
+    Document d_bad_dependencies, d_bad_dependencies_array, d_bad_dependencies_array_string;
+    d_bad_dependencies.Parse("{ \"type\": \"integer\", \"dependencies\": 69 }");
+    EXPECT_FALSE(d_bad_dependencies.HasParseError());
+    SchemaDocument sd_bad_dependencies(d_bad_dependencies);
+    EXPECT_FALSE(sd_bad_dependencies.IsValid());
+    d_bad_dependencies_array.Parse("{ \"type\": \"integer\", \"dependencies\": { \"a\": 69 } }");
+    EXPECT_FALSE(d_bad_dependencies_array.HasParseError());
+    SchemaDocument sd_bad_dependencies_array(d_bad_dependencies_array);
+    EXPECT_FALSE(sd_bad_dependencies_array.IsValid());
+    d_bad_dependencies_array_string.Parse("{ \"type\": \"integer\", \"dependencies\": { \"a\": [ 69 ] } }");
+    EXPECT_FALSE(d_bad_dependencies_array_string.HasParseError());
+    SchemaDocument sd_bad_dependencies_array_string(d_bad_dependencies_array_string);
+    EXPECT_FALSE(sd_bad_dependencies_array_string.IsValid());
+
+    // "patternProperties" is an object whose keys are valid regexes
+    Document d_bad_patternProperties, d_bad_patternProperties_pattern;
+    d_bad_patternProperties.Parse("{ \"type\": \"object\", \"patternProperties\": \"not an object\" }");
+    EXPECT_FALSE(d_bad_patternProperties.HasParseError());
+    SchemaDocument sd_bad_patternProperties(d_bad_patternProperties);
+    EXPECT_FALSE(sd_bad_patternProperties.IsValid());
+    d_bad_patternProperties_pattern.Parse("{ \"type\": \"object\", \"patternProperties\": { \"(unclosed\": { \"type\": \"string\" } } }");
+    EXPECT_FALSE(d_bad_patternProperties_pattern.HasParseError());
+    SchemaDocument sd_bad_patternProperties_pattern(d_bad_patternProperties_pattern);
+    EXPECT_FALSE(sd_bad_patternProperties_pattern.IsValid());
+
+    // "additionalProperties" is a boolean or an object/schema
+    Document d_bad_additionalProperties;
+    d_bad_additionalProperties.Parse("{ \"type\": \"object\", \"additionalProperties\": \"not a bool or an object\" }");
+    EXPECT_FALSE(d_bad_additionalProperties.HasParseError());
+    SchemaDocument sd_bad_additionalProperties(d_bad_additionalProperties);
+    EXPECT_FALSE(sd_bad_additionalProperties.IsValid());
+
+    // "min/maxProperties" are positive or nul integers
+    Document d_bad_minProperties, d_bad_maxProperties;
+    d_bad_minProperties.Parse("{ \"type\": \"object\", \"minProperties\": -1 }");
+    EXPECT_FALSE(d_bad_minProperties.HasParseError());
+    SchemaDocument sd_bad_minProperties(d_bad_minProperties);
+    EXPECT_FALSE(sd_bad_minProperties.IsValid());
+    d_bad_maxProperties.Parse("{ \"type\": \"object\", \"maxProperties\": false }");
+    EXPECT_FALSE(d_bad_maxProperties.HasParseError());
+    SchemaDocument sd_bad_maxProperties(d_bad_maxProperties);
+    EXPECT_FALSE(sd_bad_maxProperties.IsValid());
+
+    // "items" is an array or an object/schema
+    Document d_bad_items;
+    d_bad_items.Parse("{ \"type\": \"object\", \"items\": \"not an array or an object\" }");
+    EXPECT_FALSE(d_bad_items.HasParseError());
+    SchemaDocument sd_bad_items(d_bad_items);
+    EXPECT_FALSE(sd_bad_items.IsValid());
+
+    // "min/maxItems" are positive or nul integers
+    Document d_bad_minItems, d_bad_maxItems;
+    d_bad_minItems.Parse("{ \"type\": \"object\", \"minItems\": -1 }");
+    EXPECT_FALSE(d_bad_minItems.HasParseError());
+    SchemaDocument sd_bad_minItems(d_bad_minItems);
+    EXPECT_FALSE(sd_bad_minItems.IsValid());
+    d_bad_maxItems.Parse("{ \"type\": \"object\", \"maxItems\": false }");
+    EXPECT_FALSE(d_bad_maxItems.HasParseError());
+    SchemaDocument sd_bad_maxItems(d_bad_maxItems);
+    EXPECT_FALSE(sd_bad_maxItems.IsValid());
+
+    // "additionalItems" is a boolean or an object/schema
+    Document d_bad_additionalItems;
+    d_bad_additionalItems.Parse("{ \"type\": \"object\", \"additionalItems\": \"not a bool or an object\" }");
+    EXPECT_FALSE(d_bad_additionalItems.HasParseError());
+    SchemaDocument sd_bad_additionalItems(d_bad_additionalItems);
+    EXPECT_FALSE(sd_bad_additionalItems.IsValid());
+
+    // "uniqueItems" is a bool
+    Document d_bad_uniqueItems;
+    d_bad_uniqueItems.Parse("{ \"uniqueItems\": \"not a bool\" }");
+    EXPECT_FALSE(d_bad_uniqueItems.HasParseError());
+    SchemaDocument sd_bad_uniqueItems(d_bad_uniqueItems);
+    EXPECT_FALSE(sd_bad_uniqueItems.IsValid());
+
+    // "min/maxLength" are positive or nul integers
+    Document d_bad_minLength, d_bad_maxLength;
+    d_bad_minLength.Parse("{ \"type\": \"object\", \"minLength\": -1 }");
+    EXPECT_FALSE(d_bad_minLength.HasParseError());
+    SchemaDocument sd_bad_minLength(d_bad_minLength);
+    EXPECT_FALSE(sd_bad_minLength.IsValid());
+    d_bad_maxLength.Parse("{ \"type\": \"object\", \"maxLength\": false }");
+    EXPECT_FALSE(d_bad_maxLength.HasParseError());
+    SchemaDocument sd_bad_maxLength(d_bad_maxLength);
+    EXPECT_FALSE(sd_bad_maxLength.IsValid());
+
+    // "pattern" is a regex
+    Document d_bad_pattern;
+    d_bad_pattern.Parse("{ \"pattern\": \"(unclosed\" }");
+    EXPECT_FALSE(d_bad_pattern.HasParseError());
+    SchemaDocument sd_bad_pattern(d_bad_pattern);
+    EXPECT_FALSE(sd_bad_pattern.IsValid());
+
+    // "minimum/maximum" are numbers
+    Document d_bad_minimum, d_bad_maximum;
+    d_bad_minimum.Parse("{ \"type\": \"object\", \"minimum\": \"not a number\" }");
+    EXPECT_FALSE(d_bad_minimum.HasParseError());
+    SchemaDocument sd_bad_minimum(d_bad_minimum);
+    EXPECT_FALSE(sd_bad_minimum.IsValid());
+    d_bad_maximum.Parse("{ \"type\": \"object\", \"maximum\": false }");
+    EXPECT_FALSE(d_bad_maximum.HasParseError());
+    SchemaDocument sd_bad_maximum(d_bad_maximum);
+    EXPECT_FALSE(sd_bad_maximum.IsValid());
+
+    // "exclusiveMinimum/exclusiveMaximum" are booleans
+    Document d_bad_exclusiveMinimum, d_bad_exclusiveMaximum;
+    d_bad_exclusiveMinimum.Parse("{ \"type\": \"object\", \"exclusiveMinimum\": 1 }");
+    EXPECT_FALSE(d_bad_exclusiveMinimum.HasParseError());
+    SchemaDocument sd_bad_exclusiveMinimum(d_bad_exclusiveMinimum);
+    EXPECT_FALSE(sd_bad_exclusiveMinimum.IsValid());
+    d_bad_exclusiveMaximum.Parse("{ \"type\": \"object\", \"exclusiveMaximum\": \"not a bool\" }");
+    EXPECT_FALSE(d_bad_exclusiveMaximum.HasParseError());
+    SchemaDocument sd_bad_exclusiveMaximum(d_bad_exclusiveMaximum);
+    EXPECT_FALSE(sd_bad_exclusiveMaximum.IsValid());
+
+    // "multipleOf" is a stricly positive number
+    Document d_bad_multipleOf;
+    d_bad_multipleOf.Parse("{ \"type\": \"object\", \"multipleOf\": 0 }");
+    EXPECT_FALSE(d_bad_multipleOf.HasParseError());
+    SchemaDocument sd_bad_multipleOf(d_bad_multipleOf);
+
+    // "defaultValue" is a string
+    Document d_bad_defaultValue;
+    d_bad_defaultValue.Parse("{ \"type\": \"object\", \"defaultValue\": false }");
+    EXPECT_FALSE(d_bad_defaultValue.HasParseError());
+    SchemaDocument sd_bad_defaultValue(d_bad_defaultValue);
+}
+
 #if defined(_MSC_VER) || defined(__clang__)
 RAPIDJSON_DIAG_POP
 #endif
