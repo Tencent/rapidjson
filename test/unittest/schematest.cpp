@@ -2265,12 +2265,14 @@ TEST(Schema, InvalidParsing) {
     d_bad_multipleOf.Parse("{ \"type\": \"object\", \"multipleOf\": 0 }");
     EXPECT_FALSE(d_bad_multipleOf.HasParseError());
     SchemaDocument sd_bad_multipleOf(d_bad_multipleOf);
+    EXPECT_FALSE(sd_bad_multipleOf.IsValid());
 
-    // "defaultValue" is a string
-    Document d_bad_defaultValue;
-    d_bad_defaultValue.Parse("{ \"type\": \"object\", \"defaultValue\": false }");
-    EXPECT_FALSE(d_bad_defaultValue.HasParseError());
-    SchemaDocument sd_bad_defaultValue(d_bad_defaultValue);
+    // "default" is a string
+    Document d_bad_default;
+    d_bad_default.Parse("{ \"type\": \"object\", \"default\": false }");
+    EXPECT_FALSE(d_bad_default.HasParseError());
+    SchemaDocument sd_bad_default(d_bad_default);
+    EXPECT_FALSE(sd_bad_default.IsValid());
 }
 
 #if defined(_MSC_VER) || defined(__clang__)
