@@ -1528,8 +1528,12 @@ public:
         root_(),
         typeless_(),
         schemaMap_(allocator, kInitialSchemaMapSize),
-        schemaRef_(allocator, kInitialSchemaRefSize)
+        schemaRef_(allocator, kInitialSchemaRefSize),
+        clearOnExit_(true)
+
     {
+        ClearOnExit scope(*this);
+
         if (!allocator_)
             ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
 
@@ -1564,6 +1568,7 @@ public:
         RAPIDJSON_ASSERT(root_ != 0);
 
         schemaRef_.ShrinkToFit(); // Deallocate all memory for ref
+        clearOnExit_ = false;
     }
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
@@ -1587,15 +1592,7 @@ public:
 
     //! Destructor
     ~GenericSchemaDocument() {
-        while (!schemaMap_.Empty())
-            schemaMap_.template Pop<SchemaEntry>(1)->~SchemaEntry();
-
-        if (typeless_) {
-            typeless_->~SchemaType();
-            Allocator::Free(typeless_);
-        }
-
-        RAPIDJSON_DELETE(ownAllocator_);
+        Clear();
     }
 
     const URIType& GetURI() const { return uri_; }
@@ -1608,6 +1605,29 @@ private:
     GenericSchemaDocument(const GenericSchemaDocument&);
     //! Prohibit assignment
     GenericSchemaDocument& operator=(const GenericSchemaDocument&);
+
+    // clear on any exit from constructor, e.g. due to exception
+    struct ClearOnExit {
+        explicit ClearOnExit(GenericSchemaDocument& d) : d_(d) {}
+        ~ClearOnExit() { if (d_.clearOnExit_) d_.Clear(); }
+    private:
+        ClearOnExit(const ClearOnExit&);
+        ClearOnExit& operator=(const ClearOnExit&);
+        GenericSchemaDocument& d_;
+    };
+
+    void Clear()
+    {
+        while (!schemaMap_.Empty())
+            schemaMap_.template Pop<SchemaEntry>(1)->~SchemaEntry();
+
+        if (typeless_) {
+            typeless_->~SchemaType();
+            Allocator::Free(typeless_);
+        }
+
+        RAPIDJSON_DELETE(ownAllocator_);
+    }
 
     struct SchemaRefEntry {
         SchemaRefEntry(const PointerType& s, const PointerType& t, const SchemaType** outSchema, Allocator *allocator) : source(s, allocator), target(t, allocator), schema(outSchema) {}
@@ -1732,6 +1752,7 @@ private:
     internal::Stack<Allocator> schemaMap_;  // Stores created Pointer -> Schemas
     internal::Stack<Allocator> schemaRef_;  // Stores Pointer from $ref and schema which holds the $ref
     URIType uri_;
+    bool clearOnExit_;
 };
 
 //! GenericSchemaDocument using Value type.
