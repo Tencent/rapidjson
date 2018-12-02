@@ -429,9 +429,9 @@ public:
         hasRequired_(),
         hasSchemaDependencies_(),
         additionalItemsSchema_(),
+        itemsSchema_(),
         itemsList_(),
-        itemsTuple_(),
-        itemsTupleCount_(),
+        itemsListCount_(),
         minItems_(),
         maxItems_(SizeType(~0)),
         additionalItems_(true),
@@ -636,14 +636,14 @@ public:
         // Array
         if (const ValueType* v = GetMember(value, GetItemsString())) {
             PointerType q = p.Append(GetItemsString(), allocator_);
-            if (v->IsArray()) { // Tuple validation
-                itemsTuple_ = static_cast<const Schema**>(allocator_->Malloc(sizeof(const Schema*) * v->Size()));
+            if (v->IsArray()) { // List validation
+                itemsList_ = static_cast<const Schema**>(allocator_->Malloc(sizeof(const Schema*) * v->Size()));
                 SizeType index = 0;
                 for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr, index++)
-                    valid_ &= schemaDocument->CreateSchema(&itemsTuple_[itemsTupleCount_++], q.Append(index, allocator_), *itr, document);
+                    valid_ &= schemaDocument->CreateSchema(&itemsList_[itemsListCount_++], q.Append(index, allocator_), *itr, document);
             }
             else
-                valid_ &= schemaDocument->CreateSchema(&itemsList_, q, *v, document);
+                valid_ &= schemaDocument->CreateSchema(&itemsSchema_, q, *v, document);
         }
 
         AssignIfExist(minItems_, value, GetMinItemsString());
@@ -711,7 +711,7 @@ public:
                 patternProperties_[i].~PatternProperty();
             AllocatorType::Free(patternProperties_);
         }
-        AllocatorType::Free(itemsTuple_);
+        AllocatorType::Free(itemsList_);
 #if RAPIDJSON_SCHEMA_HAS_REGEX
         if (pattern_) {
             pattern_->~RegexType();
@@ -737,11 +737,11 @@ public:
             if (uniqueItems_)
                 context.valueUniqueness = true;
 
-            if (itemsList_)
-                context.valueSchema = itemsList_;
-            else if (itemsTuple_) {
-                if (context.arrayElementIndex < itemsTupleCount_)
-                    context.valueSchema = itemsTuple_[context.arrayElementIndex];
+            if (itemsSchema_)
+                context.valueSchema = itemsSchema_;
+            else if (itemsList_) {
+                if (context.arrayElementIndex < itemsListCount_)
+                    context.valueSchema = itemsList_[context.arrayElementIndex];
                 else if (additionalItemsSchema_)
                     context.valueSchema = additionalItemsSchema_;
                 else if (additionalItems_)
@@ -1489,9 +1489,9 @@ private:
     bool hasSchemaDependencies_;
 
     const SchemaType* additionalItemsSchema_;
-    const SchemaType* itemsList_;
-    const SchemaType** itemsTuple_;
-    SizeType itemsTupleCount_;
+    const SchemaType* itemsSchema_;
+    const SchemaType** itemsList_;
+    SizeType itemsListCount_;
     SizeType minItems_;
     SizeType maxItems_;
     bool additionalItems_;
