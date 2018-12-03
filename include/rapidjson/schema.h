@@ -1150,10 +1150,12 @@ private:
     template <typename ValueType>
     RegexType* CreatePattern(const ValueType& value) {
         if (value.IsString())
+            RegexType *r = static_cast<RegexType*>(allocator_->Malloc(sizeof(RegexType)));
             try {
-                return new (allocator_->Malloc(sizeof(RegexType))) RegexType(value.GetString(), std::size_t(value.GetStringLength()), std::regex_constants::ECMAScript);
+                return new (r) RegexType(value.GetString(), std::size_t(value.GetStringLength()), std::regex_constants::ECMAScript);
             }
             catch (const std::regex_error&) {
+                AllocatorType::Free(r);
             }
         return 0;
     }
