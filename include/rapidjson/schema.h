@@ -598,16 +598,16 @@ public:
             hasDependencies_ = true;
             for (ConstMemberIterator itr = dependencies->MemberBegin(); itr != dependencies->MemberEnd(); ++itr) {
                 SizeType sourceIndex;
-                bool found = FindPropertyIndex(itr->name, &sourceIndex);
-                RAPIDJSON_ASSERT(found); (void)found;
+                bool source_found = FindPropertyIndex(itr->name, &sourceIndex);
+                RAPIDJSON_ASSERT(source_found); (void)source_found;
                 if (itr->value.IsArray()) {
                     properties_[sourceIndex].dependencies = static_cast<bool*>(allocator_->Malloc(sizeof(bool) * propertyCount_));
                     std::memset(properties_[sourceIndex].dependencies, 0, sizeof(bool)* propertyCount_);
                     for (ConstValueIterator targetItr = itr->value.Begin(); targetItr != itr->value.End(); ++targetItr) {
                         SizeType targetIndex;
                         if (targetItr->IsString()) {
-                            bool found = FindPropertyIndex(*targetItr, &targetIndex);
-                            RAPIDJSON_ASSERT(found); (void)found;
+                            bool target_found = FindPropertyIndex(*targetItr, &targetIndex);
+                            RAPIDJSON_ASSERT(target_found); (void)target_found;
                             properties_[sourceIndex].dependencies[targetIndex] = true;
                         }
                     }
