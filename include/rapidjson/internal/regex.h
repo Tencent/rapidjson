@@ -118,7 +118,8 @@ public:
     template <typename, typename> friend class GenericRegexSearch;
 
     GenericRegex(const Ch* source, Allocator* allocator = 0) : 
-        states_(allocator, 256), ranges_(allocator, 256), root_(kRegexInvalidState), stateCount_(), rangeCount_(), 
+        ownAllocator_(allocator ? 0 : RAPIDJSON_NEW(Allocator)()), allocator_(allocator ? allocator : ownAllocator_), 
+        states_(allocator_, 256), ranges_(allocator_, 256), root_(kRegexInvalidState), stateCount_(), rangeCount_(), 
         anchorBegin_(), anchorEnd_()
     {
         GenericStringStream<Encoding> ss(source);
@@ -126,7 +127,10 @@ public:
         Parse(ds);
     }
 
-    ~GenericRegex() {}
+    ~GenericRegex()
+    {
+        RAPIDJSON_DELETE(ownAllocator_);
+    }
 
     bool IsValid() const {
         return root_ != kRegexInvalidState;
@@ -188,10 +192,9 @@ private:
 
     template <typename InputStream>
     void Parse(DecodedStream<InputStream, Encoding>& ds) {
-        Allocator allocator;
-        Stack<Allocator> operandStack(&allocator, 256);     // Frag
-        Stack<Allocator> operatorStack(&allocator, 256);    // Operator
-        Stack<Allocator> atomCountStack(&allocator, 256);   // unsigned (Atom per parenthesis)
+        Stack<Allocator> operandStack(allocator_, 256);    // Frag
+        Stack<Allocator> operatorStack(allocator_, 256);   // Operator
+        Stack<Allocator> atomCountStack(allocator_, 256);  // unsigned (Atom per parenthesis)
 
         *atomCountStack.template Push<unsigned>() = 0;
 
@@ -582,6 +585,8 @@ private:
         }
     }
 
+    Allocator* ownAllocator_;
+    Allocator* allocator_;
     Stack<Allocator> states_;
     Stack<Allocator> ranges_;
     SizeType root_;
