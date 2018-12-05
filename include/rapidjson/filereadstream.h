@@ -17,6 +17,7 @@
 
 #include "stream.h"
 #include <cstdio>
+#include <cstring>
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
@@ -38,18 +39,39 @@ public:
     //! Constructor.
     /*!
         \param fp File pointer opened for read.
+    */
+    FileReadStream(std::FILE* fp) : fp_(fp), buffer_(peekBuffer_), size_(sizeof(peekBuffer_) / sizeof(Ch)), pos_(), len_(), count_()
+    {
+        RAPIDJSON_ASSERT(fp_ != 0);
+    }
+
+    //! Constructor.
+    /*!
+        \param fp File pointer opened for read.
         \param buffer user-supplied buffer.
         \param bufferSize size of buffer in bytes. Must >=4 bytes.
     */
-    FileReadStream(std::FILE* fp, char* buffer, size_t bufferSize) : fp_(fp), buffer_(buffer), bufferSize_(bufferSize), bufferLast_(0), current_(buffer_), readCount_(0), count_(0), eof_(false) { 
-        RAPIDJSON_ASSERT(fp_ != 0);
-        RAPIDJSON_ASSERT(bufferSize >= 4);
-        Read();
+    FileReadStream(std::FILE* fp, Ch *buffer, size_t size) : fp_(fp), buffer_(buffer), size_(size), pos_(), len_(), count_() {
+        RAPIDJSON_ASSERT(fp_ != 0 && buffer_ != 0 && size_ > 0);
+        if (RAPIDJSON_UNLIKELY(size_ < sizeof(peekBuffer_) / sizeof(Ch))) {
+            size_ = sizeof(peekBuffer_) / sizeof(Ch);
+            buffer_ = peekBuffer_;
+        }
     }
 
-    Ch Peek() const { return *current_; }
-    Ch Take() { Ch c = *current_; Read(); return c; }
-    size_t Tell() const { return count_ + static_cast<size_t>(current_ - buffer_); }
+    Ch Peek() const {
+        if (RAPIDJSON_UNLIKELY(pos_ == len_) && !Read())
+            return static_cast<Ch>('\0');
+        return buffer_[pos_];
+    }
+
+    Ch Take() {
+        if (RAPIDJSON_UNLIKELY(pos_ == len_) && !Read())
+            return static_cast<Ch>('\0');
+        return buffer_[pos_++];
+    }
+
+    size_t Tell() const { return count_ + pos_; }
 
     // Not implemented
     void Put(Ch) { RAPIDJSON_ASSERT(false); }
@@ -59,35 +81,36 @@ public:
 
     // For encoding detection only.
     const Ch* Peek4() const {
-        return (current_ + 4 <= bufferLast_) ? current_ : 0;
+        if (len_ - pos_ < 4) {
+            if (pos_) {
+                len_ -= pos_;
+                std::memmove(buffer_, buffer_ + pos_, len_);
+                count_ += pos_;
+                pos_ = 0;
+            }
+            len_ += std::fread(buffer_ + len_, sizeof(Ch), size_ - len_, fp_);
+            if (len_ < 4)
+                return 0;
+        }
+        return &buffer_[pos_];
     }
 
 private:
-    void Read() {
-        if (current_ < bufferLast_)
-            ++current_;
-        else if (!eof_) {
-            count_ += readCount_;
-            readCount_ = std::fread(buffer_, 1, bufferSize_, fp_);
-            bufferLast_ = buffer_ + readCount_ - 1;
-            current_ = buffer_;
+    FileReadStream();
+    FileReadStream(const FileReadStream&);
+    FileReadStream& operator=(const FileReadStream&);
 
-            if (readCount_ < bufferSize_) {
-                buffer_[readCount_] = '\0';
-                ++bufferLast_;
-                eof_ = true;
-            }
-        }
+    size_t Read() const {
+        count_ += pos_;
+        pos_ = 0;
+        len_ = std::fread(buffer_, sizeof(Ch), size_, fp_);
+        return len_;
     }
 
     std::FILE* fp_;
-    Ch *buffer_;
-    size_t bufferSize_;
-    Ch *bufferLast_;
-    Ch *current_;
-    size_t readCount_;
-    size_t count_;  //!< Number of characters read
-    bool eof_;
+    Ch peekBuffer_[4], *buffer_;
+    size_t size_;
+    mutable size_t pos_, len_, count_;
 };
 
 RAPIDJSON_NAMESPACE_END

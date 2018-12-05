@@ -17,6 +17,7 @@
 
 #include "stream.h"
 #include <iosfwd>
+#include <cstring>
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
@@ -48,26 +49,33 @@ template <typename StreamType>
 class BasicIStreamWrapper {
 public:
     typedef typename StreamType::char_type Ch;
-    BasicIStreamWrapper(StreamType& stream) : stream_(stream), count_(), peekBuffer_() {}
 
-    Ch Peek() const { 
-        typename StreamType::int_type c = stream_.peek();
-        return RAPIDJSON_LIKELY(c != StreamType::traits_type::eof()) ? static_cast<Ch>(c) : static_cast<Ch>('\0');
+    BasicIStreamWrapper(StreamType& stream) : stream_(stream), buffer_(peekBuffer_), size_(sizeof(peekBuffer_) / sizeof(Ch)), pos_(), len_(), count_() {}
+
+    BasicIStreamWrapper(StreamType& stream, Ch *buffer, size_t size) : stream_(stream), buffer_(buffer), size_(size), pos_(), len_(), count_() {
+        RAPIDJSON_ASSERT(buffer_ != 0 && static_cast<std::streamsize>(size_) > 0);
+        if (RAPIDJSON_UNLIKELY(size_ < sizeof(peekBuffer_) / sizeof(Ch))) {
+            size_ = sizeof(peekBuffer_) / sizeof(Ch);
+            buffer_ = peekBuffer_;
+        }
     }
 
-    Ch Take() { 
-        typename StreamType::int_type c = stream_.get();
-        if (RAPIDJSON_LIKELY(c != StreamType::traits_type::eof())) {
-            count_++;
-            return static_cast<Ch>(c);
-        }
-        else
-            return '\0';
+    Ch Peek() const {
+        if (RAPIDJSON_UNLIKELY(pos_ == len_) && !Read())
+            return static_cast<Ch>('\0');
+        return buffer_[pos_];
+    }
+
+    Ch Take() {
+        if (RAPIDJSON_UNLIKELY(pos_ == len_) && !Read())
+            return static_cast<Ch>('\0');
+        return buffer_[pos_++];
     }
 
     // tellg() may return -1 when failed. So we count by ourself.
-    size_t Tell() const { return count_; }
+    size_t Tell() const { return count_ + pos_; }
 
+    // Not implemented
     Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
     void Put(Ch) { RAPIDJSON_ASSERT(false); }
     void Flush() { RAPIDJSON_ASSERT(false); }
@@ -76,29 +84,42 @@ public:
     // For encoding detection only.
     const Ch* Peek4() const {
         RAPIDJSON_ASSERT(sizeof(Ch) == 1); // Only usable for byte stream.
-        int i;
-        bool hasError = false;
-        for (i = 0; i < 4; ++i) {
-            typename StreamType::int_type c = stream_.get();
-            if (c == StreamType::traits_type::eof()) {
-                hasError = true;
-                stream_.clear();
-                break;
+        if (len_ - pos_ < 4) {
+            if (pos_) {
+                len_ -= pos_;
+                std::memmove(buffer_, buffer_ + pos_, len_);
+                count_ += pos_;
+                pos_ = 0;
             }
-            peekBuffer_[i] = static_cast<Ch>(c);
+            if (!stream_.read(buffer_ + len_, static_cast<std::streamsize>(size_ - len_))) {
+                len_ += static_cast<size_t>(stream_.gcount());
+                if (len_ < 4)
+                    return 0;
+            }
+            else
+                len_ = size_;
         }
-        for (--i; i >= 0; --i)
-            stream_.putback(peekBuffer_[i]);
-        return !hasError ? peekBuffer_ : 0;
+        return &buffer_[pos_];
     }
 
 private:
     BasicIStreamWrapper(const BasicIStreamWrapper&);
     BasicIStreamWrapper& operator=(const BasicIStreamWrapper&);
 
+    size_t Read() const {
+        count_ += pos_;
+        pos_ = 0;
+        if (!stream_.read(buffer_, static_cast<std::streamsize>(size_)))
+            len_ = static_cast<size_t>(stream_.gcount());
+        else
+            len_ = size_;
+        return len_;
+    }
+
     StreamType& stream_;
-    size_t count_;  //!< Number of characters read. Note:
-    mutable Ch peekBuffer_[4];
+    Ch peekBuffer_[4], *buffer_;
+    size_t size_;
+    mutable size_t pos_, len_, count_;
 };
 
 typedef BasicIStreamWrapper<std::istream> IStreamWrapper;
