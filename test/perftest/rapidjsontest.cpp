@@ -454,32 +454,11 @@ TEST_F(RapidJson, FileReadStream) {
     }
 }
 
-TEST_F(RapidJson, FileReadStream_Unbuffered) {
-    for (size_t i = 0; i < kTrialCount; i++) {
-        FILE *fp = fopen(filename_, "rb");
-        FileReadStream s(fp);
-        while (s.Take() != '\0')
-            ;
-        fclose(fp);
-    }
-}
-
 TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_FileReadStream)) {
     for (size_t i = 0; i < kTrialCount; i++) {
         FILE *fp = fopen(filename_, "rb");
         char buffer[65536];
         FileReadStream s(fp, buffer, sizeof(buffer));
-        BaseReaderHandler<> h;
-        Reader reader;
-        reader.Parse(s, h);
-        fclose(fp);
-    }
-}
-
-TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_FileReadStream_Unbuffered)) {
-    for (size_t i = 0; i < kTrialCount; i++) {
-        FILE *fp = fopen(filename_, "rb");
-        FileReadStream s(fp);
         BaseReaderHandler<> h;
         Reader reader;
         reader.Parse(s, h);
