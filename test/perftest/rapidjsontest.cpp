@@ -489,7 +489,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_FileReadStream_Unbuffered
 
 TEST_F(RapidJson, IStreamWrapper) {
     for (size_t i = 0; i < kTrialCount; i++) {
-        std::ifstream is(filename_);
+        std::ifstream is(filename_, std::ios::in | std::ios::binary);
         char buffer[65536];
         IStreamWrapper isw(is, buffer, sizeof(buffer));
         while (isw.Take() != '\0')
@@ -500,7 +500,7 @@ TEST_F(RapidJson, IStreamWrapper) {
 
 TEST_F(RapidJson, IStreamWrapper_Unbuffered) {
     for (size_t i = 0; i < kTrialCount; i++) {
-        std::ifstream is(filename_);
+        std::ifstream is(filename_, std::ios::in | std::ios::binary);
         IStreamWrapper isw(is);
         while (isw.Take() != '\0')
             ;
@@ -513,7 +513,7 @@ TEST_F(RapidJson, IStreamWrapper_Setbuffered) {
         std::ifstream is;
         char buffer[65536];
         is.rdbuf()->pubsetbuf(buffer, sizeof(buffer));
-        is.open(filename_);
+        is.open(filename_, std::ios::in | std::ios::binary);
         IStreamWrapper isw(is);
         while (isw.Take() != '\0')
             ;
@@ -523,7 +523,7 @@ TEST_F(RapidJson, IStreamWrapper_Setbuffered) {
 
 TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_IStreamWrapper)) {
     for (size_t i = 0; i < kTrialCount; i++) {
-        std::ifstream is(filename_);
+        std::ifstream is(filename_, std::ios::in | std::ios::binary);
         char buffer[65536];
         IStreamWrapper isw(is, buffer, sizeof(buffer));
         BaseReaderHandler<> h;
@@ -535,7 +535,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_IStreamWrapper)) {
 
 TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_IStreamWrapper_Unbuffered)) {
     for (size_t i = 0; i < kTrialCount; i++) {
-        std::ifstream is(filename_);
+        std::ifstream is(filename_, std::ios::in | std::ios::binary);
         IStreamWrapper isw(is);
         BaseReaderHandler<> h;
         Reader reader;
@@ -549,7 +549,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_IStreamWrapper_Setbuffere
         std::ifstream is;
         char buffer[65536];
         is.rdbuf()->pubsetbuf(buffer, sizeof(buffer));
-        is.open(filename_);
+        is.open(filename_, std::ios::in | std::ios::binary);
         IStreamWrapper isw(is);
         BaseReaderHandler<> h;
         Reader reader;
