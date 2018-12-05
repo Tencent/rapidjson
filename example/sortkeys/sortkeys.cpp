@@ -1,7 +1,6 @@
-#define RAPIDJSON_HAS_STDSTRING 1
 #include "rapidjson/document.h"
+#include "rapidjson/filewritestream.h"
 #include <rapidjson/prettywriter.h>
-#include <rapidjson/stringbuffer.h>
 
 #include <algorithm>
 #include <iostream>
@@ -9,26 +8,23 @@
 using namespace rapidjson;
 using namespace std;
 
-void printIt(Document &doc)
+void printIt(const Value &doc)
 {
-    string output;
-    StringBuffer buffer;
-    PrettyWriter<StringBuffer> writer(buffer);
+    char writeBuffer[65536];
+    FileWriteStream os(stdout, writeBuffer, sizeof(writeBuffer));
+    PrettyWriter<FileWriteStream> writer(os);
     doc.Accept(writer);
 
-    output = buffer.GetString();
-    cout << output << endl;
+    cout << endl;
 }
 
-struct ValueNameComparator
+struct NameComparator
 {
     bool
     operator()(const GenericMember<UTF8<>, MemoryPoolAllocator<>> &lhs,
                const GenericMember<UTF8<>, MemoryPoolAllocator<>> &rhs) const
     {
-        string lhss = string(lhs.name.GetString());
-        string rhss = string(rhs.name.GetString());
-        return lhss < rhss;
+        return (strcmp(lhs.name.GetString(), rhs.name.GetString()) < 0);
     }
 };
 
@@ -55,7 +51,7 @@ int main()
 }
 **/
 
-    std::sort(d.MemberBegin(), d.MemberEnd(), ValueNameComparator());
+    std::sort(d.MemberBegin(), d.MemberEnd(), NameComparator());
 
     printIt(d);
     /**
