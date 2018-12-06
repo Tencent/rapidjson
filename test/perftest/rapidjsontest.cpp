@@ -21,8 +21,11 @@
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/filereadstream.h"
+#include "rapidjson/istreamwrapper.h"
 #include "rapidjson/encodedstream.h"
 #include "rapidjson/memorystream.h"
+
+#include <fstream>
 
 #ifdef RAPIDJSON_SSE2
 #define SIMD_SUFFIX(name) name##_SSE2
@@ -460,6 +463,77 @@ TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_FileReadStream)) {
         Reader reader;
         reader.Parse(s, h);
         fclose(fp);
+    }
+}
+
+TEST_F(RapidJson, IStreamWrapper) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        std::ifstream is(filename_, std::ios::in | std::ios::binary);
+        char buffer[65536];
+        IStreamWrapper isw(is, buffer, sizeof(buffer));
+        while (isw.Take() != '\0')
+            ;
+        is.close();
+    }
+}
+
+TEST_F(RapidJson, IStreamWrapper_Unbuffered) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        std::ifstream is(filename_, std::ios::in | std::ios::binary);
+        IStreamWrapper isw(is);
+        while (isw.Take() != '\0')
+            ;
+        is.close();
+    }
+}
+
+TEST_F(RapidJson, IStreamWrapper_Setbuffered) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        std::ifstream is;
+        char buffer[65536];
+        is.rdbuf()->pubsetbuf(buffer, sizeof(buffer));
+        is.open(filename_, std::ios::in | std::ios::binary);
+        IStreamWrapper isw(is);
+        while (isw.Take() != '\0')
+            ;
+        is.close();
+    }
+}
+
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_IStreamWrapper)) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        std::ifstream is(filename_, std::ios::in | std::ios::binary);
+        char buffer[65536];
+        IStreamWrapper isw(is, buffer, sizeof(buffer));
+        BaseReaderHandler<> h;
+        Reader reader;
+        reader.Parse(isw, h);
+        is.close();
+    }
+}
+
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_IStreamWrapper_Unbuffered)) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        std::ifstream is(filename_, std::ios::in | std::ios::binary);
+        IStreamWrapper isw(is);
+        BaseReaderHandler<> h;
+        Reader reader;
+        reader.Parse(isw, h);
+        is.close();
+    }
+}
+
+TEST_F(RapidJson, SIMD_SUFFIX(ReaderParse_DummyHandler_IStreamWrapper_Setbuffered)) {
+    for (size_t i = 0; i < kTrialCount; i++) {
+        std::ifstream is;
+        char buffer[65536];
+        is.rdbuf()->pubsetbuf(buffer, sizeof(buffer));
+        is.open(filename_, std::ios::in | std::ios::binary);
+        IStreamWrapper isw(is);
+        BaseReaderHandler<> h;
+        Reader reader;
+        reader.Parse(isw, h);
+        is.close();
     }
 }
 
