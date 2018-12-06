@@ -395,8 +395,7 @@ private:
                 }
                 return false;
 
-            default: 
-                RAPIDJSON_ASSERT(op == kOneOrMore);
+            case kOneOrMore:
                 if (operandStack.GetSize() >= sizeof(Frag)) {
                     Frag e = *operandStack.template Pop<Frag>(1);
                     SizeType s = NewState(kRegexInvalidState, e.start, 0);
@@ -404,6 +403,10 @@ private:
                     *operandStack.template Push<Frag>() = Frag(e.start, s, e.minIndex);
                     return true;
                 }
+                return false;
+
+            default: 
+                // syntax error (e.g. unclosed kLeftParenthesis)
                 return false;
         }
     }
