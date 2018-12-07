@@ -2089,7 +2089,7 @@ TEST(SchemaException, Ref_exception_issue818) {
 
     Document x, y;
     x.Parse("{\"properties\":{\"country\":{\"$ref\":\"y.json#/definitions/country\"},\"language\":{\"$ref\":\"z.json#/definitions/language\"}},\"type\":\"object\"}");
-    y.Parse("{\"definitions\":{\"country\":{\"enum\":\[\"UK\"]}}}");
+    y.Parse("{\"definitions\":{\"country\":{\"enum\":[\"UK\"]}}}");
 
     SchemaDocument sy(y, "y.json", 6, &provider);
     collection[0] = &sy;
