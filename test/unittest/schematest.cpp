@@ -2067,6 +2067,41 @@ TEST(SchemaValidator, Ref_remote_issue1210) {
     VALIDATE(sx, "{\"country\":\"US\"}", true);
 }
 
+TEST(SchemaException, Ref_exception_issue818) {
+    class SchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
+        SchemaDocument** collection;
+
+        SchemaDocumentProvider(const SchemaDocumentProvider&);
+        SchemaDocumentProvider& operator=(const SchemaDocumentProvider&);
+
+        public:
+          SchemaDocumentProvider(SchemaDocument** collection) : collection(collection) { }
+          virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
+            int i = 0;
+            while (collection[i] && SchemaDocument::URIType(uri, length) != collection[i]->GetURI()) ++i;
+            if (!collection[i])
+              throw 1;
+            return collection[i];
+          }
+    };
+    SchemaDocument* collection[] = { 0, 0 };
+    SchemaDocumentProvider provider(collection);
+
+    Document x, y;
+    x.Parse("{\"properties\":{\"country\":{\"$ref\":\"y.json#/definitions/country\"},\"language\":{\"$ref\":\"z.json#/definitions/language\"}},\"type\":\"object\"}");
+    y.Parse("{\"definitions\":{\"country\":{\"enum\":\[\"UK\"]}}}");
+
+    SchemaDocument sy(y, "y.json", 6, &provider);
+    collection[0] = &sy;
+
+    try {
+        SchemaDocument sx(x, "x.json", 6, &provider);
+    }
+    catch (int e) {
+        EXPECT_EQ(e, 1);
+    }
+}
+
 #if defined(_MSC_VER) || defined(__clang__)
 RAPIDJSON_DIAG_POP
 #endif
