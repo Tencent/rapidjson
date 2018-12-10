@@ -1515,8 +1515,8 @@ TEST(Pointer, LessThan) {
         "/e/f.g",
         ""
     };
-    static struct {
-        const char *string;
+    static const struct {
+        const char *str;
         bool valid;
     } ordered_pointers[] = {
         { "", true },
@@ -1537,24 +1537,29 @@ TEST(Pointer, LessThan) {
         { "/e/f~g", false },
         { "/e/f~~g", false }
     };
-    MemoryPoolAllocator<> allocator;
-    typedef GenericPointer<Value, MemoryPoolAllocator<> > PooledPointer;
-    std::multiset<PooledPointer> set;
+    typedef MemoryPoolAllocator<> AllocatorType;
+    typedef GenericPointer<Value, AllocatorType> PointerType;
+    typedef std::multiset<PointerType> PointerSet;
+    AllocatorType allocator;
+    PointerSet set;
     size_t i;
 
-    for (i = 0; i < sizeof(pointers) / sizeof(*pointers); ++i) {
-        set.insert(PooledPointer(pointers[i], &allocator));
+    EXPECT_EQ(sizeof(pointers) / sizeof(pointers[0]),
+              sizeof(ordered_pointers) / sizeof(ordered_pointers[0]));
+
+    for (i = 0; i < sizeof(pointers) / sizeof(pointers[0]); ++i) {
+        set.insert(PointerType(pointers[i], &allocator));
     }
 
     i = 0;
-    for (std::set<PooledPointer>::iterator it = set.begin(); it != set.end(); ++it) {
-        EXPECT_TRUE(i < sizeof(ordered_pointers) / sizeof(*ordered_pointers));
+    for (PointerSet::iterator it = set.begin(); it != set.end(); ++it) {
+        EXPECT_TRUE(i < sizeof(ordered_pointers) / sizeof(ordered_pointers[0]));
         EXPECT_EQ(it->IsValid(), ordered_pointers[i].valid);
         if (it->IsValid()) {
             std::stringstream ss;
             OStreamWrapper os(ss);
             EXPECT_TRUE(it->Stringify(os));
-            EXPECT_EQ(ss.str(), ordered_pointers[i].string);
+            EXPECT_EQ(ss.str(), ordered_pointers[i].str);
         }
         i++;
     }

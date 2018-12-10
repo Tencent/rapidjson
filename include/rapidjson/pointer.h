@@ -358,7 +358,7 @@ public:
 
     //! Less than operator.
     /*!
-        \note Invalid pointers are never lesser than valid ones.
+        \note Invalid pointers are always greater than valid ones.
     */
     bool operator<(const GenericPointer& rhs) const {
         if (!IsValid())
@@ -366,27 +366,20 @@ public:
         if (!rhs.IsValid())
             return true;
 
-        size_t i = 0, lCount = tokenCount_, rCount = rhs.tokenCount_;
-        for (;;) {
-            if (!rCount)
-                return false;
-            if (!lCount)
-                return true;
+        const Token *lTok = tokens_, *const lEnd = lTok + tokenCount_,
+                    *rTok = rhs.tokens_, *const rEnd = rTok + rhs.tokenCount_;
+        for (; lTok != lEnd && rTok != rEnd; ++lTok, ++rTok) {
+            if (lTok->index != rTok->index)
+                return lTok->index < rTok->index;
 
-            if (tokens_[i].index != rhs.tokens_[i].index)
-                return tokens_[i].index < rhs.tokens_[i].index;
+            if (lTok->length > rTok->length)
+                return std::memcmp(lTok->name, rTok->name, sizeof(Ch) * rTok->length) < 0;
 
-            if (tokens_[i].length > rhs.tokens_[i].length)
-                return std::memcmp(tokens_[i].name, rhs.tokens_[i].name, sizeof(Ch) * rhs.tokens_[i].length) < 0;
-
-            int cmp = std::memcmp(tokens_[i].name, rhs.tokens_[i].name, sizeof(Ch) * tokens_[i].length);
-            if (cmp || tokens_[i].length != rhs.tokens_[i].length)
-                return cmp <= 0;
-
-            lCount--;
-            rCount--;
-            i++;
+            int comp = std::memcmp(lTok->name, rTok->name, sizeof(Ch) * lTok->length);
+            if (comp || lTok->length != rTok->length)
+                return comp <= 0;
         }
+        return rTok != rEnd;
     }
 
     //@}
