@@ -356,6 +356,39 @@ public:
     */
     bool operator!=(const GenericPointer& rhs) const { return !(*this == rhs); }
 
+    //! Less than operator.
+    /*!
+        \note Invalid pointers are never lesser than valid ones.
+    */
+    bool operator<(const GenericPointer& rhs) const {
+        if (!IsValid())
+            return false;
+        if (!rhs.IsValid())
+            return true;
+
+        size_t i = 0, lCount = tokenCount_, rCount = rhs.tokenCount_;
+        for (;;) {
+            if (!rCount)
+                return false;
+            if (!lCount)
+                return true;
+
+            if (tokens_[i].index != rhs.tokens_[i].index)
+                return tokens_[i].index < rhs.tokens_[i].index;
+
+            if (tokens_[i].length > rhs.tokens_[i].length)
+                return std::memcmp(tokens_[i].name, rhs.tokens_[i].name, sizeof(Ch) * rhs.tokens_[i].length) < 0;
+
+            int cmp = std::memcmp(tokens_[i].name, rhs.tokens_[i].name, sizeof(Ch) * tokens_[i].length);
+            if (cmp || tokens_[i].length != rhs.tokens_[i].length)
+                return cmp <= 0;
+
+            lCount--;
+            rCount--;
+            i++;
+        }
+    }
+
     //@}
 
     //!@name Stringify
