@@ -15,7 +15,9 @@
 #include "unittest.h"
 #include "rapidjson/pointer.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/ostreamwrapper.h"
 #include <sstream>
+#include <set>
 
 using namespace rapidjson;
 
@@ -1490,6 +1492,71 @@ TEST(Pointer, Ambiguity) {
         Pointer("/0/1").Set(d, 456); // 1 is treated as "1" to index object
         EXPECT_EQ(123, Pointer("/0/0").Get(d)->GetInt());
         EXPECT_EQ(456, Pointer("/0/1").Get(d)->GetInt());
+    }
+}
+
+TEST(Pointer, LessThan) {
+    static const char *pointers[] = {
+        "/a/b",
+        "/a/c",
+        "/a",
+        "/d/1",
+        "/d/2/z",
+        "/d/2/3",
+        "/d/2",
+        "/d/2/zz",
+        "/d/1",
+        "/d/2/z",
+        "/e/f~g",
+        "/e/f~0g",
+        "/e/f~1g",
+        "/e/f~~g",
+        "#/e/f%2fg",
+        "/e/f.g",
+        ""
+    };
+    static struct {
+        const char *string;
+        bool valid;
+    } ordered_pointers[] = {
+        { "", true },
+        { "/a", true },
+        { "/a/b", true },
+        { "/a/c", true },
+        { "/d/1", true },
+        { "/d/1", true },
+        { "/d/2", true },
+        { "/d/2/3", true },
+        { "/d/2/z", true },
+        { "/d/2/z", true },
+        { "/d/2/zz", true },
+        { "/e/f.g", true },
+        { "/e/f~1g", true },
+        { "/e/f~1g", true }, // was "#/e/f%2fg"
+        { "/e/f~0g", true },
+        { "/e/f~g", false },
+        { "/e/f~~g", false }
+    };
+    MemoryPoolAllocator<> allocator;
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PooledPointer;
+    std::multiset<PooledPointer> set;
+    size_t i;
+
+    for (i = 0; i < sizeof(pointers) / sizeof(*pointers); ++i) {
+        set.insert(PooledPointer(pointers[i], &allocator));
+    }
+
+    i = 0;
+    for (std::set<PooledPointer>::iterator it = set.begin(); it != set.end(); ++it) {
+        EXPECT_TRUE(i < sizeof(ordered_pointers) / sizeof(*ordered_pointers));
+        EXPECT_EQ(it->IsValid(), ordered_pointers[i].valid);
+        if (it->IsValid()) {
+            std::stringstream ss;
+            OStreamWrapper os(ss);
+            EXPECT_TRUE(it->Stringify(os));
+            EXPECT_EQ(ss.str(), ordered_pointers[i].string);
+        }
+        i++;
     }
 }
 
