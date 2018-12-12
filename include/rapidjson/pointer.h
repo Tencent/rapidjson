@@ -366,20 +366,21 @@ public:
         if (!rhs.IsValid())
             return true;
 
-        const Token *lTok = tokens_, *const lEnd = lTok + tokenCount_,
-                    *rTok = rhs.tokens_, *const rEnd = rTok + rhs.tokenCount_;
-        for (; lTok != lEnd && rTok != rEnd; ++lTok, ++rTok) {
-            if (lTok->index != rTok->index)
-                return lTok->index < rTok->index;
+        if (tokenCount_ != rhs.tokenCount_)
+            return tokenCount_ < rhs.tokenCount_;
 
-            if (lTok->length > rTok->length)
-                return std::memcmp(lTok->name, rTok->name, sizeof(Ch) * rTok->length) < 0;
+        for (size_t i = 0; i < tokenCount_; i++) {
+            if (tokens_[i].index != rhs.tokens_[i].index)
+                return tokens_[i].index < rhs.tokens_[i].index;
 
-            int comp = std::memcmp(lTok->name, rTok->name, sizeof(Ch) * lTok->length);
-            if (comp || lTok->length != rTok->length)
-                return comp <= 0;
+            if (tokens_[i].length != rhs.tokens_[i].length)
+                return tokens_[i].length < rhs.tokens_[i].length;
+
+            if (int cmp = std::memcmp(tokens_[i].name, rhs.tokens_[i].name, sizeof(Ch) * tokens_[i].length))
+                return cmp < 0;
         }
-        return rTok != rEnd;
+
+        return false;
     }
 
     //@}
