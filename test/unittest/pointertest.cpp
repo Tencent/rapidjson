@@ -16,6 +16,7 @@
 #include "rapidjson/pointer.h"
 #include "rapidjson/stringbuffer.h"
 #include <sstream>
+#include <algorithm>
 
 using namespace rapidjson;
 
@@ -529,6 +530,36 @@ TEST(Pointer, Assignment) {
     }
 }
 
+TEST(Pointer, Swap) {
+    Pointer p("/foo/0");
+    Pointer q(&p.GetAllocator());
+
+    q.Swap(p);
+    EXPECT_EQ(&q.GetAllocator(), &p.GetAllocator());
+    EXPECT_TRUE(p.IsValid());
+    EXPECT_TRUE(q.IsValid());
+    EXPECT_EQ(0u, p.GetTokenCount());
+    EXPECT_EQ(2u, q.GetTokenCount());
+    EXPECT_EQ(3u, q.GetTokens()[0].length);
+    EXPECT_STREQ("foo", q.GetTokens()[0].name);
+    EXPECT_EQ(1u, q.GetTokens()[1].length);
+    EXPECT_STREQ("0", q.GetTokens()[1].name);
+    EXPECT_EQ(0u, q.GetTokens()[1].index);
+
+    // std::swap compatibility
+    std::swap(p, q);
+    EXPECT_EQ(&p.GetAllocator(), &q.GetAllocator());
+    EXPECT_TRUE(q.IsValid());
+    EXPECT_TRUE(p.IsValid());
+    EXPECT_EQ(0u, q.GetTokenCount());
+    EXPECT_EQ(2u, p.GetTokenCount());
+    EXPECT_EQ(3u, p.GetTokens()[0].length);
+    EXPECT_STREQ("foo", p.GetTokens()[0].name);
+    EXPECT_EQ(1u, p.GetTokens()[1].length);
+    EXPECT_STREQ("0", p.GetTokens()[1].name);
+    EXPECT_EQ(0u, p.GetTokens()[1].index);
+}
+
 TEST(Pointer, Append) {
     {
         Pointer p;
@@ -867,7 +898,7 @@ TEST(Pointer, Set_NoAllocator) {
 #endif
 }
 
-TEST(Pointer, Swap) {
+TEST(Pointer, Swap_Value) {
     Document d;
     d.Parse(kJson);
     Document::AllocatorType& a = d.GetAllocator();
@@ -876,7 +907,7 @@ TEST(Pointer, Swap) {
     EXPECT_STREQ("bar", d["foo"][1].GetString());
 }
 
-TEST(Pointer, Swap_NoAllocator) {
+TEST(Pointer, Swap_Value_NoAllocator) {
     Document d;
     d.Parse(kJson);
     Pointer("/foo/0").Swap(d, *Pointer("/foo/1").Get(d));
