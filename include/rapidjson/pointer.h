@@ -200,6 +200,36 @@ public:
         return *this;
     }
 
+    //! Swap the content of this pointer with an other.
+    /*!
+        \param other The pointer to swap with.
+        \note Constant complexity.
+    */
+    GenericPointer& Swap(GenericPointer& other) RAPIDJSON_NOEXCEPT {
+        internal::Swap(allocator_, other.allocator_);
+        internal::Swap(ownAllocator_, other.ownAllocator_);
+        internal::Swap(nameBuffer_, other.nameBuffer_);
+        internal::Swap(tokens_, other.tokens_);
+        internal::Swap(tokenCount_, other.tokenCount_);
+        internal::Swap(parseErrorOffset_, other.parseErrorOffset_);
+        internal::Swap(parseErrorCode_, other.parseErrorCode_);
+        return *this;
+    }
+
+    //! free-standing swap function helper
+    /*!
+        Helper function to enable support for common swap implementation pattern based on \c std::swap:
+        \code
+        void swap(MyClass& a, MyClass& b) {
+            using std::swap;
+            swap(a.pointer, b.pointer);
+            // ...
+        }
+        \endcode
+        \see Swap()
+     */
+    friend inline void swap(GenericPointer& a, GenericPointer& b) RAPIDJSON_NOEXCEPT { a.Swap(b); }
+
     //@}
 
     //!@name Append token
