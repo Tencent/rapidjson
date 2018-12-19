@@ -15,7 +15,9 @@
 #include "unittest.h"
 #include "rapidjson/pointer.h"
 #include "rapidjson/stringbuffer.h"
+#include "rapidjson/ostreamwrapper.h"
 #include <sstream>
+#include <map>
 #include <algorithm>
 
 using namespace rapidjson;
@@ -1521,6 +1523,79 @@ TEST(Pointer, Ambiguity) {
         Pointer("/0/1").Set(d, 456); // 1 is treated as "1" to index object
         EXPECT_EQ(123, Pointer("/0/0").Get(d)->GetInt());
         EXPECT_EQ(456, Pointer("/0/1").Get(d)->GetInt());
+    }
+}
+
+TEST(Pointer, LessThan) {
+    static const struct {
+        const char *str;
+        bool valid;
+    } pointers[] = {
+        { "/a/b",       true },
+        { "/a",         true },
+        { "/d/1",       true },
+        { "/d/2/z",     true },
+        { "/d/2/3",     true },
+        { "/d/2",       true },
+        { "/a/c",       true },
+        { "/e/f~g",     false },
+        { "/d/2/zz",    true },
+        { "/d/1",       true },
+        { "/d/2/z",     true },
+        { "/e/f~~g",    false },
+        { "/e/f~0g",    true },
+        { "/e/f~1g",    true },
+        { "/e/f.g",     true },
+        { "",           true }
+    };
+    static const char *ordered_pointers[] = {
+        "",
+        "/a",
+        "/a/b",
+        "/a/c",
+        "/d/1",
+        "/d/1",
+        "/d/2",
+        "/e/f.g",
+        "/e/f~1g",
+        "/e/f~0g",
+        "/d/2/3",
+        "/d/2/z",
+        "/d/2/z",
+        "/d/2/zz",
+        NULL,       // was invalid "/e/f~g"
+        NULL        // was invalid "/e/f~~g"
+    };
+    typedef MemoryPoolAllocator<> AllocatorType;
+    typedef GenericPointer<Value, AllocatorType> PointerType;
+    typedef std::multimap<PointerType, size_t> PointerMap;
+    PointerMap map;
+    PointerMap::iterator it;
+    AllocatorType allocator;
+    size_t i;
+
+    EXPECT_EQ(sizeof(pointers) / sizeof(pointers[0]),
+              sizeof(ordered_pointers) / sizeof(ordered_pointers[0]));
+
+    for (i = 0; i < sizeof(pointers) / sizeof(pointers[0]); ++i) {
+        it = map.insert(PointerMap::value_type(PointerType(pointers[i].str, &allocator), i));
+        if (!it->first.IsValid()) {
+            EXPECT_EQ(++it, map.end());
+        }
+    }
+
+    for (i = 0, it = map.begin(); it != map.end(); ++it, ++i) {
+        EXPECT_TRUE(it->second < sizeof(pointers) / sizeof(pointers[0]));
+        EXPECT_EQ(it->first.IsValid(), pointers[it->second].valid);
+        EXPECT_TRUE(i < sizeof(ordered_pointers) / sizeof(ordered_pointers[0]));
+        EXPECT_EQ(it->first.IsValid(), !!ordered_pointers[i]);
+        if (it->first.IsValid()) {
+            std::stringstream ss;
+            OStreamWrapper os(ss);
+            EXPECT_TRUE(it->first.Stringify(os));
+            EXPECT_EQ(ss.str(), pointers[it->second].str);
+            EXPECT_EQ(ss.str(), ordered_pointers[i]);
+        }
     }
 }
 
