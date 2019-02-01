@@ -923,7 +923,7 @@ public:
     //! Equal-to operator
     /*!
         \note If an object contains duplicated named member, comparing equality with any object is always \c false.
-        \note Linear time complexity (number of all values in the subtree and total lengths of all strings).
+        \note Complexity is quadratic in Object's member number and linear for the rest (number of all values in the subtree and total lengths of all strings).
     */
     template <typename SourceAllocator>
     bool operator==(const GenericValue<Encoding, SourceAllocator>& rhs) const {
