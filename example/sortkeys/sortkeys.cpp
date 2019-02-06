@@ -26,7 +26,7 @@ struct NameComparator {
 };
 
 int main() {
-    Document d = Document(kObjectType);
+    Document d(kObjectType);
     Document::AllocatorType &allocator = d.GetAllocator();
 
     d.AddMember("zeta", Value().SetBool(false), allocator);
