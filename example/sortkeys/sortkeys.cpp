@@ -17,10 +17,7 @@ static void printIt(const Value &doc) {
 }
 
 struct NameComparator {
-    bool operator()(
-        const GenericMember<UTF8<>, MemoryPoolAllocator<> > &lhs,
-        const GenericMember<UTF8<>, MemoryPoolAllocator<> > &rhs) const
-    {
+    bool operator()(const Value::Member &lhs, const Value::Member &rhs) const {
         return (strcmp(lhs.name.GetString(), rhs.name.GetString()) < 0);
     }
 };

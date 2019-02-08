@@ -66,6 +66,12 @@ template <typename Encoding, typename Allocator>
 struct GenericMember { 
     GenericValue<Encoding, Allocator> name;     //!< name of member (must be a string)
     GenericValue<Encoding, Allocator> value;    //!< value of member.
+
+    // swap() for std::sort() and other potential use in STL.
+    friend inline void swap(GenericMember& a, GenericMember& b) RAPIDJSON_NOEXCEPT {
+        a.name.Swap(b.name);
+        a.value.Swap(b.value);
+    }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
