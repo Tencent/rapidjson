@@ -42,7 +42,13 @@ int main() {
 }
 */
 
+// C++11 supports std::move() of Value so it always have no problem for std::sort().
+// Some C++03 implementations of std::sort() requires copy constructor which causes compilation error.
+// Needs a sorting function only depends on std::swap() instead.
+#if __cplusplus >= 201103L || !defined(__GLIBCXX__)
     std::sort(d.MemberBegin(), d.MemberEnd(), NameComparator());
+#endif
+
     printIt(d);
 
 /*
