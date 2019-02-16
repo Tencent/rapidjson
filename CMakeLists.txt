@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8)
 if(POLICY CMP0025)
   # detect Apple's Clang
   cmake_policy(SET CMP0025 NEW)
@@ -7,9 +7,9 @@ if(POLICY CMP0054)
   cmake_policy(SET CMP0054 NEW)
 endif()
 
-SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
 
-PROJECT(RapidJSON CXX)
+project(RapidJSON CXX)
 
 set(LIB_MAJOR_VERSION "1")
 set(LIB_MINOR_VERSION "1")
@@ -22,7 +22,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Build all binaries in a separate directory
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 option(RAPIDJSON_BUILD_DOC "Build rapidjson documentation." ON)
 option(RAPIDJSON_BUILD_EXAMPLES "Build rapidjson examples." ON)
@@ -50,12 +50,12 @@ find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
-    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Qunused-arguments -fcolor-diagnostics")
     endif()
-endif(CCACHE_FOUND)
+endif()
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     if(RAPIDJSON_ENABLE_INSTRUMENTATION_OPT AND NOT CMAKE_CROSSCOMPILING)
         if(CMAKE_SYSTEM_PROCESSOR STREQUAL "powerpc" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "ppc64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "ppc64le")
           set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=native")
@@ -66,69 +66,69 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     endif()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")
     set(EXTRA_CXX_FLAGS -Weffc++ -Wswitch-default -Wfloat-equal -Wconversion -Wsign-conversion)
-    if (RAPIDJSON_BUILD_CXX11 AND CMAKE_VERSION VERSION_LESS 3.1)
-        if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.7.0")
+    if(RAPIDJSON_BUILD_CXX11 AND CMAKE_VERSION VERSION_LESS 3.1)
+        if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.7.0")
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
         else()
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
         endif()
     endif()
-    if (RAPIDJSON_BUILD_ASAN)
-        if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.8.0")
+    if(RAPIDJSON_BUILD_ASAN)
+        if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.8.0")
             message(FATAL_ERROR "GCC < 4.8 doesn't support the address sanitizer")
         else()
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
         endif()
     endif()
-    if (RAPIDJSON_BUILD_UBSAN)
-        if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.9.0")
+    if(RAPIDJSON_BUILD_UBSAN)
+        if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.9.0")
             message(FATAL_ERROR "GCC < 4.9 doesn't support the undefined behavior sanitizer")
         else()
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined")
         endif()
     endif()
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     if(NOT CMAKE_CROSSCOMPILING)
-      if(CMAKE_SYSTEM_PROCESSOR STREQUAL "powerpc" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "ppc64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "ppc64le")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=native")
-      else()
-        #FIXME: x86 is -march=native, but doesn't mean every arch is this option. To keep original project's compatibility, I leave this except POWER.
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
-      endif()
+        if(CMAKE_SYSTEM_PROCESSOR STREQUAL "powerpc" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "ppc64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "ppc64le")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcpu=native")
+        else()
+            #FIXME: x86 is -march=native, but doesn't mean every arch is this option. To keep original project's compatibility, I leave this except POWER.
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+        endif()
     endif()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -Wno-missing-field-initializers")
     set(EXTRA_CXX_FLAGS -Weffc++ -Wswitch-default -Wfloat-equal -Wconversion -Wimplicit-fallthrough)
-    if (RAPIDJSON_BUILD_CXX11 AND CMAKE_VERSION VERSION_LESS 3.1)
+    if(RAPIDJSON_BUILD_CXX11 AND CMAKE_VERSION VERSION_LESS 3.1)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     endif()
-    if (RAPIDJSON_BUILD_ASAN)
+    if(RAPIDJSON_BUILD_ASAN)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
     endif()
-    if (RAPIDJSON_BUILD_UBSAN)
-        if (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+    if(RAPIDJSON_BUILD_UBSAN)
+        if(CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined-trap -fsanitize-undefined-trap-on-error")
         else()
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined")
         endif()
     endif()
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS=1)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
-elseif (CMAKE_CXX_COMPILER_ID MATCHES "XL")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "XL")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -qarch=auto")
 endif()
 
 #add extra search paths for libraries and includes
-SET(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The directory the headers are installed in")
-SET(LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib" CACHE STRING "Directory where lib will install")
-SET(DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}" CACHE PATH "Path to the documentation")
+set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The directory the headers are installed in")
+set(LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib" CACHE STRING "Directory where lib will install")
+set(DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}" CACHE PATH "Path to the documentation")
 
-IF(UNIX OR CYGWIN)
-    SET(_CMAKE_INSTALL_DIR "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}")
-ELSEIF(WIN32)
-    SET(_CMAKE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/cmake")
-ENDIF()
-SET(CMAKE_INSTALL_DIR "${_CMAKE_INSTALL_DIR}" CACHE PATH "The directory cmake files are installed in")
+if(UNIX OR CYGWIN)
+    set(_CMAKE_INSTALL_DIR "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}")
+elseif(WIN32)
+    set(_CMAKE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/cmake")
+endif()
+set(CMAKE_INSTALL_DIR "${_CMAKE_INSTALL_DIR}" CACHE PATH "The directory cmake files are installed in")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
@@ -148,24 +148,23 @@ if(RAPIDJSON_BUILD_TESTS)
     if(MSVC11)
         # required for VS2012 due to missing support for variadic templates
         add_definitions(-D_VARIADIC_MAX=10)
-    endif(MSVC11)
+    endif()
     add_subdirectory(test)
     include(CTest)
 endif()
 
 # pkg-config
-IF (UNIX OR CYGWIN)
-  CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
-                  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
-                  @ONLY)
-  INSTALL (FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
-      DESTINATION "${LIB_INSTALL_DIR}/pkgconfig"
-      COMPONENT pkgconfig)
-ENDIF()
+if(UNIX OR CYGWIN)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc @ONLY)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
+        DESTINATION "${LIB_INSTALL_DIR}/pkgconfig"
+        COMPONENT pkgconfig)
+endif()
 
 install(FILES readme.md
-        DESTINATION "${DOC_INSTALL_DIR}"
-        COMPONENT doc)
+    DESTINATION "${DOC_INSTALL_DIR}"
+    COMPONENT doc)
 
 install(DIRECTORY include/rapidjson
     DESTINATION "${INCLUDE_INSTALL_DIR}"
@@ -185,36 +184,36 @@ install(DIRECTORY example/
 
 ################################################################################
 # Export package for use from the build tree
-EXPORT( PACKAGE ${PROJECT_NAME} )
+export(PACKAGE ${PROJECT_NAME})
 
 # Create the RapidJSONConfig.cmake file for other cmake projects.
 # ... for the build tree
-SET( CONFIG_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-SET( CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR})
-SET( ${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_SOURCE_DIR}/include" )
+set(CONFIG_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_SOURCE_DIR}/include")
 
-CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY )
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake @ONLY)
 
 # ... for the install tree
-SET( CMAKECONFIG_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME} )
-FILE( RELATIVE_PATH REL_INCLUDE_DIR
+set(CMAKECONFIG_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME})
+file(RELATIVE_PATH REL_INCLUDE_DIR
     "${CMAKECONFIG_INSTALL_DIR}"
-    "${CMAKE_INSTALL_PREFIX}/include" )
+    "${CMAKE_INSTALL_PREFIX}/include")
 
-SET( ${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_CMAKE_DIR}/${REL_INCLUDE_DIR}" )
-SET( CONFIG_SOURCE_DIR )
-SET( CONFIG_DIR )
-CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake @ONLY )
+set(${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+set(CONFIG_SOURCE_DIR)
+set(CONFIG_DIR)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake @ONLY)
 
-INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
-        DESTINATION ${CMAKECONFIG_INSTALL_DIR} )
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
+    DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 
 # Install files
-INSTALL(FILES
+install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     DESTINATION "${CMAKE_INSTALL_DIR}"
