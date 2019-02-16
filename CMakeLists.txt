@@ -119,14 +119,14 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "XL")
 endif()
 
 #add extra search paths for libraries and includes
-set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The directory the headers are installed in")
-set(LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib" CACHE STRING "Directory where lib will install")
-set(DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}" CACHE PATH "Path to the documentation")
+set(INCLUDE_INSTALL_DIR "include" CACHE PATH "The directory the headers are installed in")
+set(LIB_INSTALL_DIR "lib" CACHE STRING "Directory where lib will install")
+set(DOC_INSTALL_DIR "share/doc/${PROJECT_NAME}" CACHE PATH "Path to the documentation")
 
 if(UNIX OR CYGWIN)
     set(_CMAKE_INSTALL_DIR "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}")
 elseif(WIN32)
-    set(_CMAKE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/cmake")
+    set(_CMAKE_INSTALL_DIR "cmake")
 endif()
 set(CMAKE_INSTALL_DIR "${_CMAKE_INSTALL_DIR}" CACHE PATH "The directory cmake files are installed in")
 
