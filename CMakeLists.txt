@@ -16,6 +16,12 @@ set(LIB_MINOR_VERSION "1")
 set(LIB_PATCH_VERSION "0")
 set(LIB_VERSION_STRING "${LIB_MAJOR_VERSION}.${LIB_MINOR_VERSION}.${LIB_PATCH_VERSION}")
 
+# Check if this is the master project.
+set(MASTER_PROJECT OFF)
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  set(MASTER_PROJECT ON)
+endif()
+
 # compile in release with debug info mode by default
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose the type of build." FORCE)
@@ -26,9 +32,9 @@ endif()
 # Build all binaries in a separate directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-option(RAPIDJSON_BUILD_DOC "Build rapidjson documentation." ON)
-option(RAPIDJSON_BUILD_EXAMPLES "Build rapidjson examples." ON)
-option(RAPIDJSON_BUILD_TESTS "Build rapidjson perftests and unittests." ON)
+option(RAPIDJSON_BUILD_DOC "Build rapidjson documentation." ${MASTER_PROJECT})
+option(RAPIDJSON_BUILD_EXAMPLES "Build rapidjson examples." ${MASTER_PROJECT})
+option(RAPIDJSON_BUILD_TESTS "Build rapidjson perftests and unittests." ${MASTER_PROJECT})
 option(RAPIDJSON_BUILD_THIRDPARTY_GTEST
     "Use gtest installation in `thirdparty/gtest` by default if available" OFF)
 
@@ -49,7 +55,7 @@ if(RAPIDJSON_HAS_STDSTRING)
 endif()
 
 find_program(CCACHE_FOUND ccache)
-if(CCACHE_FOUND)
+if(CCACHE_FOUND AND MASTER_PROJECT)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -186,7 +192,9 @@ install(DIRECTORY example/
 
 ################################################################################
 # Export package for use from the build tree
-export(PACKAGE ${PROJECT_NAME})
+if(MASTER_PROJECT)
+    export(PACKAGE ${PROJECT_NAME})
+endif()
 
 # Create the RapidJSONConfig.cmake file for other cmake projects.
 include(CMakePackageConfigHelpers)
