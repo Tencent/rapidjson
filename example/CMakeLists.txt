@@ -14,6 +14,7 @@ set(EXAMPLES
     messagereader
     parsebyparts
     pretty
+    prettyarray
     prettyauto
     schemavalidator
     serialize
