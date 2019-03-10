@@ -607,6 +607,7 @@ RAPIDJSON_NAMESPACE_END
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NOEXCEPT_ASSERT
 
+#ifndef RAPIDJSON_NOEXCEPT_ASSERT
 #ifdef RAPIDJSON_ASSERT_THROWS
 #if RAPIDJSON_HAS_CXX11_NOEXCEPT
 #define RAPIDJSON_NOEXCEPT_ASSERT(x)
@@ -616,6 +617,7 @@ RAPIDJSON_NAMESPACE_END
 #else
 #define RAPIDJSON_NOEXCEPT_ASSERT(x) RAPIDJSON_ASSERT(x)
 #endif // RAPIDJSON_ASSERT_THROWS
+#endif // RAPIDJSON_NOEXCEPT_ASSERT
 
 ///////////////////////////////////////////////////////////////////////////////
 // new/delete
