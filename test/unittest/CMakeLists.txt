@@ -13,6 +13,7 @@ set(UNITTEST_SOURCES
     itoatest.cpp
     istreamwrappertest.cpp
     jsoncheckertest.cpp
+    jsonstructtest.cpp
     namespacetest.cpp
     pointertest.cpp
     prettywritertest.cpp
