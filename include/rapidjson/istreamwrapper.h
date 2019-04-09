@@ -17,6 +17,7 @@
 
 #include "stream.h"
 #include <iosfwd>
+#include <ios>
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
