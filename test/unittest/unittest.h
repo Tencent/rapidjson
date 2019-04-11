@@ -122,6 +122,9 @@ public:
 
 #ifndef RAPIDJSON_ASSERT
 #define RAPIDJSON_ASSERT(x) (!(x) ? throw AssertException(RAPIDJSON_STRINGIFY(x)) : (void)0u)
+#ifndef RAPIDJSON_ASSERT_THROWS
+#define RAPIDJSON_ASSERT_THROWS
+#endif
 #endif
 
 class Random {
