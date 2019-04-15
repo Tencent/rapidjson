@@ -181,7 +181,7 @@ private:
 
 `Pointer` 在其建构函数里会解译源字符串。若有解析错误，`Pointer::IsValid()` 返回 `false`。你可使用 `Pointer::GetParseErrorCode()` 和 `GetParseErrorOffset()` 去获取错信息。
 
-要注意的是，所有解析函数都假设 pointer 是合法的。对一个非法 pointer 解析会做成断言失败。
+要注意的是，所有解析函数都假设 pointer 是合法的。对一个非法 pointer 解析会造成断言失败。
 
 # URI 片段表示方式 {#URIFragment}
 
