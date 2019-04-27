@@ -325,6 +325,8 @@ TEST(Document, Swap) {
     EXPECT_TRUE(d1.IsNull());
 
     // reset document, including allocator
+    // so clear o before so that it doesnt contain dangling elements
+    o.Clear();
     Document().Swap(d2);
     EXPECT_TRUE(d2.IsNull());
     EXPECT_NE(&d2.GetAllocator(), &a);

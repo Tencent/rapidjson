@@ -1078,9 +1078,9 @@ static void TestArray(T& x, Allocator& allocator) {
 }
 
 TEST(Value, Array) {
+    Value::AllocatorType allocator;
     Value x(kArrayType);
     const Value& y = x;
-    Value::AllocatorType allocator;
 
     EXPECT_EQ(kArrayType, x.GetType());
     EXPECT_TRUE(x.IsArray());
@@ -1491,9 +1491,9 @@ static void TestObject(T& x, Allocator& allocator) {
 }
 
 TEST(Value, Object) {
+    Value::AllocatorType allocator;
     Value x(kObjectType);
     const Value& y = x; // const version
-    Value::AllocatorType allocator;
 
     EXPECT_EQ(kObjectType, x.GetType());
     EXPECT_TRUE(x.IsObject());
