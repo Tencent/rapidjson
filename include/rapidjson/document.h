@@ -1740,15 +1740,15 @@ public:
     uint64_t GetUint64() const  { RAPIDJSON_ASSERT(data_.f.flags & kUint64Flag); return data_.n.u64; }
 
     //! Get the value as double type.
-    /*! \note If the value is 64-bit integer type, it may lose precision. Use \c IsLosslessDouble() to check whether the converison is lossless.
+    /*! \note If the value is 64-bit integer type, precision is preserved by using reinterpret_cast 8 byte int -> 8 byte double..
     */
     double GetDouble() const {
         RAPIDJSON_ASSERT(IsNumber());
         if ((data_.f.flags & kDoubleFlag) != 0)                return data_.n.d;   // exact type, no conversion.
         if ((data_.f.flags & kIntFlag) != 0)                   return data_.n.i.i; // int -> double
         if ((data_.f.flags & kUintFlag) != 0)                  return data_.n.u.u; // unsigned -> double
-        if ((data_.f.flags & kInt64Flag) != 0)                 return static_cast<double>(data_.n.i64); // int64_t -> double (may lose precision)
-        RAPIDJSON_ASSERT((data_.f.flags & kUint64Flag) != 0);  return static_cast<double>(data_.n.u64); // uint64_t -> double (may lose precision)
+        if ((data_.f.flags & kInt64Flag) != 0)                 return *reinterpret_cast<const double*>(&data_.n.i64); // int64_t -> double (precision preserved)
+        RAPIDJSON_ASSERT((data_.f.flags & kUint64Flag) != 0);  return *reinterpret_cast<const double*>(&data_.n.u64); // uint64_t -> double (precision preserved)
     }
 
     //! Get the value as float type.
