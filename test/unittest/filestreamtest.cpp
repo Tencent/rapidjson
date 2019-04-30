@@ -21,7 +21,7 @@ using namespace rapidjson;
 
 class FileStreamTest : public ::testing::Test {
 public:
-    FileStreamTest() : filename_(), json_(), length_() {}
+    FileStreamTest() : filename_(), json_(), length_(), abcde_() {}
     virtual ~FileStreamTest();
 
     virtual void SetUp() {
@@ -49,6 +49,24 @@ public:
         size_t readLength = fread(json_, 1, length_, fp);
         json_[readLength] = '\0';
         fclose(fp);
+
+        const char *abcde_paths[] = {
+            "data/abcde.txt",
+            "bin/data/abcde.txt",
+            "../bin/data/abcde.txt",
+            "../../bin/data/abcde.txt",
+            "../../../bin/data/abcde.txt"
+        };
+        fp = 0;
+        for (size_t i = 0; i < sizeof(abcde_paths) / sizeof(abcde_paths[0]); i++) {
+            fp = fopen(abcde_paths[i], "rb");
+            if (fp) {
+                abcde_ = abcde_paths[i];
+                break;
+            }
+        }
+        ASSERT_TRUE(fp != 0);
+        fclose(fp);
     }
 
     virtual void TearDown() {
@@ -64,6 +82,7 @@ protected:
     const char* filename_;
     char *json_;
     size_t length_;
+    const char* abcde_;
 };
 
 FileStreamTest::~FileStreamTest() {}
@@ -82,6 +101,30 @@ TEST_F(FileStreamTest, FileReadStream) {
 
     EXPECT_EQ(length_, s.Tell());
     EXPECT_EQ('\0', s.Peek());
+
+    fclose(fp);
+}
+
+TEST_F(FileStreamTest, FileReadStream_Peek4) {
+    FILE *fp = fopen(abcde_, "rb");
+    ASSERT_TRUE(fp != 0);
+    char buffer[4];
+    FileReadStream s(fp, buffer, sizeof(buffer));
+
+    const char* c = s.Peek4();
+    for (int i = 0; i < 4; i++)
+        EXPECT_EQ('a' + i, c[i]);
+    EXPECT_EQ(0u, s.Tell());
+
+    for (int i = 0; i < 5; i++) {
+        EXPECT_EQ(static_cast<size_t>(i), s.Tell());
+        EXPECT_EQ('a' + i, s.Peek());
+        EXPECT_EQ('a' + i, s.Peek());
+        EXPECT_EQ('a' + i, s.Take());
+    }
+    EXPECT_EQ(5u, s.Tell());
+    EXPECT_EQ(0, s.Peek());
+    EXPECT_EQ(0, s.Take());
 
     fclose(fp);
 }

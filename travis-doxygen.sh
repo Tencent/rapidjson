@@ -4,9 +4,9 @@
 
 set -e
 
-DOXYGEN_VER=doxygen-1.8.13
+DOXYGEN_VER=doxygen-1.8.15
 DOXYGEN_TAR=${DOXYGEN_VER}.linux.bin.tar.gz
-DOXYGEN_URL="http://ftp.stack.nl/pub/users/dimitri/${DOXYGEN_TAR}"
+DOXYGEN_URL="http://doxygen.nl/files/${DOXYGEN_TAR}"
 
 : ${GITHUB_REPO:="Tencent/rapidjson"}
 GITHUB_HOST="github.com"

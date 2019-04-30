@@ -11,6 +11,11 @@
 
 using namespace rapidjson;
 
+RAPIDJSON_DIAG_PUSH
+#if defined(__GNUC__) && __GNUC__ >= 7
+RAPIDJSON_DIAG_OFF(format-overflow)
+#endif
+
 template <typename Allocator>
 static char* ReadFile(const char* filename, Allocator& allocator) {
     const char *paths[] = {
@@ -41,6 +46,8 @@ static char* ReadFile(const char* filename, Allocator& allocator) {
     fclose(fp);
     return json;
 }
+
+RAPIDJSON_DIAG_POP
 
 class Schema : public PerfTest {
 public:

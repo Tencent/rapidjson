@@ -144,7 +144,7 @@
    
    Simple yet most efficient way to achieve that is to modify the `address` definition above to initialize it with allocator of the `person` document, then we just add the root member of the value:
    ~~~~~~~~~~cpp
-   Document address(person.GetAllocator());
+   Document address(&person.GetAllocator());
    ...
    person["person"].AddMember("address", address["address"], person.GetAllocator());
    ~~~~~~~~~~

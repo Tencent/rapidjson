@@ -595,6 +595,7 @@ TEST(Regex, Invalid) {
     TEST_INVALID("");
     TEST_INVALID("a|");
     TEST_INVALID("()");
+    TEST_INVALID("(");
     TEST_INVALID(")");
     TEST_INVALID("(a))");
     TEST_INVALID("(a|)");

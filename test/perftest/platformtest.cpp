@@ -76,7 +76,7 @@ TEST_F(Platform, strlen) {
 
 TEST_F(Platform, memcmp) {
     for (int i = 0; i < kTrialCount; i++) {
-        EXPECT_EQ(0, memcmp(temp_, json_, length_));
+        EXPECT_EQ(0u, memcmp(temp_, json_, length_));
     }
 }
 

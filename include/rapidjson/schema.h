@@ -409,7 +409,7 @@ public:
     Schema(SchemaDocumentType* schemaDocument, const PointerType& p, const ValueType& value, const ValueType& document, AllocatorType* allocator) :
         allocator_(allocator),
         uri_(schemaDocument->GetURI(), *allocator),
-        pointer_(p),
+        pointer_(p, allocator),
         typeless_(schemaDocument->GetTypeless()),
         enum_(),
         enumCount_(),
@@ -464,7 +464,7 @@ public:
                 enum_ = static_cast<uint64_t*>(allocator_->Malloc(sizeof(uint64_t) * v->Size()));
                 for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr) {
                     typedef Hasher<EncodingType, MemoryPoolAllocator<> > EnumHasherType;
-                    char buffer[256 + 24];
+                    char buffer[256u + 24];
                     MemoryPoolAllocator<> hasherAllocator(buffer, sizeof(buffer));
                     EnumHasherType h(&hasherAllocator, 256);
                     itr->Accept(h);
@@ -1150,10 +1150,12 @@ private:
     template <typename ValueType>
     RegexType* CreatePattern(const ValueType& value) {
         if (value.IsString())
+            RegexType *r = static_cast<RegexType*>(allocator_->Malloc(sizeof(RegexType)));
             try {
-                return new (allocator_->Malloc(sizeof(RegexType))) RegexType(value.GetString(), std::size_t(value.GetStringLength()), std::regex_constants::ECMAScript);
+                return new (r) RegexType(value.GetString(), std::size_t(value.GetStringLength()), std::regex_constants::ECMAScript);
             }
             catch (const std::regex_error&) {
+                AllocatorType::Free(r);
             }
         return 0;
     }

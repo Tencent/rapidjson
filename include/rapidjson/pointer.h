@@ -200,6 +200,36 @@ public:
         return *this;
     }
 
+    //! Swap the content of this pointer with an other.
+    /*!
+        \param other The pointer to swap with.
+        \note Constant complexity.
+    */
+    GenericPointer& Swap(GenericPointer& other) RAPIDJSON_NOEXCEPT {
+        internal::Swap(allocator_, other.allocator_);
+        internal::Swap(ownAllocator_, other.ownAllocator_);
+        internal::Swap(nameBuffer_, other.nameBuffer_);
+        internal::Swap(tokens_, other.tokens_);
+        internal::Swap(tokenCount_, other.tokenCount_);
+        internal::Swap(parseErrorOffset_, other.parseErrorOffset_);
+        internal::Swap(parseErrorCode_, other.parseErrorCode_);
+        return *this;
+    }
+
+    //! free-standing swap function helper
+    /*!
+        Helper function to enable support for common swap implementation pattern based on \c std::swap:
+        \code
+        void swap(MyClass& a, MyClass& b) {
+            using std::swap;
+            swap(a.pointer, b.pointer);
+            // ...
+        }
+        \endcode
+        \see Swap()
+     */
+    friend inline void swap(GenericPointer& a, GenericPointer& b) RAPIDJSON_NOEXCEPT { a.Swap(b); }
+
     //@}
 
     //!@name Append token
@@ -355,6 +385,33 @@ public:
         \note When any pointers are invalid, always returns true.
     */
     bool operator!=(const GenericPointer& rhs) const { return !(*this == rhs); }
+
+    //! Less than operator.
+    /*!
+        \note Invalid pointers are always greater than valid ones.
+    */
+    bool operator<(const GenericPointer& rhs) const {
+        if (!IsValid())
+            return false;
+        if (!rhs.IsValid())
+            return true;
+
+        if (tokenCount_ != rhs.tokenCount_)
+            return tokenCount_ < rhs.tokenCount_;
+
+        for (size_t i = 0; i < tokenCount_; i++) {
+            if (tokens_[i].index != rhs.tokens_[i].index)
+                return tokens_[i].index < rhs.tokens_[i].index;
+
+            if (tokens_[i].length != rhs.tokens_[i].length)
+                return tokens_[i].length < rhs.tokens_[i].length;
+
+            if (int cmp = std::memcmp(tokens_[i].name, rhs.tokens_[i].name, sizeof(Ch) * tokens_[i].length))
+                return cmp < 0;
+        }
+
+        return false;
+    }
 
     //@}
 

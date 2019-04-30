@@ -59,7 +59,7 @@ public:
 
     // For encoding detection only.
     const Ch* Peek4() const {
-        return (current_ + 4 <= bufferLast_) ? current_ : 0;
+        return (current_ + 4 - !eof_ <= bufferLast_) ? current_ : 0;
     }
 
 private:

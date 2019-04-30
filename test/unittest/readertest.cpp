@@ -422,7 +422,7 @@ static void TestParseDouble() {
             "67546703537516986049910576551282076245490090389328944075868508455133942"
             "30458323690322294816580855933212334827479782620414472316873817718091929"
             "9881250404026184124858368",
-            std::numeric_limits<double>::max());
+            (std::numeric_limits<double>::max)());
 
         TEST_DOUBLE(fullPrecision,
             "243546080556034731077856379609316893158278902575447060151047"
@@ -649,43 +649,43 @@ static void TestParseNumberError() {
         for (int i = 1; i < 310; i++)
             n1e309[i] = '0';
         n1e309[310] = '\0';
-        TEST_NUMBER_ERROR(kParseErrorNumberTooBig, n1e309, 0, 310);
+        TEST_NUMBER_ERROR(kParseErrorNumberTooBig, n1e309, 0u, 310u);
     }
-    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e309", 0, 5);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e309", 0u, 5u);
 
     // Miss fraction part in number.
-    TEST_NUMBER_ERROR(kParseErrorNumberMissFraction, "1.", 2, 2);
-    TEST_NUMBER_ERROR(kParseErrorNumberMissFraction, "1.a", 2, 2);
+    TEST_NUMBER_ERROR(kParseErrorNumberMissFraction, "1.", 2u, 2u);
+    TEST_NUMBER_ERROR(kParseErrorNumberMissFraction, "1.a", 2u, 2u);
 
     // Miss exponent in number.
-    TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e", 2, 2);
-    TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e_", 2, 2);
+    TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e", 2u, 2u);
+    TEST_NUMBER_ERROR(kParseErrorNumberMissExponent, "1e_", 2u, 2u);
 
     // Issue 849
-    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1.8e308", 0, 7);
-    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "5e308", 0, 5);
-    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e309", 0, 5);
-    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1.0e310", 0, 7);
-    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1.00e310", 0, 8);
-    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "-1.8e308", 0, 8);
-    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "-1e309", 0, 6);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1.8e308", 0u, 7u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "5e308", 0u, 5u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e309", 0u, 5u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1.0e310", 0u, 7u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1.00e310", 0u, 8u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "-1.8e308", 0u, 8u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "-1e309", 0u, 6u);
 
     // Issue 1253
-    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "2e308", 0, 5);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "2e308", 0u, 5u);
 
     // Issue 1259
     TEST_NUMBER_ERROR(kParseErrorNumberTooBig,
         "88474320368547737236837236775298547354737253685475547552933720368546854775297525"
         "29337203685468547770151233720097201372368547312337203687203685423685123372036872"
         "03685473724737236837236775297525854775297525472975254737236873720170151235473783"
-        "7236737247372368772473723683723456789012E66", 0, 283);
+        "7236737247372368772473723683723456789012E66", 0u, 283u);
 
 #if 0
     // Test (length + exponent) overflow
-    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e+2147483647", 0, 13);
-    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e+9223372036854775807", 0, 22);
-    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e+10000", 0, 8);
-    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e+50000", 0, 8);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e+2147483647", 0u, 13u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e+9223372036854775807", 0u, 22u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e+10000", 0u, 8u);
+    TEST_NUMBER_ERROR(kParseErrorNumberTooBig, "1e+50000", 0u, 8u);
 #endif
 
     // 9007199254740992 * 2^971 ("infinity")
@@ -693,7 +693,7 @@ static void TestParseNumberError() {
         "1.797693134862315907729305190789024733617976978942306572734300811577326758055009"
         "63132708477322407536021120113879871393357658789768814416622492847430639474124377"
         "76789342486548527630221960124609411945308295208500576883815068234246288147391311"
-        "0540827237163350510684586298239947245938479716304835356329624224137216e+308", 0, 315);
+        "0540827237163350510684586298239947245938479716304835356329624224137216e+308", 0u, 315u);
 
     // TODO:
     // These tests (currently) fail in normal-precision mode
@@ -715,7 +715,7 @@ static void TestParseNumberError() {
             "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
             "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
             "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
-            "00000000000000000000000000000000000000000000000000000000000000000000000000000000e+308", 0, 1125);
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000000e+308", 0u, 1125u);
         // ...round up
         TEST_NUMBER_ERROR(kParseErrorNumberTooBig,
             "1.797693134862315807937289714053034150799341327100378269361737789804449682927647"
@@ -732,14 +732,14 @@ static void TestParseNumberError() {
             "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
             "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
             "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
-            "00000000000000000000000000000000000000000000000000000000000000000000000000000001e+308", 0, 1205);
+            "00000000000000000000000000000000000000000000000000000000000000000000000000000001e+308", 0u, 1205u);
     }
 
     TEST_NUMBER_ERROR(kParseErrorNumberTooBig,
         "10000000000000000000000000000000000000000000000000000000000000000000000000000000"
         "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
         "00000000000000000000000000000000000000000000000000000000000000000000000000000000"
-        "0000000000000000000000000000000000000000000000000000000000000000000001", 0, 310);
+        "0000000000000000000000000000000000000000000000000000000000000000000001", 0u, 310u);
 
 #undef TEST_NUMBER_ERROR
 }
@@ -931,21 +931,21 @@ TEST(Reader, ParseString_Error) {
     }
 
     // Invalid escape character in string.
-    TEST_STRING_ERROR(kParseErrorStringEscapeInvalid, "[\"\\a\"]", 2, 3);
+    TEST_STRING_ERROR(kParseErrorStringEscapeInvalid, "[\"\\a\"]", 2u, 3u);
 
     // Incorrect hex digit after \\u escape in string.
-    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uABCG\"]", 2, 7);
+    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uABCG\"]", 2u, 7u);
 
     // Quotation in \\u escape in string (Issue #288)
-    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uaaa\"]", 2, 7);
-    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uD800\\uFFF\"]", 2, 13);
+    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uaaa\"]", 2u, 7u);
+    TEST_STRING_ERROR(kParseErrorStringUnicodeEscapeInvalidHex, "[\"\\uD800\\uFFF\"]", 2u, 13u);
 
     // The surrogate pair in string is invalid.
-    TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800X\"]", 2, 8);
-    TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800\\uFFFF\"]", 2, 14);
+    TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800X\"]", 2u, 8u);
+    TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800\\uFFFF\"]", 2u, 14u);
 
     // Missing a closing quotation mark in string.
-    TEST_STRING_ERROR(kParseErrorStringMissQuotationMark, "[\"Test]", 7, 7);
+    TEST_STRING_ERROR(kParseErrorStringMissQuotationMark, "[\"Test]", 7u, 7u);
 
     // http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-test.txt
 
@@ -968,7 +968,7 @@ TEST(Reader, ParseString_Error) {
         char e[] = { '[', '\"', 0, ' ', '\"', ']', '\0' };
         for (unsigned c = 0xC0u; c <= 0xFFu; c++) {
             e[2] = static_cast<char>(c);
-            int streamPos;
+            unsigned streamPos;
             if (c <= 0xC1u)
                 streamPos = 3; // 0xC0 - 0xC1
             else if (c <= 0xDFu)
@@ -979,7 +979,7 @@ TEST(Reader, ParseString_Error) {
                 streamPos = 6; // 0xF0 - 0xF4
             else
                 streamPos = 3; // 0xF5 - 0xFF
-            TEST_STRING_ERROR(kParseErrorStringInvalidEncoding, e, 2, streamPos);
+            TEST_STRING_ERROR(kParseErrorStringInvalidEncoding, e, 2u, streamPos);
         }
     }
 
@@ -1062,7 +1062,7 @@ TEST(Reader, ParseArray) {
 TEST(Reader, ParseArray_Error) {
 #define TEST_ARRAY_ERROR(errorCode, str, errorOffset) \
     { \
-        int streamPos = errorOffset; \
+        unsigned streamPos = errorOffset; \
         char buffer[1001]; \
         strncpy(buffer, str, 1000); \
         InsituStringStream s(buffer); \
@@ -1075,13 +1075,13 @@ TEST(Reader, ParseArray_Error) {
     }
 
     // Missing a comma or ']' after an array element.
-    TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1", 2);
-    TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1}", 2);
-    TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1 2]", 3);
+    TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1", 2u);
+    TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1}", 2u);
+    TEST_ARRAY_ERROR(kParseErrorArrayMissCommaOrSquareBracket, "[1 2]", 3u);
 
     // Array cannot have a trailing comma (without kParseTrailingCommasFlag);
     // a value must follow a comma
-    TEST_ARRAY_ERROR(kParseErrorValueInvalid, "[1,]", 3);
+    TEST_ARRAY_ERROR(kParseErrorValueInvalid, "[1,]", 3u);
 
 #undef TEST_ARRAY_ERROR
 }
@@ -1230,7 +1230,7 @@ TEST(Reader, ParseInsituIterative_MultipleRoot) {
 
 #define TEST_ERROR(errorCode, str, errorOffset) \
     { \
-        int streamPos = errorOffset; \
+        unsigned streamPos = errorOffset; \
         char buffer[1001]; \
         strncpy(buffer, str, 1000); \
         InsituStringStream s(buffer); \
@@ -1244,48 +1244,48 @@ TEST(Reader, ParseInsituIterative_MultipleRoot) {
 
 TEST(Reader, ParseDocument_Error) {
     // The document is empty.
-    TEST_ERROR(kParseErrorDocumentEmpty, "", 0);
-    TEST_ERROR(kParseErrorDocumentEmpty, " ", 1);
-    TEST_ERROR(kParseErrorDocumentEmpty, " \n", 2);
+    TEST_ERROR(kParseErrorDocumentEmpty, "", 0u);
+    TEST_ERROR(kParseErrorDocumentEmpty, " ", 1u);
+    TEST_ERROR(kParseErrorDocumentEmpty, " \n", 2u);
 
     // The document root must not follow by other values.
-    TEST_ERROR(kParseErrorDocumentRootNotSingular, "[] 0", 3);
-    TEST_ERROR(kParseErrorDocumentRootNotSingular, "{} 0", 3);
-    TEST_ERROR(kParseErrorDocumentRootNotSingular, "null []", 5);
-    TEST_ERROR(kParseErrorDocumentRootNotSingular, "0 {}", 2);
+    TEST_ERROR(kParseErrorDocumentRootNotSingular, "[] 0", 3u);
+    TEST_ERROR(kParseErrorDocumentRootNotSingular, "{} 0", 3u);
+    TEST_ERROR(kParseErrorDocumentRootNotSingular, "null []", 5u);
+    TEST_ERROR(kParseErrorDocumentRootNotSingular, "0 {}", 2u);
 }
 
 TEST(Reader, ParseValue_Error) {
     // Invalid value.
-    TEST_ERROR(kParseErrorValueInvalid, "nulL", 3);
-    TEST_ERROR(kParseErrorValueInvalid, "truE", 3);
-    TEST_ERROR(kParseErrorValueInvalid, "falsE", 4);
-    TEST_ERROR(kParseErrorValueInvalid, "a]", 0);
-    TEST_ERROR(kParseErrorValueInvalid, ".1", 0);
+    TEST_ERROR(kParseErrorValueInvalid, "nulL", 3u);
+    TEST_ERROR(kParseErrorValueInvalid, "truE", 3u);
+    TEST_ERROR(kParseErrorValueInvalid, "falsE", 4u);
+    TEST_ERROR(kParseErrorValueInvalid, "a]", 0u);
+    TEST_ERROR(kParseErrorValueInvalid, ".1", 0u);
 }
 
 TEST(Reader, ParseObject_Error) {
     // Missing a name for object member.
-    TEST_ERROR(kParseErrorObjectMissName, "{1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{:1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{null:1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{true:1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{false:1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{1:1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{[]:1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{{}:1}", 1);
-    TEST_ERROR(kParseErrorObjectMissName, "{xyz:1}", 1);
+    TEST_ERROR(kParseErrorObjectMissName, "{1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{:1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{null:1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{true:1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{false:1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{1:1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{[]:1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{{}:1}", 1u);
+    TEST_ERROR(kParseErrorObjectMissName, "{xyz:1}", 1u);
 
     // Missing a colon after a name of object member.
-    TEST_ERROR(kParseErrorObjectMissColon, "{\"a\" 1}", 5);
-    TEST_ERROR(kParseErrorObjectMissColon, "{\"a\",1}", 4);
+    TEST_ERROR(kParseErrorObjectMissColon, "{\"a\" 1}", 5u);
+    TEST_ERROR(kParseErrorObjectMissColon, "{\"a\",1}", 4u);
 
     // Must be a comma or '}' after an object member
-    TEST_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, "{\"a\":1]", 6);
+    TEST_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, "{\"a\":1]", 6u);
 
     // Object cannot have a trailing comma (without kParseTrailingCommasFlag);
     // an object member name must follow a comma
-    TEST_ERROR(kParseErrorObjectMissName, "{\"a\":1,}", 7);
+    TEST_ERROR(kParseErrorObjectMissName, "{\"a\":1,}", 7u);
 
     // This tests that MemoryStream is checking the length in Peek().
     {
@@ -1405,7 +1405,7 @@ TEST(Reader, Parse_IStreamWrapper_StringStream) {
 
 #define TESTERRORHANDLING(text, errorCode, offset)\
 {\
-    int streamPos = offset; \
+    unsigned streamPos = offset; \
     StringStream json(text); \
     BaseReaderHandler<> handler; \
     Reader reader; \
@@ -1975,6 +1975,17 @@ TEST(Reader, NumbersAsStrings) {
         Reader reader;
         EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
     }
+    {
+        char n1e319[321];   // '1' followed by 319 '0'
+        n1e319[0] = '1';
+        for (int i = 1; i < 320; i++)
+            n1e319[i] = '0';
+        n1e319[320] = '\0';
+        StringStream s(n1e319);
+        NumbersAsStringsHandler h(n1e319);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+    }
 }
 
 template <unsigned extraFlags>
@@ -2153,7 +2164,7 @@ TEST(Reader, ParseNanAndInfinity) {
     }
 #define TEST_NAN_INF_ERROR(errorCode, str, errorOffset) \
     { \
-        int streamPos = errorOffset; \
+        unsigned streamPos = errorOffset; \
         char buffer[1001]; \
         strncpy(buffer, str, 1000); \
         InsituStringStream s(buffer); \
@@ -2174,14 +2185,14 @@ TEST(Reader, ParseNanAndInfinity) {
     TEST_NAN_INF("Infinity", inf);
     TEST_NAN_INF("-Inf", -inf);
     TEST_NAN_INF("-Infinity", -inf);
-    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NInf", 1);
-    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NaInf", 2);
-    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "INan", 1);
-    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "InNan", 2);
-    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "nan", 1);
-    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-nan", 1);
-    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NAN", 1);
-    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-Infinty", 6);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NInf", 1u);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NaInf", 2u);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "INan", 1u);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "InNan", 2u);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "nan", 1u);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-nan", 1u);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NAN", 1u);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-Infinty", 6u);
 
 #undef TEST_NAN_INF_ERROR
 #undef TEST_NAN_INF
