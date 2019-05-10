@@ -6,7 +6,7 @@ set(PERFTEST_SOURCES
     schematest.cpp)
 
 add_executable(perftest ${PERFTEST_SOURCES})
-target_link_libraries(perftest ${TEST_LIBRARIES})
+target_link_libraries(perftest gtest gtest_main)
 
 add_dependencies(tests perftest)
 

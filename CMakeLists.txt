@@ -30,6 +30,11 @@ option(RAPIDJSON_BUILD_TESTS "Build rapidjson perftests and unittests." ON)
 option(RAPIDJSON_BUILD_THIRDPARTY_GTEST
     "Use gtest installation in `thirdparty/gtest` by default if available" OFF)
 
+if(MSVC AND RAPIDJSON_BUILD_THIRDPARTY_GTEST)
+    set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+    set(CMAKE_CXX_FLAGS_DEBUG   "/MTd")
+endif()
+
 option(RAPIDJSON_BUILD_CXX11 "Build rapidjson with C++11 (gcc/clang)" ON)
 if(RAPIDJSON_BUILD_CXX11)
     set(CMAKE_CXX_STANDARD 11)
