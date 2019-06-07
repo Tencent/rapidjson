@@ -1848,7 +1848,7 @@ TEST(SchemaValidator, TestSuite) {
                                 validator.Reset();
                                 bool actual = data.Accept(validator);
                                 if (expected != actual)
-                                    printf("Fail: %30s \"%s\" \"%s\"\n", filename, description1, description2);
+                                    printf("Fail: %.30s \"%s\" \"%s\"\n", filename, description1, description2);
                                 else
                                     passCount++;
                             }
