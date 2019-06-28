@@ -205,17 +205,17 @@ private:
 // class-based member iterator implementation disabled, use plain pointers
 
 template <bool Const, typename Encoding, typename Allocator>
-struct GenericMemberIterator;
+class GenericMemberIterator;
 
 //! non-const GenericMemberIterator
 template <typename Encoding, typename Allocator>
-struct GenericMemberIterator<false,Encoding,Allocator> {
+class GenericMemberIterator<false,Encoding,Allocator> {
     //! use plain pointer as iterator type
     typedef GenericMember<Encoding,Allocator>* Iterator;
 };
 //! const GenericMemberIterator
 template <typename Encoding, typename Allocator>
-struct GenericMemberIterator<true,Encoding,Allocator> {
+class GenericMemberIterator<true,Encoding,Allocator> {
     //! use plain const pointer as iterator type
     typedef const GenericMember<Encoding,Allocator>* Iterator;
 };
