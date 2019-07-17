@@ -1514,7 +1514,7 @@ public:
         RAPIDJSON_ASSERT(first <= last);
         RAPIDJSON_ASSERT(last <= MemberEnd());
 
-        MemberIterator pos = MemberBegin() + (first - MemberBegin());
+        MemberIterator pos = first;
         for (MemberIterator itr = pos; itr != last; ++itr)
             itr->~Member();
         std::memmove(static_cast<void*>(&*pos), &*last, static_cast<size_t>(MemberEnd() - last) * sizeof(Member));
