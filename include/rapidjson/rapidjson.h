@@ -490,6 +490,12 @@ RAPIDJSON_NAMESPACE_END
 #define RAPIDJSON_VERSION_CODE(x,y,z) \
   (((x)*100000) + ((y)*100) + (z))
 
+#if defined(__has_builtin)
+#define RAPIDJSON_HAS_BUILTIN(x) __has_builtin(x)
+#else
+#define RAPIDJSON_HAS_BUILTIN(x) 0
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_DIAG_PUSH/POP, RAPIDJSON_DIAG_OFF
 

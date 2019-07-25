@@ -29,7 +29,7 @@
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
-#if defined(__has_builtin) && __has_builtin(__builtin_clzll)
+#if (defined(__GNUC__) && __GNUC__ >= 4) || RAPIDJSON_HAS_BUILTIN(__builtin_clzll)
 #define RAPIDJSON_CLZLL __builtin_clzll
 #else
 
