@@ -64,7 +64,7 @@ inline uint32_t clzll(uint64_t x) {
 }
 
 #define RAPIDJSON_CLZLL RAPIDJSON_NAMESPACE::internal::clzll
-#endif // defined(__has_builtin) && __has_builtin(__builtin_clzll)
+#endif // (defined(__GNUC__) && __GNUC__ >= 4) || RAPIDJSON_HAS_BUILTIN(__builtin_clzll)
 
 } // namespace internal
 RAPIDJSON_NAMESPACE_END
