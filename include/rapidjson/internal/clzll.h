@@ -38,9 +38,9 @@ inline uint32_t clzll(uint64_t x) {
     // infinite loop in the software implementation.
     RAPIDJSON_ASSERT(x != 0);
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER)
     unsigned long r = 0;
-#ifdef _WIN64
+#if defined(_WIN64)
     _BitScanReverse64(&r, x);
 #else
     // Scan the high 32 bits.
