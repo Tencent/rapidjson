@@ -20,6 +20,7 @@
 #include "allocators.h"
 #include "stream.h"
 #include "encodedstream.h"
+#include "internal/clzll.h"
 #include "internal/meta.h"
 #include "internal/stack.h"
 #include "internal/strtod.h"
@@ -443,16 +444,16 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
 
         x = vmvnq_u8(x);                       // Negate
         x = vrev64q_u8(x);                     // Rev in 64
-        uint64_t low = vgetq_lane_u64(reinterpret_cast<uint64x2_t>(x), 0);   // extract
-        uint64_t high = vgetq_lane_u64(reinterpret_cast<uint64x2_t>(x), 1);  // extract
+        uint64_t low = vgetq_lane_u64(vreinterpretq_u64_u8(x), 0);   // extract
+        uint64_t high = vgetq_lane_u64(vreinterpretq_u64_u8(x), 1);  // extract
 
         if (low == 0) {
             if (high != 0) {
-                int lz =__builtin_clzll(high);;
+                uint32_t lz = RAPIDJSON_CLZLL(high);
                 return p + 8 + (lz >> 3);
             }
         } else {
-            int lz = __builtin_clzll(low);;
+            uint32_t lz = RAPIDJSON_CLZLL(low);
             return p + (lz >> 3);
         }
     }
@@ -479,16 +480,16 @@ inline const char *SkipWhitespace_SIMD(const char* p, const char* end) {
 
         x = vmvnq_u8(x);                       // Negate
         x = vrev64q_u8(x);                     // Rev in 64
-        uint64_t low = vgetq_lane_u64(reinterpret_cast<uint64x2_t>(x), 0);   // extract
-        uint64_t high = vgetq_lane_u64(reinterpret_cast<uint64x2_t>(x), 1);  // extract
+        uint64_t low = vgetq_lane_u64(vreinterpretq_u64_u8(x), 0);   // extract
+        uint64_t high = vgetq_lane_u64(vreinterpretq_u64_u8(x), 1);  // extract
 
         if (low == 0) {
             if (high != 0) {
-                int lz = __builtin_clzll(high);
+                uint32_t lz = RAPIDJSON_CLZLL(high);
                 return p + 8 + (lz >> 3);
             }
         } else {
-            int lz = __builtin_clzll(low);
+            uint32_t lz = RAPIDJSON_CLZLL(low);
             return p + (lz >> 3);
         }
     }
@@ -1244,19 +1245,19 @@ private:
             x = vorrq_u8(x, vcltq_u8(s, s3));
 
             x = vrev64q_u8(x);                     // Rev in 64
-            uint64_t low = vgetq_lane_u64(reinterpret_cast<uint64x2_t>(x), 0);   // extract
-            uint64_t high = vgetq_lane_u64(reinterpret_cast<uint64x2_t>(x), 1);  // extract
+            uint64_t low = vgetq_lane_u64(vreinterpretq_u64_u8(x), 0);   // extract
+            uint64_t high = vgetq_lane_u64(vreinterpretq_u64_u8(x), 1);  // extract
 
             SizeType length = 0;
             bool escaped = false;
             if (low == 0) {
                 if (high != 0) {
-                    unsigned lz = (unsigned)__builtin_clzll(high);;
+                    uint32_t lz = RAPIDJSON_CLZLL(high);
                     length = 8 + (lz >> 3);
                     escaped = true;
                 }
             } else {
-                unsigned lz = (unsigned)__builtin_clzll(low);;
+                uint32_t lz = RAPIDJSON_CLZLL(low);
                 length = lz >> 3;
                 escaped = true;
             }
@@ -1314,19 +1315,19 @@ private:
             x = vorrq_u8(x, vcltq_u8(s, s3));
 
             x = vrev64q_u8(x);                     // Rev in 64
-            uint64_t low = vgetq_lane_u64(reinterpret_cast<uint64x2_t>(x), 0);   // extract
-            uint64_t high = vgetq_lane_u64(reinterpret_cast<uint64x2_t>(x), 1);  // extract
+            uint64_t low = vgetq_lane_u64(vreinterpretq_u64_u8(x), 0);   // extract
+            uint64_t high = vgetq_lane_u64(vreinterpretq_u64_u8(x), 1);  // extract
 
             SizeType length = 0;
             bool escaped = false;
             if (low == 0) {
                 if (high != 0) {
-                    unsigned lz = (unsigned)__builtin_clzll(high);
+                    uint32_t lz = RAPIDJSON_CLZLL(high);
                     length = 8 + (lz >> 3);
                     escaped = true;
                 }
             } else {
-                unsigned lz = (unsigned)__builtin_clzll(low);
+                uint32_t lz = RAPIDJSON_CLZLL(low);
                 length = lz >> 3;
                 escaped = true;
             }
@@ -1370,17 +1371,17 @@ private:
             x = vorrq_u8(x, vcltq_u8(s, s3));
 
             x = vrev64q_u8(x);                     // Rev in 64
-            uint64_t low = vgetq_lane_u64(reinterpret_cast<uint64x2_t>(x), 0);   // extract
-            uint64_t high = vgetq_lane_u64(reinterpret_cast<uint64x2_t>(x), 1);  // extract
+            uint64_t low = vgetq_lane_u64(vreinterpretq_u64_u8(x), 0);   // extract
+            uint64_t high = vgetq_lane_u64(vreinterpretq_u64_u8(x), 1);  // extract
 
             if (low == 0) {
                 if (high != 0) {
-                    int lz = __builtin_clzll(high);
+                    uint32_t lz = RAPIDJSON_CLZLL(high);
                     p += 8 + (lz >> 3);
                     break;
                 }
             } else {
-                int lz = __builtin_clzll(low);
+                uint32_t lz = RAPIDJSON_CLZLL(low);
                 p += lz >> 3;
                 break;
             }
@@ -1403,7 +1404,7 @@ private:
         RAPIDJSON_FORCEINLINE Ch Peek() const { return is.Peek(); }
         RAPIDJSON_FORCEINLINE Ch TakePush() { return is.Take(); }
         RAPIDJSON_FORCEINLINE Ch Take() { return is.Take(); }
-		  RAPIDJSON_FORCEINLINE void Push(char) {}
+        RAPIDJSON_FORCEINLINE void Push(char) {}
 
         size_t Tell() { return is.Tell(); }
         size_t Length() { return 0; }
