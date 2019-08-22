@@ -79,7 +79,7 @@ SAX 和 DOM API 都依赖于3个额外的概念：`Allocator`、`Encoding` 和 `
 | `unsigned u`        | 32位无符号整数                      |4     |4     |
 | （零填充）          | 0                                   |4     |4     |
 | （未使用）          |                                     |4     |8     |
-| `unsigned flags_`   | `kNumberType kNumberFlag kUIntFlag kUInt64Flag ...` |4     |4     |
+| `unsigned flags_`   | `kNumberType kNumberFlag kUintFlag kUint64Flag ...` |4     |4     |
 
 | Number (Int64)      |                                     | 32位 | 64位 |
 |---------------------|-------------------------------------|:----:|:----:|
