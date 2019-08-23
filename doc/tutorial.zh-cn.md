@@ -82,7 +82,7 @@ JSON Number 类型表示所有数值。然而，C++ 需要使用更专门的类�
 ~~~~~~~~~~cpp
 assert(document["i"].IsNumber());
 
-// 在此情况下，IsUint()/IsInt64()/IsUInt64() 也会返回 true
+// 在此情况下，IsUint()/IsInt64()/IsUint64() 也会返回 true
 assert(document["i"].IsInt());          
 printf("i = %d\n", document["i"].GetInt());
 // 另一种用法： (int)document["i"]
