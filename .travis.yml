@@ -20,14 +20,15 @@ env:
 before_install:
     - sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
     - sudo apt-get update -qq
-    - sudo apt-get install -y cmake valgrind g++-multilib libc6-dbg:i386
+    - sudo apt-get install -y cmake valgrind g++-8-multilib libc6-dbg:i386
 
 matrix:
   include:
     # gcc
     - env: CONF=release ARCH=x86    CXX11=ON
       compiler: gcc
-    - env: CONF=release ARCH=x86_64 CXX11=ON
+    # Travis overwrites "CXX" with its own value
+    - env: CONF=release ARCH=x86_64 CXX11=ON CXX_COMPILER=g++-8
       compiler: gcc
     - env: CONF=debug   ARCH=x86    CXX11=OFF
       compiler: gcc
@@ -85,6 +86,7 @@ script:
   - if [ "$CXX" = "clang++" ]; then export CXXFLAGS="-stdlib=libc++ ${CXXFLAGS}"; fi
   - >
       eval "ARCH_FLAGS=\${ARCH_FLAGS_${ARCH}}" ;
+      eval "CXX_COMPILER=\${CXX_COMPILER:-$CXX}" ;
       (cd build && cmake
       -DRAPIDJSON_HAS_STDSTRING=ON
       -DRAPIDJSON_BUILD_CXX11=$CXX11
@@ -92,8 +94,9 @@ script:
       -DCMAKE_BUILD_TYPE=$CONF
       -DCMAKE_CXX_FLAGS="$ARCH_FLAGS $GCOV_FLAGS"
       -DCMAKE_EXE_LINKER_FLAGS=$GCOV_FLAGS
+      -DCMAKE_CXX_COMPILER=$CXX_COMPILER
       ..)
   - cd build
-  - make tests -j 2
-  - make examples -j 2
+  - make tests -kj 2
+  - make examples -kj 2
   - ctest -j 2 -V `[ "$CONF" = "release" ] || echo "-E perftest"`
