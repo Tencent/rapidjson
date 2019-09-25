@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.13"/>
+<meta name="generator" content="Doxygen 1.8.16"/>
 <title>RapidJSON: 教程</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
@@ -14,13 +14,16 @@
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(initResizable);
-</script>
+/* @license-end */</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(function() { init_search(); });
+/* @license-end */
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
@@ -43,9 +46,11 @@
           </span>
         </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.13 -->
+<!-- 制作者 Doxygen 1.8.16 -->
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
 </script>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
@@ -59,7 +64,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 $(document).ready(function(){initNavTree('md_doc_tutorial_8zh-cn.html','');});
+/* @license-end */
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -76,20 +83,27 @@ $(document).ready(function(){initNavTree('md_doc_tutorial_8zh-cn.html','');});
 </iframe>
 </div>
 
-<div class="header">
+<div class="PageDoc"><div class="header">
   <div class="headertitle">
 <div class="title">教程 </div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>目录</h3>
 <ul><li class="level1"><a href="#ValueDocument">Value 及 Document</a></li>
-<li class="level1"><a href="#QueryValue">查询 Value</a><ul><li class="level2"><a href="#QueryArray">查询 Array</a></li>
-<li class="level2"><a href="#QueryObject">查询 Object</a></li>
-<li class="level2"><a href="#QueryNumber">查询 Number</a></li>
-<li class="level2"><a href="#QueryString">查询 String</a></li>
+<li class="level1"><a href="#QueryValue">查询 Value</a><ul><li class="level2"><a href="#QueryArray">查询 Array</a><ul><li class="level3"><a href="#autotoc_md42">范围 for 循环 (v1.1.0 中的新功能)</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#CreateModifyValues">创建／修改值</a><ul><li class="level2"><a href="#ChangeValueType">改变 Value 类型</a></li>
+<li class="level2"><a href="#QueryObject">查询 Object</a><ul><li class="level3"><a href="#autotoc_md43">范围 for 循环 (v1.1.0 中的新功能)</a></li>
+</ul>
+</li>
+<li class="level2"><a href="#QueryNumber">查询 Number</a></li>
+<li class="level2"><a href="#QueryString">查询 String</a></li>
+<li class="level2"><a href="#autotoc_md44">比较两个 Value</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#CreateModifyValues">创建／修改值</a><ul><li class="level2"><a href="#ChangeValueType">改变 Value 类型</a><ul><li class="level3"><a href="#autotoc_md45">构造函数的各个重载</a></li>
+</ul>
+</li>
 <li class="level2"><a href="#MoveSemantics">转移语义（Move Semantics）</a><ul><li class="level3"><a href="#TemporaryValues">转移语义及临时值</a></li>
 </ul>
 </li>
@@ -111,82 +125,164 @@ Value 及 Document</h1>
 <h1><a class="anchor" id="QueryValue"></a>
 查询 Value</h1>
 <p>在本节中，我们会使用到 <code>example/tutorial/tutorial.cpp</code> 中的代码片段。</p>
-<p>假设我们用 C 语言的字符串储存一个 JSON（<code>const char* json</code>）： </p><div class="fragment"><div class="line">{</div><div class="line">    &quot;hello&quot;: &quot;world&quot;,</div><div class="line">    &quot;t&quot;: true ,</div><div class="line">    &quot;f&quot;: false,</div><div class="line">    &quot;n&quot;: null,</div><div class="line">    &quot;i&quot;: 123,</div><div class="line">    &quot;pi&quot;: 3.1416,</div><div class="line">    &quot;a&quot;: [1, 2, 3, 4]</div><div class="line">}</div></div><!-- fragment --><p>把它解析至一个 <code>Document</code>： </p><div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="document_8h.html">rapidjson/document.h</a>&quot;</span></div><div class="line"></div><div class="line"><span class="keyword">using namespace </span><a class="code" href="namespacerapidjson.html">rapidjson</a>;</div><div class="line"></div><div class="line"><span class="comment">// ...</span></div><div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> document;</div><div class="line">document.<a class="code" href="classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c">Parse</a>(json);</div></div><!-- fragment --><p>那么现在该 JSON 就会被解析至 <code>document</code> 中，成为一棵 *DOM 树 *:</p>
+<p>假设我们用 C 语言的字符串储存一个 JSON（<code>const char* json</code>）： </p><div class="fragment"><div class="line">{</div>
+<div class="line">    &quot;hello&quot;: &quot;world&quot;,</div>
+<div class="line">    &quot;t&quot;: true ,</div>
+<div class="line">    &quot;f&quot;: false,</div>
+<div class="line">    &quot;n&quot;: null,</div>
+<div class="line">    &quot;i&quot;: 123,</div>
+<div class="line">    &quot;pi&quot;: 3.1416,</div>
+<div class="line">    &quot;a&quot;: [1, 2, 3, 4]</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>把它解析至一个 <code>Document</code>： </p><div class="fragment"><div class="line"><span class="preprocessor">#include &quot;<a class="code" href="document_8h.html">rapidjson/document.h</a>&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">using namespace </span><a class="code" href="namespacerapidjson.html">rapidjson</a>;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// ...</span></div>
+<div class="line"><a class="code" href="classrapidjson_1_1_generic_document.html">Document</a> document;</div>
+<div class="line">document.<a class="code" href="classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c">Parse</a>(json);</div>
+</div><!-- fragment --><p>那么现在该 JSON 就会被解析至 <code>document</code> 中，成为一棵 *DOM 树 *:</p>
 <div class="image">
-<img src="tutorial.png" alt="tutorial.png"/>
+<img src="tutorial.png" alt=""/>
 <div class="caption">
 教程中的 DOM</div></div>
-<p> 自从 RFC 7159 作出更新，合法 JSON 文件的根可以是任何类型的 JSON 值。而在较早的 RFC 4627 中，根值只允许是 Object 或 Array。而在上述例子中，根是一个 Object。 </p><div class="fragment"><div class="line">assert(document.IsObject());</div></div><!-- fragment --><p>让我们查询一下根 Object 中有没有 <code>"hello"</code> 成员。由于一个 <code>Value</code> 可包含不同类型的值，我们可能需要验证它的类型，并使用合适的 API 去获取其值。在此例中，<code>"hello"</code> 成员关联到一个 JSON String。 </p><div class="fragment"><div class="line">assert(document.<a class="code" href="classrapidjson_1_1_generic_value.html#aa78e2eb30c6b918826eccf03f04f166b">HasMember</a>(<span class="stringliteral">&quot;hello&quot;</span>));</div><div class="line">assert(document[<span class="stringliteral">&quot;hello&quot;</span>].IsString());</div><div class="line">printf(<span class="stringliteral">&quot;hello = %s\n&quot;</span>, document[<span class="stringliteral">&quot;hello&quot;</span>].GetString());</div></div><!-- fragment --><div class="fragment"><div class="line">world</div></div><!-- fragment --><p>JSON True/False 值是以 <code>bool</code> 表示的。 </p><div class="fragment"><div class="line">assert(document[<span class="stringliteral">&quot;t&quot;</span>].IsBool());</div><div class="line">printf(<span class="stringliteral">&quot;t = %s\n&quot;</span>, document[<span class="stringliteral">&quot;t&quot;</span>].GetBool() ? <span class="stringliteral">&quot;true&quot;</span> : <span class="stringliteral">&quot;false&quot;</span>);</div></div><!-- fragment --><div class="fragment"><div class="line">true</div></div><!-- fragment --><p>JSON Null 值可用 <code>IsNull()</code> 查询。 </p><div class="fragment"><div class="line">printf(<span class="stringliteral">&quot;n = %s\n&quot;</span>, document[<span class="stringliteral">&quot;n&quot;</span>].IsNull() ? <span class="stringliteral">&quot;null&quot;</span> : <span class="stringliteral">&quot;?&quot;</span>);</div></div><!-- fragment --><div class="fragment"><div class="line">null</div></div><!-- fragment --><p>JSON Number 类型表示所有数值。然而，C++ 需要使用更专门的类型。</p>
-<div class="fragment"><div class="line">assert(document[<span class="stringliteral">&quot;i&quot;</span>].IsNumber());</div><div class="line"></div><div class="line"><span class="comment">// 在此情况下，IsUint()/IsInt64()/IsUInt64() 也会返回 true</span></div><div class="line">assert(document[<span class="stringliteral">&quot;i&quot;</span>].IsInt());          </div><div class="line">printf(<span class="stringliteral">&quot;i = %d\n&quot;</span>, document[<span class="stringliteral">&quot;i&quot;</span>].GetInt());</div><div class="line"><span class="comment">// 另一种用法： (int)document[&quot;i&quot;]</span></div><div class="line"></div><div class="line">assert(document[<span class="stringliteral">&quot;pi&quot;</span>].IsNumber());</div><div class="line">assert(document[<span class="stringliteral">&quot;pi&quot;</span>].IsDouble());</div><div class="line">printf(<span class="stringliteral">&quot;pi = %g\n&quot;</span>, document[<span class="stringliteral">&quot;pi&quot;</span>].GetDouble());</div></div><!-- fragment --><div class="fragment"><div class="line">i = 123</div><div class="line">pi = 3.1416</div></div><!-- fragment --><p>JSON Array 包含一些元素。 </p><div class="fragment"><div class="line"><span class="comment">// 使用引用来连续访问，方便之余还更高效。</span></div><div class="line"><span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>&amp; a = document[<span class="stringliteral">&quot;a&quot;</span>];</div><div class="line">assert(a.IsArray());</div><div class="line"><span class="keywordflow">for</span> (<a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> i = 0; i &lt; a.Size(); i++) <span class="comment">// 使用 SizeType 而不是 size_t</span></div><div class="line">        printf(<span class="stringliteral">&quot;a[%d] = %d\n&quot;</span>, i, a[i].GetInt());</div></div><!-- fragment --><div class="fragment"><div class="line">a[0] = 1</div><div class="line">a[1] = 2</div><div class="line">a[2] = 3</div><div class="line">a[3] = 4</div></div><!-- fragment --><p>注意，RapidJSON 并不自动转换各种 JSON 类型。例如，对一个 String 的 Value 调用 <code>GetInt()</code> 是非法的。在调试模式下，它会被断言失败。在发布模式下，其行为是未定义的。</p>
+   <p>自从 RFC 7159 作出更新，合法 JSON 文件的根可以是任何类型的 JSON 值。而在较早的 RFC 4627 中，根值只允许是 Object 或 Array。而在上述例子中，根是一个 Object。 </p><div class="fragment"><div class="line">assert(document.IsObject());</div>
+</div><!-- fragment --><p>让我们查询一下根 Object 中有没有 <code>"hello"</code> 成员。由于一个 <code>Value</code> 可包含不同类型的值，我们可能需要验证它的类型，并使用合适的 API 去获取其值。在此例中，<code>"hello"</code> 成员关联到一个 JSON String。 </p><div class="fragment"><div class="line">assert(document.HasMember(<span class="stringliteral">&quot;hello&quot;</span>));</div>
+<div class="line">assert(document[<span class="stringliteral">&quot;hello&quot;</span>].IsString());</div>
+<div class="line">printf(<span class="stringliteral">&quot;hello = %s\n&quot;</span>, document[<span class="stringliteral">&quot;hello&quot;</span>].GetString());</div>
+</div><!-- fragment --><div class="fragment"><div class="line">world</div>
+</div><!-- fragment --><p>JSON True/False 值是以 <code>bool</code> 表示的。 </p><div class="fragment"><div class="line">assert(document[<span class="stringliteral">&quot;t&quot;</span>].IsBool());</div>
+<div class="line">printf(<span class="stringliteral">&quot;t = %s\n&quot;</span>, document[<span class="stringliteral">&quot;t&quot;</span>].GetBool() ? <span class="stringliteral">&quot;true&quot;</span> : <span class="stringliteral">&quot;false&quot;</span>);</div>
+</div><!-- fragment --><div class="fragment"><div class="line">true</div>
+</div><!-- fragment --><p>JSON Null 值可用 <code>IsNull()</code> 查询。 </p><div class="fragment"><div class="line">printf(<span class="stringliteral">&quot;n = %s\n&quot;</span>, document[<span class="stringliteral">&quot;n&quot;</span>].IsNull() ? <span class="stringliteral">&quot;null&quot;</span> : <span class="stringliteral">&quot;?&quot;</span>);</div>
+</div><!-- fragment --><div class="fragment"><div class="line">null</div>
+</div><!-- fragment --><p>JSON Number 类型表示所有数值。然而，C++ 需要使用更专门的类型。</p>
+<div class="fragment"><div class="line">assert(document[<span class="stringliteral">&quot;i&quot;</span>].IsNumber());</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// 在此情况下，IsUint()/IsInt64()/IsUint64() 也会返回 true</span></div>
+<div class="line">assert(document[<span class="stringliteral">&quot;i&quot;</span>].IsInt());          </div>
+<div class="line">printf(<span class="stringliteral">&quot;i = %d\n&quot;</span>, document[<span class="stringliteral">&quot;i&quot;</span>].GetInt());</div>
+<div class="line"><span class="comment">// 另一种用法： (int)document[&quot;i&quot;]</span></div>
+<div class="line"> </div>
+<div class="line">assert(document[<span class="stringliteral">&quot;pi&quot;</span>].IsNumber());</div>
+<div class="line">assert(document[<span class="stringliteral">&quot;pi&quot;</span>].IsDouble());</div>
+<div class="line">printf(<span class="stringliteral">&quot;pi = %g\n&quot;</span>, document[<span class="stringliteral">&quot;pi&quot;</span>].GetDouble());</div>
+</div><!-- fragment --><div class="fragment"><div class="line">i = 123</div>
+<div class="line">pi = 3.1416</div>
+</div><!-- fragment --><p>JSON Array 包含一些元素。 </p><div class="fragment"><div class="line"><span class="comment">// 使用引用来连续访问，方便之余还更高效。</span></div>
+<div class="line"><span class="keyword">const</span> <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>&amp; a = document[<span class="stringliteral">&quot;a&quot;</span>];</div>
+<div class="line">assert(a.IsArray());</div>
+<div class="line"><span class="keywordflow">for</span> (<a class="code" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> i = 0; i &lt; a.Size(); i++) <span class="comment">// 使用 SizeType 而不是 size_t</span></div>
+<div class="line">        printf(<span class="stringliteral">&quot;a[%d] = %d\n&quot;</span>, i, a[i].GetInt());</div>
+</div><!-- fragment --><div class="fragment"><div class="line">a[0] = 1</div>
+<div class="line">a[1] = 2</div>
+<div class="line">a[2] = 3</div>
+<div class="line">a[3] = 4</div>
+</div><!-- fragment --><p>注意，RapidJSON 并不自动转换各种 JSON 类型。例如，对一个 String 的 Value 调用 <code>GetInt()</code> 是非法的。在调试模式下，它会被断言失败。在发布模式下，其行为是未定义的。</p>
 <p>以下将会讨论有关查询各类型的细节。</p>
 <h2><a class="anchor" id="QueryArray"></a>
 查询 Array</h2>
 <p>缺省情况下，<code>SizeType</code> 是 <code>unsigned</code> 的 typedef。在多数系统中，Array 最多能存储 2^32-1 个元素。</p>
 <p>你可以用整数字面量访问元素，如 <code>a[0]</code>、<code>a[1]</code>、<code>a[2]</code>。</p>
-<p>Array 与 <code>std::vector</code> 相似，除了使用索引，也可使用迭代器来访问所有元素。 </p><div class="fragment"><div class="line"><span class="keywordflow">for</span> (Value::ConstValueIterator itr = a.Begin(); itr != a.End(); ++itr)</div><div class="line">    printf(<span class="stringliteral">&quot;%d &quot;</span>, itr-&gt;GetInt());</div></div><!-- fragment --><p>还有一些熟悉的查询函数：</p><ul>
+<p>Array 与 <code>std::vector</code> 相似，除了使用索引，也可使用迭代器来访问所有元素。 </p><div class="fragment"><div class="line"><span class="keywordflow">for</span> (Value::ConstValueIterator itr = a.Begin(); itr != a.End(); ++itr)</div>
+<div class="line">    printf(<span class="stringliteral">&quot;%d &quot;</span>, itr-&gt;GetInt());</div>
+</div><!-- fragment --><p>还有一些熟悉的查询函数：</p><ul>
 <li><code>SizeType Capacity() const</code></li>
 <li><code>bool Empty() const</code></li>
 </ul>
-<h3>范围 for 循环 (v1.1.0 中的新功能)</h3>
+<h3><a class="anchor" id="autotoc_md42"></a>
+范围 for 循环 (v1.1.0 中的新功能)</h3>
 <p>当使用 C++11 功能时，你可使用范围 for 循环去访问 Array 内的所有元素。</p>
-<div class="fragment"><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; v : a.GetArray())</div><div class="line">    printf(<span class="stringliteral">&quot;%d &quot;</span>, v.GetInt());</div></div><!-- fragment --><h2><a class="anchor" id="QueryObject"></a>
+<div class="fragment"><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; v : a.GetArray())</div>
+<div class="line">    printf(<span class="stringliteral">&quot;%d &quot;</span>, v.GetInt());</div>
+</div><!-- fragment --><h2><a class="anchor" id="QueryObject"></a>
 查询 Object</h2>
 <p>和 Array 相似，我们可以用迭代器去访问所有 Object 成员：</p>
-<div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* kTypeNames[] = </div><div class="line">    { <span class="stringliteral">&quot;Null&quot;</span>, <span class="stringliteral">&quot;False&quot;</span>, <span class="stringliteral">&quot;True&quot;</span>, <span class="stringliteral">&quot;Object&quot;</span>, <span class="stringliteral">&quot;Array&quot;</span>, <span class="stringliteral">&quot;String&quot;</span>, <span class="stringliteral">&quot;Number&quot;</span> };</div><div class="line"></div><div class="line"><span class="keywordflow">for</span> (Value::ConstMemberIterator itr = document.<a class="code" href="classrapidjson_1_1_generic_value.html#ae89a77887aa3eb1f1f913727cbff6786">MemberBegin</a>();</div><div class="line">    itr != document.<a class="code" href="classrapidjson_1_1_generic_value.html#a34ee3d75a7aa308043fb34b0743bfe7c">MemberEnd</a>(); ++itr)</div><div class="line">{</div><div class="line">    printf(<span class="stringliteral">&quot;Type of member %s is %s\n&quot;</span>,</div><div class="line">        itr-&gt;name.GetString(), kTypeNames[itr-&gt;value.GetType()]);</div><div class="line">}</div></div><!-- fragment --><div class="fragment"><div class="line">Type of member hello is String</div><div class="line">Type of member t is True</div><div class="line">Type of member f is False</div><div class="line">Type of member n is Null</div><div class="line">Type of member i is Number</div><div class="line">Type of member pi is Number</div><div class="line">Type of member a is Array</div></div><!-- fragment --><p>注意，当 <code>operator[](const char*)</code> 找不到成员，它会断言失败。</p>
+<div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span>* kTypeNames[] = </div>
+<div class="line">    { <span class="stringliteral">&quot;Null&quot;</span>, <span class="stringliteral">&quot;False&quot;</span>, <span class="stringliteral">&quot;True&quot;</span>, <span class="stringliteral">&quot;Object&quot;</span>, <span class="stringliteral">&quot;Array&quot;</span>, <span class="stringliteral">&quot;String&quot;</span>, <span class="stringliteral">&quot;Number&quot;</span> };</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordflow">for</span> (Value::ConstMemberIterator itr = document.MemberBegin();</div>
+<div class="line">    itr != document.MemberEnd(); ++itr)</div>
+<div class="line">{</div>
+<div class="line">    printf(<span class="stringliteral">&quot;Type of member %s is %s\n&quot;</span>,</div>
+<div class="line">        itr-&gt;name.GetString(), kTypeNames[itr-&gt;value.GetType()]);</div>
+<div class="line">}</div>
+</div><!-- fragment --><div class="fragment"><div class="line">Type of member hello is String</div>
+<div class="line">Type of member t is True</div>
+<div class="line">Type of member f is False</div>
+<div class="line">Type of member n is Null</div>
+<div class="line">Type of member i is Number</div>
+<div class="line">Type of member pi is Number</div>
+<div class="line">Type of member a is Array</div>
+</div><!-- fragment --><p>注意，当 <code>operator[](const char*)</code> 找不到成员，它会断言失败。</p>
 <p>若我们不确定一个成员是否存在，便需要在调用 <code>operator[](const char*)</code> 前先调用 <code>HasMember()</code>。然而，这会导致两次查找。更好的做法是调用 <code>FindMember()</code>，它能同时检查成员是否存在并返回它的 Value：</p>
-<div class="fragment"><div class="line">Value::ConstMemberIterator itr = document.<a class="code" href="classrapidjson_1_1_generic_value.html#ad22fdeac87ec6c370dd43075d3586811">FindMember</a>(<span class="stringliteral">&quot;hello&quot;</span>);</div><div class="line"><span class="keywordflow">if</span> (itr != document.<a class="code" href="classrapidjson_1_1_generic_value.html#a34ee3d75a7aa308043fb34b0743bfe7c">MemberEnd</a>())</div><div class="line">    printf(<span class="stringliteral">&quot;%s\n&quot;</span>, itr-&gt;value.GetString());</div></div><!-- fragment --><h3>范围 for 循环 (v1.1.0 中的新功能)</h3>
+<div class="fragment"><div class="line">Value::ConstMemberIterator itr = document.FindMember(<span class="stringliteral">&quot;hello&quot;</span>);</div>
+<div class="line"><span class="keywordflow">if</span> (itr != document.MemberEnd())</div>
+<div class="line">    printf(<span class="stringliteral">&quot;%s\n&quot;</span>, itr-&gt;value.GetString());</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md43"></a>
+范围 for 循环 (v1.1.0 中的新功能)</h3>
 <p>当使用 C++11 功能时，你可使用范围 for 循环去访问 Object 内的所有成员。</p>
-<div class="fragment"><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; m : document.GetObject())</div><div class="line">    printf(<span class="stringliteral">&quot;Type of member %s is %s\n&quot;</span>,</div><div class="line">        m.name.GetString(), kTypeNames[m.value.GetType()]);</div></div><!-- fragment --><h2><a class="anchor" id="QueryNumber"></a>
+<div class="fragment"><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; m : document.GetObject())</div>
+<div class="line">    printf(<span class="stringliteral">&quot;Type of member %s is %s\n&quot;</span>,</div>
+<div class="line">        m.name.GetString(), kTypeNames[m.value.GetType()]);</div>
+</div><!-- fragment --><h2><a class="anchor" id="QueryNumber"></a>
 查询 Number</h2>
 <p>JSON 只提供一种数值类型──Number。数字可以是整数或实数。RFC 4627 规定数字的范围由解析器指定。</p>
 <p>由于 C++ 提供多种整数及浮点数类型，DOM 尝试尽量提供最广的范围及良好性能。</p>
 <p>当解析一个 Number 时, 它会被存储在 DOM 之中，成为下列其中一个类型：</p>
-<table class="doxtable">
-<tr>
-<th>类型 </th><th>描述  </th></tr>
-<tr>
-<td><code>unsigned</code> </td><td>32 位无号整数 </td></tr>
-<tr>
-<td><code>int</code> </td><td>32 位有号整数 </td></tr>
-<tr>
-<td><code>uint64_t</code> </td><td>64 位无号整数 </td></tr>
-<tr>
-<td><code>int64_t</code> </td><td>64 位有号整数 </td></tr>
-<tr>
-<td><code>double</code> </td><td>64 位双精度浮点数 </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">类型  </th><th class="markdownTableHeadNone">描述   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>unsigned</code>  </td><td class="markdownTableBodyNone">32 位无号整数   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>int</code>  </td><td class="markdownTableBodyNone">32 位有号整数   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>uint64_t</code>  </td><td class="markdownTableBodyNone">64 位无号整数   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>int64_t</code>  </td><td class="markdownTableBodyNone">64 位有号整数   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>double</code>  </td><td class="markdownTableBodyNone">64 位双精度浮点数   </td></tr>
 </table>
 <p>当查询一个 Number 时, 你可以检查该数字是否能以目标类型来提取：</p>
-<table class="doxtable">
-<tr>
-<th>查检 </th><th>提取  </th></tr>
-<tr>
-<td><code>bool IsNumber()</code> </td><td>不适用 </td></tr>
-<tr>
-<td><code>bool IsUint()</code> </td><td><code>unsigned GetUint()</code> </td></tr>
-<tr>
-<td><code>bool IsInt()</code> </td><td><code>int GetInt()</code> </td></tr>
-<tr>
-<td><code>bool IsUint64()</code> </td><td><code>uint64_t GetUint64()</code> </td></tr>
-<tr>
-<td><code>bool IsInt64()</code> </td><td><code>int64_t GetInt64()</code> </td></tr>
-<tr>
-<td><code>bool IsDouble()</code> </td><td><code>double GetDouble()</code> </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">查检  </th><th class="markdownTableHeadNone">提取   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>bool IsNumber()</code>  </td><td class="markdownTableBodyNone">不适用   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>bool IsUint()</code>  </td><td class="markdownTableBodyNone"><code>unsigned GetUint()</code>   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>bool IsInt()</code>  </td><td class="markdownTableBodyNone"><code>int GetInt()</code>   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>bool IsUint64()</code>  </td><td class="markdownTableBodyNone"><code>uint64_t GetUint64()</code>   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>bool IsInt64()</code>  </td><td class="markdownTableBodyNone"><code>int64_t GetInt64()</code>   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>bool IsDouble()</code>  </td><td class="markdownTableBodyNone"><code>double GetDouble()</code>   </td></tr>
 </table>
 <p>注意，一个整数可能用几种类型来提取，而无需转换。例如，一个名为 <code>x</code> 的 Value 包含 123，那么 <code>x.IsInt() == x.IsUint() == x.IsInt64() == x.IsUint64() == true</code>。但如果一个名为 <code>y</code> 的 Value 包含 -3000000000，那么仅会令 <code>x.IsInt64() == true</code>。</p>
 <p>当要提取 Number 类型，<code>GetDouble()</code> 是会把内部整数的表示转换成 <code>double</code>。注意 <code>int</code> 和 <code>unsigned</code> 可以安全地转换至 <code>double</code>，但 <code>int64_t</code> 及 <code>uint64_t</code> 可能会丧失精度（因为 <code>double</code> 的尾数只有 52 位）。</p>
 <h2><a class="anchor" id="QueryString"></a>
 查询 String</h2>
 <p>除了 <code>GetString()</code>，<code>Value</code> 类也有一个 <code>GetStringLength()</code>。这里会解释个中原因。</p>
-<p>根据 RFC 4627，JSON String 可包含 Unicode 字符 <code>U+0000</code>，在 JSON 中会表示为 <code>"\u0000"</code>。问题是，C/C++ 通常使用空字符结尾字符串（null-terminated string），这种字符串把 `<code>\0'</code> 作为结束符号。</p>
+<p>根据 RFC 4627，JSON String 可包含 Unicode 字符 <code>U+0000</code>，在 JSON 中会表示为 <code>"\u0000"</code>。问题是，C/C++ 通常使用空字符结尾字符串（null-terminated string），这种字符串把 `&lsquo;\0&rsquo;` 作为结束符号。</p>
 <p>为了符合 RFC 4627，RapidJSON 支持包含 <code>U+0000</code> 的 String。若你需要处理这些 String，便可使用 <code>GetStringLength()</code> 去获得正确的字符串长度。</p>
 <p>例如，当解析以下的 JSON 至 <code>Document d</code> 之后：</p>
-<div class="fragment"><div class="line">{ &quot;s&quot; :  &quot;a\u0000b&quot; }</div></div><!-- fragment --><p> <code>"a\u0000b"</code> 值的正确长度应该是 3。但 <code>strlen()</code> 会返回 1。</p>
+<div class="fragment"><div class="line">{ &quot;s&quot; :  &quot;a\u0000b&quot; }</div>
+</div><!-- fragment --><p> <code>"a\u0000b"</code> 值的正确长度应该是 3。但 <code>strlen()</code> 会返回 1。</p>
 <p><code>GetStringLength()</code> 也可以提高性能，因为用户可能需要调用 <code>strlen()</code> 去分配缓冲。</p>
 <p>此外，<code>std::string</code> 也支持这个构造函数：</p>
-<div class="fragment"><div class="line">string(<span class="keyword">const</span> <span class="keywordtype">char</span>* s, <span class="keywordtype">size_t</span> count);</div></div><!-- fragment --><p>此构造函数接受字符串长度作为参数。它支持在字符串中存储空字符，也应该会有更好的性能。</p>
-<h2>比较两个 Value</h2>
+<div class="fragment"><div class="line">string(<span class="keyword">const</span> <span class="keywordtype">char</span>* s, <span class="keywordtype">size_t</span> count);</div>
+</div><!-- fragment --><p>此构造函数接受字符串长度作为参数。它支持在字符串中存储空字符，也应该会有更好的性能。</p>
+<h2><a class="anchor" id="autotoc_md44"></a>
+比较两个 Value</h2>
 <p>你可使用 <code>==</code> 及 <code>!=</code> 去比较两个 Value。当且仅当两个 Value 的类型及内容相同，它们才当作相等。你也可以比较 Value 和它的原生类型值。以下是一个例子。</p>
-<div class="fragment"><div class="line"><span class="keywordflow">if</span> (document[<span class="stringliteral">&quot;hello&quot;</span>] == document[<span class="stringliteral">&quot;n&quot;</span>]) <span class="comment">/*...*/</span>;    <span class="comment">// 比较两个值</span></div><div class="line"><span class="keywordflow">if</span> (document[<span class="stringliteral">&quot;hello&quot;</span>] == <span class="stringliteral">&quot;world&quot;</span>) <span class="comment">/*...*/</span>;          <span class="comment">// 与字符串家面量作比较</span></div><div class="line"><span class="keywordflow">if</span> (document[<span class="stringliteral">&quot;i&quot;</span>] != 123) <span class="comment">/*...*/</span>;                  <span class="comment">// 与整数作比较</span></div><div class="line"><span class="keywordflow">if</span> (document[<span class="stringliteral">&quot;pi&quot;</span>] != 3.14) <span class="comment">/*...*/</span>;                <span class="comment">// 与 double 作比较</span></div></div><!-- fragment --><p>Array／Object 顺序以它们的元素／成员作比较。当且仅当它们的整个子树相等，它们才当作相等。</p>
+<div class="fragment"><div class="line"><span class="keywordflow">if</span> (document[<span class="stringliteral">&quot;hello&quot;</span>] == document[<span class="stringliteral">&quot;n&quot;</span>]) <span class="comment">/*...*/</span>;    <span class="comment">// 比较两个值</span></div>
+<div class="line"><span class="keywordflow">if</span> (document[<span class="stringliteral">&quot;hello&quot;</span>] == <span class="stringliteral">&quot;world&quot;</span>) <span class="comment">/*...*/</span>;          <span class="comment">// 与字符串字面量作比较</span></div>
+<div class="line"><span class="keywordflow">if</span> (document[<span class="stringliteral">&quot;i&quot;</span>] != 123) <span class="comment">/*...*/</span>;                  <span class="comment">// 与整数作比较</span></div>
+<div class="line"><span class="keywordflow">if</span> (document[<span class="stringliteral">&quot;pi&quot;</span>] != 3.14) <span class="comment">/*...*/</span>;                <span class="comment">// 与 double 作比较</span></div>
+</div><!-- fragment --><p>Array／Object 顺序以它们的元素／成员作比较。当且仅当它们的整个子树相等，它们才当作相等。</p>
 <p>注意，现时若一个 Object 含有重复命名的成员，它与任何 Object 作比较都总会返回 <code>false</code>。</p>
 <h1><a class="anchor" id="CreateModifyValues"></a>
 创建／修改值</h1>
@@ -194,36 +290,72 @@ Value 及 Document</h1>
 <h2><a class="anchor" id="ChangeValueType"></a>
 改变 Value 类型</h2>
 <p>当使用默认构造函数创建一个 Value 或 Document，它的类型便会是 Null。要改变其类型，需调用 <code>SetXXX()</code> 或赋值操作，例如：</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d; <span class="comment">// Null</span></div><div class="line">d.SetObject();</div><div class="line"></div><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> v;    <span class="comment">// Null</span></div><div class="line">v.SetInt(10);</div><div class="line">v = 10;     <span class="comment">// 简写，和上面的相同</span></div></div><!-- fragment --><h3>构造函数的各个重载</h3>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d; <span class="comment">// Null</span></div>
+<div class="line">d.SetObject();</div>
+<div class="line"> </div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> v;    <span class="comment">// Null</span></div>
+<div class="line">v.SetInt(10);</div>
+<div class="line">v = 10;     <span class="comment">// 简写，和上面的相同</span></div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md45"></a>
+构造函数的各个重载</h3>
 <p>几个类型也有重载构造函数：</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> b(<span class="keyword">true</span>);    <span class="comment">// 调用 Value(bool)</span></div><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> i(-123);    <span class="comment">// 调用 Value(int)</span></div><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> u(123u);    <span class="comment">// 调用 Value(unsigned)</span></div><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> d(1.5);     <span class="comment">// 调用 Value(double)</span></div></div><!-- fragment --><p>要重建空 Object 或 Array，可在默认构造函数后使用 <code>SetObject()</code>/<code>SetArray()</code>，或一次性使用 <code>Value(Type)</code>：</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div></div><!-- fragment --><h2><a class="anchor" id="MoveSemantics"></a>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> b(<span class="keyword">true</span>);    <span class="comment">// 调用 Value(bool)</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> i(-123);    <span class="comment">// 调用 Value(int)</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> u(123u);    <span class="comment">// 调用 Value(unsigned)</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> d(1.5);     <span class="comment">// 调用 Value(double)</span></div>
+</div><!-- fragment --><p>要重建空 Object 或 Array，可在默认构造函数后使用 <code>SetObject()</code>/<code>SetArray()</code>，或一次性使用 <code>Value(Type)</code>：</p>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
+</div><!-- fragment --><h2><a class="anchor" id="MoveSemantics"></a>
 转移语义（Move Semantics）</h2>
 <p>在设计 RapidJSON 时有一个非常特别的决定，就是 Value 赋值并不是把来源 Value 复制至目的 Value，而是把来源 Value 转移（move）至目的 Value。例如：</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(123);</div><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> b(456);</div><div class="line">b = a;         <span class="comment">// a 变成 Null，b 变成数字 123。</span></div></div><!-- fragment --><div class="image">
-<img src="move1.png" alt="move1.png"/>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(123);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> b(456);</div>
+<div class="line">b = a;         <span class="comment">// a 变成 Null，b 变成数字 123。</span></div>
+</div><!-- fragment --><div class="image">
+<img src="move1.png" alt=""/>
 <div class="caption">
 使用移动语义赋值。</div></div>
-<p> 为什么？此语义有何优点？</p>
+   <p>为什么？此语义有何优点？</p>
 <p>最简单的答案就是性能。对于固定大小的 JSON 类型（Number、True、False、Null），复制它们是简单快捷。然而，对于可变大小的 JSON 类型（String、Array、Object），复制它们会产生大量开销，而且这些开销常常不被察觉。尤其是当我们需要创建临时 Object，把它复制至另一变量，然后再析构它。</p>
 <p>例如，若使用正常 * 复制 * 语义：</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div><div class="line">{</div><div class="line">    <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> contacts(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div><div class="line">    <span class="comment">// 把元素加进 contacts 数组。</span></div><div class="line">    <span class="comment">// ...</span></div><div class="line">    o.AddMember(<span class="stringliteral">&quot;contacts&quot;</span>, contacts, d.GetAllocator());  <span class="comment">// 深度复制 contacts （可能有大量内存分配）</span></div><div class="line">    <span class="comment">// 析构 contacts。</span></div><div class="line">}</div></div><!-- fragment --><div class="image">
-<img src="move2.png" alt="move2.png"/>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
+<div class="line">{</div>
+<div class="line">    <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> contacts(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
+<div class="line">    <span class="comment">// 把元素加进 contacts 数组。</span></div>
+<div class="line">    <span class="comment">// ...</span></div>
+<div class="line">    o.AddMember(<span class="stringliteral">&quot;contacts&quot;</span>, contacts, d.GetAllocator());  <span class="comment">// 深度复制 contacts （可能有大量内存分配）</span></div>
+<div class="line">    <span class="comment">// 析构 contacts。</span></div>
+<div class="line">}</div>
+</div><!-- fragment --><div class="image">
+<img src="move2.png" alt=""/>
 <div class="caption">
 复制语义产生大量的复制操作。</div></div>
-<p> 那个 <code>o</code> Object 需要分配一个和 contacts 相同大小的缓冲区，对 conacts 做深度复制，并最终要析构 contacts。这样会产生大量无必要的内存分配／释放，以及内存复制。</p>
+   <p>那个 <code>o</code> Object 需要分配一个和 contacts 相同大小的缓冲区，对 conacts 做深度复制，并最终要析构 contacts。这样会产生大量无必要的内存分配／释放，以及内存复制。</p>
 <p>有一些方案可避免实质地复制这些数据，例如引用计数（reference counting）、垃圾回收（garbage collection, GC）。</p>
 <p>为了使 RapidJSON 简单及快速，我们选择了对赋值采用 * 转移 * 语义。这方法与 <code>std::auto_ptr</code> 相似，都是在赋值时转移拥有权。转移快得多简单得多，只需要析构原来的 Value，把来源 <code>memcpy()</code> 至目标，最后把来源设置为 Null 类型。</p>
 <p>因此，使用转移语义后，上面的例子变成：</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div><div class="line">{</div><div class="line">    <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> contacts(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div><div class="line">    <span class="comment">// adding elements to contacts array.</span></div><div class="line">    o.AddMember(<span class="stringliteral">&quot;contacts&quot;</span>, contacts, d.GetAllocator());  <span class="comment">// 只需 memcpy() contacts 本身至新成员的 Value（16 字节）</span></div><div class="line">    <span class="comment">// contacts 在这里变成 Null。它的析构是平凡的。</span></div><div class="line">}</div></div><!-- fragment --><div class="image">
-<img src="move3.png" alt="move3.png"/>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> o(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>);</div>
+<div class="line">{</div>
+<div class="line">    <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> contacts(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
+<div class="line">    <span class="comment">// adding elements to contacts array.</span></div>
+<div class="line">    o.AddMember(<span class="stringliteral">&quot;contacts&quot;</span>, contacts, d.GetAllocator());  <span class="comment">// 只需 memcpy() contacts 本身至新成员的 Value（16 字节）</span></div>
+<div class="line">    <span class="comment">// contacts 在这里变成 Null。它的析构是平凡的。</span></div>
+<div class="line">}</div>
+</div><!-- fragment --><div class="image">
+<img src="move3.png" alt=""/>
 <div class="caption">
 转移语义不需复制。</div></div>
-<p> 在 C++11 中这称为转移赋值操作（move assignment operator）。由于 RapidJSON 支持 C++03，它在赋值操作采用转移语义，其它修改型函数如 <code>AddMember()</code>, <code>PushBack()</code> 也采用转移语义。</p>
+   <p>在 C++11 中这称为转移赋值操作（move assignment operator）。由于 RapidJSON 支持 C++03，它在赋值操作采用转移语义，其它修改型函数如 <code>AddMember()</code>, <code>PushBack()</code> 也采用转移语义。</p>
 <h3><a class="anchor" id="TemporaryValues"></a>
 转移语义及临时值</h3>
 <p>有时候，我们想直接构造一个 Value 并传递给一个“转移”函数（如 <code>PushBack()</code>、<code>AddMember()</code>）。由于临时对象是不能转换为正常的 Value 引用，我们加入了一个方便的 <code>Move()</code> 函数：</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div><div class="line">Document::AllocatorType&amp; allocator = document.<a class="code" href="classrapidjson_1_1_generic_document.html#ad92c6cd025d411258d1f2ad890e2ee3f">GetAllocator</a>();</div><div class="line"><span class="comment">// a.PushBack(Value(42), allocator);       // 不能通过编译</span></div><div class="line">a.PushBack(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>().SetInt(42), allocator); <span class="comment">// fluent API</span></div><div class="line">a.PushBack(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(42).Move(), allocator);   <span class="comment">// 和上一行相同</span></div></div><!-- fragment --><h2><a class="anchor" id="CreateString"></a>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
+<div class="line">Document::AllocatorType&amp; allocator = document.<a class="code" href="classrapidjson_1_1_generic_document.html#ad92c6cd025d411258d1f2ad890e2ee3f">GetAllocator</a>();</div>
+<div class="line"><span class="comment">// a.PushBack(Value(42), allocator);       // 不能通过编译</span></div>
+<div class="line">a.PushBack(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>().SetInt(42), allocator); <span class="comment">// fluent API</span></div>
+<div class="line">a.PushBack(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(42).Move(), allocator);   <span class="comment">// 和上一行相同</span></div>
+</div><!-- fragment --><h2><a class="anchor" id="CreateString"></a>
 创建 String</h2>
 <p>RapidJSON 提供两个 String 的存储策略。</p>
 <ol type="1">
@@ -233,11 +365,29 @@ Value 及 Document</h1>
 <p>Copy-string 总是安全的，因为它拥有数据的克隆。Const-string 可用于存储字符串字面量，以及用于在 DOM 一节中将会提到的 in-situ 解析中。</p>
 <p>为了让用户自定义内存分配方式，当一个操作可能需要内存分配时，RapidJSON 要求用户传递一个 allocator 实例作为 API 参数。此设计避免了在每个 Value 存储 allocator（或 document）的指针。</p>
 <p>因此，当我们把一个 copy-string 赋值时, 调用含有 allocator 的 <code>SetString()</code> 重载函数：</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> document;</div><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> author;</div><div class="line"><span class="keywordtype">char</span> buffer[10];</div><div class="line"><span class="keywordtype">int</span> len = sprintf(buffer, <span class="stringliteral">&quot;%s %s&quot;</span>, <span class="stringliteral">&quot;Milo&quot;</span>, <span class="stringliteral">&quot;Yip&quot;</span>); <span class="comment">// 动态创建的字符串。</span></div><div class="line">author.SetString(buffer, len, document.GetAllocator());</div><div class="line">memset(buffer, 0, <span class="keyword">sizeof</span>(buffer));</div><div class="line"><span class="comment">// 清空 buffer 后 author.GetString() 仍然包含 &quot;Milo Yip&quot;</span></div></div><!-- fragment --><p>在此例子中，我们使用 <code>Document</code> 实例的 allocator。这是使用 RapidJSON 时常用的惯用法。但你也可以用其他 allocator 实例。</p>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> document;</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> author;</div>
+<div class="line"><span class="keywordtype">char</span> buffer[10];</div>
+<div class="line"><span class="keywordtype">int</span> len = sprintf(buffer, <span class="stringliteral">&quot;%s %s&quot;</span>, <span class="stringliteral">&quot;Milo&quot;</span>, <span class="stringliteral">&quot;Yip&quot;</span>); <span class="comment">// 动态创建的字符串。</span></div>
+<div class="line">author.SetString(buffer, len, document.GetAllocator());</div>
+<div class="line">memset(buffer, 0, <span class="keyword">sizeof</span>(buffer));</div>
+<div class="line"><span class="comment">// 清空 buffer 后 author.GetString() 仍然包含 &quot;Milo Yip&quot;</span></div>
+</div><!-- fragment --><p>在此例子中，我们使用 <code>Document</code> 实例的 allocator。这是使用 RapidJSON 时常用的惯用法。但你也可以用其他 allocator 实例。</p>
 <p>另外，上面的 <code>SetString()</code> 需要长度参数。这个 API 能处理含有空字符的字符串。另一个 <code>SetString()</code> 重载函数没有长度参数，它假设输入是空字符结尾的，并会调用类似 <code>strlen()</code> 的函数去获取长度。</p>
 <p>最后，对于字符串字面量或有安全生命周期的字符串，可以使用 const-string 版本的 <code>SetString()</code>，它没有 allocator 参数。对于字符串字面量（或字符数组常量），只需简单地传递字面量，又安全又高效：</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> s;</div><div class="line">s.SetString(<span class="stringliteral">&quot;rapidjson&quot;</span>);    <span class="comment">// 可包含空字符，长度在编译萁推导</span></div><div class="line">s = <span class="stringliteral">&quot;rapidjson&quot;</span>;             <span class="comment">// 上行的缩写</span></div></div><!-- fragment --><p>对于字符指针，RapidJSON 需要作一个标记，代表它不复制也是安全的。可以使用 <code>StringRef</code> 函数：</p>
-<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span> * cstr = getenv(<span class="stringliteral">&quot;USER&quot;</span>);</div><div class="line"><span class="keywordtype">size_t</span> cstr_len = ...;                 <span class="comment">// 如果有长度</span></div><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> s;</div><div class="line"><span class="comment">// s.SetString(cstr);                  // 这不能通过编译</span></div><div class="line">s.SetString(<a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(cstr));          <span class="comment">// 可以，假设它的生命周期安全，并且是以空字符结尾的</span></div><div class="line">s = <a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(cstr);                   <span class="comment">// 上行的缩写</span></div><div class="line">s.SetString(<a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(cstr, cstr_len));<span class="comment">// 更快，可处理空字符</span></div><div class="line">s = <a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(cstr, cstr_len);         <span class="comment">// 上行的缩写</span></div></div><!-- fragment --><h2><a class="anchor" id="ModifyArray"></a>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> s;</div>
+<div class="line">s.SetString(<span class="stringliteral">&quot;rapidjson&quot;</span>);    <span class="comment">// 可包含空字符，长度在编译期推导</span></div>
+<div class="line">s = <span class="stringliteral">&quot;rapidjson&quot;</span>;             <span class="comment">// 上行的缩写</span></div>
+</div><!-- fragment --><p>对于字符指针，RapidJSON 需要作一个标记，代表它不复制也是安全的。可以使用 <code>StringRef</code> 函数：</p>
+<div class="fragment"><div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span> * cstr = getenv(<span class="stringliteral">&quot;USER&quot;</span>);</div>
+<div class="line"><span class="keywordtype">size_t</span> cstr_len = ...;                 <span class="comment">// 如果有长度</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> s;</div>
+<div class="line"><span class="comment">// s.SetString(cstr);                  // 这不能通过编译</span></div>
+<div class="line">s.SetString(<a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(cstr));          <span class="comment">// 可以，假设它的生命周期安全，并且是以空字符结尾的</span></div>
+<div class="line">s = <a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(cstr);                   <span class="comment">// 上行的缩写</span></div>
+<div class="line">s.SetString(<a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(cstr, cstr_len));<span class="comment">// 更快，可处理空字符</span></div>
+<div class="line">s = <a class="code" href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">StringRef</a>(cstr, cstr_len);         <span class="comment">// 上行的缩写</span></div>
+</div><!-- fragment --><h2><a class="anchor" id="ModifyArray"></a>
 修改 Array</h2>
 <p>Array 类型的 Value 提供与 <code>std::vector</code> 相似的 API。</p>
 <ul>
@@ -251,9 +401,24 @@ Value 及 Document</h1>
 </ul>
 <p>注意，<code>Reserve(...)</code> 及 <code>PushBack(...)</code> 可能会为数组元素分配内存，所以需要一个 allocator。</p>
 <p>以下是 <code>PushBack()</code> 的例子：</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div><div class="line">Document::AllocatorType&amp; allocator = document.GetAllocator();</div><div class="line"></div><div class="line"><span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 5; i &lt;= 10; i++)</div><div class="line">    a.PushBack(i, allocator);   <span class="comment">// 可能需要调用 realloc() 所以需要 allocator</span></div><div class="line"></div><div class="line"><span class="comment">// 流畅接口（Fluent interface）</span></div><div class="line">a.PushBack(<span class="stringliteral">&quot;Lua&quot;</span>, allocator).PushBack(<span class="stringliteral">&quot;Mio&quot;</span>, allocator);</div></div><!-- fragment --><p>与 STL 不一样的是，<code>PushBack()</code>/<code>PopBack()</code> 返回 Array 本身的引用。这称为流畅接口（_fluent interface_）。</p>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">kArrayType</a>);</div>
+<div class="line">Document::AllocatorType&amp; allocator = document.GetAllocator();</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 5; i &lt;= 10; i++)</div>
+<div class="line">    a.PushBack(i, allocator);   <span class="comment">// 可能需要调用 realloc() 所以需要 allocator</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// 流畅接口（Fluent interface）</span></div>
+<div class="line">a.PushBack(<span class="stringliteral">&quot;Lua&quot;</span>, allocator).PushBack(<span class="stringliteral">&quot;Mio&quot;</span>, allocator);</div>
+</div><!-- fragment --><p>与 STL 不一样的是，<code>PushBack()</code>/<code>PopBack()</code> 返回 Array 本身的引用。这称为流畅接口（_fluent interface_）。</p>
 <p>如果你想在 Array 中加入一个非常量字符串，或是一个没有足够生命周期的字符串（见 <a href="#CreateString">Create String</a>），你需要使用 copy-string API 去创建一个 String。为了避免加入中间变量，可以就地使用一个 <a href="#TemporaryValues">临时值</a>：</p>
-<div class="fragment"><div class="line"><span class="comment">// 就地 Value 参数</span></div><div class="line">contact.PushBack(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<span class="stringliteral">&quot;copy&quot;</span>, document.GetAllocator()).Move(), <span class="comment">// copy string</span></div><div class="line">                 document.GetAllocator());</div><div class="line"></div><div class="line"><span class="comment">// 显式 Value 参数</span></div><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> val(<span class="stringliteral">&quot;key&quot;</span>, document.GetAllocator()); <span class="comment">// copy string</span></div><div class="line">contact.PushBack(val, document.GetAllocator());</div></div><!-- fragment --><h2><a class="anchor" id="ModifyObject"></a>
+<div class="fragment"><div class="line"><span class="comment">// 就地 Value 参数</span></div>
+<div class="line">contact.PushBack(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<span class="stringliteral">&quot;copy&quot;</span>, document.GetAllocator()).Move(), <span class="comment">// copy string</span></div>
+<div class="line">                 document.GetAllocator());</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// 显式 Value 参数</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> val(<span class="stringliteral">&quot;key&quot;</span>, document.GetAllocator()); <span class="comment">// copy string</span></div>
+<div class="line">contact.PushBack(val, document.GetAllocator());</div>
+</div><!-- fragment --><h2><a class="anchor" id="ModifyObject"></a>
 修改 Object</h2>
 <p>Object 是键值对的集合。每个键必须为 String。要修改 Object，方法是增加或移除成员。以下的 API 用来增加城员：</p>
 <ul>
@@ -262,9 +427,21 @@ Value 及 Document</h1>
 <li><code>template &lt;typename T&gt; Value&amp; AddMember(StringRefType, T value, Allocator&amp;)</code></li>
 </ul>
 <p>以下是一个例子。</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> contact(kObject);</div><div class="line">contact.AddMember(<span class="stringliteral">&quot;name&quot;</span>, <span class="stringliteral">&quot;Milo&quot;</span>, document.GetAllocator());</div><div class="line">contact.AddMember(<span class="stringliteral">&quot;married&quot;</span>, <span class="keyword">true</span>, document.GetAllocator());</div></div><!-- fragment --><p>使用 <code>StringRefType</code> 作为 name 参数的重载版本与字符串的 <code>SetString</code> 的接口相似。 这些重载是为了避免复制 <code>name</code> 字符串，因为 JSON object 中经常会使用常数键名。</p>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> contact(kObject);</div>
+<div class="line">contact.AddMember(<span class="stringliteral">&quot;name&quot;</span>, <span class="stringliteral">&quot;Milo&quot;</span>, document.GetAllocator());</div>
+<div class="line">contact.AddMember(<span class="stringliteral">&quot;married&quot;</span>, <span class="keyword">true</span>, document.GetAllocator());</div>
+</div><!-- fragment --><p>使用 <code>StringRefType</code> 作为 name 参数的重载版本与字符串的 <code>SetString</code> 的接口相似。 这些重载是为了避免复制 <code>name</code> 字符串，因为 JSON object 中经常会使用常数键名。</p>
 <p>如果你需要从非常数字符串或生命周期不足的字符串创建键名（见 <a href="#CreateString">创建 String</a>），你需要使用 copy-string API。为了避免中间变量，可以就地使用 <a href="#TemporaryValues">临时值</a>：</p>
-<div class="fragment"><div class="line"><span class="comment">// 就地 Value 参数</span></div><div class="line">contact.AddMember(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<span class="stringliteral">&quot;copy&quot;</span>, document.GetAllocator()).Move(), <span class="comment">// copy string</span></div><div class="line">                  <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>().Move(),                                <span class="comment">// null value</span></div><div class="line">                  document.GetAllocator());</div><div class="line"></div><div class="line"><span class="comment">// 显式参数</span></div><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> key(<span class="stringliteral">&quot;key&quot;</span>, document.GetAllocator()); <span class="comment">// copy string name</span></div><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> val(42);                             <span class="comment">// 某 Value</span></div><div class="line">contact.AddMember(key, val, document.GetAllocator());</div></div><!-- fragment --><p>移除成员有几个选择：</p>
+<div class="fragment"><div class="line"><span class="comment">// 就地 Value 参数</span></div>
+<div class="line">contact.AddMember(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<span class="stringliteral">&quot;copy&quot;</span>, document.GetAllocator()).Move(), <span class="comment">// copy string</span></div>
+<div class="line">                  <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>().Move(),                                <span class="comment">// null value</span></div>
+<div class="line">                  document.GetAllocator());</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// 显式参数</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> key(<span class="stringliteral">&quot;key&quot;</span>, document.GetAllocator()); <span class="comment">// copy string name</span></div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> val(42);                             <span class="comment">// 某 Value</span></div>
+<div class="line">contact.AddMember(key, val, document.GetAllocator());</div>
+</div><!-- fragment --><p>移除成员有几个选择：</p>
 <ul>
 <li><code>bool RemoveMember(const Ch* name)</code>：使用键名来移除成员（线性时间复杂度）。</li>
 <li><code>bool RemoveMember(const Value&amp; name)</code>：除了 <code>name</code> 是一个 Value，和上一行相同。</li>
@@ -276,24 +453,55 @@ Value 及 Document</h1>
 <h2><a class="anchor" id="DeepCopyValue"></a>
 深复制 Value</h2>
 <p>若我们真的要复制一个 DOM 树，我们可使用两个 APIs 作深复制：含 allocator 的构造函数及 <code>CopyFrom()</code>。</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div><div class="line">Document::AllocatorType&amp; a = d.GetAllocator();</div><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> v1(<span class="stringliteral">&quot;foo&quot;</span>);</div><div class="line"><span class="comment">// Value v2(v1); // 不容许</span></div><div class="line"></div><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> v2(v1, a);                      <span class="comment">// 制造一个克隆</span></div><div class="line">assert(v1.IsString());                <span class="comment">// v1 不变</span></div><div class="line">d.SetArray().PushBack(v1, a).PushBack(v2, a);</div><div class="line">assert(v1.IsNull() &amp;&amp; v2.IsNull());   <span class="comment">// 两个都转移动 d</span></div><div class="line"></div><div class="line">v2.CopyFrom(d, a);                    <span class="comment">// 把整个 document 复制至 v2</span></div><div class="line">assert(d.IsArray() &amp;&amp; d.Size() == 2); <span class="comment">// d 不变</span></div><div class="line">v1.SetObject().AddMember(<span class="stringliteral">&quot;array&quot;</span>, v2, a);</div><div class="line">d.PushBack(v1, a);</div></div><!-- fragment --><h2><a class="anchor" id="SwapValues"></a>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
+<div class="line">Document::AllocatorType&amp; a = d.GetAllocator();</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> v1(<span class="stringliteral">&quot;foo&quot;</span>);</div>
+<div class="line"><span class="comment">// Value v2(v1); // 不容许</span></div>
+<div class="line"> </div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> v2(v1, a);                      <span class="comment">// 制造一个克隆</span></div>
+<div class="line">assert(v1.IsString());                <span class="comment">// v1 不变</span></div>
+<div class="line">d.SetArray().PushBack(v1, a).PushBack(v2, a);</div>
+<div class="line">assert(v1.IsNull() &amp;&amp; v2.IsNull());   <span class="comment">// 两个都转移动 d</span></div>
+<div class="line"> </div>
+<div class="line">v2.CopyFrom(d, a);                    <span class="comment">// 把整个 document 复制至 v2</span></div>
+<div class="line">assert(d.IsArray() &amp;&amp; d.Size() == 2); <span class="comment">// d 不变</span></div>
+<div class="line">v1.SetObject().AddMember(<span class="stringliteral">&quot;array&quot;</span>, v2, a);</div>
+<div class="line">d.PushBack(v1, a);</div>
+</div><!-- fragment --><h2><a class="anchor" id="SwapValues"></a>
 交换 Value</h2>
 <p>RapidJSON 也提供 <code>Swap()</code>。</p>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(123);</div><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> b(<span class="stringliteral">&quot;Hello&quot;</span>);</div><div class="line">a.Swap(b);</div><div class="line">assert(a.IsString());</div><div class="line">assert(b.IsInt());</div></div><!-- fragment --><p>无论两棵 DOM 树有多复杂，交换是很快的（常数时间）。</p>
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> a(123);</div>
+<div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> b(<span class="stringliteral">&quot;Hello&quot;</span>);</div>
+<div class="line">a.Swap(b);</div>
+<div class="line">assert(a.IsString());</div>
+<div class="line">assert(b.IsInt());</div>
+</div><!-- fragment --><p>无论两棵 DOM 树有多复杂，交换是很快的（常数时间）。</p>
 <h1><a class="anchor" id="WhatsNext"></a>
 下一部分</h1>
 <p>本教程展示了如何询查及修改 DOM 树。RapidJSON 还有一个重要概念：</p>
 <ol type="1">
-<li><a class="el" href="md_doc_stream_8zh-cn.html">流</a> 是读写 JSON 的通道。流可以是内存字符串、文件流等。用户也可以自定义流。</li>
-<li><a class="el" href="md_doc_encoding_8zh-cn.html">编码</a> 定义在流或内存中使用的字符编码。RapidJSON 也在内部提供 Unicode 转换及校验功能。</li>
-<li><a class="el" href="md_doc_dom_8zh-cn.html">DOM</a> 的基本功能已在本教程里介绍。还有更高级的功能，如原位（*in situ*）解析、其他解析选项及高级用法。</li>
-<li><a class="el" href="md_doc_sax_8zh-cn.html">SAX</a> 是 RapidJSON 解析／生成功能的基础。学习使用 <code>Reader</code>/<code>Writer</code> 去实现更高性能的应用程序。也可以使用 <code>PrettyWriter</code> 去格式化 JSON。</li>
-<li><a class="el" href="md_doc_performance_8zh-cn.html">性能</a> 展示一些我们做的及第三方的性能测试。</li>
+<li><a href="doc/stream.zh-cn.md">流</a> 是读写 JSON 的通道。流可以是内存字符串、文件流等。用户也可以自定义流。</li>
+<li><a href="doc/encoding.zh-cn.md">编码</a> 定义在流或内存中使用的字符编码。RapidJSON 也在内部提供 Unicode 转换及校验功能。</li>
+<li><a href="doc/dom.zh-cn.md">DOM</a> 的基本功能已在本教程里介绍。还有更高级的功能，如原位（*in situ*）解析、其他解析选项及高级用法。</li>
+<li><a href="doc/sax.zh-cn.md">SAX</a> 是 RapidJSON 解析／生成功能的基础。学习使用 <code>Reader</code>/<code>Writer</code> 去实现更高性能的应用程序。也可以使用 <code>PrettyWriter</code> 去格式化 JSON。</li>
+<li><a href="doc/performance.zh-cn.md">性能</a> 展示一些我们做的及第三方的性能测试。</li>
 <li>技术内幕 讲述一些 RapidJSON 内部的设计及技术。</li>
 </ol>
-<p>你也可以参考 <a class="el" href="md_doc_faq_8zh-cn.html">常见问题</a>、API 文档、例子及单元测试。 </p>
+<p>你也可以参考 <a href="doc/faq.zh-cn.md">常见问题</a>、API 文档、例子及单元测试。 </p>
 </div></div><!-- contents -->
+</div><!-- PageDoc -->
 </div><!-- doc-content -->
+<div class="ttc" id="adocument_8h_html"><div class="ttname"><a href="document_8h.html">document.h</a></div></div>
+<div class="ttc" id="astructrapidjson_1_1_generic_string_ref_html_aa6b9fd9f6aa49405a574c362ba9af6b5"><div class="ttname"><a href="structrapidjson_1_1_generic_string_ref.html#aa6b9fd9f6aa49405a574c362ba9af6b5">rapidjson::GenericStringRef::StringRef</a></div><div class="ttdeci">GenericStringRef&lt; CharType &gt; StringRef(const CharType *str)</div><div class="ttdoc">Mark a character pointer as constant string</div><div class="ttdef"><b>Definition:</b> document.h:364</div></div>
+<div class="ttc" id="anamespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">rapidjson::kObjectType</a></div><div class="ttdoc">object</div><div class="ttdef"><b>Definition:</b> rapidjson.h:648</div></div>
+<div class="ttc" id="anamespacerapidjson_html_a44eb33eaa523e36d466b1ced64b85c84"><div class="ttname"><a href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">rapidjson::SizeType</a></div><div class="ttdeci">unsigned SizeType</div><div class="ttdoc">Size type (for string lengths, array sizes, etc.)</div><div class="ttdef"><b>Definition:</b> rapidjson.h:384</div></div>
+<div class="ttc" id="anamespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468">rapidjson::kArrayType</a></div><div class="ttdoc">array</div><div class="ttdef"><b>Definition:</b> rapidjson.h:649</div></div>
+<div class="ttc" id="aclassrapidjson_1_1_generic_document_html_ad92c6cd025d411258d1f2ad890e2ee3f"><div class="ttname"><a href="classrapidjson_1_1_generic_document.html#ad92c6cd025d411258d1f2ad890e2ee3f">rapidjson::GenericDocument::GetAllocator</a></div><div class="ttdeci">Allocator &amp; GetAllocator()</div><div class="ttdoc">Get the allocator of this document.</div><div class="ttdef"><b>Definition:</b> document.h:2412</div></div>
+<div class="ttc" id="anamespacerapidjson_html_aa65fc9fb381b2cbc54f98673eadd6505"><div class="ttname"><a href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">rapidjson::Value</a></div><div class="ttdeci">GenericValue&lt; UTF8&lt;&gt; &gt; Value</div><div class="ttdoc">GenericValue with UTF8 encoding</div><div class="ttdef"><b>Definition:</b> document.h:2110</div></div>
+<div class="ttc" id="aclassrapidjson_1_1_generic_document_html_aea842b533a858c9a3861451ad9e8642c"><div class="ttname"><a href="classrapidjson_1_1_generic_document.html#aea842b533a858c9a3861451ad9e8642c">rapidjson::GenericDocument::Parse</a></div><div class="ttdeci">GenericDocument &amp; Parse(const typename SourceEncoding::Ch *str)</div><div class="ttdoc">Parse JSON text from a read-only string (with Encoding conversion)</div><div class="ttdef"><b>Definition:</b> document.h:2325</div></div>
+<div class="ttc" id="aclassrapidjson_1_1_generic_document_html"><div class="ttname"><a href="classrapidjson_1_1_generic_document.html">rapidjson::GenericDocument</a></div><div class="ttdoc">A document for parsing JSON text as DOM.</div><div class="ttdef"><b>Definition:</b> document.h:57</div></div>
+<div class="ttc" id="anamespacerapidjson_html_ace11b5b575baf1cccd5ba5f8586dcdc8"><div class="ttname"><a href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">rapidjson::Document</a></div><div class="ttdeci">GenericDocument&lt; UTF8&lt;&gt; &gt; Document</div><div class="ttdoc">GenericDocument with UTF8 encoding</div><div class="ttdef"><b>Definition:</b> document.h:2506</div></div>
+<div class="ttc" id="anamespacerapidjson_html"><div class="ttname"><a href="namespacerapidjson.html">rapidjson</a></div><div class="ttdoc">main RapidJSON namespace</div><div class="ttdef"><b>Definition:</b> rapidjson.h:378</div></div>
 <!-- HTML footer for doxygen 1.8.7-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

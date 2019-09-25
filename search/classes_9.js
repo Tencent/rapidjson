@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['memorypoolallocator',['MemoryPoolAllocator',['../classrapidjson_1_1_memory_pool_allocator.html',1,'rapidjson']]],
-  ['memorystream',['MemoryStream',['../structrapidjson_1_1_memory_stream.html',1,'rapidjson']]]
+  ['level_332',['Level',['../structrapidjson_1_1_writer_1_1_level.html',1,'rapidjson::Writer']]]
 ];

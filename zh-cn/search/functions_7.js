@@ -1,5 +1,9 @@
 var searchData=
 [
-  ['hasmember',['HasMember',['../classrapidjson_1_1_generic_value.html#aa78e2eb30c6b918826eccf03f04f166b',1,'rapidjson::GenericValue::HasMember(const Ch *name) const'],['../classrapidjson_1_1_generic_value.html#a9b3b30acbe60d7a5b105afa05c1ddfb0',1,'rapidjson::GenericValue::HasMember(const std::basic_string&lt; Ch &gt; &amp;name) const'],['../classrapidjson_1_1_generic_value.html#a794129b8adffb97d123306a0c0ccaf71',1,'rapidjson::GenericValue::HasMember(const GenericValue&lt; Encoding, SourceAllocator &gt; &amp;name) const']]],
-  ['hasparseerror',['HasParseError',['../classrapidjson_1_1_generic_document.html#a7607bb42b51547e44bfd4cab35d8f20e',1,'rapidjson::GenericDocument::HasParseError()'],['../classrapidjson_1_1_generic_reader.html#ac42370c3497a0e2b6973110f298e3a59',1,'rapidjson::GenericReader::HasParseError()']]]
+  ['iscomplete_399',['IsComplete',['../classrapidjson_1_1_writer.html#a190d964d3e62155e87153e858a0b04da',1,'rapidjson::Writer']]],
+  ['iserror_400',['IsError',['../group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ab6d87c6ce9c849f35e902fbe23f485c4',1,'rapidjson::ParseResult']]],
+  ['isvalid_401',['IsValid',['../classrapidjson_1_1_generic_schema_validator.html#ad32a9ad31dbb588edaaf038ab053275b',1,'rapidjson::GenericSchemaValidator']]],
+  ['iterativeparsecomplete_402',['IterativeParseComplete',['../classrapidjson_1_1_generic_reader.html#a037aee35044b894d1487b42365aadc4b',1,'rapidjson::GenericReader']]],
+  ['iterativeparseinit_403',['IterativeParseInit',['../classrapidjson_1_1_generic_reader.html#a90403a2c55dadf82fd2bb9d4c66b3280',1,'rapidjson::GenericReader']]],
+  ['iterativeparsenext_404',['IterativeParseNext',['../classrapidjson_1_1_generic_reader.html#abac6611bec17167de50fede5cd5194ca',1,'rapidjson::GenericReader']]]
 ];

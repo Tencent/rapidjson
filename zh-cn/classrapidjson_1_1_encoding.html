@@ -4,8 +4,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.13"/>
-<title>RapidJSON: rapidjson::Encoding类 参考</title>
+<meta name="generator" content="Doxygen 1.8.16"/>
+<title>RapidJSON: Encoding类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -14,13 +14,16 @@
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(initResizable);
-</script>
+/* @license-end */</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(function() { init_search(); });
+/* @license-end */
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
@@ -43,9 +46,11 @@
           </span>
         </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.13 -->
+<!-- 制作者 Doxygen 1.8.16 -->
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
 </script>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
@@ -59,7 +64,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 $(document).ready(function(){initNavTree('classrapidjson_1_1_encoding.html','');});
+/* @license-end */
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -78,7 +85,7 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_encoding.html','');
 
 <div class="header">
   <div class="headertitle">
-<div class="title">rapidjson::Encoding类 参考</div>  </div>
+<div class="title">Encoding类 参考</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -88,16 +95,61 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_encoding.html','');
 <p><code>#include &lt;<a class="el" href="encodings_8h_source.html">encodings.h</a>&gt;</code></p>
 <a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
 <div class="textblock"><p>Concept for encoding of Unicode characters. </p>
-<div class="fragment"><div class="line">concept Encoding {</div><div class="line">    <span class="keyword">typename</span> Ch;    <span class="comment">//! Type of character. A &quot;character&quot; is actually a code unit in unicode&#39;s definition.</span></div><div class="line"><span class="comment"></span></div><div class="line">    <span class="keyword">enum</span> { supportUnicode = 1 }; <span class="comment">// or 0 if not supporting unicode</span></div><div class="line"><span class="comment"></span></div><div class="line"><span class="comment">    //! \brief Encode a Unicode codepoint to an output stream.</span></div><div class="line"><span class="comment">    //! \param os Output stream.</span></div><div class="line"><span class="comment">    //! \param codepoint An unicode codepoint, ranging from 0x0 to 0x10FFFF inclusively.</span></div><div class="line"><span class="comment"></span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OutputStream&gt;</div><div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> Encode(OutputStream&amp; os, <span class="keywordtype">unsigned</span> codepoint);</div><div class="line"><span class="comment"></span></div><div class="line"><span class="comment">    //! \brief Decode a Unicode codepoint from an input stream.</span></div><div class="line"><span class="comment">    //! \param is Input stream.</span></div><div class="line"><span class="comment">    //! \param codepoint Output of the unicode codepoint.</span></div><div class="line"><span class="comment">    //! \return true if a valid codepoint can be decoded from the stream.</span></div><div class="line"><span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputStream&gt;</div><div class="line">    <span class="keyword">static</span> <span class="keywordtype">bool</span> Decode(InputStream&amp; is, <span class="keywordtype">unsigned</span>* codepoint);</div><div class="line"><span class="comment"></span></div><div class="line"><span class="comment">    //! \brief Validate one Unicode codepoint from an encoded stream.</span></div><div class="line"><span class="comment">    //! \param is Input stream to obtain codepoint.</span></div><div class="line"><span class="comment">    //! \param os Output for copying one codepoint.</span></div><div class="line"><span class="comment">    //! \return true if it is valid.</span></div><div class="line"><span class="comment">    //! \note This function just validating and copying the codepoint without actually decode it.</span></div><div class="line"><span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> OutputStream&gt;</div><div class="line">    <span class="keyword">static</span> <span class="keywordtype">bool</span> Validate(InputStream&amp; is, OutputStream&amp; os);</div><div class="line"></div><div class="line">    <span class="comment">// The following functions are deal with byte streams.</span></div><div class="line"><span class="comment"></span></div><div class="line"><span class="comment">    //! Take a character from input byte stream, skip BOM if exist.</span></div><div class="line"><span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputByteStream&gt;</div><div class="line">    <span class="keyword">static</span> CharType TakeBOM(InputByteStream&amp; is);</div><div class="line"><span class="comment"></span></div><div class="line"><span class="comment">    //! Take a character from input byte stream.</span></div><div class="line"><span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputByteStream&gt;</div><div class="line">    <span class="keyword">static</span> Ch Take(InputByteStream&amp; is);</div><div class="line"><span class="comment"></span></div><div class="line"><span class="comment">    //! Put BOM to output byte stream.</span></div><div class="line"><span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutputByteStream&gt;</div><div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> PutBOM(OutputByteStream&amp; os);</div><div class="line"><span class="comment"></span></div><div class="line"><span class="comment">    //! Put a character to output byte stream.</span></div><div class="line"><span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutputByteStream&gt;</div><div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> Put(OutputByteStream&amp; os, Ch c);</div><div class="line">};</div></div><!-- fragment --> </div><hr/>该类的文档由以下文件生成:<ul>
+<div class="fragment"><div class="line">concept <a class="code" href="classrapidjson_1_1_encoding.html">Encoding</a> {</div>
+<div class="line">    <span class="keyword">typename</span> Ch;    <span class="comment">//! Type of character. A &quot;character&quot; is actually a code unit in unicode&#39;s definition.</span></div>
+<div class="line"><span class="comment"></span> </div>
+<div class="line">    <span class="keyword">enum</span> { supportUnicode = 1 }; <span class="comment">// or 0 if not supporting unicode</span></div>
+<div class="line"><span class="comment"></span> </div>
+<div class="line"><span class="comment">    //! \brief Encode a Unicode codepoint to an output stream.</span></div>
+<div class="line"><span class="comment">    //! \param os Output stream.</span></div>
+<div class="line"><span class="comment">    //! \param codepoint An unicode codepoint, ranging from 0x0 to 0x10FFFF inclusively.</span></div>
+<div class="line"><span class="comment"></span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> OutputStream&gt;</div>
+<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> Encode(OutputStream&amp; os, <span class="keywordtype">unsigned</span> codepoint);</div>
+<div class="line"><span class="comment"></span> </div>
+<div class="line"><span class="comment">    //! \brief Decode a Unicode codepoint from an input stream.</span></div>
+<div class="line"><span class="comment">    //! \param is Input stream.</span></div>
+<div class="line"><span class="comment">    //! \param codepoint Output of the unicode codepoint.</span></div>
+<div class="line"><span class="comment">    //! \return true if a valid codepoint can be decoded from the stream.</span></div>
+<div class="line"><span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputStream&gt;</div>
+<div class="line">    <span class="keyword">static</span> <span class="keywordtype">bool</span> Decode(InputStream&amp; is, <span class="keywordtype">unsigned</span>* codepoint);</div>
+<div class="line"><span class="comment"></span> </div>
+<div class="line"><span class="comment">    //! \brief Validate one Unicode codepoint from an encoded stream.</span></div>
+<div class="line"><span class="comment">    //! \param is Input stream to obtain codepoint.</span></div>
+<div class="line"><span class="comment">    //! \param os Output for copying one codepoint.</span></div>
+<div class="line"><span class="comment">    //! \return true if it is valid.</span></div>
+<div class="line"><span class="comment">    //! \note This function just validating and copying the codepoint without actually decode it.</span></div>
+<div class="line"><span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputStream, <span class="keyword">typename</span> OutputStream&gt;</div>
+<div class="line">    <span class="keyword">static</span> <span class="keywordtype">bool</span> Validate(InputStream&amp; is, OutputStream&amp; os);</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// The following functions are deal with byte streams.</span></div>
+<div class="line"><span class="comment"></span> </div>
+<div class="line"><span class="comment">    //! Take a character from input byte stream, skip BOM if exist.</span></div>
+<div class="line"><span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputByteStream&gt;</div>
+<div class="line">    <span class="keyword">static</span> CharType TakeBOM(InputByteStream&amp; is);</div>
+<div class="line"><span class="comment"></span> </div>
+<div class="line"><span class="comment">    //! Take a character from input byte stream.</span></div>
+<div class="line"><span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> InputByteStream&gt;</div>
+<div class="line">    <span class="keyword">static</span> Ch Take(InputByteStream&amp; is);</div>
+<div class="line"><span class="comment"></span> </div>
+<div class="line"><span class="comment">    //! Put BOM to output byte stream.</span></div>
+<div class="line"><span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutputByteStream&gt;</div>
+<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> PutBOM(OutputByteStream&amp; os);</div>
+<div class="line"><span class="comment"></span> </div>
+<div class="line"><span class="comment">    //! Put a character to output byte stream.</span></div>
+<div class="line"><span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">typename</span> OutputByteStream&gt;</div>
+<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> Put(OutputByteStream&amp; os, Ch c);</div>
+<div class="line">};</div>
+</div><!-- fragment --> </div><hr/>该类的文档由以下文件生成:<ul>
 <li>include/rapidjson/<a class="el" href="encodings_8h_source.html">encodings.h</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="aclassrapidjson_1_1_encoding_html"><div class="ttname"><a href="classrapidjson_1_1_encoding.html">Encoding</a></div><div class="ttdoc">Concept for encoding of Unicode characters.</div></div>
 <!-- HTML footer for doxygen 1.8.7-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespacerapidjson.html">rapidjson</a></li><li class="navelem"><a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a></li>
+    <li class="navelem"><a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a></li>
   </ul>
 </div>
 </body>

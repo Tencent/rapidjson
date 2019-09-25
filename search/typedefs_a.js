@@ -1,5 +1,8 @@
 var searchData=
 [
-  ['reader',['Reader',['../namespacerapidjson.html#ad5310edd1226f5b3ea82dc0d4d3740c6',1,'rapidjson']]],
-  ['reference',['Reference',['../classrapidjson_1_1_generic_member_iterator.html#abe27838f8dc71fdb38028ef27ae0b4f2',1,'rapidjson::GenericMemberIterator']]]
+  ['schemadocument_488',['SchemaDocument',['../namespacerapidjson.html#a52bbb5d64d1319495089e1713a0653cf',1,'rapidjson']]],
+  ['sizetype_489',['SizeType',['../namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84',1,'rapidjson']]],
+  ['stringbuffer_490',['StringBuffer',['../namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21',1,'rapidjson']]],
+  ['stringreftype_491',['StringRefType',['../classrapidjson_1_1_generic_value.html#a559eb9cea54364a35518b02f6d74f379',1,'rapidjson::GenericValue']]],
+  ['stringstream_492',['StringStream',['../namespacerapidjson.html#a021f77051e9f85188fc2f71ff5a15ebc',1,'rapidjson']]]
 ];

@@ -4,8 +4,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.13"/>
-<title>RapidJSON: rapidjson::Allocator类 参考</title>
+<meta name="generator" content="Doxygen 1.8.16"/>
+<title>RapidJSON: Allocator类 参考</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -14,13 +14,16 @@
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(initResizable);
-</script>
+/* @license-end */</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(function() { init_search(); });
+/* @license-end */
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
@@ -43,9 +46,11 @@
           </span>
         </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.13 -->
+<!-- 制作者 Doxygen 1.8.16 -->
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
 </script>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
@@ -59,7 +64,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 $(document).ready(function(){initNavTree('classrapidjson_1_1_allocator.html','');});
+/* @license-end */
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -78,7 +85,7 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_allocator.html','')
 
 <div class="header">
   <div class="headertitle">
-<div class="title">rapidjson::Allocator类 参考</div>  </div>
+<div class="title">Allocator类 参考</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -90,16 +97,35 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_allocator.html','')
 <div class="textblock"><p>Concept for allocating, resizing and freeing memory block. </p>
 <p>Note that Malloc() and Realloc() are non-static but Free() is static.</p>
 <p>So if an allocator need to support Free(), it needs to put its pointer in the header of memory block.</p>
-<div class="fragment"><div class="line">concept Allocator {</div><div class="line">    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> kNeedFree;    <span class="comment">//!&lt; Whether this allocator needs to call Free().</span></div><div class="line"><span class="comment"></span></div><div class="line">    <span class="comment">// Allocate a memory block.</span></div><div class="line">    <span class="comment">// \param size of the memory block in bytes.</span></div><div class="line">    <span class="comment">// \returns pointer to the memory block.</span></div><div class="line">    <span class="keywordtype">void</span>* Malloc(<span class="keywordtype">size_t</span> size);</div><div class="line"></div><div class="line">    <span class="comment">// Resize a memory block.</span></div><div class="line">    <span class="comment">// \param originalPtr The pointer to current memory block. Null pointer is permitted.</span></div><div class="line">    <span class="comment">// \param originalSize The current size in bytes. (Design issue: since some allocator may not book-keep this, explicitly pass to it can save memory.)</span></div><div class="line">    <span class="comment">// \param newSize the new size in bytes.</span></div><div class="line">    <span class="keywordtype">void</span>* Realloc(<span class="keywordtype">void</span>* originalPtr, <span class="keywordtype">size_t</span> originalSize, <span class="keywordtype">size_t</span> newSize);</div><div class="line"></div><div class="line">    <span class="comment">// Free a memory block.</span></div><div class="line">    <span class="comment">// \param pointer to the memory block. Null pointer is permitted.</span></div><div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> Free(<span class="keywordtype">void</span> *ptr);</div><div class="line">};</div></div><!-- fragment --> </div><hr/>该类的文档由以下文件生成:<ul>
+<div class="fragment"><div class="line">concept <a class="code" href="classrapidjson_1_1_allocator.html">Allocator</a> {</div>
+<div class="line">    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> kNeedFree;    <span class="comment">//!&lt; Whether this allocator needs to call Free().</span></div>
+<div class="line"><span class="comment"></span> </div>
+<div class="line">    <span class="comment">// Allocate a memory block.</span></div>
+<div class="line">    <span class="comment">// \param size of the memory block in bytes.</span></div>
+<div class="line">    <span class="comment">// \returns pointer to the memory block.</span></div>
+<div class="line">    <span class="keywordtype">void</span>* Malloc(<span class="keywordtype">size_t</span> size);</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// Resize a memory block.</span></div>
+<div class="line">    <span class="comment">// \param originalPtr The pointer to current memory block. Null pointer is permitted.</span></div>
+<div class="line">    <span class="comment">// \param originalSize The current size in bytes. (Design issue: since some allocator may not book-keep this, explicitly pass to it can save memory.)</span></div>
+<div class="line">    <span class="comment">// \param newSize the new size in bytes.</span></div>
+<div class="line">    <span class="keywordtype">void</span>* Realloc(<span class="keywordtype">void</span>* originalPtr, <span class="keywordtype">size_t</span> originalSize, <span class="keywordtype">size_t</span> newSize);</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// Free a memory block.</span></div>
+<div class="line">    <span class="comment">// \param pointer to the memory block. Null pointer is permitted.</span></div>
+<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> Free(<span class="keywordtype">void</span> *ptr);</div>
+<div class="line">};</div>
+</div><!-- fragment --> </div><hr/>该类的文档由以下文件生成:<ul>
 <li>include/rapidjson/<a class="el" href="allocators_8h_source.html">allocators.h</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="aclassrapidjson_1_1_allocator_html"><div class="ttname"><a href="classrapidjson_1_1_allocator.html">Allocator</a></div><div class="ttdoc">Concept for allocating, resizing and freeing memory block.</div></div>
 <!-- HTML footer for doxygen 1.8.7-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespacerapidjson.html">rapidjson</a></li><li class="navelem"><a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a></li>
+    <li class="navelem"><a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a></li>
   </ul>
 </div>
 </body>

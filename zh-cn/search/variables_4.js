@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['kneedfree',['kNeedFree',['../classrapidjson_1_1_memory_pool_allocator.html#a2606d96e19bcfc9d4bf58aefe55c1b29',1,'rapidjson::MemoryPoolAllocator']]]
+  ['getparseerrorfunc_452',['GetParseErrorFunc',['../group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga9d6e699072f8275623a52c4892005751',1,'rapidjson']]]
 ];

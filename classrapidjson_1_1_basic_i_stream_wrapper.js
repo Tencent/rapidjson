@@ -2,6 +2,7 @@ var classrapidjson_1_1_basic_i_stream_wrapper =
 [
     [ "Ch", "classrapidjson_1_1_basic_i_stream_wrapper.html#a5fd972d8cd20b90ba0772aeebf122597", null ],
     [ "BasicIStreamWrapper", "classrapidjson_1_1_basic_i_stream_wrapper.html#a2b4e069522fa9119685f1cee836e5cfa", null ],
+    [ "BasicIStreamWrapper", "classrapidjson_1_1_basic_i_stream_wrapper.html#acd380a93ccc01d02aef95ea2a926e154", null ],
     [ "Flush", "classrapidjson_1_1_basic_i_stream_wrapper.html#ab787ec1bce9ec0e4ddc42cde173d3ab1", null ],
     [ "Peek", "classrapidjson_1_1_basic_i_stream_wrapper.html#adfae250fbfdf7dda0ee9b3895758e767", null ],
     [ "Peek4", "classrapidjson_1_1_basic_i_stream_wrapper.html#afaece8ea8d7b73abc0d4942070b41f8a", null ],

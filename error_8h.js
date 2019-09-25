@@ -2,7 +2,6 @@ var error_8h =
 [
     [ "RAPIDJSON_ERROR_CHARTYPE", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7e4636fd48d0148f102b8a13f0539d8c", null ],
     [ "RAPIDJSON_ERROR_STRING", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabe2e1bd1349e5a7d6c1af78c05a98f0d", null ],
-    [ "GetParseErrorFunc", "error_8h.html#gac1bee7fdafeba5a85c27943fcde12882", null ],
     [ "ParseErrorCode", "error_8h.html#ga7d3acf640886b1f2552dc8c4cd6dea60", [
       [ "kParseErrorNone", "error_8h.html#gga7d3acf640886b1f2552dc8c4cd6dea60a86a60b723dca32df5debab2c3db4235f", null ],
       [ "kParseErrorDocumentEmpty", "error_8h.html#gga7d3acf640886b1f2552dc8c4cd6dea60a06183076357ebd9eca228666f614c286", null ],
@@ -22,5 +21,6 @@ var error_8h =
       [ "kParseErrorNumberMissExponent", "error_8h.html#gga7d3acf640886b1f2552dc8c4cd6dea60a28a1c720ae63560780ccd992dc999ab7", null ],
       [ "kParseErrorTermination", "error_8h.html#gga7d3acf640886b1f2552dc8c4cd6dea60ab250f87c3d8454c579364b5a0f697a50", null ],
       [ "kParseErrorUnspecificSyntaxError", "error_8h.html#gga7d3acf640886b1f2552dc8c4cd6dea60a7abf1a337294d984a3f4d18b5843fb24", null ]
-    ] ]
+    ] ],
+    [ "GetParseErrorFunc", "error_8h.html#ga9d6e699072f8275623a52c4892005751", null ]
 ];

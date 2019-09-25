@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['transcode',['Transcode',['../structrapidjson_1_1_transcoder.html#a3a1de7069d3cf7f1d4f4e2f96ceb7664',1,'rapidjson::Transcoder']]]
+  ['validate_441',['Validate',['../structrapidjson_1_1_transcoder.html#ae9178e512e99394a38785e73927140da',1,'rapidjson::Transcoder']]]
 ];

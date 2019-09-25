@@ -21,7 +21,6 @@ var group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s =
     [ "RAPIDJSON_ERROR_STRING", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabe2e1bd1349e5a7d6c1af78c05a98f0d", null ],
     [ "RAPIDJSON_PARSE_ERROR", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gae3689840fa6e89a241313f33b602f865", null ],
     [ "RAPIDJSON_PARSE_ERROR_NORETURN", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7f8c4265b2edda78568ae3338aaf1461", null ],
-    [ "GetParseErrorFunc", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gac1bee7fdafeba5a85c27943fcde12882", null ],
     [ "ParseErrorCode", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga7d3acf640886b1f2552dc8c4cd6dea60", [
       [ "kParseErrorNone", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a86a60b723dca32df5debab2c3db4235f", null ],
       [ "kParseErrorDocumentEmpty", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a06183076357ebd9eca228666f614c286", null ],
@@ -49,5 +48,6 @@ var group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s =
       [ "kPointerParseErrorInvalidPercentEncoding", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7ba29831a02b8ee23a05d552b47f4d64d28", null ],
       [ "kPointerParseErrorCharacterMustPercentEncode", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7bae244a98f53279fda5a750f847b81c54f", null ]
     ] ],
-    [ "GetParseError_En", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79", null ]
+    [ "GetParseError_En", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79", null ],
+    [ "GetParseErrorFunc", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga9d6e699072f8275623a52c4892005751", null ]
 ];

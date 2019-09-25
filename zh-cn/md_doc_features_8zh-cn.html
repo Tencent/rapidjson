@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.13"/>
+<meta name="generator" content="Doxygen 1.8.16"/>
 <title>RapidJSON: 特点</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
@@ -14,13 +14,16 @@
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(initResizable);
-</script>
+/* @license-end */</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(function() { init_search(); });
+/* @license-end */
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
@@ -43,9 +46,11 @@
           </span>
         </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.13 -->
+<!-- 制作者 Doxygen 1.8.16 -->
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
 </script>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
@@ -59,7 +64,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 $(document).ready(function(){initNavTree('md_doc_features_8zh-cn.html','');});
+/* @license-end */
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -76,12 +83,13 @@ $(document).ready(function(){initNavTree('md_doc_features_8zh-cn.html','');});
 </iframe>
 </div>
 
-<div class="header">
+<div class="PageDoc"><div class="header">
   <div class="headertitle">
 <div class="title">特点 </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h2>总体</h2>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md31"></a>
+总体</h1>
 <ul>
 <li>跨平台<ul>
 <li>编译器：Visual Studio、gcc、clang 等</li>
@@ -106,7 +114,8 @@ $(document).ready(function(){initNavTree('md_doc_features_8zh-cn.html','');});
 </ul>
 </li>
 </ul>
-<h2>符合标准</h2>
+<h1><a class="anchor" id="autotoc_md32"></a>
+符合标准</h1>
 <ul>
 <li>RapidJSON 应完全符合 RFC4627/ECMA-404 标准。</li>
 <li>支持 JSON Pointer (RFC6901).</li>
@@ -117,14 +126,15 @@ $(document).ready(function(){initNavTree('md_doc_features_8zh-cn.html','');});
 </ul>
 </li>
 <li>支持可选的放宽语法<ul>
-<li>单行（<code>// ...</code>）及多行（<code>/* ... */</code>） 注释 (<code>kParseCommentsFlag</code>)。</li>
+<li>单行（<code>// ...</code>）及多行（<code>/* ... *&zwj;/</code>） 注释 (<code>kParseCommentsFlag</code>)。</li>
 <li>在对象和数组结束前含逗号 (<code>kParseTrailingCommasFlag</code>)。</li>
 <li><code>NaN</code>、<code>Inf</code>、<code>Infinity</code>、<code>-Inf</code> 及 <code>-Infinity</code> 作为 <code>double</code> 值 (<code>kParseNanAndInfFlag</code>)</li>
 </ul>
 </li>
-<li>https://github.com/Tencent/rapidjson/blob/master/doc/npm.md "NPM 兼容".</li>
+<li><a href="https://github.com/Tencent/rapidjson/blob/master/doc/npm.md">NPM 兼容</a>.</li>
 </ul>
-<h2>Unicode</h2>
+<h1><a class="anchor" id="autotoc_md33"></a>
+Unicode</h1>
 <ul>
 <li>支持 UTF-8、UTF-16、UTF-32 编码，包括小端序和大端序。<ul>
 <li>这些编码用于输入输出流，以及内存中的表示。</li>
@@ -145,19 +155,21 @@ $(document).ready(function(){initNavTree('md_doc_features_8zh-cn.html','');});
 </li>
 <li>支持自定义的编码。</li>
 </ul>
-<h2>API 风格</h2>
+<h1><a class="anchor" id="autotoc_md34"></a>
+API 风格</h1>
 <ul>
 <li>SAX（Simple API for XML）风格 API<ul>
-<li>类似于 <a href="http://en.wikipedia.org/wiki/Simple_API_for_XML">SAX</a>, RapidJSON 提供一个事件循序访问的解析器 API（<code><a class="el" href="classrapidjson_1_1_generic_reader.html" title="SAX-style JSON parser. Use Reader for UTF8 encoding and default allocator. ">rapidjson::GenericReader</a></code>）。RapidJSON 也提供一个生成器 API（<code><a class="el" href="classrapidjson_1_1_writer.html" title="JSON writer ">rapidjson::Writer</a></code>），可以处理相同的事件集合。</li>
+<li>类似于 <a href="http://en.wikipedia.org/wiki/Simple_API_for_XML">SAX</a>, RapidJSON 提供一个事件循序访问的解析器 API（<code><a class="el" href="classrapidjson_1_1_generic_reader.html" title="SAX-style JSON parser. Use Reader for UTF8 encoding and default allocator.">rapidjson::GenericReader</a></code>）。RapidJSON 也提供一个生成器 API（<code><a class="el" href="classrapidjson_1_1_writer.html" title="JSON writer">rapidjson::Writer</a></code>），可以处理相同的事件集合。</li>
 </ul>
 </li>
 <li>DOM（Document Object Model）风格 API<ul>
-<li>类似于 HTML／XML 的 <a href="http://en.wikipedia.org/wiki/Document_Object_Model">DOM</a>，RapidJSON 可把 JSON 解析至一个 DOM 表示方式（<code><a class="el" href="classrapidjson_1_1_generic_document.html" title="A document for parsing JSON text as DOM. ">rapidjson::GenericDocument</a></code>），以方便操作。如有需要，可把 DOM 转换（stringify）回 JSON。</li>
-<li>DOM 风格 API（<code><a class="el" href="classrapidjson_1_1_generic_document.html" title="A document for parsing JSON text as DOM. ">rapidjson::GenericDocument</a></code>）实际上是由 SAX 风格 API（<code><a class="el" href="classrapidjson_1_1_generic_reader.html" title="SAX-style JSON parser. Use Reader for UTF8 encoding and default allocator. ">rapidjson::GenericReader</a></code>）实现的。SAX 更快，但有时 DOM 更易用。用户可根据情况作出选择。</li>
+<li>类似于 HTML／XML 的 <a href="http://en.wikipedia.org/wiki/Document_Object_Model">DOM</a>，RapidJSON 可把 JSON 解析至一个 DOM 表示方式（<code><a class="el" href="classrapidjson_1_1_generic_document.html" title="A document for parsing JSON text as DOM.">rapidjson::GenericDocument</a></code>），以方便操作。如有需要，可把 DOM 转换（stringify）回 JSON。</li>
+<li>DOM 风格 API（<code><a class="el" href="classrapidjson_1_1_generic_document.html" title="A document for parsing JSON text as DOM.">rapidjson::GenericDocument</a></code>）实际上是由 SAX 风格 API（<code><a class="el" href="classrapidjson_1_1_generic_reader.html" title="SAX-style JSON parser. Use Reader for UTF8 encoding and default allocator.">rapidjson::GenericReader</a></code>）实现的。SAX 更快，但有时 DOM 更易用。用户可根据情况作出选择。</li>
 </ul>
 </li>
 </ul>
-<h2>解析</h2>
+<h1><a class="anchor" id="autotoc_md35"></a>
+解析</h1>
 <ul>
 <li>递归式（预设）及迭代式解析器<ul>
 <li>递归式解析器较快，但在极端情况下可出现堆栈溢出。</li>
@@ -176,7 +188,8 @@ $(document).ready(function(){initNavTree('md_doc_features_8zh-cn.html','');});
 </ul>
 </li>
 </ul>
-<h2>DOM (Document)</h2>
+<h1><a class="anchor" id="autotoc_md36"></a>
+DOM (Document)</h1>
 <ul>
 <li>RapidJSON 在类型转换时会检查数值的范围。</li>
 <li>字符串字面量的优化<ul>
@@ -190,17 +203,20 @@ $(document).ready(function(){initNavTree('md_doc_features_8zh-cn.html','');});
 </li>
 <li>可选地支持 <code>std::string</code>（定义 <code>RAPIDJSON_HAS_STDSTRING=1</code>）</li>
 </ul>
-<h2>生成</h2>
+<h1><a class="anchor" id="autotoc_md37"></a>
+生成</h1>
 <ul>
-<li>支持 <code><a class="el" href="classrapidjson_1_1_pretty_writer.html" title="Writer with indentation and spacing. ">rapidjson::PrettyWriter</a></code> 去加入换行及缩进。</li>
+<li>支持 <code><a class="el" href="classrapidjson_1_1_pretty_writer.html" title="Writer with indentation and spacing.">rapidjson::PrettyWriter</a></code> 去加入换行及缩进。</li>
 </ul>
-<h2>输入输出流</h2>
+<h1><a class="anchor" id="autotoc_md38"></a>
+输入输出流</h1>
 <ul>
-<li>支持 <code><a class="el" href="classrapidjson_1_1_generic_string_buffer.html" title="Represents an in-memory output stream. ">rapidjson::GenericStringBuffer</a></code>，把输出的 JSON 储存于字符串内。</li>
-<li>支持 <code><a class="el" href="classrapidjson_1_1_file_read_stream.html" title="File byte stream for input using fread(). ">rapidjson::FileReadStream</a></code> 及 <code><a class="el" href="classrapidjson_1_1_file_write_stream.html" title="Wrapper of C file stream for output using fwrite(). ">rapidjson::FileWriteStream</a></code>，使用 <code>FILE</code> 对象作输入输出。</li>
+<li>支持 <code><a class="el" href="classrapidjson_1_1_generic_string_buffer.html" title="Represents an in-memory output stream.">rapidjson::GenericStringBuffer</a></code>，把输出的 JSON 储存于字符串内。</li>
+<li>支持 <code><a class="el" href="classrapidjson_1_1_file_read_stream.html" title="File byte stream for input using fread().">rapidjson::FileReadStream</a></code> 及 <code><a class="el" href="classrapidjson_1_1_file_write_stream.html" title="Wrapper of C file stream for output using fwrite().">rapidjson::FileWriteStream</a></code>，使用 <code>FILE</code> 对象作输入输出。</li>
 <li>支持自定义输入输出流。</li>
 </ul>
-<h2>内存</h2>
+<h1><a class="anchor" id="autotoc_md39"></a>
+内存</h1>
 <ul>
 <li>最小化 DOM 的内存开销。<ul>
 <li>对大部分 32／64 位机器而言，每个 JSON 值只占 16 或 20 字节（不包含字符串）。</li>
@@ -214,7 +230,8 @@ $(document).ready(function(){initNavTree('md_doc_features_8zh-cn.html','');});
 <li>支持标准 CRT（C-runtime）分配器。</li>
 <li>支持自定义分配器。</li>
 </ul>
-<h2>其他</h2>
+<h1><a class="anchor" id="autotoc_md40"></a>
+其他</h1>
 <ul>
 <li>一些 C++11 的支持（可选）<ul>
 <li>右值引用（rvalue reference）</li>
@@ -224,6 +241,7 @@ $(document).ready(function(){initNavTree('md_doc_features_8zh-cn.html','');});
 </li>
 </ul>
 </div></div><!-- contents -->
+</div><!-- PageDoc -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.7-->
 <!-- start footer part -->

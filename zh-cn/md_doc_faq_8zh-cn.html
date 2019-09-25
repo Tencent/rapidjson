@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.13"/>
+<meta name="generator" content="Doxygen 1.8.16"/>
 <title>RapidJSON: 常见问题</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
@@ -14,13 +14,16 @@
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(initResizable);
-</script>
+/* @license-end */</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(function() { init_search(); });
+/* @license-end */
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
@@ -43,9 +46,11 @@
           </span>
         </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.13 -->
+<!-- 制作者 Doxygen 1.8.16 -->
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
 </script>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
@@ -59,7 +64,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
+/* @license-end */
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -76,15 +83,28 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 </iframe>
 </div>
 
-<div class="header">
+<div class="PageDoc"><div class="header">
   <div class="headertitle">
 <div class="title">常见问题 </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h2>一般问题</h2>
+<div class="toc"><h3>目录</h3>
+<ul><li class="level1"><a href="#autotoc_md63">一般问题</a></li>
+<li class="level1"><a href="#autotoc_md64">JSON</a></li>
+<li class="level1"><a href="#autotoc_md65">DOM 与 SAX</a></li>
+<li class="level1"><a href="#autotoc_md66">Document/Value (DOM)</a></li>
+<li class="level1"><a href="#autotoc_md67">Reader/Writer (SAX)</a></li>
+<li class="level1"><a href="#autotoc_md68">Unicode</a></li>
+<li class="level1"><a href="#autotoc_md69">流</a></li>
+<li class="level1"><a href="#autotoc_md70">性能</a></li>
+<li class="level1"><a href="#autotoc_md71">八挂</a></li>
+</ul>
+</div>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md63"></a>
+一般问题</h1>
 <ol type="1">
 <li><p class="startli">RapidJSON 是什么？</p>
-<p class="startli">RapidJSON 是一个 C++ 库，用于解析及生成 JSON。读者可参考它的所有 <a class="el" href="md_doc_features_8zh-cn.html">特点</a>。</p>
+<p class="startli">RapidJSON 是一个 C++ 库，用于解析及生成 JSON。读者可参考它的所有 <a href="doc/features.zh-cn.md">特点</a>。</p>
 </li>
 <li><p class="startli">为什么称作 RapidJSON？</p>
 <p class="startli">它的灵感来自于 <a href="http://rapidxml.sourceforge.net/">RapidXML</a>，RapidXML 是一个高速的 XML DOM 解析器。</p>
@@ -121,7 +141,8 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <p class="startli">有许多替代品。例如 <a href="https://github.com/miloyip/nativejson-benchmark">nativejson-benchmark</a> 列出了一些开源的 C/C++ JSON 库。<a href="http://www.json.org/">json.org</a> 也有一个列表。</p>
 </li>
 </ol>
-<h2>JSON</h2>
+<h1><a class="anchor" id="autotoc_md64"></a>
+JSON</h1>
 <ol type="1">
 <li><p class="startli">什么是 JSON？</p>
 <p class="startli">JSON (JavaScript Object Notation) 是一个轻量的数据交换格式。它使用人类可读的文本格式。更多关于 JSON 的细节可考 <a href="http://www.ietf.org/rfc/rfc7159.txt">RFC7159</a> 及 <a href="http://www.ecma-international.org/publications/standards/Ecma-404.htm">ECMA-404</a>。</p>
@@ -138,7 +159,8 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <p class="startli">现时不支持。RapidJSON 只支持严格的标准格式。宽松语法现时在这 <a href="https://github.com/Tencent/rapidjson/issues/36">issue</a> 中进行讨论。</p>
 </li>
 </ol>
-<h2>DOM 与 SAX</h2>
+<h1><a class="anchor" id="autotoc_md65"></a>
+DOM 与 SAX</h1>
 <ol type="1">
 <li><p class="startli">什么是 DOM 风格 API？</p>
 <p class="startli">Document Object Model（DOM）是一个储存于内存的 JSON 表示方式，用于查询及修改 JSON。</p>
@@ -150,10 +172,10 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <p class="startli">DOM 易于查询及修改。SAX 则是非常快及省内存的，但通常较难使用。</p>
 </li>
 <li><p class="startli">什么是原位（*in situ*）解析？</p>
-<p class="startli">原位解析会把 JSON 字符串直接解码至输入的 JSON 中。这是一个优化，可减少内存消耗及提升性能，但输入的 JSON 会被更改。进一步细节请参考 <a class="el" href="md_doc_dom_8zh-cn.html">原位解析</a> 。</p>
+<p class="startli">原位解析会把 JSON 字符串直接解码至输入的 JSON 中。这是一个优化，可减少内存消耗及提升性能，但输入的 JSON 会被更改。进一步细节请参考 <a href="doc/dom.zh-cn.md">原位解析</a> 。</p>
 </li>
 <li><p class="startli">什么时候会产生解析错误？</p>
-<p class="startli">当输入的 JSON 包含非法语法，或不能表示一个值（如 Number 太大），或解析器的处理器中断解析过程，解析器都会产生一个错误。详情请参考 <a class="el" href="md_doc_dom_8zh-cn.html">解析错误</a>。</p>
+<p class="startli">当输入的 JSON 包含非法语法，或不能表示一个值（如 Number 太大），或解析器的处理器中断解析过程，解析器都会产生一个错误。详情请参考 <a href="doc/dom.zh-cn.md">解析错误</a>。</p>
 </li>
 <li><p class="startli">有什么错误信息？</p>
 <p class="startli">错误信息存储在 <code>ParseResult</code>，它包含错误代号及偏移值（从 JSON 开始至错误处的字符数目）。可以把错误代号翻译为人类可读的错误讯息。</p>
@@ -165,20 +187,43 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <p class="startli">调用 <code>SetXXX()</code> 方法 - 这些方法会调用析构函数，并重建空的 Object 或 Array:</p>
 </li>
 </ol>
-<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div><div class="line">...</div><div class="line">d.SetObject();  <span class="comment">// clear and minimize</span></div></div><!-- fragment --><p>另外，也可以参考在 <a href="https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Clear-and-minimize">C++ swap with temporary idiom</a> 中的一种等价的方法: </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>).Swap(d);</div></div><!-- fragment --><p> 或者，使用这个稍微长一点的代码也能完成同样的事情: </p><div class="fragment"><div class="line">d.Swap(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>).Move()); </div></div><!-- fragment --><ol type="1">
+<div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
+<div class="line">...</div>
+<div class="line">d.SetObject();  <span class="comment">// clear and minimize</span></div>
+</div><!-- fragment --><p>另外，也可以参考在 <a href="https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Clear-and-minimize">C++ swap with temporary idiom</a> 中的一种等价的方法: </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>).Swap(d);</div>
+</div><!-- fragment --><p> 或者，使用这个稍微长一点的代码也能完成同样的事情: </p><div class="fragment"><div class="line">d.Swap(<a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(<a class="code" href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">kObjectType</a>).Move()); </div>
+</div><!-- fragment --><ol type="1">
 <li><p class="startli">如何将一个 <code>document</code> 节点插入到另一个 <code>document</code> 中？</p>
-<p class="startli">比如有以下两个 document(DOM): </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> person;</div><div class="line">person.Parse(<span class="stringliteral">&quot;{\&quot;person\&quot;:{\&quot;name\&quot;:{\&quot;first\&quot;:\&quot;Adam\&quot;,\&quot;last\&quot;:\&quot;Thomas\&quot;}}}&quot;</span>);</div><div class="line"></div><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> address;</div><div class="line">address.Parse(<span class="stringliteral">&quot;{\&quot;address\&quot;:{\&quot;city\&quot;:\&quot;Moscow\&quot;,\&quot;street\&quot;:\&quot;Quiet\&quot;}}&quot;</span>);</div></div><!-- fragment --><p> 假设我们希望将整个 <code>address</code> 插入到 <code>person</code> 中，作为其的一个子节点: </p><div class="fragment"><div class="line">{ &quot;person&quot;: {</div><div class="line">   &quot;name&quot;: { &quot;first&quot;: &quot;Adam&quot;, &quot;last&quot;: &quot;Thomas&quot; },</div><div class="line">   &quot;address&quot;: { &quot;city&quot;: &quot;Moscow&quot;, &quot;street&quot;: &quot;Quiet&quot; }</div><div class="line">   }</div><div class="line">}</div></div><!-- fragment --><p class="startli">在插入节点的过程中需要注意 <code>document</code> 和 <code>value</code> 的生命周期并且正确地使用 allocator 进行内存分配和管理。</p>
+<p class="startli">比如有以下两个 document(DOM): </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> person;</div>
+<div class="line">person.Parse(<span class="stringliteral">&quot;{\&quot;person\&quot;:{\&quot;name\&quot;:{\&quot;first\&quot;:\&quot;Adam\&quot;,\&quot;last\&quot;:\&quot;Thomas\&quot;}}}&quot;</span>);</div>
+<div class="line"> </div>
+<div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> address;</div>
+<div class="line">address.Parse(<span class="stringliteral">&quot;{\&quot;address\&quot;:{\&quot;city\&quot;:\&quot;Moscow\&quot;,\&quot;street\&quot;:\&quot;Quiet\&quot;}}&quot;</span>);</div>
+</div><!-- fragment --><p> 假设我们希望将整个 <code>address</code> 插入到 <code>person</code> 中，作为其的一个子节点: </p><div class="fragment"><div class="line">{ &quot;person&quot;: {</div>
+<div class="line">   &quot;name&quot;: { &quot;first&quot;: &quot;Adam&quot;, &quot;last&quot;: &quot;Thomas&quot; },</div>
+<div class="line">   &quot;address&quot;: { &quot;city&quot;: &quot;Moscow&quot;, &quot;street&quot;: &quot;Quiet&quot; }</div>
+<div class="line">   }</div>
+<div class="line">}</div>
+</div><!-- fragment --><p class="startli">在插入节点的过程中需要注意 <code>document</code> 和 <code>value</code> 的生命周期并且正确地使用 allocator 进行内存分配和管理。</p>
 <p class="startli">一个简单有效的方法就是修改上述 <code>address</code> 变量的定义，让其使用 <code>person</code> 的 allocator 初始化，然后将其添加到根节点。</p>
 </li>
 </ol>
-<div class="fragment"><div class="line">Documnet address(&amp;person.GetAllocator());</div><div class="line">...</div><div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(<span class="stringliteral">&quot;address&quot;</span>, address[<span class="stringliteral">&quot;address&quot;</span>], person.GetAllocator());</div></div><!-- fragment --><p> 当然，如果你不想通过显式地写出 <code>address</code> 的 key 来得到其值，可以使用迭代器来实现: </p><div class="fragment"><div class="line"><span class="keyword">auto</span> addressRoot = address.MemberBegin();</div><div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(addressRoot-&gt;name, addressRoot-&gt;value, person.GetAllocator());</div></div><!-- fragment --><p>此外，还可以通过深拷贝 address document 来实现: </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> addressValue = <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(address[<span class="stringliteral">&quot;address&quot;</span>], person.GetAllocator());</div><div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(<span class="stringliteral">&quot;address&quot;</span>, addressValue, person.GetAllocator());</div></div><!-- fragment --><h2>Document/Value (DOM)</h2>
+<div class="fragment"><div class="line">Documnet address(&amp;person.GetAllocator());</div>
+<div class="line">...</div>
+<div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(<span class="stringliteral">&quot;address&quot;</span>, address[<span class="stringliteral">&quot;address&quot;</span>], person.GetAllocator());</div>
+</div><!-- fragment --><p> 当然，如果你不想通过显式地写出 <code>address</code> 的 key 来得到其值，可以使用迭代器来实现: </p><div class="fragment"><div class="line"><span class="keyword">auto</span> addressRoot = address.MemberBegin();</div>
+<div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(addressRoot-&gt;name, addressRoot-&gt;value, person.GetAllocator());</div>
+</div><!-- fragment --><p>此外，还可以通过深拷贝 address document 来实现: </p><div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> addressValue = <a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>(address[<span class="stringliteral">&quot;address&quot;</span>], person.GetAllocator());</div>
+<div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(<span class="stringliteral">&quot;address&quot;</span>, addressValue, person.GetAllocator());</div>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md66"></a>
+Document/Value (DOM)</h1>
 <ol type="1">
 <li><p class="startli">什么是转移语义？为什么？</p>
 <p class="startli"><code>Value</code> 不用复制语义，而使用了转移语义。这是指，当把来源值赋值于目标值时，来源值的所有权会转移至目标值。</p>
 <p class="startli">由于转移快于复制，此设计决定强迫使用者注意到复制的消耗。</p>
 </li>
 <li><p class="startli">怎样去复制一个值？</p>
-<p class="startli">有两个 API 可用：含 allocator 的构造函数，以及 <code>CopyFrom()</code>。可参考 <a class="el" href="md_doc_tutorial_8zh-cn.html">深复制 Value</a> 里的用例。</p>
+<p class="startli">有两个 API 可用：含 allocator 的构造函数，以及 <code>CopyFrom()</code>。可参考 <a href="doc/tutorial.zh-cn.md">深复制 Value</a> 里的用例。</p>
 </li>
 <li><p class="startli">为什么我需要提供字符串的长度？</p>
 <p class="startli">由于 C 字符串是空字符结尾的，需要使用 <code>strlen()</code> 去计算其长度，这是线性复杂度的操作。若使用者已知字符串的长度，对很多操作来说会造成不必要的消耗。</p>
@@ -191,7 +236,8 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <p class="startli">当使用 <code>GetInt()</code>、<code>GetUint()</code> 等 API 时，可能会发生转换。对于整数至整数转换，仅当保证转换安全才会转换（否则会断言失败）。然而，当把一个 64 位有号／无号整数转换至 double 时，它会转换，但有可能会损失精度。含有小数的数字、或大于 64 位的整数，都只能使用 <code>GetDouble()</code> 获取其值。</p>
 </li>
 </ol>
-<h2>Reader/Writer (SAX)</h2>
+<h1><a class="anchor" id="autotoc_md67"></a>
+Reader/Writer (SAX)</h1>
 <ol type="1">
 <li><p class="startli">为什么不仅仅用 <code>printf</code> 输出一个 JSON？为什么需要 <code>Writer</code>？</p>
 <p class="startli">最重要的是，<code>Writer</code> 能确保输出的 JSON 是格式正确的。错误地调用 SAX 事件（如 <code>StartObject()</code> 错配 <code>EndArray()</code>）会造成断言失败。此外，<code>Writer</code> 会把字符串进行转义（如 <code>\n</code>）。最后，<code>printf()</code> 的数值输出可能并不是一个合法的 JSON number，特别是某些 locale 会有数字分隔符。而且 <code>Writer</code> 的数值字符串转换是使用非常快的算法来实现的，胜过 <code>printf()</code> 及 <code>iostream</code>。</p>
@@ -200,7 +246,8 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <p class="startli">基于性能考虑，目前版本并不直接支持此功能。然而，若执行环境支持多线程，使用者可以在另一线程解析 JSON，并通过阻塞输入流去暂停。</p>
 </li>
 </ol>
-<h2>Unicode</h2>
+<h1><a class="anchor" id="autotoc_md68"></a>
+Unicode</h1>
 <ol type="1">
 <li><p class="startli">它是否支持 UTF-8、UTF-16 及其他格式？</p>
 <p class="startli">是。它完全支持 UTF-8、UTF-16（大端／小端）、UTF-32（大端／小端）及 ASCII。</p>
@@ -219,7 +266,8 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <p class="startli">可以。只要在 <code>Writer</code> 中使用 <code>ASCII&lt;&gt;</code> 作为输出编码参数，就可以强逼转义那些字符。</p>
 </li>
 </ol>
-<h2>流</h2>
+<h1><a class="anchor" id="autotoc_md69"></a>
+流</h1>
 <ol type="1">
 <li><p class="startli">我有一个很大的 JSON 文件。我应否把它整个载入内存中？</p>
 <p class="startli">使用者可使用 <code>FileReadStream</code> 去逐块读入文件。但若使用于原位解析，必须载入整个文件。</p>
@@ -232,13 +280,14 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 </li>
 <li><p class="startli">什么是 BOM？RapidJSON 怎样处理它？</p>
 <p class="startli"><a href="http://en.wikipedia.org/wiki/Byte_order_mark">字节顺序标记（byte order mark, BOM）</a> 有时会出现于文件／流的开始，以表示其 UTF 编码类型。</p>
-<p class="startli">RapidJSON 的 <code>EncodedInputStream</code> 可检测／跳过 BOM。<code>EncodedOutputStream</code> 可选择是否写入 BOM。可参考 <a class="el" href="md_doc_stream_8zh-cn.html">编码流</a> 中的例子。</p>
+<p class="startli">RapidJSON 的 <code>EncodedInputStream</code> 可检测／跳过 BOM。<code>EncodedOutputStream</code> 可选择是否写入 BOM。可参考 <a href="doc/stream.zh-cn.md">编码流</a> 中的例子。</p>
 </li>
 <li><p class="startli">为什么会涉及大端／小端？</p>
 <p class="startli">流的大端／小端是 UTF-16 及 UTF-32 流要处理的问题，而 UTF-8 不需要处理。</p>
 </li>
 </ol>
-<h2>性能</h2>
+<h1><a class="anchor" id="autotoc_md70"></a>
+性能</h1>
 <ol type="1">
 <li><p class="startli">RapidJSON 是否真的快？</p>
 <p class="startli">是。它可能是最快的开源 JSON 库。有一个 <a href="https://github.com/miloyip/nativejson-benchmark">评测</a> 评估 C/C++ JSON 库的性能。</p>
@@ -258,7 +307,8 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 <p class="startli">有些应用程序需要处理非常大的 JSON 文件。而有些后台应用程序需要处理大量的 JSON。达到高性能同时改善延时及吞吐量。更广义来说，这也可以节省能源。</p>
 </li>
 </ol>
-<h2>八挂</h2>
+<h1><a class="anchor" id="autotoc_md71"></a>
+八挂</h1>
 <ol type="1">
 <li><p class="startli">谁是 RapidJSON 的开发者？</p>
 <p class="startli">叶劲峰（Milo Yip，<a href="https://github.com/miloyip">miloyip</a>）是 RapidJSON 的原作者。全世界许多贡献者一直在改善 RapidJSON。Philipp A. Hartmann（<a href="https://github.com/pah">pah</a>）实现了许多改进，也设置了自动化测试，而且还参与许多社区讨论。丁欧南（Don Ding，<a href="https://github.com/thebusytypist">thebusytypist</a>）实现了迭代式解析器。Andrii Senkovych（<a href="https://github.com/jollyroger">jollyroger</a>）完成了向 CMake 的迁移。Kosta（<a href="https://github.com/Kosta-Github">Kosta-Github</a>）提供了一个非常灵巧的短字符串优化。也需要感谢其他献者及社区成员。</p>
@@ -274,7 +324,11 @@ $(document).ready(function(){initNavTree('md_doc_faq_8zh-cn.html','');});
 </li>
 </ol>
 </div></div><!-- contents -->
+</div><!-- PageDoc -->
 </div><!-- doc-content -->
+<div class="ttc" id="anamespacerapidjson_html_ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9"><div class="ttname"><a href="namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9">rapidjson::kObjectType</a></div><div class="ttdoc">object</div><div class="ttdef"><b>Definition:</b> rapidjson.h:648</div></div>
+<div class="ttc" id="anamespacerapidjson_html_aa65fc9fb381b2cbc54f98673eadd6505"><div class="ttname"><a href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">rapidjson::Value</a></div><div class="ttdeci">GenericValue&lt; UTF8&lt;&gt; &gt; Value</div><div class="ttdoc">GenericValue with UTF8 encoding</div><div class="ttdef"><b>Definition:</b> document.h:2110</div></div>
+<div class="ttc" id="anamespacerapidjson_html_ace11b5b575baf1cccd5ba5f8586dcdc8"><div class="ttname"><a href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">rapidjson::Document</a></div><div class="ttdeci">GenericDocument&lt; UTF8&lt;&gt; &gt; Document</div><div class="ttdoc">GenericDocument with UTF8 encoding</div><div class="ttdef"><b>Definition:</b> document.h:2506</div></div>
 <!-- HTML footer for doxygen 1.8.7-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

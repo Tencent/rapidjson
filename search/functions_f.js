@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['validate',['Validate',['../structrapidjson_1_1_transcoder.html#ae9178e512e99394a38785e73927140da',1,'rapidjson::Transcoder']]]
+  ['writer_442',['Writer',['../classrapidjson_1_1_writer.html#a98a421c806b456688874511f64add1f2',1,'rapidjson::Writer']]]
 ];

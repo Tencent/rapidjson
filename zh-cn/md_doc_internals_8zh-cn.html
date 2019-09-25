@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<meta name="generator" content="Doxygen 1.8.13"/>
+<meta name="generator" content="Doxygen 1.8.16"/>
 <title>RapidJSON: 内部架构</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
@@ -14,13 +14,16 @@
 <script type="text/javascript" src="navtreedata.js"></script>
 <script type="text/javascript" src="navtree.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(initResizable);
-</script>
+/* @license-end */</script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
   $(document).ready(function() { init_search(); });
+/* @license-end */
 </script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
 <link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
@@ -43,9 +46,11 @@
           </span>
         </div>
 <!-- end header part -->
-<!-- 制作者 Doxygen 1.8.13 -->
+<!-- 制作者 Doxygen 1.8.16 -->
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'搜索');
+/* @license-end */
 </script>
 </div><!-- top -->
 <div id="side-nav" class="ui-resizable side-nav-resizable">
@@ -59,7 +64,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'搜索');
   </div>
 </div>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 $(document).ready(function(){initNavTree('md_doc_internals_8zh-cn.html','');});
+/* @license-end */
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -76,13 +83,16 @@ $(document).ready(function(){initNavTree('md_doc_internals_8zh-cn.html','');});
 </iframe>
 </div>
 
-<div class="header">
+<div class="PageDoc"><div class="header">
   <div class="headertitle">
 <div class="title">内部架构 </div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>目录</h3>
-<ul><li class="level1"><a href="#Architecture">架构</a></li>
+<ul><li class="level1"><a href="#Architecture">架构</a><ul><li class="level2"><a href="#autotoc_md59">SAX 和 DOM</a></li>
+<li class="level2"><a href="#autotoc_md60">工具类</a></li>
+</ul>
+</li>
 <li class="level1"><a href="#Value">值（Value）</a><ul><li class="level2"><a href="#DataLayout">数据布局</a></li>
 <li class="level2"><a href="#Flags">标志</a></li>
 <li class="level2"><a href="#ShortString">短字符串优化</a></li>
@@ -91,7 +101,9 @@ $(document).ready(function(){initNavTree('md_doc_internals_8zh-cn.html','');});
 <li class="level1"><a href="#InternalAllocator">分配器（Allocator）</a><ul><li class="level2"><a href="#MemoryPoolAllocator">MemoryPoolAllocator</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#ParsingOptimization">解析优化</a><ul><li class="level2"><a href="#SkipwhitespaceWithSIMD">使用 SIMD 跳过空格</a></li>
+<li class="level1"><a href="#ParsingOptimization">解析优化</a><ul><li class="level2"><a href="#SkipwhitespaceWithSIMD">使用 SIMD 跳过空格</a><ul><li class="level3"><a href="#autotoc_md61">页面对齐问题</a></li>
+</ul>
+</li>
 <li class="level2"><a href="#LocalStreamCopy">局部流拷贝</a></li>
 <li class="level2"><a href="#ParsingDouble">解析为双精度浮点数</a></li>
 </ul>
@@ -112,140 +124,142 @@ $(document).ready(function(){initNavTree('md_doc_internals_8zh-cn.html','');});
 <div class="textblock"><p>本部分记录了一些设计和实现细节。</p>
 <h1><a class="anchor" id="Architecture"></a>
 架构</h1>
-<h2>SAX 和 DOM</h2>
+<h2><a class="anchor" id="autotoc_md59"></a>
+SAX 和 DOM</h2>
 <p>下面的 UML 图显示了 SAX 和 DOM 的基本关系。</p>
 <div class="image">
-<img src="architecture.png" alt="architecture.png"/>
+<img src="architecture.png" alt=""/>
 <div class="caption">
 架构 UML 类图</div></div>
-<p> 关系的核心是 <code>Handler</code> 概念。在 SAX 一边，<code>Reader</code> 从流解析 JSON 并将事件发送到 <code>Handler</code>。<code>Writer</code> 实现了 <code>Handler</code> 概念，用于处理相同的事件。在 DOM 一边，<code>Document</code> 实现了 <code>Handler</code> 概念，用于通过这些时间来构建 DOM。<code>Value</code> 支持了 <code>Value::Accept(Handler&amp;)</code> 函数，它可以将 DOM 转换为事件进行发送。</p>
+   <p>关系的核心是 <code>Handler</code> 概念。在 SAX 一边，<code>Reader</code> 从流解析 JSON 并将事件发送到 <code>Handler</code>。<code>Writer</code> 实现了 <code>Handler</code> 概念，用于处理相同的事件。在 DOM 一边，<code>Document</code> 实现了 <code>Handler</code> 概念，用于通过这些时间来构建 DOM。<code>Value</code> 支持了 <code>Value::Accept(Handler&amp;)</code> 函数，它可以将 DOM 转换为事件进行发送。</p>
 <p>在这个设计，SAX 是不依赖于 DOM 的。甚至 <code>Reader</code> 和 <code>Writer</code> 之间也没有依赖。这提供了连接事件发送器和处理器的灵活性。除此之外，<code>Value</code> 也是不依赖于 SAX 的。所以，除了将 DOM 序列化为 JSON 之外，用户也可以将其序列化为 XML，或者做任何其他事情。</p>
-<h2>工具类</h2>
+<h2><a class="anchor" id="autotoc_md60"></a>
+工具类</h2>
 <p>SAX 和 DOM API 都依赖于3个额外的概念：<code>Allocator</code>、<code>Encoding</code> 和 <code>Stream</code>。它们的继承层次结构如下图所示。</p>
 <div class="image">
-<img src="utilityclass.png" alt="utilityclass.png"/>
+<img src="utilityclass.png" alt=""/>
 <div class="caption">
 工具类 UML 类图</div></div>
- <h1><a class="anchor" id="Value"></a>
+   <h1><a class="anchor" id="Value"></a>
 值（Value）</h1>
 <p><code>Value</code> （实际上被定义为 <code>GenericValue&lt;UTF8&lt;&gt;&gt;</code>）是 DOM API 的核心。本部分描述了它的设计。</p>
 <h2><a class="anchor" id="DataLayout"></a>
 数据布局</h2>
 <p><code>Value</code> 是<a href="http://en.wikipedia.org/wiki/Variant_type">可变类型</a>。在 RapidJSON 的上下文中，一个 <code>Value</code> 的实例可以包含6种 JSON 数据类型之一。通过使用 <code>union</code> ，这是可能实现的。每一个 <code>Value</code> 包含两个成员：<code>union Data data_</code> 和 <code>unsigned flags_</code>。<code>flags_</code> 表明了 JSON 类型，以及附加的信息。</p>
 <p>下表显示了所有类型的数据布局。32位/64位列表明了字段所占用的字节数。</p>
-<table class="doxtable">
-<tr>
-<th>Null </th><th></th><th align="center">32位 </th><th align="center">64位  </th></tr>
-<tr>
-<td>（未使用） </td><td></td><td align="center">4 </td><td align="center">8 </td></tr>
-<tr>
-<td>（未使用） </td><td></td><td align="center">4 </td><td align="center">4 </td></tr>
-<tr>
-<td>（未使用） </td><td></td><td align="center">4 </td><td align="center">4 </td></tr>
-<tr>
-<td><code>unsigned flags_</code> </td><td><code>kNullType kNullFlag</code> </td><td align="center">4 </td><td align="center">4 </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Null  </th><th class="markdownTableHeadNone"></th><th class="markdownTableHeadCenter">32位  </th><th class="markdownTableHeadCenter">64位   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">（未使用）  </td><td class="markdownTableBodyNone"></td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">8   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">（未使用）  </td><td class="markdownTableBodyNone"></td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">（未使用）  </td><td class="markdownTableBodyNone"></td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>unsigned flags_</code>  </td><td class="markdownTableBodyNone"><code>kNullType kNullFlag</code>  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
 </table>
-<table class="doxtable">
-<tr>
-<th>Bool </th><th></th><th align="center">32位 </th><th align="center">64位  </th></tr>
-<tr>
-<td>（未使用） </td><td></td><td align="center">4 </td><td align="center">8 </td></tr>
-<tr>
-<td>（未使用） </td><td></td><td align="center">4 </td><td align="center">4 </td></tr>
-<tr>
-<td>（未使用） </td><td></td><td align="center">4 </td><td align="center">4 </td></tr>
-<tr>
-<td><code>unsigned flags_</code> </td><td><code>kBoolType</code> (either <code>kTrueFlag</code> or <code>kFalseFlag</code>) </td><td align="center">4 </td><td align="center">4 </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Bool  </th><th class="markdownTableHeadNone"></th><th class="markdownTableHeadCenter">32位  </th><th class="markdownTableHeadCenter">64位   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">（未使用）  </td><td class="markdownTableBodyNone"></td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">8   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">（未使用）  </td><td class="markdownTableBodyNone"></td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">（未使用）  </td><td class="markdownTableBodyNone"></td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>unsigned flags_</code>  </td><td class="markdownTableBodyNone"><code>kBoolType</code> (either <code>kTrueFlag</code> or <code>kFalseFlag</code>)  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
 </table>
-<table class="doxtable">
-<tr>
-<th>String </th><th></th><th align="center">32位 </th><th align="center">64位  </th></tr>
-<tr>
-<td><code>Ch* str</code> </td><td>指向字符串的指针（可能拥有所有权） </td><td align="center">4 </td><td align="center">8 </td></tr>
-<tr>
-<td><code>SizeType length</code> </td><td>字符串长度 </td><td align="center">4 </td><td align="center">4 </td></tr>
-<tr>
-<td>（未使用） </td><td></td><td align="center">4 </td><td align="center">4 </td></tr>
-<tr>
-<td><code>unsigned flags_</code> </td><td><code>kStringType kStringFlag ...</code> </td><td align="center">4 </td><td align="center">4 </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">String  </th><th class="markdownTableHeadNone"></th><th class="markdownTableHeadCenter">32位  </th><th class="markdownTableHeadCenter">64位   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Ch* str</code>  </td><td class="markdownTableBodyNone">指向字符串的指针（可能拥有所有权）  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">8   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>SizeType length</code>  </td><td class="markdownTableBodyNone">字符串长度  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">（未使用）  </td><td class="markdownTableBodyNone"></td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>unsigned flags_</code>  </td><td class="markdownTableBodyNone"><code>kStringType kStringFlag ...</code>  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
 </table>
-<table class="doxtable">
-<tr>
-<th>Object </th><th></th><th align="center">32位 </th><th align="center">64位  </th></tr>
-<tr>
-<td><code>Member* members</code> </td><td>指向成员数组的指针（拥有所有权） </td><td align="center">4 </td><td align="center">8 </td></tr>
-<tr>
-<td><code>SizeType size</code> </td><td>成员数量 </td><td align="center">4 </td><td align="center">4 </td></tr>
-<tr>
-<td><code>SizeType capacity</code> </td><td>成员容量 </td><td align="center">4 </td><td align="center">4 </td></tr>
-<tr>
-<td><code>unsigned flags_</code> </td><td><code>kObjectType kObjectFlag</code> </td><td align="center">4 </td><td align="center">4 </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Object  </th><th class="markdownTableHeadNone"></th><th class="markdownTableHeadCenter">32位  </th><th class="markdownTableHeadCenter">64位   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Member* members</code>  </td><td class="markdownTableBodyNone">指向成员数组的指针（拥有所有权）  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">8   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>SizeType size</code>  </td><td class="markdownTableBodyNone">成员数量  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>SizeType capacity</code>  </td><td class="markdownTableBodyNone">成员容量  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>unsigned flags_</code>  </td><td class="markdownTableBodyNone"><code>kObjectType kObjectFlag</code>  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
 </table>
-<table class="doxtable">
-<tr>
-<th>Array </th><th></th><th align="center">32位 </th><th align="center">64位  </th></tr>
-<tr>
-<td><code>Value* values</code> </td><td>指向值数组的指针（拥有所有权） </td><td align="center">4 </td><td align="center">8 </td></tr>
-<tr>
-<td><code>SizeType size</code> </td><td>值数量 </td><td align="center">4 </td><td align="center">4 </td></tr>
-<tr>
-<td><code>SizeType capacity</code> </td><td>值容量 </td><td align="center">4 </td><td align="center">4 </td></tr>
-<tr>
-<td><code>unsigned flags_</code> </td><td><code>kArrayType kArrayFlag</code> </td><td align="center">4 </td><td align="center">4 </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Array  </th><th class="markdownTableHeadNone"></th><th class="markdownTableHeadCenter">32位  </th><th class="markdownTableHeadCenter">64位   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Value* values</code>  </td><td class="markdownTableBodyNone">指向值数组的指针（拥有所有权）  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">8   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>SizeType size</code>  </td><td class="markdownTableBodyNone">值数量  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>SizeType capacity</code>  </td><td class="markdownTableBodyNone">值容量  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>unsigned flags_</code>  </td><td class="markdownTableBodyNone"><code>kArrayType kArrayFlag</code>  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
 </table>
-<table class="doxtable">
-<tr>
-<th>Number (Int) </th><th></th><th align="center">32位 </th><th align="center">64位  </th></tr>
-<tr>
-<td><code>int i</code> </td><td>32位有符号整数 </td><td align="center">4 </td><td align="center">4 </td></tr>
-<tr>
-<td>（零填充） </td><td>0 </td><td align="center">4 </td><td align="center">4 </td></tr>
-<tr>
-<td>（未使用） </td><td></td><td align="center">4 </td><td align="center">8 </td></tr>
-<tr>
-<td><code>unsigned flags_</code> </td><td><code>kNumberType kNumberFlag kIntFlag kInt64Flag ...</code> </td><td align="center">4 </td><td align="center">4 </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Number (Int)  </th><th class="markdownTableHeadNone"></th><th class="markdownTableHeadCenter">32位  </th><th class="markdownTableHeadCenter">64位   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>int i</code>  </td><td class="markdownTableBodyNone">32位有符号整数  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">（零填充）  </td><td class="markdownTableBodyNone">0  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">（未使用）  </td><td class="markdownTableBodyNone"></td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">8   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>unsigned flags_</code>  </td><td class="markdownTableBodyNone"><code>kNumberType kNumberFlag kIntFlag kInt64Flag ...</code>  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
 </table>
-<table class="doxtable">
-<tr>
-<th>Number (UInt) </th><th></th><th align="center">32位 </th><th align="center">64位  </th></tr>
-<tr>
-<td><code>unsigned u</code> </td><td>32位无符号整数 </td><td align="center">4 </td><td align="center">4 </td></tr>
-<tr>
-<td>（零填充） </td><td>0 </td><td align="center">4 </td><td align="center">4 </td></tr>
-<tr>
-<td>（未使用） </td><td></td><td align="center">4 </td><td align="center">8 </td></tr>
-<tr>
-<td><code>unsigned flags_</code> </td><td><code>kNumberType kNumberFlag kUIntFlag kUInt64Flag ...</code> </td><td align="center">4 </td><td align="center">4 </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Number (UInt)  </th><th class="markdownTableHeadNone"></th><th class="markdownTableHeadCenter">32位  </th><th class="markdownTableHeadCenter">64位   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>unsigned u</code>  </td><td class="markdownTableBodyNone">32位无符号整数  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">（零填充）  </td><td class="markdownTableBodyNone">0  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">（未使用）  </td><td class="markdownTableBodyNone"></td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">8   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>unsigned flags_</code>  </td><td class="markdownTableBodyNone"><code>kNumberType kNumberFlag kUintFlag kUint64Flag ...</code>  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
 </table>
-<table class="doxtable">
-<tr>
-<th>Number (Int64) </th><th></th><th align="center">32位 </th><th align="center">64位  </th></tr>
-<tr>
-<td><code>int64_t i64</code> </td><td>64位有符号整数 </td><td align="center">8 </td><td align="center">8 </td></tr>
-<tr>
-<td>（未使用） </td><td></td><td align="center">4 </td><td align="center">8 </td></tr>
-<tr>
-<td><code>unsigned flags_</code> </td><td><code>kNumberType kNumberFlag kInt64Flag ...</code> </td><td align="center">4 </td><td align="center">4 </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Number (Int64)  </th><th class="markdownTableHeadNone"></th><th class="markdownTableHeadCenter">32位  </th><th class="markdownTableHeadCenter">64位   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>int64_t i64</code>  </td><td class="markdownTableBodyNone">64位有符号整数  </td><td class="markdownTableBodyCenter">8  </td><td class="markdownTableBodyCenter">8   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">（未使用）  </td><td class="markdownTableBodyNone"></td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">8   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>unsigned flags_</code>  </td><td class="markdownTableBodyNone"><code>kNumberType kNumberFlag kInt64Flag ...</code>  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
 </table>
-<table class="doxtable">
-<tr>
-<th>Number (Uint64) </th><th></th><th align="center">32位 </th><th align="center">64位  </th></tr>
-<tr>
-<td><code>uint64_t i64</code> </td><td>64位无符号整数 </td><td align="center">8 </td><td align="center">8 </td></tr>
-<tr>
-<td>（未使用） </td><td></td><td align="center">4 </td><td align="center">8 </td></tr>
-<tr>
-<td><code>unsigned flags_</code> </td><td><code>kNumberType kNumberFlag kInt64Flag ...</code> </td><td align="center">4 </td><td align="center">4 </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Number (Uint64)  </th><th class="markdownTableHeadNone"></th><th class="markdownTableHeadCenter">32位  </th><th class="markdownTableHeadCenter">64位   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>uint64_t i64</code>  </td><td class="markdownTableBodyNone">64位无符号整数  </td><td class="markdownTableBodyCenter">8  </td><td class="markdownTableBodyCenter">8   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">（未使用）  </td><td class="markdownTableBodyNone"></td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">8   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>unsigned flags_</code>  </td><td class="markdownTableBodyNone"><code>kNumberType kNumberFlag kInt64Flag ...</code>  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
 </table>
-<table class="doxtable">
-<tr>
-<th>Number (Double) </th><th></th><th align="center">32位 </th><th align="center">64位  </th></tr>
-<tr>
-<td><code>uint64_t i64</code> </td><td>双精度浮点数 </td><td align="center">8 </td><td align="center">8 </td></tr>
-<tr>
-<td>（未使用） </td><td></td><td align="center">4 </td><td align="center">8 </td></tr>
-<tr>
-<td><code>unsigned flags_</code> </td><td><code>kNumberType kNumberFlag kDoubleFlag</code></td><td align="center">4 </td><td align="center">4 </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Number (Double)  </th><th class="markdownTableHeadNone"></th><th class="markdownTableHeadCenter">32位  </th><th class="markdownTableHeadCenter">64位   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>uint64_t i64</code>  </td><td class="markdownTableBodyNone">双精度浮点数  </td><td class="markdownTableBodyCenter">8  </td><td class="markdownTableBodyCenter">8   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">（未使用）  </td><td class="markdownTableBodyNone"></td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">8   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>unsigned flags_</code>  </td><td class="markdownTableBodyNone"><code>kNumberType kNumberFlag kDoubleFlag</code>  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
 </table>
 <p>这里有一些需要注意的地方：</p><ul>
 <li>为了减少在64位架构上的内存消耗，<code>SizeType</code> 被定义为 <code>unsigned</code> 而不是 <code>size_t</code>。</li>
@@ -260,21 +274,39 @@ $(document).ready(function(){initNavTree('md_doc_internals_8zh-cn.html','');});
 <h2><a class="anchor" id="ShortString"></a>
 短字符串优化</h2>
 <p><a href="https://github.com/Kosta-Github">Kosta</a> 提供了很棒的短字符串优化。这个优化的xxx如下所述。除去 <code>flags_</code> ，<code>Value</code> 有12或16字节（对于32位或64位）来存储实际的数据。这为在其内部直接存储短字符串而不是存储字符串的指针创造了可能。对于1字节的字符类型（例如 <code>char</code>），它可以在 <code>Value</code> 类型内部存储至多11或15个字符的字符串。</p>
-<table class="doxtable">
-<tr>
-<th>ShortString (Ch=char)</th><th></th><th align="center">32位 </th><th align="center">64位  </th></tr>
-<tr>
-<td><code>Ch str[MaxChars]</code> </td><td>字符串缓冲区 </td><td align="center">11 </td><td align="center">15 </td></tr>
-<tr>
-<td><code>Ch invLength</code> </td><td>MaxChars - Length </td><td align="center">1 </td><td align="center">1 </td></tr>
-<tr>
-<td><code>unsigned flags_</code> </td><td><code>kStringType kStringFlag ...</code> </td><td align="center">4 </td><td align="center">4 </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">ShortString (Ch=char)  </th><th class="markdownTableHeadNone"></th><th class="markdownTableHeadCenter">32位  </th><th class="markdownTableHeadCenter">64位   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>Ch str[MaxChars]</code>  </td><td class="markdownTableBodyNone">字符串缓冲区  </td><td class="markdownTableBodyCenter">11  </td><td class="markdownTableBodyCenter">15   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>Ch invLength</code>  </td><td class="markdownTableBodyNone">MaxChars - Length  </td><td class="markdownTableBodyCenter">1  </td><td class="markdownTableBodyCenter">1   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>unsigned flags_</code>  </td><td class="markdownTableBodyNone"><code>kStringType kStringFlag ...</code>  </td><td class="markdownTableBodyCenter">4  </td><td class="markdownTableBodyCenter">4   </td></tr>
 </table>
 <p>这里使用了一项特殊的技术。它存储了 (MaxChars - length) 而不直接存储字符串的长度。这使得存储11个字符并且带有后缀 <code>\0</code> 成为可能。</p>
 <p>这个优化可以减少字符串拷贝内存占用。它也改善了缓存一致性，并进一步提高了运行时性能。</p>
 <h1><a class="anchor" id="InternalAllocator"></a>
 分配器（Allocator）</h1>
-<p><code>Allocator</code> 是 RapidJSON 中的概念： </p><div class="fragment"><div class="line">concept Allocator {</div><div class="line">    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> kNeedFree;    <span class="comment">//!&lt; 表明这个分配器是否需要调用 Free()。</span></div><div class="line"><span class="comment"></span></div><div class="line">    <span class="comment">// 申请内存块。</span></div><div class="line">    <span class="comment">// \param size 内存块的大小，以字节记。</span></div><div class="line">    <span class="comment">// \returns 指向内存块的指针。</span></div><div class="line">    <span class="keywordtype">void</span>* Malloc(<span class="keywordtype">size_t</span> size);</div><div class="line"></div><div class="line">    <span class="comment">// 调整内存块的大小。</span></div><div class="line">    <span class="comment">// \param originalPtr 当前内存块的指针。空指针是被允许的。</span></div><div class="line">    <span class="comment">// \param originalSize 当前大小，以字节记。（设计问题：因为有些分配器可能不会记录它，显示的传递它可以节约内存。）</span></div><div class="line">    <span class="comment">// \param newSize 新大小，以字节记。</span></div><div class="line">    <span class="keywordtype">void</span>* Realloc(<span class="keywordtype">void</span>* originalPtr, <span class="keywordtype">size_t</span> originalSize, <span class="keywordtype">size_t</span> newSize);</div><div class="line"></div><div class="line">    <span class="comment">// 释放内存块。</span></div><div class="line">    <span class="comment">// \param ptr 指向内存块的指针。空指针是被允许的。</span></div><div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> Free(<span class="keywordtype">void</span> *ptr);</div><div class="line">};</div></div><!-- fragment --><p>需要注意的是 <code>Malloc()</code> 和 <code>Realloc()</code> 是成员函数而 <code>Free()</code> 是静态成员函数。</p>
+<p><code>Allocator</code> 是 RapidJSON 中的概念： </p><div class="fragment"><div class="line">concept <a class="code" href="classrapidjson_1_1_allocator.html">Allocator</a> {</div>
+<div class="line">    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">bool</span> kNeedFree;    <span class="comment">//!&lt; 表明这个分配器是否需要调用 Free()。</span></div>
+<div class="line"><span class="comment"></span> </div>
+<div class="line">    <span class="comment">// 申请内存块。</span></div>
+<div class="line">    <span class="comment">// \param size 内存块的大小，以字节记。</span></div>
+<div class="line">    <span class="comment">// \returns 指向内存块的指针。</span></div>
+<div class="line">    <span class="keywordtype">void</span>* Malloc(<span class="keywordtype">size_t</span> size);</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// 调整内存块的大小。</span></div>
+<div class="line">    <span class="comment">// \param originalPtr 当前内存块的指针。空指针是被允许的。</span></div>
+<div class="line">    <span class="comment">// \param originalSize 当前大小，以字节记。（设计问题：因为有些分配器可能不会记录它，显示的传递它可以节约内存。）</span></div>
+<div class="line">    <span class="comment">// \param newSize 新大小，以字节记。</span></div>
+<div class="line">    <span class="keywordtype">void</span>* Realloc(<span class="keywordtype">void</span>* originalPtr, <span class="keywordtype">size_t</span> originalSize, <span class="keywordtype">size_t</span> newSize);</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// 释放内存块。</span></div>
+<div class="line">    <span class="comment">// \param ptr 指向内存块的指针。空指针是被允许的。</span></div>
+<div class="line">    <span class="keyword">static</span> <span class="keywordtype">void</span> Free(<span class="keywordtype">void</span> *ptr);</div>
+<div class="line">};</div>
+</div><!-- fragment --><p>需要注意的是 <code>Malloc()</code> 和 <code>Realloc()</code> 是成员函数而 <code>Free()</code> 是静态成员函数。</p>
 <h2><a class="anchor" id="MemoryPoolAllocator"></a>
 MemoryPoolAllocator</h2>
 <p><code>MemoryPoolAllocator</code> 是 DOM 的默认内存分配器。它只申请内存而不释放内存。这对于构建 DOM 树非常合适。</p>
@@ -295,12 +327,27 @@ MemoryPoolAllocator</h2>
 <li>换行 (<code>U+000A</code>)</li>
 <li>回车 (<code>U+000D</code>)</li>
 </ol>
-<p>这是一份简单的实现： </p><div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a">SkipWhitespace</a>(InputStream&amp; s) {</div><div class="line">    <span class="keywordflow">while</span> (s.Peek() == <span class="charliteral">&#39; &#39;</span> || s.Peek() == <span class="charliteral">&#39;\n&#39;</span> || s.Peek() == <span class="charliteral">&#39;\r&#39;</span> || s.Peek() == <span class="charliteral">&#39;\t&#39;</span>)</div><div class="line">        s.Take();</div><div class="line">}</div></div><!-- fragment --><p>但是，这需要对每个字符进行4次比较以及一些分支。这被发现是一个热点。</p>
+<p>这是一份简单的实现： </p><div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a">SkipWhitespace</a>(InputStream&amp; s) {</div>
+<div class="line">    <span class="keywordflow">while</span> (s.Peek() == <span class="charliteral">&#39; &#39;</span> || s.Peek() == <span class="charliteral">&#39;\n&#39;</span> || s.Peek() == <span class="charliteral">&#39;\r&#39;</span> || s.Peek() == <span class="charliteral">&#39;\t&#39;</span>)</div>
+<div class="line">        s.Take();</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>但是，这需要对每个字符进行4次比较以及一些分支。这被发现是一个热点。</p>
 <p>为了加速这一处理，RapidJSON 使用 SIMD 来在一次迭代中比较16个字符和4个空格。目前 RapidJSON 支持 SSE2 ， SSE4.2 和 ARM Neon 指令。同时它也只会对 UTF-8 内存流启用，包括字符串流或 <em>原位</em> 解析。</p>
-<p>你可以通过在包含 <code><a class="el" href="rapidjson_8h.html" title="common definitions and configuration ">rapidjson.h</a></code> 之前定义 <code>RAPIDJSON_SSE2</code> ， <code>RAPIDJSON_SSE42</code> 或 <code>RAPIDJSON_NEON</code> 来启用这个优化。一些编译器可以检测这个设置，如 <code>perftest.h</code>：</p>
-<div class="fragment"><div class="line"><span class="comment">// __SSE2__ 和 __SSE4_2__ 可被 gcc、clang 和 Intel 编译器识别：</span></div><div class="line"><span class="comment">// 如果支持的话，我们在 gmake 中使用了 -march=native 来启用 -msse2 和 -msse4.2</span></div><div class="line"><span class="comment">// 同样的， __ARM_NEON 被用于识别Neon</span></div><div class="line"><span class="preprocessor">#if defined(__SSE4_2__)</span></div><div class="line"><span class="preprocessor">#  define RAPIDJSON_SSE42</span></div><div class="line"><span class="preprocessor">#elif defined(__SSE2__)</span></div><div class="line"><span class="preprocessor">#  define RAPIDJSON_SSE2</span></div><div class="line"><span class="preprocessor">#elif defined(__ARM_NEON)</span></div><div class="line"><span class="preprocessor">#  define RAPIDJSON_NEON</span></div><div class="line"><span class="preprocessor">#endif</span></div></div><!-- fragment --><p>需要注意的是，这是编译期的设置。在不支持这些指令的机器上运行可执行文件会使它崩溃。</p>
-<h3>页面对齐问题</h3>
-<p>在 RapidJSON 的早期版本中，被报告了<a href="https://code.google.com/archive/p/rapidjson/issues/104">一个问题</a>：<code>SkipWhitespace_SIMD()</code> 会罕见地导致崩溃（约五十万分之一的几率）。在调查之后，怀疑是 <code>_mm_loadu_si128()</code> 访问了 `'\0'` 之后的内存，并越过被保护的页面边界。</p>
+<p>你可以通过在包含 <code><a class="el" href="rapidjson_8h.html" title="common definitions and configuration">rapidjson.h</a></code> 之前定义 <code>RAPIDJSON_SSE2</code> ， <code>RAPIDJSON_SSE42</code> 或 <code>RAPIDJSON_NEON</code> 来启用这个优化。一些编译器可以检测这个设置，如 <code>perftest.h</code>：</p>
+<div class="fragment"><div class="line"><span class="comment">// __SSE2__ 和 __SSE4_2__ 可被 gcc、clang 和 Intel 编译器识别：</span></div>
+<div class="line"><span class="comment">// 如果支持的话，我们在 gmake 中使用了 -march=native 来启用 -msse2 和 -msse4.2</span></div>
+<div class="line"><span class="comment">// 同样的， __ARM_NEON 被用于识别Neon</span></div>
+<div class="line"><span class="preprocessor">#if defined(__SSE4_2__)</span></div>
+<div class="line"><span class="preprocessor">#  define RAPIDJSON_SSE42</span></div>
+<div class="line"><span class="preprocessor">#elif defined(__SSE2__)</span></div>
+<div class="line"><span class="preprocessor">#  define RAPIDJSON_SSE2</span></div>
+<div class="line"><span class="preprocessor">#elif defined(__ARM_NEON)</span></div>
+<div class="line"><span class="preprocessor">#  define RAPIDJSON_NEON</span></div>
+<div class="line"><span class="preprocessor">#endif</span></div>
+</div><!-- fragment --><p>需要注意的是，这是编译期的设置。在不支持这些指令的机器上运行可执行文件会使它崩溃。</p>
+<h3><a class="anchor" id="autotoc_md61"></a>
+页面对齐问题</h3>
+<p>在 RapidJSON 的早期版本中，被报告了<a href="https://code.google.com/archive/p/rapidjson/issues/104">一个问题</a>：<code>SkipWhitespace_SIMD()</code> 会罕见地导致崩溃（约五十万分之一的几率）。在调查之后，怀疑是 <code>_mm_loadu_si128()</code> 访问了 &lsquo;&rsquo;\0'` 之后的内存，并越过被保护的页面边界。</p>
 <p>在 <a href="http://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-optimization-manual.html">Intel® 64 and IA-32 Architectures Optimization Reference Manual</a> 中，章节 10.2.1：</p>
 <blockquote class="doxtable">
 <p>为了支持需要费对齐的128位 SIMD 内存访问的算法，调用者的内存缓冲区申请应当考虑添加一些填充空间，这样被调用的函数可以安全地将地址指针用于未对齐的128位 SIMD 内存操作。 在结合非对齐的 SIMD 内存操作中，最小的对齐大小应该等于 SIMD 寄存器的大小。 </p>
@@ -309,15 +356,23 @@ MemoryPoolAllocator</h2>
 <p>为了修复这个问题，当前的代码会先按字节处理直到下一个对齐的地址。在这之后，使用对齐读取来进行 SIMD 处理。见 <a href="https://github.com/Tencent/rapidjson/issues/85">#85</a>。</p>
 <h2><a class="anchor" id="LocalStreamCopy"></a>
 局部流拷贝</h2>
-<p>在优化的过程中，我们发现一些编译器不能将访问流的一些成员数据放入局部变量或者寄存器中。测试结果显示，对于一些流类型，创建流的拷贝并将其用于内层循环中可以改善性能。例如，实际（非 SIMD）的 <code><a class="el" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a" title="Skip the JSON white spaces in a stream. ">SkipWhitespace()</a></code> 被实现为：</p>
-<div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream&gt;</div><div class="line"><span class="keywordtype">void</span> <a class="code" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a">SkipWhitespace</a>(InputStream&amp; is) {</div><div class="line">    internal::StreamLocalCopy&lt;InputStream&gt; copy(is);</div><div class="line">    InputStream&amp; s(copy.s);</div><div class="line"></div><div class="line">    <span class="keywordflow">while</span> (s.Peek() == <span class="charliteral">&#39; &#39;</span> || s.Peek() == <span class="charliteral">&#39;\n&#39;</span> || s.Peek() == <span class="charliteral">&#39;\r&#39;</span> || s.Peek() == <span class="charliteral">&#39;\t&#39;</span>)</div><div class="line">        s.Take();</div><div class="line">}</div></div><!-- fragment --><p>基于流的特征，<code>StreamLocalCopy</code> 会创建（或不创建）流对象的拷贝，在局部使用它并将流的状态拷贝回原来的流。</p>
+<p>在优化的过程中，我们发现一些编译器不能将访问流的一些成员数据放入局部变量或者寄存器中。测试结果显示，对于一些流类型，创建流的拷贝并将其用于内层循环中可以改善性能。例如，实际（非 SIMD）的 <code><a class="el" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a" title="Skip the JSON white spaces in a stream.">SkipWhitespace()</a></code> 被实现为：</p>
+<div class="fragment"><div class="line"><span class="keyword">template</span>&lt;<span class="keyword">typename</span> InputStream&gt;</div>
+<div class="line"><span class="keywordtype">void</span> <a class="code" href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a">SkipWhitespace</a>(InputStream&amp; is) {</div>
+<div class="line">    internal::StreamLocalCopy&lt;InputStream&gt; copy(is);</div>
+<div class="line">    InputStream&amp; s(copy.s);</div>
+<div class="line"> </div>
+<div class="line">    <span class="keywordflow">while</span> (s.Peek() == <span class="charliteral">&#39; &#39;</span> || s.Peek() == <span class="charliteral">&#39;\n&#39;</span> || s.Peek() == <span class="charliteral">&#39;\r&#39;</span> || s.Peek() == <span class="charliteral">&#39;\t&#39;</span>)</div>
+<div class="line">        s.Take();</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>基于流的特征，<code>StreamLocalCopy</code> 会创建（或不创建）流对象的拷贝，在局部使用它并将流的状态拷贝回原来的流。</p>
 <h2><a class="anchor" id="ParsingDouble"></a>
 解析为双精度浮点数</h2>
 <p>将字符串解析为 <code>double</code> 并不简单。标准库函数 <code>strtod()</code> 可以胜任这项工作，但它比较缓慢。默认情况下，解析器使用默认的精度设置。这最多有 3<a href="http://en.wikipedia.org/wiki/Unit_in_the_last_place">ULP</a> 的误差，并实现在 <code>internal::StrtodNormalPrecision()</code> 中。</p>
 <p>当使用 <code>kParseFullPrecisionFlag</code> 时，编译器会改为调用 <code>internal::StrtodFullPrecision()</code> ，这个函数会自动调用三个版本的转换。</p><ol type="1">
 <li><a href="http://www.exploringbinary.com/fast-path-decimal-to-floating-point-conversion/">Fast-Path</a>。</li>
 <li><a href="https://github.com/floitsch/double-conversion">double-conversion</a> 中的自定义 DIY-FP 实现。</li>
-<li>（Clinger, William D. How to read floating point numbers accurately. Vol. 25. No. 6. ACM, 1990） 中的大整数算法。</li>
+<li>（Clinger, William D.&#160;How to read floating point numbers accurately. Vol. 25. No. 6. ACM, 1990） 中的大整数算法。</li>
 </ol>
 <p>如果第一个转换方法失败，则尝试使用第二种方法，以此类推。</p>
 <h1><a class="anchor" id="GenerationOptimization"></a>
@@ -329,7 +384,7 @@ MemoryPoolAllocator</h2>
 <h2><a class="anchor" id="dtoa"></a>
 双精度浮点数到字符串的转换</h2>
 <p>原来 RapidJSON 使用 <code>snprintf(..., ..., "%g")</code> 来进行双精度浮点数到字符串的转换。这是不准确的，因为默认的精度是6。随后我们发现它很缓慢，而且有其它的替代品。</p>
-<p>Google 的 V8 <a href="https://github.com/floitsch/double-conversion">double-conversion</a> 实现了更新的、快速的被称为 Grisu3 的算法（Loitsch, Florian. "Printing floating-point numbers quickly and accurately with integers." ACM Sigplan Notices 45.6 (2010): 233-243.）。</p>
+<p>Google 的 V8 <a href="https://github.com/floitsch/double-conversion">double-conversion</a> 实现了更新的、快速的被称为 Grisu3 的算法（Loitsch, Florian. "Printing floating-point numbers quickly and accurately with integers."&#160;ACM Sigplan Notices&#160;45.6 (2010): 233-243.）。</p>
 <p>然而，这个实现不是仅头文件的，所以我们实现了一个仅头文件的 Grisu2 版本。这个算法保证了结果永远精确。而且在大多数情况下，它会生成最短的（可选）字符串表示。</p>
 <p>这个仅头文件的转换函数在 <a href="https://github.com/miloyip/dtoa-benchmark">dtoa-benchmark</a> 中进行评估。</p>
 <h1><a class="anchor" id="Parser"></a>
@@ -339,90 +394,101 @@ MemoryPoolAllocator</h2>
 <p>迭代解析器是一个以非递归方式实现的递归下降的 LL(1) 解析器。</p>
 <h3><a class="anchor" id="IterativeParserGrammar"></a>
 语法</h3>
-<p>解析器使用的语法是基于严格 JSON 语法的： </p><div class="fragment"><div class="line">S -&gt; array | object</div><div class="line">array -&gt; [ values ]</div><div class="line">object -&gt; { members }</div><div class="line">values -&gt; non-empty-values | ε</div><div class="line">non-empty-values -&gt; value addition-values</div><div class="line">addition-values -&gt; ε | , non-empty-values</div><div class="line">members -&gt; non-empty-members | ε</div><div class="line">non-empty-members -&gt; member addition-members</div><div class="line">addition-members -&gt; ε | , non-empty-members</div><div class="line">member -&gt; STRING : value</div><div class="line">value -&gt; STRING | NUMBER | NULL | BOOLEAN | object | array</div></div><!-- fragment --><p>注意到左因子被加入了非终结符的 <code>values</code> 和 <code>members</code> 来保证语法是 LL(1) 的。</p>
+<p>解析器使用的语法是基于严格 JSON 语法的： </p><div class="fragment"><div class="line">S -&gt; array | object</div>
+<div class="line">array -&gt; [ values ]</div>
+<div class="line">object -&gt; { members }</div>
+<div class="line">values -&gt; non-empty-values | ε</div>
+<div class="line">non-empty-values -&gt; value addition-values</div>
+<div class="line">addition-values -&gt; ε | , non-empty-values</div>
+<div class="line">members -&gt; non-empty-members | ε</div>
+<div class="line">non-empty-members -&gt; member addition-members</div>
+<div class="line">addition-members -&gt; ε | , non-empty-members</div>
+<div class="line">member -&gt; STRING : value</div>
+<div class="line">value -&gt; STRING | NUMBER | NULL | BOOLEAN | object | array</div>
+</div><!-- fragment --><p>注意到左因子被加入了非终结符的 <code>values</code> 和 <code>members</code> 来保证语法是 LL(1) 的。</p>
 <h3><a class="anchor" id="IterativeParserParsingTable"></a>
 解析表</h3>
 <p>基于这份语法，我们可以构造 FIRST 和 FOLLOW 集合。</p>
 <p>非终结符的 FIRST 集合如下所示：</p>
-<table class="doxtable">
-<tr>
-<th align="center">NON-TERMINAL </th><th align="center">FIRST  </th></tr>
-<tr>
-<td align="center">array </td><td align="center">[ </td></tr>
-<tr>
-<td align="center">object </td><td align="center">{ </td></tr>
-<tr>
-<td align="center">values </td><td align="center">ε STRING NUMBER NULL BOOLEAN { [ </td></tr>
-<tr>
-<td align="center">addition-values </td><td align="center">ε COMMA </td></tr>
-<tr>
-<td align="center">members </td><td align="center">ε STRING </td></tr>
-<tr>
-<td align="center">addition-members </td><td align="center">ε COMMA </td></tr>
-<tr>
-<td align="center">member </td><td align="center">STRING </td></tr>
-<tr>
-<td align="center">value </td><td align="center">STRING NUMBER NULL BOOLEAN { [ </td></tr>
-<tr>
-<td align="center">S </td><td align="center">[ { </td></tr>
-<tr>
-<td align="center">non-empty-members </td><td align="center">STRING </td></tr>
-<tr>
-<td align="center">non-empty-values </td><td align="center">STRING NUMBER NULL BOOLEAN { [ </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadCenter">NON-TERMINAL  </th><th class="markdownTableHeadCenter">FIRST   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">array  </td><td class="markdownTableBodyCenter">[   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">object  </td><td class="markdownTableBodyCenter">{   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">values  </td><td class="markdownTableBodyCenter">ε STRING NUMBER NULL BOOLEAN { [   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">addition-values  </td><td class="markdownTableBodyCenter">ε COMMA   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">members  </td><td class="markdownTableBodyCenter">ε STRING   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">addition-members  </td><td class="markdownTableBodyCenter">ε COMMA   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">member  </td><td class="markdownTableBodyCenter">STRING   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">value  </td><td class="markdownTableBodyCenter">STRING NUMBER NULL BOOLEAN { [   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">S  </td><td class="markdownTableBodyCenter">[ {   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">non-empty-members  </td><td class="markdownTableBodyCenter">STRING   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">non-empty-values  </td><td class="markdownTableBodyCenter">STRING NUMBER NULL BOOLEAN { [   </td></tr>
 </table>
 <p>FOLLOW 集合如下所示：</p>
-<table class="doxtable">
-<tr>
-<th align="center">NON-TERMINAL </th><th align="center">FOLLOW  </th></tr>
-<tr>
-<td align="center">S </td><td align="center">$ </td></tr>
-<tr>
-<td align="center">array </td><td align="center">, $ } ] </td></tr>
-<tr>
-<td align="center">object </td><td align="center">, $ } ] </td></tr>
-<tr>
-<td align="center">values </td><td align="center">] </td></tr>
-<tr>
-<td align="center">non-empty-values </td><td align="center">] </td></tr>
-<tr>
-<td align="center">addition-values </td><td align="center">] </td></tr>
-<tr>
-<td align="center">members </td><td align="center">} </td></tr>
-<tr>
-<td align="center">non-empty-members </td><td align="center">} </td></tr>
-<tr>
-<td align="center">addition-members </td><td align="center">} </td></tr>
-<tr>
-<td align="center">member </td><td align="center">, } </td></tr>
-<tr>
-<td align="center">value </td><td align="center">, } ] </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadCenter">NON-TERMINAL  </th><th class="markdownTableHeadCenter">FOLLOW   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">S  </td><td class="markdownTableBodyCenter">$   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">array  </td><td class="markdownTableBodyCenter">, $ } ]   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">object  </td><td class="markdownTableBodyCenter">, $ } ]   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">values  </td><td class="markdownTableBodyCenter">]   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">non-empty-values  </td><td class="markdownTableBodyCenter">]   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">addition-values  </td><td class="markdownTableBodyCenter">]   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">members  </td><td class="markdownTableBodyCenter">}   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">non-empty-members  </td><td class="markdownTableBodyCenter">}   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">addition-members  </td><td class="markdownTableBodyCenter">}   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">member  </td><td class="markdownTableBodyCenter">, }   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">value  </td><td class="markdownTableBodyCenter">, } ]   </td></tr>
 </table>
 <p>最终可以从 FIRST 和 FOLLOW 集合生成解析表：</p>
-<table class="doxtable">
-<tr>
-<th align="center">NON-TERMINAL </th><th align="center">[ </th><th align="center">{ </th><th align="center">, </th><th align="center">: </th><th align="center">] </th><th align="center">} </th><th align="center">STRING </th><th align="center">NUMBER </th><th align="center">NULL </th><th align="center">BOOLEAN  </th></tr>
-<tr>
-<td align="center">S </td><td align="center">array </td><td align="center">object </td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td></tr>
-<tr>
-<td align="center">array </td><td align="center">[ values ] </td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td></tr>
-<tr>
-<td align="center">object </td><td align="center"></td><td align="center">{ members } </td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td></tr>
-<tr>
-<td align="center">values </td><td align="center">non-empty-values </td><td align="center">non-empty-values </td><td align="center"></td><td align="center"></td><td align="center">ε </td><td align="center"></td><td align="center">non-empty-values </td><td align="center">non-empty-values </td><td align="center">non-empty-values </td><td align="center">non-empty-values </td></tr>
-<tr>
-<td align="center">non-empty-values </td><td align="center">value addition-values </td><td align="center">value addition-values </td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center">value addition-values </td><td align="center">value addition-values </td><td align="center">value addition-values </td><td align="center">value addition-values </td></tr>
-<tr>
-<td align="center">addition-values </td><td align="center"></td><td align="center"></td><td align="center">, non-empty-values </td><td align="center"></td><td align="center">ε </td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td></tr>
-<tr>
-<td align="center">members </td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center">ε </td><td align="center">non-empty-members </td><td align="center"></td><td align="center"></td><td align="center"></td></tr>
-<tr>
-<td align="center">non-empty-members </td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center">member addition-members </td><td align="center"></td><td align="center"></td><td align="center"></td></tr>
-<tr>
-<td align="center">addition-members </td><td align="center"></td><td align="center"></td><td align="center">, non-empty-members </td><td align="center"></td><td align="center"></td><td align="center">ε </td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td></tr>
-<tr>
-<td align="center">member </td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center">STRING : value </td><td align="center"></td><td align="center"></td><td align="center"></td></tr>
-<tr>
-<td align="center">value </td><td align="center">array </td><td align="center">object </td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center"></td><td align="center">STRING </td><td align="center">NUMBER </td><td align="center">NULL </td><td align="center">BOOLEAN </td></tr>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadCenter">NON-TERMINAL  </th><th class="markdownTableHeadCenter">[  </th><th class="markdownTableHeadCenter">{  </th><th class="markdownTableHeadCenter">,  </th><th class="markdownTableHeadCenter">:  </th><th class="markdownTableHeadCenter">]  </th><th class="markdownTableHeadCenter">}  </th><th class="markdownTableHeadCenter">STRING  </th><th class="markdownTableHeadCenter">NUMBER  </th><th class="markdownTableHeadCenter">NULL  </th><th class="markdownTableHeadCenter">BOOLEAN   </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">S  </td><td class="markdownTableBodyCenter">array  </td><td class="markdownTableBodyCenter">object  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">array  </td><td class="markdownTableBodyCenter">[ values ]  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">object  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter">{ members }  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">values  </td><td class="markdownTableBodyCenter">non-empty-values  </td><td class="markdownTableBodyCenter">non-empty-values  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter">ε  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter">non-empty-values  </td><td class="markdownTableBodyCenter">non-empty-values  </td><td class="markdownTableBodyCenter">non-empty-values  </td><td class="markdownTableBodyCenter">non-empty-values   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">non-empty-values  </td><td class="markdownTableBodyCenter">value addition-values  </td><td class="markdownTableBodyCenter">value addition-values  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter">value addition-values  </td><td class="markdownTableBodyCenter">value addition-values  </td><td class="markdownTableBodyCenter">value addition-values  </td><td class="markdownTableBodyCenter">value addition-values   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">addition-values  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter">, non-empty-values  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter">ε  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">members  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter">ε  </td><td class="markdownTableBodyCenter">non-empty-members  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">non-empty-members  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter">member addition-members  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">addition-members  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter">, non-empty-members  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter">ε  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyCenter">member  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter">STRING : value  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter">value  </td><td class="markdownTableBodyCenter">array  </td><td class="markdownTableBodyCenter">object  </td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter"></td><td class="markdownTableBodyCenter">STRING  </td><td class="markdownTableBodyCenter">NUMBER  </td><td class="markdownTableBodyCenter">NULL  </td><td class="markdownTableBodyCenter">BOOLEAN   </td></tr>
 </table>
 <p>对于上面的语法分析，这里有一个很棒的<a href="http://hackingoff.com/compilers/predict-first-follow-set">工具</a>。</p>
 <h3><a class="anchor" id="IterativeParserImplementation"></a>
@@ -432,12 +498,15 @@ MemoryPoolAllocator</h2>
 <p>首先，在 RapidJSON 中，这份解析表被编码为状态机。 规则由头部和主体组成。 状态转换由规则构造。 除此之外，额外的状态被添加到与 <code>array</code> 和 <code>object</code> 有关的规则。 通过这种方式，生成数组值或对象成员可以只用一次状态转移便可完成， 而不需要在直接的实现中的多次出栈/入栈操作。 这也使得估计栈的大小更加容易。</p>
 <p>状态图如如下所示：</p>
 <div class="image">
-<img src="iterative-parser-states-diagram.png" alt="iterative-parser-states-diagram.png"/>
+<img src="iterative-parser-states-diagram.png" alt=""/>
 <div class="caption">
 状态图</div></div>
-<p> 第二，迭代解析器也在内部栈保存了数组的值个数和对象成员的数量，这也与传统的实现不同。 </p>
+   <p>第二，迭代解析器也在内部栈保存了数组的值个数和对象成员的数量，这也与传统的实现不同。 </p>
 </div></div><!-- contents -->
+</div><!-- PageDoc -->
 </div><!-- doc-content -->
+<div class="ttc" id="aclassrapidjson_1_1_allocator_html"><div class="ttname"><a href="classrapidjson_1_1_allocator.html">Allocator</a></div><div class="ttdoc">Concept for allocating, resizing and freeing memory block.</div></div>
+<div class="ttc" id="anamespacerapidjson_html_a6efb0f4d2a6f81477a59718d42e9464a"><div class="ttname"><a href="namespacerapidjson.html#a6efb0f4d2a6f81477a59718d42e9464a">rapidjson::SkipWhitespace</a></div><div class="ttdeci">void SkipWhitespace(InputStream &amp;is)</div><div class="ttdoc">Skip the JSON white spaces in a stream.</div><div class="ttdef"><b>Definition:</b> reader.h:264</div></div>
 <!-- HTML footer for doxygen 1.8.7-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

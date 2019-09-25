@@ -18,9 +18,9 @@ var reader_8h =
       [ "kParseNanAndInfFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a857894ab51cafa62956e9c9f0dafc4d8", null ],
       [ "kParseDefaultFlags", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835", null ]
     ] ],
-    [ "SkipWhitespace", "reader_8h.html#a6efb0f4d2a6f81477a59718d42e9464a", null ],
     [ "SkipWhitespace", "reader_8h.html#a946a04b733bc148c13e7b3b0721cabcc", null ],
+    [ "SkipWhitespace", "reader_8h.html#a6bb4c8ff395f8962f7df38a5467ee2ed", null ],
+    [ "SkipWhitespace", "reader_8h.html#a6efb0f4d2a6f81477a59718d42e9464a", null ],
     [ "SkipWhitespace", "reader_8h.html#a3caa6f393c9940e6525d5f1c21ed9ea2", null ],
-    [ "SkipWhitespace", "reader_8h.html#a791735c27e073a70d720c2775ddf9568", null ],
-    [ "SkipWhitespace", "reader_8h.html#a6bb4c8ff395f8962f7df38a5467ee2ed", null ]
+    [ "SkipWhitespace", "reader_8h.html#a791735c27e073a70d720c2775ddf9568", null ]
 ];

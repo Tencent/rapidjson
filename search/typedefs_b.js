@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['schemadocument',['SchemaDocument',['../namespacerapidjson.html#a52bbb5d64d1319495089e1713a0653cf',1,'rapidjson']]],
-  ['sizetype',['SizeType',['../namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84',1,'rapidjson']]],
-  ['stringbuffer',['StringBuffer',['../namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21',1,'rapidjson']]],
-  ['stringreftype',['StringRefType',['../classrapidjson_1_1_generic_value.html#a559eb9cea54364a35518b02f6d74f379',1,'rapidjson::GenericValue']]],
-  ['stringstream',['StringStream',['../namespacerapidjson.html#a021f77051e9f85188fc2f71ff5a15ebc',1,'rapidjson']]]
+  ['value_493',['Value',['../namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505',1,'rapidjson']]],
+  ['valueiterator_494',['ValueIterator',['../classrapidjson_1_1_generic_value.html#a06ce0e14ec83b53c83e1b1699b53a25e',1,'rapidjson::GenericValue']]],
+  ['valuetype_495',['ValueType',['../classrapidjson_1_1_generic_value.html#ad2935191ab28c2c2e472b739a9d58202',1,'rapidjson::GenericValue::ValueType()'],['../classrapidjson_1_1_generic_document.html#a41bbec044c421e870a9d355075d741bc',1,'rapidjson::GenericDocument::ValueType()']]]
 ];
