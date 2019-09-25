@@ -46,17 +46,17 @@ abort() {
 # install doxygen binary distribution
 doxygen_install()
 {
-	    cd ${TMPDIR-/tmp}
-	    curl ${DOXYGEN_URL} -o doxygen.tar.gz
-	    tar zxvf doxygen.tar.gz
-	    mkdir doxygen_build
-	    cd doxygen_build
-	    cmake ../doxygen-Release_${DOXYGEN_VER}/
-	    make
+	cd ${TMPDIR-/tmp}
+	curl ${DOXYGEN_URL} -o doxygen.tar.gz
+	tar zxvf doxygen.tar.gz
+	mkdir doxygen_build
+	cd doxygen_build
+	cmake ../doxygen-Release_${DOXYGEN_VER}/
+	make
     
-	    export PATH="${TMPDIR-/tmp}/doxygen_build/bin:$PATH"
+	export PATH="${TMPDIR-/tmp}/doxygen_build/bin:$PATH"
 	
-	    cd ../../
+	cd ../../
 }
 
 doxygen_run()
