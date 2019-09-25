@@ -46,11 +46,7 @@ abort() {
 # install doxygen binary distribution
 doxygen_install()
 {
-	wget -O - "${DOXYGEN_URL}" | \
-		tar xz -C ${TMPDIR-/tmp} ${DOXYGEN_VER}/bin/doxygen
-    export PATH="${TMPDIR-/tmp}/${DOXYGEN_VER}/bin:$PATH"
-    
-	cd ${TMPDIR-/tmp}
+    cd ${TMPDIR-/tmp}
     curl ${DOXYGEN_URL} -o doxygen.tar.gz
     tar zxvf doxygen.tar.gz
     mkdir doxygen_build
@@ -60,7 +56,7 @@ doxygen_install()
     
     export PATH="${TMPDIR-/tmp}/doxygen_build/bin:$PATH"
 	
-	cd ../../
+    cd ../../
 }
 
 doxygen_run()
