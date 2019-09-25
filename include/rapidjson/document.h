@@ -70,10 +70,16 @@ public:
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     //! Move constructor in C++11
-    GenericMember(GenericMember&& rhs) RAPIDJSON_NOEXCEPT = default;
+    GenericMember(GenericMember&& rhs) RAPIDJSON_NOEXCEPT
+        : name(std::move(rhs.name)),
+          value(std::move(rhs.value))
+    {
+    }
 
     //! Move assignment in C++11
-    GenericMember& operator=(GenericMember&& rhs) RAPIDJSON_NOEXCEPT = default;
+    GenericMember& operator=(GenericMember&& rhs) RAPIDJSON_NOEXCEPT {
+        return *this = static_cast<GenericMember&>(rhs);
+    }
 #endif
 
     //! Assignment with move semantics.
