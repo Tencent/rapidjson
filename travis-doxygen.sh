@@ -4,9 +4,8 @@
 
 set -e
 
-DOXYGEN_VER=doxygen-1.8.15
-DOXYGEN_TAR=${DOXYGEN_VER}.linux.bin.tar.gz
-DOXYGEN_URL="http://doxygen.nl/files/${DOXYGEN_TAR}"
+DOXYGEN_VER=1_8_16
+DOXYGEN_URL="https://codeload.github.com/doxygen/doxygen/tar.gz/Release_${DOXYGEN_VER}"
 
 : ${GITHUB_REPO:="Tencent/rapidjson"}
 GITHUB_HOST="github.com"
@@ -47,9 +46,17 @@ abort() {
 # install doxygen binary distribution
 doxygen_install()
 {
-	wget -O - "${DOXYGEN_URL}" | \
-		tar xz -C ${TMPDIR-/tmp} ${DOXYGEN_VER}/bin/doxygen
-    export PATH="${TMPDIR-/tmp}/${DOXYGEN_VER}/bin:$PATH"
+	cd ${TMPDIR-/tmp}
+	curl ${DOXYGEN_URL} -o doxygen.tar.gz
+	tar zxvf doxygen.tar.gz
+	mkdir doxygen_build
+	cd doxygen_build
+	cmake ../doxygen-Release_${DOXYGEN_VER}/
+	make
+    
+	export PATH="${TMPDIR-/tmp}/doxygen_build/bin:$PATH"
+	
+	cd ../../
 }
 
 doxygen_run()

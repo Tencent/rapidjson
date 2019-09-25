@@ -20,7 +20,7 @@ env:
 before_install:
     - sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
     - sudo apt-get update -qq
-    - sudo apt-get install -y cmake valgrind g++-multilib libc6-dbg:i386
+    - sudo apt-get install -y cmake valgrind g++-multilib libc6-dbg:i386 --allow-unauthenticated
 
 matrix:
   include:
