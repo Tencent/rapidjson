@@ -491,7 +491,8 @@ public:
                     typename ValueType::MemberIterator m = v->FindMember(GenericValue<EncodingType>(GenericStringRef<Ch>(t->name, t->length)));
                     if (m == v->MemberEnd()) {
                         v->AddMember(ValueType(t->name, t->length, allocator).Move(), ValueType().Move(), allocator);
-                        v = &(--v->MemberEnd())->value; // Assumes AddMember() appends at the end
+                        m = v->MemberEnd();
+                        v = &(--m)->value; // Assumes AddMember() appends at the end
                         exist = false;
                     }
                     else
