@@ -1,5 +1,10 @@
 var NAVTREEINDEX4 =
 {
+"reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9":[15,0,0,0,17,5],
+"reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a02748971d6ea0c5e22c69b8aa7f344ea":[15,0,0,0,17,5,1],
+"reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a13981c0b803803f59d7a01aef3dfc987":[15,0,0,0,17,5,7],
+"reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a3df81f75479da8e052393f92cbec394b":[15,0,0,0,17,5,2],
+"reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835":[15,0,0,0,17,5,10],
 "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a7923686c8bdb7614699f1fb1bb615bb2":[15,0,0,0,17,5,3],
 "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a857894ab51cafa62956e9c9f0dafc4d8":[15,0,0,0,17,5,9],
 "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9ab5d719b36aac626135d5d622d0d837c1":[15,0,0,0,17,5,6],
@@ -55,10 +60,6 @@ var NAVTREEINDEX4 =
 "structrapidjson_1_1_generic_insitu_string_stream.html#ac6b5cf07cdb691f99abd52a672790d8a":[14,0,0,16,11],
 "structrapidjson_1_1_generic_insitu_string_stream.html#ae68a80f99fd484704af045a0ccd9c00f":[14,0,0,16,13],
 "structrapidjson_1_1_generic_insitu_string_stream.html#affff67ccd9e6cd2816fd7e67cb5b147d":[14,0,0,16,4],
-"structrapidjson_1_1_generic_member.html":[14,0,0,17],
-"structrapidjson_1_1_generic_member.html#a8ffff2076e62d988a070a136da6ffca6":[14,0,0,17,2],
-"structrapidjson_1_1_generic_member.html#ae820eaa74b415a9073f3f3855f6c6607":[14,0,0,17,1],
-"structrapidjson_1_1_generic_member.html#af72094da5f8967de3fab3d2c34bc71cc":[14,0,0,17,0],
 "structrapidjson_1_1_generic_memory_buffer.html":[14,0,0,19],
 "structrapidjson_1_1_generic_memory_buffer.html#a070ea27ab1e80df671ced9edb7d03150":[14,0,0,19,7],
 "structrapidjson_1_1_generic_memory_buffer.html#a1b2639889f687f0f6f1b90181918f273":[14,0,0,19,2],

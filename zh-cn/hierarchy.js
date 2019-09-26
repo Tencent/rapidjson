@@ -20,7 +20,7 @@ var hierarchy =
     [ "rapidjson::GenericValue< Encoding, Allocator >::Flag", "structrapidjson_1_1_generic_value_1_1_flag.html", null ],
     [ "rapidjson::GenericArray< Const, ValueT >", "classrapidjson_1_1_generic_array.html", null ],
     [ "rapidjson::GenericInsituStringStream< Encoding >", "structrapidjson_1_1_generic_insitu_string_stream.html", null ],
-    [ "rapidjson::GenericMember< Encoding, Allocator >", "structrapidjson_1_1_generic_member.html", null ],
+    [ "rapidjson::GenericMember< Encoding, Allocator >", "classrapidjson_1_1_generic_member.html", null ],
     [ "rapidjson::GenericMemberIterator< Const, Encoding, Allocator >", "classrapidjson_1_1_generic_member_iterator.html", null ],
     [ "rapidjson::GenericMemoryBuffer< Allocator >", "structrapidjson_1_1_generic_memory_buffer.html", null ],
     [ "rapidjson::GenericObject< Const, ValueT >", "classrapidjson_1_1_generic_object.html", null ],

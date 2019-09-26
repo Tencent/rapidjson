@@ -2,7 +2,7 @@ var document_8h =
 [
     [ "GenericValue", "classrapidjson_1_1_generic_value.html", "classrapidjson_1_1_generic_value" ],
     [ "GenericDocument", "classrapidjson_1_1_generic_document.html", "classrapidjson_1_1_generic_document" ],
-    [ "GenericMember", "structrapidjson_1_1_generic_member.html", "structrapidjson_1_1_generic_member" ],
+    [ "GenericMember", "classrapidjson_1_1_generic_member.html", "classrapidjson_1_1_generic_member" ],
     [ "GenericMemberIterator", "classrapidjson_1_1_generic_member_iterator.html", "classrapidjson_1_1_generic_member_iterator" ],
     [ "GenericStringRef", "structrapidjson_1_1_generic_string_ref.html", "structrapidjson_1_1_generic_string_ref" ],
     [ "GenericArray", "classrapidjson_1_1_generic_array.html", "classrapidjson_1_1_generic_array" ],

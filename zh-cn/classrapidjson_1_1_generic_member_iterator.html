@@ -190,11 +190,11 @@ typedef std::random_access_iterator_tag&#160;</td><td class="memItemRight" valig
 <tr class="separator:a38b75fd16d115b5230b373207ac05b27"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa9d53504374c7c6bdf46775482c5b107"><td class="memItemLeft" align="right" valign="top"><a id="aa9d53504374c7c6bdf46775482c5b107"></a>
 typedef pointer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_member_iterator.html#aa9d53504374c7c6bdf46775482c5b107">Pointer</a></td></tr>
-<tr class="memdesc:aa9d53504374c7c6bdf46775482c5b107"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to (const) <a class="el" href="structrapidjson_1_1_generic_member.html" title="Name-value pair in a JSON object value.">GenericMember</a> <br /></td></tr>
+<tr class="memdesc:aa9d53504374c7c6bdf46775482c5b107"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pointer to (const) <a class="el" href="classrapidjson_1_1_generic_member.html" title="Name-value pair in a JSON object value.">GenericMember</a> <br /></td></tr>
 <tr class="separator:aa9d53504374c7c6bdf46775482c5b107"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe27838f8dc71fdb38028ef27ae0b4f2"><td class="memItemLeft" align="right" valign="top"><a id="abe27838f8dc71fdb38028ef27ae0b4f2"></a>
 typedef reference&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_member_iterator.html#abe27838f8dc71fdb38028ef27ae0b4f2">Reference</a></td></tr>
-<tr class="memdesc:abe27838f8dc71fdb38028ef27ae0b4f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference to (const) <a class="el" href="structrapidjson_1_1_generic_member.html" title="Name-value pair in a JSON object value.">GenericMember</a> <br /></td></tr>
+<tr class="memdesc:abe27838f8dc71fdb38028ef27ae0b4f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reference to (const) <a class="el" href="classrapidjson_1_1_generic_member.html" title="Name-value pair in a JSON object value.">GenericMember</a> <br /></td></tr>
 <tr class="separator:abe27838f8dc71fdb38028ef27ae0b4f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aff2739a9265639a7a4be8c3e6216b31a"><td class="memItemLeft" align="right" valign="top"><a id="aff2739a9265639a7a4be8c3e6216b31a"></a>
 typedef difference_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_member_iterator.html#aff2739a9265639a7a4be8c3e6216b31a">DifferenceType</a></td></tr>
@@ -239,11 +239,11 @@ class rapidjson::GenericMemberIterator&lt; Const, Encoding, Allocator &gt;</h3>
   </table>
   </dd>
 </dl>
-<p>This class implements a Random Access Iterator for <a class="el" href="structrapidjson_1_1_generic_member.html" title="Name-value pair in a JSON object value.">GenericMember</a> elements of a <a class="el" href="classrapidjson_1_1_generic_value.html" title="Represents a JSON value. Use Value for UTF8 encoding and default allocator.">GenericValue</a>, see ISO/IEC 14882:2003(E) C++ standard, 24.1 [lib.iterator.requirements].</p>
+<p>This class implements a Random Access Iterator for <a class="el" href="classrapidjson_1_1_generic_member.html" title="Name-value pair in a JSON object value.">GenericMember</a> elements of a <a class="el" href="classrapidjson_1_1_generic_value.html" title="Represents a JSON value. Use Value for UTF8 encoding and default allocator.">GenericValue</a>, see ISO/IEC 14882:2003(E) C++ standard, 24.1 [lib.iterator.requirements].</p>
 <dl class="section note"><dt>注解</dt><dd>This iterator implementation is mainly intended to avoid implicit conversions from iterator values to <code>NULL</code>, e.g. from GenericValue::FindMember.</dd>
 <dd>
 Define <code>RAPIDJSON_NOMEMBERITERATORCLASS</code> to fall back to a pointer-based implementation, if your platform doesn't provide the C++ &lt;iterator&gt; header.</dd></dl>
-<dl class="section see"><dt>参见</dt><dd><a class="el" href="structrapidjson_1_1_generic_member.html" title="Name-value pair in a JSON object value.">GenericMember</a>, <a class="el" href="classrapidjson_1_1_generic_value.html#aca5596987335016c1a7c2a9467baf80b" title="Member iterator for iterating in object.">GenericValue::MemberIterator</a>, <a class="el" href="classrapidjson_1_1_generic_value.html#a6cd2b09795c48d2892bebc0ae350d51f" title="Constant member iterator for iterating in object.">GenericValue::ConstMemberIterator</a> </dd></dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classrapidjson_1_1_generic_member.html" title="Name-value pair in a JSON object value.">GenericMember</a>, <a class="el" href="classrapidjson_1_1_generic_value.html#aca5596987335016c1a7c2a9467baf80b" title="Member iterator for iterating in object.">GenericValue::MemberIterator</a>, <a class="el" href="classrapidjson_1_1_generic_value.html#a6cd2b09795c48d2892bebc0ae350d51f" title="Constant member iterator for iterating in object.">GenericValue::ConstMemberIterator</a> </dd></dl>
 </div><h2 class="groupheader">构造及析构函数说明</h2>
 <a id="ac920af483c9e31a6746c22acf0dffc50"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac920af483c9e31a6746c22acf0dffc50">&#9670;&nbsp;</a></span>GenericMemberIterator() <span class="overload">[1/2]</span></h2>

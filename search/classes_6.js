@@ -3,7 +3,7 @@ var searchData=
   ['genericarray_309',['GenericArray',['../classrapidjson_1_1_generic_array.html',1,'rapidjson']]],
   ['genericdocument_310',['GenericDocument',['../classrapidjson_1_1_generic_document.html',1,'rapidjson']]],
   ['genericinsitustringstream_311',['GenericInsituStringStream',['../structrapidjson_1_1_generic_insitu_string_stream.html',1,'rapidjson']]],
-  ['genericmember_312',['GenericMember',['../structrapidjson_1_1_generic_member.html',1,'rapidjson']]],
+  ['genericmember_312',['GenericMember',['../classrapidjson_1_1_generic_member.html',1,'rapidjson']]],
   ['genericmemberiterator_313',['GenericMemberIterator',['../classrapidjson_1_1_generic_member_iterator.html',1,'rapidjson']]],
   ['genericmemorybuffer_314',['GenericMemoryBuffer',['../structrapidjson_1_1_generic_memory_buffer.html',1,'rapidjson']]],
   ['genericobject_315',['GenericObject',['../classrapidjson_1_1_generic_object.html',1,'rapidjson']]],
