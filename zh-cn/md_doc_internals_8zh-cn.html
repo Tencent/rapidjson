@@ -379,7 +379,7 @@ MemoryPoolAllocator</h2>
 生成优化</h1>
 <h2><a class="anchor" id="itoa"></a>
 整数到字符串的转换</h2>
-<p>整数到字符串转换的朴素算法需要对每一个十进制位进行一次处罚。我们实现了若干版本并在 <a href="https://github.com/miloyip/itoa-benchmark">itoa-benchmark</a> 中对它们进行了评估。</p>
+<p>整数到字符串转换的朴素算法需要对每一个十进制位进行一次除法。我们实现了若干版本并在 <a href="https://github.com/miloyip/itoa-benchmark">itoa-benchmark</a> 中对它们进行了评估。</p>
 <p>虽然 SSE2 版本是最快的，但它和第二快的 <code>branchlut</code> 差距不大。而且 <code>branchlut</code> 是纯C++实现，所以我们在 RapidJSON 中使用了 <code>branchlut</code>。</p>
 <h2><a class="anchor" id="dtoa"></a>
 双精度浮点数到字符串的转换</h2>
