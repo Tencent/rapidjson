@@ -591,6 +591,19 @@ RAPIDJSON_NAMESPACE_END
 #endif
 #endif // RAPIDJSON_HAS_CXX11_RANGE_FOR
 
+///////////////////////////////////////////////////////////////////////////////
+// C++17 features
+
+#if defined(__has_cpp_attribute)
+# if __has_cpp_attribute(fallthrough)
+#  define RAPIDJSON_DELIBERATE_FALLTHROUGH [[fallthrough]]
+# else
+#  define RAPIDJSON_DELIBERATE_FALLTHROUGH
+# endif
+#else
+# define RAPIDJSON_DELIBERATE_FALLTHROUGH
+#endif
+
 //!@endcond
 
 //! Assertion (in non-throwing contexts).
