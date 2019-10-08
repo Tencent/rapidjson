@@ -248,7 +248,7 @@ void SkipWhitespace(InputStream& is) {
 
 ## 整数到字符串的转换 {#itoa}
 
-整数到字符串转换的朴素算法需要对每一个十进制位进行一次处罚。我们实现了若干版本并在 [itoa-benchmark](https://github.com/miloyip/itoa-benchmark) 中对它们进行了评估。
+整数到字符串转换的朴素算法需要对每一个十进制位进行一次除法。我们实现了若干版本并在 [itoa-benchmark](https://github.com/miloyip/itoa-benchmark) 中对它们进行了评估。
 
 虽然 SSE2 版本是最快的，但它和第二快的 `branchlut` 差距不大。而且 `branchlut` 是纯C++实现，所以我们在 RapidJSON 中使用了 `branchlut`。
 
