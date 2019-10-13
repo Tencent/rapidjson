@@ -69,7 +69,7 @@ public:
     }
 
     // Not implemented
-    [[nodiscard]] char Peek() const {
+    char Peek() const {
         RAPIDJSON_ASSERT(false);
         return 0;
     }
@@ -79,7 +79,7 @@ public:
         return 0;
     }
 
-    [[nodiscard]] size_t Tell() const {
+    size_t Tell() const {
         RAPIDJSON_ASSERT(false);
         return 0;
     }
