@@ -30,7 +30,8 @@ template<typename Stream = std::ostream, typename Allocator = CrtAllocator>
 class BufferedOStreamWrapper {
 public:
     typedef typename Stream::char_type Ch;
-    explicit BufferedOStreamWrapper(Stream &stream, Allocator *allocator = nullptr)
+
+    BufferedOStreamWrapper(Stream &stream, Allocator *allocator = NULL)
             : stream_(stream), allocator_(allocator) {}
 
     ~BufferedOStreamWrapper() {
@@ -39,9 +40,6 @@ public:
         Allocator::Free(top_);
         RAPIDJSON_DELETE(ownAllocator_);
     }
-
-    BufferedOStreamWrapper(const BufferedOStreamWrapper &) = delete;
-    BufferedOStreamWrapper &operator=(const BufferedOStreamWrapper &) = delete;
 
     void Put(Ch c) {
         ReserveMore(1);
@@ -55,7 +53,7 @@ public:
 
     Ch *Push(size_t cnt) {
         ReserveMore(cnt);
-        auto *const res = end_;
+        Ch *const res = end_;
         end_ += cnt;
         return res;
     }
@@ -85,7 +83,7 @@ public:
     }
     char *PutBegin() {
         RAPIDJSON_ASSERT(false);
-        return nullptr;
+        return NULL;
     }
     size_t PutEnd(char *) {
         RAPIDJSON_ASSERT(false);
@@ -103,7 +101,7 @@ public:
             if (extra_cnt > cur_capacity) {
                 Resize(extra_cnt);
             }
-        } else if (top_ == nullptr) {
+        } else if (top_ == NULL) {
             FirstAllocMemory(extra_cnt);
         } else {
             Resize(extra_cnt);
@@ -111,21 +109,24 @@ public:
     }
 
 private:
+    BufferedOStreamWrapper(const BufferedOStreamWrapper &);
+    BufferedOStreamWrapper &operator=(const BufferedOStreamWrapper &);
+
     static const size_t kMaxBufSize = 1024 * 1;
     static const size_t kInitialBufSize = 64;
     Stream &stream_;
 
-    Ch *top_ = nullptr;
-    Ch *end_ = nullptr;
-    Ch *capacity_end_ = nullptr;
+    Ch *top_ = NULL;
+    Ch *end_ = NULL;
+    Ch *capacity_end_ = NULL;
 
-    Allocator *allocator_ = nullptr;
-    Allocator *ownAllocator_ = nullptr;
+    Allocator *allocator_ = NULL;
+    Allocator *ownAllocator_ = NULL;
 
     void ClearBuf() { end_ = top_; }
 
     void FirstAllocMemory(size_t cnt) {
-        if (allocator_ == nullptr) {
+        if (allocator_ == NULL) {
             ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator());
         }
 
@@ -191,27 +192,27 @@ inline void PutN(BufferedOStreamWrapper<Allocator> &stream,
 // Full specialization for Writer<BufferedOStreamWrapper<>> to prevent memory copying
 
 template<>
-inline bool Writer<BufferedOStreamWrapper<>>::WriteInt(int i) {
+inline bool Writer<BufferedOStreamWrapper<> >::WriteInt(int i) {
     return internal::WriteIntToStream(i, os_);
 }
 
 template<>
-inline bool Writer<BufferedOStreamWrapper<>>::WriteUint(unsigned u) {
+inline bool Writer<BufferedOStreamWrapper<> >::WriteUint(unsigned u) {
     return internal::WriteUintToStream(u, os_);
 }
 
 template<>
-inline bool Writer<BufferedOStreamWrapper<>>::WriteInt64(int64_t i64) {
+inline bool Writer<BufferedOStreamWrapper<> >::WriteInt64(int64_t i64) {
     return internal::WriteInt64ToStream(i64, os_);
 }
 
 template<>
-inline bool Writer<BufferedOStreamWrapper<>>::WriteUint64(uint64_t u) {
+inline bool Writer<BufferedOStreamWrapper<> >::WriteUint64(uint64_t u) {
     return internal::WriteUint64ToStream(u, os_);
 }
 
 template<>
-inline bool Writer<BufferedOStreamWrapper<>>::WriteDouble(double d) {
+inline bool Writer<BufferedOStreamWrapper<> >::WriteDouble(double d) {
     return internal::WriteDoubleToStream(d, os_, maxDecimalPlaces_);
 }
 
