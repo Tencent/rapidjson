@@ -32,7 +32,9 @@ public:
     typedef typename Stream::char_type Ch;
 
     BufferedOStreamWrapper(Stream &stream, Allocator *allocator = NULL)
-            : stream_(stream), allocator_(allocator) {}
+            : stream_(stream),
+              top_(NULL), end_(NULL), capacity_end_(NULL),
+              allocator_(allocator), ownAllocator_(NULL) {}
 
     ~BufferedOStreamWrapper() {
         Flush();
@@ -116,12 +118,12 @@ private:
     static const size_t kInitialBufSize = 64;
     Stream &stream_;
 
-    Ch *top_ = NULL;
-    Ch *end_ = NULL;
-    Ch *capacity_end_ = NULL;
+    Ch *top_;
+    Ch *end_;
+    Ch *capacity_end_;
 
-    Allocator *allocator_ = NULL;
-    Allocator *ownAllocator_ = NULL;
+    Allocator *allocator_;
+    Allocator *ownAllocator_;
 
     void ClearBuf() { end_ = top_; }
 
