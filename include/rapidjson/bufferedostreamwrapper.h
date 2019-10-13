@@ -33,7 +33,7 @@ public:
 
     BufferedOStreamWrapper(Stream &stream, Allocator *allocator = NULL)
             : stream_(stream),
-              top_(NULL), end_(NULL), capacity_end_(NULL),
+              top_(NULL), end_(NULL), capacityEnd_(NULL),
               allocator_(allocator), ownAllocator_(NULL) {}
 
     ~BufferedOStreamWrapper() {
@@ -120,7 +120,7 @@ private:
 
     Ch *top_;
     Ch *end_;
-    Ch *capacity_end_;
+    Ch *capacityEnd_;
 
     Allocator *allocator_;
     Allocator *ownAllocator_;
@@ -139,7 +139,7 @@ private:
 
         end_ = top_ =
                 reinterpret_cast<Ch *>(allocator_->Malloc(capacity * sizeof(Ch)));
-        capacity_end_ = top_ + capacity;
+        capacityEnd_ = top_ + capacity;
     }
 
     void Resize(size_t extra_cnt) {
@@ -153,14 +153,14 @@ private:
 
         top_ = reinterpret_cast<Ch *>(allocator_->Realloc(top_, cur_cap, new_cap));
         end_ = top_ + cur_size;
-        capacity_end_ = top_ + new_cap;
+        capacityEnd_ = top_ + new_cap;
     }
 
     size_t GetBufLeftCapacity() const {
-        return static_cast<size_t>(capacity_end_ - end_) / sizeof(Ch);
+        return static_cast<size_t>(capacityEnd_ - end_) / sizeof(Ch);
     }
     size_t GetBufCapacity() const {
-        return static_cast<size_t>(capacity_end_ - top_) / sizeof(Ch);
+        return static_cast<size_t>(capacityEnd_ - top_) / sizeof(Ch);
     }
     size_t GetBufSize() const {
         return static_cast<size_t>(end_ - top_) / sizeof(Ch);
