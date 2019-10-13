@@ -48,6 +48,33 @@ TEST(BufferedOStreamWrapper, UseInWriter) {
             ss.str().c_str());
 }
 
+TEST(BufferedOStreamWrapper, IntegerWriter) {
+    std::stringstream ss;
+    {
+        StreamWrapper buffer(ss);
+        Writer<StreamWrapper> writer(buffer);
+
+        writer.StartObject();
+
+        writer.Key("int32");
+        writer.Int(-5);
+
+        writer.Key("uint32");
+        writer.Uint(5);
+
+        writer.Key("int64");
+        writer.Int64(-24679110332283771LL);
+
+        writer.Key("uint64");
+        writer.Uint64(24679110332283771ULL);
+
+        writer.EndObject();
+    }
+    EXPECT_STREQ(
+            "{\"int32\":-5,\"uint32\":5,\"int64\":-24679110332283771,\"uint64\":24679110332283771}",
+            ss.str().c_str());
+}
+
 TEST(BufferedOStreamWrapper, InitialSize) {
     std::stringstream ss;
     {
@@ -126,6 +153,17 @@ TEST(BufferedOStreamWrapper, Push5Then65536) {
     }
 
     EXPECT_EQ(std::string(5, ' ') + std::string(65536u, '_'), ss.str());
+}
+
+TEST(BufferedOStreamWrapper, Push65536Twice) {
+    std::stringstream ss;
+    {
+        StreamWrapper buffer(ss);
+        memset(buffer.Push(65536u), ' ', 65536u);
+        memset(buffer.Push(65536u), '_', 65536u);
+    }
+
+    EXPECT_EQ(std::string(65536u, ' ') + std::string(65536u, '_'), ss.str());
 }
 
 TEST(BufferedOStreamWrapper, RepeatedPush) {
