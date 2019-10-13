@@ -166,6 +166,17 @@ TEST(BufferedOStreamWrapper, Push65536Twice) {
     EXPECT_EQ(std::string(65536u, ' ') + std::string(65536u, '_'), ss.str());
 }
 
+TEST(BufferedOStreamWrapper, Push32768Then65536) {
+    std::stringstream ss;
+    {
+        StreamWrapper buffer(ss);
+        memset(buffer.Push(32768u), ' ', 32768u);
+        memset(buffer.Push(65536u), '_', 65536u);
+    }
+
+    EXPECT_EQ(std::string(32768u, ' ') + std::string(65536u, '_'), ss.str());
+}
+
 TEST(BufferedOStreamWrapper, RepeatedPush) {
     const size_t chunk_size = 53;
     const std::string source = GenerateLongString(chunk_size * 1000);
