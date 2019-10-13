@@ -507,66 +507,95 @@ private:
     Writer& operator=(const Writer&);
 };
 
-// Full specialization for StringStream to prevent memory copying
+namespace internal {
 
-template<>
-inline bool Writer<StringBuffer>::WriteInt(int i) {
-    char *buffer = os_->Push(11);
+template<typename OutputStream>
+inline bool WriteIntToStream(int i, OutputStream *os) {
+    char *buffer = os->Push(11);
     const char* end = internal::i32toa(i, buffer);
-    os_->Pop(static_cast<size_t>(11 - (end - buffer)));
+    os->Pop(static_cast<size_t>(11 - (end - buffer)));
     return true;
 }
 
-template<>
-inline bool Writer<StringBuffer>::WriteUint(unsigned u) {
-    char *buffer = os_->Push(10);
+template<typename OutputStream>
+inline bool WriteUintToStream(unsigned u, OutputStream *os) {
+    char *buffer = os->Push(10);
     const char* end = internal::u32toa(u, buffer);
-    os_->Pop(static_cast<size_t>(10 - (end - buffer)));
+    os->Pop(static_cast<size_t>(10 - (end - buffer)));
     return true;
 }
 
-template<>
-inline bool Writer<StringBuffer>::WriteInt64(int64_t i64) {
-    char *buffer = os_->Push(21);
+template<typename OutputStream>
+inline bool WriteInt64ToStream(int64_t i64, OutputStream *os) {
+    char *buffer = os->Push(21);
     const char* end = internal::i64toa(i64, buffer);
-    os_->Pop(static_cast<size_t>(21 - (end - buffer)));
+    os->Pop(static_cast<size_t>(21 - (end - buffer)));
     return true;
 }
 
-template<>
-inline bool Writer<StringBuffer>::WriteUint64(uint64_t u) {
-    char *buffer = os_->Push(20);
+template<typename OutputStream>
+inline bool WriteUint64ToStream(uint64_t u, OutputStream *os) {
+    char *buffer = os->Push(20);
     const char* end = internal::u64toa(u, buffer);
-    os_->Pop(static_cast<size_t>(20 - (end - buffer)));
+    os->Pop(static_cast<size_t>(20 - (end - buffer)));
     return true;
 }
 
-template<>
-inline bool Writer<StringBuffer>::WriteDouble(double d) {
+template<typename OutputStream>
+inline bool WriteDoubleToStream(double d, OutputStream *os, int maxDecimalPlaces) {
     if (internal::Double(d).IsNanOrInf()) {
         // Note: This code path can only be reached if (RAPIDJSON_WRITE_DEFAULT_FLAGS & kWriteNanAndInfFlag).
         if (!(kWriteDefaultFlags & kWriteNanAndInfFlag))
             return false;
         if (internal::Double(d).IsNan()) {
-            PutReserve(*os_, 3);
-            PutUnsafe(*os_, 'N'); PutUnsafe(*os_, 'a'); PutUnsafe(*os_, 'N');
+            PutReserve(*os, 3);
+            PutUnsafe(*os, 'N'); PutUnsafe(*os, 'a'); PutUnsafe(*os, 'N');
             return true;
         }
         if (internal::Double(d).Sign()) {
-            PutReserve(*os_, 9);
-            PutUnsafe(*os_, '-');
+            PutReserve(*os, 9);
+            PutUnsafe(*os, '-');
         }
         else
-            PutReserve(*os_, 8);
-        PutUnsafe(*os_, 'I'); PutUnsafe(*os_, 'n'); PutUnsafe(*os_, 'f');
-        PutUnsafe(*os_, 'i'); PutUnsafe(*os_, 'n'); PutUnsafe(*os_, 'i'); PutUnsafe(*os_, 't'); PutUnsafe(*os_, 'y');
+            PutReserve(*os, 8);
+        PutUnsafe(*os, 'I'); PutUnsafe(*os, 'n'); PutUnsafe(*os, 'f');
+        PutUnsafe(*os, 'i'); PutUnsafe(*os, 'n'); PutUnsafe(*os, 'i'); PutUnsafe(*os, 't'); PutUnsafe(*os, 'y');
         return true;
     }
-    
-    char *buffer = os_->Push(25);
-    char* end = internal::dtoa(d, buffer, maxDecimalPlaces_);
-    os_->Pop(static_cast<size_t>(25 - (end - buffer)));
+
+    char *buffer = os->Push(25);
+    char* end = internal::dtoa(d, buffer, maxDecimalPlaces);
+    os->Pop(static_cast<size_t>(25 - (end - buffer)));
     return true;
+}
+
+} // namespace internal
+
+// Full specialization for StringStream to prevent memory copying
+
+template<>
+inline bool Writer<StringBuffer>::WriteInt(int i) {
+    return internal::WriteIntToStream(i, os_);
+}
+
+template<>
+inline bool Writer<StringBuffer>::WriteUint(unsigned u) {
+    return internal::WriteUintToStream(u, os_);
+}
+
+template<>
+inline bool Writer<StringBuffer>::WriteInt64(int64_t i64) {
+    return internal::WriteInt64ToStream(i64, os_);
+}
+
+template<>
+inline bool Writer<StringBuffer>::WriteUint64(uint64_t u) {
+    return internal::WriteUint64ToStream(u, os_);
+}
+
+template<>
+inline bool Writer<StringBuffer>::WriteDouble(double d) {
+    return internal::WriteDoubleToStream(d, os_, maxDecimalPlaces_);
 }
 
 #if defined(RAPIDJSON_SSE2) || defined(RAPIDJSON_SSE42)
