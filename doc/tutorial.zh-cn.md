@@ -447,7 +447,7 @@ contact.PushBack(val, document.GetAllocator());
 ~~~~~~~~~~
 
 ## 修改 Object {#ModifyObject}
-Object 是键值对的集合。每个键必须为 String。要修改 Object，方法是增加或移除成员。以下的 API 用来增加城员：
+Object 是键值对的集合。每个键必须为 String。要修改 Object，方法是增加或移除成员。以下的 API 用来增加成员：
 
 * `Value& AddMember(Value&, Value&, Allocator& allocator)`
 * `Value& AddMember(StringRefType, Value&, Allocator&)`
