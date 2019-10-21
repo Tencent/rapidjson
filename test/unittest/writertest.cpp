@@ -493,8 +493,12 @@ TEST(Writer, NaN) {
     {
         Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfFlag> writer(buffer);
         EXPECT_TRUE(writer.Double(nan));
-        EXPECT_STREQ("NaN", buffer.GetString());
     }
+    {
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfAsNullFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(nan));
+    }
+    EXPECT_STREQ("NaNnull", buffer.GetString());
     GenericStringBuffer<UTF16<> > buffer2;
     Writer<GenericStringBuffer<UTF16<> > > writer2(buffer2);
     EXPECT_FALSE(writer2.Double(nan));
@@ -521,7 +525,15 @@ TEST(Writer, Inf) {
         Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfFlag> writer(buffer);
         EXPECT_TRUE(writer.Double(-inf));
     }
-    EXPECT_STREQ("Infinity-Infinity", buffer.GetString());
+    {
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfAsNullFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(inf));
+    }
+    {
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfAsNullFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(-inf));
+    }
+    EXPECT_STREQ("Infinity-Infinitynullnull", buffer.GetString());
 }
 
 TEST(Writer, RawValue) {
