@@ -82,7 +82,7 @@ JSON number type represents all numeric values. However, C++ needs more specific
 ~~~~~~~~~~cpp
 assert(document["i"].IsNumber());
 
-// In this case, IsUint()/IsInt64()/IsUInt64() also return true.
+// In this case, IsUint()/IsInt64()/IsUint64() also return true.
 assert(document["i"].IsInt());          
 printf("i = %d\n", document["i"].GetInt());
 // Alternative (int)document["i"]

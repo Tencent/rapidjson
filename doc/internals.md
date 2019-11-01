@@ -79,7 +79,7 @@ The following tables show the data layout of each type. The 32-bit/64-bit column
 | `unsigned u`        | 32-bit unsigned integer             |4     |4     | 
 | (zero padding)      | 0                                   |4     |4     |
 | (unused)            |                                     |4     |8     |
-| `unsigned flags_`   | `kNumberType kNumberFlag kUIntFlag kUInt64Flag ...` |4     |4     |
+| `unsigned flags_`   | `kNumberType kNumberFlag kUintFlag kUint64Flag ...` |4     |4     |
 
 | Number (Int64)      |                                     |32-bit|64-bit|
 |---------------------|-------------------------------------|:----:|:----:|

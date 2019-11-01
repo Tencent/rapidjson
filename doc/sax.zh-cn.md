@@ -37,7 +37,7 @@ Bool(false)
 Key("n", 1, true)
 Null()
 Key("i")
-UInt(123)
+Uint(123)
 Key("pi")
 Double(3.1416)
 Key("a")
@@ -91,7 +91,7 @@ void main() {
 }
 ~~~~~~~~~~
 
-注意 RapidJSON 使用模板去静态挷定 `Reader` 类型及处理器的类形，而不是使用含虚函数的类。这个范式可以通过把函数内联而改善性能。
+注意 RapidJSON 使用模板去静态挷定 `Reader` 类型及处理器的类型，而不是使用含虚函数的类。这个范式可以通过把函数内联而改善性能。
 
 ## 处理器 {#Handler}
 

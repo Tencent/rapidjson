@@ -674,6 +674,9 @@ TEST(Pointer, Get) {
     EXPECT_EQ(2u, unresolvedTokenIndex);
     EXPECT_TRUE(Pointer("/foo/0/a").Get(d, &unresolvedTokenIndex) == 0); // "/foo/0" is an string, cannot further query
     EXPECT_EQ(2u, unresolvedTokenIndex);
+
+    Pointer::Token tokens[] = { { "foo ...", 3, kPointerInvalidIndex } };
+    EXPECT_EQ(&d["foo"], Pointer(tokens, 1).Get(d));
 }
 
 TEST(Pointer, GetWithDefault) {
