@@ -1,5 +1,6 @@
 var NAVTREEINDEX4 =
 {
+"structrapidjson_1_1_auto_u_t_f.html#aa9095b9e85767361f9a0ae5527dba101a15b55b712f9e34d146fb236e5a89e06e":[14,0,0,1,1],
 "structrapidjson_1_1_base_reader_handler.html":[14,0,0,4],
 "structrapidjson_1_1_base_reader_handler.html#a03e7d273b4d317b61a4ae56e0da9097a":[14,0,0,4,4],
 "structrapidjson_1_1_base_reader_handler.html#a050d1b4130a924d138f762d3c914a748":[14,0,0,4,3],
@@ -143,7 +144,7 @@ var NAVTREEINDEX4 =
 "structrapidjson_1_1_writer_1_1_level.html#a59255e3b1d371161f7c894503cfd6bec":[14,0,0,48,0,1],
 "structrapidjson_1_1_writer_1_1_level.html#a5d17bdfa9ded5de72f5f91175cc3e36b":[14,0,0,48,0,2],
 "structrapidjson_1_1_writer_1_1_level.html#aa12b98bd13c621e6a19cdb67d118f510":[14,0,0,48,0,0],
-"swap_8h_source.html":[15,0,0,0,1,11],
+"swap_8h_source.html":[15,0,0,0,1,12],
 "unionrapidjson_1_1_generic_value_1_1_data.html":[14,0,0,29,1],
 "unionrapidjson_1_1_generic_value_1_1_data.html#a0163c333b902c6dfd1dccc21082f40eb":[14,0,0,29,1,2],
 "unionrapidjson_1_1_generic_value_1_1_data.html#a316504c65a492283fd6d87b017f58e29":[14,0,0,29,1,1],
