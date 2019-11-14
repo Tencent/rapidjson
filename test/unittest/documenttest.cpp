@@ -625,6 +625,12 @@ TYPED_TEST(DocumentMove, MoveAssignmentParseError) {
     EXPECT_EQ(c.GetErrorOffset(), error.Offset());
 }
 
+TEST(Document, Issue1604_ASCIIValidation) {
+    GenericDocument<ASCII<> > d;
+    d.Parse<kParseValidateEncodingFlag>("\"\\u1234\"");
+    EXPECT_EQ(kParseErrorStringInvalidEncoding, d.GetParseError());
+}
+
 // This test does not properly use parsing, just for testing.
 // It must call ClearStack() explicitly to prevent memory leak.
 // But here we cannot as ClearStack() is private.
