@@ -99,6 +99,11 @@ struct UTF8 {
     enum { supportUnicode = 1 };
 
     template<typename OutputStream>
+    static bool ValidateCodePoint(OutputStream&, unsigned codepoint) {
+        return codepoint <= 0x10FFFF;
+    }
+
+    template<typename OutputStream>
     static void Encode(OutputStream& os, unsigned codepoint) {
         if (codepoint <= 0x7F) 
             os.Put(static_cast<Ch>(codepoint & 0xFF));
@@ -273,6 +278,16 @@ struct UTF16 {
     enum { supportUnicode = 1 };
 
     template<typename OutputStream>
+    static bool ValidateCodePoint(OutputStream&, unsigned codepoint) {
+        if (codepoint <= 0xFFFF) {
+            return (codepoint < 0xD800 || codepoint > 0xDFFF);
+        }
+        else {
+            return codepoint <= 0x10FFFF;
+        }
+    }
+
+    template<typename OutputStream>
     static void Encode(OutputStream& os, unsigned codepoint) {
         RAPIDJSON_STATIC_ASSERT(sizeof(typename OutputStream::Ch) >= 2);
         if (codepoint <= 0xFFFF) {
@@ -422,6 +437,11 @@ struct UTF32 {
     enum { supportUnicode = 1 };
 
     template<typename OutputStream>
+    static bool ValidateCodePoint(OutputStream&, unsigned codepoint) {
+        return codepoint <= 0x10FFFF;
+    }
+
+    template<typename OutputStream>
     static void Encode(OutputStream& os, unsigned codepoint) {
         RAPIDJSON_STATIC_ASSERT(sizeof(typename OutputStream::Ch) >= 4);
         RAPIDJSON_ASSERT(codepoint <= 0x10FFFF);
@@ -545,6 +565,11 @@ struct ASCII {
     enum { supportUnicode = 0 };
 
     template<typename OutputStream>
+    static bool ValidateCodePoint(OutputStream&, unsigned codepoint) {
+        return codepoint <= 0x7F;
+    }
+
+    template<typename OutputStream>
     static void Encode(OutputStream& os, unsigned codepoint) {
         RAPIDJSON_ASSERT(codepoint <= 0x7F);
         os.Put(static_cast<Ch>(codepoint & 0xFF));
@@ -620,6 +645,13 @@ struct AutoUTF {
 #define RAPIDJSON_ENCODINGS_FUNC(x) UTF8<Ch>::x, UTF16LE<Ch>::x, UTF16BE<Ch>::x, UTF32LE<Ch>::x, UTF32BE<Ch>::x
 
     template<typename OutputStream>
+    static RAPIDJSON_FORCEINLINE bool ValidateCodePoint(OutputStream& os, unsigned codepoint) {
+        typedef bool (*ValidateCodePointFunc)(OutputStream&, unsigned);
+        static const ValidateCodePointFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(ValidateCodePoint) };
+        return (*f[os.GetType()])(os, codepoint);
+    }
+
+    template<typename OutputStream>
     static RAPIDJSON_FORCEINLINE void Encode(OutputStream& os, unsigned codepoint) {
         typedef void (*EncodeFunc)(OutputStream&, unsigned);
         static const EncodeFunc f[] = { RAPIDJSON_ENCODINGS_FUNC(Encode) };
@@ -651,10 +683,70 @@ struct AutoUTF {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
+// ValidatableEncoder
+
+/*! Wrapper for TEncoding::Encode, have an optional validate feature.
+    Since the feature is optional, this function will be implemented by
+    template partial specialization, to avoid the overhead of runtime check.
+
+    \tprarm CodePointValidation Run validate before encode or not.
+*/
+template<bool CodePointValidation = true>
+class ValidatableEncoder {
+public:
+    template<typename TEncoding, typename OutputStream>
+    static RAPIDJSON_FORCEINLINE bool Encode(OutputStream &os, unsigned codepoint);
+
+    template<typename TEncoding, typename OutputStream>
+    static RAPIDJSON_FORCEINLINE bool EncodeUnsafe(OutputStream &os, unsigned codepoint);
+};
+
+// By default, reader will validate code point and generate parse error.
+template<bool CodePointValidation>
+template<typename TEncoding, typename OutputStream>
+bool
+ValidatableEncoder<CodePointValidation>::Encode(OutputStream &os, unsigned codepoint) {
+    if (!TEncoding::ValidateCodePoint(os, codepoint)) {
+        return false;
+    }
+    TEncoding::Encode(os, codepoint);
+    return true;
+}
+
+template<bool CodePointValidation>
+template<typename TEncoding, typename OutputStream>
+bool
+ValidatableEncoder<CodePointValidation>::EncodeUnsafe(OutputStream &os, unsigned codepoint) {
+    if (!TEncoding::ValidateCodePoint(os, codepoint)) {
+        return false;
+    }
+    TEncoding::EncodeUnsafe(os, codepoint);
+    return true;
+}
+
+// Users can switch the check feature off by set 'CodePointValidation' to 'false'.
+template<>
+template<typename TEncoding, typename OutputStream>
+bool
+ValidatableEncoder<false>::Encode(OutputStream &os, unsigned codepoint) {
+    TEncoding::Encode(os, codepoint);
+    return true;
+}
+
+// Users can switch the check feature off by set 'CodePointValidation' to 'false'.
+template<>
+template<typename TEncoding, typename OutputStream>
+bool
+ValidatableEncoder<false>::EncodeUnsafe(OutputStream &os, unsigned codepoint) {
+    TEncoding::EncodeUnsafe(os, codepoint);
+    return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Transcoder
 
 //! Encoding conversion.
-template<typename SourceEncoding, typename TargetEncoding>
+template<typename SourceEncoding, typename TargetEncoding, bool CodePointValidation = true>
 struct Transcoder {
     //! Take one Unicode codepoint from source encoding, convert it to target encoding and put it to the output stream.
     template<typename InputStream, typename OutputStream>
@@ -662,8 +754,7 @@ struct Transcoder {
         unsigned codepoint;
         if (!SourceEncoding::Decode(is, &codepoint))
             return false;
-        TargetEncoding::Encode(os, codepoint);
-        return true;
+        return ValidatableEncoder<CodePointValidation>::template Encode<TargetEncoding>(os, codepoint);
     }
 
     template<typename InputStream, typename OutputStream>
@@ -671,8 +762,7 @@ struct Transcoder {
         unsigned codepoint;
         if (!SourceEncoding::Decode(is, &codepoint))
             return false;
-        TargetEncoding::EncodeUnsafe(os, codepoint);
-        return true;
+        return ValidatableEncoder<CodePointValidation>::template EncodeUnsafe<TargetEncoding>(os, codepoint);
     }
 
     //! Validate one Unicode codepoint from an encoded stream.

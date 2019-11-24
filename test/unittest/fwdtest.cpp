@@ -39,7 +39,7 @@ struct Foo {
     UTF32LE<unsigned>* utf32le;
     ASCII<char>* ascii;
     AutoUTF<unsigned>* autoutf;
-    Transcoder<UTF8<char>, UTF8<char> >* transcoder;
+    Transcoder<UTF8<char>, UTF8<char>, true>* transcoder;
 
     // allocators.h
     CrtAllocator* crtallocator;

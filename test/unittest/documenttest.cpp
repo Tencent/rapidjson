@@ -631,6 +631,11 @@ TEST(Document, Issue1604_ASCIIValidation) {
     EXPECT_EQ(kParseErrorStringInvalidEncoding, d.GetParseError());
 }
 
+TEST(DocumentDeathTest, Issue1604_ASCIIValidation) {
+    GenericDocument<ASCII<>> d_no_check;
+    ASSERT_THROW((d_no_check.Parse("\"\\u1234\"")), AssertException);
+}
+
 // This test does not properly use parsing, just for testing.
 // It must call ClearStack() explicitly to prevent memory leak.
 // But here we cannot as ClearStack() is private.
