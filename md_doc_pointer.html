@@ -92,13 +92,13 @@ $(document).ready(function(){initNavTree('md_doc_pointer.html','');});
 <ul><li class="level1"><a href="#JsonPointer">JSON Pointer</a></li>
 <li class="level1"><a href="#BasicUsage">Basic Usage</a></li>
 <li class="level1"><a href="#HelperFunctions">Helper Functions</a></li>
-<li class="level1"><a href="#ResolvingPointer">Resolving Pointer</a><ul><li class="level2"><a href="#autotoc_md47">Resolving Minus Sign Token</a></li>
-<li class="level2"><a href="#autotoc_md48">Resolving Document and Value</a></li>
+<li class="level1"><a href="#ResolvingPointer">Resolving Pointer</a><ul><li class="level2"><a href="#autotoc_md51">Resolving Minus Sign Token</a></li>
+<li class="level2"><a href="#autotoc_md52">Resolving Document and Value</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#ErrorHandling">Error Handling</a></li>
 <li class="level1"><a href="#URIFragment">URI Fragment Representation</a></li>
-<li class="level1"><a href="#autotoc_md49">Stringify</a></li>
+<li class="level1"><a href="#autotoc_md53">Stringify</a></li>
 <li class="level1"><a href="#UserSuppliedTokens">User-Supplied Tokens</a></li>
 </ul>
 </div>
@@ -204,14 +204,14 @@ Resolving Pointer</h1>
 <p>The other functions, including <code>Create()</code>, <code>GetWithDefault()</code>, <code>Set()</code> and <code>Swap()</code>, will change the DOM. These functions will always succeed. They will create the parent values if they do not exist. If the parent values do not match the tokens, they will also be forced to change their type. Changing the type also mean fully removal of that DOM subtree.</p>
 <p>Parsing the above JSON into <code>d</code>,</p>
 <div class="fragment"><div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;1/a&quot;</span>, 789); <span class="comment">// { &quot;0&quot; : 123, &quot;1&quot; : { &quot;a&quot; : 789 } }</span></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md47"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md51"></a>
 Resolving Minus Sign Token</h2>
 <p>Besides, <a href="https://tools.ietf.org/html/rfc6901">RFC6901</a> defines a special token <code>-</code> (single minus sign), which represents the pass-the-end element of an array. <code>Get()</code> only treats this token as a member name '"-"'. Yet the other functions can resolve this for array, equivalent to calling <code>Value::PushBack()</code> to the array.</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
 <div class="line">d.Parse(<span class="stringliteral">&quot;{\&quot;foo\&quot;:[123]}&quot;</span>);</div>
 <div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;/foo/-&quot;</span>, 456); <span class="comment">// { &quot;foo&quot; : [123, 456] }</span></div>
 <div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;/-&quot;</span>, 789);    <span class="comment">// { &quot;foo&quot; : [123, 456], &quot;-&quot; : 789 }</span></div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md48"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md52"></a>
 Resolving Document and Value</h2>
 <p>When using <code>p.Get(root)</code> or <code>GetValueByPointer(root, p)</code>, <code>root</code> is a (const) <code>Value&amp;</code>. That means, it can be a subtree of the DOM.</p>
 <p>The other functions have two groups of signature. One group uses <code>Document&amp; document</code> as parameter, another one uses <code>Value&amp; root</code>. The first group uses <code>document.GetAllocator()</code> for creating values. And the second group needs user to supply an allocator, like the functions in DOM.</p>
@@ -264,7 +264,7 @@ URI Fragment Representation</h1>
 <td class="markdownTableBodyNone"><code>"/€"</code>  </td><td class="markdownTableBodyNone"><code>"#/%E2%82%AC"</code>  </td><td class="markdownTableBodyNone"><code>{"€"}</code>   </td></tr>
 </table>
 <p>RapidJSON fully support URI fragment representation. It automatically detects the pound sign during parsing.</p>
-<h1><a class="anchor" id="autotoc_md49"></a>
+<h1><a class="anchor" id="autotoc_md53"></a>
 Stringify</h1>
 <p>You may also stringify a <code>Pointer</code> to a string or other output streams. This can be done by:</p>
 <div class="fragment"><div class="line">Pointer p(...);</div>

@@ -89,11 +89,11 @@ $(document).ready(function(){initNavTree('md__c_h_a_n_g_e_l_o_g.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>All notable changes to this project will be documented in this file. This project adheres to <a href="http://semver.org/">Semantic Versioning</a>.</p>
-<h1><a class="anchor" id="autotoc_md8"></a>
+<h1><a class="anchor" id="autotoc_md12"></a>
 &lt;a href="https://github.com/Tencent/rapidjson/compare/v1.1.0...HEAD"&gt;Unreleased&lt;/a&gt;</h1>
-<h1><a class="anchor" id="autotoc_md9"></a>
+<h1><a class="anchor" id="autotoc_md13"></a>
 1.1.0 - 2016-08-25</h1>
-<h2><a class="anchor" id="autotoc_md10"></a>
+<h2><a class="anchor" id="autotoc_md14"></a>
 Added</h2>
 <ul>
 <li>Add GenericDocument ctor overload to specify JSON type (#369)</li>
@@ -131,7 +131,7 @@ Added</h2>
 <li>Allow options for writing and parsing NaN/Infinity (#641)</li>
 <li>Add std::string overload to PrettyWriter::Key() when RAPIDJSON_HAS_STDSTRING is defined (#698)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md11"></a>
+<h2><a class="anchor" id="autotoc_md15"></a>
 Fixed</h2>
 <ul>
 <li>Fix gcc/clang/vc warnings (#350, #394, #397, #444, #447, #473, #515, #582, #589, #595, #667)</li>
@@ -162,7 +162,7 @@ Fixed</h2>
 <li>Handle malloc() fail in PoolAllocator (#691)</li>
 <li>Fix builds on x32 platform. #703</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md12"></a>
+<h2><a class="anchor" id="autotoc_md16"></a>
 Changed</h2>
 <ul>
 <li>Clarify problematic JSON license (#392)</li>
@@ -174,14 +174,14 @@ Changed</h2>
 <li>Make GenericSchemaDocument constructor explicit (#674)</li>
 <li>Optimize FindMember when use std::string (#690)</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md13"></a>
+<h1><a class="anchor" id="autotoc_md17"></a>
 &lt;a href="https://github.com/Tencent/rapidjson/compare/v1.0.1...v1.0.2"&gt;1.0.2&lt;/a&gt; - 2015-05-14</h1>
-<h2><a class="anchor" id="autotoc_md14"></a>
+<h2><a class="anchor" id="autotoc_md18"></a>
 Added</h2>
 <ul>
 <li>Add Value::XXXMember(...) overloads for std::string (#335)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md15"></a>
+<h2><a class="anchor" id="autotoc_md19"></a>
 Fixed</h2>
 <ul>
 <li>Include <a class="el" href="rapidjson_8h.html" title="common definitions and configuration">rapidjson.h</a> for all internal/error headers.</li>
@@ -190,34 +190,34 @@ Fixed</h2>
 <li>Fix alignment of 64bit platforms (#328)</li>
 <li>Fix MemoryPoolAllocator::Clear() to clear user-buffer (0691502573f1afd3341073dd24b12c3db20fbde4)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md16"></a>
+<h2><a class="anchor" id="autotoc_md20"></a>
 Changed</h2>
 <ul>
 <li>CMakeLists for include as a thirdparty in projects (#334, #337)</li>
 <li>Change Document::ParseStream() to use stack allocator for Reader (ffbe38614732af8e0b3abdc8b50071f386a4a685)</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md17"></a>
+<h1><a class="anchor" id="autotoc_md21"></a>
 &lt;a href="https://github.com/Tencent/rapidjson/compare/v1.0.0...v1.0.1"&gt;1.0.1&lt;/a&gt; - 2015-04-25</h1>
-<h2><a class="anchor" id="autotoc_md18"></a>
+<h2><a class="anchor" id="autotoc_md22"></a>
 Added</h2>
 <ul>
 <li>Changelog following <a href="https://github.com/olivierlacan/keep-a-changelog">Keep a CHANGELOG</a> suggestions.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md19"></a>
+<h2><a class="anchor" id="autotoc_md23"></a>
 Fixed</h2>
 <ul>
 <li>Parsing of some numbers (e.g. "1e-00011111111111") causing assertion (#314).</li>
 <li>Visual C++ 32-bit compilation error in <code><a class="el" href="diyfp_8h_source.html">diyfp.h</a></code> (#317).</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md20"></a>
+<h1><a class="anchor" id="autotoc_md24"></a>
 &lt;a href="https://github.com/Tencent/rapidjson/compare/v1.0-beta...v1.0.0"&gt;1.0.0&lt;/a&gt; - 2015-04-22</h1>
-<h2><a class="anchor" id="autotoc_md21"></a>
+<h2><a class="anchor" id="autotoc_md25"></a>
 Added</h2>
 <ul>
 <li>100% <a href="https://coveralls.io/r/Tencent/rapidjson?branch=master">Coverall</a> coverage.</li>
 <li>Version macros (#311)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md22"></a>
+<h2><a class="anchor" id="autotoc_md26"></a>
 Fixed</h2>
 <ul>
 <li>A bug in trimming long number sequence (4824f12efbf01af72b8cb6fc96fae7b097b73015).</li>
@@ -225,14 +225,14 @@ Fixed</h2>
 <li>Negative zero roundtrip (double only) (#289).</li>
 <li>Standardize behavior of <code>memcpy()</code> and <code>malloc()</code> (0c5c1538dcfc7f160e5a4aa208ddf092c787be5a, #305, 0e8bbe5e3ef375e7f052f556878be0bd79e9062d).</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md23"></a>
+<h2><a class="anchor" id="autotoc_md27"></a>
 Removed</h2>
 <ul>
 <li>Remove an invalid <code>Document::ParseInsitu()</code> API (e7f1c6dd08b522cfcf9aed58a333bd9a0c0ccbeb).</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md24"></a>
+<h1><a class="anchor" id="autotoc_md28"></a>
 1.0-beta - 2015-04-8</h1>
-<h2><a class="anchor" id="autotoc_md25"></a>
+<h2><a class="anchor" id="autotoc_md29"></a>
 Added</h2>
 <ul>
 <li>RFC 7159 (#101)</li>
@@ -250,21 +250,21 @@ Added</h2>
 <li>Travis &amp; Appveyor Continuous Integration, with Valgrind verification (#24, #242)</li>
 <li>Redo all documentation (English, Simplified Chinese)</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md26"></a>
+<h2><a class="anchor" id="autotoc_md30"></a>
 Changed</h2>
 <ul>
 <li>Copyright ownership transferred to THL A29 Limited (a Tencent company).</li>
 <li>Migrating from Premake to CMAKE (#192)</li>
 <li>Resolve all warning reports</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md27"></a>
+<h2><a class="anchor" id="autotoc_md31"></a>
 Removed</h2>
 <ul>
 <li>Remove other JSON libraries for performance comparison (#180)</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md28"></a>
+<h1><a class="anchor" id="autotoc_md32"></a>
 0.11 - 2012-11-16</h1>
-<h1><a class="anchor" id="autotoc_md29"></a>
+<h1><a class="anchor" id="autotoc_md33"></a>
 0.1 - 2011-11-18</h1>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

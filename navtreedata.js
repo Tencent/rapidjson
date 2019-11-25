@@ -31,62 +31,67 @@ var NAVTREE =
       [ "Compatibility", "index.html#autotoc_md4", null ],
       [ "Installation", "index.html#autotoc_md5", null ],
       [ "Usage at a glance", "index.html#autotoc_md6", null ],
-      [ "<a href=\"https://github.com/Tencent/rapidjson/compare/v1.1.0...HEAD\">Unreleased</a>", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md8", null ],
-      [ "1.1.0 - 2016-08-25", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md9", [
-        [ "Added", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md10", null ],
-        [ "Fixed", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md11", null ],
-        [ "Changed", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md12", null ]
+      [ "Contributing", "index.html#autotoc_md7", [
+        [ "Issues", "index.html#autotoc_md8", null ],
+        [ "Workflow", "index.html#autotoc_md9", null ],
+        [ "Copyright and Licensing", "index.html#autotoc_md10", null ]
       ] ],
-      [ "<a href=\"https://github.com/Tencent/rapidjson/compare/v1.0.1...v1.0.2\">1.0.2</a> - 2015-05-14", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md13", [
+      [ "<a href=\"https://github.com/Tencent/rapidjson/compare/v1.1.0...HEAD\">Unreleased</a>", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md12", null ],
+      [ "1.1.0 - 2016-08-25", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md13", [
         [ "Added", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md14", null ],
         [ "Fixed", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md15", null ],
         [ "Changed", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md16", null ]
       ] ],
-      [ "<a href=\"https://github.com/Tencent/rapidjson/compare/v1.0.0...v1.0.1\">1.0.1</a> - 2015-04-25", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md17", [
+      [ "<a href=\"https://github.com/Tencent/rapidjson/compare/v1.0.1...v1.0.2\">1.0.2</a> - 2015-05-14", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md17", [
         [ "Added", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md18", null ],
-        [ "Fixed", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md19", null ]
+        [ "Fixed", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md19", null ],
+        [ "Changed", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md20", null ]
       ] ],
-      [ "<a href=\"https://github.com/Tencent/rapidjson/compare/v1.0-beta...v1.0.0\">1.0.0</a> - 2015-04-22", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md20", [
-        [ "Added", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md21", null ],
-        [ "Fixed", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md22", null ],
-        [ "Removed", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md23", null ]
+      [ "<a href=\"https://github.com/Tencent/rapidjson/compare/v1.0.0...v1.0.1\">1.0.1</a> - 2015-04-25", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md21", [
+        [ "Added", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md22", null ],
+        [ "Fixed", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md23", null ]
       ] ],
-      [ "1.0-beta - 2015-04-8", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md24", [
+      [ "<a href=\"https://github.com/Tencent/rapidjson/compare/v1.0-beta...v1.0.0\">1.0.0</a> - 2015-04-22", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md24", [
         [ "Added", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md25", null ],
-        [ "Changed", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md26", null ],
+        [ "Fixed", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md26", null ],
         [ "Removed", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md27", null ]
       ] ],
-      [ "0.11 - 2012-11-16", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md28", null ],
-      [ "0.1 - 2011-11-18", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md29", null ]
+      [ "1.0-beta - 2015-04-8", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md28", [
+        [ "Added", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md29", null ],
+        [ "Changed", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md30", null ],
+        [ "Removed", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md31", null ]
+      ] ],
+      [ "0.11 - 2012-11-16", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md32", null ],
+      [ "0.1 - 2011-11-18", "md__c_h_a_n_g_e_l_o_g.html#autotoc_md33", null ]
     ] ],
     [ "Features", "md_doc_features.html", [
-      [ "General", "md_doc_features.html#autotoc_md31", null ],
-      [ "Standard compliance", "md_doc_features.html#autotoc_md32", null ],
-      [ "Unicode", "md_doc_features.html#autotoc_md33", null ],
-      [ "API styles", "md_doc_features.html#autotoc_md34", null ],
-      [ "Parsing", "md_doc_features.html#autotoc_md35", null ],
-      [ "DOM (Document)", "md_doc_features.html#autotoc_md36", null ],
-      [ "Generation", "md_doc_features.html#autotoc_md37", null ],
-      [ "Stream", "md_doc_features.html#autotoc_md38", null ],
-      [ "Memory", "md_doc_features.html#autotoc_md39", null ],
-      [ "Miscellaneous", "md_doc_features.html#autotoc_md40", null ]
+      [ "General", "md_doc_features.html#autotoc_md35", null ],
+      [ "Standard compliance", "md_doc_features.html#autotoc_md36", null ],
+      [ "Unicode", "md_doc_features.html#autotoc_md37", null ],
+      [ "API styles", "md_doc_features.html#autotoc_md38", null ],
+      [ "Parsing", "md_doc_features.html#autotoc_md39", null ],
+      [ "DOM (Document)", "md_doc_features.html#autotoc_md40", null ],
+      [ "Generation", "md_doc_features.html#autotoc_md41", null ],
+      [ "Stream", "md_doc_features.html#autotoc_md42", null ],
+      [ "Memory", "md_doc_features.html#autotoc_md43", null ],
+      [ "Miscellaneous", "md_doc_features.html#autotoc_md44", null ]
     ] ],
     [ "Tutorial", "md_doc_tutorial.html", [
       [ "Value & Document", "md_doc_tutorial.html#ValueDocument", null ],
       [ "Query Value", "md_doc_tutorial.html#QueryValue", [
         [ "Query Array", "md_doc_tutorial.html#QueryArray", [
-          [ "Range-based For Loop (New in v1.1.0)", "md_doc_tutorial.html#autotoc_md42", null ]
+          [ "Range-based For Loop (New in v1.1.0)", "md_doc_tutorial.html#autotoc_md46", null ]
         ] ],
         [ "Query Object", "md_doc_tutorial.html#QueryObject", [
-          [ "Range-based For Loop (New in v1.1.0)", "md_doc_tutorial.html#autotoc_md43", null ]
+          [ "Range-based For Loop (New in v1.1.0)", "md_doc_tutorial.html#autotoc_md47", null ]
         ] ],
         [ "Querying Number", "md_doc_tutorial.html#QueryNumber", null ],
         [ "Query String", "md_doc_tutorial.html#QueryString", null ],
-        [ "Comparing values", "md_doc_tutorial.html#autotoc_md44", null ]
+        [ "Comparing values", "md_doc_tutorial.html#autotoc_md48", null ]
       ] ],
       [ "Create/Modify Values", "md_doc_tutorial.html#CreateModifyValues", [
         [ "Change Value Type", "md_doc_tutorial.html#ChangeValueType", [
-          [ "Overloaded Constructors", "md_doc_tutorial.html#autotoc_md45", null ]
+          [ "Overloaded Constructors", "md_doc_tutorial.html#autotoc_md49", null ]
         ] ],
         [ "Move Semantics", "md_doc_tutorial.html#MoveSemantics", [
           [ "Move semantics and temporary values", "md_doc_tutorial.html#TemporaryValues", null ]
@@ -104,12 +109,12 @@ var NAVTREE =
       [ "Basic Usage", "md_doc_pointer.html#BasicUsage", null ],
       [ "Helper Functions", "md_doc_pointer.html#HelperFunctions", null ],
       [ "Resolving Pointer", "md_doc_pointer.html#ResolvingPointer", [
-        [ "Resolving Minus Sign Token", "md_doc_pointer.html#autotoc_md47", null ],
-        [ "Resolving Document and Value", "md_doc_pointer.html#autotoc_md48", null ]
+        [ "Resolving Minus Sign Token", "md_doc_pointer.html#autotoc_md51", null ],
+        [ "Resolving Document and Value", "md_doc_pointer.html#autotoc_md52", null ]
       ] ],
       [ "Error Handling", "md_doc_pointer.html#ErrorHandling", null ],
       [ "URI Fragment Representation", "md_doc_pointer.html#URIFragment", null ],
-      [ "Stringify", "md_doc_pointer.html#autotoc_md49", null ],
+      [ "Stringify", "md_doc_pointer.html#autotoc_md53", null ],
       [ "User-Supplied Tokens", "md_doc_pointer.html#UserSuppliedTokens", null ]
     ] ],
     [ "Stream", "md_doc_stream.html", [
@@ -159,7 +164,7 @@ var NAVTREE =
         [ "Transcoding and Validation", "md_doc_dom.html#TranscodingAndValidation", null ]
       ] ],
       [ "Techniques", "md_doc_dom.html#Techniques", [
-        [ "DOM as SAX Event Publisher", "md_doc_dom.html#autotoc_md53", null ],
+        [ "DOM as SAX Event Publisher", "md_doc_dom.html#autotoc_md57", null ],
         [ "User Buffer", "md_doc_dom.html#UserBuffer", null ]
       ] ]
     ] ],
@@ -209,7 +214,7 @@ var NAVTREE =
           [ "maxItems and minItems", "md_doc_schema.html#maxItems-minItems", null ],
           [ "uniqueItems", "md_doc_schema.html#uniqueItems", null ]
         ] ],
-        [ "Validation keywords for objects", "md_doc_schema.html#autotoc_md56", [
+        [ "Validation keywords for objects", "md_doc_schema.html#autotoc_md60", [
           [ "maxProperties and minProperties", "md_doc_schema.html#maxProperties-minProperties", null ],
           [ "required", "md_doc_schema.html#required", null ],
           [ "additionalProperties", "md_doc_schema.html#additionalProperties", null ],
@@ -224,12 +229,12 @@ var NAVTREE =
       ] ]
     ] ],
     [ "Performance", "md_doc_performance.html", [
-      [ "Third-party benchmarks", "md_doc_performance.html#autotoc_md58", null ]
+      [ "Third-party benchmarks", "md_doc_performance.html#autotoc_md62", null ]
     ] ],
     [ "Internals", "md_doc_internals.html", [
       [ "Architecture", "md_doc_internals.html#Architecture", [
-        [ "SAX and DOM", "md_doc_internals.html#autotoc_md60", null ],
-        [ "Utility Classes", "md_doc_internals.html#autotoc_md61", null ]
+        [ "SAX and DOM", "md_doc_internals.html#autotoc_md64", null ],
+        [ "Utility Classes", "md_doc_internals.html#autotoc_md65", null ]
       ] ],
       [ "Value", "md_doc_internals.html#Value", [
         [ "Data Layout", "md_doc_internals.html#DataLayout", null ],
@@ -241,7 +246,7 @@ var NAVTREE =
       ] ],
       [ "Parsing Optimization", "md_doc_internals.html#ParsingOptimization", [
         [ "Skip Whitespaces with SIMD", "md_doc_internals.html#SkipwhitespaceWithSIMD", [
-          [ "Page boundary issue", "md_doc_internals.html#autotoc_md62", null ]
+          [ "Page boundary issue", "md_doc_internals.html#autotoc_md66", null ]
         ] ],
         [ "Local Stream Copy", "md_doc_internals.html#LocalStreamCopy", null ],
         [ "Parsing to Double", "md_doc_internals.html#ParsingDouble", null ]
@@ -259,15 +264,15 @@ var NAVTREE =
       ] ]
     ] ],
     [ "FAQ", "md_doc_faq.html", [
-      [ "General", "md_doc_faq.html#autotoc_md64", null ],
-      [ "JSON", "md_doc_faq.html#autotoc_md65", null ],
-      [ "DOM and SAX", "md_doc_faq.html#autotoc_md66", null ],
-      [ "Document/Value (DOM)", "md_doc_faq.html#autotoc_md67", null ],
-      [ "Reader/Writer (SAX)", "md_doc_faq.html#autotoc_md68", null ],
-      [ "Unicode", "md_doc_faq.html#autotoc_md69", null ],
-      [ "Stream", "md_doc_faq.html#autotoc_md70", null ],
-      [ "Performance", "md_doc_faq.html#autotoc_md71", null ],
-      [ "Gossip", "md_doc_faq.html#autotoc_md72", null ]
+      [ "General", "md_doc_faq.html#autotoc_md68", null ],
+      [ "JSON", "md_doc_faq.html#autotoc_md69", null ],
+      [ "DOM and SAX", "md_doc_faq.html#autotoc_md70", null ],
+      [ "Document/Value (DOM)", "md_doc_faq.html#autotoc_md71", null ],
+      [ "Reader/Writer (SAX)", "md_doc_faq.html#autotoc_md72", null ],
+      [ "Unicode", "md_doc_faq.html#autotoc_md73", null ],
+      [ "Stream", "md_doc_faq.html#autotoc_md74", null ],
+      [ "Performance", "md_doc_faq.html#autotoc_md75", null ],
+      [ "Gossip", "md_doc_faq.html#autotoc_md76", null ]
     ] ],
     [ "Modules", "modules.html", "modules" ],
     [ "Namespace Members", "namespacemembers.html", [
@@ -305,7 +310,7 @@ var NAVTREEINDEX =
 "classrapidjson_1_1_generic_object.html#a947f543afbdd5e6d1c5b2dd1fe5a6e60",
 "classrapidjson_1_1_generic_value.html#aeedcc5ea216f2f8f1c02c49065dab0eaabdd866cdef4d9e97f7d1446b720c1b02",
 "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga7d3acf640886b1f2552dc8c4cd6dea60a8dd0af5e6103a6503c61c38cb2b0bab9",
-"reader_8h.html#a791735c27e073a70d720c2775ddf9568"
+"reader_8h.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

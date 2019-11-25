@@ -90,18 +90,18 @@ $(document).ready(function(){initNavTree('md_doc_tutorial.html','');});
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
 <ul><li class="level1"><a href="#ValueDocument">Value &amp; Document</a></li>
-<li class="level1"><a href="#QueryValue">Query Value</a><ul><li class="level2"><a href="#QueryArray">Query Array</a><ul><li class="level3"><a href="#autotoc_md42">Range-based For Loop (New in v1.1.0)</a></li>
+<li class="level1"><a href="#QueryValue">Query Value</a><ul><li class="level2"><a href="#QueryArray">Query Array</a><ul><li class="level3"><a href="#autotoc_md46">Range-based For Loop (New in v1.1.0)</a></li>
 </ul>
 </li>
-<li class="level2"><a href="#QueryObject">Query Object</a><ul><li class="level3"><a href="#autotoc_md43">Range-based For Loop (New in v1.1.0)</a></li>
+<li class="level2"><a href="#QueryObject">Query Object</a><ul><li class="level3"><a href="#autotoc_md47">Range-based For Loop (New in v1.1.0)</a></li>
 </ul>
 </li>
 <li class="level2"><a href="#QueryNumber">Querying Number</a></li>
 <li class="level2"><a href="#QueryString">Query String</a></li>
-<li class="level2"><a href="#autotoc_md44">Comparing values</a></li>
+<li class="level2"><a href="#autotoc_md48">Comparing values</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#CreateModifyValues">Create/Modify Values</a><ul><li class="level2"><a href="#ChangeValueType">Change Value Type</a><ul><li class="level3"><a href="#autotoc_md45">Overloaded Constructors</a></li>
+<li class="level1"><a href="#CreateModifyValues">Create/Modify Values</a><ul><li class="level2"><a href="#ChangeValueType">Change Value Type</a><ul><li class="level3"><a href="#autotoc_md49">Overloaded Constructors</a></li>
 </ul>
 </li>
 <li class="level2"><a href="#MoveSemantics">Move Semantics</a><ul><li class="level3"><a href="#TemporaryValues">Move semantics and temporary values</a></li>
@@ -190,7 +190,7 @@ Query Array</h2>
 <li><code>SizeType Capacity() const</code></li>
 <li><code>bool Empty() const</code></li>
 </ul>
-<h3><a class="anchor" id="autotoc_md42"></a>
+<h3><a class="anchor" id="autotoc_md46"></a>
 Range-based For Loop (New in v1.1.0)</h3>
 <p>When C++11 is enabled, you can use range-based for loop to access all elements in an array.</p>
 <div class="fragment"><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; v : a.GetArray())</div>
@@ -219,7 +219,7 @@ Query Object</h2>
 <div class="fragment"><div class="line">Value::ConstMemberIterator itr = document.FindMember(<span class="stringliteral">&quot;hello&quot;</span>);</div>
 <div class="line"><span class="keywordflow">if</span> (itr != document.MemberEnd())</div>
 <div class="line">    printf(<span class="stringliteral">&quot;%s\n&quot;</span>, itr-&gt;value.GetString());</div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md43"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md47"></a>
 Range-based For Loop (New in v1.1.0)</h3>
 <p>When C++11 is enabled, you can use range-based for loop to access all members in an object.</p>
 <div class="fragment"><div class="line"><span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; m : document.GetObject())</div>
@@ -275,7 +275,7 @@ Query String</h2>
 <p>Besides, <code>std::string</code> also support a constructor:</p>
 <div class="fragment"><div class="line">string(<span class="keyword">const</span> <span class="keywordtype">char</span>* s, <span class="keywordtype">size_t</span> count);</div>
 </div><!-- fragment --><p>which accepts the length of string as parameter. This constructor supports storing null character within the string, and should also provide better performance.</p>
-<h2><a class="anchor" id="autotoc_md44"></a>
+<h2><a class="anchor" id="autotoc_md48"></a>
 Comparing values</h2>
 <p>You can use <code>==</code> and <code>!=</code> to compare values. Two values are equal if and only if they are have same type and contents. You can also compare values with primitive types. Here is an example.</p>
 <div class="fragment"><div class="line"><span class="keywordflow">if</span> (document[<span class="stringliteral">&quot;hello&quot;</span>] == document[<span class="stringliteral">&quot;n&quot;</span>]) <span class="comment">/*...*/</span>;    <span class="comment">// Compare values</span></div>
@@ -296,7 +296,7 @@ Change Value Type</h2>
 <div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> v;    <span class="comment">// Null</span></div>
 <div class="line">v.SetInt(10);</div>
 <div class="line">v = 10;     <span class="comment">// Shortcut, same as above</span></div>
-</div><!-- fragment --><h3><a class="anchor" id="autotoc_md45"></a>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md49"></a>
 Overloaded Constructors</h3>
 <p>There are also overloaded constructors for several types:</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> b(<span class="keyword">true</span>);    <span class="comment">// calls Value(bool)</span></div>

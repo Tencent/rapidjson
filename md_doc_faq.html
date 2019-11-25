@@ -89,18 +89,18 @@ $(document).ready(function(){initNavTree('md_doc_faq.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#autotoc_md64">General</a></li>
-<li class="level1"><a href="#autotoc_md65">JSON</a></li>
-<li class="level1"><a href="#autotoc_md66">DOM and SAX</a></li>
-<li class="level1"><a href="#autotoc_md67">Document/Value (DOM)</a></li>
-<li class="level1"><a href="#autotoc_md68">Reader/Writer (SAX)</a></li>
-<li class="level1"><a href="#autotoc_md69">Unicode</a></li>
-<li class="level1"><a href="#autotoc_md70">Stream</a></li>
-<li class="level1"><a href="#autotoc_md71">Performance</a></li>
-<li class="level1"><a href="#autotoc_md72">Gossip</a></li>
+<ul><li class="level1"><a href="#autotoc_md68">General</a></li>
+<li class="level1"><a href="#autotoc_md69">JSON</a></li>
+<li class="level1"><a href="#autotoc_md70">DOM and SAX</a></li>
+<li class="level1"><a href="#autotoc_md71">Document/Value (DOM)</a></li>
+<li class="level1"><a href="#autotoc_md72">Reader/Writer (SAX)</a></li>
+<li class="level1"><a href="#autotoc_md73">Unicode</a></li>
+<li class="level1"><a href="#autotoc_md74">Stream</a></li>
+<li class="level1"><a href="#autotoc_md75">Performance</a></li>
+<li class="level1"><a href="#autotoc_md76">Gossip</a></li>
 </ul>
 </div>
-<div class="textblock"><h1><a class="anchor" id="autotoc_md64"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md68"></a>
 General</h1>
 <ol type="1">
 <li><p class="startli">What is RapidJSON?</p>
@@ -141,7 +141,7 @@ General</h1>
 <p class="startli">Yes, there are a lot alternatives. For example, <a href="https://github.com/miloyip/nativejson-benchmark">nativejson-benchmark</a> has a listing of open-source C/C++ JSON libraries. <a href="http://www.json.org/">json.org</a> also has a list.</p>
 </li>
 </ol>
-<h1><a class="anchor" id="autotoc_md65"></a>
+<h1><a class="anchor" id="autotoc_md69"></a>
 JSON</h1>
 <ol type="1">
 <li><p class="startli">What is JSON?</p>
@@ -159,7 +159,7 @@ JSON</h1>
 <p class="startli">Currently no. RapidJSON only support the strict standardized format. Support on related syntax is under discussion in this <a href="https://github.com/Tencent/rapidjson/issues/36">issue</a>.</p>
 </li>
 </ol>
-<h1><a class="anchor" id="autotoc_md66"></a>
+<h1><a class="anchor" id="autotoc_md70"></a>
 DOM and SAX</h1>
 <ol type="1">
 <li><p class="startli">What is DOM style API?</p>
@@ -214,7 +214,7 @@ DOM and SAX</h1>
 <div class="line">person[<span class="stringliteral">&quot;person&quot;</span>].AddMember(<span class="stringliteral">&quot;address&quot;</span>, addressValue, person.GetAllocator());</div>
 </div><!-- fragment --></li>
 </ol>
-<h1><a class="anchor" id="autotoc_md67"></a>
+<h1><a class="anchor" id="autotoc_md71"></a>
 Document/Value (DOM)</h1>
 <ol type="1">
 <li><p class="startli">What is move semantics? Why?</p>
@@ -235,7 +235,7 @@ Document/Value (DOM)</h1>
 <p class="startli">When using <code>GetInt()</code>, <code>GetUint()</code>, ... conversion may occur. For integer-to-integer conversion, it only convert when it is safe (otherwise it will assert). However, when converting a 64-bit signed/unsigned integer to double, it will convert but be aware that it may lose precision. A number with fraction, or an integer larger than 64-bit, can only be obtained by <code>GetDouble()</code>.</p>
 </li>
 </ol>
-<h1><a class="anchor" id="autotoc_md68"></a>
+<h1><a class="anchor" id="autotoc_md72"></a>
 Reader/Writer (SAX)</h1>
 <ol type="1">
 <li><p class="startli">Why don't we just <code>printf</code> a JSON? Why do we need a <code>Writer</code>?</p>
@@ -245,7 +245,7 @@ Reader/Writer (SAX)</h1>
 <p class="startli">This is not directly supported in the current version due to performance consideration. However, if the execution environment supports multi-threading, user can parse a JSON in a separate thread, and pause it by blocking in the input stream.</p>
 </li>
 </ol>
-<h1><a class="anchor" id="autotoc_md69"></a>
+<h1><a class="anchor" id="autotoc_md73"></a>
 Unicode</h1>
 <ol type="1">
 <li><p class="startli">Does it support UTF-8, UTF-16 and other format?</p>
@@ -265,7 +265,7 @@ Unicode</h1>
 <p class="startli">Yes, use <code>ASCII&lt;&gt;</code> as output encoding template parameter in <code>Writer</code> can enforce escaping those characters.</p>
 </li>
 </ol>
-<h1><a class="anchor" id="autotoc_md70"></a>
+<h1><a class="anchor" id="autotoc_md74"></a>
 Stream</h1>
 <ol type="1">
 <li><p class="startli">I have a big JSON file. Should I load the whole file to memory?</p>
@@ -285,7 +285,7 @@ Stream</h1>
 <p class="startli">little/big endian of stream is an issue for UTF-16 and UTF-32 streams, but not UTF-8 stream.</p>
 </li>
 </ol>
-<h1><a class="anchor" id="autotoc_md71"></a>
+<h1><a class="anchor" id="autotoc_md75"></a>
 Performance</h1>
 <ol type="1">
 <li><p class="startli">Is RapidJSON really fast?</p>
@@ -306,7 +306,7 @@ Performance</h1>
 <p class="startli">Some applications need to process very large JSON files. Some server-side applications need to process huge amount of JSONs. Being high performance can improve both latency and throughput. In a broad sense, it will also save energy.</p>
 </li>
 </ol>
-<h1><a class="anchor" id="autotoc_md72"></a>
+<h1><a class="anchor" id="autotoc_md76"></a>
 Gossip</h1>
 <ol type="1">
 <li><p class="startli">Who are the developers of RapidJSON?</p>

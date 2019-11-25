@@ -89,8 +89,8 @@ $(document).ready(function(){initNavTree('md_doc_internals.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="toc"><h3>Table of Contents</h3>
-<ul><li class="level1"><a href="#Architecture">Architecture</a><ul><li class="level2"><a href="#autotoc_md60">SAX and DOM</a></li>
-<li class="level2"><a href="#autotoc_md61">Utility Classes</a></li>
+<ul><li class="level1"><a href="#Architecture">Architecture</a><ul><li class="level2"><a href="#autotoc_md64">SAX and DOM</a></li>
+<li class="level2"><a href="#autotoc_md65">Utility Classes</a></li>
 </ul>
 </li>
 <li class="level1"><a href="#Value">Value</a><ul><li class="level2"><a href="#DataLayout">Data Layout</a></li>
@@ -101,7 +101,7 @@ $(document).ready(function(){initNavTree('md_doc_internals.html','');});
 <li class="level1"><a href="#InternalAllocator">Allocator</a><ul><li class="level2"><a href="#MemoryPoolAllocator">MemoryPoolAllocator</a></li>
 </ul>
 </li>
-<li class="level1"><a href="#ParsingOptimization">Parsing Optimization</a><ul><li class="level2"><a href="#SkipwhitespaceWithSIMD">Skip Whitespaces with SIMD</a><ul><li class="level3"><a href="#autotoc_md62">Page boundary issue</a></li>
+<li class="level1"><a href="#ParsingOptimization">Parsing Optimization</a><ul><li class="level2"><a href="#SkipwhitespaceWithSIMD">Skip Whitespaces with SIMD</a><ul><li class="level3"><a href="#autotoc_md66">Page boundary issue</a></li>
 </ul>
 </li>
 <li class="level2"><a href="#LocalStreamCopy">Local Stream Copy</a></li>
@@ -124,7 +124,7 @@ $(document).ready(function(){initNavTree('md_doc_internals.html','');});
 <div class="textblock"><p>This section records some design and implementation details.</p>
 <h1><a class="anchor" id="Architecture"></a>
 Architecture</h1>
-<h2><a class="anchor" id="autotoc_md60"></a>
+<h2><a class="anchor" id="autotoc_md64"></a>
 SAX and DOM</h2>
 <p>The basic relationships of SAX and DOM is shown in the following UML diagram.</p>
 <div class="image">
@@ -133,7 +133,7 @@ SAX and DOM</h2>
 Architecture UML class diagram</div></div>
    <p>The core of the relationship is the <code>Handler</code> concept. From the SAX side, <code>Reader</code> parses a JSON from a stream and publish events to a <code>Handler</code>. <code>Writer</code> implements the <code>Handler</code> concept to handle the same set of events. From the DOM side, <code>Document</code> implements the <code>Handler</code> concept to build a DOM according to the events. <code>Value</code> supports a <code>Value::Accept(Handler&amp;)</code> function, which traverses the DOM to publish events.</p>
 <p>With this design, SAX is not dependent on DOM. Even <code>Reader</code> and <code>Writer</code> have no dependencies between them. This provides flexibility to chain event publisher and handlers. Besides, <code>Value</code> does not depends on SAX as well. So, in addition to stringify a DOM to JSON, user may also stringify it to a XML writer, or do anything else.</p>
-<h2><a class="anchor" id="autotoc_md61"></a>
+<h2><a class="anchor" id="autotoc_md65"></a>
 Utility Classes</h2>
 <p>Both SAX and DOM APIs depends on 3 additional concepts: <code>Allocator</code>, <code>Encoding</code> and <code>Stream</code>. Their inheritance hierarchy is shown as below.</p>
 <div class="image">
@@ -345,7 +345,7 @@ Skip Whitespaces with SIMD</h2>
 <div class="line"><span class="preprocessor">#  define RAPIDJSON_NEON</span></div>
 <div class="line"><span class="preprocessor">#endif</span></div>
 </div><!-- fragment --><p>Note that, these are compile-time settings. Running the executable on a machine without such instruction set support will make it crash.</p>
-<h3><a class="anchor" id="autotoc_md62"></a>
+<h3><a class="anchor" id="autotoc_md66"></a>
 Page boundary issue</h3>
 <p>In an early version of RapidJSON, <a href="https://code.google.com/archive/p/rapidjson/issues/104">an issue</a> reported that the <code>SkipWhitespace_SIMD()</code> causes crash very rarely (around 1 in 500,000). After investigation, it is suspected that <code>_mm_loadu_si128()</code> accessed bytes after &lsquo;&rsquo;\0'`, and across a protected page boundary.</p>
 <p>In <a href="http://www.intel.com/content/www/us/en/architecture-and-technology/64-ia-32-architectures-optimization-manual.html">Intel® 64 and IA-32 Architectures Optimization Reference Manual</a>, section 10.2.1:</p>
