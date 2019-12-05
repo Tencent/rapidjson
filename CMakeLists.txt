@@ -6,6 +6,7 @@ endif()
 if(POLICY CMP0054)
   cmake_policy(SET CMP0054 NEW)
 endif()
+cmake_policy(SET CMP0076 OLD)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
 
@@ -135,7 +136,55 @@ ELSEIF(WIN32)
 ENDIF()
 SET(CMAKE_INSTALL_DIR "${_CMAKE_INSTALL_DIR}" CACHE PATH "The directory cmake files are installed in")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+add_library(rapidjson INTERFACE)
+
+target_include_directories(rapidjson INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+set(RAPIDJSON_SRCS 
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/error/en.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/error/error.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/internal/biginteger.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/internal/clzll.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/internal/diyfp.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/internal/dtoa.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/internal/ieee754.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/internal/itoa.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/internal/meta.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/internal/pow10.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/internal/regex.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/internal/stack.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/internal/strfunc.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/internal/strtod.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/internal/swap.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/msinttypes/inttypes.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/msinttypes/stdint.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/allocators.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/cursorstreamwrapper.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/document.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/encodedstream.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/encodings.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/filereadstream.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/filewritestream.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/fwd.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/istreamwrapper.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/memorybuffer.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/memorystream.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/ostreamwrapper.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/pointer.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/prettywriter.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/rapidjson.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/reader.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/schema.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/stream.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/stringbuffer.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rapidjson/writer.h	
+)
+
+source_group(rapidjson FILES ${RAPIDJSON_SRCS})
+
+target_sources(rapidjson INTERFACE ${RAPIDJSON_SRCS})
+
+add_library(rapidjson::rapidjson ALIAS rapidjson)
 
 if(RAPIDJSON_BUILD_DOC)
     add_subdirectory(doc)
