@@ -158,7 +158,7 @@ concept Allocator {
 
 在它的内部，它从基础的内存分配器申请内存块（默认为 `CrtAllocator`）并将这些内存块存储为单向链表。当用户请求申请内存，它会遵循下列步骤来申请内存：
 
-1. 如果可用，使用用户提供的缓冲区。（见 [User Buffer section in DOM](doc/dom.md)）
+1. 如果可用，使用用户提供的缓冲区。（见 [User Buffer section in DOM](./dom.md)）
 2. 如果用户提供的缓冲区已满，使用当前内存块。
 3. 如果当前内存块已满，申请新的内存块。
 

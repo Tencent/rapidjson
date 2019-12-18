@@ -172,7 +172,7 @@ template <typename InputStream, typename Handler>
 bool Parse(InputStream& is, Handler& handler);
 ~~~~~~~~~~
 
-若在解析中出现错误，它会返回 `false`。使用者可调用 `bool HasParseEror()`, `ParseErrorCode GetParseErrorCode()` 及 `size_t GetErrorOffset()` 获取错误状态。实际上 `Document` 使用这些 `Reader` 函数去获取解析错误。请参考 [DOM](doc/dom.zh-cn.md) 去了解有关解析错误的细节。
+若在解析中出现错误，它会返回 `false`。使用者可调用 `bool HasParseEror()`, `ParseErrorCode GetParseErrorCode()` 及 `size_t GetErrorOffset()` 获取错误状态。实际上 `Document` 使用这些 `Reader` 函数去获取解析错误。请参考 [DOM](./dom.zh-cn.md) 去了解有关解析错误的细节。
 
 # Writer {#Writer}
 

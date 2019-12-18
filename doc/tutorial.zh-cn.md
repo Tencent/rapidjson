@@ -525,11 +525,11 @@ assert(b.IsInt());
 
 本教程展示了如何询查及修改 DOM 树。RapidJSON 还有一个重要概念：
 
-1. [流](doc/stream.zh-cn.md) 是读写 JSON 的通道。流可以是内存字符串、文件流等。用户也可以自定义流。
-2. [编码](doc/encoding.zh-cn.md) 定义在流或内存中使用的字符编码。RapidJSON 也在内部提供 Unicode 转换及校验功能。
-3. [DOM](doc/dom.zh-cn.md) 的基本功能已在本教程里介绍。还有更高级的功能，如原位（*in situ*）解析、其他解析选项及高级用法。
-4. [SAX](doc/sax.zh-cn.md) 是 RapidJSON 解析／生成功能的基础。学习使用 `Reader`/`Writer` 去实现更高性能的应用程序。也可以使用 `PrettyWriter` 去格式化 JSON。
-5. [性能](doc/performance.zh-cn.md) 展示一些我们做的及第三方的性能测试。
-6. [技术内幕](doc/internals.md) 讲述一些 RapidJSON 内部的设计及技术。
+1. [流](./stream.zh-cn.md) 是读写 JSON 的通道。流可以是内存字符串、文件流等。用户也可以自定义流。
+2. [编码](./encoding.zh-cn.md) 定义在流或内存中使用的字符编码。RapidJSON 也在内部提供 Unicode 转换及校验功能。
+3. [DOM](./dom.zh-cn.md) 的基本功能已在本教程里介绍。还有更高级的功能，如原位（*in situ*）解析、其他解析选项及高级用法。
+4. [SAX](./sax.zh-cn.md) 是 RapidJSON 解析／生成功能的基础。学习使用 `Reader`/`Writer` 去实现更高性能的应用程序。也可以使用 `PrettyWriter` 去格式化 JSON。
+5. [性能](./performance.zh-cn.md) 展示一些我们做的及第三方的性能测试。
+6. [技术内幕](./internals.md) 讲述一些 RapidJSON 内部的设计及技术。
 
-你也可以参考 [常见问题](doc/faq.zh-cn.md)、API 文档、例子及单元测试。
+你也可以参考 [常见问题](./faq.zh-cn.md)、API 文档、例子及单元测试。

@@ -158,7 +158,7 @@ Note that `Malloc()` and `Realloc()` are member functions but `Free()` is static
 
 Internally, it allocates chunks of memory from the base allocator (by default `CrtAllocator`) and stores the chunks as a singly linked list. When user requests an allocation, it allocates memory from the following order:
 
-1. User supplied buffer if it is available. (See [User Buffer section in DOM](doc/dom.md))
+1. User supplied buffer if it is available. (See [User Buffer section in DOM](./dom.md))
 2. If user supplied buffer is full, use the current memory chunk.
 3. If the current block is full, allocate a new block of memory.
 

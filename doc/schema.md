@@ -146,7 +146,7 @@ Of course, if your application only needs SAX-style serialization, it can simply
 
 # Remote Schema {#Remote}
 
-JSON Schema supports [`$ref` keyword](http://spacetelescope.github.io/understanding-json-schema/structuring.html), which is a [JSON pointer](doc/pointer.md) referencing to a local or remote schema. Local pointer is prefixed with `#`, while remote pointer is an relative or absolute URI. For example:
+JSON Schema supports [`$ref` keyword](http://spacetelescope.github.io/understanding-json-schema/structuring.html), which is a [JSON pointer](./pointer.md) referencing to a local or remote schema. Local pointer is prefixed with `#`, while remote pointer is an relative or absolute URI. For example:
 
 ~~~js
 { "$ref": "definitions.json#/address" }
