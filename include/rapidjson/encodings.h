@@ -695,10 +695,10 @@ template<bool CodePointValidation = true>
 class ValidatableEncoder {
 public:
     template<typename TEncoding, typename OutputStream>
-    static RAPIDJSON_FORCEINLINE bool Encode(OutputStream &os, unsigned codepoint);
+    static bool Encode(OutputStream &os, unsigned codepoint);
 
     template<typename TEncoding, typename OutputStream>
-    static RAPIDJSON_FORCEINLINE bool EncodeUnsafe(OutputStream &os, unsigned codepoint);
+    static bool EncodeUnsafe(OutputStream &os, unsigned codepoint);
 };
 
 // By default, reader will validate code point and generate parse error.
