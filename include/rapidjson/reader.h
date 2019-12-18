@@ -1028,7 +1028,7 @@ private:
                             RAPIDJSON_PARSE_ERROR(kParseErrorStringUnicodeSurrogateInvalid, escapeOffset);
                         codepoint = (((codepoint - 0xD800) << 10) | (codepoint2 - 0xDC00)) + 0x10000;
                     }
-                    if (!ValidatableEncoder<parseFlags & kParseValidateEncodingFlag>::template Encode<TEncoding>(os, codepoint))
+                    if (!ValidatableEncoder<static_cast<bool>(parseFlags & kParseValidateEncodingFlag)>::template Encode<TEncoding>(os, codepoint))
                     {
                         RAPIDJSON_PARSE_ERROR(kParseErrorStringInvalidEncoding, escapeOffset);
                     }
