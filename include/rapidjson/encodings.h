@@ -691,6 +691,8 @@ struct AutoUTF {
 
     \tprarm CodePointValidation Run validate before encode or not.
 */
+// By default, This Encoder will validate code point and generate parse error.
+// Users can switch the check feature off by set 'CodePointValidation' to 'false'.
 template<bool CodePointValidation = true>
 class ValidatableEncoder {
 public:
@@ -701,7 +703,6 @@ public:
     static bool EncodeUnsafe(OutputStream &os, unsigned codepoint);
 };
 
-// By default, reader will validate code point and generate parse error.
 template<bool CodePointValidation>
 template<typename TEncoding, typename OutputStream>
 bool
@@ -724,7 +725,6 @@ ValidatableEncoder<CodePointValidation>::EncodeUnsafe(OutputStream &os, unsigned
     return true;
 }
 
-// Users can switch the check feature off by set 'CodePointValidation' to 'false'.
 template<>
 template<typename TEncoding, typename OutputStream>
 bool
@@ -733,7 +733,6 @@ ValidatableEncoder<false>::Encode(OutputStream &os, unsigned codepoint) {
     return true;
 }
 
-// Users can switch the check feature off by set 'CodePointValidation' to 'false'.
 template<>
 template<typename TEncoding, typename OutputStream>
 bool
