@@ -332,10 +332,10 @@ TEST(EncodingsTest, UTF8) {
     }
 
     // Validate code point before encoding
-    EXPECT_FALSE(ValidatableEncoder<>::Encode<UTF8<>>(os, 0xFFFFFFFF));
-    EXPECT_FALSE(ValidatableEncoder<>::EncodeUnsafe<UTF8<>>(os, 0xFFFFFFFF));
-    EXPECT_THROW(ValidatableEncoder<false>::Encode<UTF8<>>(os, 0xFFFFFFFF), AssertException);
-    EXPECT_THROW(ValidatableEncoder<false>::EncodeUnsafe<UTF8<>>(os, 0xFFFFFFFF), AssertException);
+    EXPECT_FALSE(ValidatableEncoder<>::Encode<UTF8<> >(os, 0xFFFFFFFF));
+    EXPECT_FALSE(ValidatableEncoder<>::EncodeUnsafe<UTF8<> >(os, 0xFFFFFFFF));
+    EXPECT_THROW(ValidatableEncoder<false>::Encode<UTF8<> >(os, 0xFFFFFFFF), AssertException);
+    EXPECT_THROW(ValidatableEncoder<false>::EncodeUnsafe<UTF8<> >(os, 0xFFFFFFFF), AssertException);
 }
 
 TEST(EncodingsTest, UTF16) {
@@ -398,18 +398,18 @@ TEST(EncodingsTest, UTF16) {
     }
 
     // Validate code point before encoding
-    EXPECT_FALSE(ValidatableEncoder<>::Encode<UTF16<>>(os, 0xFFFFFFFF));
-    EXPECT_FALSE(ValidatableEncoder<>::EncodeUnsafe<UTF16<>>(os, 0xFFFFFFFF));
-    EXPECT_FALSE(ValidatableEncoder<>::Encode<UTF16<>>(os, 0xD800));
-    EXPECT_FALSE(ValidatableEncoder<>::EncodeUnsafe<UTF16<>>(os, 0xD800));
-    EXPECT_FALSE(ValidatableEncoder<>::Encode<UTF16<>>(os, 0xDFFF));
-    EXPECT_FALSE(ValidatableEncoder<>::EncodeUnsafe<UTF16<>>(os, 0xDFFF));
-    EXPECT_THROW(ValidatableEncoder<false>::Encode<UTF16<>>(os, 0xFFFFFFFF), AssertException);
-    EXPECT_THROW(ValidatableEncoder<false>::EncodeUnsafe<UTF16<>>(os, 0xFFFFFFFF), AssertException);
-    EXPECT_THROW(ValidatableEncoder<false>::Encode<UTF16<>>(os, 0xD800), AssertException);
-    EXPECT_THROW(ValidatableEncoder<false>::EncodeUnsafe<UTF16<>>(os, 0xD800), AssertException);
-    EXPECT_THROW(ValidatableEncoder<false>::Encode<UTF16<>>(os, 0xDFFF), AssertException);
-    EXPECT_THROW(ValidatableEncoder<false>::EncodeUnsafe<UTF16<>>(os, 0xDFFF), AssertException);
+    EXPECT_FALSE(ValidatableEncoder<>::Encode<UTF16<> >(os, 0xFFFFFFFF));
+    EXPECT_FALSE(ValidatableEncoder<>::EncodeUnsafe<UTF16<> >(os, 0xFFFFFFFF));
+    EXPECT_FALSE(ValidatableEncoder<>::Encode<UTF16<> >(os, 0xD800));
+    EXPECT_FALSE(ValidatableEncoder<>::EncodeUnsafe<UTF16<> >(os, 0xD800));
+    EXPECT_FALSE(ValidatableEncoder<>::Encode<UTF16<> >(os, 0xDFFF));
+    EXPECT_FALSE(ValidatableEncoder<>::EncodeUnsafe<UTF16<> >(os, 0xDFFF));
+    EXPECT_THROW(ValidatableEncoder<false>::Encode<UTF16<> >(os, 0xFFFFFFFF), AssertException);
+    EXPECT_THROW(ValidatableEncoder<false>::EncodeUnsafe<UTF16<> >(os, 0xFFFFFFFF), AssertException);
+    EXPECT_THROW(ValidatableEncoder<false>::Encode<UTF16<> >(os, 0xD800), AssertException);
+    EXPECT_THROW(ValidatableEncoder<false>::EncodeUnsafe<UTF16<> >(os, 0xD800), AssertException);
+    EXPECT_THROW(ValidatableEncoder<false>::Encode<UTF16<> >(os, 0xDFFF), AssertException);
+    EXPECT_THROW(ValidatableEncoder<false>::EncodeUnsafe<UTF16<> >(os, 0xDFFF), AssertException);
 }
 
 TEST(EncodingsTest, UTF32) {
@@ -443,10 +443,10 @@ TEST(EncodingsTest, UTF32) {
     }
 
     // Validate code point before encoding
-    EXPECT_FALSE(ValidatableEncoder<>::Encode<UTF32<>>(os, 0xFFFFFFFF));
-    EXPECT_FALSE(ValidatableEncoder<>::EncodeUnsafe<UTF32<>>(os, 0xFFFFFFFF));
-    EXPECT_THROW(ValidatableEncoder<false>::Encode<UTF32<>>(os, 0xFFFFFFFF), AssertException);
-    EXPECT_THROW(ValidatableEncoder<false>::EncodeUnsafe<UTF32<>>(os, 0xFFFFFFFF), AssertException);
+    EXPECT_FALSE(ValidatableEncoder<>::Encode<UTF32<> >(os, 0xFFFFFFFF));
+    EXPECT_FALSE(ValidatableEncoder<>::EncodeUnsafe<UTF32<> >(os, 0xFFFFFFFF));
+    EXPECT_THROW(ValidatableEncoder<false>::Encode<UTF32<> >(os, 0xFFFFFFFF), AssertException);
+    EXPECT_THROW(ValidatableEncoder<false>::EncodeUnsafe<UTF32<> >(os, 0xFFFFFFFF), AssertException);
 }
 
 TEST(EncodingsTest, ASCII) {
@@ -474,8 +474,8 @@ TEST(EncodingsTest, ASCII) {
     }
 
     // Validate code point before encoding
-    EXPECT_FALSE(ValidatableEncoder<>::Encode<ASCII<>>(os, 0x0080));
-    EXPECT_FALSE(ValidatableEncoder<>::EncodeUnsafe<ASCII<>>(os, 0x0080));
-    EXPECT_THROW(ValidatableEncoder<false>::Encode<ASCII<>>(os, 0x0080), AssertException);
-    EXPECT_THROW(ValidatableEncoder<false>::EncodeUnsafe<ASCII<>>(os, 0x0080), AssertException);
+    EXPECT_FALSE(ValidatableEncoder<>::Encode<ASCII<> >(os, 0x0080));
+    EXPECT_FALSE(ValidatableEncoder<>::EncodeUnsafe<ASCII<> >(os, 0x0080));
+    EXPECT_THROW(ValidatableEncoder<false>::Encode<ASCII<> >(os, 0x0080), AssertException);
+    EXPECT_THROW(ValidatableEncoder<false>::EncodeUnsafe<ASCII<> >(os, 0x0080), AssertException);
 }
