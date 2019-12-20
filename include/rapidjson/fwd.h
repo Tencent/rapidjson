@@ -31,7 +31,7 @@ template<typename CharType> struct UTF32LE;
 template<typename CharType> struct ASCII;
 template<typename CharType> struct AutoUTF;
 
-template<typename SourceEncoding, typename TargetEncoding>
+template<typename SourceEncoding, typename TargetEncoding, bool CodePointValidation>
 struct Transcoder;
 
 // allocators.h
