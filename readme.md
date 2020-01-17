@@ -72,6 +72,9 @@ Users can build and run the unit tests on their platform/compiler.
 
 RapidJSON is a header-only C++ library. Just copy the `include/rapidjson` folder to system or project's include path.
 
+Alternatively, if you are using the [vcpkg](https://github.com/Microsoft/vcpkg/) dependency manager you can download and install rapidjson with CMake integration in a single command:
+* vcpkg install rapidjson
+
 RapidJSON uses following software as its dependencies:
 * [CMake](https://cmake.org/) as a general build tool
 * (optional) [Doxygen](http://www.doxygen.org) to build documentation
