@@ -2198,4 +2198,58 @@ TEST(Reader, ParseNanAndInfinity) {
 #undef TEST_NAN_INF
 }
 
+TEST(Reader, ParsePartialFraction) {
+#define TEST_PARSE_PARTIAL_FRACTION(str, x) \
+    { \
+        StringStream s(str); \
+        ParseDoubleHandler h; \
+        Reader reader; \
+        ASSERT_EQ(kParseErrorNone, reader.Parse<kParsePartialFractionFlag>(s, h).Code()); \
+        internal::Double e(x), a(h.actual_); \
+        EXPECT_EQ(1u, h.step_); \
+        EXPECT_EQ(e.Sign(), a.Sign()); \
+        EXPECT_DOUBLE_EQ(x, h.actual_); \
+    }
+#define TEST_PARSE_PARTIAL_FRACTION_ERROR(errorCode, str, errorOffset) \
+    { \
+        char buffer[1001]; \
+        int streamPos = errorOffset; \
+        sprintf(buffer, "%s", str); \
+        InsituStringStream s(buffer); \
+        BaseReaderHandler<> h; \
+        Reader reader; \
+        EXPECT_FALSE(reader.Parse<kParsePartialFractionFlag>(s, h)); \
+        EXPECT_EQ(errorCode, reader.GetParseErrorCode()); \
+        EXPECT_EQ(errorOffset, reader.GetErrorOffset()); \
+        EXPECT_EQ(streamPos, s.Tell()); \
+    }
+    TEST_PARSE_PARTIAL_FRACTION("0.", 0.0);
+    TEST_PARSE_PARTIAL_FRACTION("-0.", -0.0);
+    TEST_PARSE_PARTIAL_FRACTION("1.", 1.0);
+    TEST_PARSE_PARTIAL_FRACTION("-1.", -1.0);
+    TEST_PARSE_PARTIAL_FRACTION("1.E10", 1E10);
+    TEST_PARSE_PARTIAL_FRACTION("1.e10", 1e10);
+    TEST_PARSE_PARTIAL_FRACTION("1.E+10", 1E+10);
+    TEST_PARSE_PARTIAL_FRACTION("1.E-10", 1E-10);
+    TEST_PARSE_PARTIAL_FRACTION("-1.E10", -1E10);
+    TEST_PARSE_PARTIAL_FRACTION("-1.e10", -1e10);
+    TEST_PARSE_PARTIAL_FRACTION("-1.E+10", -1E+10);
+    TEST_PARSE_PARTIAL_FRACTION("-1.E-10", -1E-10);
+    TEST_PARSE_PARTIAL_FRACTION("123.", 123.0);
+    TEST_PARSE_PARTIAL_FRACTION(".123", 0.123);
+    TEST_PARSE_PARTIAL_FRACTION("-.123", -0.123);
+    TEST_PARSE_PARTIAL_FRACTION(".E10", 0.0);
+    TEST_PARSE_PARTIAL_FRACTION(".e10", 0.0);
+    TEST_PARSE_PARTIAL_FRACTION(".E+10", 0.0);
+    TEST_PARSE_PARTIAL_FRACTION(".E-10", 0.0);
+    TEST_PARSE_PARTIAL_FRACTION("-.E10", -0.0);
+    TEST_PARSE_PARTIAL_FRACTION("-.e10", -0.0);
+    TEST_PARSE_PARTIAL_FRACTION("-.E+10", -0.0);
+    TEST_PARSE_PARTIAL_FRACTION("-.E-10", -0.0);
+    TEST_PARSE_PARTIAL_FRACTION(".123e10", 1.23e9);
+    TEST_PARSE_PARTIAL_FRACTION("-.123e10", -1.23e9);
+    TEST_PARSE_PARTIAL_FRACTION(".", 0.0);
+    TEST_PARSE_PARTIAL_FRACTION("-.", -0.0);
+}
+
 RAPIDJSON_DIAG_POP

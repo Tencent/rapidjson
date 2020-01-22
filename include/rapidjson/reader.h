@@ -154,6 +154,7 @@ enum ParseFlag {
     kParseNumbersAsStringsFlag = 64,    //!< Parse all numbers (ints/doubles) as strings.
     kParseTrailingCommasFlag = 128, //!< Allow trailing commas at the end of objects and arrays.
     kParseNanAndInfFlag = 256,      //!< Allow parsing NaN, Inf, Infinity, -Inf and -Infinity as doubles.
+    kParsePartialFractionFlag = 512,//!< Allow parsing fractions that begin or end with a dot.
     kParseDefaultFlags = RAPIDJSON_PARSE_DEFAULT_FLAGS  //!< Default parse flags. Can be customized by defining RAPIDJSON_PARSE_DEFAULT_FLAGS
 };
 
@@ -1529,7 +1530,8 @@ private:
                 RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
             }
         }
-        else
+        // Continue parsing if it looks like a partial fraction
+        else if (!((parseFlags & kParsePartialFractionFlag) && s.Peek() == '.'))
             RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
 
         // Parse 64bit int
@@ -1572,8 +1574,10 @@ private:
         if (Consume(s, '.')) {
             decimalPosition = s.Length();
 
-            if (RAPIDJSON_UNLIKELY(!(s.Peek() >= '0' && s.Peek() <= '9')))
-                RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, s.Tell());
+            if (RAPIDJSON_UNLIKELY(!(s.Peek() >= '0' && s.Peek() <= '9'))) {
+                if (!(parseFlags & kParsePartialFractionFlag))
+                    RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissFraction, s.Tell());
+            }
 
             if (!useDouble) {
 #if RAPIDJSON_64BIT
