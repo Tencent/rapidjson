@@ -2215,7 +2215,7 @@ TEST(Reader, EscapedApostrophe) {
     {
         StringStream s(json);
         Reader reader;
-        ParseResult r = reader.Parse<kParseEscapedApostrophe>(s, h);
+        ParseResult r = reader.Parse<kParseEscapedApostropheFlag>(s, h);
         EXPECT_FALSE(reader.HasParseError());
         EXPECT_EQ(kParseErrorNone, r.Code());
         EXPECT_EQ(0u, r.Offset());
