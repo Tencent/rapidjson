@@ -213,6 +213,8 @@ Parsing</h1>
 <td class="markdownTableBodyNone"><code>kParseTrailingCommasFlag</code>  </td><td class="markdownTableBodyNone">Allow trailing commas at the end of objects and arrays (relaxed JSON syntax).   </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><code>kParseNanAndInfFlag</code>  </td><td class="markdownTableBodyNone">Allow parsing <code>NaN</code>, <code>Inf</code>, <code>Infinity</code>, <code>-Inf</code> and <code>-Infinity</code> as <code>double</code> values (relaxed JSON syntax).   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>kParseEscapedApostropheFlag</code>  </td><td class="markdownTableBodyNone">Allow escaped apostrophe &lsquo;&amp;rsquo;` in strings (relaxed JSON syntax).   </td></tr>
 </table>
 <p>By using a non-type template parameter, instead of a function parameter, C++ compiler can generate code which is optimized for specified combinations, improving speed, and reducing code size (if only using a single specialization). The downside is the flags needed to be determined in compile-time.</p>
 <p>The <code>SourceEncoding</code> parameter defines what encoding is in the stream. This can be differed to the <code>Encoding</code> of the <code>Document</code>. See <a href="#TranscodingAndValidation">Transcoding and Validation</a> section for details.</p>

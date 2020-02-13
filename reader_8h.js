@@ -16,6 +16,7 @@ var reader_8h =
       [ "kParseNumbersAsStringsFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a13981c0b803803f59d7a01aef3dfc987", null ],
       [ "kParseTrailingCommasFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9af8b8470221dbc6046a40ff31d758ceec", null ],
       [ "kParseNanAndInfFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a857894ab51cafa62956e9c9f0dafc4d8", null ],
+      [ "kParseEscapedApostropheFlag", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a9d0cd4c136483497f32f4af366b12d63", null ],
       [ "kParseDefaultFlags", "reader_8h.html#a81379eb4e94a0386d71d15fda882ebc9a5640cb00db7814b7f22be3683dda9835", null ]
     ] ],
     [ "SkipWhitespace", "reader_8h.html#a946a04b733bc148c13e7b3b0721cabcc", null ],
