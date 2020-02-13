@@ -2198,4 +2198,28 @@ TEST(Reader, ParseNanAndInfinity) {
 #undef TEST_NAN_INF
 }
 
+TEST(Reader, EscapedApostrophe) {
+    const char json[] = " { \"foo\": \"bar\\'buzz\" } ";
+
+    BaseReaderHandler<> h;
+
+    {
+        StringStream s(json);
+        Reader reader;
+        ParseResult r = reader.Parse<kParseNoFlags>(s, h);
+        EXPECT_TRUE(reader.HasParseError());
+        EXPECT_EQ(kParseErrorStringEscapeInvalid, r.Code());
+        EXPECT_EQ(14u, r.Offset());
+    }
+
+    {
+        StringStream s(json);
+        Reader reader;
+        ParseResult r = reader.Parse<kParseEscapedApostropheFlag>(s, h);
+        EXPECT_FALSE(reader.HasParseError());
+        EXPECT_EQ(kParseErrorNone, r.Code());
+        EXPECT_EQ(0u, r.Offset());
+    }
+}
+
 RAPIDJSON_DIAG_POP
