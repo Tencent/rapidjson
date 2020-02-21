@@ -127,7 +127,7 @@ Due to users' requests, RapidJSON provided official wrappers for `std::basic_ist
 
 ## IStreamWrapper {#IStreamWrapper}
 
-`IStreamWrapper` wraps any class drived from `std::istream`, such as `std::istringstream`, `std::stringstream`, `std::ifstream`, `std::fstream`, into RapidJSON's input stream.
+`IStreamWrapper` wraps any class derived from `std::istream`, such as `std::istringstream`, `std::stringstream`, `std::ifstream`, `std::fstream`, into RapidJSON's input stream.
 
 ~~~cpp
 #include <rapidjson/document.h>
