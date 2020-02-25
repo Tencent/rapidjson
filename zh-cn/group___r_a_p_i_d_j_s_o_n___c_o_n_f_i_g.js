@@ -4,6 +4,8 @@ var group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g =
     [ "RAPIDJSON_ALIGN", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga583915242504c7fdb36e826f02f76242", null ],
     [ "RAPIDJSON_ALLOCATOR_DEFAULT_CHUNK_CAPACITY", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga860570d04d489be08b9835d2ec58bac5", null ],
     [ "RAPIDJSON_ASSERT", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c", null ],
+    [ "RAPIDJSON_DEFAULT_ALLOCATOR", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga04a88f0b2db9091006eb7fc6deb6077b", null ],
+    [ "RAPIDJSON_DEFAULT_STACK_ALLOCATOR", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga1178cffff7c596922a5ed3fda30c5520", null ],
     [ "RAPIDJSON_ENDIAN", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaba2445f582142cf918e74c2d22d1aa07", null ],
     [ "RAPIDJSON_HAS_STDSTRING", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga2f2eef0ee4477f3fe5874703a66e997f", null ],
     [ "RAPIDJSON_LIKELY", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga5dc14176a9e71ace282404b0bcda57a1", null ],
@@ -17,6 +19,8 @@ var group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g =
     [ "RAPIDJSON_PATCH_VERSION", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaf967d31be43666ce7f53756d73bd1cdf", null ],
     [ "RAPIDJSON_SIMD", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga0ccf72f3ebc4b3306ab669f95ca5c64b", null ],
     [ "RAPIDJSON_UNLIKELY", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga6a2b1695c13e77ae425e3cbac980ccb5", null ],
+    [ "RAPIDJSON_VALUE_DEFAULT_ARRAY_CAPACITY", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga10ba0ee06d0ac2803d0f2290d46b19f7", null ],
+    [ "RAPIDJSON_VALUE_DEFAULT_OBJECT_CAPACITY", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga5c88aa612939b592d15d3fc4bdf54272", null ],
     [ "RAPIDJSON_VERSION_STRING", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gad283cfde97d9a32b7d8e8107b11f70a6", null ],
     [ "RAPIDJSON_WRITE_DEFAULT_FLAGS", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga1975595e2f1dc20a2d4859f340ac88c6", null ]
 ];

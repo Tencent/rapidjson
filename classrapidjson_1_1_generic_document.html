@@ -485,14 +485,14 @@ const typedef <a class="el" href="classrapidjson_1_1_generic_value.html">Generic
 <tr class="separator:a7d1d50ccd6639e29231b3f67d94c9ecf inherit pub_attribs_classrapidjson_1_1_generic_value"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_static_attribs_classrapidjson_1_1_generic_value"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classrapidjson_1_1_generic_value')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classrapidjson_1_1_generic_value.html">rapidjson::GenericValue&lt; Encoding, Allocator &gt;</a></td></tr>
 <tr class="memitem:ab22b5f5f153376de937e70d6be6dcadc inherit pub_static_attribs_classrapidjson_1_1_generic_value"><td class="memItemLeft" align="right" valign="top"><a id="ab22b5f5f153376de937e70d6be6dcadc"></a>
-static const <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>kDefaultArrayCapacity</b> = 16</td></tr>
+static const <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>kDefaultArrayCapacity</b> = <a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga10ba0ee06d0ac2803d0f2290d46b19f7">RAPIDJSON_VALUE_DEFAULT_ARRAY_CAPACITY</a></td></tr>
 <tr class="separator:ab22b5f5f153376de937e70d6be6dcadc inherit pub_static_attribs_classrapidjson_1_1_generic_value"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2c66dad43986842f4a624f478de1741 inherit pub_static_attribs_classrapidjson_1_1_generic_value"><td class="memItemLeft" align="right" valign="top"><a id="ac2c66dad43986842f4a624f478de1741"></a>
-static const <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>kDefaultObjectCapacity</b> = 16</td></tr>
+static const <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>kDefaultObjectCapacity</b> = <a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga5c88aa612939b592d15d3fc4bdf54272">RAPIDJSON_VALUE_DEFAULT_OBJECT_CAPACITY</a></td></tr>
 <tr class="separator:ac2c66dad43986842f4a624f478de1741 inherit pub_static_attribs_classrapidjson_1_1_generic_value"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename Encoding, typename Allocator = MemoryPoolAllocator&lt;&gt;, typename StackAllocator = CrtAllocator&gt;<br />
+<div class="textblock"><h3>template&lt;typename Encoding, typename Allocator = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator = RAPIDJSON_DEFAULT_STACK_ALLOCATOR&gt;<br />
 class rapidjson::GenericDocument&lt; Encoding, Allocator, StackAllocator &gt;</h3>
 
 <p>A document for parsing JSON text as DOM. </p>
@@ -513,7 +513,7 @@ class rapidjson::GenericDocument&lt; Encoding, Allocator, StackAllocator &gt;</h
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+template&lt;typename Encoding , typename Allocator  = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator  = RAPIDJSON_DEFAULT_STACK_ALLOCATOR&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -574,7 +574,7 @@ template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+template&lt;typename Encoding , typename Allocator  = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator  = RAPIDJSON_DEFAULT_STACK_ALLOCATOR&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -629,7 +629,7 @@ template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+template&lt;typename Encoding , typename Allocator  = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator  = RAPIDJSON_DEFAULT_STACK_ALLOCATOR&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -663,7 +663,7 @@ template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+template&lt;typename Encoding , typename Allocator  = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator  = RAPIDJSON_DEFAULT_STACK_ALLOCATOR&gt; </div>
 <div class="memtemplate">
 template&lt;unsigned parseFlags&gt; </div>
 <table class="mlabels">
@@ -707,7 +707,7 @@ template&lt;unsigned parseFlags&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+template&lt;typename Encoding , typename Allocator  = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator  = RAPIDJSON_DEFAULT_STACK_ALLOCATOR&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -743,7 +743,7 @@ template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+template&lt;typename Encoding , typename Allocator  = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator  = RAPIDJSON_DEFAULT_STACK_ALLOCATOR&gt; </div>
 <div class="memtemplate">
 template&lt;unsigned parseFlags, typename SourceEncoding &gt; </div>
 <table class="mlabels">
@@ -788,7 +788,7 @@ template&lt;unsigned parseFlags, typename SourceEncoding &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+template&lt;typename Encoding , typename Allocator  = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator  = RAPIDJSON_DEFAULT_STACK_ALLOCATOR&gt; </div>
 <div class="memtemplate">
 template&lt;unsigned parseFlags&gt; </div>
 <table class="mlabels">
@@ -833,7 +833,7 @@ template&lt;unsigned parseFlags&gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+template&lt;typename Encoding , typename Allocator  = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator  = RAPIDJSON_DEFAULT_STACK_ALLOCATOR&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -870,7 +870,7 @@ template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+template&lt;typename Encoding , typename Allocator  = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator  = RAPIDJSON_DEFAULT_STACK_ALLOCATOR&gt; </div>
 <div class="memtemplate">
 template&lt;unsigned parseFlags, typename SourceEncoding , typename InputStream &gt; </div>
 <table class="mlabels">
@@ -917,7 +917,7 @@ template&lt;unsigned parseFlags, typename SourceEncoding , typename InputStream 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+template&lt;typename Encoding , typename Allocator  = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator  = RAPIDJSON_DEFAULT_STACK_ALLOCATOR&gt; </div>
 <div class="memtemplate">
 template&lt;unsigned parseFlags, typename InputStream &gt; </div>
 <table class="mlabels">
@@ -963,7 +963,7 @@ template&lt;unsigned parseFlags, typename InputStream &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+template&lt;typename Encoding , typename Allocator  = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator  = RAPIDJSON_DEFAULT_STACK_ALLOCATOR&gt; </div>
 <div class="memtemplate">
 template&lt;typename InputStream &gt; </div>
 <table class="mlabels">
@@ -1008,7 +1008,7 @@ template&lt;typename InputStream &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+template&lt;typename Encoding , typename Allocator  = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator  = RAPIDJSON_DEFAULT_STACK_ALLOCATOR&gt; </div>
 <div class="memtemplate">
 template&lt;typename Generator &gt; </div>
 <table class="mlabels">
@@ -1053,7 +1053,7 @@ template&lt;typename Generator &gt; </div>
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+template&lt;typename Encoding , typename Allocator  = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator  = RAPIDJSON_DEFAULT_STACK_ALLOCATOR&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1092,7 +1092,7 @@ template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt;, typename StackAllocator  = CrtAllocator&gt; </div>
+template&lt;typename Encoding , typename Allocator  = RAPIDJSON_DEFAULT_ALLOCATOR, typename StackAllocator  = RAPIDJSON_DEFAULT_STACK_ALLOCATOR&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1137,8 +1137,8 @@ template&lt;typename Encoding , typename Allocator  = MemoryPoolAllocator&lt;&gt
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassrapidjson_1_1_generic_document_html_a0d63efcc43758ac3aed77e868233369d"><div class="ttname"><a href="classrapidjson_1_1_generic_document.html#a0d63efcc43758ac3aed77e868233369d">rapidjson::GenericDocument::swap</a></div><div class="ttdeci">friend void swap(GenericDocument &amp;a, GenericDocument &amp;b) RAPIDJSON_NOEXCEPT</div><div class="ttdoc">free-standing swap function helper</div><div class="ttdef"><b>Definition:</b> document.h:2261</div></div>
-<div class="ttc" id="anamespacerapidjson_html_ace11b5b575baf1cccd5ba5f8586dcdc8"><div class="ttname"><a href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">rapidjson::Document</a></div><div class="ttdeci">GenericDocument&lt; UTF8&lt;&gt; &gt; Document</div><div class="ttdoc">GenericDocument with UTF8 encoding.</div><div class="ttdef"><b>Definition:</b> document.h:2536</div></div>
+<div class="ttc" id="aclassrapidjson_1_1_generic_document_html_a0d63efcc43758ac3aed77e868233369d"><div class="ttname"><a href="classrapidjson_1_1_generic_document.html#a0d63efcc43758ac3aed77e868233369d">rapidjson::GenericDocument::swap</a></div><div class="ttdeci">friend void swap(GenericDocument &amp;a, GenericDocument &amp;b) RAPIDJSON_NOEXCEPT</div><div class="ttdoc">free-standing swap function helper</div><div class="ttdef"><b>Definition:</b> document.h:2303</div></div>
+<div class="ttc" id="anamespacerapidjson_html_ace11b5b575baf1cccd5ba5f8586dcdc8"><div class="ttname"><a href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">rapidjson::Document</a></div><div class="ttdeci">GenericDocument&lt; UTF8&lt;&gt; &gt; Document</div><div class="ttdoc">GenericDocument with UTF8 encoding.</div><div class="ttdef"><b>Definition:</b> document.h:2578</div></div>
 <div class="ttc" id="agroup___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_html_gabdaf1a7a4db30fb0e3d927fdf0fabe79"><div class="ttname"><a href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79">rapidjson::GetParseError_En</a></div><div class="ttdeci">const RAPIDJSON_ERROR_CHARTYPE * GetParseError_En(ParseErrorCode parseErrorCode)</div><div class="ttdoc">Maps error code of parsing into error message.</div><div class="ttdef"><b>Definition:</b> en.h:36</div></div>
 <!-- HTML footer for doxygen 1.8.7-->
 <!-- start footer part -->
