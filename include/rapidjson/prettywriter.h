@@ -60,7 +60,7 @@ public:
 
 
     explicit PrettyWriter(StackAllocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
-        Base(allocator, levelDepth), indentChar_(' '), indentCharCount_(4) {}
+        Base(allocator, levelDepth), indentChar_(' '), indentCharCount_(4), formatOptions_(kFormatDefault) {}
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     PrettyWriter(PrettyWriter&& rhs) :
