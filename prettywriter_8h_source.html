@@ -150,7 +150,7 @@ $(document).ready(function(){initNavTree('prettywriter_8h_source.html','');});
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keyword">explicit</span> <a class="code" href="classrapidjson_1_1_pretty_writer.html">PrettyWriter</a>(StackAllocator* allocator = 0, <span class="keywordtype">size_t</span> levelDepth = Base::kDefaultLevelDepth) : </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        Base(allocator, levelDepth), indentChar_(<span class="stringliteral">&#39; &#39;</span>), indentCharCount_(4) {}</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        Base(allocator, levelDepth), indentChar_(<span class="stringliteral">&#39; &#39;</span>), indentCharCount_(4), formatOptions_(<a class="code" href="namespacerapidjson.html#a084b31753ef2edefdeca8a5374eccc4ba8164b0d4993439856171585b9cf3adc0">kFormatDefault</a>) {}</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#if RAPIDJSON_HAS_CXX11_RVALUE_REFS</span></div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    PrettyWriter(PrettyWriter&amp;&amp; rhs) :</div>
