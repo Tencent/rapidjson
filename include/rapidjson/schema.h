@@ -221,7 +221,7 @@ class Hasher {
 public:
     typedef typename Encoding::Ch Ch;
 
-    Hasher(Allocator* allocator = 0, size_t stackCapacity = kDefaultSize) : stack_(allocator, stackCapacity) {}
+    Hasher(Allocator* allocator = 0, size_t stackCapacity = kDefaultSize, bool arraySensitivity = true) : stack_(allocator, stackCapacity), arrayElementOrderSensitivity_(commutativeArrays) {}
 
     bool Null() { return WriteType(kNullType); }
     bool Bool(bool b) { return WriteType(b ? kTrueType : kFalseType); }
@@ -262,8 +262,12 @@ public:
     bool EndArray(SizeType elementCount) { 
         uint64_t h = Hash(0, kArrayType);
         uint64_t* e = stack_.template Pop<uint64_t>(elementCount);
-        for (SizeType i = 0; i < elementCount; i++)
-            h = Hash(h, e[i]); // Use hash to achieve element order sensitive
+        if(arrayElementOrderSensitivity_)
+            for (SizeType i = 0; i < elementCount; i++)
+                h = Hash(h, e[i]); // Use hash to achieve element order sensitive
+        else
+            for (SizeType i = 0; i < elementCount; i++)
+                h ^= h, e[i]; // Use xor to achieve element order insensitive
         *stack_.template Push<uint64_t>() = h;
         return true;
     }
@@ -274,7 +278,7 @@ public:
         RAPIDJSON_ASSERT(IsValid());
         return *stack_.template Top<uint64_t>();
     }
-
+    
 private:
     static const size_t kDefaultSize = 256;
     struct Number {
@@ -305,7 +309,7 @@ private:
         h *= kPrime;
         return h;
     }
-
+    bool arrayElementOrderSensitivity_;
     Stack<Allocator> stack_;
 };
 
