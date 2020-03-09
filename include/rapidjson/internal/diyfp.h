@@ -100,7 +100,7 @@ struct DiyFp {
     }
 
     DiyFp Normalize() const {
-        int s = static_cast<int>(RAPIDJSON_CLZLL(f));
+        int s = static_cast<int>(clzll(f));
         return DiyFp(f << s, e - s);
     }
 

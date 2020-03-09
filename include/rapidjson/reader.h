@@ -450,11 +450,11 @@ inline const char *SkipWhitespace_SIMD(const char* p) {
 
         if (low == 0) {
             if (high != 0) {
-                uint32_t lz = RAPIDJSON_CLZLL(high);
+                uint32_t lz = internal::clzll(high);
                 return p + 8 + (lz >> 3);
             }
         } else {
-            uint32_t lz = RAPIDJSON_CLZLL(low);
+            uint32_t lz = internal::clzll(low);
             return p + (lz >> 3);
         }
     }
@@ -486,11 +486,11 @@ inline const char *SkipWhitespace_SIMD(const char* p, const char* end) {
 
         if (low == 0) {
             if (high != 0) {
-                uint32_t lz = RAPIDJSON_CLZLL(high);
+                uint32_t lz = internal::clzll(high);
                 return p + 8 + (lz >> 3);
             }
         } else {
-            uint32_t lz = RAPIDJSON_CLZLL(low);
+            uint32_t lz = internal::clzll(low);
             return p + (lz >> 3);
         }
     }
@@ -1257,12 +1257,12 @@ private:
             bool escaped = false;
             if (low == 0) {
                 if (high != 0) {
-                    uint32_t lz = RAPIDJSON_CLZLL(high);
+                    uint32_t lz = internal::clzll(high);
                     length = 8 + (lz >> 3);
                     escaped = true;
                 }
             } else {
-                uint32_t lz = RAPIDJSON_CLZLL(low);
+                uint32_t lz = internal::clzll(low);
                 length = lz >> 3;
                 escaped = true;
             }
@@ -1327,12 +1327,12 @@ private:
             bool escaped = false;
             if (low == 0) {
                 if (high != 0) {
-                    uint32_t lz = RAPIDJSON_CLZLL(high);
+                    uint32_t lz = internal::clzll(high);
                     length = 8 + (lz >> 3);
                     escaped = true;
                 }
             } else {
-                uint32_t lz = RAPIDJSON_CLZLL(low);
+                uint32_t lz = internal::clzll(low);
                 length = lz >> 3;
                 escaped = true;
             }
@@ -1381,12 +1381,12 @@ private:
 
             if (low == 0) {
                 if (high != 0) {
-                    uint32_t lz = RAPIDJSON_CLZLL(high);
+                    uint32_t lz = internal::clzll(high);
                     p += 8 + (lz >> 3);
                     break;
                 }
             } else {
-                uint32_t lz = RAPIDJSON_CLZLL(low);
+                uint32_t lz = internal::clzll(low);
                 p += lz >> 3;
                 break;
             }

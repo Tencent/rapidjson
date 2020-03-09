@@ -29,10 +29,6 @@
 RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
-#if (defined(__GNUC__) && __GNUC__ >= 4) || RAPIDJSON_HAS_BUILTIN(__builtin_clzll)
-#define RAPIDJSON_CLZLL __builtin_clzll
-#else
-
 inline uint32_t clzll(uint64_t x) {
     // Passing 0 to __builtin_clzll is UB in GCC and results in an
     // infinite loop in the software implementation.
@@ -52,7 +48,11 @@ inline uint32_t clzll(uint64_t x) {
 #endif // _WIN64
 
     return 63 - r;
+#elif (defined(__GNUC__) && __GNUC__ >= 4) || RAPIDJSON_HAS_BUILTIN(__builtin_clzll)
+    // __builtin_clzll wrapper
+    return static_cast<uint32_t>(__builtin_clzll(x));
 #else
+    // naive version
     uint32_t r;
     while (!(x & (static_cast<uint64_t>(1) << 63))) {
         x <<= 1;
@@ -64,7 +64,6 @@ inline uint32_t clzll(uint64_t x) {
 }
 
 #define RAPIDJSON_CLZLL RAPIDJSON_NAMESPACE::internal::clzll
-#endif // (defined(__GNUC__) && __GNUC__ >= 4) || RAPIDJSON_HAS_BUILTIN(__builtin_clzll)
 
 } // namespace internal
 RAPIDJSON_NAMESPACE_END

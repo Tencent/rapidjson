@@ -676,12 +676,12 @@ inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, siz
         bool escaped = false;
         if (low == 0) {
             if (high != 0) {
-                uint32_t lz = RAPIDJSON_CLZLL(high);
+                uint32_t lz = internal::clzll(high);
                 len = 8 + (lz >> 3);
                 escaped = true;
             }
         } else {
-            uint32_t lz = RAPIDJSON_CLZLL(low);
+            uint32_t lz = internal::clzll(low);
             len = lz >> 3;
             escaped = true;
         }
