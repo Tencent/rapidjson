@@ -540,11 +540,11 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160; </div>
 <div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;        <span class="keywordflow">if</span> (low == 0) {</div>
 <div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;            <span class="keywordflow">if</span> (high != 0) {</div>
-<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;                uint32_t lz = RAPIDJSON_CLZLL(high);</div>
+<div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;                uint32_t lz = internal::clzll(high);</div>
 <div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;                <span class="keywordflow">return</span> p + 8 + (lz &gt;&gt; 3);</div>
 <div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;            }</div>
 <div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;            uint32_t lz = RAPIDJSON_CLZLL(low);</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;            uint32_t lz = internal::clzll(low);</div>
 <div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;            <span class="keywordflow">return</span> p + (lz &gt;&gt; 3);</div>
 <div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;        }</div>
 <div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;    }</div>
@@ -576,11 +576,11 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160; </div>
 <div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;        <span class="keywordflow">if</span> (low == 0) {</div>
 <div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;            <span class="keywordflow">if</span> (high != 0) {</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;                uint32_t lz = RAPIDJSON_CLZLL(high);</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;                uint32_t lz = internal::clzll(high);</div>
 <div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;                <span class="keywordflow">return</span> p + 8 + (lz &gt;&gt; 3);</div>
 <div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;            }</div>
 <div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;            uint32_t lz = RAPIDJSON_CLZLL(low);</div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;            uint32_t lz = internal::clzll(low);</div>
 <div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;            <span class="keywordflow">return</span> p + (lz &gt;&gt; 3);</div>
 <div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;        }</div>
 <div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;    }</div>
@@ -1347,12 +1347,12 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l01257"></a><span class="lineno"> 1257</span>&#160;            <span class="keywordtype">bool</span> escaped = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l01258"></a><span class="lineno"> 1258</span>&#160;            <span class="keywordflow">if</span> (low == 0) {</div>
 <div class="line"><a name="l01259"></a><span class="lineno"> 1259</span>&#160;                <span class="keywordflow">if</span> (high != 0) {</div>
-<div class="line"><a name="l01260"></a><span class="lineno"> 1260</span>&#160;                    uint32_t lz = RAPIDJSON_CLZLL(high);</div>
+<div class="line"><a name="l01260"></a><span class="lineno"> 1260</span>&#160;                    uint32_t lz = internal::clzll(high);</div>
 <div class="line"><a name="l01261"></a><span class="lineno"> 1261</span>&#160;                    length = 8 + (lz &gt;&gt; 3);</div>
 <div class="line"><a name="l01262"></a><span class="lineno"> 1262</span>&#160;                    escaped = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l01263"></a><span class="lineno"> 1263</span>&#160;                }</div>
 <div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160;                uint32_t lz = RAPIDJSON_CLZLL(low);</div>
+<div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160;                uint32_t lz = internal::clzll(low);</div>
 <div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;                length = lz &gt;&gt; 3;</div>
 <div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;                escaped = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160;            }</div>
@@ -1417,12 +1417,12 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l01327"></a><span class="lineno"> 1327</span>&#160;            <span class="keywordtype">bool</span> escaped = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l01328"></a><span class="lineno"> 1328</span>&#160;            <span class="keywordflow">if</span> (low == 0) {</div>
 <div class="line"><a name="l01329"></a><span class="lineno"> 1329</span>&#160;                <span class="keywordflow">if</span> (high != 0) {</div>
-<div class="line"><a name="l01330"></a><span class="lineno"> 1330</span>&#160;                    uint32_t lz = RAPIDJSON_CLZLL(high);</div>
+<div class="line"><a name="l01330"></a><span class="lineno"> 1330</span>&#160;                    uint32_t lz = internal::clzll(high);</div>
 <div class="line"><a name="l01331"></a><span class="lineno"> 1331</span>&#160;                    length = 8 + (lz &gt;&gt; 3);</div>
 <div class="line"><a name="l01332"></a><span class="lineno"> 1332</span>&#160;                    escaped = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l01333"></a><span class="lineno"> 1333</span>&#160;                }</div>
 <div class="line"><a name="l01334"></a><span class="lineno"> 1334</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l01335"></a><span class="lineno"> 1335</span>&#160;                uint32_t lz = RAPIDJSON_CLZLL(low);</div>
+<div class="line"><a name="l01335"></a><span class="lineno"> 1335</span>&#160;                uint32_t lz = internal::clzll(low);</div>
 <div class="line"><a name="l01336"></a><span class="lineno"> 1336</span>&#160;                length = lz &gt;&gt; 3;</div>
 <div class="line"><a name="l01337"></a><span class="lineno"> 1337</span>&#160;                escaped = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l01338"></a><span class="lineno"> 1338</span>&#160;            }</div>
@@ -1471,12 +1471,12 @@ $(document).ready(function(){initNavTree('reader_8h_source.html','');});
 <div class="line"><a name="l01381"></a><span class="lineno"> 1381</span>&#160; </div>
 <div class="line"><a name="l01382"></a><span class="lineno"> 1382</span>&#160;            <span class="keywordflow">if</span> (low == 0) {</div>
 <div class="line"><a name="l01383"></a><span class="lineno"> 1383</span>&#160;                <span class="keywordflow">if</span> (high != 0) {</div>
-<div class="line"><a name="l01384"></a><span class="lineno"> 1384</span>&#160;                    uint32_t lz = RAPIDJSON_CLZLL(high);</div>
+<div class="line"><a name="l01384"></a><span class="lineno"> 1384</span>&#160;                    uint32_t lz = internal::clzll(high);</div>
 <div class="line"><a name="l01385"></a><span class="lineno"> 1385</span>&#160;                    p += 8 + (lz &gt;&gt; 3);</div>
 <div class="line"><a name="l01386"></a><span class="lineno"> 1386</span>&#160;                    <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l01387"></a><span class="lineno"> 1387</span>&#160;                }</div>
 <div class="line"><a name="l01388"></a><span class="lineno"> 1388</span>&#160;            } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l01389"></a><span class="lineno"> 1389</span>&#160;                uint32_t lz = RAPIDJSON_CLZLL(low);</div>
+<div class="line"><a name="l01389"></a><span class="lineno"> 1389</span>&#160;                uint32_t lz = internal::clzll(low);</div>
 <div class="line"><a name="l01390"></a><span class="lineno"> 1390</span>&#160;                p += lz &gt;&gt; 3;</div>
 <div class="line"><a name="l01391"></a><span class="lineno"> 1391</span>&#160;                <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l01392"></a><span class="lineno"> 1392</span>&#160;            }</div>
