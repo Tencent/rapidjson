@@ -5,8 +5,8 @@
 		<DisplayString Condition="(data_.f.flags &amp; kTypeMask) == kNullType">null</DisplayString>
 		<DisplayString Condition="data_.f.flags == kTrueFlag">true</DisplayString>
 		<DisplayString Condition="data_.f.flags == kFalseFlag">false</DisplayString>
-		<DisplayString Condition="data_.f.flags == kShortStringFlag">{data_.ss.str}</DisplayString>
-		<DisplayString Condition="(data_.f.flags &amp; kTypeMask) == kStringType">{(const char*)((size_t)data_.s.str &amp; 0x0000FFFFFFFFFFFF)}</DisplayString>
+		<DisplayString Condition="data_.f.flags == kShortStringFlag">{(const Ch*)data_.ss.str,na}</DisplayString>
+		<DisplayString Condition="(data_.f.flags &amp; kTypeMask) == kStringType">{(const Ch*)((size_t)data_.s.str &amp; 0x0000FFFFFFFFFFFF),na}</DisplayString>
 		<DisplayString Condition="(data_.f.flags &amp; kNumberIntFlag) == kNumberIntFlag">{data_.n.i.i}</DisplayString>
 		<DisplayString Condition="(data_.f.flags &amp; kNumberUintFlag) == kNumberUintFlag">{data_.n.u.u}</DisplayString>
 		<DisplayString Condition="(data_.f.flags &amp; kNumberInt64Flag) == kNumberInt64Flag">{data_.n.i64}</DisplayString>
