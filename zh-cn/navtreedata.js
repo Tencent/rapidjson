@@ -234,7 +234,7 @@ var NAVTREE =
       [ "Unicode", "md_doc_faq_8zh-cn.html#autotoc_md68", null ],
       [ "流", "md_doc_faq_8zh-cn.html#autotoc_md69", null ],
       [ "性能", "md_doc_faq_8zh-cn.html#autotoc_md70", null ],
-      [ "八挂", "md_doc_faq_8zh-cn.html#autotoc_md71", null ]
+      [ "八卦", "md_doc_faq_8zh-cn.html#autotoc_md71", null ]
     ] ],
     [ "模块", "modules.html", "modules" ],
     [ "命名空间成员", "namespacemembers.html", [
