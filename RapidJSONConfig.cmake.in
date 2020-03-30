@@ -20,6 +20,10 @@ if (NOT RapidJSON_FIND_QUIETLY)
   message(STATUS "RapidJSON found. Headers: ${RapidJSON_INCLUDE_DIRS}")
 endif ()
 
+unset(RapidJSON_SOURCE_DIR)
+unset(RapidJSON_DIR)
+unset(RapidJSON_CMAKE_DIR)
+
 if(NOT TARGET RapidJSON::RapidJSON)
   add_library(RapidJSON::RapidJSON INTERFACE IMPORTED)
   set_property(TARGET RapidJSON::RapidJSON PROPERTY
