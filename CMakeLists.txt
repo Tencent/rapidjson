@@ -210,10 +210,6 @@ install(DIRECTORY example/
 # Provide config and version files to be used by other applications
 # ===============================
 
-################################################################################
-# Export package for use from the build tree
-EXPORT( PACKAGE ${PROJECT_NAME} )
-
 # Create the RapidJSONConfig.cmake file for other cmake projects.
 # ... for the build tree
 SET( CONFIG_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
