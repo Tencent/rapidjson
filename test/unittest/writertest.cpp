@@ -88,7 +88,7 @@ TEST(Writer, Uint64) {
 TEST(Writer, String) {
     TEST_ROUNDTRIP("[\"Hello\"]");
     TEST_ROUNDTRIP("[\"Hello\\u0000World\"]");
-    TEST_ROUNDTRIP("[\"\\\"\\\\/\\b\\f\\n\\r\\t\"]");
+    TEST_ROUNDTRIP("[\"\\\"\\\\\\/\\b\\f\\n\\r\\t\"]");
 
 #if RAPIDJSON_HAS_STDSTRING
     {
