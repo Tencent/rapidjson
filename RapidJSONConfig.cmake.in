@@ -1,4 +1,8 @@
 ################################################################################
+# CMake minimum version required
+cmake_minimum_required(VERSION 3.0)
+
+################################################################################
 # RapidJSON source dir
 set( RapidJSON_SOURCE_DIR "@CONFIG_SOURCE_DIR@")
 
