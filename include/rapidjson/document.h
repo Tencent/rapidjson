@@ -113,7 +113,7 @@ template <typename Encoding, typename Allocator>
 class GenericMember {
 public:
     // Allow default construction as it is needed during copying.
-    GenericMember() = default;
+    GenericMember() {}
 
     GenericValue<Encoding, Allocator> name;     //!< name of member (must be a string)
     GenericValue<Encoding, Allocator> value;    //!< value of member.
