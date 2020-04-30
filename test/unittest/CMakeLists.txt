@@ -78,10 +78,12 @@ add_test(NAME unittest
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 if(NOT MSVC)
-    # Not running SIMD.* unit test cases for Valgrind
-    add_test(NAME valgrind_unittest
-        COMMAND valgrind --suppressions=${CMAKE_SOURCE_DIR}/test/valgrind.supp --leak-check=full --error-exitcode=1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest --gtest_filter=-SIMD.*
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+    if(NOT APPLE)
+        # Not running SIMD.* unit test cases for Valgrind
+        add_test(NAME valgrind_unittest
+            COMMAND valgrind --suppressions=${CMAKE_SOURCE_DIR}/test/valgrind.supp --leak-check=full --error-exitcode=1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest --gtest_filter=-SIMD.*
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../bin)
+    endif()
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_test(NAME symbol_check
