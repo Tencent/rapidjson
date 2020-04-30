@@ -25,8 +25,10 @@
 #include <new>      // placement new
 #include <limits>
 
+#ifdef __has_include
 #if __has_include(<compare>)
 #include <compare>
+#endif
 #endif
 
 RAPIDJSON_DIAG_PUSH
