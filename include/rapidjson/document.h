@@ -24,7 +24,8 @@
 #include "encodedstream.h"
 #include <new>      // placement new
 #include <limits>
-#ifdef __cpp_lib_three_way_comparison
+
+#if __has_include(<compare>)
 #include <compare>
 #endif
 
@@ -250,15 +251,15 @@ public:
 
     //! @name relations
     //@{
-    template <bool Const_> bool operator==(const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ == that.ptr_; }
-    template <bool Const_> bool operator!=(const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ != that.ptr_; }
-    template <bool Const_> bool operator<=(const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ <= that.ptr_; }
-    template <bool Const_> bool operator>=(const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ >= that.ptr_; }
-    template <bool Const_> bool operator< (const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ < that.ptr_; }
-    template <bool Const_> bool operator> (const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ > that.ptr_; }
-
 #ifdef __cpp_lib_three_way_comparison
-    template <bool Const_> std::strong_ordering operator<=>(const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ <=> that.ptr_; }
+    friend auto operator<=>(Iterator, Iterator) = default;
+#else
+    bool operator==(ConstIterator that) const { return ptr_ == that.ptr_; }
+    bool operator!=(ConstIterator that) const { return ptr_ != that.ptr_; }
+    bool operator<=(ConstIterator that) const { return ptr_ <= that.ptr_; }
+    bool operator>=(ConstIterator that) const { return ptr_ >= that.ptr_; }
+    bool operator< (ConstIterator that) const { return ptr_ < that.ptr_; }
+    bool operator> (ConstIterator that) const { return ptr_ > that.ptr_; }
 #endif
     //@}
 
