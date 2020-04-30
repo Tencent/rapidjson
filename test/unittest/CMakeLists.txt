@@ -75,7 +75,7 @@ add_dependencies(tests unittest)
 
 add_test(NAME unittest
     COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../bin)
 
 if(NOT MSVC)
     # Not running SIMD.* unit test cases for Valgrind
