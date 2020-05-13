@@ -605,6 +605,7 @@ public:
     /*!
      */
     void IterativeParseInit() {
+        ClearStack();
         parseResult_.Clear();
         state_ = IterativeParsingStartState;
     }
