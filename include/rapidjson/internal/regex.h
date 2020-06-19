@@ -78,7 +78,7 @@ static const SizeType kRegexInvalidState = ~SizeType(0);  //!< Represents an inv
 static const SizeType kRegexInvalidRange = ~SizeType(0);
 
 template <typename Encoding, typename Allocator>
-class GenericRegexSearch;
+class [[deprecated("missing handling of memory allocation errors")]] GenericRegexSearch;
 
 //! Regular expression engine with subset of ECMAscript grammar.
 /*!

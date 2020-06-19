@@ -930,13 +930,18 @@ private:
 
         StackStream(internal::Stack<StackAllocator>& stack) : stack_(stack), length_(0) {}
         RAPIDJSON_FORCEINLINE void Put(Ch c) {
-            *stack_.template Push<Ch>() = c;
-            ++length_;
+            auto ptr = stack_.template Push<Ch>();
+            if (ptr) {
+                *ptr = c;
+                ++length_;
+            }
         }
 
         RAPIDJSON_FORCEINLINE void* Push(SizeType count) {
-            length_ += count;
-            return stack_.template Push<Ch>(count);
+            auto ptr = stack_.template Push<Ch>(count);
+            if (ptr)
+                length_ += count;
+            return ptr;
         }
 
         size_t Length() const { return length_; }
@@ -976,9 +981,13 @@ private:
             StackStream<typename TargetEncoding::Ch> stackStream(stack_);
             ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
-            SizeType length = static_cast<SizeType>(stackStream.Length()) - 1;
-            const typename TargetEncoding::Ch* const str = stackStream.Pop();
-            success = (isKey ? handler.Key(str, length, true) : handler.String(str, length, true));
+            if (stackStream.Length()) {
+                SizeType length = static_cast<SizeType>(stackStream.Length()) - 1;
+                const typename TargetEncoding::Ch *const str = stackStream.Pop();
+                success = (isKey ? handler.Key(str, length, true) : handler.String(str, length, true));
+            }
+            else
+                success = false;
         }
         if (RAPIDJSON_UNLIKELY(!success))
             RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());

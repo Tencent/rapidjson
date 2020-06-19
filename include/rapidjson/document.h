@@ -622,7 +622,7 @@ public:
         \see CopyFrom()
     */
     template <typename SourceAllocator>
-    GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator, bool copyConstStrings = false) {
+    [[deprecated("missing handling of memory allocation errors")]] GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator, bool copyConstStrings = false) {
         switch (rhs.GetType()) {
         case kObjectType: {
                 SizeType count = rhs.data_.o.size;
@@ -1245,13 +1245,20 @@ public:
         ObjectData& o = data_.o;
         if (o.size >= o.capacity) {
             if (o.capacity == 0) {
+                auto ptr = reinterpret_cast<Member*>(allocator.Malloc(kDefaultObjectCapacity * sizeof(Member)));
+                if (!ptr)
+                    return *this;
                 o.capacity = kDefaultObjectCapacity;
-                SetMembersPointer(reinterpret_cast<Member*>(allocator.Malloc(o.capacity * sizeof(Member))));
+                SetMembersPointer(ptr);
             }
             else {
                 SizeType oldCapacity = o.capacity;
-                o.capacity += (oldCapacity + 1) / 2; // grow by factor 1.5
-                SetMembersPointer(reinterpret_cast<Member*>(allocator.Realloc(GetMembersPointer(), oldCapacity * sizeof(Member), o.capacity * sizeof(Member))));
+                SizeType newCapacity = o.capacity + (oldCapacity + 1) / 2; // grow by factor 1.5
+                auto ptr = reinterpret_cast<Member*>(allocator.Realloc(GetMembersPointer(), oldCapacity * sizeof(Member), newCapacity * sizeof(Member)));
+                if (!ptr)
+                    return *this;
+                o.capacity = newCapacity;
+                SetMembersPointer(ptr);
             }
         }
         Member* members = GetMembersPointer();
@@ -1999,7 +2006,10 @@ private:
         if (count) {
             GenericValue* e = static_cast<GenericValue*>(allocator.Malloc(count * sizeof(GenericValue)));
             SetElementsPointer(e);
-            std::memcpy(e, values, count * sizeof(GenericValue));
+            if (e)
+                std::memcpy(e, values, count * sizeof(GenericValue));
+            else
+                count = 0;
         }
         else
             SetElementsPointer(0);
@@ -2012,7 +2022,10 @@ private:
         if (count) {
             Member* m = static_cast<Member*>(allocator.Malloc(count * sizeof(Member)));
             SetMembersPointer(m);
-            std::memcpy(m, members, count * sizeof(Member));
+            if (m)
+                std::memcpy(m, members, count * sizeof(Member));
+            else
+                count = 0;
         }
         else
             SetMembersPointer(0);
@@ -2039,8 +2052,10 @@ private:
             str = static_cast<Ch *>(allocator.Malloc((s.length + 1) * sizeof(Ch)));
             SetStringPointer(str);
         }
-        std::memcpy(str, s, s.length * sizeof(Ch));
-        str[s.length] = '\0';
+        if (str) {
+            std::memcpy(str, s, s.length * sizeof(Ch));
+            str[s.length] = '\0';
+        }
     }
 
     //! Assignment without calling destructor
@@ -2397,37 +2412,58 @@ private:
 
 public:
     // Implementation of Handler
-    bool Null() { new (stack_.template Push<ValueType>()) ValueType(); return true; }
-    bool Bool(bool b) { new (stack_.template Push<ValueType>()) ValueType(b); return true; }
-    bool Int(int i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
-    bool Uint(unsigned i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
-    bool Int64(int64_t i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
-    bool Uint64(uint64_t i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
-    bool Double(double d) { new (stack_.template Push<ValueType>()) ValueType(d); return true; }
+    bool Null() { auto ptr = stack_.template Push<ValueType>(); if (!ptr) return false; new (ptr) ValueType(); return true; }
+    bool Bool(bool b) { auto ptr = stack_.template Push<ValueType>(); if (!ptr) return false; new (ptr) ValueType(b); return true; }
+    bool Int(int i) { auto ptr = stack_.template Push<ValueType>(); if (!ptr) return false; new (ptr) ValueType(i); return true; }
+    bool Uint(unsigned i) { auto ptr = stack_.template Push<ValueType>(); if (!ptr) return false; new (ptr) ValueType(i); return true; }
+    bool Int64(int64_t i) { auto ptr = stack_.template Push<ValueType>(); if (!ptr) return false; new (ptr) ValueType(i); return true; }
+    bool Uint64(uint64_t i) { auto ptr = stack_.template Push<ValueType>(); if (!ptr) return false; new (ptr) ValueType(i); return true; }
+    bool Double(double d) { auto ptr = stack_.template Push<ValueType>(); if (!ptr) return false; new (ptr) ValueType(d); return true; }
 
     bool RawNumber(const Ch* str, SizeType length, bool copy) { 
-        if (copy) 
-            new (stack_.template Push<ValueType>()) ValueType(str, length, GetAllocator());
+        auto ptr = stack_.template Push<ValueType>();
+        if (!ptr)
+            return false;
+        if (copy) {
+            auto tptr = new (ptr) ValueType(str, length, GetAllocator());
+            if (tptr->data_.f.flags == ValueType::kCopyStringFlag && !RAPIDJSON_GETPOINTER(GenericValue::Ch, tptr->data_.s.str))
+                return false;
+        }
         else
-            new (stack_.template Push<ValueType>()) ValueType(str, length);
+            new (ptr) ValueType(str, length);
         return true;
     }
 
     bool String(const Ch* str, SizeType length, bool copy) { 
-        if (copy) 
-            new (stack_.template Push<ValueType>()) ValueType(str, length, GetAllocator());
+        auto ptr = stack_.template Push<ValueType>();
+        if (!ptr)
+            return false;
+        if (copy) {
+            auto tptr = new (ptr) ValueType(str, length, GetAllocator());
+            if (tptr->data_.f.flags == ValueType::kCopyStringFlag && !RAPIDJSON_GETPOINTER(GenericValue::Ch, tptr->data_.s.str))
+              return false;
+        }
         else
-            new (stack_.template Push<ValueType>()) ValueType(str, length);
+            new (ptr) ValueType(str, length);
         return true;
     }
 
-    bool StartObject() { new (stack_.template Push<ValueType>()) ValueType(kObjectType); return true; }
+    bool StartObject() {
+        auto ptr = stack_.template Push<ValueType>();
+        if (!ptr)
+            return false;
+        new (ptr) ValueType(kObjectType);
+        return true;
+    }
     
     bool Key(const Ch* str, SizeType length, bool copy) { return String(str, length, copy); }
 
     bool EndObject(SizeType memberCount) {
         typename ValueType::Member* members = stack_.template Pop<typename ValueType::Member>(memberCount);
-        stack_.template Top<ValueType>()->SetObjectRaw(members, memberCount, GetAllocator());
+        auto ptr = stack_.template Top<ValueType>();
+        ptr->SetObjectRaw(members, memberCount, GetAllocator());
+        if (memberCount && !RAPIDJSON_GETPOINTER(Member, ptr->data_.o.members))
+            return false;
         return true;
     }
 
@@ -2435,7 +2471,10 @@ public:
     
     bool EndArray(SizeType elementCount) {
         ValueType* elements = stack_.template Pop<ValueType>(elementCount);
-        stack_.template Top<ValueType>()->SetArrayRaw(elements, elementCount, GetAllocator());
+        auto ptr = stack_.template Top<ValueType>();
+        ptr->SetArrayRaw(elements, elementCount, GetAllocator());
+        if (elementCount && !RAPIDJSON_GETPOINTER(GenericValue, ptr->data_.a.elements))
+            return false;
         return true;
     }
 

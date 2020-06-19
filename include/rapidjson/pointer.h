@@ -42,7 +42,8 @@ enum PointerParseErrorCode {
     kPointerParseErrorTokenMustBeginWithSolidus,    //!< A token must begin with a '/'
     kPointerParseErrorInvalidEscape,                //!< Invalid escape
     kPointerParseErrorInvalidPercentEncoding,       //!< Invalid percent encoding in URI fragment
-    kPointerParseErrorCharacterMustPercentEncode    //!< A character must percent encoded in URI fragment
+    kPointerParseErrorCharacterMustPercentEncode,   //!< A character must percent encoded in URI fragment
+    kPointerParseErrorMemoryAllocationFailure
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -398,7 +399,7 @@ public:
         \param alreadyExist If non-null, it stores whether the resolved value is already exist.
         \return The resolved newly created (a JSON Null value), or already exists value.
     */
-    ValueType& Create(ValueType& root, typename ValueType::AllocatorType& allocator, bool* alreadyExist = 0) const {
+    [[deprecated("missing handling of memory allocation errors")]] ValueType& Create(ValueType& root, typename ValueType::AllocatorType& allocator, bool* alreadyExist = 0) const {
         RAPIDJSON_ASSERT(IsValid());
         ValueType* v = &root;
         bool exist = true;
@@ -756,7 +757,7 @@ private:
         \param extraNameBufferSize Extra name buffer size (in number of Ch) to be allocated.
         \return Start of non-occupied name buffer, for storing extra names.
     */
-    Ch* CopyFromRaw(const GenericPointer& rhs, size_t extraToken = 0, size_t extraNameBufferSize = 0) {
+    [[deprecated("missing handling of memory allocation errors")]] Ch* CopyFromRaw(const GenericPointer& rhs, size_t extraToken = 0, size_t extraNameBufferSize = 0) {
         if (!allocator_) // allocator is independently owned.
             ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
 
@@ -809,17 +810,24 @@ private:
             ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
 
         // Count number of '/' as tokenCount
-        tokenCount_ = 0;
+        size_t tokenCount = 0;
         for (const Ch* s = source; s != source + length; s++) 
             if (*s == '/')
-                tokenCount_++;
+                tokenCount++;
 
-        Token* token = tokens_ = static_cast<Token *>(allocator_->Malloc(tokenCount_ * sizeof(Token) + length * sizeof(Ch)));
-        Ch* name = nameBuffer_ = reinterpret_cast<Ch *>(tokens_ + tokenCount_);
+        Ch* name = nullptr;
         size_t i = 0;
+        bool uriFragment = false;
+
+        Token* token = tokens_ = static_cast<Token *>(allocator_->Malloc(tokenCount * sizeof(Token) + length * sizeof(Ch)));
+        if (!tokens_) {
+            parseErrorCode_ = kPointerParseErrorMemoryAllocationFailure;
+            goto error;
+        }
+        tokenCount_ = tokenCount;
+        name = nameBuffer_ = reinterpret_cast<Ch *>(tokens_ + tokenCount_);
 
         // Detect if it is a URI fragment
-        bool uriFragment = false;
         if (source[i] == '#') {
             uriFragment = true;
             i++;

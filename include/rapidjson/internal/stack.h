@@ -37,7 +37,7 @@ class Stack {
 public:
     // Optimization note: Do not allocate memory for stack_ in constructor.
     // Do it lazily when first Push() -> Expand() -> Resize().
-    Stack(Allocator* allocator, size_t stackCapacity) : allocator_(allocator), ownAllocator_(0), stack_(0), stackTop_(0), stackEnd_(0), initialCapacity_(stackCapacity) {
+    Stack(Allocator* allocator, size_t stackCapacity) : allocator_(allocator), ownAllocator_(0), stack_(0), stackTop_(0), stackEnd_(0), initialCapacity_(stackCapacity), allocationError_(false) {
     }
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
@@ -47,7 +47,8 @@ public:
           stack_(rhs.stack_),
           stackTop_(rhs.stackTop_),
           stackEnd_(rhs.stackEnd_),
-          initialCapacity_(rhs.initialCapacity_)
+          initialCapacity_(rhs.initialCapacity_),
+          allocationError_(rhs.allocationError_)
     {
         rhs.allocator_ = 0;
         rhs.ownAllocator_ = 0;
@@ -55,6 +56,7 @@ public:
         rhs.stackTop_ = 0;
         rhs.stackEnd_ = 0;
         rhs.initialCapacity_ = 0;
+        rhs.allocationError_ = false;
     }
 #endif
 
@@ -74,6 +76,7 @@ public:
             stackTop_ = rhs.stackTop_;
             stackEnd_ = rhs.stackEnd_;
             initialCapacity_ = rhs.initialCapacity_;
+            allocationError_ = rhs.allocationError_;
 
             rhs.allocator_ = 0;
             rhs.ownAllocator_ = 0;
@@ -81,6 +84,7 @@ public:
             rhs.stackTop_ = 0;
             rhs.stackEnd_ = 0;
             rhs.initialCapacity_ = 0;
+            rhs.allocationError_ = 0;
         }
         return *this;
     }
@@ -93,6 +97,7 @@ public:
         internal::Swap(stackTop_, rhs.stackTop_);
         internal::Swap(stackEnd_, rhs.stackEnd_);
         internal::Swap(initialCapacity_, rhs.initialCapacity_);
+        internal::Swap(allocationError_, rhs.allocationError_);
     }
 
     void Clear() { stackTop_ = stack_; }
@@ -121,6 +126,8 @@ public:
     template<typename T>
     RAPIDJSON_FORCEINLINE T* Push(size_t count = 1) {
         Reserve<T>(count);
+        if (allocationError_)
+            return nullptr;
         return PushUnsafe<T>(count);
     }
 
@@ -129,7 +136,8 @@ public:
         RAPIDJSON_ASSERT(stackTop_);
         RAPIDJSON_ASSERT(stackTop_ + sizeof(T) * count <= stackEnd_);
         T* ret = reinterpret_cast<T*>(stackTop_);
-        stackTop_ += sizeof(T) * count;
+        if (stackTop_)
+            stackTop_ += sizeof(T) * count;
         return ret;
     }
 
@@ -199,9 +207,15 @@ private:
 
     void Resize(size_t newCapacity) {
         const size_t size = GetSize();  // Backup the current size
-        stack_ = static_cast<char*>(allocator_->Realloc(stack_, GetCapacity(), newCapacity));
-        stackTop_ = stack_ + size;
-        stackEnd_ = stack_ + newCapacity;
+        char* newStack = static_cast<char*>(allocator_->Realloc(stack_, GetCapacity(), newCapacity));
+        if (newStack) {
+            stack_ = newStack;
+            stackTop_ = stack_ + size;
+            stackEnd_ = stack_ + newCapacity;
+        }
+        else {
+            allocationError_ = true;
+        }
     }
 
     void Destroy() {
@@ -219,6 +233,7 @@ private:
     char *stackTop_;
     char *stackEnd_;
     size_t initialCapacity_;
+    bool allocationError_;
 };
 
 } // namespace internal

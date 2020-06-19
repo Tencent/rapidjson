@@ -125,12 +125,12 @@ RAPIDJSON_MULTILINEMACRO_END
 // Forward declarations
 
 template <typename ValueType, typename Allocator>
-class GenericSchemaDocument;
+class [[deprecated("missing handling of memory allocation errors")]] GenericSchemaDocument;
 
 namespace internal {
 
 template <typename SchemaDocumentType>
-class Schema;
+class [[deprecated("missing handling of memory allocation errors")]] Schema;
 
 ///////////////////////////////////////////////////////////////////////////////
 // ISchemaValidator
