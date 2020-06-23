@@ -57,7 +57,7 @@ int main(int, char*[]) {
     printf("n = %s\n", document["n"].IsNull() ? "null" : "?");
 
     assert(document["i"].IsNumber());   // Number is a JSON type, but C++ needs more specific type.
-    assert(document["i"].IsInt());      // In this case, IsUint()/IsInt64()/IsUInt64() also return true.
+    assert(document["i"].IsInt());      // In this case, IsUint()/IsInt64()/IsUint64() also return true.
     printf("i = %d\n", document["i"].GetInt()); // Alternative (int)document["i"]
 
     assert(document["pi"].IsNumber());
