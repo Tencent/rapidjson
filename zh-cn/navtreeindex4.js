@@ -1,5 +1,8 @@
 var NAVTREEINDEX4 =
 {
+"regex_8h_source.html":[15,0,0,0,1,8],
+"schema_8h_source.html":[15,0,0,0,18],
+"stack_8h_source.html":[15,0,0,0,1,9],
 "stream_8h_source.html":[15,0,0,0,19],
 "strfunc_8h_source.html":[15,0,0,0,1,10],
 "stringbuffer_8h_source.html":[15,0,0,0,20],
