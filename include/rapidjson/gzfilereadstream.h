@@ -12,8 +12,8 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-#ifndef RAPIDJSON_FILEREADSTREAM_H_
-#define RAPIDJSON_FILEREADSTREAM_H_
+#ifndef RAPIDJSON_GZFILEREADSTREAM_H_
+#define RAPIDJSON_GZFILEREADSTREAM_H_
 
 #include "stream.h"
 #include <zlib.h>
@@ -96,4 +96,4 @@ RAPIDJSON_NAMESPACE_END
 RAPIDJSON_DIAG_POP
 #endif
 
-#endif // RAPIDJSON_FILESTREAM_H_
+#endif // RAPIDJSON_GZFILESTREAM_H_
