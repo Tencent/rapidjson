@@ -37,7 +37,7 @@ public:
 
     //! Constructor.
     /*!
-        \param fp File pointer opened for read.
+        \param fp gzFile_s pointer opened for read.
         \param buffer user-supplied buffer.
         \param bufferSize size of buffer in bytes. Must >=4 bytes.
     */
