@@ -27,7 +27,7 @@ RAPIDJSON_DIAG_OFF(missing-noreturn)
 
 RAPIDJSON_NAMESPACE_BEGIN
 
-//! File byte stream for input using fread().
+//! gzFile byte stream for input using gzread() from zlib.h.
 /*!
     \note implements Stream concept
 */
