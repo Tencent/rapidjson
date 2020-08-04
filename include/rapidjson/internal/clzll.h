@@ -17,7 +17,7 @@
 
 #include "../rapidjson.h"
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(UNDER_CE)
 #include <intrin.h>
 #if defined(_WIN64)
 #pragma intrinsic(_BitScanReverse64)
@@ -38,6 +38,27 @@ inline uint32_t clzll(uint64_t x) {
     unsigned long r = 0;
 #if defined(_WIN64)
     _BitScanReverse64(&r, x);
+#elif defined(UNDER_CE)
+	// Scan the high 32 bits.
+	uint32_t high = static_cast<uint32_t>(x >> 32);
+	if (high != 0)
+	{
+		unsigned long index = 31;
+		while((high & (1U<<index)) == 0)
+		{
+			--index;
+		}
+		return index;
+	}
+	
+	// Scan the low 32 bits.
+	uint32_t low =static_cast<uint32_t>(x & 0xFFFFFFFF);
+	unsigned long index = 31;
+	while((low & (1U<<index)) == 0)
+	{
+		--index;
+	}
+	return index;
 #else
     // Scan the high 32 bits.
     if (_BitScanReverse(&r, static_cast<uint32_t>(x >> 32)))
