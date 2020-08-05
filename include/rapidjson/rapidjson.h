@@ -640,6 +640,22 @@ RAPIDJSON_NAMESPACE_END
 #endif // RAPIDJSON_NOEXCEPT_ASSERT
 
 ///////////////////////////////////////////////////////////////////////////////
+// malloc/realloc/free
+
+#ifndef RAPIDJSON_MALLOC
+///! customization point for global \c malloc
+#define RAPIDJSON_MALLOC(size) std::malloc(size)
+#endif
+#ifndef RAPIDJSON_REALLOC
+///! customization point for global \c realloc
+#define RAPIDJSON_REALLOC(ptr, new_size) std::realloc(ptr, new_size)
+#endif
+#ifndef RAPIDJSON_FREE
+///! customization point for global \c free
+#define RAPIDJSON_FREE(ptr) std::free(ptr)
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // new/delete
 
 #ifndef RAPIDJSON_NEW

@@ -944,6 +944,9 @@ TEST(Reader, ParseString_Error) {
     TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800X\"]", 2u, 8u);
     TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\uD800\\uFFFF\"]", 2u, 14u);
 
+    // Single low surrogate pair in string is invalid.
+    TEST_STRING_ERROR(kParseErrorStringUnicodeSurrogateInvalid, "[\"\\udc4d\"]", 2u, 8u);
+
     // Missing a closing quotation mark in string.
     TEST_STRING_ERROR(kParseErrorStringMissQuotationMark, "[\"Test]", 7u, 7u);
 
