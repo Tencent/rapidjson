@@ -53,10 +53,10 @@ inline uint32_t clzll(uint64_t x) {
     return static_cast<uint32_t>(__builtin_clzll(x));
 #else
     // naive version
-    uint32_t r = 63;
+    uint32_t r = 0;
     while (!(x & (static_cast<uint64_t>(1) << 63))) {
         x <<= 1;
-        --r;
+        ++r;
     }
 
     return r;
