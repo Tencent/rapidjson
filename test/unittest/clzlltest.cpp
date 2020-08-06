@@ -22,11 +22,11 @@ RAPIDJSON_DIAG_PUSH
 using namespace rapidjson::internal;
 
 TEST(clzll, normal) {
-    EXPECT_EQ(clzll(1), 0U);
-    EXPECT_EQ(clzll(2), 1U);
-    EXPECT_EQ(clzll(12), 3U);
-    EXPECT_EQ(clzll(0x0000000080000001UL), 31U);
-    EXPECT_EQ(clzll(0x8000000000000001UL), 63U);
+    EXPECT_EQ(clzll(1), 63U);
+    EXPECT_EQ(clzll(2), 62U);
+    EXPECT_EQ(clzll(12), 60U);
+    EXPECT_EQ(clzll(0x0000000080000001UL), 32U);
+    EXPECT_EQ(clzll(0x8000000000000001UL), 0U);
 }
 
 #ifdef __GNUC__
