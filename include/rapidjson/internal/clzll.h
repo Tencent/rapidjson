@@ -17,7 +17,7 @@
 
 #include "../rapidjson.h"
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(UNDER_CE)
 #include <intrin.h>
 #if defined(_WIN64)
 #pragma intrinsic(_BitScanReverse64)
@@ -34,7 +34,7 @@ inline uint32_t clzll(uint64_t x) {
     // infinite loop in the software implementation.
     RAPIDJSON_ASSERT(x != 0);
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(UNDER_CE)
     unsigned long r = 0;
 #if defined(_WIN64)
     _BitScanReverse64(&r, x);
@@ -53,7 +53,7 @@ inline uint32_t clzll(uint64_t x) {
     return static_cast<uint32_t>(__builtin_clzll(x));
 #else
     // naive version
-    uint32_t r;
+    uint32_t r = 0;
     while (!(x & (static_cast<uint64_t>(1) << 63))) {
         x <<= 1;
         ++r;
