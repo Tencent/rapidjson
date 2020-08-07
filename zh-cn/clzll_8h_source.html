@@ -107,7 +107,7 @@ $(document).ready(function(){initNavTree('clzll_8h_source.html','');});
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor">#include &quot;../rapidjson.h&quot;</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#if defined(_MSC_VER)</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#if defined(_MSC_VER) &amp;&amp; !defined(UNDER_CE)</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;intrin.h&gt;</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#if defined(_WIN64)</span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#pragma intrinsic(_BitScanReverse64)</span></div>
@@ -124,7 +124,7 @@ $(document).ready(function(){initNavTree('clzll_8h_source.html','');});
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="comment">// infinite loop in the software implementation.</span></div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gabeba18d612187bad2ac62aed9276d47c">RAPIDJSON_ASSERT</a>(x != 0);</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#if defined(_MSC_VER)</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#if defined(_MSC_VER) &amp;&amp; !defined(UNDER_CE)</span></div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> r = 0;</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">#if defined(_WIN64)</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    _BitScanReverse64(&amp;r, x);</div>
@@ -143,7 +143,7 @@ $(document).ready(function(){initNavTree('clzll_8h_source.html','');});
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordflow">return</span> static_cast&lt;uint32_t&gt;(__builtin_clzll(x));</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#else</span></div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="comment">// naive version</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    uint32_t r;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    uint32_t r = 0;</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keywordflow">while</span> (!(x &amp; (static_cast&lt;uint64_t&gt;(1) &lt;&lt; 63))) {</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        x &lt;&lt;= 1;</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        ++r;</div>
