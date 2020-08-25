@@ -1,0 +1,31 @@
+version: '0.0.{build}'
+
+init:
+  - ps: >-
+      if($env:appveyor_repo_tag -eq 'True') {
+        Update-AppveyorBuild -Version "$($env:APPVEYOR_REPO_TAG_NAME.TrimStart("v"))"
+      }
+
+environment:
+  global:
+    PYTHON: "C:\\Python36"
+    CYG_ROOT: C:\cygwin64
+
+install:
+  - "SET PATH=%PYTHON%;%PYTHON%/Scripts/;%PATH%"
+  - pip.exe install conan
+  - conan user
+  - conan remote add systelab-bintray https://api.bintray.com/conan/systelab/conan
+  - conan --version
+
+build_script:
+  - conan export-pkg conanfile.py rapidjson/%APPVEYOR_BUILD_VERSION%@systelab/stable
+  - conan test test_package/conanfile.py rapidjson/%APPVEYOR_BUILD_VERSION%@systelab/stable
+
+deploy_script:
+  - ps: >- 
+      if($env:appveyor_repo_tag -eq 'True') {
+        conan upload rapidjson/$env:appveyor_build_version@systelab/stable --all -r systelab-bintray --force
+      } else {
+        echo "Not uploading because this is not a tag build"
+      }
