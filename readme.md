@@ -16,9 +16,9 @@ Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights 
 
 ## Build status
 
-| [Linux][lin-link] | [Windows][win-link] | [Coveralls][cov-link] |
-| :---------------: | :-----------------: | :-------------------: |
-| ![lin-badge]      | ![win-badge]        | ![cov-badge]          |
+| [Linux][lin-link] | [Windows][win-link] | [Coveralls][cov-link] | [Conan][con-link] |
+| :---------------: | :-----------------: | :-------------------: | :---------------: |
+| ![lin-badge]      | ![win-badge]        | ![cov-badge]          | ![con-badge]      |
 
 [lin-badge]: https://travis-ci.org/Tencent/rapidjson.svg?branch=master "Travis build status"
 [lin-link]:  https://travis-ci.org/Tencent/rapidjson "Travis build status"
@@ -26,6 +26,8 @@ Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights 
 [win-link]:  https://ci.appveyor.com/project/miloyip/rapidjson-0fdqj/branch/master "AppVeyor build status"
 [cov-badge]: https://coveralls.io/repos/Tencent/rapidjson/badge.svg?branch=master "Coveralls coverage"
 [cov-link]:  https://coveralls.io/r/Tencent/rapidjson?branch=master "Coveralls coverage"
+[con-badge]: https://ci.appveyor.com/api/projects/status/o1k3n56v5jxnu11c?svg=true "Conan build status"
+[con-link]:  https://ci.appveyor.com/project/systelab/rapidjson "Conan build status"
 
 ## Introduction
 
