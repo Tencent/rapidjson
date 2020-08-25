@@ -4,7 +4,6 @@ import os
 
 class RapidjsonConan(ConanFile):
     name = "rapidjson"
-    version = "1.1.0"
     description = "A fast JSON parser/generator for C++ with both SAX/DOM style API"
     homepage = "http://rapidjson.org/"
     url = "https://github.com/systelab/rapidjson"
