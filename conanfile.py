@@ -13,13 +13,14 @@ class RapidjsonConan(ConanFile):
     no_copy_source = True
     _source_subfolder = "source_subfolder"
 
-    def source(self):
-        source_url = self.url
-        tools.get("{0}/archive/v{1}.tar.gz".format(source_url, self.version))
+    def package(self):
+        source_archive_url = "{0}/archive/v{1}.tar.gz".format(self.url, self.version)
+        self.output.info(("Downloading sources from '%s'...") % source_archive_url)
+        tools.get(source_archive_url)
+
         extracted_dir = self.name + "-" + self.version
         os.rename(extracted_dir, self._source_subfolder)
 
-    def package(self):
         include_folder = os.path.join(self._source_subfolder, "include")
         self.copy(pattern="license.txt", dst="licenses", src=self._source_subfolder)
         self.copy(pattern="*", dst="include", src=include_folder)
