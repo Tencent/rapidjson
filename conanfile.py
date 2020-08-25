@@ -14,7 +14,7 @@ class RapidjsonConan(ConanFile):
     _source_subfolder = "source_subfolder"
 
     def source(self):
-        source_url = "https://github.com/Tencent/rapidjson"
+        source_url = self.url
         tools.get("{0}/archive/v{1}.tar.gz".format(source_url, self.version))
         extracted_dir = self.name + "-" + self.version
         os.rename(extracted_dir, self._source_subfolder)
