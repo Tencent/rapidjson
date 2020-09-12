@@ -1,5 +1,5 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
-// 
+//
 // Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
@@ -7,9 +7,9 @@
 //
 // http://opensource.org/licenses/MIT
 //
-// Unless required by applicable law or agreed to in writing, software distributed 
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// Unless required by applicable law or agreed to in writing, software distributed
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
 #ifndef RAPIDJSON_FWD_H_
@@ -46,12 +46,12 @@ class MemoryPoolAllocator;
 template <typename Encoding>
 struct GenericStringStream;
 
-typedef GenericStringStream<UTF8<char> > StringStream;
+typedef GenericStringStream<UTF8<char>> StringStream;
 
 template <typename Encoding>
 struct GenericInsituStringStream;
 
-typedef GenericInsituStringStream<UTF8<char> > InsituStringStream;
+typedef GenericInsituStringStream<UTF8<char>> InsituStringStream;
 
 // stringbuffer.h
 
@@ -101,7 +101,7 @@ class PrettyWriter;
 
 // document.h
 
-template <typename Encoding, typename Allocator> 
+template <typename Encoding, typename Allocator>
 class GenericMember;
 
 template <bool Const, typename Encoding, typename Allocator>
@@ -110,10 +110,10 @@ class GenericMemberIterator;
 template<typename CharType>
 struct GenericStringRef;
 
-template <typename Encoding, typename Allocator> 
+template <typename Encoding, typename Allocator>
 class GenericValue;
 
-typedef GenericValue<UTF8<char>, MemoryPoolAllocator<CrtAllocator> > Value;
+typedef GenericValue<UTF8<char>, MemoryPoolAllocator<CrtAllocator>> Value;
 
 template <typename Encoding, typename Allocator, typename StackAllocator>
 class GenericDocument;
@@ -139,9 +139,9 @@ typedef GenericSchemaDocument<Value, CrtAllocator> SchemaDocument;
 typedef IGenericRemoteSchemaDocumentProvider<SchemaDocument> IRemoteSchemaDocumentProvider;
 
 template <
-    typename SchemaDocumentType,
-    typename OutputHandler,
-    typename StateAllocator>
+  typename SchemaDocumentType,
+  typename OutputHandler,
+  typename StateAllocator >
 class GenericSchemaValidator;
 
 typedef GenericSchemaValidator<SchemaDocument, BaseReaderHandler<UTF8<char>, void>, CrtAllocator> SchemaValidator;
