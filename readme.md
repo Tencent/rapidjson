@@ -6,7 +6,7 @@
 
 Tencent is pleased to support the open source community by making RapidJSON available.
 
-Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 
 * [RapidJSON GitHub](https://github.com/Tencent/rapidjson/)
 * RapidJSON Documentation
@@ -196,7 +196,7 @@ You can copy and paste the license summary from below.
 ```
 Tencent is pleased to support the open source community by making RapidJSON available.
 
-Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 
 Licensed under the MIT License (the "License"); you may not use this file except
 in compliance with the License. You may obtain a copy of the License at
