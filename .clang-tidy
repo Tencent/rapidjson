@@ -1,0 +1,29 @@
+---
+Checks: "-*,\
+boost-*,\
+cert-*,\
+clang-analyzer-*,\
+cppcoreguidelines-*,\
+-cppcoreguidelines-pro-*,\
+-cppcoreguidelines-macro-usage,\
+-cppcoreguidelines-owning-memory,\
+-hicpp-*,\
+misc-*,\
+-misc-no-recursion,\
+-misc-unused-parameters,\
+-misc-non-private-member-variables-in-classes,\
+-modernize-*,\
+-modernize-use-trailing-return-type,\
+performance-*,\
+portability-*,\
+-readability-*,\
+-*magic-numbers,\
+-*avoid-c-arrays,\
+"
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*'
+AnalyzeTemporaryDtors: false
+FormatStyle:     file
+User:            clausklein
+...
+

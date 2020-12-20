@@ -1,0 +1,113 @@
+---
+name: CMake
+
+on: [push]
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Debug
+  CXX: clang++
+  CC: clang
+
+  build:
+
+    # The CMake configure and build commands are platform agnostic and
+    # should work equally well on Windows or Mac.  You can convert this
+    # to a matrix build if you need cross-platform coverage.
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false  # Keep running other jobs even if one fails
+      matrix:
+        # TODO: llvm_version: [10, 11, 12]
+        os: [macos-latest, ubuntu-20.04]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure Ubuntu Host
+        if: startsWith(matrix.os, 'ubuntu')
+        shell: bash
+        run: |
+          sudo apt-get update
+
+          sudo apt-get install \
+            llvm-10 clang-10 libclang-10-dev clang-tidy-10 ||
+              echo IGNORED
+
+          # TODO fmt is not available!
+          sudo apt-get install \
+            libboost-all-dev \
+            googletest \
+            doctest \
+            cereal \
+            ninja-build
+
+      - name: Configure MacOS Host
+        if: startsWith(matrix.os, 'macos')
+        shell: bash
+        run: |
+          # coreutils is for gtimeout
+          # make is for gmake
+          brew install \
+            googletest \
+            coreutils \
+            doctest \
+            cereal \
+            boost \
+            ninja \
+            make \
+            fmt \
+            python
+
+      - name: Create Build Environment
+        shell: bash
+        # Some projects don't allow in-source building, so create a
+        # separate build directory We'll use this as our working
+        # directory for all subsequent commands
+        run: |
+          cmake -E make_directory ${{runner.workspace}}/build &&
+
+      - name: Install builddriver
+        shell: bash
+        run: |
+          pip3 install builddriver
+
+      - name: Configure CMake
+        # Use a bash shell so we can use the same syntax for environment
+        # variable access regardless of the host operating system
+        shell: bash
+        working-directory: ${{runner.workspace}}/build
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G Ninja
+
+      - name: Build
+        working-directory: ${{runner.workspace}}/build
+        shell: bash
+        # Execute the build.
+        run: cmake --build . --config $BUILD_TYPE --target all
+
+      - name: Test
+        working-directory: ${{runner.workspace}}/build
+        shell: bash
+        # Execute tests defined by the CMake configuration.
+        # See https://cmake.org/cmake/help/latest/manual/ctest.1.html
+        run: ctest -C $BUILD_TYPE --timeout 2 || echo IGNORED
+
+      # - name: Clang Analyser Checks
+      #   shell: bash
+      #   run: make all check || echo IGNORED
+
+      - name: Run clang-tidy on MacOS Host
+        if: startsWith(matrix.os, 'macos')
+        shell: bash
+        run: |
+          export PATH=/usr/local/opt/llvm/bin/:${PATH}
+          builddriver /usr/local/opt/llvm/share/clang/run-clang-tidy.py cert-*.cpp ||
+          echo IGNORED
+
+      - name: Run clang-tidy on Ubuntu Host
+        if: startsWith(matrix.os, 'ubuntu')
+        shell: bash
+        run: |
+          /home/runner/.local/bin/builddriver run-clang-tidy-10 cert-*.cpp ||
+          echo IGNORED
