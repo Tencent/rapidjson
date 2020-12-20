@@ -9,6 +9,7 @@ env:
   CXX: clang++
   CC: clang
 
+jobs:
   build:
 
     # The CMake configure and build commands are platform agnostic and
