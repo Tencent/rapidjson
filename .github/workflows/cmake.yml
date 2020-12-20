@@ -66,8 +66,7 @@ jobs:
         # Some projects don't allow in-source building, so create a
         # separate build directory We'll use this as our working
         # directory for all subsequent commands
-        run: |
-          cmake -E make_directory ${{runner.workspace}}/build &&
+        run: cmake -E make_directory ${{runner.workspace}}/build
 
       - name: Install builddriver
         shell: bash
