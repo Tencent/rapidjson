@@ -22,7 +22,7 @@ option(RAPIDJSON_BUILD_DOC "Build rapidjson documentation." OFF)
 option(RAPIDJSON_BUILD_EXAMPLES "Build rapidjson examples." ON)
 option(RAPIDJSON_BUILD_TESTS "Build rapidjson perftests and unittests." ON)
 option(RAPIDJSON_BUILD_THIRDPARTY_GTEST
-    "Use gtest installation in `thirdparty/gtest` by default if available" OFF)
+    "Use gtest installation in `thirdparty/gtest` by default if available" ON)
 
 option(RAPIDJSON_BUILD_CXX17 "Build rapidjson with C++17 (gcc/clang)" ON)
 if(RAPIDJSON_BUILD_CXX17)
