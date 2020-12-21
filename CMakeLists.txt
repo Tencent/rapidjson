@@ -2,13 +2,9 @@ cmake_minimum_required(VERSION 3.13...3.19)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
 
-set(LIB_MAJOR_VERSION "1")
-set(LIB_MINOR_VERSION "1")
-set(LIB_PATCH_VERSION "0")
-set(LIB_VERSION_STRING "${LIB_MAJOR_VERSION}.${LIB_MINOR_VERSION}.${LIB_PATCH_VERSION}")
+include(before_project_setup)   # setup ccache if available ...
 
-include(before_project_setup)
-project(RapidJSON VERSION "${LIB_VERSION_STRING}" LANGUAGES CXX)
+project(RapidJSON VERSION 1.1.0 LANGUAGES CXX)
 
 # compile in release with debug info mode by default
 if(NOT CMAKE_BUILD_TYPE)
@@ -18,15 +14,16 @@ endif()
 # Build all binaries in a separate directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-option(RAPIDJSON_BUILD_DOC "Build rapidjson documentation." OFF)
+option(RAPIDJSON_BUILD_DOC "Build rapidjson documentation." ON)
 option(RAPIDJSON_BUILD_EXAMPLES "Build rapidjson examples." ON)
 option(RAPIDJSON_BUILD_TESTS "Build rapidjson perftests and unittests." ON)
 option(RAPIDJSON_BUILD_THIRDPARTY_GTEST
-    "Use gtest installation in `thirdparty/gtest` by default if available" ON)
+    "Use gtest installation in `thirdparty/gtest` by default if available" OFF)
 
 option(RAPIDJSON_BUILD_CXX17 "Build rapidjson with C++17 (gcc/clang)" ON)
 if(RAPIDJSON_BUILD_CXX17)
     set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_EXTENSIONS OFF)
     set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 endif()
 
@@ -35,6 +32,8 @@ option(RAPIDJSON_BUILD_UBSAN "Build rapidjson with undefined behavior sanitizer 
 
 option(RAPIDJSON_ENABLE_INSTRUMENTATION_OPT "Build rapidjson with -march or -mcpu options" ON)
 
+
+# TODO: why this option! CK
 option(RAPIDJSON_HAS_STDSTRING "" ON)
 if(RAPIDJSON_HAS_STDSTRING)
     add_definitions(-DRAPIDJSON_HAS_STDSTRING)
@@ -100,7 +99,8 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "XL")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -qarch=auto")
 endif()
 
-#add extra search paths for libraries and includes
+
+# add extra search paths for libraries and includes
 set(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The directory the headers are installed in")
 set(LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib" CACHE STRING "Directory where lib will install")
 set(DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}" CACHE PATH "Path to the documentation")
@@ -158,11 +158,13 @@ install(DIRECTORY example/
     PATTERN "Makefile" EXCLUDE
     PATTERN "cmake_install.cmake" EXCLUDE)
 
-# Provide config and version files to be used by other applications
-# ===============================
 
 ################################################################################
+# Provide config and version files to be used by other applications
+################################################################################
 # Export package for use from the build tree
+# TODO: modernice! CK
+# ==========================================
 export(PACKAGE ${PROJECT_NAME})
 
 # Create the RapidJSONConfig.cmake file for other cmake projects.

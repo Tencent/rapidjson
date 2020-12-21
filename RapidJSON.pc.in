@@ -2,6 +2,6 @@ includedir=@INCLUDE_INSTALL_DIR@
 
 Name: @PROJECT_NAME@
 Description: A fast JSON parser/generator for C++ with both SAX/DOM style API
-Version: @LIB_VERSION_STRING@
+Version: @PROJECT_VERSION@
 URL: https://github.com/Tencent/rapidjson
 Cflags: -I${includedir}
