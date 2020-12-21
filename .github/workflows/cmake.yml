@@ -32,11 +32,10 @@ jobs:
         run: |
           sudo apt-get update
 
-          # sudo apt-get install \
-          #   llvm-10 clang-10 libclang-10-dev clang-tidy-10 ||
-          #     echo IGNORED
+          sudo apt-get install \
+            llvm-10 clang-10 libclang-10-dev clang-tidy-10 ||
+              echo IGNORED
 
-          # TODO fmt is not available!
           sudo apt-get install \
             libboost-all-dev \
             googletest \
@@ -48,13 +47,11 @@ jobs:
         shell: bash
         run: |
           # coreutils is for gtimeout
-          # make is for gmake
           brew install \
             googletest \
             coreutils \
             doctest \
             ninja \
-            make \
             python
 
       - name: Create Build Environment
@@ -94,6 +91,7 @@ jobs:
         run: ctest -C $BUILD_TYPE --timeout 60 --output-on-failure ||
           echo IGNORED
 
+      # TODO:
       # - name: Clang Analyser Checks
       #   shell: bash
       #   run: make all check || echo IGNORED
