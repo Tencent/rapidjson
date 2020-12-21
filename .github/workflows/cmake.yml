@@ -32,16 +32,15 @@ jobs:
         run: |
           sudo apt-get update
 
-          sudo apt-get install \
-            llvm-10 clang-10 libclang-10-dev clang-tidy-10 ||
-              echo IGNORED
+          # sudo apt-get install \
+          #   llvm-10 clang-10 libclang-10-dev clang-tidy-10 ||
+          #     echo IGNORED
 
           # TODO fmt is not available!
           sudo apt-get install \
             libboost-all-dev \
             googletest \
             doctest \
-            cereal \
             ninja-build
 
       - name: Configure MacOS Host
@@ -54,11 +53,8 @@ jobs:
             googletest \
             coreutils \
             doctest \
-            cereal \
-            boost \
             ninja \
             make \
-            fmt \
             python
 
       - name: Create Build Environment
@@ -80,7 +76,9 @@ jobs:
         # variable access regardless of the host operating system
         shell: bash
         working-directory: ${{runner.workspace}}/build
-        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G Ninja
+        run: |
+          cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G Ninja
+          cd .. && ln -s build/compile_commands.json .
 
       - name: Build
         working-directory: ${{runner.workspace}}/build
@@ -93,7 +91,8 @@ jobs:
         shell: bash
         # Execute tests defined by the CMake configuration.
         # See https://cmake.org/cmake/help/latest/manual/ctest.1.html
-        run: ctest -C $BUILD_TYPE --timeout 7 --output-on-failure || echo IGNORED
+        run: ctest -C $BUILD_TYPE --timeout 60 --output-on-failure ||
+          echo IGNORED
 
       # - name: Clang Analyser Checks
       #   shell: bash
