@@ -6,14 +6,14 @@ set(PERFTEST_SOURCES
     schematest.cpp)
 
 add_executable(perftest ${PERFTEST_SOURCES})
-target_link_libraries(perftest ${TEST_LIBRARIES})
+target_link_libraries(perftest rapidjson ${TEST_LIBRARIES})
 
 add_dependencies(tests perftest)
 
 set_property(DIRECTORY PROPERTY COMPILE_OPTIONS ${EXTRA_CXX_FLAGS})
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-add_test(NAME perftest
-    COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/perftest
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin})
+    add_test(NAME perftest
+        COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/perftest
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin})
 endif()

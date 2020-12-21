@@ -19,7 +19,6 @@ set(EXAMPLES
     sortkeys
     tutorial)
 
-include_directories("../include/")
 
 add_definitions(-D__STDC_FORMAT_MACROS)
 set_property(DIRECTORY PROPERTY COMPILE_OPTIONS ${EXTRA_CXX_FLAGS})
@@ -29,9 +28,11 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 add_executable(archivertest archiver/archiver.cpp archiver/archivertest.cpp)
+target_link_libraries(archivertest rapidjson)
 
 foreach(example ${EXAMPLES})
     add_executable(${example} ${example}/${example}.cpp)
+    target_link_libraries(${example} rapidjson)
 endforeach()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")

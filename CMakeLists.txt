@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8...3.19)
+cmake_minimum_required(VERSION 3.5...3.19)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
 
@@ -25,6 +25,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 option(RAPIDJSON_BUILD_DOC "Build rapidjson documentation." ${MASTER_PROJECT})
 option(RAPIDJSON_BUILD_EXAMPLES "Build rapidjson examples." ${MASTER_PROJECT})
 option(RAPIDJSON_BUILD_TESTS "Build rapidjson perftests and unittests." ${MASTER_PROJECT})
+
 option(RAPIDJSON_BUILD_THIRDPARTY_GTEST
     "Use gtest installation in `thirdparty/gtest` by default if available" OFF)
 
@@ -40,13 +41,6 @@ endif()
 option(RAPIDJSON_BUILD_ASAN "Build rapidjson with address sanitizer (gcc/clang)" ${MASTER_PROJECT})
 option(RAPIDJSON_BUILD_UBSAN "Build rapidjson with undefined behavior sanitizer (gcc/clang)" ${MASTER_PROJECT})
 option(RAPIDJSON_ENABLE_INSTRUMENTATION_OPT "Build rapidjson with -march or -mcpu options" ${MASTER_PROJECT})
-
-
-# TODO: why this option! CK
-option(RAPIDJSON_HAS_STDSTRING "" ON)
-if(RAPIDJSON_HAS_STDSTRING)
-    add_definitions(-DRAPIDJSON_HAS_STDSTRING)
-endif()
 
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -121,7 +115,16 @@ elseif(WIN32)
 endif()
 set(CMAKE_INSTALL_DIR "${_CMAKE_INSTALL_DIR}" CACHE PATH "The directory cmake files are installed in")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+add_library(rapidjson INTERFACE)
+add_library(rapidjson::rapidjson ALIAS rapidjson)
+target_include_directories(rapidjson INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
+target_compile_features(rapidjson INTERFACE cxx_std_11)
+target_compile_definitions(rapidjson INTERFACE RAPIDJSON_HAS_STDSTRING)
+
 
 if(RAPIDJSON_BUILD_DOC)
     add_subdirectory(doc)
@@ -140,71 +143,67 @@ if(RAPIDJSON_BUILD_TESTS)
     add_subdirectory(test)
 endif()
 
-# pkg-config
-if(UNIX OR CYGWIN)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
-                  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
-                  @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
-      DESTINATION "${LIB_INSTALL_DIR}/pkgconfig"
-      COMPONENT pkgconfig)
-endif()
-
-install(FILES readme.md
-    DESTINATION "${DOC_INSTALL_DIR}"
-    COMPONENT doc)
-
-install(DIRECTORY include/rapidjson
-    DESTINATION "${INCLUDE_INSTALL_DIR}"
-    COMPONENT dev)
-
-install(DIRECTORY example/
-    DESTINATION "${DOC_INSTALL_DIR}/examples"
-    COMPONENT examples
-    # Following patterns are for excluding the intermediate/object files
-    # from an install of in-source CMake build.
-    PATTERN "CMakeFiles" EXCLUDE
-    PATTERN "Makefile" EXCLUDE
-    PATTERN "cmake_install.cmake" EXCLUDE)
-
 
 ################################################################################
 # Provide config and version files to be used by other applications
 ################################################################################
-# Export package for use from the build tree
-# TODO: modernice! CK
-# ==========================================
-export(PACKAGE ${PROJECT_NAME})
+option(RAPIDJSON_INSTALL "Generate the install target" ${MASTER_PROJECT})
+if(RAPIDJSON_INSTALL)
+    include(CMakePackageConfigHelpers)
 
-# Create the RapidJSONConfig.cmake file for other cmake projects.
-# ... for the build tree
-set(CONFIG_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-set(CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR})
-set(${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_SOURCE_DIR}/include")
+    # pkg-config
+    if(UNIX OR CYGWIN)
+      configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
+                      ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
+                      @ONLY)
+      install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
+          DESTINATION "${LIB_INSTALL_DIR}/pkgconfig"
+          COMPONENT pkgconfig)
+    endif()
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake @ONLY)
+    install(FILES readme.md
+        DESTINATION "${DOC_INSTALL_DIR}"
+        COMPONENT doc)
 
-# ... for the install tree
-set(CMAKECONFIG_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME})
-file(RELATIVE_PATH REL_INCLUDE_DIR
-    "${CMAKECONFIG_INSTALL_DIR}"
-    "${CMAKE_INSTALL_PREFIX}/include")
+    install(DIRECTORY include/rapidjson
+        DESTINATION "${INCLUDE_INSTALL_DIR}"
+        COMPONENT dev)
 
-set(${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_CMAKE_DIR}/${REL_INCLUDE_DIR}")
-set(CONFIG_SOURCE_DIR)
-set(CONFIG_DIR)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake @ONLY)
+    install(DIRECTORY example/
+        DESTINATION "${DOC_INSTALL_DIR}/examples"
+        COMPONENT examples
+        # Following patterns are for excluding the intermediate/object files
+        # from an install of in-source CMake build.
+        PATTERN "CMakeFiles" EXCLUDE
+        PATTERN "Makefile" EXCLUDE
+        PATTERN "cmake_install.cmake" EXCLUDE)
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
-        DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 
-# Install files
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    DESTINATION "${CMAKE_INSTALL_DIR}"
-    COMPONENT dev)
+    # Create the RapidJSONConfig.cmake file for other cmake projects.
+    # ... for the build tree
+
+    install(TARGETS rapidjson EXPORT ${PROJECT_NAME}Targets)
+    #DONE! install(DIRECTORY include/rapidjson DESTINATION include)
+
+    set(configFile ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake)
+    set(versionFile ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake)
+    set(configInstallDestination lib/cmake/${PROJECT_NAME})
+
+    configure_package_config_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+        ${configFile}
+        INSTALL_DESTINATION ${configInstallDestination}
+    )
+    write_basic_package_version_file(
+        ${versionFile}
+        COMPATIBILITY SameMajorVersion
+    )
+
+    install(FILES ${configFile} ${versionFile} DESTINATION ${configInstallDestination})
+    install(
+        EXPORT ${PROJECT_NAME}Targets
+        NAMESPACE "rapidjson::"
+        DESTINATION ${configInstallDestination}
+    )
+endif()
+

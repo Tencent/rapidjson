@@ -57,12 +57,11 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     endif()
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DRAPIDJSON_HAS_STDSTRING=1")
-
 add_library(namespacetest STATIC namespacetest.cpp)
+target_link_libraries(namespacetest PRIVATE rapidjson)
 
 add_executable(unittest ${UNITTEST_SOURCES})
-target_link_libraries(unittest ${TEST_LIBRARIES} namespacetest)
+target_link_libraries(unittest rapidjson ${TEST_LIBRARIES} namespacetest)
 
 add_dependencies(tests unittest)
 
