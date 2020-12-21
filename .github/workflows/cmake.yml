@@ -77,7 +77,7 @@ jobs:
         shell: bash
         working-directory: ${{runner.workspace}}/build
         run: |
-          cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G Ninja
+          cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G Ninja &&
           cd .. && ln -s build/compile_commands.json .
 
       - name: Build
@@ -103,12 +103,12 @@ jobs:
         shell: bash
         run: |
           export PATH=/usr/local/opt/llvm/bin/:${PATH}
-          builddriver /usr/local/opt/llvm/share/clang/run-clang-tidy.py example ||
+          builddriver /usr/local/opt/llvm/share/clang/run-clang-tidy.py -p build example ||
           echo IGNORED
 
       - name: Run clang-tidy on Ubuntu Host
         if: startsWith(matrix.os, 'ubuntu')
         shell: bash
         run: |
-          /home/runner/.local/bin/builddriver run-clang-tidy-10 example ||
+          /home/runner/.local/bin/builddriver run-clang-tidy-10 -p build example ||
           echo IGNORED
