@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13...3.19)
+cmake_minimum_required(VERSION 3.8...3.19)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
 
@@ -6,31 +6,40 @@ include(before_project_setup)   # setup ccache if available ...
 
 project(RapidJSON VERSION 1.1.0 LANGUAGES CXX)
 
+#
+# Check if this is the master project.
+set(MASTER_PROJECT OFF)
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+  set(MASTER_PROJECT ON)
+endif()
+
 # compile in release with debug info mode by default
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif()
 
+
 # Build all binaries in a separate directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-option(RAPIDJSON_BUILD_DOC "Build rapidjson documentation." ON)
-option(RAPIDJSON_BUILD_EXAMPLES "Build rapidjson examples." ON)
-option(RAPIDJSON_BUILD_TESTS "Build rapidjson perftests and unittests." ON)
+option(RAPIDJSON_BUILD_DOC "Build rapidjson documentation." ${MASTER_PROJECT})
+option(RAPIDJSON_BUILD_EXAMPLES "Build rapidjson examples." ${MASTER_PROJECT})
+option(RAPIDJSON_BUILD_TESTS "Build rapidjson perftests and unittests." ${MASTER_PROJECT})
 option(RAPIDJSON_BUILD_THIRDPARTY_GTEST
     "Use gtest installation in `thirdparty/gtest` by default if available" OFF)
 
-option(RAPIDJSON_BUILD_CXX17 "Build rapidjson with C++17 (gcc/clang)" ON)
-if(RAPIDJSON_BUILD_CXX17)
-    set(CMAKE_CXX_STANDARD 17)
+
+option(RAPIDJSON_BUILD_CXX11 "Build rapidjson with C++11 (gcc/clang)" ON)
+if(RAPIDJSON_BUILD_CXX11)
+    set(CMAKE_CXX_STANDARD 11)
     set(CMAKE_CXX_EXTENSIONS OFF)
     set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 endif()
 
-option(RAPIDJSON_BUILD_ASAN "Build rapidjson with address sanitizer (gcc/clang)" ON)
-option(RAPIDJSON_BUILD_UBSAN "Build rapidjson with undefined behavior sanitizer (gcc/clang)" ON)
 
-option(RAPIDJSON_ENABLE_INSTRUMENTATION_OPT "Build rapidjson with -march or -mcpu options" ON)
+option(RAPIDJSON_BUILD_ASAN "Build rapidjson with address sanitizer (gcc/clang)" ${MASTER_PROJECT})
+option(RAPIDJSON_BUILD_UBSAN "Build rapidjson with undefined behavior sanitizer (gcc/clang)" ${MASTER_PROJECT})
+option(RAPIDJSON_ENABLE_INSTRUMENTATION_OPT "Build rapidjson with -march or -mcpu options" ${MASTER_PROJECT})
 
 
 # TODO: why this option! CK
@@ -142,8 +151,8 @@ if(UNIX OR CYGWIN)
 endif()
 
 install(FILES readme.md
-        DESTINATION "${DOC_INSTALL_DIR}"
-        COMPONENT doc)
+    DESTINATION "${DOC_INSTALL_DIR}"
+    COMPONENT doc)
 
 install(DIRECTORY include/rapidjson
     DESTINATION "${INCLUDE_INSTALL_DIR}"
