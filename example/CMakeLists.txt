@@ -17,13 +17,14 @@ set(EXAMPLES
     simplepullreader
     simplewriter
     sortkeys
-    tutorial)
+    tutorial
+)
 
 
 add_definitions(-D__STDC_FORMAT_MACROS)
 set_property(DIRECTORY PROPERTY COMPILE_OPTIONS ${EXTRA_CXX_FLAGS})
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 endif()
 
