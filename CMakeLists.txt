@@ -196,28 +196,31 @@ if(RAPIDJSON_INSTALL)
         PATTERN "Makefile" EXCLUDE
         PATTERN "cmake_install.cmake" EXCLUDE)
 
-    # Create the RapidJSONConfig.cmake file for other cmake projects.
-    # ... for the build tree
-    install(TARGETS rapidjson EXPORT ${PROJECT_NAME}Targets)
+    if(NOT CMAKE_VERSION VERSION_LESS 3.12)
+        # Create the RapidJSONConfig.cmake file for other cmake projects.
+        # ... for the build tree
+        install(TARGETS rapidjson EXPORT ${PROJECT_NAME}Targets)
 
-    set(configFile ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake)
-    set(versionFile ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake)
-    set(configInstallDestination ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+        set(configFile ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake)
+        set(versionFile ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake)
+        set(configInstallDestination ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
-    configure_package_config_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-        ${configFile}
-        INSTALL_DESTINATION ${configInstallDestination}
-    )
-    write_basic_package_version_file(
-        ${versionFile}
-        COMPATIBILITY SameMajorVersion
-    )
+        configure_package_config_file(
+            ${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+            ${configFile}
+            INSTALL_DESTINATION ${configInstallDestination}
+        )
+        write_basic_package_version_file(
+            ${versionFile}
+            COMPATIBILITY SameMajorVersion
+        )
 
-    install(FILES ${configFile} ${versionFile} DESTINATION ${configInstallDestination})
-    install(
-        EXPORT ${PROJECT_NAME}Targets
-        NAMESPACE "rapidjson::"
-        DESTINATION ${configInstallDestination}
-    )
+        install(FILES ${configFile} ${versionFile} DESTINATION ${configInstallDestination})
+        install(
+            EXPORT ${PROJECT_NAME}Targets
+            NAMESPACE "rapidjson::"
+            DESTINATION ${configInstallDestination}
+        )
+    endif()
+
 endif()
