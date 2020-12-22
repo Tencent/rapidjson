@@ -37,10 +37,10 @@ jobs:
               echo IGNORED
 
           sudo apt-get install \
-            libboost-all-dev \
+            ninja-build \
             googletest \
-            doctest \
-            ninja-build
+            valgrind \
+            doctest
 
       - name: Configure MacOS Host
         if: startsWith(matrix.os, 'macos')

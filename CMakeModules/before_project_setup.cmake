@@ -3,7 +3,9 @@
 # ===========================================================================
 # USE: INCLUDE-BEFOR project() !!!
 
-include_guard(DIRECTORY)
+if(NOT CMAKE_VERSION VERSION_LESS 3.10)
+    include_guard(DIRECTORY)
+endif()
 
 # ---------------------------------------------------------------------------
 # use ccache if found
@@ -11,8 +13,8 @@ include_guard(DIRECTORY)
 find_program(CCACHE_EXECUTABLE "ccache")
 if(CCACHE_EXECUTABLE)
     message(STATUS "use ccache")
-    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_EXECUTABLE}" CACHE PATH "ccache" FORCE)
-    set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_EXECUTABLE}" CACHE PATH "ccache" FORCE)
+    set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_EXECUTABLE}" CACHE PATH "path to ccache" FORCE)
+    set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_EXECUTABLE}" CACHE PATH "path to ccache" FORCE)
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

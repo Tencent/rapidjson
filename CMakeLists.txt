@@ -52,8 +52,10 @@ target_include_directories(rapidjson INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
-target_compile_features(rapidjson INTERFACE cxx_std_11)
-target_compile_definitions(rapidjson INTERFACE RAPIDJSON_HAS_STDSTRING)
+if(RAPIDJSON_BUILD_CXX11)
+    target_compile_features(rapidjson INTERFACE cxx_std_11)
+    target_compile_definitions(rapidjson INTERFACE RAPIDJSON_HAS_STDSTRING)
+endif()
 ################################################################################
 
 # TODO: use target_compile_options()
@@ -67,7 +69,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         endif()
     endif()
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
     set(EXTRA_CXX_FLAGS -Weffc++ -Wswitch-default -Wfloat-equal -Wconversion -Wsign-conversion)
 
     if(RAPIDJSON_BUILD_ASAN)
@@ -95,12 +97,13 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         endif()
     endif()
 
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
     set(EXTRA_CXX_FLAGS -Weffc++ -Wswitch-default -Wfloat-equal -Wconversion -Wimplicit-fallthrough)
 
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-field-initializers -Wno-deprecated-copy")
-    endif()
+    # FIXME: do not suppress any warning! CK
+    # if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    #     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-missing-field-initializers -Wno-deprecated-copy")
+    # endif()
 
     if(RAPIDJSON_BUILD_ASAN)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address")
@@ -170,6 +173,7 @@ if(RAPIDJSON_INSTALL)
     install(DIRECTORY example/
         DESTINATION "${CMAKE_INSTALL_DOCDIR}/examples"
         COMPONENT examples
+        # TODO: better to disable in-source build! CK
         # Following patterns are for excluding the intermediate/object files
         # from an install of in-source CMake build.
         PATTERN "CMakeLists.txt" EXCLUDE

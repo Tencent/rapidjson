@@ -71,10 +71,10 @@ add_test(NAME unittest
 
 if(NOT MSVC)
     # Not running SIMD.* unit test cases for Valgrind
-    find_program(VALGRIND_FOUND valgrind)
-    if(VALGRIND_FOUND)
+    find_program(VALGRIND_PROGRAM valgrind)
+    if(VALGRIND_PROGRAM)
         add_test(NAME valgrind_unittest
-            COMMAND valgrind --suppressions=${CMAKE_SOURCE_DIR}/test/valgrind.supp --leak-check=full --error-exitcode=1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest --gtest_filter=-SIMD.*
+            COMMAND ${VALGRIND_PROGRAM} --suppressions=${CMAKE_SOURCE_DIR}/test/valgrind.supp --leak-check=full --error-exitcode=1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest --gtest_filter=-SIMD.*
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
     endif()
 
