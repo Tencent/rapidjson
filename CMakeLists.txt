@@ -44,6 +44,7 @@ endif()
 option(RAPIDJSON_BUILD_ASAN "Build rapidjson with address sanitizer (gcc/clang)" ${MASTER_PROJECT})
 option(RAPIDJSON_BUILD_UBSAN "Build rapidjson with undefined behavior sanitizer (gcc/clang)" ${MASTER_PROJECT})
 option(RAPIDJSON_ENABLE_INSTRUMENTATION_OPT "Build rapidjson with -march or -mcpu options" ${MASTER_PROJECT})
+option(RAPIDJSON_HAS_STDSTRING "" OFF)
 
 ################################################################################
 add_library(rapidjson INTERFACE)
@@ -53,7 +54,11 @@ target_include_directories(rapidjson INTERFACE
     $<INSTALL_INTERFACE:include>
 )
 if(RAPIDJSON_BUILD_CXX11)
-    target_compile_features(rapidjson INTERFACE cxx_std_11)
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.8)
+        target_compile_features(rapidjson INTERFACE cxx_std_11)
+    endif()
+    target_compile_definitions(rapidjson INTERFACE RAPIDJSON_HAS_STDSTRING)
+elseif(RAPIDJSON_HAS_STDSTRING)
     target_compile_definitions(rapidjson INTERFACE RAPIDJSON_HAS_STDSTRING)
 endif()
 ################################################################################

@@ -3,7 +3,7 @@
 # ===========================================================================
 # USE: INCLUDE-BEFOR project() !!!
 
-if(NOT CMAKE_VERSION VERSION_LESS 3.10)
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.10)
     include_guard(DIRECTORY)
 endif()
 
