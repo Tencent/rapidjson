@@ -289,12 +289,14 @@ class GenericMemberIterator;
 //! non-const GenericMemberIterator
 template <typename Encoding, typename Allocator>
 class GenericMemberIterator<false,Encoding,Allocator> {
+public:
     //! use plain pointer as iterator type
     typedef GenericMember<Encoding,Allocator>* Iterator;
 };
 //! const GenericMemberIterator
 template <typename Encoding, typename Allocator>
 class GenericMemberIterator<true,Encoding,Allocator> {
+public:
     //! use plain const pointer as iterator type
     typedef const GenericMember<Encoding,Allocator>* Iterator;
 };
