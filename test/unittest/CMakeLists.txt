@@ -70,12 +70,14 @@ add_test(NAME unittest
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 if(NOT MSVC)
-    # Not running SIMD.* unit test cases for Valgrind
-    find_program(VALGRIND_PROGRAM valgrind)
-    if(VALGRIND_PROGRAM)
-        add_test(NAME valgrind_unittest
-            COMMAND ${VALGRIND_PROGRAM} --suppressions=${CMAKE_SOURCE_DIR}/test/valgrind.supp --leak-check=full --error-exitcode=1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest --gtest_filter=-SIMD.*
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+    if(NOT APPLE)
+        # Not running SIMD.* unit test cases for Valgrind
+        find_program(VALGRIND_PROGRAM valgrind)
+        if(VALGRIND_PROGRAM)
+            add_test(NAME valgrind_unittest
+                COMMAND ${VALGRIND_PROGRAM} --suppressions=${CMAKE_SOURCE_DIR}/test/valgrind.supp --leak-check=full --error-exitcode=1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest --gtest_filter=-SIMD.*
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+        endif()
     endif()
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -83,5 +85,4 @@ if(NOT MSVC)
         COMMAND sh -c "objdump -t -C libnamespacetest.a | grep rapidjson ; test $? -ne 0"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
     endif()
-
 endif()
