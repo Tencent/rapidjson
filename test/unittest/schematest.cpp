@@ -2038,9 +2038,11 @@ TEST(SchemaValidator, Ref_remote_issue1210) {
     class SchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
         SchemaDocument** collection;
 
+        // Dummy private copy constructor & assignment operator.
         SchemaDocumentProvider(const SchemaDocumentProvider&) {
         }
         SchemaDocumentProvider& operator=(const SchemaDocumentProvider&) {
+            return *this;
         }
 
         public:
