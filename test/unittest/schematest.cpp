@@ -2038,6 +2038,11 @@ TEST(SchemaValidator, Ref_remote_issue1210) {
     class SchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
         SchemaDocument** collection;
 
+        SchemaDocumentProvider(const SchemaDocumentProvider&) {
+        }
+        SchemaDocumentProvider& operator=(const SchemaDocumentProvider&) {
+        }
+
         public:
           SchemaDocumentProvider(SchemaDocument** collection) : collection(collection) { }
           virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
