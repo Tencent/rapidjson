@@ -2039,7 +2039,8 @@ TEST(SchemaValidator, Ref_remote_issue1210) {
         SchemaDocument** collection;
 
         // Dummy private copy constructor & assignment operator.
-        SchemaDocumentProvider(const SchemaDocumentProvider&) {
+        // Function bodies added so that they compile in MSVC 2019.
+        SchemaDocumentProvider(const SchemaDocumentProvider&) : collection(NULL) {
         }
         SchemaDocumentProvider& operator=(const SchemaDocumentProvider&) {
             return *this;
