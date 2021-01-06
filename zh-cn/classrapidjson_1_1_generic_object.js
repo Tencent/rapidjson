@@ -34,6 +34,7 @@ var classrapidjson_1_1_generic_object =
     [ "MemberEnd", "classrapidjson_1_1_generic_object.html#a446032e977f37638cf3c44eb3a972fdd", null ],
     [ "MemberReserve", "classrapidjson_1_1_generic_object.html#afcd9124531e6c55ba44c2de99b2f9bf1", null ],
     [ "ObjectEmpty", "classrapidjson_1_1_generic_object.html#ad5ad0ae2038d629f17b10b2b11ced58b", null ],
+    [ "operator ValueType &", "classrapidjson_1_1_generic_object.html#ae9dddf91b1527b9773fd3d9c69fbef9d", null ],
     [ "operator=", "classrapidjson_1_1_generic_object.html#af94485b6c52b821203fe2c23a92c282f", null ],
     [ "operator[]", "classrapidjson_1_1_generic_object.html#a920c32f4acd1f8a896c467777452595a", null ],
     [ "operator[]", "classrapidjson_1_1_generic_object.html#ab9a78993f69240bff0744f05436aaf80", null ],

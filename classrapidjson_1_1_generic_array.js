@@ -16,6 +16,7 @@ var classrapidjson_1_1_generic_array =
     [ "End", "classrapidjson_1_1_generic_array.html#a27e2a9f13adcca6e0f191495cdce9689", null ],
     [ "Erase", "classrapidjson_1_1_generic_array.html#af8fb2a13a98c62a284de0005850d624c", null ],
     [ "Erase", "classrapidjson_1_1_generic_array.html#a13d2a18801a80add6e1bd9ad167822a5", null ],
+    [ "operator ValueType &", "classrapidjson_1_1_generic_array.html#a37a9b2e7b7ce914b25654b04ed7a8344", null ],
     [ "operator=", "classrapidjson_1_1_generic_array.html#ab9c9bffca8056d6b20b9f92334d35798", null ],
     [ "operator[]", "classrapidjson_1_1_generic_array.html#ae3455ca0429fa330cb981c78fab473c0", null ],
     [ "PopBack", "classrapidjson_1_1_generic_array.html#a50ccee2eea89c21fcd29363506e5ed3f", null ],

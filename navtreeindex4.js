@@ -1,5 +1,7 @@
 var NAVTREEINDEX4 =
 {
+"rapidjson_8h.html#abdc7cd7902748ffe6626d71c59a73c3b":[15,0,0,0,16,16],
+"rapidjson_8h.html#ac7951ebf8a2624ab85d2dcd3ec7af974":[15,0,0,0,16,4],
 "rapidjson_8h.html#addcc0c3607c5790f35cc4c15885ff97c":[15,0,0,0,16,11],
 "rapidjson_8h.html#ae79a4751c1c460ff0de5ecc07874f3e4":[15,0,0,0,16,29],
 "rapidjson_8h.html#ae79a4751c1c460ff0de5ecc07874f3e4a058c622e1e7d59419ae58b895cbce468":[15,0,0,0,16,29,4],
