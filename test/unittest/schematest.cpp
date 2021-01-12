@@ -2038,8 +2038,13 @@ TEST(SchemaValidator, Ref_remote_issue1210) {
     class SchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
         SchemaDocument** collection;
 
-        SchemaDocumentProvider(const SchemaDocumentProvider&);
-        SchemaDocumentProvider& operator=(const SchemaDocumentProvider&);
+        // Dummy private copy constructor & assignment operator.
+        // Function bodies added so that they compile in MSVC 2019.
+        SchemaDocumentProvider(const SchemaDocumentProvider&) : collection(NULL) {
+        }
+        SchemaDocumentProvider& operator=(const SchemaDocumentProvider&) {
+            return *this;
+        }
 
         public:
           SchemaDocumentProvider(SchemaDocument** collection) : collection(collection) { }

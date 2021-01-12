@@ -1529,6 +1529,38 @@ TEST(Pointer, Ambiguity) {
     }
 }
 
+TEST(Pointer, ResolveOnObject) {
+    Document d;
+    EXPECT_FALSE(d.Parse("{\"a\": 123}").HasParseError());
+
+    {
+        Value::ConstObject o = static_cast<const Document&>(d).GetObject();
+        EXPECT_EQ(123, Pointer("/a").Get(o)->GetInt());
+    }
+
+    {
+        Value::Object o = d.GetObject();
+        Pointer("/a").Set(o, 456, d.GetAllocator());
+        EXPECT_EQ(456, Pointer("/a").Get(o)->GetInt());
+    }
+}
+
+TEST(Pointer, ResolveOnArray) {
+    Document d;
+    EXPECT_FALSE(d.Parse("[1, 2, 3]").HasParseError());
+
+    {
+        Value::ConstArray a = static_cast<const Document&>(d).GetArray();
+        EXPECT_EQ(2, Pointer("/1").Get(a)->GetInt());
+    }
+
+    {
+        Value::Array a = d.GetArray();
+        Pointer("/1").Set(a, 123, d.GetAllocator());
+        EXPECT_EQ(123, Pointer("/1").Get(a)->GetInt());
+    }
+}
+
 TEST(Pointer, LessThan) {
     static const struct {
         const char *str;
