@@ -192,13 +192,13 @@ TEST(PrettyWriter, FileWriteStream) {
 TEST(PrettyWriter, RawValue) {
     StringBuffer buffer;
     PrettyWriter<StringBuffer> writer(buffer);
-    writer.StartObject();
+    writer.StartObj();
     writer.Key("a");
     writer.Int(1);
     writer.Key("raw");
     const char json[] = "[\"Hello\\nWorld\", 123.456]";
     writer.RawValue(json, strlen(json), kArrayType);
-    writer.EndObject();
+    writer.EndObj();
     EXPECT_TRUE(writer.IsComplete());
     EXPECT_STREQ(
         "{\n"
@@ -213,7 +213,7 @@ TEST(PrettyWriter, InvalidEventSequence) {
     {
         StringBuffer buffer;
         PrettyWriter<StringBuffer> writer(buffer);
-        writer.StartObject();
+        writer.StartObj();
         EXPECT_THROW(writer.EndArray(), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
@@ -223,7 +223,7 @@ TEST(PrettyWriter, InvalidEventSequence) {
         StringBuffer buffer;
         PrettyWriter<StringBuffer> writer(buffer);
         writer.StartArray();
-        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_THROW(writer.EndObj(), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
     
@@ -231,7 +231,7 @@ TEST(PrettyWriter, InvalidEventSequence) {
     {
         StringBuffer buffer;
         PrettyWriter<StringBuffer> writer(buffer);
-        writer.StartObject();
+        writer.StartObj();
         EXPECT_THROW(writer.Int(1), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
@@ -240,9 +240,9 @@ TEST(PrettyWriter, InvalidEventSequence) {
     {
         StringBuffer buffer;
         PrettyWriter<StringBuffer> writer(buffer);
-        writer.StartObject();
+        writer.StartObj();
         writer.Key("a");
-        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_THROW(writer.EndObj(), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
     
@@ -250,11 +250,11 @@ TEST(PrettyWriter, InvalidEventSequence) {
     {
         StringBuffer buffer;
         PrettyWriter<StringBuffer> writer(buffer);
-        writer.StartObject();
+        writer.StartObj();
         writer.Key("a");
         writer.String("b");
         writer.Key("c");
-        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_THROW(writer.EndObj(), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
 }
@@ -320,7 +320,7 @@ TEST(PrettyWriter, Issue_889) {
 
 static PrettyWriter<StringBuffer> WriterGen(StringBuffer &target) {
     PrettyWriter<StringBuffer> writer(target);
-    writer.StartObject();
+    writer.StartObj();
     writer.Key("a");
     writer.Int(1);
     return writer;
@@ -329,7 +329,7 @@ static PrettyWriter<StringBuffer> WriterGen(StringBuffer &target) {
 TEST(PrettyWriter, MoveCtor) {
     StringBuffer buffer;
     PrettyWriter<StringBuffer> writer(WriterGen(buffer));
-    writer.EndObject();
+    writer.EndObj();
     EXPECT_TRUE(writer.IsComplete());
     EXPECT_STREQ(
         "{\n"

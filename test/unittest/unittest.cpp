@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
 
 #ifdef _MSC_VER
     // Current gtest constantly leak 2 blocks at exit
-    _CrtMemDumpAllObjectsSince(&memoryState);
+    _CrtMemDumpAllObjsSince(&memoryState);
 #endif
     return ret;
 }

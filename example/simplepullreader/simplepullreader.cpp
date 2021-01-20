@@ -27,9 +27,9 @@ struct MyHandler {
     bool Double(double d) { type = "Double:"; data = stringify(d); return true; }
     bool RawNumber(const char* str, SizeType length, bool) { type = "Number:"; data = std::string(str, length); return true; }
     bool String(const char* str, SizeType length, bool) { type = "String:"; data = std::string(str, length); return true; }
-    bool StartObject() { type = "StartObject"; data.clear(); return true; }
+    bool StartObj() { type = "StartObj"; data.clear(); return true; }
     bool Key(const char* str, SizeType length, bool) { type = "Key:"; data = std::string(str, length); return true; }
-    bool EndObject(SizeType memberCount) { type = "EndObject:"; data = stringify(memberCount); return true; }
+    bool EndObj(SizeType memberCount) { type = "EndObj:"; data = stringify(memberCount); return true; }
     bool StartArray() { type = "StartArray"; data.clear(); return true; }
     bool EndArray(SizeType elementCount) { type = "EndArray:"; data = stringify(elementCount); return true; }
 private:

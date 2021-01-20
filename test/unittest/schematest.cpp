@@ -920,7 +920,7 @@ TEST(SchemaValidator, Number_MultipleOfOne) {
         "}}");
 }
 
-TEST(SchemaValidator, Object) {
+TEST(SchemaValidator, Obj) {
     Document sd;
     sd.Parse("{\"type\":\"object\"}");
     SchemaDocument s(sd);
@@ -939,7 +939,7 @@ TEST(SchemaValidator, Object) {
         "}}");
 }
 
-TEST(SchemaValidator, Object_Properties) {
+TEST(SchemaValidator, Obj_Properties) {
     Document sd;
     sd.Parse(
         "{"
@@ -970,7 +970,7 @@ TEST(SchemaValidator, Object_Properties) {
     VALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\", \"direction\": \"NW\" }", true);
 }
 
-TEST(SchemaValidator, Object_AdditionalPropertiesBoolean) {
+TEST(SchemaValidator, Obj_AdditionalPropertiesBoolean) {
     Document sd;
     sd.Parse(
         "{"
@@ -995,7 +995,7 @@ TEST(SchemaValidator, Object_AdditionalPropertiesBoolean) {
         "}}");
 }
 
-TEST(SchemaValidator, Object_AdditionalPropertiesObject) {
+TEST(SchemaValidator, Obj_AdditionalPropertiesObj) {
     Document sd;
     sd.Parse(
         "{"
@@ -1020,7 +1020,7 @@ TEST(SchemaValidator, Object_AdditionalPropertiesObject) {
         "}}");
 }
 
-TEST(SchemaValidator, Object_Required) {
+TEST(SchemaValidator, Obj_Required) {
     Document sd;
     sd.Parse(
         "{"
@@ -1049,7 +1049,7 @@ TEST(SchemaValidator, Object_Required) {
         "}}");
 }
 
-TEST(SchemaValidator, Object_Required_PassWithDefault) {
+TEST(SchemaValidator, Obj_Required_PassWithDefault) {
     Document sd;
     sd.Parse(
         "{"
@@ -1077,7 +1077,7 @@ TEST(SchemaValidator, Object_Required_PassWithDefault) {
         "}}");
 }
 
-TEST(SchemaValidator, Object_PropertiesRange) {
+TEST(SchemaValidator, Obj_PropertiesRange) {
     Document sd;
     sd.Parse("{\"type\":\"object\", \"minProperties\":2, \"maxProperties\":3}");
     SchemaDocument s(sd);
@@ -1101,7 +1101,7 @@ TEST(SchemaValidator, Object_PropertiesRange) {
         "}}");
 }
 
-TEST(SchemaValidator, Object_PropertyDependencies) {
+TEST(SchemaValidator, Obj_PropertyDependencies) {
     Document sd;
     sd.Parse(
         "{"
@@ -1130,7 +1130,7 @@ TEST(SchemaValidator, Object_PropertyDependencies) {
     VALIDATE(s, "{ \"name\": \"John Doe\", \"cvv_code\": 777, \"billing_address\": \"555 Debtor's Lane\" }", true);
 }
 
-TEST(SchemaValidator, Object_SchemaDependencies) {
+TEST(SchemaValidator, Obj_SchemaDependencies) {
     Document sd;
     sd.Parse(
         "{"
@@ -1166,7 +1166,7 @@ TEST(SchemaValidator, Object_SchemaDependencies) {
 }
 
 #if RAPIDJSON_SCHEMA_HAS_REGEX
-TEST(SchemaValidator, Object_PatternProperties) {
+TEST(SchemaValidator, Obj_PatternProperties) {
     Document sd;
     sd.Parse(
         "{"
@@ -1193,7 +1193,7 @@ TEST(SchemaValidator, Object_PatternProperties) {
     VALIDATE(s, "{ \"keyword\": \"value\" }", true);
 }
 
-TEST(SchemaValidator, Object_PattternProperties_ErrorConflict) {
+TEST(SchemaValidator, Obj_PattternProperties_ErrorConflict) {
     Document sd;
     sd.Parse(
         "{"
@@ -1218,7 +1218,7 @@ TEST(SchemaValidator, Object_PattternProperties_ErrorConflict) {
         "]}");
 }
 
-TEST(SchemaValidator, Object_Properties_PatternProperties) {
+TEST(SchemaValidator, Obj_Properties_PatternProperties) {
     Document sd;
     sd.Parse(
         "{"
@@ -1251,7 +1251,7 @@ TEST(SchemaValidator, Object_Properties_PatternProperties) {
         "}");
 }
 
-TEST(SchemaValidator, Object_PatternProperties_AdditionalProperties) {
+TEST(SchemaValidator, Obj_PatternProperties_AdditionalProperties) {
     Document sd;
     sd.Parse(
         "{"
@@ -1473,7 +1473,7 @@ TEST(SchemaValidator, Null) {
 
 // Additional tests
 
-TEST(SchemaValidator, ObjectInArray) {
+TEST(SchemaValidator, ObjInArray) {
     Document sd;
     sd.Parse("{\"type\":\"array\", \"items\": { \"type\":\"string\" }}");
     SchemaDocument s(sd);
@@ -1491,7 +1491,7 @@ TEST(SchemaValidator, ObjectInArray) {
         "}}");
 }
 
-TEST(SchemaValidator, MultiTypeInObject) {
+TEST(SchemaValidator, MultiTypeInObj) {
     Document sd;
     sd.Parse(
         "{"
@@ -1513,7 +1513,7 @@ TEST(SchemaValidator, MultiTypeInObject) {
         "}}");
 }
 
-TEST(SchemaValidator, MultiTypeWithObject) {
+TEST(SchemaValidator, MultiTypeWithObj) {
     Document sd;
     sd.Parse(
         "{"
@@ -1983,7 +1983,7 @@ TEST(SchemaValidator, Issue608) {
         "}}");
 }
 
-// Fail to resolve $ref in allOf causes crash in SchemaValidator::StartObject()
+// Fail to resolve $ref in allOf causes crash in SchemaValidator::StartObj()
 TEST(SchemaValidator, Issue728_AllOfRef) {
     Document sd;
     sd.Parse("{\"allOf\": [{\"$ref\": \"#/abc\"}]}");
@@ -2005,14 +2005,14 @@ TEST(SchemaValidator, Issue1017_allOfHandler) {
     StringBuffer sb;
     Writer<StringBuffer> writer(sb);
     GenericSchemaValidator<SchemaDocument, Writer<StringBuffer> > validator(s, writer);
-    EXPECT_TRUE(validator.StartObject());
+    EXPECT_TRUE(validator.StartObj());
     EXPECT_TRUE(validator.Key("cyanArray2", 10, false));
     EXPECT_TRUE(validator.StartArray());    
     EXPECT_TRUE(validator.EndArray(0));    
     EXPECT_TRUE(validator.Key("blackArray", 10, false));
     EXPECT_TRUE(validator.StartArray());    
     EXPECT_TRUE(validator.EndArray(0));    
-    EXPECT_TRUE(validator.EndObject(0));
+    EXPECT_TRUE(validator.EndObj(0));
     EXPECT_TRUE(validator.IsValid());
     EXPECT_STREQ("{\"cyanArray2\":[],\"blackArray\":[]}", sb.GetString());
 }

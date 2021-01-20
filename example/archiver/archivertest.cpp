@@ -19,12 +19,12 @@ struct Student {
 
 template <typename Archiver>
 Archiver& operator&(Archiver& ar, Student& s) {
-    ar.StartObject();
+    ar.StartObj();
     ar.Member("name") & s.name;
     ar.Member("age") & s.age;
     ar.Member("height") & s.height;
     ar.Member("canSwim") & s.canSwim;
-    return ar.EndObject();
+    return ar.EndObj();
 }
 
 std::ostream& operator<<(std::ostream& os, const Student& s) {
@@ -66,7 +66,7 @@ struct Group {
 
 template <typename Archiver>
 Archiver& operator&(Archiver& ar, Group& g) {
-    ar.StartObject();
+    ar.StartObj();
     
     ar.Member("groupName");
     ar & g.groupName;
@@ -80,7 +80,7 @@ Archiver& operator&(Archiver& ar, Group& g) {
         ar & g.students[i];
     ar.EndArray();
 
-    return ar.EndObject();
+    return ar.EndObj();
 }
 
 std::ostream& operator<<(std::ostream& os, const Group& g) {
@@ -228,7 +228,7 @@ private:
 template <typename Archiver>
 Archiver& operator&(Archiver& ar, Shape*& shape) {
     std::string type = ar.IsReader ? "" : shape->GetType();
-    ar.StartObject();
+    ar.StartObj();
     ar.Member("type") & type;
     if (type == "Circle") {
         if (ar.IsReader) shape = new Circle;
@@ -238,7 +238,7 @@ Archiver& operator&(Archiver& ar, Shape*& shape) {
         if (ar.IsReader) shape = new Box;
         ar & static_cast<Box&>(*shape);
     }
-    return ar.EndObject();
+    return ar.EndObj();
 }
 
 template <typename Archiver>

@@ -9,8 +9,8 @@ using namespace rapidjson;
 
 struct JsonReaderStackItem {
     enum State {
-        BeforeStart,    //!< An object/array is in the stack but it is not yet called by StartObject()/StartArray().
-        Started,        //!< An object/array is called by StartObject()/StartArray().
+        BeforeStart,    //!< An object/array is in the stack but it is not yet called by StartObj()/StartArray().
+        Started,        //!< An object/array is called by StartObj()/StartArray().
         Closed          //!< An array is closed after read all element, but before EndArray().
     };
 
@@ -45,9 +45,9 @@ JsonReader::~JsonReader() {
 }
 
 // Archive concept
-JsonReader& JsonReader::StartObject() {
+JsonReader& JsonReader::StartObj() {
     if (!mError) {
-        if (CURRENT.IsObject() && TOP.state == JsonReaderStackItem::BeforeStart)
+        if (CURRENT.IsObj() && TOP.state == JsonReaderStackItem::BeforeStart)
             TOP.state = JsonReaderStackItem::Started;
         else
             mError = true;
@@ -55,9 +55,9 @@ JsonReader& JsonReader::StartObject() {
     return *this;
 }
 
-JsonReader& JsonReader::EndObject() {
+JsonReader& JsonReader::EndObj() {
     if (!mError) {
-        if (CURRENT.IsObject() && TOP.state == JsonReaderStackItem::Started)
+        if (CURRENT.IsObj() && TOP.state == JsonReaderStackItem::Started)
             Next();
         else
             mError = true;
@@ -67,7 +67,7 @@ JsonReader& JsonReader::EndObject() {
 
 JsonReader& JsonReader::Member(const char* name) {
     if (!mError) {
-        if (CURRENT.IsObject() && TOP.state == JsonReaderStackItem::Started) {
+        if (CURRENT.IsObj() && TOP.state == JsonReaderStackItem::Started) {
             Value::ConstMemberIterator memberItr = CURRENT.FindMember(name);
             if (memberItr != CURRENT.MemberEnd()) 
                 STACK->push(JsonReaderStackItem(&memberItr->value, JsonReaderStackItem::BeforeStart));
@@ -81,7 +81,7 @@ JsonReader& JsonReader::Member(const char* name) {
 }
 
 bool JsonReader::HasMember(const char* name) const {
-    if (!mError && CURRENT.IsObject() && TOP.state == JsonReaderStackItem::Started)
+    if (!mError && CURRENT.IsObj() && TOP.state == JsonReaderStackItem::Started)
         return CURRENT.HasMember(name);
     return false;
 }
@@ -227,13 +227,13 @@ const char* JsonWriter::GetString() const {
     return STREAM->GetString();
 }
 
-JsonWriter& JsonWriter::StartObject() {
-    WRITER->StartObject();
+JsonWriter& JsonWriter::StartObj() {
+    WRITER->StartObj();
     return *this;
 }
 
-JsonWriter& JsonWriter::EndObject() {
-    WRITER->EndObject();
+JsonWriter& JsonWriter::EndObj() {
+    WRITER->EndObj();
     return *this;
 }
 

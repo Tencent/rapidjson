@@ -681,7 +681,7 @@ enum Type {
     kNullType = 0,      //!< null
     kFalseType = 1,     //!< false
     kTrueType = 2,      //!< true
-    kObjectType = 3,    //!< object
+    kObjType = 3,    //!< object
     kArrayType = 4,     //!< array 
     kStringType = 5,    //!< string
     kNumberType = 6     //!< number

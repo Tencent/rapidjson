@@ -11,7 +11,7 @@ RAPIDJSON_DIAG_OFF(effc++)
 // more direct; you don't need to design your logic around a handler object and
 // callbacks. Instead, you retrieve values from the JSON stream by calling
 // GetInt(), GetDouble(), GetString() and GetBool(), traverse into structures
-// by calling EnterObject() and EnterArray(), and skip over unwanted data by
+// by calling EnterObj() and EnterArray(), and skip over unwanted data by
 // calling SkipValue(). When you know your JSON's structure, this can be quite
 // convenient.
 //
@@ -19,14 +19,14 @@ RAPIDJSON_DIAG_OFF(effc++)
 // PeekValue() to look ahead to the next object before reading it.
 //
 // If you call the wrong retrieval method--e.g. GetInt when the next JSON token is
-// not an int, EnterObject or EnterArray when there isn't actually an object or array
+// not an int, EnterObj or EnterArray when there isn't actually an object or array
 // to read--the stream parsing will end immediately and no more data will be delivered.
 //
-// After calling EnterObject, you retrieve keys via NextObjectKey() and values via
-// the normal getters. When NextObjectKey() returns null, you have exited the
-// object, or you can call SkipObject() to skip to the end of the object
-// immediately. If you fetch the entire object (i.e. NextObjectKey() returned  null),
-// you should not call SkipObject().
+// After calling EnterObj, you retrieve keys via NextObjKey() and values via
+// the normal getters. When NextObjKey() returns null, you have exited the
+// object, or you can call SkipObj() to skip to the end of the object
+// immediately. If you fetch the entire object (i.e. NextObjKey() returned  null),
+// you should not call SkipObj().
 //
 // After calling EnterArray(), you must alternate between calling NextArrayValue()
 // to see if the array has more data, and then retrieving values via the normal
@@ -51,9 +51,9 @@ public:
     bool Double(double d) { st_ = kHasNumber; v_.SetDouble(d); return true; }
     bool RawNumber(const char*, SizeType, bool) { return false; }
     bool String(const char* str, SizeType length, bool) { st_ = kHasString; v_.SetString(str, length); return true; }
-    bool StartObject() { st_ = kEnteringObject; return true; }
+    bool StartObj() { st_ = kEnteringObj; return true; }
     bool Key(const char* str, SizeType length, bool) { st_ = kHasKey; v_.SetString(str, length); return true; }
-    bool EndObject(SizeType) { st_ = kExitingObject; return true; }
+    bool EndObj(SizeType) { st_ = kExitingObj; return true; }
     bool StartArray() { st_ = kEnteringArray; return true; }
     bool EndArray(SizeType) { st_ = kExitingArray; return true; }
 
@@ -70,8 +70,8 @@ protected:
         kHasNumber,
         kHasString,
         kHasKey,
-        kEnteringObject,
-        kExitingObject,
+        kEnteringObj,
+        kExitingObj,
         kEnteringArray,
         kExitingArray
     };
@@ -102,9 +102,9 @@ class LookaheadParser : protected LookaheadParserHandler {
 public:
     LookaheadParser(char* str) : LookaheadParserHandler(str) {}
     
-    bool EnterObject();
+    bool EnterObj();
     bool EnterArray();
-    const char* NextObjectKey();
+    const char* NextObjKey();
     bool NextArrayValue();
     int GetInt();
     double GetDouble();
@@ -112,7 +112,7 @@ public:
     bool GetBool();
     void GetNull();
 
-    void SkipObject();
+    void SkipObj();
     void SkipArray();
     void SkipValue();
     Value* PeekValue();
@@ -124,8 +124,8 @@ protected:
     void SkipOut(int depth);
 };
 
-bool LookaheadParser::EnterObject() {
-    if (st_ != kEnteringObject) {
+bool LookaheadParser::EnterObj() {
+    if (st_ != kEnteringObj) {
         st_  = kError;
         return false;
     }
@@ -144,14 +144,14 @@ bool LookaheadParser::EnterArray() {
     return true;
 }
 
-const char* LookaheadParser::NextObjectKey() {
+const char* LookaheadParser::NextObjKey() {
     if (st_ == kHasKey) {
         const char* result = v_.GetString();
         ParseNext();
         return result;
     }
     
-    if (st_ != kExitingObject) {
+    if (st_ != kExitingObj) {
         st_ = kError;
         return 0;
     }
@@ -166,7 +166,7 @@ bool LookaheadParser::NextArrayValue() {
         return false;
     }
     
-    if (st_ == kError || st_ == kExitingObject || st_ == kHasKey) {
+    if (st_ == kError || st_ == kExitingObj || st_ == kHasKey) {
         st_ = kError;
         return false;
     }
@@ -229,10 +229,10 @@ const char* LookaheadParser::GetString() {
 
 void LookaheadParser::SkipOut(int depth) {
     do {
-        if (st_ == kEnteringArray || st_ == kEnteringObject) {
+        if (st_ == kEnteringArray || st_ == kEnteringObj) {
             ++depth;
         }
-        else if (st_ == kExitingArray || st_ == kExitingObject) {
+        else if (st_ == kExitingArray || st_ == kExitingObj) {
             --depth;
         }
         else if (st_ == kError) {
@@ -252,7 +252,7 @@ void LookaheadParser::SkipArray() {
     SkipOut(1);
 }
 
-void LookaheadParser::SkipObject() {
+void LookaheadParser::SkipObj() {
     SkipOut(1);
 }
 
@@ -273,8 +273,8 @@ int LookaheadParser::PeekType() {
         return kArrayType;
     }
     
-    if (st_ == kEnteringObject) {
-        return kObjectType;
+    if (st_ == kEnteringObj) {
+        return kObjType;
     }
 
     return -1;
@@ -287,16 +287,16 @@ int main() {
 
     char json[] = " { \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null,"
         "\"i\":123, \"pi\": 3.1416, \"a\":[-1, 2, 3, 4, \"array\", []], \"skipArrays\":[1, 2, [[[3]]]], "
-        "\"skipObject\":{ \"i\":0, \"t\":true, \"n\":null, \"d\":123.45 }, "
+        "\"skipObj\":{ \"i\":0, \"t\":true, \"n\":null, \"d\":123.45 }, "
         "\"skipNested\":[[[[{\"\":0}, {\"\":[-9.87]}]]], [], []], "
         "\"skipString\":\"zzz\", \"reachedEnd\":null, \"t\":true }";
 
     LookaheadParser r(json);
     
-    RAPIDJSON_ASSERT(r.PeekType() == kObjectType);
+    RAPIDJSON_ASSERT(r.PeekType() == kObjType);
 
-    r.EnterObject();
-    while (const char* key = r.NextObjectKey()) {
+    r.EnterObj();
+    while (const char* key = r.NextObjKey()) {
         if (0 == strcmp(key, "hello")) {
             RAPIDJSON_ASSERT(r.PeekType() == kStringType);
             cout << key << ":" << r.GetString() << endl;

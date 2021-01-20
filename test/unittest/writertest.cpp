@@ -252,12 +252,12 @@ TEST(Writer, AssertRootMayBeAnyValue) {
 #undef T
 }
 
-TEST(Writer, AssertIncorrectObjectLevel) {
+TEST(Writer, AssertIncorrectObjLevel) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
-    writer.StartObject();
-    writer.EndObject();
-    ASSERT_THROW(writer.EndObject(), AssertException);
+    writer.StartObj();
+    writer.EndObj();
+    ASSERT_THROW(writer.EndObj(), AssertException);
 }
 
 TEST(Writer, AssertIncorrectArrayLevel) {
@@ -268,26 +268,26 @@ TEST(Writer, AssertIncorrectArrayLevel) {
     ASSERT_THROW(writer.EndArray(), AssertException);
 }
 
-TEST(Writer, AssertIncorrectEndObject) {
+TEST(Writer, AssertIncorrectEndObj) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
-    writer.StartObject();
+    writer.StartObj();
     ASSERT_THROW(writer.EndArray(), AssertException);
 }
 
 TEST(Writer, AssertIncorrectEndArray) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
-    writer.StartObject();
+    writer.StartObj();
     ASSERT_THROW(writer.EndArray(), AssertException);
 }
 
-TEST(Writer, AssertObjectKeyNotString) {
+TEST(Writer, AssertObjKeyNotString) {
 #define T(x)\
     {\
         StringBuffer buffer;\
         Writer<StringBuffer> writer(buffer);\
-        writer.StartObject();\
+        writer.StartObj();\
         ASSERT_THROW(x, AssertException); \
     }
     T(writer.Bool(false));
@@ -298,7 +298,7 @@ TEST(Writer, AssertObjectKeyNotString) {
     T(writer.Int64(0));
     T(writer.Uint64(0));
     T(writer.Double(0));
-    T(writer.StartObject());
+    T(writer.StartObj());
     T(writer.StartArray());
 #undef T
 }
@@ -307,9 +307,9 @@ TEST(Writer, AssertMultipleRoot) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
 
-    writer.StartObject();
-    writer.EndObject();
-    ASSERT_THROW(writer.StartObject(), AssertException);
+    writer.StartObj();
+    writer.EndObj();
+    ASSERT_THROW(writer.StartObj(), AssertException);
 
     writer.Reset(buffer);
     writer.Null();
@@ -325,17 +325,17 @@ TEST(Writer, AssertMultipleRoot) {
     //ASSERT_THROW(writer.Double(3.14), AssertException);
 }
 
-TEST(Writer, RootObjectIsComplete) {
+TEST(Writer, RootObjIsComplete) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
     EXPECT_FALSE(writer.IsComplete());
-    writer.StartObject();
+    writer.StartObj();
     EXPECT_FALSE(writer.IsComplete());
     writer.String("foo");
     EXPECT_FALSE(writer.IsComplete());
     writer.Int(1);
     EXPECT_FALSE(writer.IsComplete());
-    writer.EndObject();
+    writer.EndObj();
     EXPECT_TRUE(writer.IsComplete());
 }
 
@@ -435,7 +435,7 @@ TEST(Writer, InvalidEventSequence) {
     {
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
-        writer.StartObject();
+        writer.StartObj();
         EXPECT_THROW(writer.EndArray(), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
@@ -445,7 +445,7 @@ TEST(Writer, InvalidEventSequence) {
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
         writer.StartArray();
-        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_THROW(writer.EndObj(), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
 
@@ -453,7 +453,7 @@ TEST(Writer, InvalidEventSequence) {
     {
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
-        writer.StartObject();
+        writer.StartObj();
         EXPECT_THROW(writer.Int(1), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
@@ -462,9 +462,9 @@ TEST(Writer, InvalidEventSequence) {
     {
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
-        writer.StartObject();
+        writer.StartObj();
         writer.Key("a");
-        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_THROW(writer.EndObj(), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
 
@@ -472,11 +472,11 @@ TEST(Writer, InvalidEventSequence) {
     {
         StringBuffer buffer;
         Writer<StringBuffer> writer(buffer);
-        writer.StartObject();
+        writer.StartObj();
         writer.Key("a");
         writer.String("b");
         writer.Key("c");
-        EXPECT_THROW(writer.EndObject(), AssertException);
+        EXPECT_THROW(writer.EndObj(), AssertException);
         EXPECT_FALSE(writer.IsComplete());
     }
 }
@@ -527,13 +527,13 @@ TEST(Writer, Inf) {
 TEST(Writer, RawValue) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
-    writer.StartObject();
+    writer.StartObj();
     writer.Key("a");
     writer.Int(1);
     writer.Key("raw");
     const char json[] = "[\"Hello\\nWorld\", 123.456]";
     writer.RawValue(json, strlen(json), kArrayType);
-    writer.EndObject();
+    writer.EndObj();
     EXPECT_TRUE(writer.IsComplete());
     EXPECT_STREQ("{\"a\":1,\"raw\":[\"Hello\\nWorld\", 123.456]}", buffer.GetString());
 }
@@ -578,7 +578,7 @@ TEST(Write, RawValue_Issue1152) {
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 static Writer<StringBuffer> WriterGen(StringBuffer &target) {
     Writer<StringBuffer> writer(target);
-    writer.StartObject();
+    writer.StartObj();
     writer.Key("a");
     writer.Int(1);
     return writer;
@@ -587,7 +587,7 @@ static Writer<StringBuffer> WriterGen(StringBuffer &target) {
 TEST(Writer, MoveCtor) {
     StringBuffer buffer;
     Writer<StringBuffer> writer(WriterGen(buffer));
-    writer.EndObject();
+    writer.EndObj();
     EXPECT_TRUE(writer.IsComplete());
     EXPECT_STREQ("{\"a\":1}", buffer.GetString());
 }

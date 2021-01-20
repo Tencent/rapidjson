@@ -24,12 +24,12 @@ RAPIDJSON_DIAG_OFF(switch-enum)
 
 struct MessageHandler
     : public BaseReaderHandler<UTF8<>, MessageHandler> {
-    MessageHandler() : messages_(), state_(kExpectObjectStart), name_() {}
+    MessageHandler() : messages_(), state_(kExpectObjStart), name_() {}
 
-    bool StartObject() {
+    bool StartObj() {
         switch (state_) {
-        case kExpectObjectStart:
-            state_ = kExpectNameOrObjectEnd;
+        case kExpectObjStart:
+            state_ = kExpectNameOrObjEnd;
             return true;
         default:
             return false;
@@ -38,27 +38,27 @@ struct MessageHandler
 
     bool String(const char* str, SizeType length, bool) {
         switch (state_) {
-        case kExpectNameOrObjectEnd:
+        case kExpectNameOrObjEnd:
             name_ = string(str, length);
             state_ = kExpectValue;
             return true;
         case kExpectValue:
             messages_.insert(MessageMap::value_type(name_, string(str, length)));
-            state_ = kExpectNameOrObjectEnd;
+            state_ = kExpectNameOrObjEnd;
             return true;
         default:
             return false;
         }
     }
 
-    bool EndObject(SizeType) { return state_ == kExpectNameOrObjectEnd; }
+    bool EndObj(SizeType) { return state_ == kExpectNameOrObjEnd; }
 
     bool Default() { return false; } // All other events are invalid.
 
     MessageMap messages_;
     enum State {
-        kExpectObjectStart,
-        kExpectNameOrObjectEnd,
+        kExpectObjStart,
+        kExpectNameOrObjEnd,
         kExpectValue
     }state_;
     std::string name_;

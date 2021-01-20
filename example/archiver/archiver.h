@@ -16,16 +16,16 @@ public:
     operator bool() const;
 
     /// Starts an object
-    Archiver& StartObject();
+    Archiver& StartObj();
     
-    /// After calling StartObject(), assign a member with a name
+    /// After calling StartObj(), assign a member with a name
     Archiver& Member(const char* name);
 
-    /// After calling StartObject(), check if a member presents
+    /// After calling StartObj(), check if a member presents
     bool HasMember(const char* name) const;
 
     /// Ends an object
-    Archiver& EndObject();
+    Archiver& EndObj();
 
     /// Starts an array
     /// \param size If Archiver::IsReader is true, the size of array is written.
@@ -69,10 +69,10 @@ public:
 
     operator bool() const { return !mError; }
 
-    JsonReader& StartObject();
+    JsonReader& StartObj();
     JsonReader& Member(const char* name);
     bool HasMember(const char* name) const;
-    JsonReader& EndObject();
+    JsonReader& EndObj();
 
     JsonReader& StartArray(size_t* size = 0);
     JsonReader& EndArray();
@@ -115,10 +115,10 @@ public:
 
     operator bool() const { return true; }
 
-    JsonWriter& StartObject();
+    JsonWriter& StartObj();
     JsonWriter& Member(const char* name);
     bool HasMember(const char* name) const;
-    JsonWriter& EndObject();
+    JsonWriter& EndObj();
 
     JsonWriter& StartArray(size_t* size = 0);
     JsonWriter& EndArray();

@@ -1529,17 +1529,17 @@ TEST(Pointer, Ambiguity) {
     }
 }
 
-TEST(Pointer, ResolveOnObject) {
+TEST(Pointer, ResolveOnObj) {
     Document d;
     EXPECT_FALSE(d.Parse("{\"a\": 123}").HasParseError());
 
     {
-        Value::ConstObject o = static_cast<const Document&>(d).GetObject();
+        Value::ConstObj o = static_cast<const Document&>(d).GetObj();
         EXPECT_EQ(123, Pointer("/a").Get(o)->GetInt());
     }
 
     {
-        Value::Object o = d.GetObject();
+        Value::Obj o = d.GetObj();
         Pointer("/a").Set(o, 456, d.GetAllocator());
         EXPECT_EQ(456, Pointer("/a").Get(o)->GetInt());
     }

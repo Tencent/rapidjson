@@ -69,9 +69,9 @@ enum ParseErrorCode {
 
     kParseErrorValueInvalid,                    //!< Invalid value.
 
-    kParseErrorObjectMissName,                  //!< Missing a name for object member.
-    kParseErrorObjectMissColon,                 //!< Missing a colon after a name of object member.
-    kParseErrorObjectMissCommaOrCurlyBracket,   //!< Missing a comma or '}' after an object member.
+    kParseErrorObjMissName,                  //!< Missing a name for object member.
+    kParseErrorObjMissColon,                 //!< Missing a colon after a name of object member.
+    kParseErrorObjMissCommaOrCurlyBracket,   //!< Missing a comma or '}' after an object member.
 
     kParseErrorArrayMissCommaOrSquareBracket,   //!< Missing a comma or ']' after an array element.
 

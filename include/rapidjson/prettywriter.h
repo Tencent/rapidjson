@@ -120,10 +120,10 @@ public:
     }
 #endif
 
-    bool StartObject() {
-        PrettyPrefix(kObjectType);
+    bool StartObj() {
+        PrettyPrefix(kObjType);
         new (Base::level_stack_.template Push<typename Base::Level>()) typename Base::Level(false);
-        return Base::WriteStartObject();
+        return Base::WriteStartObj();
     }
 
     bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy); }
@@ -134,11 +134,11 @@ public:
     }
 #endif
 	
-    bool EndObject(SizeType memberCount = 0) {
+    bool EndObj(SizeType memberCount = 0) {
         (void)memberCount;
-        RAPIDJSON_ASSERT(Base::level_stack_.GetSize() >= sizeof(typename Base::Level)); // not inside an Object
-        RAPIDJSON_ASSERT(!Base::level_stack_.template Top<typename Base::Level>()->inArray); // currently inside an Array, not Object
-        RAPIDJSON_ASSERT(0 == Base::level_stack_.template Top<typename Base::Level>()->valueCount % 2); // Object has a Key without a Value
+        RAPIDJSON_ASSERT(Base::level_stack_.GetSize() >= sizeof(typename Base::Level)); // not inside an Obj
+        RAPIDJSON_ASSERT(!Base::level_stack_.template Top<typename Base::Level>()->inArray); // currently inside an Array, not Obj
+        RAPIDJSON_ASSERT(0 == Base::level_stack_.template Top<typename Base::Level>()->valueCount % 2); // Obj has a Key without a Value
        
         bool empty = Base::level_stack_.template Pop<typename Base::Level>(1)->valueCount == 0;
 
@@ -146,7 +146,7 @@ public:
             Base::os_->Put('\n');
             WriteIndent();
         }
-        bool ret = Base::EndValue(Base::WriteEndObject());
+        bool ret = Base::EndValue(Base::WriteEndObj());
         (void)ret;
         RAPIDJSON_ASSERT(ret == true);
         if (Base::level_stack_.Empty()) // end of json text

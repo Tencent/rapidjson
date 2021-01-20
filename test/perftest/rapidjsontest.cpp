@@ -200,7 +200,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseInsitu_MemoryPoolAllocator)) {
         memcpy(temp_, json_, length_ + 1);
         Document doc;
         doc.ParseInsitu(temp_);
-        ASSERT_TRUE(doc.IsObject());
+        ASSERT_TRUE(doc.IsObj());
     }
 }
 
@@ -209,7 +209,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseIterativeInsitu_MemoryPoolAllocator))
         memcpy(temp_, json_, length_ + 1);
         Document doc;
         doc.ParseInsitu<kParseIterativeFlag>(temp_);
-        ASSERT_TRUE(doc.IsObject());
+        ASSERT_TRUE(doc.IsObj());
     }
 }
 
@@ -217,7 +217,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(DocumentParse_MemoryPoolAllocator)) {
     for (size_t i = 0; i < kTrialCount; i++) {
         Document doc;
         doc.Parse(json_);
-        ASSERT_TRUE(doc.IsObject());
+        ASSERT_TRUE(doc.IsObj());
     }
 }
 
@@ -225,7 +225,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseLength_MemoryPoolAllocator)) {
     for (size_t i = 0; i < kTrialCount; i++) {
         Document doc;
         doc.Parse(json_, length_);
-        ASSERT_TRUE(doc.IsObject());
+        ASSERT_TRUE(doc.IsObj());
     }
 }
 
@@ -235,7 +235,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseStdString_MemoryPoolAllocator)) {
     for (size_t i = 0; i < kTrialCount; i++) {
         Document doc;
         doc.Parse(s);
-        ASSERT_TRUE(doc.IsObject());
+        ASSERT_TRUE(doc.IsObj());
     }
 }
 #endif
@@ -244,7 +244,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseIterative_MemoryPoolAllocator)) {
     for (size_t i = 0; i < kTrialCount; i++) {
         Document doc;
         doc.Parse<kParseIterativeFlag>(json_);
-        ASSERT_TRUE(doc.IsObject());
+        ASSERT_TRUE(doc.IsObj());
     }
 }
 
@@ -253,7 +253,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(DocumentParse_CrtAllocator)) {
         memcpy(temp_, json_, length_ + 1);
         GenericDocument<UTF8<>, CrtAllocator> doc;
         doc.Parse(temp_);
-        ASSERT_TRUE(doc.IsObject());
+        ASSERT_TRUE(doc.IsObj());
     }
 }
 
@@ -263,7 +263,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseEncodedInputStream_MemoryStream)) {
         EncodedInputStream<UTF8<>, MemoryStream> is(ms);
         Document doc;
         doc.ParseStream<0, UTF8<> >(is);
-        ASSERT_TRUE(doc.IsObject());
+        ASSERT_TRUE(doc.IsObj());
     }
 }
 
@@ -273,7 +273,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(DocumentParseAutoUTFInputStream_MemoryStream)) {
         AutoUTFInputStream<unsigned, MemoryStream> is(ms);
         Document doc;
         doc.ParseStream<0, AutoUTF<unsigned> >(is);
-        ASSERT_TRUE(doc.IsObject());
+        ASSERT_TRUE(doc.IsObj());
     }
 }
 
@@ -281,7 +281,7 @@ template<typename T>
 size_t Traverse(const T& value) {
     size_t count = 1;
     switch(value.GetType()) {
-        case kObjectType:
+        case kObjType:
             for (typename T::ConstMemberIterator itr = value.MemberBegin(); itr != value.MemberEnd(); ++itr) {
                 count++;    // name
                 count += Traverse(itr->value);
@@ -317,7 +317,7 @@ RAPIDJSON_DIAG_OFF(effc++)
 struct ValueCounter : public BaseReaderHandler<> {
     ValueCounter() : count_(1) {}   // root
 
-    bool EndObject(SizeType memberCount) { count_ += memberCount * 2; return true; }
+    bool EndObj(SizeType memberCount) { count_ += memberCount * 2; return true; }
     bool EndArray(SizeType elementCount) { count_ += elementCount; return true; }
 
     SizeType count_;

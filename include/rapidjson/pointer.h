@@ -48,7 +48,7 @@ enum PointerParseErrorCode {
 
 //! Represents a JSON Pointer. Use Pointer for UTF8 encoding and default allocator.
 /*!
-    This class implements RFC 6901 "JavaScript Object Notation (JSON) Pointer" 
+    This class implements RFC 6901 "JavaScript Obj Notation (JSON) Pointer" 
     (https://tools.ietf.org/html/rfc6901).
 
     A JSON pointer is for identifying a specific value in a JSON document
@@ -470,11 +470,11 @@ public:
             }
             else {
                 if (t->index == kPointerInvalidIndex) { // must be object name
-                    if (!v->IsObject())
-                        v->SetObject(); // Change to Object
+                    if (!v->IsObj())
+                        v->SetObj(); // Change to Obj
                 }
                 else { // object name or array index
-                    if (!v->IsArray() && !v->IsObject())
+                    if (!v->IsArray() && !v->IsObj())
                         v->SetArray(); // Change to Array
                 }
 
@@ -542,7 +542,7 @@ public:
         ValueType* v = &root;
         for (const Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
             switch (v->GetType()) {
-            case kObjectType:
+            case kObjType:
                 {
                     typename ValueType::MemberIterator m = v->FindMember(GenericValue<EncodingType>(GenericStringRef<Ch>(t->name, t->length)));
                     if (m == v->MemberEnd())
@@ -778,7 +778,7 @@ public:
         const Token* last = tokens_ + (tokenCount_ - 1);
         for (const Token *t = tokens_; t != last; ++t) {
             switch (v->GetType()) {
-            case kObjectType:
+            case kObjType:
                 {
                     typename ValueType::MemberIterator m = v->FindMember(GenericValue<EncodingType>(GenericStringRef<Ch>(t->name, t->length)));
                     if (m == v->MemberEnd())
@@ -797,7 +797,7 @@ public:
         }
 
         switch (v->GetType()) {
-        case kObjectType:
+        case kObjType:
             return v->EraseMember(GenericStringRef<Ch>(last->name, last->length));
         case kArrayType:
             if (last->index == kPointerInvalidIndex || last->index >= v->Size())
