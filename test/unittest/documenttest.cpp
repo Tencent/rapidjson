@@ -38,7 +38,7 @@ void ParseCheck(DocumentType& doc) {
         printf("Error: %d at %zu\n", static_cast<int>(doc.GetParseError()), doc.GetErrorOffset());
     EXPECT_TRUE(static_cast<ParseResult>(doc));
 
-    EXPECT_TRUE(doc.IsObject());
+    EXPECT_TRUE(doc.IsObj());
 
     EXPECT_TRUE(doc.HasMember("hello"));
     const ValueType& hello = doc["hello"];
@@ -149,7 +149,7 @@ TEST(Document, UnchangedOnParseError) {
     EXPECT_EQ(err.Code(), noError);
     EXPECT_EQ(err.Code(), doc.GetParseError());
     EXPECT_EQ(err.Offset(), doc.GetErrorOffset());
-    EXPECT_TRUE(doc.IsObject());
+    EXPECT_TRUE(doc.IsObj());
     EXPECT_EQ(doc.MemberCount(), 0u);
 }
 
@@ -297,19 +297,19 @@ TEST(Document, Swap) {
     d1.SetArray().PushBack(1, a).PushBack(2, a);
 
     Value o;
-    o.SetObject().AddMember("a", 1, a);
+    o.SetObj().AddMember("a", 1, a);
 
     // Swap between Document and Value
     d1.Swap(o);
-    EXPECT_TRUE(d1.IsObject());
+    EXPECT_TRUE(d1.IsObj());
     EXPECT_TRUE(o.IsArray());
 
     d1.Swap(o);
     EXPECT_TRUE(d1.IsArray());
-    EXPECT_TRUE(o.IsObject());
+    EXPECT_TRUE(o.IsObj());
 
     o.Swap(d1);
-    EXPECT_TRUE(d1.IsObject());
+    EXPECT_TRUE(d1.IsObj());
     EXPECT_TRUE(o.IsArray());
 
     // Swap between Document and Document
@@ -317,7 +317,7 @@ TEST(Document, Swap) {
     d2.SetArray().PushBack(3, a);
     d1.Swap(d2);
     EXPECT_TRUE(d1.IsArray());
-    EXPECT_TRUE(d2.IsObject());
+    EXPECT_TRUE(d2.IsObj());
     EXPECT_EQ(&d2.GetAllocator(), &a);
 
     // reset value
@@ -387,7 +387,7 @@ TEST(Document, UserBuffer) {
 // Issue 226: Value of string type should not point to NULL
 TEST(Document, AssertAcceptInvalidNameType) {
     Document doc;
-    doc.SetObject();
+    doc.SetObj();
     doc.AddMember("a", 0, doc.GetAllocator());
     doc.FindMember("a")->name.SetNull(); // Change name to non-string type.
 
@@ -403,7 +403,7 @@ TEST(Document, UTF16_Document) {
 
     ASSERT_TRUE(json.IsArray());
     GenericValue< UTF16<> >& v = json[0];
-    ASSERT_TRUE(v.IsObject());
+    ASSERT_TRUE(v.IsObj());
 
     GenericValue< UTF16<> >& s = v[L"created_at"];
     ASSERT_TRUE(s.IsString());
@@ -483,13 +483,13 @@ TYPED_TEST(DocumentMove, MoveConstructor) {
 
     b.Parse("{\"Foo\": \"Bar\", \"Baz\": 42}");
     EXPECT_FALSE(b.HasParseError());
-    EXPECT_TRUE(b.IsObject());
+    EXPECT_TRUE(b.IsObj());
     EXPECT_EQ(2u, b.MemberCount());
 
     // Document c = a; // does not compile (!is_copy_constructible)
     D c = std::move(b);
     EXPECT_TRUE(b.IsNull());
-    EXPECT_TRUE(c.IsObject());
+    EXPECT_TRUE(c.IsObj());
     EXPECT_EQ(2u, c.MemberCount());
     EXPECT_THROW(b.GetAllocator(), AssertException);
     EXPECT_EQ(&c.GetAllocator(), &allocator);
@@ -581,14 +581,14 @@ TYPED_TEST(DocumentMove, MoveAssignment) {
 
     b.Parse("{\"Foo\": \"Bar\", \"Baz\": 42}");
     EXPECT_FALSE(b.HasParseError());
-    EXPECT_TRUE(b.IsObject());
+    EXPECT_TRUE(b.IsObj());
     EXPECT_EQ(2u, b.MemberCount());
 
     // Document c; c = a; // does not compile (see static_assert)
     D c;
     c = std::move(b);
     EXPECT_TRUE(b.IsNull());
-    EXPECT_TRUE(c.IsObject());
+    EXPECT_TRUE(c.IsObj());
     EXPECT_EQ(2u, c.MemberCount());
     EXPECT_THROW(b.GetAllocator(), AssertException);
     EXPECT_EQ(&c.GetAllocator(), &allocator);

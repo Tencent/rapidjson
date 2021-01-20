@@ -42,9 +42,9 @@ inline const RAPIDJSON_ERROR_CHARTYPE* GetParseError_En(ParseErrorCode parseErro
     
         case kParseErrorValueInvalid:                   return RAPIDJSON_ERROR_STRING("Invalid value.");
     
-        case kParseErrorObjectMissName:                 return RAPIDJSON_ERROR_STRING("Missing a name for object member.");
-        case kParseErrorObjectMissColon:                return RAPIDJSON_ERROR_STRING("Missing a colon after a name of object member.");
-        case kParseErrorObjectMissCommaOrCurlyBracket:  return RAPIDJSON_ERROR_STRING("Missing a comma or '}' after an object member.");
+        case kParseErrorObjMissName:                 return RAPIDJSON_ERROR_STRING("Missing a name for object member.");
+        case kParseErrorObjMissColon:                return RAPIDJSON_ERROR_STRING("Missing a colon after a name of object member.");
+        case kParseErrorObjMissCommaOrCurlyBracket:  return RAPIDJSON_ERROR_STRING("Missing a comma or '}' after an object member.");
     
         case kParseErrorArrayMissCommaOrSquareBracket:  return RAPIDJSON_ERROR_STRING("Missing a comma or ']' after an array element.");
 

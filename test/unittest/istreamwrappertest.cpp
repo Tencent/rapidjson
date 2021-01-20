@@ -128,7 +128,7 @@ TEST(IStreamWrapper, ifstream) {
     EncodedInputStream<UTF8<>, IStreamWrapper> eis(isw);
     Document d;
     EXPECT_TRUE(!d.ParseStream(eis).HasParseError());
-    EXPECT_TRUE(d.IsObject());
+    EXPECT_TRUE(d.IsObj());
     EXPECT_EQ(5u, d.MemberCount());
 }
 
@@ -139,7 +139,7 @@ TEST(IStreamWrapper, fstream) {
     EncodedInputStream<UTF8<>, IStreamWrapper> eis(isw);
     Document d;
     EXPECT_TRUE(!d.ParseStream(eis).HasParseError());
-    EXPECT_TRUE(d.IsObject());
+    EXPECT_TRUE(d.IsObj());
     EXPECT_EQ(5u, d.MemberCount());
 }
 
@@ -157,7 +157,7 @@ TEST(IStreamWrapper, wifstream) {
     GenericDocument<UTF16<> > d;
     d.ParseStream<kParseDefaultFlags, UTF16<>, WIStreamWrapper>(isw);
     EXPECT_TRUE(!d.HasParseError());
-    EXPECT_TRUE(d.IsObject());
+    EXPECT_TRUE(d.IsObj());
     EXPECT_EQ(5, d.MemberCount());
 }
 
@@ -170,7 +170,7 @@ TEST(IStreamWrapper, wfstream) {
     GenericDocument<UTF16<> > d;
     d.ParseStream<kParseDefaultFlags, UTF16<>, WIStreamWrapper>(isw);
     EXPECT_TRUE(!d.HasParseError());
-    EXPECT_TRUE(d.IsObject());
+    EXPECT_TRUE(d.IsObj());
     EXPECT_EQ(5, d.MemberCount());
 }
 

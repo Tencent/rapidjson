@@ -137,13 +137,13 @@ TEST_F(Platform, MapViewOfFile) {
     for (int i = 0; i < kTrialCount; i++) {
         HANDLE file = CreateFile(filename_, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         ASSERT_NE(INVALID_HANDLE_VALUE, file);
-        HANDLE mapObject = CreateFileMapping(file, NULL, PAGE_READONLY, 0, length_, NULL);
-        ASSERT_NE(INVALID_HANDLE_VALUE, mapObject);
-        void *p = MapViewOfFile(mapObject, FILE_MAP_READ, 0, 0, length_);
+        HANDLE mapObj = CreateFileMapping(file, NULL, PAGE_READONLY, 0, length_, NULL);
+        ASSERT_NE(INVALID_HANDLE_VALUE, mapObj);
+        void *p = MapViewOfFile(mapObj, FILE_MAP_READ, 0, 0, length_);
         ASSERT_TRUE(p != NULL);
         EXPECT_EQ(checkSum_, CheckSum());
         ASSERT_TRUE(UnmapViewOfFile(p) == TRUE);
-        ASSERT_TRUE(CloseHandle(mapObject) == TRUE);
+        ASSERT_TRUE(CloseHandle(mapObj) == TRUE);
         ASSERT_TRUE(CloseHandle(file) == TRUE);
     }
 }

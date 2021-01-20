@@ -1089,8 +1089,8 @@ TEST(Reader, ParseArray_Error) {
 #undef TEST_ARRAY_ERROR
 }
 
-struct ParseObjectHandler : BaseReaderHandler<UTF8<>, ParseObjectHandler> {
-    ParseObjectHandler() : step_(0) {}
+struct ParseObjHandler : BaseReaderHandler<UTF8<>, ParseObjHandler> {
+    ParseObjHandler() : step_(0) {}
 
     bool Default() { ADD_FAILURE(); return false; }
     bool Null() { EXPECT_EQ(8u, step_); step_++; return true; }
@@ -1125,22 +1125,22 @@ struct ParseObjectHandler : BaseReaderHandler<UTF8<>, ParseObjectHandler> {
             default: ADD_FAILURE(); return false;
         }
     }
-    bool StartObject() { EXPECT_EQ(0u, step_); step_++; return true; }
-    bool EndObject(SizeType memberCount) { EXPECT_EQ(19u, step_); EXPECT_EQ(7u, memberCount); step_++; return true; }
+    bool StartObj() { EXPECT_EQ(0u, step_); step_++; return true; }
+    bool EndObj(SizeType memberCount) { EXPECT_EQ(19u, step_); EXPECT_EQ(7u, memberCount); step_++; return true; }
     bool StartArray() { EXPECT_EQ(14u, step_); step_++; return true; }
     bool EndArray(SizeType elementCount) { EXPECT_EQ(18u, step_); EXPECT_EQ(3u, elementCount); step_++; return true; }
 
     unsigned step_;
 };
 
-TEST(Reader, ParseObject) {
+TEST(Reader, ParseObj) {
     const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] } ";
 
     // Insitu
     {
         char* json2 = StrDup(json);
         InsituStringStream s(json2);
-        ParseObjectHandler h;
+        ParseObjHandler h;
         Reader reader;
         reader.Parse<kParseInsituFlag>(s, h);
         EXPECT_EQ(20u, h.step_);
@@ -1150,26 +1150,26 @@ TEST(Reader, ParseObject) {
     // Normal
     {
         StringStream s(json);
-        ParseObjectHandler h;
+        ParseObjHandler h;
         Reader reader;
         reader.Parse(s, h);
         EXPECT_EQ(20u, h.step_);
     }
 }
 
-struct ParseEmptyObjectHandler : BaseReaderHandler<UTF8<>, ParseEmptyObjectHandler> {
-    ParseEmptyObjectHandler() : step_(0) {}
+struct ParseEmptyObjHandler : BaseReaderHandler<UTF8<>, ParseEmptyObjHandler> {
+    ParseEmptyObjHandler() : step_(0) {}
 
     bool Default() { ADD_FAILURE(); return false; }
-    bool StartObject() { EXPECT_EQ(0u, step_); step_++; return true; }
-    bool EndObject(SizeType) { EXPECT_EQ(1u, step_); step_++; return true; }
+    bool StartObj() { EXPECT_EQ(0u, step_); step_++; return true; }
+    bool EndObj(SizeType) { EXPECT_EQ(1u, step_); step_++; return true; }
 
     unsigned step_;
 };
 
-TEST(Reader, Parse_EmptyObject) {
+TEST(Reader, Parse_EmptyObj) {
     StringStream s("{ } ");
-    ParseEmptyObjectHandler h;
+    ParseEmptyObjHandler h;
     Reader reader;
     reader.Parse(s, h);
     EXPECT_EQ(2u, h.step_);
@@ -1179,8 +1179,8 @@ struct ParseMultipleRootHandler : BaseReaderHandler<UTF8<>, ParseMultipleRootHan
     ParseMultipleRootHandler() : step_(0) {}
 
     bool Default() { ADD_FAILURE(); return false; }
-    bool StartObject() { EXPECT_EQ(0u, step_); step_++; return true; }
-    bool EndObject(SizeType) { EXPECT_EQ(1u, step_); step_++; return true; }
+    bool StartObj() { EXPECT_EQ(0u, step_); step_++; return true; }
+    bool EndObj(SizeType) { EXPECT_EQ(1u, step_); step_++; return true; }
     bool StartArray() { EXPECT_EQ(2u, step_); step_++; return true; }
     bool EndArray(SizeType) { EXPECT_EQ(3u, step_); step_++; return true; }
 
@@ -1267,28 +1267,28 @@ TEST(Reader, ParseValue_Error) {
     TEST_ERROR(kParseErrorValueInvalid, ".1", 0u);
 }
 
-TEST(Reader, ParseObject_Error) {
+TEST(Reader, ParseObj_Error) {
     // Missing a name for object member.
-    TEST_ERROR(kParseErrorObjectMissName, "{1}", 1u);
-    TEST_ERROR(kParseErrorObjectMissName, "{:1}", 1u);
-    TEST_ERROR(kParseErrorObjectMissName, "{null:1}", 1u);
-    TEST_ERROR(kParseErrorObjectMissName, "{true:1}", 1u);
-    TEST_ERROR(kParseErrorObjectMissName, "{false:1}", 1u);
-    TEST_ERROR(kParseErrorObjectMissName, "{1:1}", 1u);
-    TEST_ERROR(kParseErrorObjectMissName, "{[]:1}", 1u);
-    TEST_ERROR(kParseErrorObjectMissName, "{{}:1}", 1u);
-    TEST_ERROR(kParseErrorObjectMissName, "{xyz:1}", 1u);
+    TEST_ERROR(kParseErrorObjMissName, "{1}", 1u);
+    TEST_ERROR(kParseErrorObjMissName, "{:1}", 1u);
+    TEST_ERROR(kParseErrorObjMissName, "{null:1}", 1u);
+    TEST_ERROR(kParseErrorObjMissName, "{true:1}", 1u);
+    TEST_ERROR(kParseErrorObjMissName, "{false:1}", 1u);
+    TEST_ERROR(kParseErrorObjMissName, "{1:1}", 1u);
+    TEST_ERROR(kParseErrorObjMissName, "{[]:1}", 1u);
+    TEST_ERROR(kParseErrorObjMissName, "{{}:1}", 1u);
+    TEST_ERROR(kParseErrorObjMissName, "{xyz:1}", 1u);
 
     // Missing a colon after a name of object member.
-    TEST_ERROR(kParseErrorObjectMissColon, "{\"a\" 1}", 5u);
-    TEST_ERROR(kParseErrorObjectMissColon, "{\"a\",1}", 4u);
+    TEST_ERROR(kParseErrorObjMissColon, "{\"a\" 1}", 5u);
+    TEST_ERROR(kParseErrorObjMissColon, "{\"a\",1}", 4u);
 
     // Must be a comma or '}' after an object member
-    TEST_ERROR(kParseErrorObjectMissCommaOrCurlyBracket, "{\"a\":1]", 6u);
+    TEST_ERROR(kParseErrorObjMissCommaOrCurlyBracket, "{\"a\":1]", 6u);
 
-    // Object cannot have a trailing comma (without kParseTrailingCommasFlag);
+    // Obj cannot have a trailing comma (without kParseTrailingCommasFlag);
     // an object member name must follow a comma
-    TEST_ERROR(kParseErrorObjectMissName, "{\"a\":1,}", 7u);
+    TEST_ERROR(kParseErrorObjMissName, "{\"a\":1,}", 7u);
 
     // This tests that MemoryStream is checking the length in Peek().
     {
@@ -1296,7 +1296,7 @@ TEST(Reader, ParseObject_Error) {
         BaseReaderHandler<> h;
         Reader reader;
         EXPECT_FALSE(reader.Parse<kParseStopWhenDoneFlag>(ms, h));
-        EXPECT_EQ(kParseErrorObjectMissName, reader.GetParseErrorCode());
+        EXPECT_EQ(kParseErrorObjMissName, reader.GetParseErrorCode());
     }
 }
 
@@ -1354,7 +1354,7 @@ struct StreamTraits<CustomStringStream<Encoding> > {
 TEST(Reader, CustomStringStream) {
     const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] } ";
     CustomStringStream<UTF8<char> > s(json);
-    ParseObjectHandler h;
+    ParseObjHandler h;
     Reader reader;
     reader.Parse(s, h);
     EXPECT_EQ(20u, h.step_);
@@ -1425,10 +1425,10 @@ TEST(Reader, IterativeParsing_ErrorHandling) {
     TESTERRORHANDLING("", kParseErrorDocumentEmpty, 0u);
     TESTERRORHANDLING("{}{}", kParseErrorDocumentRootNotSingular, 2u);
 
-    TESTERRORHANDLING("{1}", kParseErrorObjectMissName, 1u);
-    TESTERRORHANDLING("{\"a\", 1}", kParseErrorObjectMissColon, 4u);
-    TESTERRORHANDLING("{\"a\"}", kParseErrorObjectMissColon, 4u);
-    TESTERRORHANDLING("{\"a\": 1", kParseErrorObjectMissCommaOrCurlyBracket, 7u);
+    TESTERRORHANDLING("{1}", kParseErrorObjMissName, 1u);
+    TESTERRORHANDLING("{\"a\", 1}", kParseErrorObjMissColon, 4u);
+    TESTERRORHANDLING("{\"a\"}", kParseErrorObjMissColon, 4u);
+    TESTERRORHANDLING("{\"a\": 1", kParseErrorObjMissCommaOrCurlyBracket, 7u);
     TESTERRORHANDLING("[1 2 3]", kParseErrorArrayMissCommaOrSquareBracket, 3u);
     TESTERRORHANDLING("{\"a: 1", kParseErrorStringMissQuotationMark, 6u);
     TESTERRORHANDLING("{\"a\":}", kParseErrorValueInvalid, 5u);
@@ -1439,7 +1439,7 @@ TEST(Reader, IterativeParsing_ErrorHandling) {
     TESTERRORHANDLING("[1,,]", kParseErrorValueInvalid, 3u);
 
     // Trailing commas are not allowed without kParseTrailingCommasFlag
-    TESTERRORHANDLING("{\"a\": 1,}", kParseErrorObjectMissName, 8u);
+    TESTERRORHANDLING("{\"a\": 1,}", kParseErrorObjMissName, 8u);
     TESTERRORHANDLING("[1,2,3,]", kParseErrorValueInvalid, 7u);
 
     // Any JSON value can be a valid root element in RFC7159.
@@ -1496,11 +1496,11 @@ struct IterativeParsingReaderHandler {
 
     bool String(const Ch*, SizeType, bool) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STRING; return true; }
 
-    bool StartObject() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STARTOBJECT; return true; }
+    bool StartObj() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STARTOBJECT; return true; }
 
     bool Key (const Ch*, SizeType, bool) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_KEY; return true; }
 
-    bool EndObject(SizeType c) {
+    bool EndObj(SizeType c) {
         RAPIDJSON_ASSERT(LogCount < LogCapacity);
         RAPIDJSON_ASSERT((static_cast<uint32_t>(c) & 0xF0000000) == 0);
         Logs[LogCount++] = LOG_ENDOBJECT | static_cast<uint32_t>(c);
@@ -1635,16 +1635,16 @@ TEST(Reader, IterativePullParsing_General) {
 }
 
 // Test iterative parsing on kParseErrorTermination.
-struct HandlerTerminateAtStartObject : public IterativeParsingReaderHandler<> {
-    bool StartObject() { return false; }
+struct HandlerTerminateAtStartObj : public IterativeParsingReaderHandler<> {
+    bool StartObj() { return false; }
 };
 
 struct HandlerTerminateAtStartArray : public IterativeParsingReaderHandler<> {
     bool StartArray() { return false; }
 };
 
-struct HandlerTerminateAtEndObject : public IterativeParsingReaderHandler<> {
-    bool EndObject(SizeType) { return false; }
+struct HandlerTerminateAtEndObj : public IterativeParsingReaderHandler<> {
+    bool EndObj(SizeType) { return false; }
 };
 
 struct HandlerTerminateAtEndArray : public IterativeParsingReaderHandler<> {
@@ -1653,7 +1653,7 @@ struct HandlerTerminateAtEndArray : public IterativeParsingReaderHandler<> {
 
 TEST(Reader, IterativeParsing_ShortCircuit) {
     {
-        HandlerTerminateAtStartObject handler;
+        HandlerTerminateAtStartObj handler;
         Reader reader;
         StringStream is("[1, {}]");
 
@@ -1677,7 +1677,7 @@ TEST(Reader, IterativeParsing_ShortCircuit) {
     }
 
     {
-        HandlerTerminateAtEndObject handler;
+        HandlerTerminateAtEndObj handler;
         Reader reader;
         StringStream is("[1, {}]");
 
@@ -1720,9 +1720,9 @@ struct TerminateHandler {
     bool Double(double) { return e != 6; }
     bool RawNumber(const char*, SizeType, bool) { return e != 7; }
     bool String(const char*, SizeType, bool) { return e != 8; }
-    bool StartObject() { return e != 9; }
+    bool StartObj() { return e != 9; }
     bool Key(const char*, SizeType, bool)  { return e != 10; }
-    bool EndObject(SizeType) { return e != 11; }
+    bool EndObj(SizeType) { return e != 11; }
     bool StartArray() { return e != 12; }
     bool EndArray(SizeType) { return e != 13; }
 };
@@ -1768,7 +1768,7 @@ TEST(Reader, ParseComments) {
     "}/*And the last one to be sure */";
 
     StringStream s(json);
-    ParseObjectHandler h;
+    ParseObjHandler h;
     Reader reader;
     EXPECT_TRUE(reader.Parse<kParseCommentsFlag>(s, h));
     EXPECT_EQ(20u, h.step_);
@@ -1778,7 +1778,7 @@ TEST(Reader, ParseEmptyInlineComment) {
     const char* json = "{/**/\"hello\" : \"world\", \"t\" : true, \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] }";
 
     StringStream s(json);
-    ParseObjectHandler h;
+    ParseObjHandler h;
     Reader reader;
     EXPECT_TRUE(reader.Parse<kParseCommentsFlag>(s, h));
     EXPECT_EQ(20u, h.step_);
@@ -1788,7 +1788,7 @@ TEST(Reader, ParseEmptyOnelineComment) {
     const char* json = "{//\n\"hello\" : \"world\", \"t\" : true, \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] }";
 
     StringStream s(json);
-    ParseObjectHandler h;
+    ParseObjHandler h;
     Reader reader;
     EXPECT_TRUE(reader.Parse<kParseCommentsFlag>(s, h));
     EXPECT_EQ(20u, h.step_);
@@ -1801,7 +1801,7 @@ TEST(Reader, ParseMultipleCommentsInARow) {
     "\"hello\" : \"world\", \"t\" : true, \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] }";
 
     StringStream s(json);
-    ParseObjectHandler h;
+    ParseObjHandler h;
     Reader reader;
     EXPECT_TRUE(reader.Parse<kParseCommentsFlag>(s, h));
     EXPECT_EQ(20u, h.step_);
@@ -1812,7 +1812,7 @@ TEST(Reader, InlineCommentsAreDisabledByDefault) {
         const char* json = "{/* Inline comment. */\"hello\" : \"world\", \"t\" : true, \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] }";
 
         StringStream s(json);
-        ParseObjectHandler h;
+        ParseObjHandler h;
         Reader reader;
         EXPECT_FALSE(reader.Parse<kParseDefaultFlags>(s, h));
     }
@@ -1824,7 +1824,7 @@ TEST(Reader, InlineCommentsAreDisabledByDefault) {
         " and ends here */\"world\", \"t\" :true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] }";
 
         StringStream s(json);
-        ParseObjectHandler h;
+        ParseObjHandler h;
         Reader reader;
         EXPECT_FALSE(reader.Parse<kParseDefaultFlags>(s, h));
     }
@@ -1834,7 +1834,7 @@ TEST(Reader, OnelineCommentsAreDisabledByDefault) {
     const char* json = "{// One-line comment\n\"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3] }";
 
     StringStream s(json);
-    ParseObjectHandler h;
+    ParseObjHandler h;
     Reader reader;
     EXPECT_FALSE(reader.Parse<kParseDefaultFlags>(s, h));
 }
@@ -1843,17 +1843,17 @@ TEST(Reader, EofAfterOneLineComment) {
     const char* json = "{\"hello\" : \"world\" // EOF is here -->\0 \n}";
 
     StringStream s(json);
-    ParseObjectHandler h;
+    ParseObjHandler h;
     Reader reader;
     EXPECT_FALSE(reader.Parse<kParseCommentsFlag>(s, h));
-    EXPECT_EQ(kParseErrorObjectMissCommaOrCurlyBracket, reader.GetParseErrorCode());
+    EXPECT_EQ(kParseErrorObjMissCommaOrCurlyBracket, reader.GetParseErrorCode());
 }
 
 TEST(Reader, IncompleteMultilineComment) {
     const char* json = "{\"hello\" : \"world\" /* EOF is here -->\0 */}";
 
     StringStream s(json);
-    ParseObjectHandler h;
+    ParseObjHandler h;
     Reader reader;
     EXPECT_FALSE(reader.Parse<kParseCommentsFlag>(s, h));
     EXPECT_EQ(kParseErrorUnspecificSyntaxError, reader.GetParseErrorCode());
@@ -1863,7 +1863,7 @@ TEST(Reader, IncompleteMultilineComment2) {
     const char* json = "{\"hello\" : \"world\" /* *\0 */}";
 
     StringStream s(json);
-    ParseObjectHandler h;
+    ParseObjHandler h;
     Reader reader;
     EXPECT_FALSE(reader.Parse<kParseCommentsFlag>(s, h));
     EXPECT_EQ(kParseErrorUnspecificSyntaxError, reader.GetParseErrorCode());
@@ -1873,7 +1873,7 @@ TEST(Reader, UnrecognizedComment) {
     const char* json = "{\"hello\" : \"world\" /! }";
 
     StringStream s(json);
-    ParseObjectHandler h;
+    ParseObjHandler h;
     Reader reader;
     EXPECT_FALSE(reader.Parse<kParseCommentsFlag>(s, h));
     EXPECT_EQ(kParseErrorUnspecificSyntaxError, reader.GetParseErrorCode());
@@ -1895,9 +1895,9 @@ struct NumbersAsStringsHandler {
         return true;
     }
     bool String(const char*, SizeType, bool) { return true; }
-    bool StartObject() { return true; }
+    bool StartObj() { return true; }
     bool Key(const char*, SizeType, bool) { return true; }
-    bool EndObject(SizeType) { return true; }
+    bool EndObj(SizeType) { return true; }
     bool StartArray() { return true; }
     bool EndArray(SizeType) { return true; }
 
@@ -2004,7 +2004,7 @@ void TestTrailingCommas() {
         const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false,"
                 "\"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3],}";
         StringStream s(json);
-        ParseObjectHandler h;
+        ParseObjHandler h;
         Reader reader;
         EXPECT_TRUE(reader.Parse<extraFlags|kParseTrailingCommasFlag>(s, h));
         EXPECT_EQ(20u, h.step_);
@@ -2014,7 +2014,7 @@ void TestTrailingCommas() {
         const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false,"
                 "\"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3\n,\n]\n,\n} ";
         StringStream s(json);
-        ParseObjectHandler h;
+        ParseObjHandler h;
         Reader reader;
         EXPECT_TRUE(reader.Parse<extraFlags|kParseTrailingCommasFlag>(s, h));
         EXPECT_EQ(20u, h.step_);
@@ -2024,7 +2024,7 @@ void TestTrailingCommas() {
         const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false, \"n\": null,"
                 "\"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3/*test*/,/*test*/]/*test*/,/*test*/}";
         StringStream s(json);
-        ParseObjectHandler h;
+        ParseObjHandler h;
         Reader reader;
         EXPECT_TRUE(reader.Parse<extraFlags|kParseTrailingCommasFlag|kParseCommentsFlag>(s, h));
         EXPECT_EQ(20u, h.step_);
@@ -2055,11 +2055,11 @@ void TestMultipleTrailingCommaErrors() {
         const char* json = "{ \"hello\" : \"world\", \"t\" : true , \"f\" : false,"
                 "\"n\": null, \"i\":123, \"pi\": 3.1416, \"a\":[1, 2, 3,],,}";
         StringStream s(json);
-        ParseObjectHandler h;
+        ParseObjHandler h;
         Reader reader;
         ParseResult r = reader.Parse<extraFlags|kParseTrailingCommasFlag>(s, h);
         EXPECT_TRUE(reader.HasParseError());
-        EXPECT_EQ(kParseErrorObjectMissName, r.Code());
+        EXPECT_EQ(kParseErrorObjMissName, r.Code());
         EXPECT_EQ(95u, r.Offset());
     }
 }
@@ -2087,11 +2087,11 @@ void TestEmptyExceptForCommaErrors() {
     }
     {
         StringStream s("{,}");
-        ParseObjectHandler h;
+        ParseObjHandler h;
         Reader reader;
         ParseResult r = reader.Parse<extraFlags|kParseTrailingCommasFlag>(s, h);
         EXPECT_TRUE(reader.HasParseError());
-        EXPECT_EQ(kParseErrorObjectMissName, r.Code());
+        EXPECT_EQ(kParseErrorObjMissName, r.Code());
         EXPECT_EQ(1u, r.Offset());
     }
 }
@@ -2116,7 +2116,7 @@ void TestTrailingCommaHandlerTermination() {
         EXPECT_EQ(7u, r.Offset());
     }
     {
-        HandlerTerminateAtEndObject h;
+        HandlerTerminateAtEndObj h;
         Reader reader;
         StringStream s("{\"t\": true, \"f\": false,}");
         ParseResult r = reader.Parse<extraFlags|kParseTrailingCommasFlag>(s, h);

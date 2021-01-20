@@ -49,7 +49,7 @@ public:
 
     template <typename Writer>
     void Serialize(Writer& writer) const {
-        writer.StartObject();
+        writer.StartObj();
         
         writer.String("school");
 #if RAPIDJSON_HAS_STDSTRING
@@ -61,7 +61,7 @@ public:
         writer.String("GPA");
         writer.Double(GPA_);
 
-        writer.EndObject();
+        writer.EndObj();
     }
 
 private:
@@ -85,7 +85,7 @@ public:
 
     template <typename Writer>
     void Serialize(Writer& writer) const {
-        writer.StartObject();
+        writer.StartObj();
 
         Person::Serialize(writer);
 
@@ -95,7 +95,7 @@ public:
         else
             writer.Null();
 
-        writer.EndObject();
+        writer.EndObj();
     }
 
 private:
@@ -126,7 +126,7 @@ public:
 
     template <typename Writer>
     void Serialize(Writer& writer) const {
-        writer.StartObject();
+        writer.StartObj();
 
         Person::Serialize(writer);
 
@@ -139,7 +139,7 @@ public:
             dependentItr->Serialize(writer);
         writer.EndArray();
 
-        writer.EndObject();
+        writer.EndObj();
     }
 
 private:

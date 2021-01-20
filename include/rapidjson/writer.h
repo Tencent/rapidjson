@@ -121,14 +121,14 @@ public:
         \param os New output stream.
         \code
         Writer<OutputStream> writer(os1);
-        writer.StartObject();
+        writer.StartObj();
         // ...
-        writer.EndObject();
+        writer.EndObj();
 
         writer.Reset(os2);
-        writer.StartObject();
+        writer.StartObj();
         // ...
-        writer.EndObject();
+        writer.EndObj();
         \endcode
     */
     void Reset(OutputStream& os) {
@@ -213,10 +213,10 @@ public:
     }
 #endif
 
-    bool StartObject() {
-        Prefix(kObjectType);
+    bool StartObj() {
+        Prefix(kObjType);
         new (level_stack_.template Push<Level>()) Level(false);
-        return WriteStartObject();
+        return WriteStartObj();
     }
 
     bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy); }
@@ -228,13 +228,13 @@ public:
     }
 #endif
 
-    bool EndObject(SizeType memberCount = 0) {
+    bool EndObj(SizeType memberCount = 0) {
         (void)memberCount;
-        RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level)); // not inside an Object
-        RAPIDJSON_ASSERT(!level_stack_.template Top<Level>()->inArray); // currently inside an Array, not Object
-        RAPIDJSON_ASSERT(0 == level_stack_.template Top<Level>()->valueCount % 2); // Object has a Key without a Value
+        RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level)); // not inside an Obj
+        RAPIDJSON_ASSERT(!level_stack_.template Top<Level>()->inArray); // currently inside an Array, not Obj
+        RAPIDJSON_ASSERT(0 == level_stack_.template Top<Level>()->valueCount % 2); // Obj has a Key without a Value
         level_stack_.template Pop<Level>(1);
-        return EndValue(WriteEndObject());
+        return EndValue(WriteEndObj());
     }
 
     bool StartArray() {
@@ -452,8 +452,8 @@ protected:
         return RAPIDJSON_LIKELY(is.Tell() < length);
     }
 
-    bool WriteStartObject() { os_->Put('{'); return true; }
-    bool WriteEndObject()   { os_->Put('}'); return true; }
+    bool WriteStartObj() { os_->Put('{'); return true; }
+    bool WriteEndObj()   { os_->Put('}'); return true; }
     bool WriteStartArray()  { os_->Put('['); return true; }
     bool WriteEndArray()    { os_->Put(']'); return true; }
 

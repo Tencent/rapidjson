@@ -33,14 +33,14 @@ public:
     bool RawNumber(const Ch* str, SizeType len, bool copy) { return filterValueDepth_ > 0 ? EndValue() : outputHandler_.RawNumber(str, len, copy) && EndValue(); }
     bool String   (const Ch* str, SizeType len, bool copy) { return filterValueDepth_ > 0 ? EndValue() : outputHandler_.String   (str, len, copy) && EndValue(); }
     
-    bool StartObject() { 
+    bool StartObj() { 
         if (filterValueDepth_ > 0) {
             filterValueDepth_++;
             return true;
         }
         else {
             filteredKeyCount_.push(0);
-            return outputHandler_.StartObject();
+            return outputHandler_.StartObj();
         }
     }
     
@@ -57,7 +57,7 @@ public:
         }
     }
 
-    bool EndObject(SizeType) {
+    bool EndObj(SizeType) {
         if (filterValueDepth_ > 0) {
             filterValueDepth_--;
             return EndValue();
@@ -66,7 +66,7 @@ public:
             // Use our own filtered memberCount
             SizeType memberCount = filteredKeyCount_.top();
             filteredKeyCount_.pop();
-            return outputHandler_.EndObject(memberCount) && EndValue();
+            return outputHandler_.EndObj(memberCount) && EndValue();
         }
     }
 

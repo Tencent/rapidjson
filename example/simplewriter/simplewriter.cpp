@@ -9,7 +9,7 @@ int main() {
     StringBuffer s;
     Writer<StringBuffer> writer(s);
     
-    writer.StartObject();               // Between StartObject()/EndObject(), 
+    writer.StartObj();               // Between StartObj()/EndObj(), 
     writer.Key("hello");                // output a key,
     writer.String("world");             // follow by a value.
     writer.Key("t");
@@ -27,7 +27,7 @@ int main() {
     for (unsigned i = 0; i < 4; i++)
         writer.Uint(i);                 // all values are elements of the array.
     writer.EndArray();
-    writer.EndObject();
+    writer.EndObj();
 
     // {"hello":"world","t":true,"f":false,"n":null,"i":123,"pi":3.1416,"a":[0,1,2,3]}
     cout << s.GetString() << endl;

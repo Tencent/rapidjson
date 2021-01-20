@@ -58,9 +58,9 @@ struct NoOpHandler {
     bool Double(double) { return true; }
     bool RawNumber(const char*, SizeType, bool) { return true; }
     bool String(const char*, SizeType, bool) { return true; }
-    bool StartObject() { return true; }
+    bool StartObj() { return true; }
     bool Key(const char*, SizeType, bool) { return true; }
-    bool EndObject(SizeType) { return true; }
+    bool EndObj(SizeType) { return true; }
     bool StartArray() { return true; }
     bool EndArray(SizeType) { return true; }
 };

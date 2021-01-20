@@ -35,7 +35,7 @@ int main(int, char*[]) {
     // 2. Access values in document. 
 
     printf("\nAccess values in document:\n");
-    assert(document.IsObject());    // Document is a JSON value represents the root of DOM. Root can be either an object or array.
+    assert(document.IsObj());    // Document is a JSON value represents the root of DOM. Root can be either an object or array.
 
     assert(document.HasMember("hello"));
     assert(document["hello"].IsString());
@@ -81,7 +81,7 @@ int main(int, char*[]) {
     }
 
     // Iterating object members
-    static const char* kTypeNames[] = { "Null", "False", "True", "Object", "Array", "String", "Number" };
+    static const char* kTypeNames[] = { "Null", "False", "True", "Obj", "Array", "String", "Number" };
     for (Value::ConstMemberIterator itr = document.MemberBegin(); itr != document.MemberEnd(); ++itr)
         printf("Type of member %s is %s\n", itr->name.GetString(), kTypeNames[itr->value.GetType()]);
 

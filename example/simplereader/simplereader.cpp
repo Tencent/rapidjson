@@ -20,12 +20,12 @@ struct MyHandler {
         cout << "String(" << str << ", " << length << ", " << boolalpha << copy << ")" << endl;
         return true;
     }
-    bool StartObject() { cout << "StartObject()" << endl; return true; }
+    bool StartObj() { cout << "StartObj()" << endl; return true; }
     bool Key(const char* str, SizeType length, bool copy) {
         cout << "Key(" << str << ", " << length << ", " << boolalpha << copy << ")" << endl;
         return true;
     }
-    bool EndObject(SizeType memberCount) { cout << "EndObject(" << memberCount << ")" << endl; return true; }
+    bool EndObj(SizeType memberCount) { cout << "EndObj(" << memberCount << ")" << endl; return true; }
     bool StartArray() { cout << "StartArray()" << endl; return true; }
     bool EndArray(SizeType elementCount) { cout << "EndArray(" << elementCount << ")" << endl; return true; }
 };

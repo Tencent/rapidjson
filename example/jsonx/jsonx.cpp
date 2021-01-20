@@ -71,7 +71,7 @@ public:
             WriteEndElement("string");
     }
 
-    bool StartObject() {
+    bool StartObj() {
         return WriteStartElement("object");
     }
 
@@ -84,7 +84,7 @@ public:
         return true;
     }
 
-    bool EndObject(SizeType) {
+    bool EndObj(SizeType) {
         return WriteEndElement("object");
     }
 
