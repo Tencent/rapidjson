@@ -8,7 +8,6 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/prettywriter.h"
 #include <string>
-#include <regex>
 #include <iostream>
 
 using namespace rapidjson;
@@ -21,87 +20,90 @@ static void CreateErrorMessages(const ValueType& errors, size_t depth, const cha
 // Convert GenericValue to std::string
 static std::string GetString(const ValueType& val) {
     std::string str("");
-    if (val.IsString()) {
+    if (val.IsString())
         str = val.GetString();
-    } else if (val.IsDouble()) {
+    else if (val.IsDouble())
         str = std::to_string(val.GetDouble());
-    } else if (val.IsUint()) {
+    else if (val.IsUint())
         str = std::to_string(val.GetUint());
-    } else if (val.IsInt()) {
+    else if (val.IsInt())
         str = std::to_string(val.GetInt());
-    } else if (val.IsUint64()) {
+    else if (val.IsUint64())
         str = std::to_string(val.GetUint64());
-    } else if (val.IsInt64()) {
+    else if (val.IsInt64())
         str = std::to_string(val.GetInt64());
-    } else if (val.IsBool()) {
-        str = std::to_string(val.GetBool());
-    } else if (val.IsFloat()) {
+    else if (val.IsBool() && val.GetBool())
+        str = "true";
+    else if (val.IsBool())
+        str = "false";
+    else if (val.IsFloat())
         str = std::to_string(val.GetFloat());
-    }
     return str;
 }
 
 // Create the error message for a named error
-// Expects the error object to contain at least member properties:
-// {
-//   "errorCode": <code>,
-//   "instanceRef": "<pointer>",
-//   "schemaRef": "<pointer>"
-// }
+// The error object can either be empty or contain at least member properties:
+// {"errorCode": <code>, "instanceRef": "<pointer>", "schemaRef": "<pointer>" }
 // Additional properties may be present for use as inserts.
 // An "errors" property may be present if there are child errors.
 static void HandleError(const char* errorName, const ValueType& error, size_t depth, const char* context) {
+  if (!error.ObjectEmpty()) {
     // Get error code and look up error message text (English)
     int code = error["errorCode"].GetInt();
     std::string message(GetValidateError_En(static_cast<ValidateErrorCode>(code)));
     // For each member property in the error, see if its name exists as an insert in the error message and if so replace with the stringified property value
     // So for example - "Number '%actual' is not a multiple of the 'multipleOf' value '%expected'." - we would expect "actual" and "expected" members.
-    for (ValueType::ConstMemberIterator insertsItr = error.MemberBegin(); insertsItr != error.MemberEnd(); ++insertsItr) {
-        std::string insertRegex("\\%");
-        insertRegex += insertsItr->name.GetString(); // eg "\%actual"
-        if (std::regex_search(message, std::regex(insertRegex))) {
-            std::string insertString("");
-            const ValueType &insert = insertsItr->value;
-            if (insert.IsArray()) {
-                // Member is an array so create comma-separated list of items for the insert string
-                for (ValueType::ConstValueIterator itemsItr = insert.Begin(); itemsItr != insert.End(); ++itemsItr) {
-                    if (itemsItr != insert.Begin()) insertString += ",";
-                    insertString += GetString(*itemsItr);
-                }
-            } else {
-                insertString += GetString(insert);
-            }
-            message = std::regex_replace(message, std::regex(insertRegex), insertString);
+    for (ValueType::ConstMemberIterator insertsItr = error.MemberBegin();
+      insertsItr != error.MemberEnd(); ++insertsItr) {
+      std::string insertName("%");
+      insertName += insertsItr->name.GetString(); // eg "%actual"
+      size_t insertPos = message.find(insertName);
+      if (insertPos != std::string::npos) {
+        std::string insertString("");
+        const ValueType &insert = insertsItr->value;
+        if (insert.IsArray()) {
+          // Member is an array so create comma-separated list of items for the insert string
+          for (ValueType::ConstValueIterator itemsItr = insert.Begin(); itemsItr != insert.End(); ++itemsItr) {
+            if (itemsItr != insert.Begin()) insertString += ",";
+            insertString += GetString(*itemsItr);
+          }
+        } else {
+          insertString += GetString(insert);
         }
+        message.replace(insertPos, insertName.length(), insertString);
+      }
     }
     // Output error message, references, context
-    std::string indent(depth*2, ' ');
+    std::string indent(depth * 2, ' ');
     std::cout << indent << "Error Name: " << errorName << std::endl;
     std::cout << indent << "Message: " << message.c_str() << std::endl;
     std::cout << indent << "Instance: " << error["instanceRef"].GetString() << std::endl;
     std::cout << indent << "Schema: " << error["schemaRef"].GetString() << std::endl;
-    if (depth > 0 ) std::cout << indent << "Context: " << context << std::endl;
+    if (depth > 0) std::cout << indent << "Context: " << context << std::endl;
     std::cout << std::endl;
 
     // If child errors exist, apply the process recursively to each error structure.
     // This occurs for "oneOf", "allOf", "anyOf" and "dependencies" errors, so pass the error name as context.
     if (error.HasMember("errors")) {
-        depth++;
-        const ValueType& childErrors = error["errors"];
-        if (childErrors.IsArray()) {
-            // Array - each item is an error structure - example
-            // "anyOf": {"errorCode": ..., "errors":[{"pattern": {"errorCode\": ...\"}}, {"pattern": {"errorCode\": ...}}]
-            for (ValueType::ConstValueIterator errorsItr = childErrors.Begin(); errorsItr != childErrors.End(); ++errorsItr) {
-                CreateErrorMessages(*errorsItr, depth, errorName);
-            }
-        } else if (childErrors.IsObject()) {
-            // Object - each member is an error structure - example
-            // "dependencies": {"errorCode": ..., "errors": {"address": {"required": {"errorCode": ...}}, "name": {"required": {"errorCode": ...}}}
-            for (ValueType::ConstMemberIterator propsItr = childErrors.MemberBegin(); propsItr != childErrors.MemberEnd(); ++propsItr) {
-                CreateErrorMessages(propsItr->value, depth, errorName);
-            }
+      depth++;
+      const ValueType &childErrors = error["errors"];
+      if (childErrors.IsArray()) {
+        // Array - each item is an error structure - example
+        // "anyOf": {"errorCode": ..., "errors":[{"pattern": {"errorCode\": ...\"}}, {"pattern": {"errorCode\": ...}}]
+        for (ValueType::ConstValueIterator errorsItr = childErrors.Begin();
+             errorsItr != childErrors.End(); ++errorsItr) {
+          CreateErrorMessages(*errorsItr, depth, errorName);
         }
+      } else if (childErrors.IsObject()) {
+        // Object - each member is an error structure - example
+        // "dependencies": {"errorCode": ..., "errors": {"address": {"required": {"errorCode": ...}}, "name": {"required": {"errorCode": ...}}}
+        for (ValueType::ConstMemberIterator propsItr = childErrors.MemberBegin();
+             propsItr != childErrors.MemberEnd(); ++propsItr) {
+          CreateErrorMessages(propsItr->value, depth, errorName);
+        }
+      }
     }
+  }
 }
 
 // Create error message for all errors in an error structure

@@ -471,7 +471,6 @@ public:
         exclusiveMaximum_(false),
         defaultValueLength_(0)
     {
-        //std::cout << "Schema constructor " << schemaDocument << std::endl; // SMH
         typedef typename ValueType::ConstValueIterator ConstValueIterator;
         typedef typename ValueType::ConstMemberIterator ConstMemberIterator;
 
@@ -903,7 +902,6 @@ public:
     }
 
     bool StartObject(Context& context) const {
-        //std::cout << "  schema StartObject" << std::endl; // SMH
         if (!(type_ & (1 << kObjectSchemaType))) {
             DisallowedType(context, GetObjectString());
             RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorType);
@@ -925,7 +923,6 @@ public:
     }
     
     bool Key(Context& context, const Ch* str, SizeType len, bool) const {
-        //std::cout << "  schema Key" << std::endl; // SMH
         if (patternProperties_) {
             context.patternPropertiesSchemaCount = 0;
             for (SizeType i = 0; i < patternPropertyCount_; i++)
@@ -977,7 +974,6 @@ public:
     }
 
     bool EndObject(Context& context, SizeType memberCount) const {
-        //std::cout << "  schema EndObject with members " << memberCount << std::endl; // SMH
         if (hasRequired_) {
             context.error_handler.StartMissingProperties();
             for (SizeType index = 0; index < propertyCount_; index++)
@@ -1025,7 +1021,6 @@ public:
     }
 
     bool StartArray(Context& context) const {
-        //std::cout << "  schema StartArray" << std::endl; // SMH
         context.arrayElementIndex = 0;
         context.inArray = true;  // Ensure we note that we are in an array
 
@@ -1038,7 +1033,6 @@ public:
     }
 
     bool EndArray(Context& context, SizeType elementCount) const {
-        //std::cout << "  schema EndArray" << std::endl; // SMH
         context.inArray = false;
         
         if (elementCount < minItems_) {
@@ -1613,7 +1607,6 @@ public:
         schemaMap_(allocator, kInitialSchemaMapSize),
         schemaRef_(allocator, kInitialSchemaRefSize)
     {
-        //std::cout << "schema document constructor " << root_ << std::endl; // SMH
         if (!allocator_)
             ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
 
@@ -1884,7 +1877,6 @@ public:
         , depth_(0)
 #endif
     {
-        //std::cout << "validator constructor" << std::endl; // SMH
     }
 
     //! Constructor with output handler.
@@ -1917,7 +1909,6 @@ public:
         , depth_(0)
 #endif
     {
-        //std::cout << "validator constructor with handler" << std::endl; // SMH
     }
 
     //! Destructor.
@@ -2154,7 +2145,7 @@ public:
         AddCurrentError(kValidateErrorType);
     }
     void NotAllOf(ISchemaValidator** subvalidators, SizeType count) {
-        // Treat allOf like oneOf and anyOf for clarity
+        // Treat allOf like oneOf and anyOf to match https://rapidjson.org/md_doc_schema.html#allOf-anyOf-oneOf
         AddErrorArray(kValidateErrorAllOf, subvalidators, count);
         //for (SizeType i = 0; i < count; ++i) {
         //    MergeError(static_cast<GenericSchemaValidator*>(subvalidators[i])->GetError());
@@ -2211,7 +2202,6 @@ RAPIDJSON_MULTILINEMACRO_END
 
 #define RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(method, arg2)\
     for (Context* context = schemaStack_.template Bottom<Context>(); context != schemaStack_.template End<Context>(); context++) {\
-        /*std::cout << "  ++Parallel context: " << context << std::endl;*/\
         if (context->hasher)\
             static_cast<HasherType*>(context->hasher)->method arg2;\
         if (context->validators)\
@@ -2224,11 +2214,9 @@ RAPIDJSON_MULTILINEMACRO_END
 
 #define RAPIDJSON_SCHEMA_HANDLE_END_(method, arg2)\
     valid_ = (EndValue() || GetContinueOnErrors()) && (!outputHandler_ || outputHandler_->method arg2);\
-    /*std::cout << "### EndValue returns " << valid_ << std::endl;*/\
     return valid_;
 
 #define RAPIDJSON_SCHEMA_HANDLE_VALUE_(method, arg1, arg2) \
-    /*std::cout << "validator Value " << this << std::endl;*/\
     RAPIDJSON_SCHEMA_HANDLE_BEGIN_   (method, arg1);\
     RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(method, arg2);\
     RAPIDJSON_SCHEMA_HANDLE_END_     (method, arg2)
@@ -2246,14 +2234,12 @@ RAPIDJSON_MULTILINEMACRO_END
                                     { RAPIDJSON_SCHEMA_HANDLE_VALUE_(String, (CurrentContext(), str, length, copy), (str, length, copy)); }
 
     bool StartObject() {
-        //std::cout << "validator StartObject " << this << std::endl; // SMH
         RAPIDJSON_SCHEMA_HANDLE_BEGIN_(StartObject, (CurrentContext()));
         RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(StartObject, ());
         return valid_ = !outputHandler_ || outputHandler_->StartObject();
     }
     
     bool Key(const Ch* str, SizeType len, bool copy) {
-        //std::cout << "validator Key: " << str << " " << this << (valid_ ? " true" : " false") << std::endl; // SMH
         if (!valid_) return false;
         AppendToken(str, len);
         if (!CurrentSchema().Key(CurrentContext(), str, len, copy) && !GetContinueOnErrors()) return valid_ = false;
@@ -2262,7 +2248,6 @@ RAPIDJSON_MULTILINEMACRO_END
     }
     
     bool EndObject(SizeType memberCount) {
-        //std::cout << "validator EndObject " << this << std::endl; // SMH
         if (!valid_) return false;
         RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(EndObject, (memberCount));
         if (!CurrentSchema().EndObject(CurrentContext(), memberCount) && !GetContinueOnErrors()) return valid_ = false;
@@ -2270,14 +2255,12 @@ RAPIDJSON_MULTILINEMACRO_END
     }
 
     bool StartArray() {
-        //std::cout << "validator StartArray " << this << std::endl; // SMH
         RAPIDJSON_SCHEMA_HANDLE_BEGIN_(StartArray, (CurrentContext()));
         RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(StartArray, ());
         return valid_ = !outputHandler_ || outputHandler_->StartArray();
     }
     
     bool EndArray(SizeType elementCount) {
-        //std::cout << "validator EndArray " << this << std::endl; // SMH
         if (!valid_) return false;
         RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(EndArray, (elementCount));
         if (!CurrentSchema().EndArray(CurrentContext(), elementCount) && !GetContinueOnErrors()) return valid_ = false;
@@ -2297,7 +2280,6 @@ RAPIDJSON_MULTILINEMACRO_END
 #endif
         &GetStateAllocator());
         sv->SetValidateFlags(inheritContinueOnErrors ? GetValidateFlags() : GetValidateFlags() & ~kValidateContinueOnErrorFlag);
-        //std::cout << "***** New validator ***** " << sv << " " << sv->GetValidateFlags() << std::endl;
         return sv;
     }
 
@@ -2520,7 +2502,6 @@ private:
     }
 
     void AddCurrentError(const ValidateErrorCode code, bool parent = false) {
-        //std::cout << "==== AddCurrentError ======= " << SchemaType::GetValidateErrorKeyword(code).GetString() << std::endl;
         AddErrorCode(currentError_, code);
         AddErrorInstanceLocation(currentError_, parent);
         AddErrorSchemaLocation(currentError_);
