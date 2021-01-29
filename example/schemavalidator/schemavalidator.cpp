@@ -9,6 +9,7 @@
 #include "rapidjson/prettywriter.h"
 #include <string>
 #include <iostream>
+#include <sstream>
 
 using namespace rapidjson;
 
@@ -19,27 +20,26 @@ static void CreateErrorMessages(const ValueType& errors, size_t depth, const cha
 
 // Convert GenericValue to std::string
 static std::string GetString(const ValueType& val) {
-    std::string str("");
-    if (val.IsString())
-        str = val.GetString();
-    else if (val.IsDouble())
-        str = std::to_string(val.GetDouble());
-    else if (val.IsUint())
-        str = std::to_string(val.GetUint());
-    else if (val.IsInt())
-        str = std::to_string(val.GetInt());
-    else if (val.IsUint64())
-        str = std::to_string(val.GetUint64());
-    else if (val.IsInt64())
-        str = std::to_string(val.GetInt64());
-    else if (val.IsBool() && val.GetBool())
-        str = "true";
-    else if (val.IsBool())
-        str = "false";
-    else if (val.IsFloat())
-        str = std::to_string(val.GetFloat());
-    return str;
-}
+  std::ostringstream s;
+  if (val.IsString())
+    s << val.GetString();
+  else if (val.IsDouble())
+    s << val.GetDouble();
+  else if (val.IsUint())
+   s << val.GetUint();
+  else if (val.IsInt())
+    s << val.GetInt();
+  else if (val.IsUint64())
+    s << val.GetUint64();
+  else if (val.IsInt64())
+    s <<  val.GetInt64();
+  else if (val.IsBool() && val.GetBool())
+    s << "true";
+  else if (val.IsBool())
+    s << "false";
+  else if (val.IsFloat())
+    s << val.GetFloat();
+  return s.str();}
 
 // Create the error message for a named error
 // The error object can either be empty or contain at least member properties:
