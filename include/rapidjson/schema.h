@@ -138,7 +138,7 @@ RAPIDJSON_MULTILINEMACRO_END
 //! Combination of validate flags
 /*! \see
  */
-enum ValidateFlag : unsigned {
+enum ValidateFlag {
     kValidateNoFlags = 0,                                       //!< No flags are set.
     kValidateContinueOnErrorFlag = 1,                           //!< Don't stop after first validation error.
     kValidateDefaultFlags = RAPIDJSON_VALIDATE_DEFAULT_FLAGS    //!< Default validate flags. Can be customized by defining RAPIDJSON_VALIDATE_DEFAULT_FLAGS
@@ -2279,7 +2279,7 @@ RAPIDJSON_MULTILINEMACRO_END
         depth_ + 1,
 #endif
         &GetStateAllocator());
-        sv->SetValidateFlags(inheritContinueOnErrors ? GetValidateFlags() : GetValidateFlags() & ~kValidateContinueOnErrorFlag);
+        sv->SetValidateFlags(inheritContinueOnErrors ? GetValidateFlags() : GetValidateFlags() & ~(unsigned)kValidateContinueOnErrorFlag);
         return sv;
     }
 
