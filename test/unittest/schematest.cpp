@@ -118,13 +118,18 @@ TEST(SchemaValidator, Hasher) {
     EXPECT_FALSE(d.HasParseError());\
     EXPECT_TRUE(expected == d.Accept(validator));\
     EXPECT_TRUE(expected == validator.IsValid());\
+    ValidateErrorCode code = validator.GetInvalidSchemaCode();\
+    if (expected) {\
+      EXPECT_TRUE(code == kValidateErrorNone);\
+      EXPECT_TRUE(validator.GetInvalidSchemaKeyword() == 0);\
+    }\
     if ((expected) && !validator.IsValid()) {\
         StringBuffer sb;\
         validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);\
         printf("Invalid schema: %s\n", sb.GetString());\
         printf("Invalid keyword: %s\n", validator.GetInvalidSchemaKeyword());\
-        printf("Invalid code: %d\n", validator.GetInvalidSchemaCode());\
-        printf("Invalid message: %s\n", GetValidateError_En(validator.GetInvalidSchemaCode()));\
+        printf("Invalid code: %d\n", code);\
+        printf("Invalid message: %s\n", GetValidateError_En(code));\
         sb.Clear();\
         validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);\
         printf("Invalid document: %s\n", sb.GetString());\
@@ -2522,6 +2527,7 @@ TEST(SchemaValidator, ContinueOnErrors_RogueObject) {
         kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
     CrtAllocator::Free(schema);
 }
+
 // Test that when kValidateContinueOnErrorFlag is set, a string appearing for an array or object property is handled
 // This tests that we don't blow up when there is a type mismatch.
 TEST(SchemaValidator, ContinueOnErrors_RogueString) {
@@ -2542,6 +2548,10 @@ TEST(SchemaValidator, ContinueOnErrors_RogueString) {
         "{\"type\": {\"expected\":[\"array\"], \"actual\": \"string\", \"errorCode\": 20, \"instanceRef\": \"#/phones\", \"schemaRef\": \"#/properties/phones\"}}",
         kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
     CrtAllocator::Free(schema);
+}
+
+TEST(SchemaValidator, Schema_UnknownError) {
+    ASSERT_TRUE(SchemaValidator::SchemaType::GetValidateErrorKeyword(kValidateErrors).GetString() == std::string("null"));
 }
 
 #if defined(_MSC_VER) || defined(__clang__)

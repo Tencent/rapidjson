@@ -199,8 +199,7 @@ TEST_F(Schema, TestSuite) {
     char validatorBuffer[65536];
     MemoryPoolAllocator<> validatorAllocator(validatorBuffer, sizeof(validatorBuffer));
 
-    // DCOLES - Reduce number by a factor of 100 to make it more reasonable and inline with other test counts
-    const int trialCount = 1000;
+    const int trialCount = 100000;
     int testCount = 0;
     clock_t start = clock();
     for (int i = 0; i < trialCount; i++) {
