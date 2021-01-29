@@ -51,8 +51,6 @@ RAPIDJSON_DIAG_POP
 
 class Schema : public PerfTest {
 public:
-    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
-
     Schema() {}
 
     virtual void SetUp() {
@@ -91,8 +89,6 @@ public:
 
         char jsonBuffer[65536];
         MemoryPoolAllocator<> jsonAllocator(jsonBuffer, sizeof(jsonBuffer));
-        char schemaBuffer[65536];
-        MemoryPoolAllocator<> schemaAllocator(schemaBuffer, sizeof(schemaBuffer));
 
         for (size_t i = 0; i < ARRAY_SIZE(filenames); i++) {
             char filename[FILENAME_MAX];
@@ -116,7 +112,7 @@ public:
                     continue;
 
                 TestSuite* ts = new TestSuite;
-                ts->schema = new SchemaDocumentType((*schemaItr)["schema"], 0, 0, 0, &schemaAllocator);
+                ts->schema = new SchemaDocument((*schemaItr)["schema"]);
 
                 const Value& tests = (*schemaItr)["tests"];
                 for (Value::ConstValueIterator testItr = tests.Begin(); testItr != tests.End(); ++testItr) {
@@ -191,7 +187,7 @@ protected:
             for (DocumentList::iterator itr = tests.begin(); itr != tests.end(); ++itr)
                 delete *itr;
         }
-        SchemaDocumentType* schema;
+        SchemaDocument* schema;
         DocumentList tests;
     };
 
@@ -210,7 +206,7 @@ TEST_F(Schema, TestSuite) {
     for (int i = 0; i < trialCount; i++) {
         for (TestSuiteList::const_iterator itr = testSuites.begin(); itr != testSuites.end(); ++itr) {
             const TestSuite& ts = **itr;
-            GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> >  validator(*ts.schema, &validatorAllocator);
+            GenericSchemaValidator<SchemaDocument, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> >  validator(*ts.schema, &validatorAllocator);
             for (DocumentList::const_iterator testItr = ts.tests.begin(); testItr != ts.tests.end(); ++testItr) {
                 validator.Reset();
                 (*testItr)->Accept(validator);
