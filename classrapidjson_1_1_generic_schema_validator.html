@@ -144,6 +144,17 @@ Public Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_validator.html#afe6cd0d9088a1d4cf8100c0efc9f76fc">Reset</a> ()</td></tr>
 <tr class="memdesc:afe6cd0d9088a1d4cf8100c0efc9f76fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the internal states. <br /></td></tr>
 <tr class="separator:afe6cd0d9088a1d4cf8100c0efc9f76fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab6478132518857d1bb2bc66c0dd03e7"><td class="memItemLeft" align="right" valign="top"><a id="aab6478132518857d1bb2bc66c0dd03e7"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_validator.html#aab6478132518857d1bb2bc66c0dd03e7">ResetError</a> ()</td></tr>
+<tr class="memdesc:aab6478132518857d1bb2bc66c0dd03e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the error state. <br /></td></tr>
+<tr class="separator:aab6478132518857d1bb2bc66c0dd03e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab521826cfc7ca994856323f9f1420d66"><td class="memItemLeft" align="right" valign="top"><a id="ab521826cfc7ca994856323f9f1420d66"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_validator.html#ab521826cfc7ca994856323f9f1420d66">SetValidateFlags</a> (unsigned flags)</td></tr>
+<tr class="memdesc:ab521826cfc7ca994856323f9f1420d66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implementation of ISchemaValidator. <br /></td></tr>
+<tr class="separator:ab521826cfc7ca994856323f9f1420d66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a194201132c2cb6465af8f3d2b6d64e"><td class="memItemLeft" align="right" valign="top"><a id="a5a194201132c2cb6465af8f3d2b6d64e"></a>
+virtual unsigned&#160;</td><td class="memItemRight" valign="bottom"><b>GetValidateFlags</b> () const</td></tr>
+<tr class="separator:a5a194201132c2cb6465af8f3d2b6d64e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad32a9ad31dbb588edaaf038ab053275b"><td class="memItemLeft" align="right" valign="top"><a id="ad32a9ad31dbb588edaaf038ab053275b"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_validator.html#ad32a9ad31dbb588edaaf038ab053275b">IsValid</a> () const</td></tr>
 <tr class="memdesc:ad32a9ad31dbb588edaaf038ab053275b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the current state is valid. <br /></td></tr>
@@ -163,6 +174,10 @@ PointerType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 const Ch *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_validator.html#a03bcd5497a574cffbd066d0aec2b5585">GetInvalidSchemaKeyword</a> () const</td></tr>
 <tr class="memdesc:a03bcd5497a574cffbd066d0aec2b5585"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the keyword of invalid schema. <br /></td></tr>
 <tr class="separator:a03bcd5497a574cffbd066d0aec2b5585"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a317d19322b003b8f4b87cad467775029"><td class="memItemLeft" align="right" valign="top"><a id="a317d19322b003b8f4b87cad467775029"></a>
+<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga633f43fd92e6ed5ceb87dbf570647847">ValidateErrorCode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_validator.html#a317d19322b003b8f4b87cad467775029">GetInvalidSchemaCode</a> () const</td></tr>
+<tr class="memdesc:a317d19322b003b8f4b87cad467775029"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the error code of invalid schema. <br /></td></tr>
+<tr class="separator:a317d19322b003b8f4b87cad467775029"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60dfb4a89593c8d3ca4c89a6202feb52"><td class="memItemLeft" align="right" valign="top"><a id="a60dfb4a89593c8d3ca4c89a6202feb52"></a>
 PointerType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_generic_schema_validator.html#a60dfb4a89593c8d3ca4c89a6202feb52">GetInvalidDocumentPointer</a> () const</td></tr>
 <tr class="memdesc:a60dfb4a89593c8d3ca4c89a6202feb52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the JSON pointer pointed to the invalid value. <br /></td></tr>
@@ -254,9 +269,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>AddDependencySchemaEr
 <tr class="memitem:aea5bba6aaf0847e58c3787e91baf2674"><td class="memItemLeft" align="right" valign="top"><a id="aea5bba6aaf0847e58c3787e91baf2674"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>EndDependencyErrors</b> ()</td></tr>
 <tr class="separator:aea5bba6aaf0847e58c3787e91baf2674"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5dd6854ff499756cc6f5bc20b24b5feb"><td class="memItemLeft" align="right" valign="top"><a id="a5dd6854ff499756cc6f5bc20b24b5feb"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>DisallowedValue</b> ()</td></tr>
-<tr class="separator:a5dd6854ff499756cc6f5bc20b24b5feb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0921d565333ef677bded70b36e31aa53"><td class="memItemLeft" align="right" valign="top"><a id="a0921d565333ef677bded70b36e31aa53"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DisallowedValue</b> (const <a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga633f43fd92e6ed5ceb87dbf570647847">ValidateErrorCode</a> code=<a class="el" href="group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a6faf5d2c20183efadf523e10287fd7c3">kValidateErrorEnum</a>)</td></tr>
+<tr class="separator:a0921d565333ef677bded70b36e31aa53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6032d1e04492a898ff2134006bd9d675"><td class="memItemLeft" align="right" valign="top"><a id="a6032d1e04492a898ff2134006bd9d675"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>StartDisallowedType</b> ()</td></tr>
 <tr class="separator:a6032d1e04492a898ff2134006bd9d675"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -272,9 +287,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>NotAllOf</b> (ISchema
 <tr class="memitem:ae4e282836f2d48711151c0a7b90b4484"><td class="memItemLeft" align="right" valign="top"><a id="ae4e282836f2d48711151c0a7b90b4484"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>NoneOf</b> (ISchemaValidator **subvalidators, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> count)</td></tr>
 <tr class="separator:ae4e282836f2d48711151c0a7b90b4484"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d9182430d8866e5ca3061a82cf8f823"><td class="memItemLeft" align="right" valign="top"><a id="a9d9182430d8866e5ca3061a82cf8f823"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>NotOneOf</b> (ISchemaValidator **subvalidators, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> count)</td></tr>
-<tr class="separator:a9d9182430d8866e5ca3061a82cf8f823"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a455cae8f2249b78dd2eec73693e0ced5"><td class="memItemLeft" align="right" valign="top"><a id="a455cae8f2249b78dd2eec73693e0ced5"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>NotOneOf</b> (ISchemaValidator **subvalidators, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> count, bool matched=false)</td></tr>
+<tr class="separator:a455cae8f2249b78dd2eec73693e0ced5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73838d75ed8f38e20f3b6798b4a56db5"><td class="memItemLeft" align="right" valign="top"><a id="a73838d75ed8f38e20f3b6798b4a56db5"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>Disallowed</b> ()</td></tr>
 <tr class="separator:a73838d75ed8f38e20f3b6798b4a56db5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -320,9 +335,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>StartArray</b> ()</td
 <tr class="memitem:a98a80c23569edb89af722c124a136b49"><td class="memItemLeft" align="right" valign="top"><a id="a98a80c23569edb89af722c124a136b49"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>EndArray</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> elementCount)</td></tr>
 <tr class="separator:a98a80c23569edb89af722c124a136b49"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae5b23d65482201d75072b958308d9d7b"><td class="memItemLeft" align="right" valign="top"><a id="ae5b23d65482201d75072b958308d9d7b"></a>
-virtual ISchemaValidator *&#160;</td><td class="memItemRight" valign="bottom"><b>CreateSchemaValidator</b> (const SchemaType &amp;root)</td></tr>
-<tr class="separator:ae5b23d65482201d75072b958308d9d7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33e646fcda3d738a921387fbe9aed3f3"><td class="memItemLeft" align="right" valign="top"><a id="a33e646fcda3d738a921387fbe9aed3f3"></a>
+virtual ISchemaValidator *&#160;</td><td class="memItemRight" valign="bottom"><b>CreateSchemaValidator</b> (const SchemaType &amp;root, const bool inheritContinueOnErrors)</td></tr>
+<tr class="separator:a33e646fcda3d738a921387fbe9aed3f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec8a2e41bc8185df35ebf9ebedb52355"><td class="memItemLeft" align="right" valign="top"><a id="aec8a2e41bc8185df35ebf9ebedb52355"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>DestroySchemaValidator</b> (ISchemaValidator *validator)</td></tr>
 <tr class="separator:aec8a2e41bc8185df35ebf9ebedb52355"><td class="memSeparator" colspan="2">&#160;</td></tr>

@@ -6,6 +6,7 @@ var classrapidjson_1_1_schema_validating_reader =
     [ "SchemaValidatingReader", "classrapidjson_1_1_schema_validating_reader.html#a1e2bcc66cad23376241cd91e8bf8c706", null ],
     [ "GetError", "classrapidjson_1_1_schema_validating_reader.html#a296167ce6eb968797de22a671311c4a5", null ],
     [ "GetInvalidDocumentPointer", "classrapidjson_1_1_schema_validating_reader.html#a00e8db597e8a55b5f8810707dda40dfa", null ],
+    [ "GetInvalidSchemaCode", "classrapidjson_1_1_schema_validating_reader.html#ae98f0c61bf10b499ccf7ef882954fe04", null ],
     [ "GetInvalidSchemaKeyword", "classrapidjson_1_1_schema_validating_reader.html#a67bf36f1e4bf24a0760170ed199f592b", null ],
     [ "GetInvalidSchemaPointer", "classrapidjson_1_1_schema_validating_reader.html#ae90052ccece8e04e7a840dd61f7ac83c", null ],
     [ "GetParseResult", "classrapidjson_1_1_schema_validating_reader.html#a957147a03ad791aa12a0552320371a41", null ],

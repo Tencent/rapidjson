@@ -22,5 +22,35 @@ var error_8h =
       [ "kParseErrorTermination", "error_8h.html#gga7d3acf640886b1f2552dc8c4cd6dea60ab250f87c3d8454c579364b5a0f697a50", null ],
       [ "kParseErrorUnspecificSyntaxError", "error_8h.html#gga7d3acf640886b1f2552dc8c4cd6dea60a7abf1a337294d984a3f4d18b5843fb24", null ]
     ] ],
-    [ "GetParseErrorFunc", "error_8h.html#ga9d6e699072f8275623a52c4892005751", null ]
+    [ "ValidateErrorCode", "error_8h.html#ga633f43fd92e6ed5ceb87dbf570647847", [
+      [ "kValidateErrors", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847a05469e37a2917fef9822eaf9e2dfd60e", null ],
+      [ "kValidateErrorNone", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847a569afaca49e48ee8bd928284409dcab5", null ],
+      [ "kValidateErrorMultipleOf", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847aa01437cd68a424643a8d9c12c1a3ff5a", null ],
+      [ "kValidateErrorMaximum", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847a5338314546adf96b80b1da045478c89b", null ],
+      [ "kValidateErrorExclusiveMaximum", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847a88597e022ffccc312d5169a87dff6cff", null ],
+      [ "kValidateErrorMinimum", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847ad365b8abebe4008652940df0a5add9c4", null ],
+      [ "kValidateErrorExclusiveMinimum", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847a82c2d77ca5266afdbdbfef23df14696b", null ],
+      [ "kValidateErrorMaxLength", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847a6fea0335e9dbcd4bc86a4a7acd15cf49", null ],
+      [ "kValidateErrorMinLength", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847acb06559789b68cb387a9b9985016905e", null ],
+      [ "kValidateErrorPattern", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847aef7f31586df8214ffc68309540d81a5a", null ],
+      [ "kValidateErrorMaxItems", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847a0aa600c87a97fc3c75f51f99517cfdfa", null ],
+      [ "kValidateErrorMinItems", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847adbf02986e366165c0ef1d89697893802", null ],
+      [ "kValidateErrorUniqueItems", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847aebecfc4b0017d7ff7eeeb32a8c97b509", null ],
+      [ "kValidateErrorAdditionalItems", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847ac31340c34bc1e59d2b60318dfe665eeb", null ],
+      [ "kValidateErrorMaxProperties", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847a79537e77683e3f1c89a4b6327a5f770e", null ],
+      [ "kValidateErrorMinProperties", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847a4b9fec15f21b43bbbd617469989c620f", null ],
+      [ "kValidateErrorRequired", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847a2d287b50e430269793dd82bb2ae91446", null ],
+      [ "kValidateErrorAdditionalProperties", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847a553f149c39aa16541848b04442e1032b", null ],
+      [ "kValidateErrorPatternProperties", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847ac6f7c8c63dd5ec2c838f34c49300e0a1", null ],
+      [ "kValidateErrorDependencies", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847ad9d2f317eae6e7a8f7eb3526a44c3962", null ],
+      [ "kValidateErrorEnum", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847a6faf5d2c20183efadf523e10287fd7c3", null ],
+      [ "kValidateErrorType", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847a7035a7fc3f6b3a51c91be264537fc504", null ],
+      [ "kValidateErrorOneOf", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847a6e5e5914d33ee2a926362fb445343103", null ],
+      [ "kValidateErrorOneOfMatch", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847adc0a6461cdb08ae4e4d537774a7e8c6d", null ],
+      [ "kValidateErrorAllOf", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847af47261845396dff12763a9be8c11f666", null ],
+      [ "kValidateErrorAnyOf", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847aaba92c1f6cbea5e14e5e8d8b86b042d4", null ],
+      [ "kValidateErrorNot", "error_8h.html#gga633f43fd92e6ed5ceb87dbf570647847a825119358f037a9d221d2f5735776429", null ]
+    ] ],
+    [ "GetParseErrorFunc", "error_8h.html#ga9d6e699072f8275623a52c4892005751", null ],
+    [ "GetValidateErrorFunc", "error_8h.html#ga5e4d44bc16d54acb0a9697110a79a83c", null ]
 ];

@@ -48,6 +48,37 @@ var group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s =
       [ "kPointerParseErrorInvalidPercentEncoding", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7ba29831a02b8ee23a05d552b47f4d64d28", null ],
       [ "kPointerParseErrorCharacterMustPercentEncode", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ggade540ee4cc2a416c23b8ee2c12393c7bae244a98f53279fda5a750f847b81c54f", null ]
     ] ],
+    [ "ValidateErrorCode", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga633f43fd92e6ed5ceb87dbf570647847", [
+      [ "kValidateErrors", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a05469e37a2917fef9822eaf9e2dfd60e", null ],
+      [ "kValidateErrorNone", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a569afaca49e48ee8bd928284409dcab5", null ],
+      [ "kValidateErrorMultipleOf", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847aa01437cd68a424643a8d9c12c1a3ff5a", null ],
+      [ "kValidateErrorMaximum", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a5338314546adf96b80b1da045478c89b", null ],
+      [ "kValidateErrorExclusiveMaximum", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a88597e022ffccc312d5169a87dff6cff", null ],
+      [ "kValidateErrorMinimum", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847ad365b8abebe4008652940df0a5add9c4", null ],
+      [ "kValidateErrorExclusiveMinimum", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a82c2d77ca5266afdbdbfef23df14696b", null ],
+      [ "kValidateErrorMaxLength", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a6fea0335e9dbcd4bc86a4a7acd15cf49", null ],
+      [ "kValidateErrorMinLength", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847acb06559789b68cb387a9b9985016905e", null ],
+      [ "kValidateErrorPattern", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847aef7f31586df8214ffc68309540d81a5a", null ],
+      [ "kValidateErrorMaxItems", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a0aa600c87a97fc3c75f51f99517cfdfa", null ],
+      [ "kValidateErrorMinItems", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847adbf02986e366165c0ef1d89697893802", null ],
+      [ "kValidateErrorUniqueItems", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847aebecfc4b0017d7ff7eeeb32a8c97b509", null ],
+      [ "kValidateErrorAdditionalItems", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847ac31340c34bc1e59d2b60318dfe665eeb", null ],
+      [ "kValidateErrorMaxProperties", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a79537e77683e3f1c89a4b6327a5f770e", null ],
+      [ "kValidateErrorMinProperties", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a4b9fec15f21b43bbbd617469989c620f", null ],
+      [ "kValidateErrorRequired", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a2d287b50e430269793dd82bb2ae91446", null ],
+      [ "kValidateErrorAdditionalProperties", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a553f149c39aa16541848b04442e1032b", null ],
+      [ "kValidateErrorPatternProperties", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847ac6f7c8c63dd5ec2c838f34c49300e0a1", null ],
+      [ "kValidateErrorDependencies", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847ad9d2f317eae6e7a8f7eb3526a44c3962", null ],
+      [ "kValidateErrorEnum", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a6faf5d2c20183efadf523e10287fd7c3", null ],
+      [ "kValidateErrorType", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a7035a7fc3f6b3a51c91be264537fc504", null ],
+      [ "kValidateErrorOneOf", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a6e5e5914d33ee2a926362fb445343103", null ],
+      [ "kValidateErrorOneOfMatch", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847adc0a6461cdb08ae4e4d537774a7e8c6d", null ],
+      [ "kValidateErrorAllOf", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847af47261845396dff12763a9be8c11f666", null ],
+      [ "kValidateErrorAnyOf", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847aaba92c1f6cbea5e14e5e8d8b86b042d4", null ],
+      [ "kValidateErrorNot", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gga633f43fd92e6ed5ceb87dbf570647847a825119358f037a9d221d2f5735776429", null ]
+    ] ],
     [ "GetParseError_En", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#gabdaf1a7a4db30fb0e3d927fdf0fabe79", null ],
-    [ "GetParseErrorFunc", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga9d6e699072f8275623a52c4892005751", null ]
+    [ "GetValidateError_En", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga68345ad2eccb3e7dfec09d188f20fe20", null ],
+    [ "GetParseErrorFunc", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga9d6e699072f8275623a52c4892005751", null ],
+    [ "GetValidateErrorFunc", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#ga5e4d44bc16d54acb0a9697110a79a83c", null ]
 ];
