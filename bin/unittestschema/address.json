@@ -115,7 +115,7 @@
       "type": "integer"
     },
     "decimal_type": {
-      "multipleOf": 0.1,
+      "multipleOf": 1.0,
       "type": "number"
     },
     "time_type": {
