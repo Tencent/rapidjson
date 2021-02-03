@@ -12,10 +12,14 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
 
+#define RAPIDJSON_SCHEMA_VERBOSE 0
+
 #include "unittest.h"
 #include "rapidjson/schema.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
+#include "rapidjson/error/error.h"
+#include "rapidjson/error/en.h"
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
@@ -114,11 +118,18 @@ TEST(SchemaValidator, Hasher) {
     EXPECT_FALSE(d.HasParseError());\
     EXPECT_TRUE(expected == d.Accept(validator));\
     EXPECT_TRUE(expected == validator.IsValid());\
+    ValidateErrorCode code = validator.GetInvalidSchemaCode();\
+    if (expected) {\
+      EXPECT_TRUE(code == kValidateErrorNone);\
+      EXPECT_TRUE(validator.GetInvalidSchemaKeyword() == 0);\
+    }\
     if ((expected) && !validator.IsValid()) {\
         StringBuffer sb;\
         validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);\
         printf("Invalid schema: %s\n", sb.GetString());\
         printf("Invalid keyword: %s\n", validator.GetInvalidSchemaKeyword());\
+        printf("Invalid code: %d\n", code);\
+        printf("Invalid message: %s\n", GetValidateError_En(code));\
         sb.Clear();\
         validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);\
         printf("Invalid document: %s\n", sb.GetString());\
@@ -131,19 +142,23 @@ TEST(SchemaValidator, Hasher) {
 
 #define INVALIDATE(schema, json, invalidSchemaPointer, invalidSchemaKeyword, invalidDocumentPointer, error) \
 {\
-    INVALIDATE_(schema, json, invalidSchemaPointer, invalidSchemaKeyword, invalidDocumentPointer, error, SchemaValidator, Pointer) \
+    INVALIDATE_(schema, json, invalidSchemaPointer, invalidSchemaKeyword, invalidDocumentPointer, error, kValidateDefaultFlags, SchemaValidator, Pointer) \
 }
 
 #define INVALIDATE_(schema, json, invalidSchemaPointer, invalidSchemaKeyword, invalidDocumentPointer, error, \
-    SchemaValidatorType, PointerType) \
+    flags, SchemaValidatorType, PointerType) \
 {\
     SchemaValidatorType validator(schema);\
+    validator.SetValidateFlags(flags);\
     Document d;\
     /*printf("\n%s\n", json);*/\
     d.Parse(json);\
     EXPECT_FALSE(d.HasParseError());\
-    EXPECT_FALSE(d.Accept(validator));\
+    d.Accept(validator);\
     EXPECT_FALSE(validator.IsValid());\
+    ValidateErrorCode code = validator.GetInvalidSchemaCode();\
+    ASSERT_TRUE(code != kValidateErrorNone);\
+    ASSERT_TRUE(strcmp(GetValidateError_En(code), "Unknown error.") != 0);\
     if (validator.GetInvalidSchemaPointer() != PointerType(invalidSchemaPointer)) {\
         StringBuffer sb;\
         validator.GetInvalidSchemaPointer().Stringify(sb);\
@@ -191,6 +206,7 @@ TEST(SchemaValidator, MultiType) {
     VALIDATE(s, "\"Life, the universe, and everything\"", true);
     INVALIDATE(s, "[\"Life\", \"the universe\", \"and everything\"]", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"string\", \"number\"], \"actual\": \"array\""
         "}}");
@@ -203,7 +219,7 @@ TEST(SchemaValidator, Enum_Typed) {
 
     VALIDATE(s, "\"red\"", true);
     INVALIDATE(s, "\"blue\"", "", "enum", "",
-        "{ \"enum\": { \"instanceRef\": \"#\", \"schemaRef\": \"#\" }}");
+        "{ \"enum\": { \"errorCode\": 19, \"instanceRef\": \"#\", \"schemaRef\": \"#\" }}");
 }
 
 TEST(SchemaValidator, Enum_Typless) {
@@ -215,7 +231,7 @@ TEST(SchemaValidator, Enum_Typless) {
     VALIDATE(s, "null", true);
     VALIDATE(s, "42", true);
     INVALIDATE(s, "0", "", "enum", "",
-        "{ \"enum\": { \"instanceRef\": \"#\", \"schemaRef\": \"#\" }}");
+        "{ \"enum\": { \"errorCode\": 19, \"instanceRef\": \"#\", \"schemaRef\": \"#\" }}");
 }
 
 TEST(SchemaValidator, Enum_InvalidType) {
@@ -226,6 +242,7 @@ TEST(SchemaValidator, Enum_InvalidType) {
     VALIDATE(s, "\"red\"", true);
     INVALIDATE(s, "null", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"string\"], \"actual\": \"null\""
         "}}");
@@ -239,9 +256,12 @@ TEST(SchemaValidator, AllOf) {
 
         VALIDATE(s, "\"ok\"", true);
         INVALIDATE(s, "\"too long\"", "", "allOf", "",
-            "{ \"maxLength\": { "
-            "    \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/1\", "
-            "    \"expected\": 5, \"actual\": \"too long\""
+            "{ \"allOf\": {"
+            "    \"errors\": ["
+            "      {},"
+            "      {\"maxLength\": {\"errorCode\": 6, \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/1\", \"expected\": 5, \"actual\": \"too long\"}}"
+            "    ],"
+            "    \"errorCode\": 23, \"instanceRef\": \"#\", \"schemaRef\": \"#\""
             "}}");
     }
     {
@@ -251,8 +271,12 @@ TEST(SchemaValidator, AllOf) {
 
         VALIDATE(s, "\"No way\"", false);
         INVALIDATE(s, "-1", "", "allOf", "",
-            "{ \"type\": { \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
-            "    \"expected\": [\"string\"], \"actual\": \"integer\""
+            "{ \"allOf\": {"
+            "    \"errors\": ["
+            "      {\"type\": { \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\", \"errorCode\": 20, \"expected\": [\"string\"], \"actual\": \"integer\"}},"
+            "      {}"
+            "    ],"
+            "    \"errorCode\": 23, \"instanceRef\": \"#\", \"schemaRef\": \"#\""
             "}}");
     }
 }
@@ -266,13 +290,16 @@ TEST(SchemaValidator, AnyOf) {
     VALIDATE(s, "42", true);
     INVALIDATE(s, "{ \"Not a\": \"string or number\" }", "", "anyOf", "",
         "{ \"anyOf\": {"
+        "    \"errorCode\": 24,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\", "
         "    \"errors\": ["
         "      { \"type\": {"
+        "          \"errorCode\": 20,"
         "          \"instanceRef\": \"#\", \"schemaRef\": \"#/anyOf/0\","
         "          \"expected\": [\"string\"], \"actual\": \"object\""
         "      }},"
         "      { \"type\": {"
+        "          \"errorCode\": 20,"
         "          \"instanceRef\": \"#\", \"schemaRef\": \"#/anyOf/1\","
         "          \"expected\": [\"number\"], \"actual\": \"object\""
         "      }}"
@@ -289,20 +316,23 @@ TEST(SchemaValidator, OneOf) {
     VALIDATE(s, "9", true);
     INVALIDATE(s, "2", "", "oneOf", "",
         "{ \"oneOf\": {"
+        "    \"errorCode\": 21,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"errors\": ["
         "      { \"multipleOf\": {"
+        "          \"errorCode\": 1,"
         "          \"instanceRef\": \"#\", \"schemaRef\": \"#/oneOf/0\","
         "          \"expected\": 5, \"actual\": 2"
         "      }},"
         "      { \"multipleOf\": {"
+        "          \"errorCode\": 1,"
         "          \"instanceRef\": \"#\", \"schemaRef\": \"#/oneOf/1\","
         "          \"expected\": 3, \"actual\": 2"
         "      }}"
         "    ]"
         "}}");
     INVALIDATE(s, "15", "", "oneOf", "",
-        "{ \"oneOf\": { \"instanceRef\": \"#\", \"schemaRef\": \"#\", \"errors\": [{}, {}]}}");
+        "{ \"oneOf\": { \"errorCode\": 22, \"instanceRef\": \"#\", \"schemaRef\": \"#\", \"errors\": [{}, {}]}}");
 }
 
 TEST(SchemaValidator, Not) {
@@ -313,7 +343,7 @@ TEST(SchemaValidator, Not) {
     VALIDATE(s, "42", true);
     VALIDATE(s, "{ \"key\": \"value\" }", true);
     INVALIDATE(s, "\"I am a string\"", "", "not", "",
-        "{ \"not\": { \"instanceRef\": \"#\", \"schemaRef\": \"#\" }}");
+        "{ \"not\": { \"errorCode\": 25, \"instanceRef\": \"#\", \"schemaRef\": \"#\" }}");
 }
 
 TEST(SchemaValidator, Ref) {
@@ -378,10 +408,12 @@ TEST(SchemaValidator, Ref_AllOf) {
     SchemaDocument s(sd);
 
     INVALIDATE(s, "{\"shipping_address\": {\"street_address\": \"1600 Pennsylvania Avenue NW\", \"city\": \"Washington\", \"state\": \"DC\"} }", "/properties/shipping_address", "allOf", "/shipping_address",
-        "{ \"required\": {"
-        "    \"instanceRef\": \"#/shipping_address\","
-        "    \"schemaRef\": \"#/properties/shipping_address/allOf/1\","
-        "    \"missing\": [\"type\"]"
+        "{ \"allOf\": {"
+        "    \"errors\": ["
+        "      {},"
+        "      {\"required\": {\"errorCode\": 15, \"instanceRef\": \"#/shipping_address\", \"schemaRef\": \"#/properties/shipping_address/allOf/1\", \"missing\": [\"type\"]}}"
+        "    ],"
+        "    \"errorCode\":23,\"instanceRef\":\"#/shipping_address\",\"schemaRef\":\"#/properties/shipping_address\""
         "}}");
     VALIDATE(s, "{\"shipping_address\": {\"street_address\": \"1600 Pennsylvania Avenue NW\", \"city\": \"Washington\", \"state\": \"DC\", \"type\": \"business\"} }", true);
 }
@@ -394,26 +426,31 @@ TEST(SchemaValidator, String) {
     VALIDATE(s, "\"I'm a string\"", true);
     INVALIDATE(s, "42", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"string\"], \"actual\": \"integer\""
         "}}");
     INVALIDATE(s, "2147483648", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"string\"], \"actual\": \"integer\""
         "}}"); // 2^31 can only be fit in unsigned
     INVALIDATE(s, "-2147483649", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"string\"], \"actual\": \"integer\""
         "}}"); // -2^31 - 1 can only be fit in int64_t
     INVALIDATE(s, "4294967296", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"string\"], \"actual\": \"integer\""
         "}}"); // 2^32 can only be fit in int64_t
     INVALIDATE(s, "3.1415926", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"string\"], \"actual\": \"number\""
         "}}");
@@ -426,6 +463,7 @@ TEST(SchemaValidator, String_LengthRange) {
 
     INVALIDATE(s, "\"A\"", "", "minLength", "",
         "{ \"minLength\": {"
+        "    \"errorCode\": 7,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 2, \"actual\": \"A\""
         "}}");
@@ -433,6 +471,7 @@ TEST(SchemaValidator, String_LengthRange) {
     VALIDATE(s, "\"ABC\"", true);
     INVALIDATE(s, "\"ABCD\"", "", "maxLength", "",
         "{ \"maxLength\": {"
+        "    \"errorCode\": 6,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 3, \"actual\": \"ABCD\""
         "}}");
@@ -448,11 +487,13 @@ TEST(SchemaValidator, String_Pattern) {
     VALIDATE(s, "\"(888)555-1212\"", true);
     INVALIDATE(s, "\"(888)555-1212 ext. 532\"", "", "pattern", "",
         "{ \"pattern\": {"
+        "    \"errorCode\": 8,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"actual\": \"(888)555-1212 ext. 532\""
         "}}");
     INVALIDATE(s, "\"(800)FLOWERS\"", "", "pattern", "",
         "{ \"pattern\": {"
+        "    \"errorCode\": 8,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"actual\": \"(800)FLOWERS\""
         "}}");
@@ -482,11 +523,13 @@ TEST(SchemaValidator, Integer) {
     VALIDATE(s, "4294967296", true); // 2^32 can only be fit in int64_t
     INVALIDATE(s, "3.1415926", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"integer\"], \"actual\": \"number\""
         "}}");
     INVALIDATE(s, "\"42\"", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"integer\"], \"actual\": \"string\""
         "}}");
@@ -499,6 +542,7 @@ TEST(SchemaValidator, Integer_Range) {
 
     INVALIDATE(s, "-1", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 0, \"actual\": -1"
         "}}");
@@ -507,11 +551,13 @@ TEST(SchemaValidator, Integer_Range) {
     VALIDATE(s, "99", true);
     INVALIDATE(s, "100", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 100, \"exclusiveMaximum\": true, \"actual\": 100"
         "}}");
     INVALIDATE(s, "101", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 100, \"exclusiveMaximum\": true, \"actual\": 101"
         "}}");
@@ -524,6 +570,7 @@ TEST(SchemaValidator, Integer_Range64Boundary) {
 
     INVALIDATE(s, "-9223372036854775808", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": -9223372036854775807, \"actual\": -9223372036854775808"
         "}}");
@@ -536,11 +583,13 @@ TEST(SchemaValidator, Integer_Range64Boundary) {
     VALIDATE(s, "9223372036854775806", true);
     INVALIDATE(s, "9223372036854775807", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 2,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 9223372036854775806, \"actual\": 9223372036854775807"
         "}}");
     INVALIDATE(s, "18446744073709551615", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 2,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 9223372036854775806, \"actual\": 18446744073709551615"
         "}}");   // uint64_t max
@@ -553,36 +602,43 @@ TEST(SchemaValidator, Integer_RangeU64Boundary) {
 
     INVALIDATE(s, "-9223372036854775808", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 9223372036854775808, \"actual\": -9223372036854775808"
         "}}");
     INVALIDATE(s, "9223372036854775807", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 9223372036854775808, \"actual\": 9223372036854775807"
         "}}");
     INVALIDATE(s, "-2147483648", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 9223372036854775808, \"actual\": -2147483648"
         "}}"); // int min
     INVALIDATE(s, "0", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 9223372036854775808, \"actual\": 0"
         "}}");
     INVALIDATE(s, "2147483647", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 9223372036854775808, \"actual\": 2147483647"
         "}}");  // int max
     INVALIDATE(s, "2147483648", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 9223372036854775808, \"actual\": 2147483648"
         "}}");  // unsigned first
     INVALIDATE(s, "4294967295", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 9223372036854775808, \"actual\": 4294967295"
         "}}");  // unsigned max
@@ -590,6 +646,7 @@ TEST(SchemaValidator, Integer_RangeU64Boundary) {
     VALIDATE(s, "18446744073709551614", true);
     INVALIDATE(s, "18446744073709551615", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 2,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 18446744073709551614, \"actual\": 18446744073709551615"
         "}}");
@@ -602,6 +659,7 @@ TEST(SchemaValidator, Integer_Range64BoundaryExclusive) {
 
     INVALIDATE(s, "-9223372036854775808", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 5,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": -9223372036854775808, \"exclusiveMinimum\": true, "
         "    \"actual\": -9223372036854775808"
@@ -610,6 +668,7 @@ TEST(SchemaValidator, Integer_Range64BoundaryExclusive) {
     VALIDATE(s, "18446744073709551614", true);
     INVALIDATE(s, "18446744073709551615", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 18446744073709551615, \"exclusiveMaximum\": true, "
         "    \"actual\": 18446744073709551615"
@@ -627,11 +686,13 @@ TEST(SchemaValidator, Integer_MultipleOf) {
     VALIDATE(s, "20", true);
     INVALIDATE(s, "23", "", "multipleOf", "",
         "{ \"multipleOf\": {"
+        "    \"errorCode\": 1,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 10, \"actual\": 23"
         "}}");
     INVALIDATE(s, "-23", "", "multipleOf", "",
         "{ \"multipleOf\": {"
+        "    \"errorCode\": 1,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 10, \"actual\": -23"
         "}}");
@@ -646,6 +707,7 @@ TEST(SchemaValidator, Integer_MultipleOf64Boundary) {
     VALIDATE(s, "18446744073709551615", true);
     INVALIDATE(s, "18446744073709551614", "", "multipleOf", "",
         "{ \"multipleOf\": {"
+        "    \"errorCode\": 1,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 18446744073709551615, \"actual\": 18446744073709551614"
         "}}");
@@ -658,6 +720,7 @@ TEST(SchemaValidator, Number_Range) {
 
     INVALIDATE(s, "-1", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 0, \"actual\": -1"
         "}}");
@@ -668,16 +731,19 @@ TEST(SchemaValidator, Number_Range) {
     VALIDATE(s, "99.9", true);
     INVALIDATE(s, "100", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 100, \"exclusiveMaximum\": true, \"actual\": 100"
         "}}");
     INVALIDATE(s, "100.0", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 100, \"exclusiveMaximum\": true, \"actual\": 100.0"
         "}}");
     INVALIDATE(s, "101.5", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 100, \"exclusiveMaximum\": true, \"actual\": 101.5"
         "}}");
@@ -690,11 +756,13 @@ TEST(SchemaValidator, Number_RangeInt) {
 
     INVALIDATE(s, "-101", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": -100, \"actual\": -101"
         "}}");
     INVALIDATE(s, "-100.1", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": -100, \"actual\": -100.1"
         "}}");
@@ -702,46 +770,55 @@ TEST(SchemaValidator, Number_RangeInt) {
     VALIDATE(s, "-2", true);
     INVALIDATE(s, "-1", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": -1"
         "}}");
     INVALIDATE(s, "-0.9", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": -0.9"
         "}}");
     INVALIDATE(s, "0", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": 0"
         "}}");
     INVALIDATE(s, "2147483647", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": 2147483647"
         "}}");  // int max
     INVALIDATE(s, "2147483648", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": 2147483648"
         "}}");  // unsigned first
     INVALIDATE(s, "4294967295", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": 4294967295"
         "}}");  // unsigned max
     INVALIDATE(s, "9223372036854775808", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": 9223372036854775808"
         "}}");
     INVALIDATE(s, "18446744073709551614", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": 18446744073709551614"
         "}}");
     INVALIDATE(s, "18446744073709551615", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": -1, \"exclusiveMaximum\": true, \"actual\": 18446744073709551615"
         "}}");
@@ -754,16 +831,19 @@ TEST(SchemaValidator, Number_RangeDouble) {
 
     INVALIDATE(s, "-9223372036854775808", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 0.1, \"actual\": -9223372036854775808"
         "}}");
     INVALIDATE(s, "-2147483648", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 0.1, \"actual\": -2147483648"
         "}}"); // int min
     INVALIDATE(s, "-1", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 0.1, \"actual\": -1"
         "}}");
@@ -773,51 +853,61 @@ TEST(SchemaValidator, Number_RangeDouble) {
     VALIDATE(s, "100", true);
     INVALIDATE(s, "101", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 101"
         "}}");
     INVALIDATE(s, "101.5", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 101.5"
         "}}");
     INVALIDATE(s, "18446744073709551614", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 18446744073709551614"
         "}}");
     INVALIDATE(s, "18446744073709551615", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 18446744073709551615"
         "}}");
     INVALIDATE(s, "2147483647", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 2147483647"
         "}}");  // int max
     INVALIDATE(s, "2147483648", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 2147483648"
         "}}");  // unsigned first
     INVALIDATE(s, "4294967295", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 4294967295"
         "}}");  // unsigned max
     INVALIDATE(s, "9223372036854775808", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 9223372036854775808"
         "}}");
     INVALIDATE(s, "18446744073709551614", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 18446744073709551614"
         "}}");
     INVALIDATE(s, "18446744073709551615", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 3,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 100.1, \"exclusiveMaximum\": true, \"actual\": 18446744073709551615"
         "}}");
@@ -830,31 +920,37 @@ TEST(SchemaValidator, Number_RangeDoubleU64Boundary) {
 
     INVALIDATE(s, "-9223372036854775808", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 9223372036854775808.0, \"actual\": -9223372036854775808"
         "}}");
     INVALIDATE(s, "-2147483648", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 9223372036854775808.0, \"actual\": -2147483648"
         "}}"); // int min
     INVALIDATE(s, "0", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 9223372036854775808.0, \"actual\": 0"
         "}}");
     INVALIDATE(s, "2147483647", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 9223372036854775808.0, \"actual\": 2147483647"
         "}}");  // int max
     INVALIDATE(s, "2147483648", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 9223372036854775808.0, \"actual\": 2147483648"
         "}}");  // unsigned first
     INVALIDATE(s, "4294967295", "", "minimum", "",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 9223372036854775808.0, \"actual\": 4294967295"
         "}}");  // unsigned max
@@ -862,6 +958,7 @@ TEST(SchemaValidator, Number_RangeDoubleU64Boundary) {
     VALIDATE(s, "18446744073709540000", true);
     INVALIDATE(s, "18446744073709551615", "", "maximum", "",
         "{ \"maximum\": {"
+        "    \"errorCode\": 2,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 18446744073709550000.0, \"actual\": 18446744073709551615"
         "}}");
@@ -878,28 +975,33 @@ TEST(SchemaValidator, Number_MultipleOf) {
     VALIDATE(s, "20", true);
     INVALIDATE(s, "23", "", "multipleOf", "",
         "{ \"multipleOf\": {"
+        "    \"errorCode\": 1,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 10.0, \"actual\": 23"
         "}}");
     INVALIDATE(s, "-2147483648", "", "multipleOf", "",
         "{ \"multipleOf\": {"
+        "    \"errorCode\": 1,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 10.0, \"actual\": -2147483648"
         "}}");  // int min
     VALIDATE(s, "-2147483640", true);
     INVALIDATE(s, "2147483647", "", "multipleOf", "",
         "{ \"multipleOf\": {"
+        "    \"errorCode\": 1,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 10.0, \"actual\": 2147483647"
         "}}");  // int max
     INVALIDATE(s, "2147483648", "", "multipleOf", "",
         "{ \"multipleOf\": {"
+        "    \"errorCode\": 1,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 10.0, \"actual\": 2147483648"
         "}}");  // unsigned first
     VALIDATE(s, "2147483650", true);
     INVALIDATE(s, "4294967295", "", "multipleOf", "",
         "{ \"multipleOf\": {"
+        "    \"errorCode\": 1,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 10.0, \"actual\": 4294967295"
         "}}");  // unsigned max
@@ -915,6 +1017,7 @@ TEST(SchemaValidator, Number_MultipleOfOne) {
     VALIDATE(s, "42.0", true);
     INVALIDATE(s, "3.1415926", "", "multipleOf", "",
         "{ \"multipleOf\": {"
+        "    \"errorCode\": 1,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 1, \"actual\": 3.1415926"
         "}}");
@@ -929,11 +1032,13 @@ TEST(SchemaValidator, Object) {
     VALIDATE(s, "{\"Sun\":1.9891e30,\"Jupiter\":1.8986e27,\"Saturn\":5.6846e26,\"Neptune\":10.243e25,\"Uranus\":8.6810e25,\"Earth\":5.9736e24,\"Venus\":4.8685e24,\"Mars\":6.4185e23,\"Mercury\":3.3022e23,\"Moon\":7.349e22,\"Pluto\":1.25e22}", true);    
     INVALIDATE(s, "[\"An\", \"array\", \"not\", \"an\", \"object\"]", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"object\"], \"actual\": \"array\""
         "}}");
     INVALIDATE(s, "\"Not an object\"", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"object\"], \"actual\": \"string\""
         "}}");
@@ -956,12 +1061,14 @@ TEST(SchemaValidator, Object_Properties) {
     VALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\" }", true);
     INVALIDATE(s, "{ \"number\": \"1600\", \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\" }", "/properties/number", "type", "/number",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#/number\", \"schemaRef\": \"#/properties/number\","
         "    \"expected\": [\"number\"], \"actual\": \"string\""
         "}}");
     INVALIDATE(s, "{ \"number\": \"One\", \"street_name\": \"Microsoft\", \"street_type\": \"Way\" }",
         "/properties/number", "type", "/number",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#/number\", \"schemaRef\": \"#/properties/number\","
         "    \"expected\": [\"number\"], \"actual\": \"string\""
         "}}"); // fail fast
@@ -990,6 +1097,7 @@ TEST(SchemaValidator, Object_AdditionalPropertiesBoolean) {
     VALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\" }", true);
     INVALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\", \"direction\": \"NW\" }", "", "additionalProperties", "/direction",
         "{ \"additionalProperties\": {"
+        "    \"errorCode\": 16,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"disallowed\": \"direction\""
         "}}");
@@ -1015,6 +1123,7 @@ TEST(SchemaValidator, Object_AdditionalPropertiesObject) {
     VALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\", \"direction\": \"NW\" }", true);
     INVALIDATE(s, "{ \"number\": 1600, \"street_name\": \"Pennsylvania\", \"street_type\": \"Avenue\", \"office_number\": 201 }", "/additionalProperties", "type", "/office_number",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#/office_number\", \"schemaRef\": \"#/additionalProperties\","
         "    \"expected\": [\"string\"], \"actual\": \"integer\""
         "}}");
@@ -1039,11 +1148,13 @@ TEST(SchemaValidator, Object_Required) {
     VALIDATE(s, "{ \"name\": \"William Shakespeare\", \"email\" : \"bill@stratford-upon-avon.co.uk\", \"address\" : \"Henley Street, Stratford-upon-Avon, Warwickshire, England\", \"authorship\" : \"in question\"}", true);
     INVALIDATE(s, "{ \"name\": \"William Shakespeare\", \"address\" : \"Henley Street, Stratford-upon-Avon, Warwickshire, England\" }", "", "required", "",
         "{ \"required\": {"
+        "    \"errorCode\": 15,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"missing\": [\"email\"]"
         "}}");
     INVALIDATE(s, "{}", "", "required", "",
         "{ \"required\": {"
+        "    \"errorCode\": 15,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"missing\": [\"name\", \"email\"]"
         "}}");
@@ -1067,11 +1178,13 @@ TEST(SchemaValidator, Object_Required_PassWithDefault) {
     VALIDATE(s, "{ \"email\" : \"bill@stratford-upon-avon.co.uk\", \"address\" : \"Henley Street, Stratford-upon-Avon, Warwickshire, England\", \"authorship\" : \"in question\"}", true);
     INVALIDATE(s, "{ \"name\": \"William Shakespeare\", \"address\" : \"Henley Street, Stratford-upon-Avon, Warwickshire, England\" }", "", "required", "",
         "{ \"required\": {"
+        "    \"errorCode\": 15,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"missing\": [\"email\"]"
         "}}");
     INVALIDATE(s, "{}", "", "required", "",
         "{ \"required\": {"
+        "    \"errorCode\": 15,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"missing\": [\"email\"]"
         "}}");
@@ -1084,11 +1197,13 @@ TEST(SchemaValidator, Object_PropertiesRange) {
 
     INVALIDATE(s, "{}", "", "minProperties", "",
         "{ \"minProperties\": {"
+        "    \"errorCode\": 14,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 2, \"actual\": 0"
         "}}");
     INVALIDATE(s, "{\"a\":0}", "", "minProperties", "",
         "{ \"minProperties\": {"
+        "    \"errorCode\": 14,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 2, \"actual\": 1"
         "}}");
@@ -1096,6 +1211,7 @@ TEST(SchemaValidator, Object_PropertiesRange) {
     VALIDATE(s, "{\"a\":0,\"b\":1,\"c\":2}", true);
     INVALIDATE(s, "{\"a\":0,\"b\":1,\"c\":2,\"d\":3}", "", "maxProperties", "",
         "{ \"maxProperties\": {"
+        "    \"errorCode\": 13,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\", "
         "    \"expected\": 3, \"actual\": 4"
         "}}");
@@ -1123,8 +1239,15 @@ TEST(SchemaValidator, Object_PropertyDependencies) {
         "\"billing_address\": \"555 Debtor's Lane\" }", true);
     INVALIDATE(s, "{ \"name\": \"John Doe\", \"credit_card\": 5555555555555555 }", "", "dependencies", "",
         "{ \"dependencies\": {"
+        "    \"errorCode\": 18,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
-        "    \"errors\": {\"credit_card\": [\"cvv_code\", \"billing_address\"]}"
+        "    \"errors\": {"
+        "       \"credit_card\": {"
+        "        \"required\": {"
+        "          \"errorCode\": 15,"
+        "          \"instanceRef\": \"#\", \"schemaRef\": \"#/dependencies/credit_card\","
+        "          \"missing\": [\"cvv_code\", \"billing_address\"]"
+        "    } } }"
         "}}");
     VALIDATE(s, "{ \"name\": \"John Doe\"}", true);
     VALIDATE(s, "{ \"name\": \"John Doe\", \"cvv_code\": 777, \"billing_address\": \"555 Debtor's Lane\" }", true);
@@ -1154,10 +1277,12 @@ TEST(SchemaValidator, Object_SchemaDependencies) {
     VALIDATE(s, "{\"name\": \"John Doe\", \"credit_card\" : 5555555555555555,\"billing_address\" : \"555 Debtor's Lane\"}", true);
     INVALIDATE(s, "{\"name\": \"John Doe\", \"credit_card\" : 5555555555555555 }", "", "dependencies", "",
         "{ \"dependencies\": {"
+        "    \"errorCode\": 18,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"errors\": {"
         "      \"credit_card\": {"
         "        \"required\": {"
+        "          \"errorCode\": 15,"
         "          \"instanceRef\": \"#\", \"schemaRef\": \"#/dependencies/credit_card\","
         "          \"missing\": [\"billing_address\"]"
         "    } } }"
@@ -1182,18 +1307,20 @@ TEST(SchemaValidator, Object_PatternProperties) {
     VALIDATE(s, "{ \"I_0\": 42 }", true);
     INVALIDATE(s, "{ \"S_0\": 42 }", "", "patternProperties", "/S_0",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#/S_0\", \"schemaRef\": \"#/patternProperties/%5ES_\","
         "    \"expected\": [\"string\"], \"actual\": \"integer\""
         "}}");
     INVALIDATE(s, "{ \"I_42\": \"This is a string\" }", "", "patternProperties", "/I_42",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#/I_42\", \"schemaRef\": \"#/patternProperties/%5EI_\","
         "    \"expected\": [\"integer\"], \"actual\": \"string\""
         "}}");
     VALIDATE(s, "{ \"keyword\": \"value\" }", true);
 }
 
-TEST(SchemaValidator, Object_PattternProperties_ErrorConflict) {
+TEST(SchemaValidator, Object_PatternProperties_ErrorConflict) {
     Document sd;
     sd.Parse(
         "{"
@@ -1209,9 +1336,11 @@ TEST(SchemaValidator, Object_PattternProperties_ErrorConflict) {
     INVALIDATE(s, "{ \"I_30\": 7 }", "", "patternProperties", "/I_30",
         "{ \"multipleOf\": ["
         "    {"
+        "      \"errorCode\": 1,"
         "      \"instanceRef\": \"#/I_30\", \"schemaRef\": \"#/patternProperties/%5EI_\","
         "      \"expected\": 5, \"actual\": 7"
         "    }, {"
+        "      \"errorCode\": 1,"
         "      \"instanceRef\": \"#/I_30\", \"schemaRef\": \"#/patternProperties/30%24\","
         "      \"expected\": 6, \"actual\": 7"
         "    }"
@@ -1236,22 +1365,25 @@ TEST(SchemaValidator, Object_Properties_PatternProperties) {
     VALIDATE(s, "{ \"I_42\": 78 }", true);
     INVALIDATE(s, "{ \"I_42\": 42 }", "", "patternProperties", "/I_42",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#/I_42\", \"schemaRef\": \"#/properties/I_42\","
         "    \"expected\": 73, \"actual\": 42"
         "}}");
     INVALIDATE(s, "{ \"I_42\": 7 }", "", "patternProperties", "/I_42",
         "{ \"minimum\": {"
+        "    \"errorCode\": 4,"
         "    \"instanceRef\": \"#/I_42\", \"schemaRef\": \"#/properties/I_42\","
         "    \"expected\": 73, \"actual\": 7"
         "  },"
         "  \"multipleOf\": {"
+        "    \"errorCode\": 1,"
         "    \"instanceRef\": \"#/I_42\", \"schemaRef\": \"#/patternProperties/%5EI_\","
         "    \"expected\": 6, \"actual\": 7"
         "  }"
         "}");
 }
 
-TEST(SchemaValidator, Object_PatternProperties_AdditionalProperties) {
+TEST(SchemaValidator, Object_PatternProperties_AdditionalPropertiesObject) {
     Document sd;
     sd.Parse(
         "{"
@@ -1271,8 +1403,33 @@ TEST(SchemaValidator, Object_PatternProperties_AdditionalProperties) {
     VALIDATE(s, "{ \"keyword\": \"value\" }", true);
     INVALIDATE(s, "{ \"keyword\": 42 }", "/additionalProperties", "type", "/keyword",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#/keyword\", \"schemaRef\": \"#/additionalProperties\","
         "    \"expected\": [\"string\"], \"actual\": \"integer\""
+        "}}");
+}
+
+// Replaces test Issue285 and tests failure as well as success
+TEST(SchemaValidator, Object_PatternProperties_AdditionalPropertiesBoolean) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "  \"type\": \"object\","
+        "  \"patternProperties\": {"
+        "    \"^S_\": { \"type\": \"string\" },"
+        "    \"^I_\": { \"type\": \"integer\" }"
+        "  },"
+        "  \"additionalProperties\": false"
+        "}");
+    SchemaDocument s(sd);
+
+    VALIDATE(s, "{ \"S_25\": \"This is a string\" }", true);
+    VALIDATE(s, "{ \"I_0\": 42 }", true);
+    INVALIDATE(s, "{ \"keyword\": \"value\" }", "", "additionalProperties", "/keyword",
+        "{ \"additionalProperties\": {"
+        "    \"errorCode\": 16,"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"disallowed\": \"keyword\""
         "}}");
 }
 #endif
@@ -1286,6 +1443,7 @@ TEST(SchemaValidator, Array) {
     VALIDATE(s, "[3, \"different\", { \"types\" : \"of values\" }]", true);
     INVALIDATE(s, "{\"Not\": \"an array\"}", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"array\"], \"actual\": \"object\""
         "}}");
@@ -1305,6 +1463,7 @@ TEST(SchemaValidator, Array_ItemsList) {
     VALIDATE(s, "[1, 2, 3, 4, 5]", true);
     INVALIDATE(s, "[1, 2, \"3\", 4, 5]", "/items", "type", "/2",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#/2\", \"schemaRef\": \"#/items\","
         "    \"expected\": [\"number\"], \"actual\": \"string\""
         "}}");
@@ -1337,14 +1496,16 @@ TEST(SchemaValidator, Array_ItemsTuple) {
 
     VALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\", \"NW\"]", true);
     INVALIDATE(s, "[24, \"Sussex\", \"Drive\"]", "/items/2", "enum", "/2",
-        "{ \"enum\": { \"instanceRef\": \"#/2\", \"schemaRef\": \"#/items/2\" }}");
+        "{ \"enum\": { \"errorCode\": 19, \"instanceRef\": \"#/2\", \"schemaRef\": \"#/items/2\" }}");
     INVALIDATE(s, "[\"Palais de l'Elysee\"]", "/items/0", "type", "/0",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#/0\", \"schemaRef\": \"#/items/0\","
         "    \"expected\": [\"number\"], \"actual\": \"string\""
         "}}");
     INVALIDATE(s, "[\"Twenty-four\", \"Sussex\", \"Drive\"]", "/items/0", "type", "/0",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#/0\", \"schemaRef\": \"#/items/0\","
         "    \"expected\": [\"number\"], \"actual\": \"string\""
         "}}"); // fail fast
@@ -1352,7 +1513,7 @@ TEST(SchemaValidator, Array_ItemsTuple) {
     VALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\", \"NW\", \"Washington\"]", true);
 }
 
-TEST(SchemaValidator, Array_AdditionalItmes) {
+TEST(SchemaValidator, Array_AdditionalItems) {
     Document sd;
     sd.Parse(
         "{"
@@ -1379,8 +1540,9 @@ TEST(SchemaValidator, Array_AdditionalItmes) {
 
     VALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\", \"NW\"]", true);
     VALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\"]", true);
-    INVALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\", \"NW\", \"Washington\"]", "", "items", "/4",
+    INVALIDATE(s, "[1600, \"Pennsylvania\", \"Avenue\", \"NW\", \"Washington\"]", "", "additionalItems", "/4",
         "{ \"additionalItems\": {"
+        "    \"errorCode\": 12,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"disallowed\": 4"
         "}}");
@@ -1393,11 +1555,13 @@ TEST(SchemaValidator, Array_ItemsRange) {
 
     INVALIDATE(s, "[]", "", "minItems", "",
         "{ \"minItems\": {"
+        "    \"errorCode\": 10,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 2, \"actual\": 0"
         "}}");
     INVALIDATE(s, "[1]", "", "minItems", "",
         "{ \"minItems\": {"
+        "    \"errorCode\": 10,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 2, \"actual\": 1"
         "}}");
@@ -1405,6 +1569,7 @@ TEST(SchemaValidator, Array_ItemsRange) {
     VALIDATE(s, "[1, 2, 3]", true);
     INVALIDATE(s, "[1, 2, 3, 4]", "", "maxItems", "",
         "{ \"maxItems\": {"
+        "    \"errorCode\": 9,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 3, \"actual\": 4"
         "}}");
@@ -1418,11 +1583,13 @@ TEST(SchemaValidator, Array_UniqueItems) {
     VALIDATE(s, "[1, 2, 3, 4, 5]", true);
     INVALIDATE(s, "[1, 2, 3, 3, 4]", "", "uniqueItems", "/3",
         "{ \"uniqueItems\": {"
+        "    \"errorCode\": 11,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"duplicates\": [2, 3]"
         "}}");
     INVALIDATE(s, "[1, 2, 3, 3, 3]", "", "uniqueItems", "/3",
         "{ \"uniqueItems\": {"
+        "    \"errorCode\": 11,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"duplicates\": [2, 3]"
         "}}"); // fail fast
@@ -1438,11 +1605,13 @@ TEST(SchemaValidator, Boolean) {
     VALIDATE(s, "false", true);
     INVALIDATE(s, "\"true\"", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"boolean\"], \"actual\": \"string\""
         "}}");
     INVALIDATE(s, "0", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"boolean\"], \"actual\": \"integer\""
         "}}");
@@ -1456,16 +1625,19 @@ TEST(SchemaValidator, Null) {
     VALIDATE(s, "null", true);
     INVALIDATE(s, "false", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"null\"], \"actual\": \"boolean\""
         "}}");
     INVALIDATE(s, "0", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"null\"], \"actual\": \"integer\""
         "}}");
     INVALIDATE(s, "\"\"", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"null\"], \"actual\": \"string\""
         "}}");
@@ -1481,11 +1653,13 @@ TEST(SchemaValidator, ObjectInArray) {
     VALIDATE(s, "[\"a\"]", true);
     INVALIDATE(s, "[1]", "/items", "type", "/0",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#/0\", \"schemaRef\": \"#/items\","
         "    \"expected\": [\"string\"], \"actual\": \"integer\""
         "}}");
     INVALIDATE(s, "[{}]", "/items", "type", "/0",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#/0\", \"schemaRef\": \"#/items\","
         "    \"expected\": [\"string\"], \"actual\": \"object\""
         "}}");
@@ -1508,6 +1682,7 @@ TEST(SchemaValidator, MultiTypeInObject) {
     VALIDATE(s, "{ \"tel\": \"123-456\" }", true);
     INVALIDATE(s, "{ \"tel\": true }", "/properties/tel", "type", "/tel",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#/tel\", \"schemaRef\": \"#/properties/tel\","
         "    \"expected\": [\"string\", \"integer\"], \"actual\": \"boolean\""
         "}}");
@@ -1530,6 +1705,7 @@ TEST(SchemaValidator, MultiTypeWithObject) {
     VALIDATE(s, "{ \"tel\": 999 }", true);
     INVALIDATE(s, "{ \"tel\": \"fail\" }", "/properties/tel", "type", "/tel",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#/tel\", \"schemaRef\": \"#/properties/tel\","
         "    \"expected\": [\"integer\"], \"actual\": \"string\""
         "}}");
@@ -1550,48 +1726,71 @@ TEST(SchemaValidator, AllOf_Nested) {
     VALIDATE(s, "\"ok\"", true);
     VALIDATE(s, "\"OK\"", true);
     INVALIDATE(s, "\"okay\"", "", "allOf", "",
-        "{ \"enum\": {"
-        "    \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\""
+        "{ \"allOf\": {"
+        "    \"errors\": ["
+        "    {},{},"
+        "    { \"allOf\": {"
+        "      \"errors\": ["
+        "        {},"
+        "        { \"enum\": {\"errorCode\": 19, \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\" }}"
+        "      ],"
+        "      \"errorCode\": 23, \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2\""
+        "    }}],"
+        "    \"errorCode\": 23, \"instanceRef\": \"#\", \"schemaRef\": \"#\""
         "}}");
     INVALIDATE(s, "\"o\"", "", "allOf", "",
-        "{ \"minLength\": {"
-        "    \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
-        "    \"expected\": 2, \"actual\": \"o\""
+        "{ \"allOf\": {"
+        "  \"errors\": ["
+        "    { \"minLength\": {\"actual\": \"o\", \"expected\": 2, \"errorCode\": 7, \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\" }},"
+        "    {},{}"
+        "  ],"
+        "  \"errorCode\": 23, \"instanceRef\": \"#\", \"schemaRef\": \"#\""
         "}}");
     INVALIDATE(s, "\"n\"", "", "allOf", "",
-        "{ \"minLength\": {"
-        "    \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
-        "    \"expected\": 2, \"actual\": \"n\""
-        "  },"
-        "  \"enum\": ["
-        "    {\"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/0\"},"
-        "    {\"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\"}"
-        "  ]"
-        "}")
+        "{ \"allOf\": {"
+        "    \"errors\": ["
+        "      { \"minLength\": {\"actual\": \"n\", \"expected\": 2, \"errorCode\": 7, \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\" }},"
+        "      {},"
+        "      { \"allOf\": {"
+        "          \"errors\": ["
+        "            { \"enum\": {\"errorCode\": 19 ,\"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/0\"}},"
+        "            { \"enum\": {\"errorCode\": 19, \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\"}}"
+        "          ],"
+        "          \"errorCode\": 23, \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2\""
+        "      }}"
+        "    ],"
+        "    \"errorCode\":23,\"instanceRef\":\"#\",\"schemaRef\":\"#\""
+        "}}");
     INVALIDATE(s, "\"too long\"", "", "allOf", "",
-        "{ \"maxLength\": {"
-        "    \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/1\","
-        "    \"expected\": 5, \"actual\": \"too long\""
-        "  },"
-        "  \"enum\": ["
-        "    {\"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/0\"},"
-        "    {\"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\"}"
-        "  ]"
-        "}");
+        "{ \"allOf\": {"
+        "    \"errors\": ["
+        "      {},"
+        "      { \"maxLength\": {\"actual\": \"too long\", \"expected\": 5, \"errorCode\": 6, \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/1\" }},"
+        "      { \"allOf\": {"
+        "          \"errors\": ["
+        "            { \"enum\": {\"errorCode\": 19 ,\"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/0\"}},"
+        "            { \"enum\": {\"errorCode\": 19, \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\"}}"
+        "          ],"
+        "          \"errorCode\": 23, \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2\""
+        "      }}"
+        "    ],"
+        "    \"errorCode\":23,\"instanceRef\":\"#\",\"schemaRef\":\"#\""
+        "}}");
     INVALIDATE(s, "123", "", "allOf", "",
-        "{ \"type\": ["
-        "    { \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\","
-        "      \"expected\": [\"string\"], \"actual\": \"integer\""
-        "    },"
-        "    { \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/1\","
-        "      \"expected\": [\"string\"], \"actual\": \"integer\""
-        "    }"
-        "  ],"
-        "  \"enum\": ["
-        "    {\"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/0\"},"
-        "    {\"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\"}"
-        "  ]"
-        "}");
+        "{ \"allOf\": {"
+        "    \"errors\": ["
+        "      {\"type\": {\"expected\": [\"string\"], \"actual\": \"integer\", \"errorCode\": 20, \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/0\"}},"
+        "      {\"type\": {\"expected\": [\"string\"], \"actual\": \"integer\", \"errorCode\": 20, \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/1\"}},"
+        "      { \"allOf\": {"
+        "          \"errors\": ["
+        "            { \"enum\": {\"errorCode\": 19 ,\"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/0\"}},"
+        "            { \"enum\": {\"errorCode\": 19, \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2/allOf/1\"}}"
+        "          ],"
+        "          \"errorCode\": 23, \"instanceRef\": \"#\", \"schemaRef\": \"#/allOf/2\""
+        "      }}"
+        "    ],"
+        "    \"errorCode\":23,\"instanceRef\":\"#\",\"schemaRef\":\"#\""
+        "}}");
 }
 
 TEST(SchemaValidator, EscapedPointer) {
@@ -1606,6 +1805,7 @@ TEST(SchemaValidator, EscapedPointer) {
     SchemaDocument s(sd);
     INVALIDATE(s, "{\"~/\":true}", "/properties/~0~1", "type", "/~0~1",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#/~0~1\", \"schemaRef\": \"#/properties/~0~1\","
         "    \"expected\": [\"number\"], \"actual\": \"boolean\""
         "}}");
@@ -1650,11 +1850,14 @@ TEST(SchemaValidator, ValidateMetaSchema) {
     ASSERT_FALSE(d.HasParseError());
     SchemaDocument sd(d);
     SchemaValidator validator(sd);
-    if (!d.Accept(validator)) {
+    d.Accept(validator);
+    if (!validator.IsValid()) {
         StringBuffer sb;
         validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);
         printf("Invalid schema: %s\n", sb.GetString());
         printf("Invalid keyword: %s\n", validator.GetInvalidSchemaKeyword());
+        printf("Invalid code: %d\n", validator.GetInvalidSchemaCode());
+        printf("Invalid message: %s\n", GetValidateError_En(validator.GetInvalidSchemaCode()));
         sb.Clear();
         validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);
         printf("Invalid document: %s\n", sb.GetString());
@@ -1681,7 +1884,8 @@ TEST(SchemaValidator, ValidateMetaSchema_UTF16) {
     ASSERT_FALSE(d.HasParseError());
     SD sd(d);
     SV validator(sd);
-    if (!d.Accept(validator)) {
+    d.Accept(validator);
+    if (!validator.IsValid()) {
         GenericStringBuffer<UTF16<> > sb;
         validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);
         wprintf(L"Invalid schema: %ls\n", sb.GetString());
@@ -1709,13 +1913,15 @@ public:
             "jsonschema/remotes/integer.json",
             "jsonschema/remotes/subSchemas.json",
             "jsonschema/remotes/folder/folderInteger.json",
-            "draft-04/schema"
+            "draft-04/schema",
+            "unittestschema/address.json"
         };
         const char* uris[kCount] = {
             "http://localhost:1234/integer.json",
             "http://localhost:1234/subSchemas.json",
             "http://localhost:1234/folder/folderInteger.json",
-            "http://json-schema.org/draft-04/schema"
+            "http://json-schema.org/draft-04/schema",
+            "http://localhost:1234/address.json"
         };
 
         for (size_t i = 0; i < kCount; i++) {
@@ -1757,7 +1963,7 @@ private:
     RemoteSchemaDocumentProvider(const RemoteSchemaDocumentProvider&);
     RemoteSchemaDocumentProvider& operator=(const RemoteSchemaDocumentProvider&);
 
-    static const size_t kCount = 4;
+    static const size_t kCount = 5;
     SchemaDocumentType* sd_[kCount];
     typename DocumentType::AllocatorType documentAllocator_;
     typename SchemaDocumentType::AllocatorType schemaAllocator_;
@@ -1826,6 +2032,7 @@ TEST(SchemaValidator, TestSuite) {
             ADD_FAILURE();
         }
         else {
+            //printf("json test suite file %s parsed ok\n", filename);
             GenericDocument<UTF8<>, MemoryPoolAllocator<>, MemoryPoolAllocator<> > d(&documentAllocator, 1024, &documentStackAllocator);
             d.Parse(json);
             if (d.HasParseError()) {
@@ -1846,11 +2053,14 @@ TEST(SchemaValidator, TestSuite) {
                                 bool expected = (*testItr)["valid"].GetBool();
                                 testCount++;
                                 validator.Reset();
-                                bool actual = data.Accept(validator);
+                                data.Accept(validator);
+                                bool actual = validator.IsValid();
                                 if (expected != actual)
                                     printf("Fail: %30s \"%s\" \"%s\"\n", filename, description1, description2);
-                                else
+                                else {
+                                    //printf("Passed: %30s \"%s\" \"%s\"\n", filename, description1, description2);
                                     passCount++;
+                                }
                             }
                         }
                         //printf("%zu %zu %zu\n", documentAllocator.Size(), schemaAllocator.Size(), validatorAllocator.Size());
@@ -1865,8 +2075,8 @@ TEST(SchemaValidator, TestSuite) {
         jsonAllocator.Clear();
     }
     printf("%d / %d passed (%2d%%)\n", passCount, testCount, passCount * 100 / testCount);
-    // if (passCount != testCount)
-    //     ADD_FAILURE();
+//    if (passCount != testCount)
+//        ADD_FAILURE();
 }
 
 TEST(SchemaValidatingReader, Simple) {
@@ -1897,12 +2107,14 @@ TEST(SchemaValidatingReader, Invalid) {
     EXPECT_FALSE(reader.IsValid());
     EXPECT_EQ(kParseErrorTermination, reader.GetParseResult().Code());
     EXPECT_STREQ("maxLength", reader.GetInvalidSchemaKeyword());
+    EXPECT_TRUE(reader.GetInvalidSchemaCode() == kValidateErrorMaxLength);
     EXPECT_TRUE(reader.GetInvalidSchemaPointer() == SchemaDocument::PointerType(""));
     EXPECT_TRUE(reader.GetInvalidDocumentPointer() == SchemaDocument::PointerType(""));
     EXPECT_TRUE(d.IsNull());
     Document e;
     e.Parse(
         "{ \"maxLength\": {"
+"            \"errorCode\": 6,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 3, \"actual\": \"ABCD\""
         "}}");
@@ -1933,9 +2145,11 @@ TEST(SchemaValidatingWriter, Simple) {
     EXPECT_FALSE(validator.IsValid());
     EXPECT_TRUE(validator.GetInvalidSchemaPointer() == SchemaDocument::PointerType(""));
     EXPECT_TRUE(validator.GetInvalidDocumentPointer() == SchemaDocument::PointerType(""));
+    EXPECT_TRUE(validator.GetInvalidSchemaCode() == kValidateErrorMaxLength);
     Document e;
     e.Parse(
         "{ \"maxLength\": {"
+"            \"errorCode\": 6,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 3, \"actual\": \"ABCD\""
         "}}");
@@ -1963,6 +2177,7 @@ TEST(Schema, Issue552) {
     VALIDATE(s, "\"Life, the universe, and everything\"", true);
     INVALIDATE(s, "[\"Life\", \"the universe\", \"and everything\"]", "", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": [\"string\", \"number\"], \"actual\": \"array\""
         "}}");
@@ -1978,6 +2193,7 @@ TEST(SchemaValidator, Issue608) {
     VALIDATE(s, "{\"a\" : null, \"b\": null}", true);
     INVALIDATE(s, "{\"a\" : null, \"a\" : null}", "", "required", "",
         "{ \"required\": {"
+        "    \"errorCode\": 15,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"missing\": [\"b\"]"
         "}}");
@@ -1989,13 +2205,6 @@ TEST(SchemaValidator, Issue728_AllOfRef) {
     sd.Parse("{\"allOf\": [{\"$ref\": \"#/abc\"}]}");
     SchemaDocument s(sd);
     VALIDATE(s, "{\"key1\": \"abc\", \"key2\": \"def\"}", true);
-}
-
-TEST(SchemaValidator, Issue825) {
-    Document sd;
-    sd.Parse("{\"type\": \"object\", \"additionalProperties\": false, \"patternProperties\": {\"^i\": { \"type\": \"string\" } } }");
-    SchemaDocument s(sd);
-    VALIDATE(s, "{ \"item\": \"hello\" }", true);
 }
 
 TEST(SchemaValidator, Issue1017_allOfHandler) {
@@ -2027,11 +2236,12 @@ TEST(SchemaValidator, Ref_remote) {
     typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
     INVALIDATE_(s, "null", "/integer", "type", "",
         "{ \"type\": {"
+        "    \"errorCode\": 20,"
         "    \"instanceRef\": \"#\","
         "    \"schemaRef\": \"http://localhost:1234/subSchemas.json#/integer\","
         "    \"expected\": [\"integer\"], \"actual\": \"null\""
         "}}",
-        SchemaValidatorType, PointerType);
+        kValidateDefaultFlags, SchemaValidatorType, PointerType);
 }
 
 TEST(SchemaValidator, Ref_remote_issue1210) {
@@ -2070,6 +2280,278 @@ TEST(SchemaValidator, Ref_remote_issue1210) {
 
     VALIDATE(sx, "{\"country\":\"UK\"}", false);
     VALIDATE(sx, "{\"country\":\"US\"}", true);
+}
+
+// Test that when kValidateContinueOnErrorFlag is set, all errors are reported.
+TEST(SchemaValidator, ContinueOnErrors) {
+    CrtAllocator allocator;
+    char* schema = ReadFile("unittestschema/address.json", allocator);
+    Document sd;
+    sd.Parse(schema);
+    ASSERT_FALSE(sd.HasParseError());
+    SchemaDocument s(sd);
+    VALIDATE(s, "{\"version\": 1.0, \"address\": {\"number\": 24, \"street1\": \"The Woodlands\", \"street3\": \"Ham\", \"city\": \"Romsey\", \"area\": \"Kent\", \"country\": \"UK\", \"postcode\": \"SO51 0GP\"}, \"phones\": [\"0111-222333\", \"0777-666888\"], \"names\": [\"Fred\", \"Bloggs\"]}", true);
+    INVALIDATE_(s, "{\"version\": 1.01, \"address\": {\"number\": 0, \"street2\": false,  \"street3\": \"Ham\", \"city\": \"RomseyTownFC\", \"area\": \"BC\", \"country\": \"USA\", \"postcode\": \"999ABC\"}, \"phones\": [], \"planet\": \"Earth\", \"extra\": {\"S_xxx\": 123}}", "#", "errors", "#",
+        "{ \"multipleOf\": {"
+        "    \"errorCode\": 1, \"instanceRef\": \"#/version\", \"schemaRef\": \"#/definitions/decimal_type\", \"expected\": 1.0, \"actual\": 1.01"
+        "  },"
+        "  \"minimum\": {"
+        "    \"errorCode\": 5, \"instanceRef\": \"#/address/number\", \"schemaRef\": \"#/definitions/positiveInt_type\", \"expected\": 0, \"actual\": 0, \"exclusiveMinimum\": true"
+        "  },"
+        "  \"type\": ["
+        "    {\"expected\": [\"null\", \"string\"], \"actual\": \"boolean\", \"errorCode\": 20, \"instanceRef\": \"#/address/street2\", \"schemaRef\": \"#/definitions/address_type/properties/street2\"},"
+        "    {\"expected\": [\"string\"], \"actual\": \"integer\", \"errorCode\": 20, \"instanceRef\": \"#/extra/S_xxx\", \"schemaRef\": \"#/properties/extra/patternProperties/%5ES_\"}"
+        "  ],"
+        "  \"maxLength\": {"
+        "    \"actual\": \"RomseyTownFC\", \"expected\": 10, \"errorCode\": 6, \"instanceRef\": \"#/address/city\", \"schemaRef\": \"#/definitions/address_type/properties/city\""
+        "  },"
+        "  \"anyOf\": {"
+        "    \"errors\":["
+        "      {\"pattern\": {\"actual\": \"999ABC\", \"errorCode\": 8, \"instanceRef\": \"#/address/postcode\", \"schemaRef\": \"#/definitions/address_type/properties/postcode/anyOf/0\"}},"
+        "      {\"pattern\": {\"actual\": \"999ABC\", \"errorCode\": 8, \"instanceRef\": \"#/address/postcode\", \"schemaRef\": \"#/definitions/address_type/properties/postcode/anyOf/1\"}}"
+        "    ],"
+        "    \"errorCode\": 24, \"instanceRef\": \"#/address/postcode\", \"schemaRef\": \"#/definitions/address_type/properties/postcode\""
+        "  },"
+        "  \"allOf\": {"
+        "    \"errors\":["
+        "      {\"enum\":{\"errorCode\":19,\"instanceRef\":\"#/address/country\",\"schemaRef\":\"#/definitions/country_type\"}}"
+        "    ],"
+        "    \"errorCode\":23,\"instanceRef\":\"#/address/country\",\"schemaRef\":\"#/definitions/address_type/properties/country\""
+        "  },"
+        "  \"minItems\": {"
+        "    \"actual\": 0, \"expected\": 1, \"errorCode\": 10, \"instanceRef\": \"#/phones\", \"schemaRef\": \"#/properties/phones\""
+        "  },"
+        "  \"additionalProperties\": {"
+        "    \"disallowed\": \"planet\", \"errorCode\": 16, \"instanceRef\": \"#\", \"schemaRef\": \"#\""
+        "  },"
+        "  \"required\": {"
+        "    \"missing\": [\"street1\"], \"errorCode\": 15, \"instanceRef\": \"#/address\", \"schemaRef\": \"#/definitions/address_type\""
+        "  }"
+        "}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
+    INVALIDATE_(s, "{\"address\": {\"number\": 200, \"street1\": {}, \"street3\": null, \"city\": \"Rom\", \"area\": \"Dorset\", \"postcode\": \"SO51 0GP\"}, \"phones\": [\"0111-222333\", \"0777-666888\", \"0777-666888\"], \"names\": [\"Fred\", \"S\", \"M\", \"Bloggs\"]}", "#", "errors", "#",
+        "{ \"maximum\": {"
+        "    \"errorCode\": 3, \"instanceRef\": \"#/address/number\", \"schemaRef\": \"#/definitions/positiveInt_type\", \"expected\": 100, \"actual\": 200, \"exclusiveMaximum\": true"
+        "  },"
+        "  \"type\": {"
+        "    \"expected\": [\"string\"], \"actual\": \"object\", \"errorCode\": 20, \"instanceRef\": \"#/address/street1\", \"schemaRef\": \"#/definitions/address_type/properties/street1\""
+        "  },"
+        "  \"not\": {"
+        "    \"errorCode\": 25, \"instanceRef\": \"#/address/street3\", \"schemaRef\": \"#/definitions/address_type/properties/street3\""
+        "  },"
+        "  \"minLength\": {"
+        "    \"actual\": \"Rom\", \"expected\": 4, \"errorCode\": 7, \"instanceRef\": \"#/address/city\", \"schemaRef\": \"#/definitions/address_type/properties/city\""
+        "  },"
+        "  \"maxItems\": {"
+        "    \"actual\": 3, \"expected\": 2, \"errorCode\": 9, \"instanceRef\": \"#/phones\", \"schemaRef\": \"#/properties/phones\""
+        "  },"
+        "  \"uniqueItems\": {"
+        "    \"duplicates\": [1, 2], \"errorCode\": 11, \"instanceRef\": \"#/phones\", \"schemaRef\": \"#/properties/phones\""
+        "  },"
+        "  \"minProperties\": {\"actual\": 6, \"expected\": 7, \"errorCode\": 14, \"instanceRef\": \"#/address\", \"schemaRef\": \"#/definitions/address_type\""
+        "  },"
+        "  \"additionalItems\": ["
+        "    {\"disallowed\": 2, \"errorCode\": 12, \"instanceRef\": \"#/names\", \"schemaRef\": \"#/properties/names\"},"
+        "    {\"disallowed\": 3, \"errorCode\": 12, \"instanceRef\": \"#/names\", \"schemaRef\": \"#/properties/names\"}"
+        "  ],"
+        "  \"dependencies\": {"
+        "    \"errors\": {"
+        "      \"address\": {\"required\": {\"missing\": [\"version\"], \"errorCode\": 15, \"instanceRef\": \"#\", \"schemaRef\": \"#/dependencies/address\"}},"
+        "      \"names\": {\"required\": {\"missing\": [\"version\"], \"errorCode\": 15, \"instanceRef\": \"#\", \"schemaRef\": \"#/dependencies/names\"}}"
+        "    },"
+        "    \"errorCode\": 18, \"instanceRef\": \"#\", \"schemaRef\": \"#\""
+        "  },"
+        "  \"oneOf\": {"
+        "    \"errors\": ["
+        "      {\"enum\": {\"errorCode\": 19, \"instanceRef\": \"#/address/area\", \"schemaRef\": \"#/definitions/county_type\"}},"
+        "      {\"enum\": {\"errorCode\": 19, \"instanceRef\": \"#/address/area\", \"schemaRef\": \"#/definitions/province_type\"}}"
+        "    ],"
+        "    \"errorCode\": 21, \"instanceRef\": \"#/address/area\", \"schemaRef\": \"#/definitions/address_type/properties/area\""
+        "  }"
+        "}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
+
+        CrtAllocator::Free(schema);
+}
+
+// Test that when kValidateContinueOnErrorFlag is set, it is not propagated to oneOf sub-validator so we only get the first error.
+TEST(SchemaValidator, ContinueOnErrors_OneOf) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
+    CrtAllocator allocator;
+    char* schema = ReadFile("unittestschema/oneOf_address.json", allocator);
+    Document sd;
+    sd.Parse(schema);
+    ASSERT_FALSE(sd.HasParseError());
+    SchemaDocumentType s(sd, 0, 0, &provider);
+    typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    INVALIDATE_(s, "{\"version\": 1.01, \"address\": {\"number\": 0, \"street2\": false,  \"street3\": \"Ham\", \"city\": \"RomseyTownFC\", \"area\": \"BC\", \"country\": \"USA\", \"postcode\": \"999ABC\"}, \"phones\": [], \"planet\": \"Earth\", \"extra\": {\"S_xxx\": 123}}", "#", "errors", "#",
+        "{ \"oneOf\": {"
+        "    \"errors\": [{"
+        "      \"multipleOf\": {"
+        "        \"errorCode\": 1, \"instanceRef\": \"#/version\", \"schemaRef\": \"http://localhost:1234/address.json#/definitions/decimal_type\", \"expected\": 1.0, \"actual\": 1.01"
+        "      }"
+        "    }],"
+        "    \"errorCode\": 21, \"instanceRef\": \"#\", \"schemaRef\": \"#\""
+        "  }"
+        "}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidatorType, PointerType);
+    CrtAllocator::Free(schema);
+}
+
+// Test that when kValidateContinueOnErrorFlag is set, it is not propagated to allOf sub-validator so we only get the first error.
+TEST(SchemaValidator, ContinueOnErrors_AllOf) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
+    CrtAllocator allocator;
+    char* schema = ReadFile("unittestschema/allOf_address.json", allocator);
+    Document sd;
+    sd.Parse(schema);
+    ASSERT_FALSE(sd.HasParseError());
+    SchemaDocumentType s(sd, 0, 0, &provider);
+    typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    INVALIDATE_(s, "{\"version\": 1.01, \"address\": {\"number\": 0, \"street2\": false,  \"street3\": \"Ham\", \"city\": \"RomseyTownFC\", \"area\": \"BC\", \"country\": \"USA\", \"postcode\": \"999ABC\"}, \"phones\": [], \"planet\": \"Earth\", \"extra\": {\"S_xxx\": 123}}", "#", "errors", "#",
+        "{ \"allOf\": {"
+        "    \"errors\": [{"
+        "      \"multipleOf\": {"
+        "        \"errorCode\": 1, \"instanceRef\": \"#/version\", \"schemaRef\": \"http://localhost:1234/address.json#/definitions/decimal_type\", \"expected\": 1.0, \"actual\": 1.01"
+        "      }"
+        "    }],"
+        "    \"errorCode\": 23, \"instanceRef\": \"#\", \"schemaRef\": \"#\""
+        "  }"
+        "}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidatorType, PointerType);
+    CrtAllocator::Free(schema);
+}
+
+// Test that when kValidateContinueOnErrorFlag is set, it is not propagated to anyOf sub-validator so we only get the first error.
+TEST(SchemaValidator, ContinueOnErrors_AnyOf) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
+    CrtAllocator allocator;
+    char* schema = ReadFile("unittestschema/anyOf_address.json", allocator);
+    Document sd;
+    sd.Parse(schema);
+    ASSERT_FALSE(sd.HasParseError());
+    SchemaDocumentType s(sd, 0, 0, &provider);
+    typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    INVALIDATE_(s, "{\"version\": 1.01, \"address\": {\"number\": 0, \"street2\": false,  \"street3\": \"Ham\", \"city\": \"RomseyTownFC\", \"area\": \"BC\", \"country\": \"USA\", \"postcode\": \"999ABC\"}, \"phones\": [], \"planet\": \"Earth\", \"extra\": {\"S_xxx\": 123}}", "#", "errors", "#",
+        "{ \"anyOf\": {"
+        "    \"errors\": [{"
+        "      \"multipleOf\": {"
+        "        \"errorCode\": 1, \"instanceRef\": \"#/version\", \"schemaRef\": \"http://localhost:1234/address.json#/definitions/decimal_type\", \"expected\": 1.0, \"actual\": 1.01"
+        "      }"
+        "    }],"
+        "    \"errorCode\": 24, \"instanceRef\": \"#\", \"schemaRef\": \"#\""
+        "  }"
+        "}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidatorType, PointerType);
+
+    CrtAllocator::Free(schema);
+}
+
+// Test that when kValidateContinueOnErrorFlag is set, arrays with uniqueItems:true are correctly processed when an item is invalid.
+// This tests that we don't blow up if a hasher does not get created.
+TEST(SchemaValidator, ContinueOnErrors_UniqueItems) {
+    CrtAllocator allocator;
+    char* schema = ReadFile("unittestschema/address.json", allocator);
+    Document sd;
+    sd.Parse(schema);
+    ASSERT_FALSE(sd.HasParseError());
+    SchemaDocument s(sd);
+    VALIDATE(s, "{\"phones\":[\"12-34\",\"56-78\"]}", true);
+    INVALIDATE_(s, "{\"phones\":[\"12-34\",\"12-34\"]}", "#", "errors", "#",
+        "{\"uniqueItems\": {\"duplicates\": [0,1], \"errorCode\": 11, \"instanceRef\": \"#/phones\", \"schemaRef\": \"#/properties/phones\"}}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
+    INVALIDATE_(s, "{\"phones\":[\"ab-34\",\"cd-78\"]}", "#", "errors", "#",
+        "{\"pattern\": ["
+        "  {\"actual\": \"ab-34\", \"errorCode\": 8, \"instanceRef\": \"#/phones/0\", \"schemaRef\": \"#/definitions/phone_type\"},"
+        "  {\"actual\": \"cd-78\", \"errorCode\": 8, \"instanceRef\": \"#/phones/1\", \"schemaRef\": \"#/definitions/phone_type\"}"
+        "]}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
+    CrtAllocator::Free(schema);
+}
+
+// Test that when kValidateContinueOnErrorFlag is set, an enum field is correctly processed when it has an invalid value.
+// This tests that we don't blow up if a hasher does not get created.
+TEST(SchemaValidator, ContinueOnErrors_Enum) {
+    CrtAllocator allocator;
+    char* schema = ReadFile("unittestschema/address.json", allocator);
+    Document sd;
+    sd.Parse(schema);
+    ASSERT_FALSE(sd.HasParseError());
+    SchemaDocument s(sd);
+    VALIDATE(s, "{\"gender\":\"M\"}", true);
+    INVALIDATE_(s, "{\"gender\":\"X\"}", "#", "errors", "#",
+        "{\"enum\": {\"errorCode\": 19, \"instanceRef\": \"#/gender\", \"schemaRef\": \"#/properties/gender\"}}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
+    INVALIDATE_(s, "{\"gender\":1}", "#", "errors", "#",
+        "{\"type\": {\"expected\":[\"string\"], \"actual\": \"integer\", \"errorCode\": 20, \"instanceRef\": \"#/gender\", \"schemaRef\": \"#/properties/gender\"}}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
+    CrtAllocator::Free(schema);
+}
+
+// Test that when kValidateContinueOnErrorFlag is set, an array appearing for an object property is handled
+// This tests that we don't blow up when there is a type mismatch.
+TEST(SchemaValidator, ContinueOnErrors_RogueArray) {
+    CrtAllocator allocator;
+    char* schema = ReadFile("unittestschema/address.json", allocator);
+    Document sd;
+    sd.Parse(schema);
+    ASSERT_FALSE(sd.HasParseError());
+    SchemaDocument s(sd);
+    INVALIDATE_(s, "{\"address\":[{\"number\": 0}]}", "#", "errors", "#",
+        "{\"type\": {\"expected\":[\"object\"], \"actual\": \"array\", \"errorCode\": 20, \"instanceRef\": \"#/address\", \"schemaRef\": \"#/definitions/address_type\"},"
+        "  \"dependencies\": {"
+        "    \"errors\": {"
+        "      \"address\": {\"required\": {\"missing\": [\"version\"], \"errorCode\": 15, \"instanceRef\": \"#\", \"schemaRef\": \"#/dependencies/address\"}}"
+        "    },\"errorCode\": 18, \"instanceRef\": \"#\", \"schemaRef\": \"#\"}}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
+    CrtAllocator::Free(schema);
+}
+
+// Test that when kValidateContinueOnErrorFlag is set, an object appearing for an array property is handled
+// This tests that we don't blow up when there is a type mismatch.
+TEST(SchemaValidator, ContinueOnErrors_RogueObject) {
+    CrtAllocator allocator;
+    char* schema = ReadFile("unittestschema/address.json", allocator);
+    Document sd;
+    sd.Parse(schema);
+    ASSERT_FALSE(sd.HasParseError());
+    SchemaDocument s(sd);
+    INVALIDATE_(s, "{\"phones\":{\"number\": 0}}", "#", "errors", "#",
+        "{\"type\": {\"expected\":[\"array\"], \"actual\": \"object\", \"errorCode\": 20, \"instanceRef\": \"#/phones\", \"schemaRef\": \"#/properties/phones\"}}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
+    CrtAllocator::Free(schema);
+}
+
+// Test that when kValidateContinueOnErrorFlag is set, a string appearing for an array or object property is handled
+// This tests that we don't blow up when there is a type mismatch.
+TEST(SchemaValidator, ContinueOnErrors_RogueString) {
+    CrtAllocator allocator;
+    char* schema = ReadFile("unittestschema/address.json", allocator);
+    Document sd;
+    sd.Parse(schema);
+    ASSERT_FALSE(sd.HasParseError());
+    SchemaDocument s(sd);
+    INVALIDATE_(s, "{\"address\":\"number\"}", "#", "errors", "#",
+        "{\"type\": {\"expected\":[\"object\"], \"actual\": \"string\", \"errorCode\": 20, \"instanceRef\": \"#/address\", \"schemaRef\": \"#/definitions/address_type\"},"
+        "  \"dependencies\": {"
+        "    \"errors\": {"
+        "      \"address\": {\"required\": {\"missing\": [\"version\"], \"errorCode\": 15, \"instanceRef\": \"#\", \"schemaRef\": \"#/dependencies/address\"}}"
+        "    },\"errorCode\": 18, \"instanceRef\": \"#\", \"schemaRef\": \"#\"}}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
+    INVALIDATE_(s, "{\"phones\":\"number\"}", "#", "errors", "#",
+        "{\"type\": {\"expected\":[\"array\"], \"actual\": \"string\", \"errorCode\": 20, \"instanceRef\": \"#/phones\", \"schemaRef\": \"#/properties/phones\"}}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
+    CrtAllocator::Free(schema);
+}
+
+TEST(SchemaValidator, Schema_UnknownError) {
+    ASSERT_TRUE(SchemaValidator::SchemaType::GetValidateErrorKeyword(kValidateErrors).GetString() == std::string("null"));
 }
 
 #if defined(_MSC_VER) || defined(__clang__)
