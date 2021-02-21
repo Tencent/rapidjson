@@ -506,7 +506,7 @@ public:
             AssignIfExist(oneOf_, *schemaDocument, p, value, GetOneOfString(), document);
         }
 
-        if (const ValueType* v = GetMember(value, GetNotString())) {
+        if (const ValueType* v = GetMember(value, GetNotString()) && schemaDocument) {
             schemaDocument->CreateSchema(&not_, p.Append(GetNotString(), allocator_), *v, document);
             notValidatorIndex_ = validatorCount_;
             validatorCount_++;
@@ -554,12 +554,12 @@ public:
             PointerType q = p.Append(GetPropertiesString(), allocator_);
             for (ConstMemberIterator itr = properties->MemberBegin(); itr != properties->MemberEnd(); ++itr) {
                 SizeType index;
-                if (FindPropertyIndex(itr->name, &index))
+                if (FindPropertyIndex(itr->name, &index) && schemaDocument)
                     schemaDocument->CreateSchema(&properties_[index].schema, q.Append(itr->name, allocator_), itr->value, document);
             }
         }
 
-        if (const ValueType* v = GetMember(value, GetPatternPropertiesString())) {
+        if (const ValueType* v = GetMember(value, GetPatternPropertiesString()) && schemaDocument) {
             PointerType q = p.Append(GetPatternPropertiesString(), allocator_);
             patternProperties_ = static_cast<PatternProperty*>(allocator_->Malloc(sizeof(PatternProperty) * v->MemberCount()));
             patternPropertyCount_ = 0;
@@ -597,7 +597,7 @@ public:
                                 properties_[sourceIndex].dependencies[targetIndex] = true;
                         }
                     }
-                    else if (itr->value.IsObject()) {
+                    else if (itr->value.IsObject() && schemaDocument) {
                         hasSchemaDependencies_ = true;
                         schemaDocument->CreateSchema(&properties_[sourceIndex].dependenciesSchema, q.Append(itr->name, allocator_), itr->value, document);
                         properties_[sourceIndex].dependenciesValidatorIndex = validatorCount_;
@@ -610,7 +610,7 @@ public:
         if (const ValueType* v = GetMember(value, GetAdditionalPropertiesString())) {
             if (v->IsBool())
                 additionalProperties_ = v->GetBool();
-            else if (v->IsObject())
+            else if (v->IsObject() && schemaDocument)
                 schemaDocument->CreateSchema(&additionalPropertiesSchema_, p.Append(GetAdditionalPropertiesString(), allocator_), *v, document);
         }
 
@@ -620,13 +620,15 @@ public:
         // Array
         if (const ValueType* v = GetMember(value, GetItemsString())) {
             PointerType q = p.Append(GetItemsString(), allocator_);
-            if (v->IsObject()) // List validation
-                schemaDocument->CreateSchema(&itemsList_, q, *v, document);
-            else if (v->IsArray()) { // Tuple validation
-                itemsTuple_ = static_cast<const Schema**>(allocator_->Malloc(sizeof(const Schema*) * v->Size()));
-                SizeType index = 0;
-                for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr, index++)
-                    schemaDocument->CreateSchema(&itemsTuple_[itemsTupleCount_++], q.Append(index, allocator_), *itr, document);
+            if (schemaDocument){
+                if (v->IsObject()) // List validation
+                    schemaDocument->CreateSchema(&itemsList_, q, *v, document);
+                else if (v->IsArray()) { // Tuple validation
+                    itemsTuple_ = static_cast<const Schema**>(allocator_->Malloc(sizeof(const Schema*) * v->Size()));
+                    SizeType index = 0;
+                    for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr, index++)
+                        schemaDocument->CreateSchema(&itemsTuple_[itemsTupleCount_++], q.Append(index, allocator_), *itr, document);
+                }
             }
         }
 
@@ -636,7 +638,7 @@ public:
         if (const ValueType* v = GetMember(value, GetAdditionalItemsString())) {
             if (v->IsBool())
                 additionalItems_ = v->GetBool();
-            else if (v->IsObject())
+            else if (v->IsObject() && schemaDocument)
                 schemaDocument->CreateSchema(&additionalItemsSchema_, p.Append(GetAdditionalItemsString(), allocator_), *v, document);
         }
 
