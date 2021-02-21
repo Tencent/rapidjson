@@ -2550,6 +2550,34 @@ TEST(SchemaValidator, ContinueOnErrors_RogueString) {
     CrtAllocator::Free(schema);
 }
 
+// Test that when kValidateContinueOnErrorFlag is set, an incorrect simple type with a sub-schema is handled correctly.
+// This tests that we don't blow up when there is a type mismatch but there is a sub-schema present
+TEST(SchemaValidator, ContinueOnErrors_Issue2) {
+    Document sd;
+    sd.Parse("{\"type\":\"string\", \"anyOf\":[{\"maxLength\":2}]}");
+    ASSERT_FALSE(sd.HasParseError());
+    SchemaDocument s(sd);
+    VALIDATE(s, "\"AB\"", true);
+    INVALIDATE_(s, "\"ABC\"", "#", "errors", "#",
+        "{ \"anyOf\": {"
+        "    \"errors\": [{"
+        "      \"maxLength\": {"
+        "        \"errorCode\": 6, \"instanceRef\": \"#\", \"schemaRef\": \"#/anyOf/0\", \"expected\": 2, \"actual\": \"ABC\""
+        "      }"
+        "    }],"
+        "    \"errorCode\": 24, \"instanceRef\": \"#\", \"schemaRef\": \"#\""
+        "  }"
+        "}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
+    // Invalid type
+    INVALIDATE_(s, "333", "#", "errors", "#",
+        "{ \"type\": {"
+        "    \"errorCode\": 20, \"instanceRef\": \"#\", \"schemaRef\": \"#\", \"expected\": [\"string\"], \"actual\": \"integer\""
+        "  }"
+        "}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
+}
+
 TEST(SchemaValidator, Schema_UnknownError) {
     ASSERT_TRUE(SchemaValidator::SchemaType::GetValidateErrorKeyword(kValidateErrors).GetString() == std::string("null"));
 }

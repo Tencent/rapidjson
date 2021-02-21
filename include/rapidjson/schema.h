@@ -733,6 +733,7 @@ public:
     }
 
     RAPIDJSON_FORCEINLINE bool EndValue(Context& context) const {
+        // Only check pattern properties if we have validators
         if (context.patternPropertiesValidatorCount > 0) {
             bool otherValid = false;
             SizeType count = context.patternPropertiesValidatorCount;
@@ -775,41 +776,44 @@ public:
             foundEnum:;
         }
 
-        if (allOf_.schemas)
-            for (SizeType i = allOf_.begin; i < allOf_.begin + allOf_.count; i++)
-                if (!context.validators[i]->IsValid()) {
-                    context.error_handler.NotAllOf(&context.validators[allOf_.begin], allOf_.count);
-                    RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorAllOf);
-                }
-        
-        if (anyOf_.schemas) {
-            for (SizeType i = anyOf_.begin; i < anyOf_.begin + anyOf_.count; i++)
-                if (context.validators[i]->IsValid())
-                    goto foundAny;
-            context.error_handler.NoneOf(&context.validators[anyOf_.begin], anyOf_.count);
-            RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorAnyOf);
-            foundAny:;
-        }
+    // Only check allOf etc if we have validators
+        if (context.validatorCount > 0) {
+            if (allOf_.schemas)
+                for (SizeType i = allOf_.begin; i < allOf_.begin + allOf_.count; i++)
+                    if (!context.validators[i]->IsValid()) {
+                        context.error_handler.NotAllOf(&context.validators[allOf_.begin], allOf_.count);
+                        RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorAllOf);
+                    }
 
-        if (oneOf_.schemas) {
-            bool oneValid = false;
-            for (SizeType i = oneOf_.begin; i < oneOf_.begin + oneOf_.count; i++)
-                if (context.validators[i]->IsValid()) {
-                    if (oneValid) {
-                        context.error_handler.NotOneOf(&context.validators[oneOf_.begin], oneOf_.count, true);
-                        RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorOneOfMatch);
-                    } else
-                        oneValid = true;
-                }
-            if (!oneValid) {
-                context.error_handler.NotOneOf(&context.validators[oneOf_.begin], oneOf_.count, false);
-                RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorOneOf);
+            if (anyOf_.schemas) {
+                for (SizeType i = anyOf_.begin; i < anyOf_.begin + anyOf_.count; i++)
+                    if (context.validators[i]->IsValid())
+                        goto foundAny;
+                context.error_handler.NoneOf(&context.validators[anyOf_.begin], anyOf_.count);
+                RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorAnyOf);
+                foundAny:;
             }
-        }
 
-        if (not_ && context.validators[notValidatorIndex_]->IsValid()) {
-            context.error_handler.Disallowed();
-            RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorNot);
+            if (oneOf_.schemas) {
+                bool oneValid = false;
+                for (SizeType i = oneOf_.begin; i < oneOf_.begin + oneOf_.count; i++)
+                    if (context.validators[i]->IsValid()) {
+                        if (oneValid) {
+                            context.error_handler.NotOneOf(&context.validators[oneOf_.begin], oneOf_.count, true);
+                            RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorOneOfMatch);
+                        } else
+                            oneValid = true;
+                    }
+                if (!oneValid) {
+                    context.error_handler.NotOneOf(&context.validators[oneOf_.begin], oneOf_.count, false);
+                    RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorOneOf);
+                }
+            }
+
+            if (not_ && context.validators[notValidatorIndex_]->IsValid()) {
+                context.error_handler.Disallowed();
+                RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorNot);
+            }
         }
 
         return true;
