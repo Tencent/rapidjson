@@ -504,12 +504,12 @@ public:
             AssignIfExist(allOf_, *schemaDocument, p, value, GetAllOfString(), document);
             AssignIfExist(anyOf_, *schemaDocument, p, value, GetAnyOfString(), document);
             AssignIfExist(oneOf_, *schemaDocument, p, value, GetOneOfString(), document);
-        }
 
-        if (const ValueType* v = GetMember(value, GetNotString())) {
+            if (const ValueType* v = GetMember(value, GetNotString())) {
             schemaDocument->CreateSchema(&not_, p.Append(GetNotString(), allocator_), *v, document);
             notValidatorIndex_ = validatorCount_;
             validatorCount_++;
+            }
         }
 
         // Object
@@ -953,7 +953,7 @@ public:
         }
 
         if (additionalPropertiesSchema_) {
-            if (additionalPropertiesSchema_ && context.patternPropertiesSchemaCount > 0) {
+            if (context.patternPropertiesSchemaCount > 0) {
                 context.patternPropertiesSchemas[context.patternPropertiesSchemaCount++] = additionalPropertiesSchema_;
                 context.valueSchema = typeless_;
                 context.valuePatternValidatorType = Context::kPatternValidatorWithAdditionalProperty;
