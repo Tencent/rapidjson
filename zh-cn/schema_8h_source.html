@@ -594,12 +594,12 @@ $(document).ready(function(){initNavTree('schema_8h_source.html','');});
 <div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;            AssignIfExist(allOf_, *schemaDocument, p, value, GetAllOfString(), document);</div>
 <div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;            AssignIfExist(anyOf_, *schemaDocument, p, value, GetAnyOfString(), document);</div>
 <div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;            AssignIfExist(oneOf_, *schemaDocument, p, value, GetOneOfString(), document);</div>
-<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;        }</div>
-<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160; </div>
-<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;        <span class="keywordflow">if</span> (<span class="keyword">const</span> ValueType* v = GetMember(value, GetNotString())) {</div>
-<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;            schemaDocument-&gt;CreateSchema(&amp;not_, p.Append(GetNotString(), allocator_), *v, document);</div>
-<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;            notValidatorIndex_ = validatorCount_;</div>
-<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;            validatorCount_++;</div>
+<div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160; </div>
+<div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;            <span class="keywordflow">if</span> (<span class="keyword">const</span> ValueType* v = GetMember(value, GetNotString())) {</div>
+<div class="line"><a name="l00509"></a><span class="lineno">  509</span>&#160;            schemaDocument-&gt;CreateSchema(&amp;not_, p.Append(GetNotString(), allocator_), *v, document);</div>
+<div class="line"><a name="l00510"></a><span class="lineno">  510</span>&#160;            notValidatorIndex_ = validatorCount_;</div>
+<div class="line"><a name="l00511"></a><span class="lineno">  511</span>&#160;            validatorCount_++;</div>
+<div class="line"><a name="l00512"></a><span class="lineno">  512</span>&#160;            }</div>
 <div class="line"><a name="l00513"></a><span class="lineno">  513</span>&#160;        }</div>
 <div class="line"><a name="l00514"></a><span class="lineno">  514</span>&#160; </div>
 <div class="line"><a name="l00515"></a><span class="lineno">  515</span>&#160;        <span class="comment">// Object</span></div>
@@ -1043,7 +1043,7 @@ $(document).ready(function(){initNavTree('schema_8h_source.html','');});
 <div class="line"><a name="l00953"></a><span class="lineno">  953</span>&#160;        }</div>
 <div class="line"><a name="l00954"></a><span class="lineno">  954</span>&#160; </div>
 <div class="line"><a name="l00955"></a><span class="lineno">  955</span>&#160;        <span class="keywordflow">if</span> (additionalPropertiesSchema_) {</div>
-<div class="line"><a name="l00956"></a><span class="lineno">  956</span>&#160;            <span class="keywordflow">if</span> (additionalPropertiesSchema_ &amp;&amp; context.patternPropertiesSchemaCount &gt; 0) {</div>
+<div class="line"><a name="l00956"></a><span class="lineno">  956</span>&#160;            <span class="keywordflow">if</span> (context.patternPropertiesSchemaCount &gt; 0) {</div>
 <div class="line"><a name="l00957"></a><span class="lineno">  957</span>&#160;                context.patternPropertiesSchemas[context.patternPropertiesSchemaCount++] = additionalPropertiesSchema_;</div>
 <div class="line"><a name="l00958"></a><span class="lineno">  958</span>&#160;                context.valueSchema = typeless_;</div>
 <div class="line"><a name="l00959"></a><span class="lineno">  959</span>&#160;                context.valuePatternValidatorType = Context::kPatternValidatorWithAdditionalProperty;</div>
