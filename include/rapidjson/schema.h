@@ -150,6 +150,9 @@ enum ValidateFlag {
 template <typename ValueType, typename Allocator>
 class GenericSchemaDocument;
 
+template <typename SchemaDocumentType>
+class Uri;
+
 namespace internal {
 
 template <typename SchemaDocumentType>
@@ -432,11 +435,13 @@ public:
     typedef Schema<SchemaDocumentType> SchemaType;
     typedef GenericValue<EncodingType, AllocatorType> SValue;
     typedef IValidationErrorHandler<Schema> ErrorHandler;
+    typedef Uri<SchemaDocumentType> UriType;
     friend class GenericSchemaDocument<ValueType, AllocatorType>;
 
-    Schema(SchemaDocumentType* schemaDocument, const PointerType& p, const ValueType& value, const ValueType& document, AllocatorType* allocator) :
+    Schema(SchemaDocumentType* schemaDocument, const PointerType& p, const ValueType& value, const ValueType& document, AllocatorType* allocator, const UriType& id = UriType()) :
         allocator_(allocator),
         uri_(schemaDocument->GetURI(), *allocator),
+        id_(id),
         pointer_(p, allocator),
         typeless_(schemaDocument->GetTypeless()),
         enum_(),
@@ -474,8 +479,29 @@ public:
         typedef typename ValueType::ConstValueIterator ConstValueIterator;
         typedef typename ValueType::ConstMemberIterator ConstMemberIterator;
 
+        // PR #1393
+        // Early add this Schema and its $ref(s) in schemaDocument's map to avoid infinite
+        // recursion (with recursive schemas), since schemaDocument->getSchema() is always
+        // checked before creating a new one. Don't cache typeless_, though.
+        if (this != typeless_) {
+          typedef typename SchemaDocumentType::SchemaEntry SchemaEntry;
+          SchemaEntry *entry = schemaDocument->schemaMap_.template Push<SchemaEntry>();
+          new (entry) SchemaEntry(pointer_, this, true, allocator_);
+          schemaDocument->AddSchemaRefs(this);
+        }
+
         if (!value.IsObject())
             return;
+
+        // If we have an id property, resolve it with the in-scope id
+        if (const ValueType* v = GetMember(value, GetIdString())) {
+            if (v->IsString()) {
+                //std::cout << "Resolving local id '" << v->.GetString() << "' with in-scope id '" << id.GetString() << "'" << std::endl;
+                UriType local = UriType(*v);
+                local.Resolve(id_);
+                id_ = local;
+            }
+        }
 
         if (const ValueType* v = GetMember(value, GetTypeString())) {
             type_ = 0;
@@ -507,7 +533,7 @@ public:
         }
 
         if (const ValueType* v = GetMember(value, GetNotString())) {
-            schemaDocument->CreateSchema(&not_, p.Append(GetNotString(), allocator_), *v, document);
+            schemaDocument->CreateSchema(&not_, p.Append(GetNotString(), allocator_), *v, document, id_);
             notValidatorIndex_ = validatorCount_;
             validatorCount_++;
         }
@@ -524,7 +550,7 @@ public:
             if (properties && properties->IsObject())
                 for (ConstMemberIterator itr = properties->MemberBegin(); itr != properties->MemberEnd(); ++itr)
                     AddUniqueElement(allProperties, itr->name);
-            
+
             if (required && required->IsArray())
                 for (ConstValueIterator itr = required->Begin(); itr != required->End(); ++itr)
                     if (itr->IsString())
@@ -555,7 +581,7 @@ public:
             for (ConstMemberIterator itr = properties->MemberBegin(); itr != properties->MemberEnd(); ++itr) {
                 SizeType index;
                 if (FindPropertyIndex(itr->name, &index))
-                    schemaDocument->CreateSchema(&properties_[index].schema, q.Append(itr->name, allocator_), itr->value, document);
+                    schemaDocument->CreateSchema(&properties_[index].schema, q.Append(itr->name, allocator_), itr->value, document, id_);
             }
         }
 
@@ -567,7 +593,7 @@ public:
             for (ConstMemberIterator itr = v->MemberBegin(); itr != v->MemberEnd(); ++itr) {
                 new (&patternProperties_[patternPropertyCount_]) PatternProperty();
                 patternProperties_[patternPropertyCount_].pattern = CreatePattern(itr->name);
-                schemaDocument->CreateSchema(&patternProperties_[patternPropertyCount_].schema, q.Append(itr->name, allocator_), itr->value, document);
+                schemaDocument->CreateSchema(&patternProperties_[patternPropertyCount_].schema, q.Append(itr->name, allocator_), itr->value, document, id_);
                 patternPropertyCount_++;
             }
         }
@@ -599,7 +625,7 @@ public:
                     }
                     else if (itr->value.IsObject()) {
                         hasSchemaDependencies_ = true;
-                        schemaDocument->CreateSchema(&properties_[sourceIndex].dependenciesSchema, q.Append(itr->name, allocator_), itr->value, document);
+                        schemaDocument->CreateSchema(&properties_[sourceIndex].dependenciesSchema, q.Append(itr->name, allocator_), itr->value, document, id_);
                         properties_[sourceIndex].dependenciesValidatorIndex = validatorCount_;
                         validatorCount_++;
                     }
@@ -611,7 +637,7 @@ public:
             if (v->IsBool())
                 additionalProperties_ = v->GetBool();
             else if (v->IsObject())
-                schemaDocument->CreateSchema(&additionalPropertiesSchema_, p.Append(GetAdditionalPropertiesString(), allocator_), *v, document);
+                schemaDocument->CreateSchema(&additionalPropertiesSchema_, p.Append(GetAdditionalPropertiesString(), allocator_), *v, document, id_);
         }
 
         AssignIfExist(minProperties_, value, GetMinPropertiesString());
@@ -621,12 +647,12 @@ public:
         if (const ValueType* v = GetMember(value, GetItemsString())) {
             PointerType q = p.Append(GetItemsString(), allocator_);
             if (v->IsObject()) // List validation
-                schemaDocument->CreateSchema(&itemsList_, q, *v, document);
+                schemaDocument->CreateSchema(&itemsList_, q, *v, document, id_);
             else if (v->IsArray()) { // Tuple validation
                 itemsTuple_ = static_cast<const Schema**>(allocator_->Malloc(sizeof(const Schema*) * v->Size()));
                 SizeType index = 0;
                 for (ConstValueIterator itr = v->Begin(); itr != v->End(); ++itr, index++)
-                    schemaDocument->CreateSchema(&itemsTuple_[itemsTupleCount_++], q.Append(index, allocator_), *itr, document);
+                    schemaDocument->CreateSchema(&itemsTuple_[itemsTupleCount_++], q.Append(index, allocator_), *itr, document, id_);
             }
         }
 
@@ -637,7 +663,7 @@ public:
             if (v->IsBool())
                 additionalItems_ = v->GetBool();
             else if (v->IsObject())
-                schemaDocument->CreateSchema(&additionalItemsSchema_, p.Append(GetAdditionalItemsString(), allocator_), *v, document);
+                schemaDocument->CreateSchema(&additionalItemsSchema_, p.Append(GetAdditionalItemsString(), allocator_), *v, document, id_);
         }
 
         AssignIfExist(uniqueItems_, value, GetUniqueItemsString());
@@ -697,7 +723,11 @@ public:
         return uri_;
     }
 
-    const PointerType& GetPointer() const {
+    const UriType& GetId() const {
+        return id_;
+    }
+
+   const PointerType& GetPointer() const {
         return pointer_;
     }
 
@@ -826,7 +856,7 @@ public:
         }
         return CreateParallelValidator(context);
     }
-    
+
     bool Bool(Context& context, bool) const {
         if (!(type_ & (1 << kBooleanSchemaType))) {
             DisallowedType(context, GetBooleanString());
@@ -870,13 +900,13 @@ public:
 
         if (!maximum_.IsNull() && !CheckDoubleMaximum(context, d))
             return false;
-        
+
         if (!multipleOf_.IsNull() && !CheckDoubleMultipleOf(context, d))
             return false;
-        
+
         return CreateParallelValidator(context);
     }
-    
+
     bool String(Context& context, const Ch* str, SizeType length, bool) const {
         if (!(type_ & (1 << kStringSchemaType))) {
             DisallowedType(context, GetStringString());
@@ -925,7 +955,7 @@ public:
 
         return CreateParallelValidator(context);
     }
-    
+
     bool Key(Context& context, const Ch* str, SizeType len, bool) const {
         if (patternProperties_) {
             context.patternPropertiesSchemaCount = 0;
@@ -1018,7 +1048,7 @@ public:
                 }
             }
             if (context.error_handler.EndDependencyErrors())
-                RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorDependencies);  
+                RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorDependencies);
         }
 
         return true;
@@ -1038,12 +1068,12 @@ public:
 
     bool EndArray(Context& context, SizeType elementCount) const {
         context.inArray = false;
-        
+
         if (elementCount < minItems_) {
             context.error_handler.TooFewItems(elementCount, minItems_);
             RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorMinItems);
         }
-        
+
         if (elementCount > maxItems_) {
             context.error_handler.TooManyItems(elementCount, maxItems_);
             RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorMaxItems);
@@ -1132,6 +1162,15 @@ public:
     RAPIDJSON_STRING_(ExclusiveMaximum, 'e', 'x', 'c', 'l', 'u', 's', 'i', 'v', 'e', 'M', 'a', 'x', 'i', 'm', 'u', 'm')
     RAPIDJSON_STRING_(MultipleOf, 'm', 'u', 'l', 't', 'i', 'p', 'l', 'e', 'O', 'f')
     RAPIDJSON_STRING_(DefaultValue, 'd', 'e', 'f', 'a', 'u', 'l', 't')
+    RAPIDJSON_STRING_(Ref, '$', 'r', 'e', 'f')
+    RAPIDJSON_STRING_(Id, 'i', 'd')
+
+    RAPIDJSON_STRING_(SchemeEnd, ':')
+    RAPIDJSON_STRING_(AuthStart, '/', '/')
+    RAPIDJSON_STRING_(QueryStart, '?')
+    RAPIDJSON_STRING_(FragStart, '#')
+    RAPIDJSON_STRING_(Slash, '/')
+    RAPIDJSON_STRING_(Dot, '.')
 
 #undef RAPIDJSON_STRING_
 
@@ -1197,7 +1236,7 @@ private:
                 out.schemas = static_cast<const Schema**>(allocator_->Malloc(out.count * sizeof(const Schema*)));
                 memset(out.schemas, 0, sizeof(Schema*)* out.count);
                 for (SizeType i = 0; i < out.count; i++)
-                    schemaDocument.CreateSchema(&out.schemas[i], q.Append(i, allocator_), (*v)[i], document);
+                    schemaDocument.CreateSchema(&out.schemas[i], q.Append(i, allocator_), (*v)[i], document, id_);
                 out.begin = validatorCount_;
                 validatorCount_ += out.count;
             }
@@ -1274,10 +1313,10 @@ private:
 
             if (anyOf_.schemas)
                 CreateSchemaValidators(context, anyOf_, false);
-            
+
             if (oneOf_.schemas)
                 CreateSchemaValidators(context, oneOf_, false);
-            
+
             if (not_)
                 context.validators[notValidatorIndex_] = context.factory.CreateSchemaValidator(*not_, false);
 
@@ -1301,7 +1340,7 @@ private:
         SizeType len = name.GetStringLength();
         const Ch* str = name.GetString();
         for (SizeType index = 0; index < propertyCount_; index++)
-            if (properties_[index].name.GetStringLength() == len && 
+            if (properties_[index].name.GetStringLength() == len &&
                 (std::memcmp(properties_[index].name.GetString(), str, sizeof(Ch) * len) == 0))
             {
                 *outIndex = index;
@@ -1462,7 +1501,7 @@ private:
 
     struct PatternProperty {
         PatternProperty() : schema(), pattern() {}
-        ~PatternProperty() { 
+        ~PatternProperty() {
             if (pattern) {
                 pattern->~RegexType();
                 AllocatorType::Free(pattern);
@@ -1474,6 +1513,7 @@ private:
 
     AllocatorType* allocator_;
     SValue uri_;
+    UriType id_;
     PointerType pointer_;
     const SchemaType* typeless_;
     uint64_t* enum_;
@@ -1516,7 +1556,7 @@ private:
     SValue multipleOf_;
     bool exclusiveMinimum_;
     bool exclusiveMaximum_;
-    
+
     SizeType defaultValueLength_;
 };
 
@@ -1553,6 +1593,209 @@ struct TokenHelper<Stack, char> {
 } // namespace internal
 
 ///////////////////////////////////////////////////////////////////////////////
+// Uri
+
+template <typename SchemaDocumentType>
+class Uri {
+public:
+    typedef typename SchemaDocumentType::Ch Ch;
+    typedef typename SchemaDocumentType::AllocatorType AllocatorType;
+    typedef internal::Schema<SchemaDocumentType> SchemaType;
+    typedef std::basic_string<Ch> String;
+
+    // Constructors
+    Uri() {}
+
+    Uri(const String& uri) {
+        Parse(uri);
+    }
+
+    Uri(const Ch* uri, SizeType len) {
+        Parse(String(uri, len));
+    }
+
+    // Use with specializations of GenericValue
+    template<typename T> Uri(const T& uri) {
+        Parse(uri.template Get<String>());
+    }
+
+    // Getters
+    const String& Get() {
+        // Create uri_ on-demand
+        if (uri_.empty()) uri_ = this->GetDoc() + frag_;
+        return uri_; }
+
+    // Use with specializations of GenericValue
+    template<typename T> void Get(T& uri, AllocatorType& allocator) {
+        uri.template Set<String>(this->Get(), allocator);
+    }
+
+    const String& GetDoc() {
+        // Create doc_ on-demand
+        if (doc_.empty()) doc_ = scheme_ + auth_ + path_ + query_;
+        return doc_;
+    }
+    const String& GetScheme() const { return scheme_; }
+    const String& GetAuth() const { return auth_; }
+    const String& GetPath() const { return path_; }
+    const String& GetQuery() const { return query_; }
+    const String& GetFrag() const { return frag_; }
+
+    const Ch* GetString() { return this->Get().c_str(); }
+    SizeType GetStringLength() { return static_cast<SizeType>(this->Get().length()); }
+
+    const Ch* GetDocString() { return this->GetDoc().c_str(); }
+    SizeType GetDocStringLength() { return static_cast<SizeType>(this->GetDoc().length()); }
+
+    const Ch* GetFragString() const { return frag_.c_str(); }
+    SizeType GetFragStringLength() const { return static_cast<SizeType>(frag_.length()); }
+
+    // Resolve this URI against a base URI in accordance with URI resolution rules at
+    // https://tools.ietf.org/html/rfc3986
+    // Use for resolving an id or $ref with an in-scope id.
+    // This URI is updated in place where needed from the base URI.
+    Uri& Resolve(const Uri& base)
+    {
+        if (!scheme_.empty()) {
+            // Use all of this URI
+            RemoveDotSegments(path_);
+        } else {
+            if (!auth_.empty()) {
+              RemoveDotSegments(path_);
+            } else {
+                if (path_.empty()) {
+                    path_ = base.GetPath();
+                    if (query_.empty()) {
+                        query_ = base.GetQuery();
+                    }
+                } else {
+                    static const String slash = SchemaType::GetSlashString().GetString();
+                    if (path_.find(slash) == 0) {
+                        // Absolute path - replace all the path
+                        RemoveDotSegments(path_);
+                    } else {
+                        // Relative path - append to path after last slash
+                        String p;
+                        if (!base.GetAuth().empty() && base.GetPath().empty()) p = slash;
+                        std::size_t lastslashpos = base.GetPath().find_last_of(slash);
+                        path_ = p + base.GetPath().substr(0, lastslashpos + 1) + path_;
+                        RemoveDotSegments(path_);
+                    }
+                }
+                auth_ = base.GetAuth();
+            }
+            scheme_ = base.GetScheme();
+        }
+        //std::cout << " Resolved uri: " <<  this->GetString() << std::endl;
+        return *this;
+    }
+
+private:
+    // Parse a URI into constituent scheme, authority, path, query, fragment
+    // Supports URIs that match regex ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))? as per
+    // https://tools.ietf.org/html/rfc3986
+    void Parse(const String& uri) {
+        std::size_t start = 0, pos1 = 0, pos2 = 0;
+        const std::size_t len = uri.length();
+        static const String schemeEnd = SchemaType::GetSchemeEndString().GetString();
+        static const String authStart = SchemaType::GetAuthStartString().GetString();
+        static const String pathStart = SchemaType::GetSlashString().GetString();
+        static const String queryStart = SchemaType::GetQueryStartString().GetString();
+        static const String fragStart = SchemaType::GetFragStartString().GetString();
+        // Look for scheme ([^:/?#]+):)?
+        if (start < len) {
+            pos1 = uri.find(schemeEnd);
+            if (pos1 != std::string::npos) {
+                pos2 = uri.find_first_of(pathStart + queryStart + fragStart);
+                if (pos1 < pos2) {
+                    pos1 += schemeEnd.length();
+                    scheme_ = uri.substr(start, pos1);
+                    start = pos1;
+                }
+            }
+        }
+        // Look for auth (//([^/?#]*))?
+        if (start < len) {
+            pos1 = uri.find(authStart, start);
+            if (pos1 == start) {
+                pos2 = uri.find_first_of(pathStart + queryStart + fragStart, start + authStart.length());
+                auth_ = uri.substr(start, pos2 - start);
+                start = pos2;
+            }
+        }
+        // Look for path ([^?#]*)
+        if (start < len) {
+            pos2 = uri.find_first_of(queryStart + fragStart, start);
+            if (start != pos2) {
+                path_ = uri.substr(start, pos2 - start);
+                if (path_.find(pathStart) == 0) {  // absolute path - normalize
+                    RemoveDotSegments(path_);
+                }
+                start = pos2;
+            }
+        }
+        // Look for query (\?([^#]*))?
+        if (start < len) {
+            pos2 = uri.find(fragStart, start);
+            if (start != pos2) {
+                query_ = uri.substr(start, pos2 - start);
+                start = pos2;
+            }
+        }
+        // Look for fragment (#(.*))?
+        if (start < len) {
+            frag_ = uri.substr(start);
+        }
+        //std::cout << " Parsed uri: " <<  "s: " << scheme_.c_str() << " a: " << auth_.c_str() << " p: " << path_.c_str() << " q: " << query_.c_str() << " f: " << frag_.c_str() << std::endl;
+    }
+
+    // Remove . and .. segments from a path
+    // https://tools.ietf.org/html/rfc3986
+    void RemoveDotSegments(String& path) {
+        String temp = path;
+        path.clear();
+        static const String slash = SchemaType::GetSlashString().GetString();
+        static const String dot = SchemaType::GetDotString().GetString();
+        std::size_t pos = 0;
+        // Loop through each path segment
+        while (pos != std::string::npos) {
+            //std::cout << "Temp: '" << temp.c_str() << "' Path: '" << path.c_str() << "'" << std::endl;
+            pos = temp.find_first_of(slash);
+            // Get next segment
+            String seg = temp.substr(0, pos);
+            if (seg == dot) {
+                // Discard . segment
+            } else if (seg == dot + dot) {
+                // Backup a .. segment
+                // We expect to find a previously added slash at the end or nothing
+                std::size_t pos1 = path.find_last_of(slash);
+                // Make sure we don't go beyond the start
+                if (pos1 != std::string::npos && pos1 != 0) {
+                    // Find the next to last slash and back up to it
+                    pos1 = path.find_last_of(slash, pos1 - 1);
+                    path = path.substr(0, pos1 + 1);
+                }
+            } else {
+                  // Copy segment and add slash if not at end
+                  path += seg;
+                  if (pos != std::string::npos) path += slash;
+            }
+            // Move to next segment if not at end
+            if (pos != std::string::npos) temp = temp.substr(pos + 1);
+        }
+        //std::cout << "Final Temp: '" << temp.c_str() << "' Final Path: '" << path.c_str() << "'" << std::endl;
+    }
+
+    String uri_;    // Created on-demand
+    String doc_;    // Created on-demand
+    String scheme_; // Includes the :
+    String auth_;   // Includes the //
+    String path_;   // Absolute if starts with /
+    String query_;  // Includes the ?
+    String frag_;   // Includes the #
+};
+
+///////////////////////////////////////////////////////////////////////////////
 // IGenericRemoteSchemaDocumentProvider
 
 template <typename SchemaDocumentType>
@@ -1562,6 +1805,7 @@ public:
 
     virtual ~IGenericRemoteSchemaDocumentProvider() {}
     virtual const SchemaDocumentType* GetRemoteDocument(const Ch* uri, SizeType length) = 0;
+    virtual const SchemaDocumentType* GetRemoteDocument(Uri<SchemaDocumentType> uri) { return GetRemoteDocument(uri.GetDocString(), uri.GetDocStringLength()); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1586,7 +1830,8 @@ public:
     typedef typename EncodingType::Ch Ch;
     typedef internal::Schema<GenericSchemaDocument> SchemaType;
     typedef GenericPointer<ValueType, Allocator> PointerType;
-    typedef GenericValue<EncodingType, Allocator> URIType;
+    typedef GenericValue<EncodingType, AllocatorType> SValue;
+    typedef Uri<GenericSchemaDocument> UriType;
     friend class internal::Schema<GenericSchemaDocument>;
     template <typename, typename, typename>
     friend class GenericSchemaValidator;
@@ -1600,9 +1845,11 @@ public:
         \param uriLength Length of \c name, in code points.
         \param remoteProvider An optional remote schema document provider for resolving remote reference. Can be null.
         \param allocator An optional allocator instance for allocating memory. Can be null.
+        \param pointer An optional JSON pointer to the start of the schema document
     */
     explicit GenericSchemaDocument(const ValueType& document, const Ch* uri = 0, SizeType uriLength = 0,
-        IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0) :
+        IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0,
+        const PointerType& pointer = PointerType() :  // PR #1393
         remoteProvider_(remoteProvider),
         allocator_(allocator),
         ownAllocator_(),
@@ -1616,30 +1863,20 @@ public:
 
         Ch noUri[1] = {0};
         uri_.SetString(uri ? uri : noUri, uriLength, *allocator_);
+        UriType baseId(uri_);
 
         typeless_ = static_cast<SchemaType*>(allocator_->Malloc(sizeof(SchemaType)));
-        new (typeless_) SchemaType(this, PointerType(), ValueType(kObjectType).Move(), ValueType(kObjectType).Move(), allocator_);
+        new (typeless_) SchemaType(this, PointerType(), ValueType(kObjectType).Move(), ValueType(kObjectType).Move(), allocator_, baseId);
 
         // Generate root schema, it will call CreateSchema() to create sub-schemas,
-        // And call AddRefSchema() if there are $ref.
-        CreateSchemaRecursive(&root_, PointerType(), document, document);
-
-        // Resolve $ref
-        while (!schemaRef_.Empty()) {
-            SchemaRefEntry* refEntry = schemaRef_.template Pop<SchemaRefEntry>(1);
-            if (const SchemaType* s = GetSchema(refEntry->target)) {
-                if (refEntry->schema)
-                    *refEntry->schema = s;
-
-                // Create entry in map if not exist
-                if (!GetSchema(refEntry->source)) {
-                    new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(refEntry->source, const_cast<SchemaType*>(s), false, allocator_);
-                }
-            }
-            else if (refEntry->schema)
-                *refEntry->schema = typeless_;
-
-            refEntry->~SchemaRefEntry();
+        // And call HandleRefSchema() if there are $ref.
+        // PR #1393 use input pointer if supplied
+        root_ = typeless_;
+        if (pointer.GetTokenCount() == 0) {
+            CreateSchemaRecursive(&root_, pointer, document, document, baseId);
+        }
+        else if (const ValueType* v = pointer.Get(document)) {
+            CreateSchema(&root_, pointer, *v, document, baseId);
         }
 
         RAPIDJSON_ASSERT(root_ != 0);
@@ -1679,7 +1916,7 @@ public:
         RAPIDJSON_DELETE(ownAllocator_);
     }
 
-    const URIType& GetURI() const { return uri_; }
+    const SValue& GetURI() const { return uri_; }
 
     //! Get the root schema.
     const SchemaType& GetRoot() const { return *root_; }
@@ -1690,12 +1927,7 @@ private:
     //! Prohibit assignment
     GenericSchemaDocument& operator=(const GenericSchemaDocument&);
 
-    struct SchemaRefEntry {
-        SchemaRefEntry(const PointerType& s, const PointerType& t, const SchemaType** outSchema, Allocator *allocator) : source(s, allocator), target(t, allocator), schema(outSchema) {}
-        PointerType source;
-        PointerType target;
-        const SchemaType** schema;
-    };
+    typedef const PointerType* SchemaRefPtr; // PR #1393
 
     struct SchemaEntry {
         SchemaEntry(const PointerType& p, SchemaType* s, bool o, Allocator* allocator) : pointer(p, allocator), schema(s), owned(o) {}
@@ -1710,79 +1942,153 @@ private:
         bool owned;
     };
 
-    void CreateSchemaRecursive(const SchemaType** schema, const PointerType& pointer, const ValueType& v, const ValueType& document) {
-        if (schema)
-            *schema = typeless_;
-
+    // Changed by PR #1393
+    void CreateSchemaRecursive(const SchemaType** schema, const PointerType& pointer, const ValueType& v, const ValueType& document, const UriType& id) {
         if (v.GetType() == kObjectType) {
-            const SchemaType* s = GetSchema(pointer);
-            if (!s)
-                CreateSchema(schema, pointer, v, document);
+            CreateSchema(schema, pointer, v, document, id);
 
             for (typename ValueType::ConstMemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr)
-                CreateSchemaRecursive(0, pointer.Append(itr->name, allocator_), itr->value, document);
+                CreateSchemaRecursive(0, pointer.Append(itr->name, allocator_), itr->value, document, id);
         }
         else if (v.GetType() == kArrayType)
             for (SizeType i = 0; i < v.Size(); i++)
-                CreateSchemaRecursive(0, pointer.Append(i, allocator_), v[i], document);
+                CreateSchemaRecursive(0, pointer.Append(i, allocator_), v[i], document, id);
     }
 
-    void CreateSchema(const SchemaType** schema, const PointerType& pointer, const ValueType& v, const ValueType& document) {
+    // Changed by PR #1393
+    void CreateSchema(const SchemaType** schema, const PointerType& pointer, const ValueType& v, const ValueType& document, const UriType& id) {
         RAPIDJSON_ASSERT(pointer.IsValid());
         if (v.IsObject()) {
-            if (!HandleRefSchema(pointer, schema, v, document)) {
-                SchemaType* s = new (allocator_->Malloc(sizeof(SchemaType))) SchemaType(this, pointer, v, document, allocator_);
-                new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(pointer, s, true, allocator_);
+             if (const SchemaType* sc = GetSchema(pointer)) {
+                if (schema)
+                    *schema = sc;
+               //std::cout << "Using Schema with id " << sc->GetId().GetString() << std::endl;
+               AddSchemaRefs(const_cast<SchemaType*>(sc));
+            }
+            else if (!HandleRefSchema(pointer, schema, v, document, id)) {
+                // The new schema adds itself and its $ref(s) to schemaMap_
+                SchemaType* s = new (allocator_->Malloc(sizeof(SchemaType))) SchemaType(this, pointer, v, document, allocator_, id);
                 if (schema)
                     *schema = s;
             }
         }
+        else {
+            if (schema)
+                *schema = typeless_;
+            AddSchemaRefs(typeless_);
+        }
     }
 
-    bool HandleRefSchema(const PointerType& source, const SchemaType** schema, const ValueType& v, const ValueType& document) {
-        static const Ch kRefString[] = { '$', 'r', 'e', 'f', '\0' };
-        static const ValueType kRefValue(kRefString, 4);
-
-        typename ValueType::ConstMemberIterator itr = v.FindMember(kRefValue);
+    // Changed by PR #1393
+    bool HandleRefSchema(const PointerType& source, const SchemaType** schema, const ValueType& v, const ValueType& document, const UriType& id) {
+        //std::cout << "HandleRefSchema called with id " << id.GetString() << std::endl;
+        typename ValueType::ConstMemberIterator itr = v.FindMember(SchemaType::GetRefString());
         if (itr == v.MemberEnd())
             return false;
+
+       // Resolve the source pointer to the $ref'ed schema (finally)
+        new (schemaRef_.template Push<SchemaRefPtr>()) SchemaRefPtr(&source);
 
         if (itr->value.IsString()) {
             SizeType len = itr->value.GetStringLength();
             if (len > 0) {
                 const Ch* s = itr->value.GetString();
-                SizeType i = 0;
-                while (i < len && s[i] != '#') // Find the first #
-                    i++;
-
-                if (i > 0) { // Remote reference, resolve immediately
+                if (s[0] != '#') { // Remote reference - resolve $ref against the in-scope id
                     if (remoteProvider_) {
-                        if (const GenericSchemaDocument* remoteDocument = remoteProvider_->GetRemoteDocument(s, i)) {
-                            PointerType pointer(&s[i], len - i, allocator_);
+                        UriType ref = UriType(itr->value);
+                        ref.Resolve(id);
+                        //std::cout << "Resolved $ref '" << s << "' against in-scope id '" << id.GetString() << "' giving '" << ref.GetDocString() << "'" << std::endl;
+                        if (const GenericSchemaDocument* remoteDocument = remoteProvider_->GetRemoteDocument(ref)) {
+                            // Create a pointer from the # onwards
+                            const PointerType pointer(ref.GetFragString(), ref.GetFragStringLength(), allocator_);
                             if (pointer.IsValid()) {
                                 if (const SchemaType* sc = remoteDocument->GetSchema(pointer)) {
                                     if (schema)
                                         *schema = sc;
-                                    new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(source, const_cast<SchemaType*>(sc), false, allocator_);
+                                    AddSchemaRefs(const_cast<SchemaType*>(sc));
                                     return true;
                                 }
                             }
                         }
                     }
                 }
-                else if (s[i] == '#') { // Local reference, defer resolution
-                    PointerType pointer(&s[i], len - i, allocator_);
-                    if (pointer.IsValid()) {
-                        if (const ValueType* nv = pointer.Get(document))
-                            if (HandleRefSchema(source, schema, *nv, document))
-                                return true;
-
-                        new (schemaRef_.template Push<SchemaRefEntry>()) SchemaRefEntry(source, pointer, schema, allocator_);
+                else { // Local reference
+                  if (len == 1 || s[1] == '/') {
+                    // JSON pointer
+                    const PointerType pointer(s, len, allocator_);
+                    if (pointer.IsValid() && !IsCyclicRef(pointer)) {
+                      if (const ValueType *nv = pointer.Get(document)) {
+                        CreateSchema(schema, pointer, *nv, document, id);
                         return true;
+                      }
                     }
+                  } else {
+                    // Internal reference to an id
+                    const ValueType val(s, len);
+                    PointerType pointer = PointerType();
+                    ValueType *nv = FindId(document, val, pointer);
+                    if (nv && !IsCyclicRef(pointer)) {
+                      CreateSchema(schema, pointer, *nv, document, id);
+                      return true;
+                    }
+                  }
                 }
             }
         }
+
+        // Invalid/Unknown $ref
+        if (schema)
+            *schema = typeless_;
+        AddSchemaRefs(typeless_);
+        return true;
+    }
+
+    //! Find the first subschema with 'id' string property matching the specified value.
+    // Return a pointer to the subschema and its JSON pointer.
+    ValueType* FindId(const ValueType& doc, const ValueType& findval, PointerType& resptr, const PointerType& here = PointerType()) const {
+        SizeType i = 0;
+        ValueType* resval = 0;
+        switch(doc.GetType()) {
+            case kObjectType:
+                for (typename ValueType::ConstMemberIterator m = doc.MemberBegin(); m != doc.MemberEnd(); ++m) {
+                    if (m->name == SchemaType::GetIdString() && m->value.GetType() == kStringType && m->value == findval) {
+                        // Found the 'id' with the value
+                        resval = const_cast<ValueType*>(&doc);
+                        resptr = here;
+                    } else if (m->value.GetType() == kObjectType || m->value.GetType() == kArrayType) {
+                        resval = FindId(m->value, findval, resptr, here.Append(m->name.GetString(), m->name.GetStringLength(), allocator_));
+                    }
+                    if (resval) break;
+                }
+                return resval;
+            case kArrayType:
+                for (typename ValueType::ConstValueIterator v = doc.Begin(); v != doc.End(); ++v) {
+                    if (v->GetType() == kObjectType || v->GetType() == kArrayType) {
+                        resval = FindId(*v, findval, resptr, here.Append(i, allocator_));
+                    }
+                    if (resval) break;
+                    i++;
+                }
+                return resval;
+            default:
+                return resval;
+        }
+    }
+
+    // Added by PR #1393
+    void AddSchemaRefs(SchemaType* schema) {
+        while (!schemaRef_.Empty()) {
+            SchemaRefPtr *ref = schemaRef_.template Pop<SchemaRefPtr>(1);
+            SchemaEntry *entry = schemaMap_.template Push<SchemaEntry>();
+            new (entry) SchemaEntry(**ref, schema, false, allocator_);
+        }
+    }
+
+    // Added by PR #1393
+    bool IsCyclicRef(const PointerType& pointer) const {
+        for (const SchemaRefPtr* ref = schemaRef_.template Bottom<SchemaRefPtr>(); ref != schemaRef_.template End<SchemaRefPtr>(); ++ref)
+            if (pointer == **ref)
+                return true;
         return false;
     }
 
@@ -1811,8 +2117,8 @@ private:
     const SchemaType* root_;                //!< Root schema.
     SchemaType* typeless_;
     internal::Stack<Allocator> schemaMap_;  // Stores created Pointer -> Schemas
-    internal::Stack<Allocator> schemaRef_;  // Stores Pointer from $ref and schema which holds the $ref
-    URIType uri_;
+    internal::Stack<Allocator> schemaRef_;  // Stores Pointer(s) from $ref(s) until resolved
+    SValue uri_;
 };
 
 //! GenericSchemaDocument using Value type.
