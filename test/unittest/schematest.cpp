@@ -2136,7 +2136,7 @@ public:
 
     virtual const SchemaDocumentType* GetRemoteDocument(const char* uri, SizeType length) {
         for (size_t i = 0; i < kCount; i++)
-            if (typename SchemaDocumentType::SType(uri, length) == sd_[i]->GetURI())
+            if (typename SchemaDocumentType::SValue(uri, length) == sd_[i]->GetURI())
                 return sd_[i];
         return 0;
     }

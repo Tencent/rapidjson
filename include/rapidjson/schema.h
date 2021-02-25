@@ -2118,7 +2118,7 @@ private:
     SchemaType* typeless_;
     internal::Stack<Allocator> schemaMap_;  // Stores created Pointer -> Schemas
     internal::Stack<Allocator> schemaRef_;  // Stores Pointer(s) from $ref(s) until resolved
-    SValue uri_;
+    SValue uri_;                            // Schema document URI
 };
 
 //! GenericSchemaDocument using Value type.
