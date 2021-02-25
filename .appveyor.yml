@@ -15,7 +15,7 @@ install:
   - "SET PATH=%PYTHON%;%PYTHON%/Scripts/;%PATH%"
   - pip.exe install conan
   - conan user
-  - conan remote add systelab-bintray https://api.bintray.com/conan/systelab/conan
+  - conan remote add systelab-public https://systelab.jfrog.io/artifactory/api/conan/cpp-conan-production-local
   - conan --version
 
 build_script:
@@ -25,7 +25,7 @@ build_script:
 deploy_script:
   - ps: >- 
       if($env:appveyor_repo_tag -eq 'True') {
-        conan upload rapidjson/$env:appveyor_build_version@systelab/stable --all -r systelab-bintray --force
+        conan upload rapidjson/$env:appveyor_build_version@systelab/stable --all -r systelab-public --force
       } else {
         echo "Not uploading because this is not a tag build"
       }
