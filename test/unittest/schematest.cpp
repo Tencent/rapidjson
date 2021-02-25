@@ -2918,7 +2918,7 @@ TEST(SchemaValidator, Schema_UnknownError) {
 
 TEST(SchemaValidator, Uri_Parse) {
     typedef std::basic_string<Value::Ch> String;
-    typedef Uri<GenericSchemaDocument<Value, MemoryPoolAllocator<> >> Uri;
+    typedef Uri<GenericSchemaDocument<Value, MemoryPoolAllocator<> > > Uri;
     MemoryPoolAllocator<CrtAllocator> allocator;
 
     String s = "http://auth/path?query#frag";
@@ -3028,7 +3028,7 @@ TEST(SchemaValidator, Uri_Parse) {
 
 TEST(SchemaValidator, Uri_Resolve) {
     typedef std::basic_string<Value::Ch> String;
-    typedef Uri<GenericSchemaDocument<Value, MemoryPoolAllocator<> >> Uri;
+    typedef Uri<GenericSchemaDocument<Value, MemoryPoolAllocator<> > > Uri;
 
     // ref is full uri
     Uri base = Uri(String("http://auth/path/#frag"));
