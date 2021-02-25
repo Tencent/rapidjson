@@ -1849,7 +1849,7 @@ public:
     */
     explicit GenericSchemaDocument(const ValueType& document, const Ch* uri = 0, SizeType uriLength = 0,
         IRemoteSchemaDocumentProviderType* remoteProvider = 0, Allocator* allocator = 0,
-        const PointerType& pointer = PointerType() :  // PR #1393
+        const PointerType& pointer = PointerType()) :  // PR #1393
         remoteProvider_(remoteProvider),
         allocator_(allocator),
         ownAllocator_(),
