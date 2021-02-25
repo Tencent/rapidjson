@@ -1,5 +1,6 @@
 ![RapidJSON logo](doc/logo/rapidjson.png)
 
+[![Build status](https://ci.appveyor.com/api/projects/status/o1k3n56v5jxnu11c?svg=true)](https://ci.appveyor.com/project/systelab/rapidjson)
 ![Release version](https://img.shields.io/badge/release-v1.1.0-blue.svg)
 
 ## A fast JSON parser/generator for C++ with both SAX/DOM style API
