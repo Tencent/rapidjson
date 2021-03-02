@@ -287,7 +287,7 @@ EncodedOutputStream</h2>
 <div class="line"><span class="keyword">typedef</span> EncodedOutputStream&lt;UTF32LE&lt;&gt;, FileWriteStream&gt; OutputStream;</div>
 <div class="line">OutputStream eos(bos, <span class="keyword">true</span>);   <span class="comment">// Write BOM</span></div>
 <div class="line"> </div>
-<div class="line">Writer&lt;OutputStream, UTF32LE&lt;&gt;, UTF8&lt;&gt;&gt; writer(eos);</div>
+<div class="line">Writer&lt;OutputStream, UTF8&lt;&gt;, UTF32LE&lt;&gt;&gt; writer(eos);</div>
 <div class="line">d.Accept(writer);   <span class="comment">// This generates UTF32-LE file from UTF-8 in memory</span></div>
 <div class="line"> </div>
 <div class="line">fclose(fp);</div>
