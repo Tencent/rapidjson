@@ -474,6 +474,16 @@ public:
         typedef typename ValueType::ConstValueIterator ConstValueIterator;
         typedef typename ValueType::ConstMemberIterator ConstMemberIterator;
 
+        // Early add this Schema and its $ref(s) in schemaDocument's map to avoid infinite
+        // recursion (with recursive schemas), since schemaDocument->getSchema() is always
+        // checked before creating a new one. Don't cache typeless_, though.
+        if (this != typeless_) {
+            typedef typename SchemaDocumentType::SchemaEntry SchemaEntry;
+            SchemaEntry *entry = schemaDocument->schemaMap_.template Push<SchemaEntry>();
+            new (entry) SchemaEntry(pointer_, this, true, allocator_);
+            schemaDocument->AddSchemaRefs(this);
+        }
+
         if (!value.IsObject())
             return;
 
@@ -1609,7 +1619,6 @@ public:
         ownAllocator_(),
         root_(),
         typeless_(),
-        parseWholeDocument_(pointer.GetTokenCount() == 0),
         schemaMap_(allocator, kInitialSchemaMapSize),
         schemaRef_(allocator, kInitialSchemaRefSize)
     {
@@ -1623,31 +1632,13 @@ public:
         new (typeless_) SchemaType(this, PointerType(), ValueType(kObjectType).Move(), ValueType(kObjectType).Move(), allocator_);
 
         // Generate root schema, it will call CreateSchema() to create (sub-)schema(s),
-        // And call AddRefSchema() if there are $ref.
+        // And call AddSchemaRefs() if there are $ref.
         root_ = typeless_;
         if (!pointer) {
             CreateSchemaRecursive(&root_, PointerType(), document, document);
         }
         else if (const ValueType* v = pointer->Get(document)) {
             CreateSchema(&root_, *pointer, *v, document);
-        }
-
-        // Resolve $ref
-        while (!schemaRef_.Empty()) {
-            SchemaRefEntry* refEntry = schemaRef_.template Pop<SchemaRefEntry>(1);
-            if (const SchemaType* s = GetSchema(refEntry->target)) {
-                if (refEntry->schema)
-                    *refEntry->schema = s;
-
-                // Create entry in map if not exist
-                if (!GetSchema(refEntry->source)) {
-                    new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(refEntry->source, const_cast<SchemaType*>(s), false, allocator_);
-                }
-            }
-            else if (refEntry->schema)
-                *refEntry->schema = typeless_;
-
-            refEntry->~SchemaRefEntry();
         }
 
         RAPIDJSON_ASSERT(root_ != 0);
@@ -1698,12 +1689,7 @@ private:
     //! Prohibit assignment
     GenericSchemaDocument& operator=(const GenericSchemaDocument&);
 
-    struct SchemaRefEntry {
-        SchemaRefEntry(const PointerType& s, const PointerType& t, const SchemaType** outSchema, Allocator *allocator) : source(s, allocator), target(t, allocator), schema(outSchema) {}
-        PointerType source;
-        PointerType target;
-        const SchemaType** schema;
-    };
+    typedef const PointerType* SchemaRefPtr;
 
     struct SchemaEntry {
         SchemaEntry(const PointerType& p, SchemaType* s, bool o, Allocator* allocator) : pointer(p, allocator), schema(s), owned(o) {}
@@ -1736,13 +1722,19 @@ private:
             if (const SchemaType* sc = GetSchema(pointer)) {
                 if (schema)
                     *schema = sc;
+                AddSchemaRefs(const_cast<SchemaType*>(sc));
             }
             else if (!HandleRefSchema(pointer, schema, v, document)) {
+                // The new schema adds itself and its $ref(s) to schemaMap_
                 SchemaType* s = new (allocator_->Malloc(sizeof(SchemaType))) SchemaType(this, pointer, v, document, allocator_);
-                new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(pointer, s, true, allocator_);
                 if (schema)
                     *schema = s;
             }
+        }
+        else {
+            if (schema)
+                *schema = typeless_;
+            AddSchemaRefs(typeless_);
         }
     }
 
@@ -1754,6 +1746,9 @@ private:
         if (itr == v.MemberEnd())
             return false;
 
+        // Resolve the source pointer to the $ref'ed schema (finally)
+        new (schemaRef_.template Push<SchemaRefPtr>()) SchemaRefPtr(&source);
+
         if (itr->value.IsString()) {
             SizeType len = itr->value.GetStringLength();
             if (len > 0) {
@@ -1762,46 +1757,46 @@ private:
                 while (i < len && s[i] != '#') // Find the first #
                     i++;
 
-                if (i > 0) { // Remote reference, resolve immediately
+                if (i > 0) { // Remote reference
                     if (remoteProvider_) {
                         if (const GenericSchemaDocument* remoteDocument = remoteProvider_->GetRemoteDocument(s, i)) {
-                            PointerType pointer(&s[i], len - i, allocator_);
+                            const PointerType pointer(&s[i], len - i, allocator_);
                             if (pointer.IsValid()) {
                                 if (const SchemaType* sc = remoteDocument->GetSchema(pointer)) {
                                     if (schema)
                                         *schema = sc;
-                                    new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(source, const_cast<SchemaType*>(sc), false, allocator_);
+                                    AddSchemaRefs(const_cast<SchemaType*>(sc));
                                     return true;
                                 }
                             }
                         }
                     }
                 }
-                else if (s[i] == '#') { // Local reference
-                    PointerType pointer(&s[i], len - i, allocator_);
+                else { // Local reference
+                    const PointerType pointer(s, len, allocator_);
                     if (pointer.IsValid()) {
-                        const ValueType* nv = pointer.Get(document);
-                        if (nv && nv->IsObject()) {
-                            if (HandleRefSchema(source, schema, *nv, document))
-                                return true;
-
-                            if (!parseWholeDocument_) {
-                                SchemaType* sc = new (allocator_->Malloc(sizeof(SchemaType))) SchemaType(this, pointer, *nv, document, allocator_);
-                                new (schemaMap_.template Push<SchemaEntry>()) SchemaEntry(pointer, sc, true, allocator_);
-                                if (schema)
-                                    *schema = sc;
-                                return true;
-                            }
+                        if (const ValueType* nv = pointer.Get(document)) {
+                            CreateSchema(schema, pointer, *nv, document);
+                            return true;
                         }
-
-                        // Defer resolution
-                        new (schemaRef_.template Push<SchemaRefEntry>()) SchemaRefEntry(source, pointer, schema, allocator_);
-                        return true;
                     }
                 }
             }
         }
-        return false;
+
+        // Invalid/Unknown $ref
+        if (schema)
+            *schema = typeless_;
+        AddSchemaRefs(typeless_);
+        return true;
+    }
+
+    void AddSchemaRefs(SchemaType* schema) {
+        while (!schemaRef_.Empty()) {
+            SchemaRefPtr *ref = schemaRef_.template Pop<SchemaRefPtr>(1);
+            SchemaEntry *entry = schemaMap_.template Push<SchemaEntry>();
+            new (entry) SchemaEntry(**ref, schema, false, allocator_);
+        }
     }
 
     const SchemaType* GetSchema(const PointerType& pointer) const {
@@ -1828,9 +1823,8 @@ private:
     Allocator *ownAllocator_;
     const SchemaType* root_;                //!< Root schema.
     SchemaType* typeless_;
-    bool parseWholeDocument_;
     internal::Stack<Allocator> schemaMap_;  // Stores created Pointer -> Schemas
-    internal::Stack<Allocator> schemaRef_;  // Stores Pointer from $ref and schema which holds the $ref
+    internal::Stack<Allocator> schemaRef_;  // Stores Pointer(s) from $ref(s) until resolved
     URIType uri_;
 };
 
