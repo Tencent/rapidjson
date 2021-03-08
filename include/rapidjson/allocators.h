@@ -190,7 +190,14 @@ public:
         if (!size)
             return NULL;
 
+        size_t save_sz = size;
+
         size = RAPIDJSON_ALIGN(size);
+
+        if(save_sz > size || size == 0) {
+            return NULL;
+        }
+
         if (chunkHead_ == 0 || chunkHead_->size + size > chunkHead_->capacity)
             if (!AddChunk(chunk_capacity_ > size ? chunk_capacity_ : size))
                 return NULL;
@@ -208,8 +215,14 @@ public:
         if (newSize == 0)
             return NULL;
 
+        size_t save_sz = newSize;
+
         originalSize = RAPIDJSON_ALIGN(originalSize);
         newSize = RAPIDJSON_ALIGN(newSize);
+
+        if(save_sz > newSize || newSize == 0) {
+            return originalPtr;
+        }
 
         // Do not shrink if new size is smaller than original
         if (originalSize >= newSize)
