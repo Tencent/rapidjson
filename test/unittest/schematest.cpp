@@ -2300,7 +2300,7 @@ TEST(SchemaValidatingReader, Invalid) {
     Document e;
     e.Parse(
         "{ \"maxLength\": {"
-"            \"errorCode\": 6,"
+        "     \"errorCode\": 6,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 3, \"actual\": \"ABCD\""
         "}}");
@@ -2576,6 +2576,37 @@ TEST(SchemaValidator, Ref_internal_id_and_schema_pointer) {
         "    \"expected\": [\"integer\"], \"actual\": \"null\""
         "}}",
         kValidateDefaultFlags, SchemaValidatorType, PointerType);
+}
+
+// Test that $refs are correctly resolved when intermediate multiple ids are present
+// Includes $ref to a part of the document with a different in-scope id, which also contains $ref..
+TEST(SchemaValidator, Ref_internal_multiple_ids) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    //RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
+    CrtAllocator allocator;
+    char* schema = ReadFile("unittestschema/idandref.json", allocator);
+    Document sd;
+    sd.Parse(schema);
+    ASSERT_FALSE(sd.HasParseError());
+    SchemaDocumentType s(sd, "http://xyz", 10/*, &provider*/);
+    typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    INVALIDATE_(s, "{\"PA1\": \"s\", \"PA2\": \"t\", \"PA3\": \"r\", \"PX1\": 1, \"PX2Y\": 2, \"PX3Z\": 3, \"PX4\": 4, \"PX5\": 5, \"PX6\": 6, \"PX7W\": 7, \"PX8N\": { \"NX\": 8}}", "#", "errors", "#",
+        "{ \"type\": ["
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PA1\", \"schemaRef\": \"http://xyz#/definitions/A\", \"expected\": [\"integer\"], \"actual\": \"string\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PA2\", \"schemaRef\": \"http://xyz#/definitions/A\", \"expected\": [\"integer\"], \"actual\": \"string\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PA3\", \"schemaRef\": \"http://xyz#/definitions/A\", \"expected\": [\"integer\"], \"actual\": \"string\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX1\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX2Y\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX3Z\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX4\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX5\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX6\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX7W\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX8N/NX\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"}"
+        "]}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidatorType, PointerType);
+    CrtAllocator::Free(schema);
 }
 
 TEST(SchemaValidator, Ref_remote_issue1210) {
@@ -2914,250 +2945,6 @@ TEST(SchemaValidator, ContinueOnErrors_Issue2) {
 
 TEST(SchemaValidator, Schema_UnknownError) {
     ASSERT_TRUE(SchemaValidator::SchemaType::GetValidateErrorKeyword(kValidateErrors).GetString() == std::string("null"));
-}
-
-TEST(SchemaValidator, Uri_Parse) {
-    typedef std::basic_string<Value::Ch> String;
-    typedef Uri<GenericSchemaDocument<Value, MemoryPoolAllocator<> > > Uri;
-    MemoryPoolAllocator<CrtAllocator> allocator;
-
-    String s = "http://auth/path?query#frag";
-    Value v;
-    v.SetString(s, allocator);
-    Uri u = Uri(v);
-    EXPECT_TRUE(u.GetScheme() == "http:");
-    EXPECT_TRUE(u.GetAuth() == "//auth");
-    EXPECT_TRUE(u.GetPath() == "/path");
-    EXPECT_TRUE(u.GetDoc() == "http://auth/path?query");
-    EXPECT_TRUE(u.GetQuery() == "?query");
-    EXPECT_TRUE(u.GetFrag() == "#frag");
-    Value w;
-    u.Get(w, allocator);
-    EXPECT_TRUE(*w.GetString() == *v.GetString());
-
-    s = "urn:uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f";
-    v.SetString(s, allocator);
-    u = Uri(v);
-    EXPECT_TRUE(u.GetScheme() == "urn:");
-    EXPECT_TRUE(u.GetAuth() == "");
-    EXPECT_TRUE(u.GetPath() == "uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f");
-    EXPECT_TRUE(u.GetDoc() == "urn:uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f");
-    EXPECT_TRUE(u.GetQuery() == "");
-    EXPECT_TRUE(u.GetFrag() == "");
-    u.Get(w, allocator);
-    EXPECT_TRUE(*w.GetString() == *v.GetString());
-
-    s = "";
-    v.SetString(s, allocator);
-    u = Uri(v);
-    EXPECT_TRUE(u.GetScheme() == "");
-    EXPECT_TRUE(u.GetAuth() == "");
-    EXPECT_TRUE(u.GetPath() == "");
-    EXPECT_TRUE(u.GetDoc() == "");
-    EXPECT_TRUE(u.GetQuery() == "");
-    EXPECT_TRUE(u.GetFrag() == "");
-
-    s = "http://auth/";
-    v.SetString(s, allocator);
-    u = Uri(v);
-    EXPECT_TRUE(u.GetScheme() == "http:");
-    EXPECT_TRUE(u.GetAuth() == "//auth");
-    EXPECT_TRUE(u.GetPath() == "/");
-    EXPECT_TRUE(u.GetDoc() == "http://auth/");
-    EXPECT_TRUE(u.GetQuery() == "");
-    EXPECT_TRUE(u.GetFrag() == "");
-
-    s = "/path/sub";
-    u = Uri(s);
-    EXPECT_TRUE(u.GetScheme() == "");
-    EXPECT_TRUE(u.GetAuth() == "");
-    EXPECT_TRUE(u.GetPath() == "/path/sub");
-    EXPECT_TRUE(u.GetDoc() == "/path/sub");
-    EXPECT_TRUE(u.GetQuery() == "");
-    EXPECT_TRUE(u.GetFrag() == "");
-
-    // absolute path gets normalized
-    s = "/path/../sub/";
-    u = Uri(s);
-    EXPECT_TRUE(u.GetScheme() == "");
-    EXPECT_TRUE(u.GetAuth() == "");
-    EXPECT_TRUE(u.GetPath() == "/sub/");
-    EXPECT_TRUE(u.GetDoc() == "/sub/");
-    EXPECT_TRUE(u.GetQuery() == "");
-    EXPECT_TRUE(u.GetFrag() == "");
-
-    // relative path does not
-    s = "path/../sub";
-    u = Uri(s);
-    EXPECT_TRUE(u.GetScheme() == "");
-    EXPECT_TRUE(u.GetAuth() == "");
-    EXPECT_TRUE(u.GetPath() == "path/../sub");
-    EXPECT_TRUE(u.GetDoc() == "path/../sub");
-    EXPECT_TRUE(u.GetQuery() == "");
-    EXPECT_TRUE(u.GetFrag() == "");
-
-    s = "http://auth#frag/stuff";
-    u = Uri(s);
-    EXPECT_TRUE(u.GetScheme() == "http:");
-    EXPECT_TRUE(u.GetAuth() == "//auth");
-    EXPECT_TRUE(u.GetPath() == "");
-    EXPECT_TRUE(u.GetDoc() == "http://auth");
-    EXPECT_TRUE(u.GetQuery() == "");
-    EXPECT_TRUE(u.GetFrag() == "#frag/stuff");
-    EXPECT_TRUE(u.Get() == s);
-
-    s = "#frag/stuff";
-    u = Uri(s);
-    EXPECT_TRUE(u.GetScheme() == "");
-    EXPECT_TRUE(u.GetAuth() == "");
-    EXPECT_TRUE(u.GetPath() == "");
-    EXPECT_TRUE(u.GetDoc() == "");
-    EXPECT_TRUE(u.GetQuery() == "");
-    EXPECT_TRUE(u.GetFrag() == "#frag/stuff");
-    EXPECT_TRUE(u.Get() == s);
-
-    Value::Ch c[] = { '#', 'f', 'r', 'a', 'g', '/', 's', 't', 'u', 'f', 'f', '\0'};
-    u = Uri(c, 11);
-    EXPECT_TRUE(String(u.GetString()) == "#frag/stuff");
-    EXPECT_TRUE(u.GetStringLength() == 11);
-    EXPECT_TRUE(String(u.GetDocString()) == "");
-    EXPECT_TRUE(u.GetDocStringLength() == 0);
-    EXPECT_TRUE(String(u.GetFragString()) == "#frag/stuff");
-    EXPECT_TRUE(u.GetFragStringLength() == 11);
-}
-
-TEST(SchemaValidator, Uri_Resolve) {
-    typedef std::basic_string<Value::Ch> String;
-    typedef Uri<GenericSchemaDocument<Value, MemoryPoolAllocator<> > > Uri;
-
-    // ref is full uri
-    Uri base = Uri(String("http://auth/path/#frag"));
-    Uri ref = Uri(String("http://newauth/newpath#newfrag"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://newauth/newpath#newfrag");
-
-    base = Uri(String("/path/#frag"));
-    ref = Uri(String("http://newauth/newpath#newfrag"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://newauth/newpath#newfrag");
-
-    // ref is alternate uri
-    base = Uri(String("http://auth/path/#frag"));
-    ref = Uri(String("urn:uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "urn:uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f");
-
-    // ref is absolute path
-    base = Uri(String("http://auth/path/#"));
-    ref = Uri(String("/newpath#newfrag"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://auth/newpath#newfrag");
-
-    // ref is relative path
-    base = Uri(String("http://auth/path/file.json#frag"));
-    ref = Uri(String("newfile.json#"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://auth/path/newfile.json#");
-
-    base = Uri(String("http://auth/path/file.json#frag/stuff"));
-    ref = Uri(String("newfile.json#newfrag/newstuff"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://auth/path/newfile.json#newfrag/newstuff");
-
-    base = Uri(String("file.json"));
-    ref = Uri(String("newfile.json"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "newfile.json");
-
-    base = Uri(String("file.json"));
-    ref = Uri(String("./newfile.json"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "newfile.json");
-
-    base = Uri(String("file.json"));
-    ref = Uri(String("parent/../newfile.json"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "newfile.json");
-
-    base = Uri(String("file.json"));
-    ref = Uri(String("parent/./newfile.json"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "parent/newfile.json");
-
-    base = Uri(String("file.json"));
-    ref = Uri(String("../../parent/.././newfile.json"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "newfile.json");
-
-    base = Uri(String("http://auth"));
-    ref = Uri(String("newfile.json"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://auth/newfile.json");
-
-    // ref is fragment
-    base = Uri(String("#frag/stuff"));
-    ref = Uri(String("#newfrag/newstuff"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "#newfrag/newstuff");
-
-    // test ref fragment always wins
-    base = Uri(String("/path#frag"));
-    ref = Uri(String(""));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "/path");
-
-    // Examples from RFC3896
-    base = Uri(String("http://a/b/c/d;p?q"));
-    ref = Uri(String("g:h"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "g:h");
-    ref = Uri(String("g"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g");
-    ref = Uri(String("./g"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g");
-    ref = Uri(String("g/"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g/");
-    ref = Uri(String("/g"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/g");
-    ref = Uri(String("//g"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://g");
-    ref = Uri(String("?y"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/d;p?y");
-    ref = Uri(String("g?y"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g?y");
-    ref = Uri(String("#s"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/d;p?q#s");
-    ref = Uri(String("g#s"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g#s");
-    ref = Uri(String("g?y#s"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g?y#s");
-    ref = Uri(String(";x"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/;x");
-    ref = Uri(String("g;x"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g;x");
-    ref = Uri(String("g;x?y#s"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g;x?y#s");
-    ref = Uri(String(""));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/d;p?q");
-    ref = Uri(String("."));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/");
-    ref = Uri(String("./"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/");
-    ref = Uri(String(".."));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/");
-    ref = Uri(String("../"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/");
-    ref = Uri(String("../g"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/g");
-    ref = Uri(String("../.."));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/");
-    ref = Uri(String("../../"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/");
-     ref = Uri(String("../../g"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/g");
-    ref = Uri(String("../../../g"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/g");
-    ref = Uri(String("../../../../g"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/g");
-    ref = Uri(String("/./g"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/g");
-    ref = Uri(String("/../g"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/g");
-    ref = Uri(String("g."));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g.");
-    ref = Uri(String(".g"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/.g");
-    ref = Uri(String("g.."));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g..");
-    ref = Uri(String("..g"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/..g");
-    ref = Uri(String("g#s/../x"));
-    EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g#s/../x");
 }
 
 #if defined(_MSC_VER) || defined(__clang__)

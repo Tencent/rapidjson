@@ -648,6 +648,48 @@ TEST(Pointer, Create) {
     }
 }
 
+static const char kJsonIds[] = "{\n"
+   "    \"id\": \"/root/\","
+   "    \"foo\":[\"bar\", \"baz\", {\"id\": \"inarray\", \"child\": 1}],\n"
+   "    \"int\" : 2,\n"
+   "    \"str\" : \"val\",\n"
+   "    \"obj\": {\"id\": \"inobj\", \"child\": 3},\n"
+   "    \"jbo\": {\"id\": true, \"child\": 4}\n"
+   "}";
+
+
+TEST(Pointer, GetUri) {
+    typedef std::basic_string<Value::Ch> String;
+    Document d;
+    d.Parse(kJsonIds);
+
+    String doc = String("http://doc");
+    EXPECT_TRUE((Pointer("").GetUri(d, Pointer::UriType(doc)).Get()) == doc);
+    EXPECT_TRUE((Pointer("/foo").GetUri(d, Pointer::UriType(doc)).Get()) == "http://doc/root/");
+    EXPECT_TRUE((Pointer("/foo/0").GetUri(d, Pointer::UriType(doc)).Get()) == "http://doc/root/");
+    EXPECT_TRUE((Pointer("/foo/2").GetUri(d, Pointer::UriType(doc)).Get()) == "http://doc/root/");
+    EXPECT_TRUE((Pointer("/foo/2/child").GetUri(d, Pointer::UriType(doc)).Get()) == "http://doc/root/inarray");
+    EXPECT_TRUE((Pointer("/int").GetUri(d, Pointer::UriType(doc)).Get()) == "http://doc/root/");
+    EXPECT_TRUE((Pointer("/str").GetUri(d, Pointer::UriType(doc)).Get()) == "http://doc/root/");
+    EXPECT_TRUE((Pointer("/obj").GetUri(d, Pointer::UriType(doc)).Get()) == "http://doc/root/");
+    EXPECT_TRUE((Pointer("/obj/child").GetUri(d, Pointer::UriType(doc)).Get()) == "http://doc/root/inobj");
+    EXPECT_TRUE((Pointer("/jbo").GetUri(d, Pointer::UriType(doc)).Get()) == "http://doc/root/");
+    EXPECT_TRUE((Pointer("/jbo/child").GetUri(d, Pointer::UriType(doc)).Get()) == "http://doc/root/"); // id not string
+
+    size_t unresolvedTokenIndex;
+    EXPECT_TRUE((Pointer("/foo/3").GetUri(d, Pointer::UriType(doc), &unresolvedTokenIndex).Get()) == ""); // Out of boundary
+    EXPECT_EQ(1u, unresolvedTokenIndex);
+    EXPECT_TRUE((Pointer("/foo/a").GetUri(d, Pointer::UriType(doc), &unresolvedTokenIndex).Get()) == ""); // "/foo" is an array, cannot query by "a"
+    EXPECT_EQ(1u, unresolvedTokenIndex);
+    EXPECT_TRUE((Pointer("/foo/0/0").GetUri(d, Pointer::UriType(doc), &unresolvedTokenIndex).Get()) == ""); // "/foo/0" is an string, cannot further query
+    EXPECT_EQ(2u, unresolvedTokenIndex);
+    EXPECT_TRUE((Pointer("/foo/0/a").GetUri(d, Pointer::UriType(doc), &unresolvedTokenIndex).Get()) == ""); // "/foo/0" is an string, cannot further query
+    EXPECT_EQ(2u, unresolvedTokenIndex);
+
+    Pointer::Token tokens[] = { { "foo ...", 3, kPointerInvalidIndex } };
+    EXPECT_TRUE((Pointer(tokens, 1).GetUri(d, Pointer::UriType(doc)).Get()) == "http://doc/root/");
+}
+
 TEST(Pointer, Get) {
     Document d;
     d.Parse(kJson);

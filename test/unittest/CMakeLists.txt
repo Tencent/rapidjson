@@ -26,6 +26,7 @@ set(UNITTEST_SOURCES
     stringbuffertest.cpp
     strtodtest.cpp
     unittest.cpp
+    uritest.cpp
     valuetest.cpp
     writertest.cpp)
 
