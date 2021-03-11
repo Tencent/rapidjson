@@ -31,13 +31,13 @@ using namespace rapidjson;
 
 TEST(Uri, Parse) {
     typedef std::basic_string<Value::Ch> String;
-    typedef GenericUri<Value, MemoryPoolAllocator<> > Uri;
+    typedef GenericUri<Value, MemoryPoolAllocator<> > UriType;
     MemoryPoolAllocator<CrtAllocator> allocator;
 
     String s = "http://auth/path?query#frag";
     Value v;
     v.SetString(s, allocator);
-    Uri u = Uri(v);
+    UriType u = UriType(v);
     EXPECT_TRUE(u.GetScheme() == "http:");
     EXPECT_TRUE(u.GetAuth() == "//auth");
     EXPECT_TRUE(u.GetPath() == "/path");
@@ -50,7 +50,7 @@ TEST(Uri, Parse) {
 
     s = "urn:uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f";
     v.SetString(s, allocator);
-    u = Uri(v);
+    u = UriType(v);
     EXPECT_TRUE(u.GetScheme() == "urn:");
     EXPECT_TRUE(u.GetAuth() == "");
     EXPECT_TRUE(u.GetPath() == "uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f");
@@ -62,7 +62,7 @@ TEST(Uri, Parse) {
 
     s = "";
     v.SetString(s, allocator);
-    u = Uri(v);
+    u = UriType(v);
     EXPECT_TRUE(u.GetScheme() == "");
     EXPECT_TRUE(u.GetAuth() == "");
     EXPECT_TRUE(u.GetPath() == "");
@@ -72,7 +72,7 @@ TEST(Uri, Parse) {
 
     s = "http://auth/";
     v.SetString(s, allocator);
-    u = Uri(v);
+    u = UriType(v);
     EXPECT_TRUE(u.GetScheme() == "http:");
     EXPECT_TRUE(u.GetAuth() == "//auth");
     EXPECT_TRUE(u.GetPath() == "/");
@@ -81,7 +81,7 @@ TEST(Uri, Parse) {
     EXPECT_TRUE(u.GetFrag() == "");
 
     s = "/path/sub";
-    u = Uri(s);
+    u = UriType(s);
     EXPECT_TRUE(u.GetScheme() == "");
     EXPECT_TRUE(u.GetAuth() == "");
     EXPECT_TRUE(u.GetPath() == "/path/sub");
@@ -91,7 +91,7 @@ TEST(Uri, Parse) {
 
     // absolute path gets normalized
     s = "/path/../sub/";
-    u = Uri(s);
+    u = UriType(s);
     EXPECT_TRUE(u.GetScheme() == "");
     EXPECT_TRUE(u.GetAuth() == "");
     EXPECT_TRUE(u.GetPath() == "/sub/");
@@ -101,7 +101,7 @@ TEST(Uri, Parse) {
 
     // relative path does not
     s = "path/../sub";
-    u = Uri(s);
+    u = UriType(s);
     EXPECT_TRUE(u.GetScheme() == "");
     EXPECT_TRUE(u.GetAuth() == "");
     EXPECT_TRUE(u.GetPath() == "path/../sub");
@@ -110,7 +110,7 @@ TEST(Uri, Parse) {
     EXPECT_TRUE(u.GetFrag() == "");
 
     s = "http://auth#frag/stuff";
-    u = Uri(s);
+    u = UriType(s);
     EXPECT_TRUE(u.GetScheme() == "http:");
     EXPECT_TRUE(u.GetAuth() == "//auth");
     EXPECT_TRUE(u.GetPath() == "");
@@ -120,7 +120,7 @@ TEST(Uri, Parse) {
     EXPECT_TRUE(u.Get() == s);
 
     s = "#frag/stuff";
-    u = Uri(s);
+    u = UriType(s);
     EXPECT_TRUE(u.GetScheme() == "");
     EXPECT_TRUE(u.GetAuth() == "");
     EXPECT_TRUE(u.GetPath() == "");
@@ -130,7 +130,7 @@ TEST(Uri, Parse) {
     EXPECT_TRUE(u.Get() == s);
 
     Value::Ch c[] = { '#', 'f', 'r', 'a', 'g', '/', 's', 't', 'u', 'f', 'f', '\0'};
-    u = Uri(c, 11);
+    u = UriType(c, 11);
     EXPECT_TRUE(String(u.GetString()) == "#frag/stuff");
     EXPECT_TRUE(u.GetStringLength() == 11);
     EXPECT_TRUE(String(u.GetBaseString()) == "");
@@ -141,135 +141,135 @@ TEST(Uri, Parse) {
 
 TEST(Uri, Resolve) {
     typedef std::basic_string<Value::Ch> String;
-    typedef GenericUri<Value, MemoryPoolAllocator<> > Uri;
+    typedef GenericUri<Value, MemoryPoolAllocator<> > UriType;
 
     // ref is full uri
-    Uri base = Uri(String("http://auth/path/#frag"));
-    Uri ref = Uri(String("http://newauth/newpath#newfrag"));
+    UriType base = UriType(String("http://auth/path/#frag"));
+    UriType ref = UriType(String("http://newauth/newpath#newfrag"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://newauth/newpath#newfrag");
 
-    base = Uri(String("/path/#frag"));
-    ref = Uri(String("http://newauth/newpath#newfrag"));
+    base = UriType(String("/path/#frag"));
+    ref = UriType(String("http://newauth/newpath#newfrag"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://newauth/newpath#newfrag");
 
     // ref is alternate uri
-    base = Uri(String("http://auth/path/#frag"));
-    ref = Uri(String("urn:uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f"));
+    base = UriType(String("http://auth/path/#frag"));
+    ref = UriType(String("urn:uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "urn:uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f");
 
     // ref is absolute path
-    base = Uri(String("http://auth/path/#"));
-    ref = Uri(String("/newpath#newfrag"));
+    base = UriType(String("http://auth/path/#"));
+    ref = UriType(String("/newpath#newfrag"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://auth/newpath#newfrag");
 
     // ref is relative path
-    base = Uri(String("http://auth/path/file.json#frag"));
-    ref = Uri(String("newfile.json#"));
+    base = UriType(String("http://auth/path/file.json#frag"));
+    ref = UriType(String("newfile.json#"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://auth/path/newfile.json#");
 
-    base = Uri(String("http://auth/path/file.json#frag/stuff"));
-    ref = Uri(String("newfile.json#newfrag/newstuff"));
+    base = UriType(String("http://auth/path/file.json#frag/stuff"));
+    ref = UriType(String("newfile.json#newfrag/newstuff"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://auth/path/newfile.json#newfrag/newstuff");
 
-    base = Uri(String("file.json"));
-    ref = Uri(String("newfile.json"));
+    base = UriType(String("file.json"));
+    ref = UriType(String("newfile.json"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "newfile.json");
 
-    base = Uri(String("file.json"));
-    ref = Uri(String("./newfile.json"));
+    base = UriType(String("file.json"));
+    ref = UriType(String("./newfile.json"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "newfile.json");
 
-    base = Uri(String("file.json"));
-    ref = Uri(String("parent/../newfile.json"));
+    base = UriType(String("file.json"));
+    ref = UriType(String("parent/../newfile.json"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "newfile.json");
 
-    base = Uri(String("file.json"));
-    ref = Uri(String("parent/./newfile.json"));
+    base = UriType(String("file.json"));
+    ref = UriType(String("parent/./newfile.json"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "parent/newfile.json");
 
-    base = Uri(String("file.json"));
-    ref = Uri(String("../../parent/.././newfile.json"));
+    base = UriType(String("file.json"));
+    ref = UriType(String("../../parent/.././newfile.json"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "newfile.json");
 
-    base = Uri(String("http://auth"));
-    ref = Uri(String("newfile.json"));
+    base = UriType(String("http://auth"));
+    ref = UriType(String("newfile.json"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://auth/newfile.json");
 
     // ref is fragment
-    base = Uri(String("#frag/stuff"));
-    ref = Uri(String("#newfrag/newstuff"));
+    base = UriType(String("#frag/stuff"));
+    ref = UriType(String("#newfrag/newstuff"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "#newfrag/newstuff");
 
     // test ref fragment always wins
-    base = Uri(String("/path#frag"));
-    ref = Uri(String(""));
+    base = UriType(String("/path#frag"));
+    ref = UriType(String(""));
     EXPECT_TRUE(ref.Resolve(base).Get() == "/path");
 
     // Examples from RFC3896
-    base = Uri(String("http://a/b/c/d;p?q"));
-    ref = Uri(String("g:h"));
+    base = UriType(String("http://a/b/c/d;p?q"));
+    ref = UriType(String("g:h"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "g:h");
-    ref = Uri(String("g"));
+    ref = UriType(String("g"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g");
-    ref = Uri(String("./g"));
+    ref = UriType(String("./g"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g");
-    ref = Uri(String("g/"));
+    ref = UriType(String("g/"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g/");
-    ref = Uri(String("/g"));
+    ref = UriType(String("/g"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/g");
-    ref = Uri(String("//g"));
+    ref = UriType(String("//g"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://g");
-    ref = Uri(String("?y"));
+    ref = UriType(String("?y"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/d;p?y");
-    ref = Uri(String("g?y"));
+    ref = UriType(String("g?y"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g?y");
-    ref = Uri(String("#s"));
+    ref = UriType(String("#s"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/d;p?q#s");
-    ref = Uri(String("g#s"));
+    ref = UriType(String("g#s"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g#s");
-    ref = Uri(String("g?y#s"));
+    ref = UriType(String("g?y#s"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g?y#s");
-    ref = Uri(String(";x"));
+    ref = UriType(String(";x"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/;x");
-    ref = Uri(String("g;x"));
+    ref = UriType(String("g;x"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g;x");
-    ref = Uri(String("g;x?y#s"));
+    ref = UriType(String("g;x?y#s"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g;x?y#s");
-    ref = Uri(String(""));
+    ref = UriType(String(""));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/d;p?q");
-    ref = Uri(String("."));
+    ref = UriType(String("."));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/");
-    ref = Uri(String("./"));
+    ref = UriType(String("./"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/");
-    ref = Uri(String(".."));
+    ref = UriType(String(".."));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/");
-    ref = Uri(String("../"));
+    ref = UriType(String("../"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/");
-    ref = Uri(String("../g"));
+    ref = UriType(String("../g"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/g");
-    ref = Uri(String("../.."));
+    ref = UriType(String("../.."));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/");
-    ref = Uri(String("../../"));
+    ref = UriType(String("../../"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/");
-     ref = Uri(String("../../g"));
+     ref = UriType(String("../../g"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/g");
-    ref = Uri(String("../../../g"));
+    ref = UriType(String("../../../g"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/g");
-    ref = Uri(String("../../../../g"));
+    ref = UriType(String("../../../../g"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/g");
-    ref = Uri(String("/./g"));
+    ref = UriType(String("/./g"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/g");
-    ref = Uri(String("/../g"));
+    ref = UriType(String("/../g"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/g");
-    ref = Uri(String("g."));
+    ref = UriType(String("g."));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g.");
-    ref = Uri(String(".g"));
+    ref = UriType(String(".g"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/.g");
-    ref = Uri(String("g.."));
+    ref = UriType(String("g.."));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g..");
-    ref = Uri(String("..g"));
+    ref = UriType(String("..g"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/..g");
-    ref = Uri(String("g#s/../x"));
+    ref = UriType(String("g#s/../x"));
     EXPECT_TRUE(ref.Resolve(base).Get() == "http://a/b/c/g#s/../x");
 }
 
