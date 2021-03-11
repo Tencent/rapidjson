@@ -15,13 +15,11 @@
 #ifndef RAPIDJSON_URI_H_
 #define RAPIDJSON_URI_H_
 
-#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
-#include <utility> // std::move
-#endif
-
 #if defined(__clang__)
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(c++98-compat)
+#elif defined(_MSC_VER)
+RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
