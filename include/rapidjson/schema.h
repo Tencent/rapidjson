@@ -1898,7 +1898,7 @@ private:
                 return resval;
             }
             // No match, continue looking
-            for (typename ValueType::ConstMemberIterator m = doc.MemberBegin(); m != doc.MemberEnd(); ++m) {
+            for (m = doc.MemberBegin(); m != doc.MemberEnd(); ++m) {
                 if (m->value.GetType() == kObjectType || m->value.GetType() == kArrayType) {
                     resval = FindId(m->value, finduri, resptr, localuri, full, here.Append(m->name.GetString(), m->name.GetStringLength(), allocator_));
                 }
