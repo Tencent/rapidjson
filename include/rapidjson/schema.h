@@ -1692,7 +1692,7 @@ public:
         schemaMap_(std::move(rhs.schemaMap_)),
         schemaRef_(std::move(rhs.schemaRef_)),
         uri_(std::move(rhs.uri_)),
-        docId_(rhs.docId_),
+        docId_(rhs.docId_)
     {
         rhs.remoteProvider_ = 0;
         rhs.allocator_ = 0;
