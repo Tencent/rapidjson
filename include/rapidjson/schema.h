@@ -1831,7 +1831,7 @@ private:
                         const PointerType relPointer(s, len, allocator_);
                         if (relPointer.IsValid()) {
                             // Get the subschema
-                            if (const ValueType *v = relPointer.Get(*base)) {
+                            if (const ValueType *pv = relPointer.Get(*base)) {
                                 // Now get the absolute JSON pointer by adding relative to base
                                 PointerType pointer(basePointer);
                                 for (SizeType i = 0; i < relPointer.GetTokenCount(); i++)
@@ -1842,7 +1842,7 @@ private:
                                     // Call CreateSchema recursively, but first compute the in-scope id for the $ref target as we have jumped there
                                     // TODO: cache pointer <-> id mapping
                                     scopeId = pointer.GetUri(document, docId_);
-                                    CreateSchema(schema, pointer, *v, document, scopeId);
+                                    CreateSchema(schema, pointer, *pv, document, scopeId);
                                     return true;
                                 }
                             }
@@ -1852,14 +1852,14 @@ private:
                         // See if the fragment matches an id in this document.
                         // Search from the base we just established. Returns the subschema in the document and its absolute JSON pointer.
                         PointerType pointer = PointerType();
-                        if (const ValueType *v = FindId(*base, ref, pointer, UriType(ref.GetBase()), true, basePointer)) {
-                            if (v && !IsCyclicRef(pointer)) {
+                        if (const ValueType *pv = FindId(*base, ref, pointer, UriType(ref.GetBase()), true, basePointer)) {
+                            if (!IsCyclicRef(pointer)) {
                                 //GenericStringBuffer<EncodingType> sb;
                                 //pointer.StringifyUriFragment(sb);
                                 // Call CreateSchema recursively, but first compute the in-scope id for the $ref target as we have jumped there
                                 // TODO: cache pointer <-> id mapping
                                 scopeId = pointer.GetUri(document, docId_);
-                                CreateSchema(schema, pointer, *v, document, scopeId);
+                                CreateSchema(schema, pointer, *pv, document, scopeId);
                                 return true;
                             }
                         }

@@ -34,18 +34,18 @@ public:
     typedef std::basic_string<Ch> String;
 
     // Constructors
-    GenericUri() {}
+    GenericUri() : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_() {}
 
-    GenericUri(const String& uri) {
+    GenericUri(const String& uri) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_() {
         Parse(uri);
     }
 
-    GenericUri(const Ch* uri, SizeType len) {
+    GenericUri(const Ch* uri, SizeType len) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_() {
         Parse(String(uri, len));
     }
 
     // Use with specializations of GenericValue
-    template<typename T> GenericUri(const T& uri) {
+    template<typename T> GenericUri(const T& uri) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_() {
         Parse(uri.template Get<String>());
     }
 
@@ -236,13 +236,13 @@ private:
         //std::cout << "Final Temp: '" << temp.c_str() << "' Final Path: '" << path.c_str() << "'" << std::endl;
     }
 
-    String uri_ = String();    // Full uri
-    String base_ = String();   // Everything except fragment
-    String scheme_ = String(); // Includes the :
-    String auth_ = String();   // Includes the //
-    String path_ = String();   // Absolute if starts with /
-    String query_ = String();  // Includes the ?
-    String frag_ = String();   // Includes the #
+    String uri_;    // Full uri
+    String base_;   // Everything except fragment
+    String scheme_; // Includes the :
+    String auth_;   // Includes the //
+    String path_;   // Absolute if starts with /
+    String query_;  // Includes the ?
+    String frag_;   // Includes the #
 };
 
 //! GenericUri for Value (UTF-8, default allocator).
