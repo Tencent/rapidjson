@@ -11,7 +11,8 @@ IF(GTESTSRC_FOUND)
     add_subdirectory(${GTEST_SOURCE_DIR} ${CMAKE_BINARY_DIR}/googletest)
     include_directories(SYSTEM ${GTEST_INCLUDE_DIR})
 
-    set(TEST_LIBRARIES gtest gtest_main)
+    set_target_properties(gtest PROPERTIES FOLDER "${GTEST_SOURCE_DIR}")
+    set_target_properties(gtest_main PROPERTIES FOLDER "${GTEST_SOURCE_DIR}")
 
     add_custom_target(tests ALL)
     add_subdirectory(perftest)
