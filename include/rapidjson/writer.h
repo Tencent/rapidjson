@@ -47,6 +47,11 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 #endif
 
+#ifdef __hpux
+// disable warning unreachable-code
+#pragma diag_suppress 2111
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
