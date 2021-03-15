@@ -1119,6 +1119,16 @@ TEST(Value, Array) {
     z.SetArray();
     EXPECT_TRUE(z.IsArray());
     EXPECT_TRUE(z.Empty());
+
+    // PR #1503: assign from inner Value
+    {
+        CrtAllocator a; // Free() is not a noop
+        GenericValue<UTF8<>, CrtAllocator> nullValue;
+        GenericValue<UTF8<>, CrtAllocator> arrayValue(kArrayType);
+        arrayValue.PushBack(nullValue, a);
+        arrayValue = arrayValue[0]; // shouldn't crash (use after free)
+        EXPECT_TRUE(arrayValue.IsNull());
+    }
 }
 
 TEST(Value, ArrayHelper) {
