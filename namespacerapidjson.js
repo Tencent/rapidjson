@@ -36,6 +36,8 @@ var namespacerapidjson =
     [ "ParseResult", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s_structrapidjson_1_1_parse_result" ],
     [ "PrettyWriter", "classrapidjson_1_1_pretty_writer.html", "classrapidjson_1_1_pretty_writer" ],
     [ "SchemaValidatingReader", "classrapidjson_1_1_schema_validating_reader.html", "classrapidjson_1_1_schema_validating_reader" ],
+    [ "StdAllocator", "classrapidjson_1_1_std_allocator.html", "classrapidjson_1_1_std_allocator" ],
+    [ "StdAllocator< void, BaseAllocator >", "classrapidjson_1_1_std_allocator_3_01void_00_01_base_allocator_01_4.html", "classrapidjson_1_1_std_allocator_3_01void_00_01_base_allocator_01_4" ],
     [ "StreamTraits", "structrapidjson_1_1_stream_traits.html", "structrapidjson_1_1_stream_traits" ],
     [ "StreamTraits< GenericInsituStringStream< Encoding > >", "structrapidjson_1_1_stream_traits_3_01_generic_insitu_string_stream_3_01_encoding_01_4_01_4.html", "structrapidjson_1_1_stream_traits_3_01_generic_insitu_string_stream_3_01_encoding_01_4_01_4" ],
     [ "StreamTraits< GenericStringStream< Encoding > >", "structrapidjson_1_1_stream_traits_3_01_generic_string_stream_3_01_encoding_01_4_01_4.html", "structrapidjson_1_1_stream_traits_3_01_generic_string_stream_3_01_encoding_01_4_01_4" ],

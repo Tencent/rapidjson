@@ -1,5 +1,9 @@
 var hierarchy =
 [
+    [ "allocator", null, [
+      [ "rapidjson::StdAllocator< T, BaseAllocator >", "classrapidjson_1_1_std_allocator.html", null ],
+      [ "rapidjson::StdAllocator< void, BaseAllocator >", "classrapidjson_1_1_std_allocator_3_01void_00_01_base_allocator_01_4.html", null ]
+    ] ],
     [ "Allocator", "classrapidjson_1_1_allocator.html", null ],
     [ "rapidjson::GenericValue< Encoding, Allocator >::ArrayData", "structrapidjson_1_1_generic_value_1_1_array_data.html", null ],
     [ "rapidjson::ASCII< CharType >", "structrapidjson_1_1_a_s_c_i_i.html", null ],
@@ -59,6 +63,8 @@ var hierarchy =
     [ "rapidjson::GenericValue< Encoding, Allocator >::ObjectData", "structrapidjson_1_1_generic_value_1_1_object_data.html", null ],
     [ "rapidjson::ParseResult", "group___r_a_p_i_d_j_s_o_n___e_r_r_o_r_s.html#structrapidjson_1_1_parse_result", null ],
     [ "rapidjson::GenericPointer< ValueType, Allocator >::PercentEncodeStream< OutputStream >", "classrapidjson_1_1_generic_pointer_1_1_percent_encode_stream.html", null ],
+    [ "rapidjson::StdAllocator< void, BaseAllocator >::rebind< U >", "structrapidjson_1_1_std_allocator_3_01void_00_01_base_allocator_01_4_1_1rebind.html", null ],
+    [ "rapidjson::StdAllocator< T, BaseAllocator >::rebind< U >", "structrapidjson_1_1_std_allocator_1_1rebind.html", null ],
     [ "rapidjson::SchemaValidatingReader< parseFlags, InputStream, SourceEncoding, SchemaDocumentType, StackAllocator >", "classrapidjson_1_1_schema_validating_reader.html", null ],
     [ "rapidjson::GenericValue< Encoding, Allocator >::ShortString", "structrapidjson_1_1_generic_value_1_1_short_string.html", null ],
     [ "Stream", "classrapidjson_1_1_stream.html", null ],
