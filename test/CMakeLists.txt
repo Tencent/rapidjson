@@ -1,7 +1,12 @@
 find_package(GTestSrc)
 
-IF(GTESTSRC_FOUND)
-    enable_testing()
+find_package(GTest)
+if(GTEST_FOUND)
+
+    include_directories(SYSTEM ${GTEST_INCLUDE_DIR})
+    set(TEST_LIBRARIES ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY})
+
+elseif(GTESTSRC_FOUND)
 
     if (WIN32 AND (NOT CYGWIN) AND (NOT MINGW))
         set(gtest_disable_pthreads ON)
@@ -12,9 +17,11 @@ IF(GTESTSRC_FOUND)
     include_directories(SYSTEM ${GTEST_INCLUDE_DIR})
 
     set(TEST_LIBRARIES gtest gtest_main)
+endif()
 
+
+if(TEST_LIBRARIES)
     add_custom_target(tests ALL)
     add_subdirectory(perftest)
     add_subdirectory(unittest)
-
-ENDIF(GTESTSRC_FOUND)
+endif()
