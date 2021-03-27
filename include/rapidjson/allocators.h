@@ -449,11 +449,17 @@ public:
     ~StdAllocator() RAPIDJSON_NOEXCEPT
     { }
 
-    typedef typename allocator_type::value_type       value_type;
+#if RAPIDJSON_HAS_CXX17
+    typedef typename std::allocator_traits<allocator_type>::pointer        pointer;
+    typedef typename std::allocator_traits<allocator_type>::const_pointer  const_pointer;
+#else
     typedef typename allocator_type::pointer          pointer;
     typedef typename allocator_type::const_pointer    const_pointer;
     typedef typename allocator_type::reference        reference;
     typedef typename allocator_type::const_reference  const_reference;
+#endif
+
+    typedef typename allocator_type::value_type       value_type;
     typedef typename allocator_type::size_type        size_type;
     typedef typename allocator_type::difference_type  difference_type;
 
@@ -462,7 +468,22 @@ public:
         typedef StdAllocator<U, BaseAllocator> other;
     };
 
-#if RAPIDJSON_HAS_CXX11
+#if RAPIDJSON_HAS_CXX17
+    size_t max_size() const RAPIDJSON_NOEXCEPT
+    {
+        return std::allocator_traits<allocator_type>::max_size(*this);
+    }
+
+    template<typename... Args>
+    void construct(pointer p, Args&&... args)
+    {
+        std::allocator_traits<allocator_type>::construct(*this, p, std::forward<Args>(args)...);
+    }
+    void destroy(pointer p)
+    {
+        std::allocator_traits<allocator_type>::destroy(*this, p);
+    }
+#elif RAPIDJSON_HAS_CXX11
     using allocator_type::max_size;
     using allocator_type::address;
     using allocator_type::construct;

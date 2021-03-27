@@ -92,11 +92,13 @@ void TestStdAllocator(const Allocator& a) {
     EXPECT_TRUE(ba == ba2);
     EXPECT_FALSE(ba != ba2);
 
+    StdAllocator<unsigned long long, Allocator> lla(a);
+#if !RAPIDJSON_HAS_CXX17
     unsigned long long ll = 0, *llp = &ll;
     const unsigned long long cll = 0, *cllp = &cll;
-    StdAllocator<unsigned long long, Allocator> lla(a);
     EXPECT_EQ(lla.address(ll), llp);
     EXPECT_EQ(lla.address(cll), cllp);
+#endif
     EXPECT_TRUE(lla.max_size() > 0 && lla.max_size() <= SIZE_MAX / sizeof(unsigned long long));
 
     int *arr;
