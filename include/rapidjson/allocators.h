@@ -20,7 +20,6 @@
 #include <memory>
 
 #if RAPIDJSON_HAS_CXX11
-#include <limits>
 #include <type_traits>
 #endif
 
@@ -466,6 +465,7 @@ public:
 
     typedef typename traits_type::size_type         size_type;
     typedef typename traits_type::difference_type   difference_type;
+
     typedef typename traits_type::value_type        value_type;
     typedef typename traits_type::pointer           pointer;
     typedef typename traits_type::const_pointer     const_pointer;
@@ -484,19 +484,19 @@ public:
         return std::addressof(r);
     }
 
-    size_t max_size() const RAPIDJSON_NOEXCEPT
+    size_type max_size() const RAPIDJSON_NOEXCEPT
     {
-        return std::numeric_limits<size_type>::max() / sizeof(value_type);
+        return traits_type::max_size(*this);
     }
 
     template <typename ...Args>
-    void construct(pointer p, Args &&...args)
+    void construct(pointer p, Args&&... args)
     {
-        ::new (static_cast<void*>(p)) value_type(std::forward<Args>(args)...);
+        traits_type::construct(*this, p, std::forward<Args>(args)...);
     }
     void destroy(pointer p)
     {
-        p->~T();
+        traits_type::destroy(*this, p);
     }
 
 #else // !RAPIDJSON_HAS_CXX11
@@ -513,7 +513,7 @@ public:
         return allocator_type::address(r);
     }
 
-    size_t max_size() const RAPIDJSON_NOEXCEPT
+    size_type max_size() const RAPIDJSON_NOEXCEPT
     {
         return allocator_type::max_size();
     }
@@ -615,12 +615,12 @@ public:
     ~StdAllocator() RAPIDJSON_NOEXCEPT
     { }
 
-    typedef typename allocator_type::value_type value_type;
-
     template<typename U>
     struct rebind {
         typedef StdAllocator<U, BaseAllocator> other;
     };
+
+    typedef typename allocator_type::value_type value_type;
 
 private:
     template <typename, typename>

@@ -135,6 +135,8 @@
 #define RAPIDJSON_CPLUSPLUS __cplusplus
 #endif
 
+//!@endcond
+
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_HAS_STDSTRING
 
@@ -627,10 +629,14 @@ RAPIDJSON_NAMESPACE_END
 
 #if RAPIDJSON_HAS_CXX17
 # define RAPIDJSON_DELIBERATE_FALLTHROUGH [[fallthrough]]
-#elif defined(__has_cpp_attribute) && __has_cpp_attribute(fallthrough)
-# define RAPIDJSON_DELIBERATE_FALLTHROUGH __attribute__((fallthrough))
-#elif defined(__has_cpp_attribute) && __has_cpp_attribute(clang::fallthrough)
-# define RAPIDJSON_DELIBERATE_FALLTHROUGH [[clang::fallthrough]]
+#elif defined(__has_cpp_attribute)
+# if __has_cpp_attribute(clang::fallthrough)
+#  define RAPIDJSON_DELIBERATE_FALLTHROUGH [[clang::fallthrough]]
+# elif __has_cpp_attribute(fallthrough)
+#  define RAPIDJSON_DELIBERATE_FALLTHROUGH __attribute__((fallthrough))
+# else
+#  define RAPIDJSON_DELIBERATE_FALLTHROUGH
+# endif
 #else
 # define RAPIDJSON_DELIBERATE_FALLTHROUGH
 #endif
