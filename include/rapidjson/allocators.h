@@ -19,6 +19,11 @@
 
 #include <memory>
 
+#if RAPIDJSON_HAS_CXX11
+#include <limits>
+#include <type_traits>
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -420,6 +425,11 @@ class StdAllocator :
     public std::allocator<T>
 {
     typedef std::allocator<T> allocator_type;
+#if RAPIDJSON_HAS_CXX11
+    typedef std::allocator_traits<allocator_type> traits_type;
+#else
+    typedef allocator_type traits_type;
+#endif
 
 public:
     typedef BaseAllocator BaseAllocatorType;
@@ -449,29 +459,50 @@ public:
     ~StdAllocator() RAPIDJSON_NOEXCEPT
     { }
 
-    typedef typename allocator_type::value_type       value_type;
-    typedef typename allocator_type::pointer          pointer;
-    typedef typename allocator_type::const_pointer    const_pointer;
-    typedef typename allocator_type::reference        reference;
-    typedef typename allocator_type::const_reference  const_reference;
-    typedef typename allocator_type::size_type        size_type;
-    typedef typename allocator_type::difference_type  difference_type;
-
     template<typename U>
     struct rebind {
         typedef StdAllocator<U, BaseAllocator> other;
     };
 
+    typedef typename traits_type::size_type         size_type;
+    typedef typename traits_type::difference_type   difference_type;
+    typedef typename traits_type::value_type        value_type;
+    typedef typename traits_type::pointer           pointer;
+    typedef typename traits_type::const_pointer     const_pointer;
+
 #if RAPIDJSON_HAS_CXX11
-    using allocator_type::max_size;
-    using allocator_type::address;
-    using allocator_type::construct;
-    using allocator_type::destroy;
-#else
+
+    typedef typename std::add_lvalue_reference<value_type>::type &reference;
+    typedef typename std::add_lvalue_reference<typename std::add_const<value_type>::type>::type &const_reference;
+
+    pointer address(reference r) const RAPIDJSON_NOEXCEPT
+    {
+        return std::addressof(r);
+    }
+    const_pointer address(const_reference r) const RAPIDJSON_NOEXCEPT
+    {
+        return std::addressof(r);
+    }
+
     size_t max_size() const RAPIDJSON_NOEXCEPT
     {
-        return allocator_type::max_size();
+        return std::numeric_limits<size_type>::max() / sizeof(value_type);
     }
+
+    template <typename ...Args>
+    void construct(pointer p, Args &&...args)
+    {
+        ::new (static_cast<void*>(p)) value_type(std::forward<Args>(args)...);
+    }
+    void destroy(pointer p)
+    {
+        p->~T();
+    }
+
+#else // !RAPIDJSON_HAS_CXX11
+
+    typedef typename allocator_type::reference       reference;
+    typedef typename allocator_type::const_reference const_reference;
 
     pointer address(reference r) const RAPIDJSON_NOEXCEPT
     {
@@ -482,6 +513,11 @@ public:
         return allocator_type::address(r);
     }
 
+    size_t max_size() const RAPIDJSON_NOEXCEPT
+    {
+        return allocator_type::max_size();
+    }
+
     void construct(pointer p, const_reference r)
     {
         allocator_type::construct(p, r);
@@ -490,7 +526,8 @@ public:
     {
         allocator_type::destroy(p);
     }
-#endif
+
+#endif // !RAPIDJSON_HAS_CXX11
 
     template <typename U>
     U* allocate(size_type n = 1, const void* = 0)
