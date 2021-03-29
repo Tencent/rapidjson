@@ -15,7 +15,7 @@ install:
   - "SET PATH=%PYTHON%;%PYTHON%/Scripts/;%PATH%"
   - pip.exe install conan
   - conan user
-  - conan remote add systelab-public https://systelab.jfrog.io/artifactory/api/conan/cpp-conan-production-local
+  - conan remote add systelab-public https://csw.jfrog.io/artifactory/api/conan/cpp-conan-production-local
   - conan --version
 
 build_script:
