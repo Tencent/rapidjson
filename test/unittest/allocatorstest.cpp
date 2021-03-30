@@ -107,12 +107,12 @@ void TestStdAllocator(const Allocator& a) {
         arr[i] = 0x0f0f0f0f;
     }
     ia.deallocate(arr, 10);
-    arr = (int *)ia.Malloc(10 * sizeof(int));
+    arr = Malloc<int>(ia, 10);
     EXPECT_TRUE(arr != 0);
     for (int i = 0; i < 10; ++i) {
         arr[i] = 0x0f0f0f0f;
     }
-    arr = (int *)ia.Realloc(arr, 10 * sizeof(int), 20 * sizeof(int));
+    arr = Realloc<int>(ia, arr, 10, 20);
     EXPECT_TRUE(arr != 0);
     for (int i = 0; i < 10; ++i) {
         EXPECT_EQ(arr[i], 0x0f0f0f0f);
@@ -120,7 +120,7 @@ void TestStdAllocator(const Allocator& a) {
     for (int i = 10; i < 20; i++) {
         arr[i] = 0x0f0f0f0f;
     }
-    ia.Free(arr);
+    Free<int>(ia, arr, 20);
 
     int cons = 0, dest = 0;
     StdAllocator<TestStdAllocatorData, Allocator> da(a);
