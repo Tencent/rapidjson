@@ -70,6 +70,11 @@ environment:
     VS_PLATFORM: x64
     CXX11: OFF
     CXX17: ON
+  - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+    VS_VERSION: 16 2019
+    VS_PLATFORM: x64
+    CXX11: OFF
+    CXX17: ON
 
 before_build:
 - git submodule update --init --recursive
