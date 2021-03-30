@@ -83,8 +83,12 @@ private:
 
 template <typename Allocator>
 void TestStdAllocator(const Allocator& a) {
+#if RAPIDJSON_HAS_CXX17
+    typedef StdAllocator<bool, Allocator> BoolAllocator;
+#else
     typedef StdAllocator<void, Allocator> VoidAllocator;
     typedef typename VoidAllocator::template rebind<bool>::other BoolAllocator;
+#endif
     BoolAllocator ba(a), ba2(a);
     EXPECT_TRUE(ba == ba2);
     EXPECT_FALSE(ba!= ba2);

@@ -581,6 +581,7 @@ private:
     BaseAllocator baseAllocator_;
 };
 
+#if !RAPIDJSON_HAS_CXX17 // std::allocator<void> deprecated in C++17
 template <typename BaseAllocator>
 class StdAllocator<void, BaseAllocator> :
     public std::allocator<void>
@@ -628,6 +629,7 @@ private:
 
     BaseAllocator baseAllocator_;
 };
+#endif
 
 #ifdef __GNUC__
 RAPIDJSON_DIAG_POP
