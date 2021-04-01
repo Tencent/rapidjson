@@ -163,6 +163,24 @@
 #endif // RAPIDJSON_HAS_STDSTRING
 
 ///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_USE_MEMBERSMAP
+
+/*! \def RAPIDJSON_USE_MEMBERSMAP
+    \ingroup RAPIDJSON_CONFIG
+    \brief Enable RapidJSON support for object members handling in a \c std::multimap
+
+    By defining this preprocessor symbol to \c 1, \ref rapidjson::GenericValue object
+    members are stored in a \c std::multimap for faster lookup and deletion times, a
+    trade off with a slightly slower insertion time and a small object allocat(or)ed
+    memory overhead.
+
+    \hideinitializer
+*/
+#ifndef RAPIDJSON_USE_MEMBERSMAP
+#define RAPIDJSON_USE_MEMBERSMAP 0 // not by default
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NO_INT64DEFINE
 
 /*! \def RAPIDJSON_NO_INT64DEFINE
@@ -577,6 +595,10 @@ RAPIDJSON_NAMESPACE_END
 #define RAPIDJSON_HAS_CXX11_RVALUE_REFS 0
 #endif
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
+
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+#include <utility> // std::move
+#endif
 
 #ifndef RAPIDJSON_HAS_CXX11_NOEXCEPT
 #if RAPIDJSON_HAS_CXX11

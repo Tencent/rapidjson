@@ -52,6 +52,11 @@ if(RAPIDJSON_HAS_STDSTRING)
     add_definitions(-DRAPIDJSON_HAS_STDSTRING)
 endif()
 
+option(RAPIDJSON_USE_MEMBERSMAP "" OFF)
+if(RAPIDJSON_USE_MEMBERSMAP)
+    add_definitions(-DRAPIDJSON_USE_MEMBERSMAP=1)
+endif()
+
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
