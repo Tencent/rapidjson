@@ -130,7 +130,8 @@ public:
                 "integers.json",
                 "mixed.json",
                 "nulls.json",
-                "paragraphs.json"
+                "paragraphs.json",
+                "alotofkeys.json"
             };
 
             for (size_t j = 0; j < sizeof(typesfilenames) / sizeof(typesfilenames[0]); j++) {
@@ -158,7 +159,7 @@ public:
         free(whitespace_);
         json_ = 0;
         whitespace_ = 0;
-        for (size_t i = 0; i < 7; i++) {
+        for (size_t i = 0; i < 8; i++) {
             free(types_[i]);
             types_[i] = 0;
         }
@@ -174,8 +175,8 @@ protected:
     size_t length_;
     char *whitespace_;
     size_t whitespace_length_;
-    char *types_[7];
-    size_t typesLength_[7];
+    char *types_[8];
+    size_t typesLength_[8];
 
     static const size_t kTrialCount = 1000;
 };
