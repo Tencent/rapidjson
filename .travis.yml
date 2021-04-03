@@ -40,10 +40,10 @@ matrix:
     - env: CONF=debug   ARCH=x86_64 CXX11=OFF CXX17=OFF
       compiler: gcc
       arch: amd64
-    - env: CONF=debug   ARCH=x86    CXX11=OFF CXX17=ON
+    - env: CONF=debug   ARCH=x86    CXX11=OFF CXX17=ON CXX_FLAGS='-D_GLIBCXX_DEBUG'
       compiler: gcc
-      arch: amd64
-    - env: CONF=debug   ARCH=x86_64 CXX11=OFF CXX17=ON
+      arch: amd64/
+    - env: CONF=debug   ARCH=x86_64 CXX11=OFF CXX17=ON CXX_FLAGS='-D_GLIBCXX_DEBUG'
       compiler: gcc
       arch: amd64
     - env: CONF=release ARCH=aarch64 CXX11=ON CXX17=OFF
@@ -84,7 +84,7 @@ matrix:
       compiler: clang
       arch: arm64
     # coverage report
-    - env: CONF=debug   ARCH=x86    CXX11=ON CXX17=OFF GCOV_FLAGS='--coverage'
+    - env: CONF=debug   ARCH=x86     GCOV_FLAGS='--coverage' CXX_FLAGS='-O0' CXX11=OFF CXX17=OFF
       compiler: gcc
       arch: amd64
       cache:
@@ -93,7 +93,7 @@ matrix:
       after_success:
         - pip install --user cpp-coveralls
         - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
-    - env: CONF=debug   ARCH=x86_64 GCOV_FLAGS='--coverage'
+    - env: CONF=debug   ARCH=x86_64  GCOV_FLAGS='--coverage' CXX_FLAGS='-O0' CXX11=ON CXX17=OFF
       compiler: gcc
       arch: amd64
       cache:
@@ -102,7 +102,7 @@ matrix:
       after_success:
         - pip install --user cpp-coveralls
         - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
-    - env: CONF=debug   ARCH=aarch64 GCOV_FLAGS='--coverage'
+    - env: CONF=debug   ARCH=aarch64 GCOV_FLAGS='--coverage' CXX_FLAGS='-O0' CXX11=OFF CXX17=ON
       compiler: gcc
       arch: arm64
       cache:
@@ -150,7 +150,7 @@ script:
       -DRAPIDJSON_BUILD_CXX17=$CXX17
       -DCMAKE_VERBOSE_MAKEFILE=ON
       -DCMAKE_BUILD_TYPE=$CONF
-      -DCMAKE_CXX_FLAGS="$ARCH_FLAGS $GCOV_FLAGS"
+      -DCMAKE_CXX_FLAGS="$ARCH_FLAGS $GCOV_FLAGS $CXX_FLAGS"
       -DCMAKE_EXE_LINKER_FLAGS=$GCOV_FLAGS
       ..)
   - cd build
