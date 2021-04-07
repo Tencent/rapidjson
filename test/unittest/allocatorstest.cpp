@@ -16,8 +16,10 @@
 
 #include "rapidjson/allocators.h"
 
+#include <map>
 #include <string>
-#include <cstring>
+#include <utility>
+#include <functional>
 
 using namespace rapidjson;
 
@@ -141,12 +143,34 @@ void TestStdAllocator(const Allocator& a) {
 
     typedef StdAllocator<char, Allocator> CharAllocator;
     typedef std::basic_string<char, std::char_traits<char>, CharAllocator> String;
+#if RAPIDJSON_HAS_CXX11
+    String s(CharAllocator{a});
+#else
     CharAllocator ca(a);
     String s(ca);
+#endif
     for (int i = 0; i < 26; i++) {
         s.push_back(static_cast<char>('A' + i));
     }
     EXPECT_TRUE(s == "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
+    typedef StdAllocator<std::pair<const int, bool>, Allocator> MapAllocator;
+    typedef std::map<int, bool, std::less<int>, MapAllocator> Map;
+#if RAPIDJSON_HAS_CXX11
+    Map map(std::less<int>(), MapAllocator{a});
+#else
+    MapAllocator ma(a);
+    Map map(std::less<int>(), ma);
+#endif
+    for (int i = 0; i < 10; i++) {
+        map.insert(std::make_pair(i, (i % 2) == 0));
+    }
+    EXPECT_TRUE(map.size() == 10);
+    for (int i = 0; i < 10; i++) {
+        typename Map::iterator it = map.find(i);
+        EXPECT_TRUE(it != map.end());
+        EXPECT_TRUE(it->second == ((i % 2) == 0));
+    }
 }
 
 TEST(Allocator, CrtAllocator) {
