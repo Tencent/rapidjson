@@ -4,7 +4,7 @@ var searchData=
   ['kfalsetype_103',['kFalseType',['../namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a9f2e7047832dce1029551b5de0f05607',1,'rapidjson']]],
   ['kformatdefault_104',['kFormatDefault',['../namespacerapidjson.html#a084b31753ef2edefdeca8a5374eccc4ba8164b0d4993439856171585b9cf3adc0',1,'rapidjson']]],
   ['kformatsinglelinearray_105',['kFormatSingleLineArray',['../namespacerapidjson.html#a084b31753ef2edefdeca8a5374eccc4ba64b0f8a37ab3125118682046ff06500f',1,'rapidjson']]],
-  ['kneedfree_106',['kNeedFree',['../classrapidjson_1_1_memory_pool_allocator.html#a2606d96e19bcfc9d4bf58aefe55c1b29',1,'rapidjson::MemoryPoolAllocator']]],
+  ['kneedfree_106',['kNeedFree',['../classrapidjson_1_1_memory_pool_allocator.html#a2606d96e19bcfc9d4bf58aefe55c1b29',1,'rapidjson::MemoryPoolAllocator::kNeedFree()'],['../classrapidjson_1_1_std_allocator.html#a000e9708918f813fc151020c0a03c62c',1,'rapidjson::StdAllocator::kNeedFree()']]],
   ['knulltype_107',['kNullType',['../namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4a952871e4326b527154fc8aac1ac1f6ff',1,'rapidjson']]],
   ['knumbertype_108',['kNumberType',['../namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4abe572cb44ce198e467ccf9d63d50d82a',1,'rapidjson']]],
   ['kobjecttype_109',['kObjectType',['../namespacerapidjson.html#ae79a4751c1c460ff0de5ecc07874f3e4acf030b422a32c3647c7c5973bd4dd0a9',1,'rapidjson']]],

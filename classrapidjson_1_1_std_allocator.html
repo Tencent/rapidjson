@@ -89,6 +89,7 @@ $(document).ready(function(){initNavTree('classrapidjson_1_1_std_allocator.html'
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classrapidjson_1_1_std_allocator-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -184,8 +185,7 @@ template&lt;typename U &gt; </td></tr>
 <tr class="memitem:a1a05f42b7c60711696384c8897644228"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>operator!=</b> (const <a class="el" href="classrapidjson_1_1_std_allocator.html">StdAllocator</a>&lt; U, BaseAllocator &gt; &amp;rhs) const RAPIDJSON_NOEXCEPT</td></tr>
 <tr class="separator:a1a05f42b7c60711696384c8897644228"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76e90ffecf295cc965e6aa1b9e839354"><td class="memItemLeft" align="right" valign="top"><a id="a76e90ffecf295cc965e6aa1b9e839354"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_std_allocator.html#a76e90ffecf295cc965e6aa1b9e839354">Malloc</a> (size_t size)</td></tr>
-<tr class="memdesc:a76e90ffecf295cc965e6aa1b9e839354"><td class="mdescLeft">&#160;</td><td class="mdescRight">rapidjson <a class="el" href="classrapidjson_1_1_allocator.html" title="Concept for allocating, resizing and freeing memory block.">Allocator</a> concept <br /></td></tr>
+void *&#160;</td><td class="memItemRight" valign="bottom"><b>Malloc</b> (size_t size)</td></tr>
 <tr class="separator:a76e90ffecf295cc965e6aa1b9e839354"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9a929639d7bcbf82480149c995c95b49"><td class="memItemLeft" align="right" valign="top"><a id="a9a929639d7bcbf82480149c995c95b49"></a>
 void *&#160;</td><td class="memItemRight" valign="bottom"><b>Realloc</b> (void *originalPtr, size_t originalSize, size_t newSize)</td></tr>
@@ -196,6 +196,13 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a140d1c6576a5ec2b89c4b544a73bbd29"><td class="memItemLeft" align="right" valign="top"><a id="a140d1c6576a5ec2b89c4b544a73bbd29"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>Free</b> (void *ptr) RAPIDJSON_NOEXCEPT</td></tr>
 <tr class="separator:a140d1c6576a5ec2b89c4b544a73bbd29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr class="memitem:a000e9708918f813fc151020c0a03c62c"><td class="memItemLeft" align="right" valign="top"><a id="a000e9708918f813fc151020c0a03c62c"></a>
+static const bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrapidjson_1_1_std_allocator.html#a000e9708918f813fc151020c0a03c62c">kNeedFree</a> = BaseAllocator::kNeedFree</td></tr>
+<tr class="memdesc:a000e9708918f813fc151020c0a03c62c"><td class="mdescLeft">&#160;</td><td class="mdescRight">rapidjson <a class="el" href="classrapidjson_1_1_allocator.html" title="Concept for allocating, resizing and freeing memory block.">Allocator</a> concept <br /></td></tr>
+<tr class="separator:a000e9708918f813fc151020c0a03c62c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
