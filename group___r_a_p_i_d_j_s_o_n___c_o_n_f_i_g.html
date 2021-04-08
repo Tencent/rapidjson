@@ -118,6 +118,9 @@ Macros</h2></td></tr>
 <tr class="memitem:ga2f2eef0ee4477f3fe5874703a66e997f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga2f2eef0ee4477f3fe5874703a66e997f">RAPIDJSON_HAS_STDSTRING</a></td></tr>
 <tr class="memdesc:ga2f2eef0ee4477f3fe5874703a66e997f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable RapidJSON support for <code>std::string</code>.  <a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga2f2eef0ee4477f3fe5874703a66e997f">More...</a><br /></td></tr>
 <tr class="separator:ga2f2eef0ee4477f3fe5874703a66e997f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga87dc65109882910388121e1dba15038b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga87dc65109882910388121e1dba15038b">RAPIDJSON_USE_MEMBERSMAP</a></td></tr>
+<tr class="memdesc:ga87dc65109882910388121e1dba15038b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable RapidJSON support for object members handling in a <code>std::multimap</code>.  <a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga87dc65109882910388121e1dba15038b">More...</a><br /></td></tr>
+<tr class="separator:ga87dc65109882910388121e1dba15038b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga7f4e50c35dae3b015390daa6d48ce23c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga7f4e50c35dae3b015390daa6d48ce23c">RAPIDJSON_NO_INT64DEFINE</a></td></tr>
 <tr class="memdesc:ga7f4e50c35dae3b015390daa6d48ce23c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use external 64-bit integer types.  <a href="group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga7f4e50c35dae3b015390daa6d48ce23c">More...</a><br /></td></tr>
 <tr class="separator:ga7f4e50c35dae3b015390daa6d48ce23c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -512,6 +515,23 @@ Macros</h2></td></tr>
 
 </div>
 </div>
+<a id="ga87dc65109882910388121e1dba15038b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga87dc65109882910388121e1dba15038b">&#9670;&nbsp;</a></span>RAPIDJSON_USE_MEMBERSMAP</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define RAPIDJSON_USE_MEMBERSMAP</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Enable RapidJSON support for object members handling in a <code>std::multimap</code>. </p>
+<p>By defining this preprocessor symbol to <code>1</code>, <a class="el" href="classrapidjson_1_1_generic_value.html">rapidjson::GenericValue</a> object members are stored in a <code>std::multimap</code> for faster lookup and deletion times, a trade off with a slightly slower insertion time and a small object allocat(or)ed memory overhead. </p>
+
+</div>
+</div>
 <a id="ga8d06f2d50592811d2890b45243b8adcc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga8d06f2d50592811d2890b45243b8adcc">&#9670;&nbsp;</a></span>RAPIDJSON_VALIDATE_DEFAULT_FLAGS</h2>
 
@@ -582,8 +602,8 @@ Macros</h2></td></tr>
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="anamespacerapidjson_html_a44eb33eaa523e36d466b1ced64b85c84"><div class="ttname"><a href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">rapidjson::SizeType</a></div><div class="ttdeci">unsigned SizeType</div><div class="ttdoc">Size type (for string lengths, array sizes, etc.)</div><div class="ttdef"><b>Definition:</b> rapidjson.h:397</div></div>
-<div class="ttc" id="anamespacerapidjson_html"><div class="ttname"><a href="namespacerapidjson.html">rapidjson</a></div><div class="ttdoc">main RapidJSON namespace</div><div class="ttdef"><b>Definition:</b> rapidjson.h:391</div></div>
+<div class="ttc" id="anamespacerapidjson_html_a44eb33eaa523e36d466b1ced64b85c84"><div class="ttname"><a href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">rapidjson::SizeType</a></div><div class="ttdeci">unsigned SizeType</div><div class="ttdoc">Size type (for string lengths, array sizes, etc.)</div><div class="ttdef"><b>Definition:</b> rapidjson.h:415</div></div>
+<div class="ttc" id="anamespacerapidjson_html"><div class="ttname"><a href="namespacerapidjson.html">rapidjson</a></div><div class="ttdoc">main RapidJSON namespace</div><div class="ttdef"><b>Definition:</b> rapidjson.h:409</div></div>
 <!-- HTML footer for doxygen 1.8.7-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

@@ -27,6 +27,7 @@ var rapidjson_8h =
     [ "RAPIDJSON_STATIC_ASSERT", "rapidjson_8h.html#af95188da1d8eb6d4b148fe9ce71cd7c4", null ],
     [ "RAPIDJSON_UINT64_C2", "rapidjson_8h.html#aaee1245f375a71be1ac9b8a07ba5fb8f", null ],
     [ "RAPIDJSON_UNLIKELY", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga6a2b1695c13e77ae425e3cbac980ccb5", null ],
+    [ "RAPIDJSON_USE_MEMBERSMAP", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga87dc65109882910388121e1dba15038b", null ],
     [ "RAPIDJSON_VERSION_STRING", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gad283cfde97d9a32b7d8e8107b11f70a6", null ],
     [ "SizeType", "rapidjson_8h.html#a44eb33eaa523e36d466b1ced64b85c84", null ],
     [ "Type", "rapidjson_8h.html#ae79a4751c1c460ff0de5ecc07874f3e4", [

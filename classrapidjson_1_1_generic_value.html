@@ -330,6 +330,35 @@ RAPIDJSON_FORCEINLINE <a class="el" href="classrapidjson_1_1_generic_value.html#
 <tr class="memitem:a19199230941f1fe59b5b6a27281fcd1b"><td class="memItemLeft" align="right" valign="top"><a id="a19199230941f1fe59b5b6a27281fcd1b"></a>
 RAPIDJSON_FORCEINLINE <a class="el" href="classrapidjson_1_1_generic_value.html#a0220ddebe2f023fa75b643a50e90e559">Member</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>SetMembersPointer</b> (<a class="el" href="classrapidjson_1_1_generic_value.html#a0220ddebe2f023fa75b643a50e90e559">Member</a> *members)</td></tr>
 <tr class="separator:a19199230941f1fe59b5b6a27281fcd1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9125585f7d3315da5e9aec2b5587bb7d"><td class="memItemLeft" align="right" valign="top"><a id="a9125585f7d3315da5e9aec2b5587bb7d"></a>
+RAPIDJSON_FORCEINLINE <a class="el" href="classrapidjson_1_1_generic_value.html#a0220ddebe2f023fa75b643a50e90e559">Member</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>DoAllocMembers</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> capacity, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &amp;allocator)</td></tr>
+<tr class="separator:a9125585f7d3315da5e9aec2b5587bb7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4451b6417bf2ada4d8b56ba0b3b6031"><td class="memItemLeft" align="right" valign="top"><a id="ad4451b6417bf2ada4d8b56ba0b3b6031"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DoReserveMembers</b> (<a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> newCapacity, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &amp;allocator)</td></tr>
+<tr class="separator:ad4451b6417bf2ada4d8b56ba0b3b6031"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94105ff1a8eeb895cee95fb4eca7781b"><td class="memTemplParams" colspan="2"><a id="a94105ff1a8eeb895cee95fb4eca7781b"></a>
+template&lt;typename SourceAllocator &gt; </td></tr>
+<tr class="memitem:a94105ff1a8eeb895cee95fb4eca7781b"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classrapidjson_1_1_generic_value.html#aca5596987335016c1a7c2a9467baf80b">MemberIterator</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>DoFindMember</b> (const <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, SourceAllocator &gt; &amp;name)</td></tr>
+<tr class="separator:a94105ff1a8eeb895cee95fb4eca7781b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c2162a0a065a59bf465497e5110788c"><td class="memItemLeft" align="right" valign="top"><a id="a1c2162a0a065a59bf465497e5110788c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DoClearMembers</b> ()</td></tr>
+<tr class="separator:a1c2162a0a065a59bf465497e5110788c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e5cf02ff6ee4938b672d98258a79546"><td class="memItemLeft" align="right" valign="top"><a id="a7e5cf02ff6ee4938b672d98258a79546"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DoFreeMembers</b> ()</td></tr>
+<tr class="separator:a7e5cf02ff6ee4938b672d98258a79546"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a92627391393b9aa6245275593040cf0a"><td class="memItemLeft" align="right" valign="top"><a id="a92627391393b9aa6245275593040cf0a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DoAddMember</b> (<a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> &amp;name, <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> &amp;value, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &amp;allocator)</td></tr>
+<tr class="separator:a92627391393b9aa6245275593040cf0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0655ea1a6fb2cf09f845a4e50b6b961f"><td class="memItemLeft" align="right" valign="top"><a id="a0655ea1a6fb2cf09f845a4e50b6b961f"></a>
+<a class="el" href="classrapidjson_1_1_generic_value.html#aca5596987335016c1a7c2a9467baf80b">MemberIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>DoRemoveMember</b> (<a class="el" href="classrapidjson_1_1_generic_value.html#aca5596987335016c1a7c2a9467baf80b">MemberIterator</a> m)</td></tr>
+<tr class="separator:a0655ea1a6fb2cf09f845a4e50b6b961f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98ce0a47cc6951eb7ee106160e3b637a"><td class="memItemLeft" align="right" valign="top"><a id="a98ce0a47cc6951eb7ee106160e3b637a"></a>
+<a class="el" href="classrapidjson_1_1_generic_value.html#aca5596987335016c1a7c2a9467baf80b">MemberIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><b>DoEraseMembers</b> (<a class="el" href="classrapidjson_1_1_generic_value.html#a6cd2b09795c48d2892bebc0ae350d51f">ConstMemberIterator</a> first, <a class="el" href="classrapidjson_1_1_generic_value.html#a6cd2b09795c48d2892bebc0ae350d51f">ConstMemberIterator</a> last)</td></tr>
+<tr class="separator:a98ce0a47cc6951eb7ee106160e3b637a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca2fab62d3450b24d46cc9841ed8cfef"><td class="memTemplParams" colspan="2"><a id="aca2fab62d3450b24d46cc9841ed8cfef"></a>
+template&lt;typename SourceAllocator &gt; </td></tr>
+<tr class="memitem:aca2fab62d3450b24d46cc9841ed8cfef"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><b>DoCopyMembers</b> (const <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, SourceAllocator &gt; &amp;rhs, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &amp;allocator, bool copyConstStrings)</td></tr>
+<tr class="separator:aca2fab62d3450b24d46cc9841ed8cfef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9cc2eb5c196affb861560219a4973dd0"><td class="memItemLeft" align="right" valign="top"><a id="a9cc2eb5c196affb861560219a4973dd0"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetArrayRaw</b> (<a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a> *values, <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a> count, <a class="el" href="classrapidjson_1_1_allocator.html">Allocator</a> &amp;allocator)</td></tr>
 <tr class="separator:a9cc2eb5c196affb861560219a4973dd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -353,6 +382,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 template&lt;typename SourceAllocator &gt; </td></tr>
 <tr class="memitem:a19e954a8f4731fea785abe0defa0ac44"><td class="memTemplItemLeft" align="right" valign="top">bool&#160;</td><td class="memTemplItemRight" valign="bottom"><b>StringEqual</b> (const <a class="el" href="classrapidjson_1_1_generic_value.html">GenericValue</a>&lt; <a class="el" href="classrapidjson_1_1_encoding.html">Encoding</a>, SourceAllocator &gt; &amp;rhs) const</td></tr>
 <tr class="separator:a19e954a8f4731fea785abe0defa0ac44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c26a47d781359b9bd0e4b7b91948bc6"><td class="memItemLeft" align="right" valign="top"><a id="a2c26a47d781359b9bd0e4b7b91948bc6"></a>
+static const RAPIDJSON_FORCEINLINE <a class="el" href="classrapidjson_1_1_generic_value.html#adcdbc7fa85a9a41b78966d7e0dcc2ac4">Ch</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>DataString</b> (const <a class="el" href="unionrapidjson_1_1_generic_value_1_1_data.html">Data</a> &amp;data)</td></tr>
+<tr class="separator:a2c26a47d781359b9bd0e4b7b91948bc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0012e161e17ef746c31b1985a3e34cc6"><td class="memItemLeft" align="right" valign="top"><a id="a0012e161e17ef746c31b1985a3e34cc6"></a>
+static RAPIDJSON_FORCEINLINE <a class="el" href="namespacerapidjson.html#a44eb33eaa523e36d466b1ced64b85c84">SizeType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>DataStringLength</b> (const <a class="el" href="unionrapidjson_1_1_generic_value_1_1_data.html">Data</a> &amp;data)</td></tr>
+<tr class="separator:a0012e161e17ef746c31b1985a3e34cc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename Encoding, typename Allocator = RAPIDJSON_DEFAULT_ALLOCATOR&gt;<br />

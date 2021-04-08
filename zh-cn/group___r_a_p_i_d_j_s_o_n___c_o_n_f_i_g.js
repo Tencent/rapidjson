@@ -19,6 +19,7 @@ var group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g =
     [ "RAPIDJSON_PATCH_VERSION", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#gaf967d31be43666ce7f53756d73bd1cdf", null ],
     [ "RAPIDJSON_SIMD", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga0ccf72f3ebc4b3306ab669f95ca5c64b", null ],
     [ "RAPIDJSON_UNLIKELY", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga6a2b1695c13e77ae425e3cbac980ccb5", null ],
+    [ "RAPIDJSON_USE_MEMBERSMAP", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga87dc65109882910388121e1dba15038b", null ],
     [ "RAPIDJSON_VALIDATE_DEFAULT_FLAGS", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga8d06f2d50592811d2890b45243b8adcc", null ],
     [ "RAPIDJSON_VALUE_DEFAULT_ARRAY_CAPACITY", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga10ba0ee06d0ac2803d0f2290d46b19f7", null ],
     [ "RAPIDJSON_VALUE_DEFAULT_OBJECT_CAPACITY", "group___r_a_p_i_d_j_s_o_n___c_o_n_f_i_g.html#ga5c88aa612939b592d15d3fc4bdf54272", null ],
