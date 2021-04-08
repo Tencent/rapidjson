@@ -16,6 +16,7 @@
 #define RAPIDJSON_ALLOCATORS_H_
 
 #include "rapidjson.h"
+#include "internal/meta.h"
 
 #include <memory>
 
@@ -158,6 +159,7 @@ class MemoryPoolAllocator {
 
 public:
     static const bool kNeedFree = false;    //!< Tell users that no need to call Free() with this allocator. (concept Allocator)
+    static const bool kRefCounted = true;   //!< Tell users that this allocator is reference counted on copy
 
     //! Constructor with chunkSize.
     /*! \param chunkSize The size of memory chunk. The default is kDefaultChunkSize.
@@ -417,6 +419,16 @@ private:
     SharedData *shared_;        //!< The shared data of the allocator
 };
 
+namespace internal {
+    template<typename, typename = void>
+    struct IsRefCounted :
+        public FalseType
+    { };
+    template<typename T>
+    struct IsRefCounted<T, typename internal::EnableIfCond<T::kRefCounted>::Type> :
+        public TrueType
+    { };
+}
 
 template<typename T, typename A>
 inline T* Realloc(A& a, T* old_p, size_t old_n, size_t new_n)
@@ -436,7 +448,6 @@ inline void Free(A& a, T *p, size_t n = 1)
 {
     static_cast<void>(Realloc<T, A>(a, p, n, 0));
 }
-
 
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
@@ -601,6 +612,7 @@ public:
 
     //! rapidjson Allocator concept
     static const bool kNeedFree = BaseAllocator::kNeedFree;
+    static const bool kRefCounted = internal::IsRefCounted<BaseAllocator>::Value;
     void* Malloc(size_t size)
     {
         return baseAllocator_.Malloc(size);
