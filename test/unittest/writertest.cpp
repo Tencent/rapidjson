@@ -97,6 +97,14 @@ TEST(Writer, String) {
         writer.String(std::string("Hello\n"));
         EXPECT_STREQ("\"Hello\\n\"", buffer.GetString());
     }
+#if __cplusplus >= 201703L
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer> writer(buffer);
+        writer.String(std::string_view("Hello\n"));
+        EXPECT_STREQ("\"Hello\\n\"", buffer.GetString());
+    }
+#endif
 #endif
 }
 

@@ -160,6 +160,9 @@
 
 #if RAPIDJSON_HAS_STDSTRING
 #include <string>
+#if __cplusplus >= 201703L
+#include <string_view>
+#endif
 #endif // RAPIDJSON_HAS_STDSTRING
 
 ///////////////////////////////////////////////////////////////////////////////

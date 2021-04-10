@@ -121,6 +121,16 @@ TEST(PrettyWriter, String_STDSTRING) {
     EXPECT_TRUE(writer.EndArray());
     EXPECT_STREQ("[\n    \"Hello\\n\"\n]", buffer.GetString());
 }
+#if __cplusplus >= 201703L
+TEST(PrettyWriter, String_STDSTRING) {
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    EXPECT_TRUE(writer.StartArray());
+    EXPECT_TRUE(writer.String(std::string_view("Hello\n")));
+    EXPECT_TRUE(writer.EndArray());
+    EXPECT_STREQ("[\n    \"Hello\\n\"\n]", buffer.GetString());
+}
+#endif
 #endif
 
 #include <sstream>
