@@ -33,8 +33,8 @@ TEST(Platform, GetObject) {
     EXPECT_TRUE(doc.HasMember("object"));
     const Document::ValueType& o = doc["object"];
     EXPECT_TRUE(o.IsObject());
-    auto sub = o.GetObject();
+    Value::ConstObject sub = o.GetObject();
     EXPECT_TRUE(sub.HasMember("pi"));
-    auto sub2 = o.GetObj();
+    Value::ConstObject sub2 = o.GetObj();
     EXPECT_TRUE(sub2.HasMember("pi"));
 }
