@@ -22,6 +22,7 @@
 #endif
 
 #include "rapidjson/document.h"
+#undef GetObject
 
 using namespace rapidjson;
 
@@ -34,4 +35,6 @@ TEST(Platform, GetObject) {
     EXPECT_TRUE(o.IsObject());
     auto sub = o.GetObject();
     EXPECT_TRUE(sub.HasMember("pi"));
+    auto sub2 = o.GetObj();
+    EXPECT_TRUE(sub2.HasMember("pi"));
 }
