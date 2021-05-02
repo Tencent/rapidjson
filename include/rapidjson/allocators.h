@@ -660,9 +660,9 @@ public:
     { }
 
     /* implicit */
-    StdAllocator(const BaseAllocator& allocator) RAPIDJSON_NOEXCEPT :
+    StdAllocator(const BaseAllocator& baseAllocator) RAPIDJSON_NOEXCEPT :
         allocator_type(),
-        baseAllocator_(allocator)
+        baseAllocator_(baseAllocator)
     { }
 
     ~StdAllocator() RAPIDJSON_NOEXCEPT
