@@ -114,7 +114,7 @@ $(document).ready(function(){initNavTree('md_doc_stream.html','');});
 <li class="level1"><a href="#Summary">Summary</a></li>
 </ul>
 </div>
-<div class="textblock"><p>In RapidJSON, <code><a class="el" href="classrapidjson_1_1_stream.html" title="Concept for reading and writing characters.">rapidjson::Stream</a></code> is a concept for reading/writing JSON. Here we first show how to use streams provided. And then see how to create a custom stream.</p>
+<div class="textblock"><p>In RapidJSON, <code><a class="el" href="classrapidjson_1_1_stream.html" title="Concept for reading and writing characters.">rapidjson::Stream</a></code> is a concept for reading/writing JSON. Here we'll first show you how to use provided streams. And then see how to create a custom stream.</p>
 <h1><a class="anchor" id="MemoryStreams"></a>
 Memory Streams</h1>
 <p>Memory streams store JSON in memory.</p>
@@ -148,7 +148,7 @@ StringBuffer (Output)</h2>
 <div class="line">d.Accept(writer);</div>
 <div class="line"> </div>
 <div class="line"><span class="keyword">const</span> <span class="keywordtype">char</span>* output = buffer.GetString();</div>
-</div><!-- fragment --><p>When the buffer is full, it will increases the capacity automatically. The default capacity is 256 characters (256 bytes for UTF8, 512 bytes for UTF16, etc.). User can provide an allocator and a initial capacity.</p>
+</div><!-- fragment --><p>When the buffer is full, it will increases the capacity automatically. The default capacity is 256 characters (256 bytes for UTF8, 512 bytes for UTF16, etc.). User can provide an allocator and an initial capacity.</p>
 <div class="fragment"><div class="line"><a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> buffer1(0, 1024); <span class="comment">// Use its allocator, initial size = 1024</span></div>
 <div class="line"><a class="code" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> buffer2(allocator, 1024);</div>
 </div><!-- fragment --><p>By default, <code>StringBuffer</code> will instantiate an internal allocator.</p>
@@ -174,7 +174,7 @@ FileReadStream (Input)</h2>
 <div class="line">d.<a class="code" href="classrapidjson_1_1_generic_document.html#a3ae97682cf04685c7db9d89ebc399b85">ParseStream</a>(is);</div>
 <div class="line"> </div>
 <div class="line">fclose(fp);</div>
-</div><!-- fragment --><p>Different from string streams, <code>FileReadStream</code> is byte stream. It does not handle encodings. If the file is not UTF-8, the byte stream can be wrapped in a <code>EncodedInputStream</code>. It will be discussed very soon.</p>
+</div><!-- fragment --><p>Different from string streams, <code>FileReadStream</code> is byte stream. It does not handle encodings. If the file is not UTF-8, the byte stream can be wrapped in a <code>EncodedInputStream</code>. We will discuss more about this later in this tutorial.</p>
 <p>Apart from reading file, user can also use <code>FileReadStream</code> to read <code>stdin</code>.</p>
 <h2><a class="anchor" id="FileWriteStream"></a>
 FileWriteStream (Output)</h2>
@@ -198,10 +198,10 @@ FileWriteStream (Output)</h2>
 <div class="line">d.Accept(writer);</div>
 <div class="line"> </div>
 <div class="line">fclose(fp);</div>
-</div><!-- fragment --><p>It can also directs the output to <code>stdout</code>.</p>
+</div><!-- fragment --><p>It can also redirect the output to <code>stdout</code>.</p>
 <h1><a class="anchor" id="iostreamWrapper"></a>
 iostream Wrapper</h1>
-<p>Due to users' requests, RapidJSON provided official wrappers for <code>std::basic_istream</code> and <code>std::basic_ostream</code>. However, please note that the performance will be much lower than the other streams above.</p>
+<p>Due to users' requests, RapidJSON also provides official wrappers for <code>std::basic_istream</code> and <code>std::basic_ostream</code>. However, please note that the performance will be much lower than the other streams above.</p>
 <h2><a class="anchor" id="IStreamWrapper"></a>
 IStreamWrapper</h2>
 <p><code>IStreamWrapper</code> wraps any class derived from <code>std::istream</code>, such as <code>std::istringstream</code>, <code>std::stringstream</code>, <code>std::ifstream</code>, <code>std::fstream</code>, into RapidJSON's input stream.</p>
@@ -245,7 +245,7 @@ Encoded Streams</h1>
 <p>Encoded streams do not contain JSON itself, but they wrap byte streams to provide basic encoding/decoding function.</p>
 <p>As mentioned above, UTF-8 byte streams can be read directly. However, UTF-16 and UTF-32 have endian issue. To handle endian correctly, it needs to convert bytes into characters (e.g. <code>wchar_t</code> for UTF-16) while reading, and characters into bytes while writing.</p>
 <p>Besides, it also need to handle <a href="http://en.wikipedia.org/wiki/Byte_order_mark">byte order mark (BOM)</a>. When reading from a byte stream, it is needed to detect or just consume the BOM if exists. When writing to a byte stream, it can optionally write BOM.</p>
-<p>If the encoding of stream is known in compile-time, you may use <code>EncodedInputStream</code> and <code>EncodedOutputStream</code>. If the stream can be UTF-8, UTF-16LE, UTF-16BE, UTF-32LE, UTF-32BE JSON, and it is only known in runtime, you may use <code>AutoUTFInputStream</code> and <code>AutoUTFOutputStream</code>. These streams are defined in <code><a class="el" href="encodedstream_8h_source.html">rapidjson/encodedstream.h</a></code>.</p>
+<p>If the encoding of stream is known during compile-time, you may use <code>EncodedInputStream</code> and <code>EncodedOutputStream</code>. If the stream can be UTF-8, UTF-16LE, UTF-16BE, UTF-32LE, UTF-32BE JSON, and it is only known in runtime, you may use <code>AutoUTFInputStream</code> and <code>AutoUTFOutputStream</code>. These streams are defined in <code><a class="el" href="encodedstream_8h_source.html">rapidjson/encodedstream.h</a></code>.</p>
 <p>Note that, these encoded streams can be applied to streams other than file. For example, you may have a file in memory, or a custom byte stream, be wrapped in encoded streams.</p>
 <h2><a class="anchor" id="EncodedInputStream"></a>
 EncodedInputStream</h2>
