@@ -1,6 +1,6 @@
 # Stream
 
-In RapidJSON, `rapidjson::Stream` is a concept for reading/writing JSON. Here we first show how to use streams provided. And then see how to create a custom stream.
+In RapidJSON, `rapidjson::Stream` is a concept for reading/writing JSON. Here we'll first show you how to use provided streams. And then see how to create a custom stream.
 
 [TOC]
 
@@ -51,7 +51,7 @@ d.Accept(writer);
 const char* output = buffer.GetString();
 ~~~~~~~~~~
 
-When the buffer is full, it will increases the capacity automatically. The default capacity is 256 characters (256 bytes for UTF8, 512 bytes for UTF16, etc.). User can provide an allocator and a initial capacity.
+When the buffer is full, it will increases the capacity automatically. The default capacity is 256 characters (256 bytes for UTF8, 512 bytes for UTF16, etc.). User can provide an allocator and an initial capacity.
 
 ~~~~~~~~~~cpp
 StringBuffer buffer1(0, 1024); // Use its allocator, initial size = 1024
@@ -89,7 +89,7 @@ d.ParseStream(is);
 fclose(fp);
 ~~~~~~~~~~
 
-Different from string streams, `FileReadStream` is byte stream. It does not handle encodings. If the file is not UTF-8, the byte stream can be wrapped in a `EncodedInputStream`. It will be discussed very soon.
+Different from string streams, `FileReadStream` is byte stream. It does not handle encodings. If the file is not UTF-8, the byte stream can be wrapped in a `EncodedInputStream`. We will discuss more about this later in this tutorial.
 
 Apart from reading file, user can also use `FileReadStream` to read `stdin`.
 
@@ -119,11 +119,11 @@ d.Accept(writer);
 fclose(fp);
 ~~~~~~~~~~
 
-It can also directs the output to `stdout`.
+It can also redirect the output to `stdout`.
 
 # iostream Wrapper {#iostreamWrapper}
 
-Due to users' requests, RapidJSON provided official wrappers for `std::basic_istream` and `std::basic_ostream`. However, please note that the performance will be much lower than the other streams above.
+Due to users' requests, RapidJSON also provides official wrappers for `std::basic_istream` and `std::basic_ostream`. However, please note that the performance will be much lower than the other streams above.
 
 ## IStreamWrapper {#IStreamWrapper}
 
@@ -181,7 +181,7 @@ As mentioned above, UTF-8 byte streams can be read directly. However, UTF-16 and
 
 Besides, it also need to handle [byte order mark (BOM)](http://en.wikipedia.org/wiki/Byte_order_mark). When reading from a byte stream, it is needed to detect or just consume the BOM if exists. When writing to a byte stream, it can optionally write BOM.
 
-If the encoding of stream is known in compile-time, you may use `EncodedInputStream` and `EncodedOutputStream`. If the stream can be UTF-8, UTF-16LE, UTF-16BE, UTF-32LE, UTF-32BE JSON, and it is only known in runtime, you may use `AutoUTFInputStream` and `AutoUTFOutputStream`. These streams are defined in `rapidjson/encodedstream.h`.
+If the encoding of stream is known during compile-time, you may use `EncodedInputStream` and `EncodedOutputStream`. If the stream can be UTF-8, UTF-16LE, UTF-16BE, UTF-32LE, UTF-32BE JSON, and it is only known in runtime, you may use `AutoUTFInputStream` and `AutoUTFOutputStream`. These streams are defined in `rapidjson/encodedstream.h`.
 
 Note that, these encoded streams can be applied to streams other than file. For example, you may have a file in memory, or a custom byte stream, be wrapped in encoded streams.
 
