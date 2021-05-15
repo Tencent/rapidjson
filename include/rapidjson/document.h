@@ -321,10 +321,10 @@ public:
   }
 
 #ifdef __cpp_lib_three_way_comparison
-  template <bool Const_> std::strong_ordering operator<= > ( const GenericMemberIterator<Const_, Encoding, Allocator>&
+  template <bool Const_> std::strong_ordering operator<=> ( const GenericMemberIterator<Const_, Encoding, Allocator>&
       that ) const
   {
-    return ptr_ <= > that.ptr_;
+    return ptr_ <=> that.ptr_;
   }
 #endif
   //@}
