@@ -16,6 +16,7 @@ set(UNITTEST_SOURCES
     jsoncheckertest.cpp
     namespacetest.cpp
     pointertest.cpp
+    platformtest.cpp
     prettywritertest.cpp
     ostreamwrappertest.cpp
     readertest.cpp
