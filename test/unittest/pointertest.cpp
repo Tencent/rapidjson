@@ -1,6 +1,7 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
 // Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
+// Portions (C) Copyright IBM Corporation 2021
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -676,14 +677,15 @@ TEST(Pointer, GetUri) {
     EXPECT_TRUE((Pointer("/jbo").GetUri(d, Pointer::UriType(doc)).Get()) == "http://doc/root/");
     EXPECT_TRUE((Pointer("/jbo/child").GetUri(d, Pointer::UriType(doc)).Get()) == "http://doc/root/"); // id not string
 
+    EXPECT_TRUE((Pointer("/abc").GetUri(d, Pointer::UriType(doc)).Get()) == Pointer::UriType().Get()); // Out of boundary
     size_t unresolvedTokenIndex;
-    EXPECT_TRUE((Pointer("/foo/3").GetUri(d, Pointer::UriType(doc), &unresolvedTokenIndex).Get()) == ""); // Out of boundary
+    EXPECT_TRUE((Pointer("/foo/3").GetUri(d, Pointer::UriType(doc), &unresolvedTokenIndex).Get()) == Pointer::UriType().Get()); // Out of boundary
     EXPECT_EQ(1u, unresolvedTokenIndex);
-    EXPECT_TRUE((Pointer("/foo/a").GetUri(d, Pointer::UriType(doc), &unresolvedTokenIndex).Get()) == ""); // "/foo" is an array, cannot query by "a"
+    EXPECT_TRUE((Pointer("/foo/a").GetUri(d, Pointer::UriType(doc), &unresolvedTokenIndex).Get()) == Pointer::UriType().Get()); // "/foo" is an array, cannot query by "a"
     EXPECT_EQ(1u, unresolvedTokenIndex);
-    EXPECT_TRUE((Pointer("/foo/0/0").GetUri(d, Pointer::UriType(doc), &unresolvedTokenIndex).Get()) == ""); // "/foo/0" is an string, cannot further query
+    EXPECT_TRUE((Pointer("/foo/0/0").GetUri(d, Pointer::UriType(doc), &unresolvedTokenIndex).Get()) == Pointer::UriType().Get()); // "/foo/0" is an string, cannot further query
     EXPECT_EQ(2u, unresolvedTokenIndex);
-    EXPECT_TRUE((Pointer("/foo/0/a").GetUri(d, Pointer::UriType(doc), &unresolvedTokenIndex).Get()) == ""); // "/foo/0" is an string, cannot further query
+    EXPECT_TRUE((Pointer("/foo/0/a").GetUri(d, Pointer::UriType(doc), &unresolvedTokenIndex).Get()) == Pointer::UriType().Get()); // "/foo/0" is an string, cannot further query
     EXPECT_EQ(2u, unresolvedTokenIndex);
 
     Pointer::Token tokens[] = { { "foo ...", 3, kPointerInvalidIndex } };
@@ -706,7 +708,8 @@ TEST(Pointer, Get) {
     EXPECT_EQ(&d["k\"l"], Pointer("/k\"l").Get(d));
     EXPECT_EQ(&d[" "], Pointer("/ ").Get(d));
     EXPECT_EQ(&d["m~n"], Pointer("/m~0n").Get(d));
-    EXPECT_TRUE(Pointer("/abc").Get(d) == 0);
+
+    EXPECT_TRUE(Pointer("/abc").Get(d) == 0);  // Out of boundary
     size_t unresolvedTokenIndex;
     EXPECT_TRUE(Pointer("/foo/2").Get(d, &unresolvedTokenIndex) == 0); // Out of boundary
     EXPECT_EQ(1u, unresolvedTokenIndex);
