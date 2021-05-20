@@ -42,12 +42,21 @@ RAPIDJSON_DIAG_OFF(4244) // conversion from kXxxFlags to 'uint16_t', possible lo
 RAPIDJSON_DIAG_OFF(effc++)
 #endif // __GNUC__
 
+#ifdef GetObject
+// see https://github.com/Tencent/rapidjson/issues/1448
+// a former included windows.h might have defined a macro called GetObject, which affects
+// GetObject defined here. This ensures the macro does not get applied
+#pragma push_macro("GetObject")
+#define RAPIDJSON_WINDOWS_GETOBJECT_WORKAROUND_APPLIED
+#undef GetObject
+#endif
+
 #ifndef RAPIDJSON_NOMEMBERITERATORCLASS
 #include <iterator> // std::random_access_iterator_tag
 #endif
 
-#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
-#include <utility> // std::move
+#if RAPIDJSON_USE_MEMBERSMAP
+#include <map> // std::multimap
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -732,18 +741,8 @@ public:
     template <typename SourceAllocator>
     GenericValue(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator, bool copyConstStrings = false) {
         switch (rhs.GetType()) {
-        case kObjectType: {
-                SizeType count = rhs.data_.o.size;
-                Member* lm = reinterpret_cast<Member*>(allocator.Malloc(count * sizeof(Member)));
-                const typename GenericValue<Encoding,SourceAllocator>::Member* rm = rhs.GetMembersPointer();
-                for (SizeType i = 0; i < count; i++) {
-                    new (&lm[i].name) GenericValue(rm[i].name, allocator, copyConstStrings);
-                    new (&lm[i].value) GenericValue(rm[i].value, allocator, copyConstStrings);
-                }
-                data_.f.flags = kObjectFlag;
-                data_.o.size = data_.o.capacity = count;
-                SetMembersPointer(lm);
-            }
+        case kObjectType:
+            DoCopyMembers(rhs, allocator, copyConstStrings);
             break;
         case kArrayType: {
                 SizeType count = rhs.data_.a.size;
@@ -879,25 +878,30 @@ public:
     /*! Need to destruct elements of array, members of object, or copy-string.
     */
     ~GenericValue() {
-        if (Allocator::kNeedFree) { // Shortcut by Allocator's trait
+        // With RAPIDJSON_USE_MEMBERSMAP, the maps need to be destroyed to release
+        // their Allocator if it's refcounted (e.g. MemoryPoolAllocator).
+        if (Allocator::kNeedFree || (RAPIDJSON_USE_MEMBERSMAP+0 &&
+                                     internal::IsRefCounted<Allocator>::Value)) {
             switch(data_.f.flags) {
             case kArrayFlag:
                 {
                     GenericValue* e = GetElementsPointer();
                     for (GenericValue* v = e; v != e + data_.a.size; ++v)
                         v->~GenericValue();
-                    Allocator::Free(e);
+                    if (Allocator::kNeedFree) { // Shortcut by Allocator's trait
+                        Allocator::Free(e);
+                    }
                 }
                 break;
 
             case kObjectFlag:
-                for (MemberIterator m = MemberBegin(); m != MemberEnd(); ++m)
-                    m->~Member();
-                Allocator::Free(GetMembersPointer());
+                DoFreeMembers();
                 break;
 
             case kCopyStringFlag:
-                Allocator::Free(const_cast<Ch*>(GetStringPointer()));
+                if (Allocator::kNeedFree) { // Shortcut by Allocator's trait
+                    Allocator::Free(const_cast<Ch*>(GetStringPointer()));
+                }
                 break;
 
             default:
@@ -916,8 +920,13 @@ public:
     */
     GenericValue& operator=(GenericValue& rhs) RAPIDJSON_NOEXCEPT {
         if (RAPIDJSON_LIKELY(this != &rhs)) {
+            // Can't destroy "this" before assigning "rhs", otherwise "rhs"
+            // could be used after free if it's an sub-Value of "this",
+            // hence the temporary danse.
+            GenericValue temp;
+            temp.RawAssign(rhs);
             this->~GenericValue();
-            RawAssign(rhs);
+            RawAssign(temp);
         }
         return *this;
     }
@@ -1260,10 +1269,7 @@ public:
     */
     GenericValue& MemberReserve(SizeType newCapacity, Allocator &allocator) {
         RAPIDJSON_ASSERT(IsObject());
-        if (newCapacity > data_.o.capacity) {
-            SetMembersPointer(reinterpret_cast<Member*>(allocator.Realloc(GetMembersPointer(), data_.o.capacity * sizeof(Member), newCapacity * sizeof(Member))));
-            data_.o.capacity = newCapacity;
-        }
+        DoReserveMembers(newCapacity, allocator);
         return *this;
     }
 
@@ -1337,11 +1343,7 @@ public:
     MemberIterator FindMember(const GenericValue<Encoding, SourceAllocator>& name) {
         RAPIDJSON_ASSERT(IsObject());
         RAPIDJSON_ASSERT(name.IsString());
-        MemberIterator member = MemberBegin();
-        for ( ; member != MemberEnd(); ++member)
-            if (name.StringEqual(member->name))
-                break;
-        return member;
+        return DoFindMember(name);
     }
     template <typename SourceAllocator> ConstMemberIterator FindMember(const GenericValue<Encoding, SourceAllocator>& name) const { return const_cast<GenericValue&>(*this).FindMember(name); }
 
@@ -1370,14 +1372,7 @@ public:
     GenericValue& AddMember(GenericValue& name, GenericValue& value, Allocator& allocator) {
         RAPIDJSON_ASSERT(IsObject());
         RAPIDJSON_ASSERT(name.IsString());
-
-        ObjectData& o = data_.o;
-        if (o.size >= o.capacity)
-            MemberReserve(o.capacity == 0 ? kDefaultObjectCapacity : (o.capacity + (o.capacity + 1) / 2), allocator);
-        Member* members = GetMembersPointer();
-        members[o.size].name.RawAssign(name);
-        members[o.size].value.RawAssign(value);
-        o.size++;
+        DoAddMember(name, value, allocator);
         return *this;
     }
 
@@ -1511,9 +1506,7 @@ public:
     */
     void RemoveAllMembers() {
         RAPIDJSON_ASSERT(IsObject()); 
-        for (MemberIterator m = MemberBegin(); m != MemberEnd(); ++m)
-            m->~Member();
-        data_.o.size = 0;
+        DoClearMembers();
     }
 
     //! Remove a member in object by its name.
@@ -1557,14 +1550,7 @@ public:
         RAPIDJSON_ASSERT(data_.o.size > 0);
         RAPIDJSON_ASSERT(GetMembersPointer() != 0);
         RAPIDJSON_ASSERT(m >= MemberBegin() && m < MemberEnd());
-
-        MemberIterator last(GetMembersPointer() + (data_.o.size - 1));
-        if (data_.o.size > 1 && m != last)
-            *m = *last; // Move the last one to this place
-        else
-            m->~Member(); // Only one left, just destroy
-        --data_.o.size;
-        return m;
+        return DoRemoveMember(m);
     }
 
     //! Remove a member from an object by iterator.
@@ -1596,13 +1582,7 @@ public:
         RAPIDJSON_ASSERT(first >= MemberBegin());
         RAPIDJSON_ASSERT(first <= last);
         RAPIDJSON_ASSERT(last <= MemberEnd());
-
-        MemberIterator pos = MemberBegin() + (first - MemberBegin());
-        for (MemberIterator itr = pos; itr != last; ++itr)
-            itr->~Member();
-        std::memmove(static_cast<void*>(&*pos), &*last, static_cast<size_t>(MemberEnd() - last) * sizeof(Member));
-        data_.o.size -= static_cast<SizeType>(last - first);
-        return pos;
+        return DoEraseMembers(first, last);
     }
 
     //! Erase a member in object by its name.
@@ -1631,7 +1611,9 @@ public:
     }
 
     Object GetObject() { RAPIDJSON_ASSERT(IsObject()); return Object(*this); }
+    Object GetObj() { RAPIDJSON_ASSERT(IsObject()); return Object(*this); }
     ConstObject GetObject() const { RAPIDJSON_ASSERT(IsObject()); return ConstObject(*this); }
+    ConstObject GetObj() const { RAPIDJSON_ASSERT(IsObject()); return ConstObject(*this); }
 
     //@}
 
@@ -1853,12 +1835,12 @@ public:
     //!@name String
     //@{
 
-    const Ch* GetString() const { RAPIDJSON_ASSERT(IsString()); return (data_.f.flags & kInlineStrFlag) ? data_.ss.str : GetStringPointer(); }
+    const Ch* GetString() const { RAPIDJSON_ASSERT(IsString()); return DataString(data_); }
 
     //! Get the length of string.
     /*! Since rapidjson permits "\\u0000" in the json string, strlen(v.GetString()) may not equal to v.GetStringLength().
     */
-    SizeType GetStringLength() const { RAPIDJSON_ASSERT(IsString()); return ((data_.f.flags & kInlineStrFlag) ? (data_.ss.GetLength()) : data_.s.length); }
+    SizeType GetStringLength() const { RAPIDJSON_ASSERT(IsString()); return DataStringLength(data_); }
 
     //! Set this value as a string without copying source string.
     /*! This version has better performance with supplied length, and also support string containing null character.
@@ -2107,12 +2089,299 @@ private:
         Flag f;
     };  // 16 bytes in 32-bit mode, 24 bytes in 64-bit mode, 16 bytes in 64-bit with RAPIDJSON_48BITPOINTER_OPTIMIZATION
 
+    static RAPIDJSON_FORCEINLINE const Ch* DataString(const Data& data) {
+        return (data.f.flags & kInlineStrFlag) ? data.ss.str : RAPIDJSON_GETPOINTER(Ch, data.s.str);
+    }
+    static RAPIDJSON_FORCEINLINE SizeType DataStringLength(const Data& data) {
+        return (data.f.flags & kInlineStrFlag) ? data.ss.GetLength() : data.s.length;
+    }
+
     RAPIDJSON_FORCEINLINE const Ch* GetStringPointer() const { return RAPIDJSON_GETPOINTER(Ch, data_.s.str); }
     RAPIDJSON_FORCEINLINE const Ch* SetStringPointer(const Ch* str) { return RAPIDJSON_SETPOINTER(Ch, data_.s.str, str); }
     RAPIDJSON_FORCEINLINE GenericValue* GetElementsPointer() const { return RAPIDJSON_GETPOINTER(GenericValue, data_.a.elements); }
     RAPIDJSON_FORCEINLINE GenericValue* SetElementsPointer(GenericValue* elements) { return RAPIDJSON_SETPOINTER(GenericValue, data_.a.elements, elements); }
     RAPIDJSON_FORCEINLINE Member* GetMembersPointer() const { return RAPIDJSON_GETPOINTER(Member, data_.o.members); }
     RAPIDJSON_FORCEINLINE Member* SetMembersPointer(Member* members) { return RAPIDJSON_SETPOINTER(Member, data_.o.members, members); }
+
+#if RAPIDJSON_USE_MEMBERSMAP
+
+    struct MapTraits {
+        struct Less {
+            bool operator()(const Data& s1, const Data& s2) const {
+                SizeType n1 = DataStringLength(s1), n2 = DataStringLength(s2);
+                int cmp = std::memcmp(DataString(s1), DataString(s2), sizeof(Ch) * (n1 < n2 ? n1 : n2));
+                return cmp < 0 || (cmp == 0 && n1 < n2);
+            }
+        };
+        typedef std::pair<const Data, SizeType> Pair;
+        typedef std::multimap<Data, SizeType, Less, StdAllocator<Pair, Allocator> > Map;
+        typedef typename Map::iterator Iterator;
+    };
+    typedef typename MapTraits::Map         Map;
+    typedef typename MapTraits::Less        MapLess;
+    typedef typename MapTraits::Pair        MapPair;
+    typedef typename MapTraits::Iterator    MapIterator;
+
+    //
+    // Layout of the members' map/array, re(al)located according to the needed capacity:
+    //
+    //    {Map*}<>{capacity}<>{Member[capacity]}<>{MapIterator[capacity]}
+    //
+    // (where <> stands for the RAPIDJSON_ALIGN-ment, if needed)
+    //
+
+    static RAPIDJSON_FORCEINLINE size_t GetMapLayoutSize(SizeType capacity) {
+        return RAPIDJSON_ALIGN(sizeof(Map*)) +
+               RAPIDJSON_ALIGN(sizeof(SizeType)) +
+               RAPIDJSON_ALIGN(capacity * sizeof(Member)) +
+               capacity * sizeof(MapIterator);
+    }
+
+    static RAPIDJSON_FORCEINLINE SizeType &GetMapCapacity(Map* &map) {
+        return *reinterpret_cast<SizeType*>(reinterpret_cast<uintptr_t>(&map) +
+                                            RAPIDJSON_ALIGN(sizeof(Map*)));
+    }
+
+    static RAPIDJSON_FORCEINLINE Member* GetMapMembers(Map* &map) {
+        return reinterpret_cast<Member*>(reinterpret_cast<uintptr_t>(&map) +
+                                         RAPIDJSON_ALIGN(sizeof(Map*)) +
+                                         RAPIDJSON_ALIGN(sizeof(SizeType)));
+    }
+
+    static RAPIDJSON_FORCEINLINE MapIterator* GetMapIterators(Map* &map) {
+        return reinterpret_cast<MapIterator*>(reinterpret_cast<uintptr_t>(&map) +
+                                              RAPIDJSON_ALIGN(sizeof(Map*)) +
+                                              RAPIDJSON_ALIGN(sizeof(SizeType)) +
+                                              RAPIDJSON_ALIGN(GetMapCapacity(map) * sizeof(Member)));
+    }
+
+    static RAPIDJSON_FORCEINLINE Map* &GetMap(Member* members) {
+        RAPIDJSON_ASSERT(members != 0);
+        return *reinterpret_cast<Map**>(reinterpret_cast<uintptr_t>(members) -
+                                        RAPIDJSON_ALIGN(sizeof(SizeType)) -
+                                        RAPIDJSON_ALIGN(sizeof(Map*)));
+    }
+
+    // Some compilers' debug mechanisms want all iterators to be destroyed, for their accounting..
+    RAPIDJSON_FORCEINLINE MapIterator DropMapIterator(MapIterator& rhs) {
+#if RAPIDJSON_HAS_CXX11
+        MapIterator ret = std::move(rhs);
+#else
+        MapIterator ret = rhs;
+#endif
+        rhs.~MapIterator();
+        return ret;
+    }
+
+    Map* &DoReallocMap(Map** oldMap, SizeType newCapacity, Allocator& allocator) {
+        Map **newMap = static_cast<Map**>(allocator.Malloc(GetMapLayoutSize(newCapacity)));
+        GetMapCapacity(*newMap) = newCapacity;
+        if (!oldMap) {
+            *newMap = new (allocator.Malloc(sizeof(Map))) Map(MapLess(), allocator);
+        }
+        else {
+            *newMap = *oldMap;
+            size_t count = (*oldMap)->size();
+            std::memcpy(static_cast<void*>(GetMapMembers(*newMap)),
+                        static_cast<void*>(GetMapMembers(*oldMap)),
+                        count * sizeof(Member));
+            MapIterator *oldIt = GetMapIterators(*oldMap),
+                        *newIt = GetMapIterators(*newMap);
+            while (count--) {
+                new (&newIt[count]) MapIterator(DropMapIterator(oldIt[count]));
+            }
+            Allocator::Free(oldMap);
+        }
+        return *newMap;
+    }
+
+    RAPIDJSON_FORCEINLINE Member* DoAllocMembers(SizeType capacity, Allocator& allocator) {
+        return GetMapMembers(DoReallocMap(0, capacity, allocator));
+    }
+
+    void DoReserveMembers(SizeType newCapacity, Allocator& allocator) {
+        ObjectData& o = data_.o;
+        if (newCapacity > o.capacity) {
+            Member* oldMembers = GetMembersPointer();
+            Map **oldMap = oldMembers ? &GetMap(oldMembers) : 0,
+                *&newMap = DoReallocMap(oldMap, newCapacity, allocator);
+            RAPIDJSON_SETPOINTER(Member, o.members, GetMapMembers(newMap));
+            o.capacity = newCapacity;
+        }
+    }
+
+    template <typename SourceAllocator>
+    MemberIterator DoFindMember(const GenericValue<Encoding, SourceAllocator>& name) {
+        if (Member* members = GetMembersPointer()) {
+            Map* &map = GetMap(members);
+            MapIterator mit = map->find(reinterpret_cast<const Data&>(name.data_));
+            if (mit != map->end()) {
+                return MemberIterator(&members[mit->second]);
+            }
+        }
+        return MemberEnd();
+    }
+
+    void DoClearMembers() {
+        if (Member* members = GetMembersPointer()) {
+            Map* &map = GetMap(members);
+            MapIterator* mit = GetMapIterators(map);
+            for (SizeType i = 0; i < data_.o.size; i++) {
+                map->erase(DropMapIterator(mit[i]));
+                members[i].~Member();
+            }
+            data_.o.size = 0;
+        }
+    }
+
+    void DoFreeMembers() {
+        if (Member* members = GetMembersPointer()) {
+            GetMap(members)->~Map();
+            for (SizeType i = 0; i < data_.o.size; i++) {
+                members[i].~Member();
+            }
+            if (Allocator::kNeedFree) { // Shortcut by Allocator's trait
+                Map** map = &GetMap(members);
+                Allocator::Free(*map);
+                Allocator::Free(map);
+            }
+        }
+    }
+
+#else // !RAPIDJSON_USE_MEMBERSMAP
+
+    RAPIDJSON_FORCEINLINE Member* DoAllocMembers(SizeType capacity, Allocator& allocator) {
+        return Malloc<Member>(allocator, capacity);
+    }
+
+    void DoReserveMembers(SizeType newCapacity, Allocator& allocator) {
+        ObjectData& o = data_.o;
+        if (newCapacity > o.capacity) {
+            Member* newMembers = Realloc<Member>(allocator, GetMembersPointer(), o.capacity, newCapacity);
+            RAPIDJSON_SETPOINTER(Member, o.members, newMembers);
+            o.capacity = newCapacity;
+        }
+    }
+
+    template <typename SourceAllocator>
+    MemberIterator DoFindMember(const GenericValue<Encoding, SourceAllocator>& name) {
+        MemberIterator member = MemberBegin();
+        for ( ; member != MemberEnd(); ++member)
+            if (name.StringEqual(member->name))
+                break;
+        return member;
+    }
+
+    void DoClearMembers() {
+        for (MemberIterator m = MemberBegin(); m != MemberEnd(); ++m)
+            m->~Member();
+        data_.o.size = 0;
+    }
+
+    void DoFreeMembers() {
+        for (MemberIterator m = MemberBegin(); m != MemberEnd(); ++m)
+            m->~Member();
+        Allocator::Free(GetMembersPointer());
+    }
+
+#endif // !RAPIDJSON_USE_MEMBERSMAP
+
+    void DoAddMember(GenericValue& name, GenericValue& value, Allocator& allocator) {
+        ObjectData& o = data_.o;
+        if (o.size >= o.capacity)
+            DoReserveMembers(o.capacity ? (o.capacity + (o.capacity + 1) / 2) : kDefaultObjectCapacity, allocator);
+        Member* members = GetMembersPointer();
+        Member* m = members + o.size;
+        m->name.RawAssign(name);
+        m->value.RawAssign(value);
+#if RAPIDJSON_USE_MEMBERSMAP
+        Map* &map = GetMap(members);
+        MapIterator* mit = GetMapIterators(map);
+        new (&mit[o.size]) MapIterator(map->insert(MapPair(m->name.data_, o.size)));
+#endif
+        ++o.size;
+    }
+
+    MemberIterator DoRemoveMember(MemberIterator m) {
+        ObjectData& o = data_.o;
+        Member* members = GetMembersPointer();
+#if RAPIDJSON_USE_MEMBERSMAP
+        Map* &map = GetMap(members);
+        MapIterator* mit = GetMapIterators(map);
+        SizeType mpos = static_cast<SizeType>(&*m - members);
+        map->erase(DropMapIterator(mit[mpos]));
+#endif
+        MemberIterator last(members + (o.size - 1));
+        if (o.size > 1 && m != last) {
+#if RAPIDJSON_USE_MEMBERSMAP
+            new (&mit[mpos]) MapIterator(DropMapIterator(mit[&*last - members]));
+            mit[mpos]->second = mpos;
+#endif
+            *m = *last; // Move the last one to this place
+        }
+        else {
+            m->~Member(); // Only one left, just destroy
+        }
+        --o.size;
+        return m;
+    }
+
+    MemberIterator DoEraseMembers(ConstMemberIterator first, ConstMemberIterator last) {
+        ObjectData& o = data_.o;
+        MemberIterator beg = MemberBegin(),
+                       pos = beg + (first - beg),
+                       end = MemberEnd();
+#if RAPIDJSON_USE_MEMBERSMAP
+        Map* &map = GetMap(GetMembersPointer());
+        MapIterator* mit = GetMapIterators(map);
+#endif
+        for (MemberIterator itr = pos; itr != last; ++itr) {
+#if RAPIDJSON_USE_MEMBERSMAP
+            map->erase(DropMapIterator(mit[itr - beg]));
+#endif
+            itr->~Member();
+        }
+#if RAPIDJSON_USE_MEMBERSMAP
+        if (first != last) {
+            // Move remaining members/iterators
+            MemberIterator next = pos + (last - first);
+            for (MemberIterator itr = pos; next != end; ++itr, ++next) {
+                std::memcpy(static_cast<void*>(&*itr), &*next, sizeof(Member));
+                SizeType mpos = static_cast<SizeType>(itr - beg);
+                new (&mit[mpos]) MapIterator(DropMapIterator(mit[next - beg]));
+                mit[mpos]->second = mpos;
+            }
+        }
+#else
+        std::memmove(static_cast<void*>(&*pos), &*last,
+                     static_cast<size_t>(end - last) * sizeof(Member));
+#endif
+        o.size -= static_cast<SizeType>(last - first);
+        return pos;
+    }
+
+    template <typename SourceAllocator>
+    void DoCopyMembers(const GenericValue<Encoding,SourceAllocator>& rhs, Allocator& allocator, bool copyConstStrings) {
+        RAPIDJSON_ASSERT(rhs.GetType() == kObjectType);
+
+        data_.f.flags = kObjectFlag;
+        SizeType count = rhs.data_.o.size;
+        Member* lm = DoAllocMembers(count, allocator);
+        const typename GenericValue<Encoding,SourceAllocator>::Member* rm = rhs.GetMembersPointer();
+#if RAPIDJSON_USE_MEMBERSMAP
+        Map* &map = GetMap(lm);
+        MapIterator* mit = GetMapIterators(map);
+#endif
+        for (SizeType i = 0; i < count; i++) {
+            new (&lm[i].name) GenericValue(rm[i].name, allocator, copyConstStrings);
+            new (&lm[i].value) GenericValue(rm[i].value, allocator, copyConstStrings);
+#if RAPIDJSON_USE_MEMBERSMAP
+            new (&mit[i]) MapIterator(map->insert(MapPair(lm[i].name.data_, i)));
+#endif
+        }
+        data_.o.size = data_.o.capacity = count;
+        SetMembersPointer(lm);
+    }
 
     // Initialize this value as array with initial data, without calling destructor.
     void SetArrayRaw(GenericValue* values, SizeType count, Allocator& allocator) {
@@ -2131,9 +2400,16 @@ private:
     void SetObjectRaw(Member* members, SizeType count, Allocator& allocator) {
         data_.f.flags = kObjectFlag;
         if (count) {
-            Member* m = static_cast<Member*>(allocator.Malloc(count * sizeof(Member)));
+            Member* m = DoAllocMembers(count, allocator);
             SetMembersPointer(m);
             std::memcpy(static_cast<void*>(m), members, count * sizeof(Member));
+#if RAPIDJSON_USE_MEMBERSMAP
+            Map* &map = GetMap(m);
+            MapIterator* mit = GetMapIterators(map);
+            for (SizeType i = 0; i < count; i++) {
+                new (&mit[i]) MapIterator(map->insert(MapPair(m[i].name.data_, i)));
+            }
+#endif
         }
         else
             SetMembersPointer(0);
@@ -2254,6 +2530,13 @@ public:
 #endif
 
     ~GenericDocument() {
+        // Clear the ::ValueType before ownAllocator is destroyed, ~ValueType()
+        // runs last and may access its elements or members which would be freed
+        // with an allocator like MemoryPoolAllocator (CrtAllocator does not
+        // free its data when destroyed, but MemoryPoolAllocator does).
+        if (ownAllocator_) {
+            ValueType::SetNull();
+        }
         Destroy();
     }
 
@@ -2735,5 +3018,10 @@ private:
 
 RAPIDJSON_NAMESPACE_END
 RAPIDJSON_DIAG_POP
+
+#ifdef RAPIDJSON_WINDOWS_GETOBJECT_WORKAROUND_APPLIED
+#pragma pop_macro("GetObject")
+#undef RAPIDJSON_WINDOWS_GETOBJECT_WORKAROUND_APPLIED
+#endif
 
 #endif // RAPIDJSON_DOCUMENT_H_
