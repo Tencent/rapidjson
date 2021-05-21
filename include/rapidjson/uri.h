@@ -110,7 +110,6 @@ public:
         }
         base_ = scheme_ + auth_ + path_ + query_;
         uri_ = base_ + frag_;
-        //std::cout << " Resolved uri: " <<  uri_ << std::endl;
         return *this;
     }
 
@@ -196,7 +195,6 @@ private:
         }
         base_ = scheme_ + auth_ + path_ + query_;
         uri_ = base_ + frag_;
-        //std::cout << " Parsed uri: " <<  "s: " << scheme_.c_str() << " a: " << auth_.c_str() << " p: " << path_.c_str() << " q: " << query_.c_str() << " f: " << frag_.c_str() << std::endl;
     }
 
     // Remove . and .. segments from a path
@@ -209,7 +207,6 @@ private:
         std::size_t pos = 0;
         // Loop through each path segment
         while (pos != std::string::npos) {
-            //std::cout << "Temp: '" << temp.c_str() << "' Path: '" << path.c_str() << "'" << std::endl;
             pos = temp.find_first_of(slash);
             // Get next segment
             String seg = temp.substr(0, pos);
@@ -233,7 +230,6 @@ private:
             // Move to next segment if not at end
             if (pos != std::string::npos) temp = temp.substr(pos + 1);
         }
-        //std::cout << "Final Temp: '" << temp.c_str() << "' Final Path: '" << path.c_str() << "'" << std::endl;
     }
 
     String uri_;    // Full uri
