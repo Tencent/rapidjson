@@ -40,10 +40,12 @@ inline SizeType StrLen(const char* s) {
     return SizeType(std::strlen(s));
 }
 
+#if RAPIDJSON_HAS_WCHAR_FUNCTIONS
 template <>
 inline SizeType StrLen(const wchar_t* s) {
     return SizeType(std::wcslen(s));
 }
+#endif
 
 //! Returns number of code points in a encoded string.
 template<typename Encoding>
