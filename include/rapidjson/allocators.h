@@ -24,6 +24,11 @@
 #include <type_traits>
 #endif
 
+#ifdef __GNUC__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(effc++) // std::allocator can safely be inherited
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -448,11 +453,6 @@ inline void Free(A& a, T *p, size_t n = 1)
 {
     static_cast<void>(Realloc<T, A>(a, p, n, 0));
 }
-
-#ifdef __GNUC__
-RAPIDJSON_DIAG_PUSH
-RAPIDJSON_DIAG_OFF(effc++) // std::allocator can safely be inherited
-#endif
 
 template <typename T, typename BaseAllocator = CrtAllocator>
 class StdAllocator :
