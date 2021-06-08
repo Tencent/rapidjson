@@ -143,11 +143,11 @@ EXPECT_TRUE(u.GetFragStringLength() == len);
 }
 
 TEST(Uri, Parse_UTF16) {
-typedef GenericValue<UTF16<> > Value;
-typedef GenericUri<Value, MemoryPoolAllocator<> > UriType;
+typedef GenericValue<UTF16<> > Value16;
+typedef GenericUri<Value16, MemoryPoolAllocator<> > UriType;
 MemoryPoolAllocator<CrtAllocator> allocator;
-Value v;
-Value w;
+Value16 v;
+Value16 w;
 
 v.SetString(L"http://auth/path/xxx?query#frag", allocator);
 UriType u = UriType(v, &allocator);
@@ -161,7 +161,7 @@ u.Get(w, allocator);
 EXPECT_TRUE(*w.GetString() == *v.GetString());
 
 #if RAPIDJSON_HAS_STDSTRING
-typedef std::basic_string<Value::Ch> String;
+typedef std::basic_string<Value16::Ch> String;
 String str = L"http://auth/path/xxx?query#frag";
 const UriType uri = UriType(str);
 EXPECT_TRUE(UriType::GetScheme(uri) == L"http:");
@@ -237,8 +237,8 @@ EXPECT_TRUE(u.GetQueryStringLength() == 0);
 EXPECT_TRUE(StrCmp(u.GetFragString(), L"#frag/stuff") == 0);
 EXPECT_TRUE(StrCmp(u.GetString(), L"http://auth#frag/stuff") == 0);
 
-const Value::Ch c[] = { '#', 'f', 'r', 'a', 'g', '/', 's', 't', 'u', 'f', 'f', '\0'};
-SizeType len = internal::StrLen<Value::Ch>(c);
+const Value16::Ch c[] = { '#', 'f', 'r', 'a', 'g', '/', 's', 't', 'u', 'f', 'f', '\0'};
+SizeType len = internal::StrLen<Value16::Ch>(c);
 u = UriType(c, len);
 EXPECT_TRUE(StrCmp(u.GetString(), L"#frag/stuff") == 0);
 EXPECT_TRUE(u.GetStringLength() == len);
@@ -438,8 +438,8 @@ EXPECT_TRUE(StrCmp(res.GetString(), "http://a/b/c/g#s/../x") == 0);
 }
 
 TEST(Uri, Resolve_UTF16) {
-typedef GenericValue<UTF16<> > Value;
-typedef GenericUri<Value> UriType;
+typedef GenericValue<UTF16<> > Value16;
+typedef GenericUri<Value16> UriType;
 CrtAllocator allocator;
 
 // ref is full uri
