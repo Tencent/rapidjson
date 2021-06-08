@@ -39,7 +39,6 @@ RAPIDJSON_NAMESPACE_BEGIN
 
     //! Constructors
     GenericUri(Allocator* allocator = 0) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(allocator), ownAllocator_() {
-        //std::cout << "Default constructor" << std::endl;
     }
 
     GenericUri(const Ch* uri, SizeType len, Allocator* allocator = 0) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(allocator), ownAllocator_() {
@@ -64,26 +63,22 @@ RAPIDJSON_NAMESPACE_BEGIN
 
     //! Copy constructor
     GenericUri(const GenericUri& rhs) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(rhs.allocator_), ownAllocator_() {
-        //std::cout << "Copy constructor" << std::endl;
         *this = rhs;
     }
 
     //! Copy constructor
     GenericUri(const GenericUri& rhs, Allocator* allocator) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(allocator), ownAllocator_() {
-        //std::cout << "Copy constructor" << std::endl;
         *this = rhs;
     }
 
     //! Destructor.
     ~GenericUri() {
-        //std::cout << "Destructor" << std::endl;
         Free();
         RAPIDJSON_DELETE(ownAllocator_);
     }
 
     //! Assignment operator
     GenericUri& operator=(const GenericUri& rhs) {
-        //std::cout << "Operator=" << std::endl;
         if (this != &rhs) {
             // Do not delete ownAllocator
             Free();
@@ -95,7 +90,6 @@ RAPIDJSON_NAMESPACE_BEGIN
             base_ = CopyPart(frag_, rhs.frag_, rhs.GetFragStringLength());
             uri_ = CopyPart(base_, rhs.base_, rhs.GetBaseStringLength());
             CopyPart(uri_, rhs.uri_, rhs.GetStringLength());
-            //std::wcout << L" Assignment uri: " <<  uri_ << ", length: " << GetStringLength() << std::endl;
         }
         return *this;
     }
@@ -160,7 +154,6 @@ RAPIDJSON_NAMESPACE_BEGIN
     // Use for resolving an id or $ref with an in-scope id.
     // Returns a new GenericUri for the resolved URI.
     GenericUri Resolve(const GenericUri& baseuri, Allocator* allocator = 0) {
-        //std::cout << "Resolve" << std::endl;
         GenericUri resuri;
         resuri.allocator_ = allocator;
         // Ensure enough space for combining paths
@@ -224,13 +217,11 @@ RAPIDJSON_NAMESPACE_BEGIN
         }
         // Always use this frag
         resuri.base_ = CopyPart(resuri.frag_, frag_, GetFragStringLength());
-        //std::wcout << L" Resolved uri: " <<  L"s: " << resuri.scheme_ << L" a: " << resuri.auth_ << L" p: " << resuri.path_ << L" q: " << resuri.query_ << L" f: " << resuri.frag_ << std::endl;
 
         // Re-constitute base_ and uri_
         resuri.SetBase();
         resuri.uri_ = resuri.base_ + resuri.GetBaseStringLength() + 1;
         resuri.SetUri();
-        //std::wcout << L" Resolved rebuilt uri: " <<  resuri.uri_ << L", length: " << resuri.GetStringLength() << std::endl;
         return resuri;
     }
 
@@ -241,7 +232,6 @@ private:
     // Allocate memory for a URI
     // Returns total amount allocated
     std::size_t Allocate(std::size_t len) {
-        //std::cout << "Allocate" << std::endl;
         // Create own allocator if user did not supply.
         if (!allocator_)
             ownAllocator_ =  allocator_ = RAPIDJSON_NEW(Allocator)();
@@ -263,15 +253,12 @@ private:
         *base_ = '\0';
         uri_ = base_ + 1;
         *uri_ = '\0';
-        //std::cout << "  Allocating " << total << std::endl;
         return total;
     }
 
     // Free memory for a URI
     void Free() {
-        //std::cout << "Free" << std::endl;
         if (scheme_) {
-            //std::cout << "  Freeing" << std::endl;
             Allocator::Free(scheme_);
             scheme_ = 0;
         }
@@ -281,7 +268,6 @@ private:
     // Supports URIs that match regex ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))? as per
     // https://tools.ietf.org/html/rfc3986
     void Parse(const Ch* uri, std::size_t len) {
-        //std::cout << "Parse" << std::endl;
         std::size_t start = 0, pos1 = 0, pos2 = 0;
         Allocate(len);
 
@@ -368,14 +354,12 @@ private:
             std::memcpy(frag_, &uri[start], (len - start) * sizeof(Ch));
             frag_[len - start] = '\0';
         }
-        //std::wcout << L" Parsed uri: " <<  L"s: " << scheme_ << L" a: " << auth_ << L" p: " << path_ << L" q: " << query_ << L" f: " << frag_ << std::endl;
 
         // Re-constitute base_ and uri_
         base_ = frag_ + GetFragStringLength() + 1;
         SetBase();
         uri_ = base_ + GetBaseStringLength() + 1;
         SetUri();
-        //std::wcout << L" Rebuilt uri: " <<  uri_ << L", length: " << GetStringLength() << std::endl;
     }
 
     // Reconstitute base
@@ -433,7 +417,6 @@ private:
             if (slashpos == 2 && path_[pathpos] == '.' && path_[pathpos + 1] == '.') {
                 // Backup a .. segment in the new path_
                 // We expect to find a previously added slash at the end or nothing
-                //std::wcout << L" Path - backing up .. in " << path_ << std::endl;
                 size_t lastslashpos = newpos;
                 while (lastslashpos > 0) {
                     if (path_[lastslashpos - 1] == '/') break;
@@ -452,7 +435,6 @@ private:
                 }
             } else if (slashpos == 1 && path_[pathpos] == '.') {
                 // Discard . segment, leaves new path_ unchanged
-                //std::wcout << L" Path - removing . in " << path_ << std::endl;
             } else {
                 // Move any other kind of segment to the new path_
                 RAPIDJSON_ASSERT(newpos <= pathpos);
@@ -468,7 +450,6 @@ private:
             pathpos += slashpos + 1;
         }
         path_[newpos] = '\0';
-        //std::wcout << L" Normalized Path: " << path_ << ", length: " << GetPathStringLength() << std::endl;
     }
 
     Ch* uri_;    // Everything
