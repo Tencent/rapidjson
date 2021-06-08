@@ -494,9 +494,8 @@ public:
         // If we have an id property, resolve it with the in-scope id
         if (const ValueType* v = GetMember(value, GetIdString())) {
             if (v->IsString()) {
-                UriType local = UriType(*v);
-                local.Resolve(id_);
-                id_ = local;
+                UriType local(*v, allocator);
+                id_ = local.Resolve(id_, allocator);
             }
         }
 
@@ -1659,7 +1658,7 @@ public:
 
         Ch noUri[1] = {0};
         uri_.SetString(uri ? uri : noUri, uriLength, *allocator_);
-        docId_ = UriType(uri_);
+        docId_ = UriType(uri_, allocator_);
 
         typeless_ = static_cast<SchemaType*>(allocator_->Malloc(sizeof(SchemaType)));
         new (typeless_) SchemaType(this, PointerType(), ValueType(kObjectType).Move(), ValueType(kObjectType).Move(), allocator_, docId_);
@@ -1792,8 +1791,7 @@ private:
             if (len > 0) {
                 // First resolve $ref against the in-scope id
                 UriType scopeId = id;
-                UriType ref = UriType(itr->value);
-                ref.Resolve(scopeId);
+                UriType ref = UriType(itr->value, allocator_).Resolve(scopeId, allocator_);
                 // See if the resolved $ref minus the fragment matches a resolved id in this document
                 // Search from the root. Returns the subschema in the document and its absolute JSON pointer.
                 PointerType basePointer = PointerType();
@@ -1851,7 +1849,7 @@ private:
                         // See if the fragment matches an id in this document.
                         // Search from the base we just established. Returns the subschema in the document and its absolute JSON pointer.
                         PointerType pointer = PointerType();
-                        if (const ValueType *pv = FindId(*base, ref, pointer, UriType(ref.GetBase()), true, basePointer)) {
+                        if (const ValueType *pv = FindId(*base, ref, pointer, UriType(ref.GetBaseString(), ref.GetBaseStringLength(), allocator_), true, basePointer)) {
                             if (!IsCyclicRef(pointer)) {
                                 //GenericStringBuffer<EncodingType> sb;
                                 //pointer.StringifyUriFragment(sb);
@@ -1887,8 +1885,7 @@ private:
             // Establish the base URI of this object
             typename ValueType::ConstMemberIterator m = doc.FindMember(SchemaType::GetIdString());
             if (m != doc.MemberEnd() && m->value.GetType() == kStringType) {
-                localuri = UriType(m->value);
-                localuri.Resolve(baseuri);
+                localuri = UriType(m->value, allocator_).Resolve(baseuri, allocator_);
             }
             // See if it matches
             if (localuri.Match(finduri, full)) {

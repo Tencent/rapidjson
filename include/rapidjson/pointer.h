@@ -554,8 +554,7 @@ public:
                     // See if we have an id, and if so resolve with the current base
                     typename ValueType::MemberIterator m = v->FindMember(kIdValue);
                     if (m != v->MemberEnd() && (m->value).IsString()) {
-                        UriType here = UriType(m->value);
-                        here.Resolve(base);
+                        UriType here = UriType(m->value, allocator_).Resolve(base, allocator_);
                         base = here;
                     }
                     m = v->FindMember(GenericValue<EncodingType>(GenericStringRef<Ch>(t->name, t->length)));
@@ -576,7 +575,7 @@ public:
             // Error: unresolved token
             if (unresolvedTokenIndex)
                 *unresolvedTokenIndex = static_cast<size_t>(t - tokens_);
-            return UriType();
+            return UriType(allocator_);
         }
         return base;
     }
