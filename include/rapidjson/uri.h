@@ -29,9 +29,9 @@ RAPIDJSON_NAMESPACE_BEGIN
 ///////////////////////////////////////////////////////////////////////////////
 // GenericUri
 
-  template <typename ValueType, typename Allocator=CrtAllocator>
-  class GenericUri {
-  public:
+template <typename ValueType, typename Allocator=CrtAllocator>
+class GenericUri {
+public:
     typedef typename ValueType::Ch Ch;
 #if RAPIDJSON_HAS_STDSTRING
     typedef std::basic_string<Ch> String;
@@ -462,10 +462,10 @@ private:
 
     Allocator* allocator_;      //!< The current allocator. It is either user-supplied or equal to ownAllocator_.
     Allocator* ownAllocator_;   //!< Allocator owned by this Uri.
-  };
+};
 
 //! GenericUri for Value (UTF-8, default allocator).
-  typedef GenericUri<Value> Uri;
+typedef GenericUri<Value> Uri;
 
 RAPIDJSON_NAMESPACE_END
 

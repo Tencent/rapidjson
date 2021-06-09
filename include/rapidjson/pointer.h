@@ -530,7 +530,9 @@ public:
     //  For use with JSON pointers into JSON schema documents.
     /*!
         \param root Root value of a DOM sub-tree to be resolved. It can be any value other than document root.
+        \param rootUri Root URI
         \param unresolvedTokenIndex If the pointer cannot resolve a token in the pointer, this parameter can obtain the index of unresolved token.
+        \param allocator Allocator for Uris
         \return Uri if it can be resolved. Otherwise null.
 
         \note
@@ -541,10 +543,10 @@ public:
 
         Use unresolvedTokenIndex to retrieve the token index.
     */
-    UriType GetUri(ValueType& root, const UriType& rootUri, size_t* unresolvedTokenIndex = 0) const {
+    UriType GetUri(ValueType& root, const UriType& rootUri, size_t* unresolvedTokenIndex = 0, Allocator* allocator = 0) const {
         static const Ch kIdString[] = { 'i', 'd', '\0' };
         static const ValueType kIdValue(kIdString, 2);
-        UriType base = rootUri;
+        UriType base = UriType(rootUri, allocator);
         RAPIDJSON_ASSERT(IsValid());
         ValueType* v = &root;
         for (const Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
@@ -554,7 +556,7 @@ public:
                     // See if we have an id, and if so resolve with the current base
                     typename ValueType::MemberIterator m = v->FindMember(kIdValue);
                     if (m != v->MemberEnd() && (m->value).IsString()) {
-                        UriType here = UriType(m->value, allocator_).Resolve(base, allocator_);
+                        UriType here = UriType(m->value, allocator).Resolve(base, allocator);
                         base = here;
                     }
                     m = v->FindMember(GenericValue<EncodingType>(GenericStringRef<Ch>(t->name, t->length)));
@@ -575,13 +577,13 @@ public:
             // Error: unresolved token
             if (unresolvedTokenIndex)
                 *unresolvedTokenIndex = static_cast<size_t>(t - tokens_);
-            return UriType(allocator_);
+            return UriType(allocator);
         }
         return base;
     }
 
-    UriType GetUri(const ValueType& root, const UriType& rootUri, size_t* unresolvedTokenIndex = 0) const {
-      return GetUri(const_cast<ValueType&>(root), rootUri, unresolvedTokenIndex);
+    UriType GetUri(const ValueType& root, const UriType& rootUri, size_t* unresolvedTokenIndex = 0, Allocator* allocator = 0) const {
+      return GetUri(const_cast<ValueType&>(root), rootUri, unresolvedTokenIndex, allocator);
     }
 
 

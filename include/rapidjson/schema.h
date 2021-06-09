@@ -1741,7 +1741,7 @@ private:
     // Changed by PR #1393
     void CreateSchemaRecursive(const SchemaType** schema, const PointerType& pointer, const ValueType& v, const ValueType& document, const UriType& id) {
         if (v.GetType() == kObjectType) {
-            UriType newid = CreateSchema(schema, pointer, v, document, id);
+            UriType newid = UriType(CreateSchema(schema, pointer, v, document, id), allocator_);
 
             for (typename ValueType::ConstMemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr)
                 CreateSchemaRecursive(0, pointer.Append(itr->name, allocator_), itr->value, document, newid);
@@ -1790,7 +1790,7 @@ private:
             SizeType len = itr->value.GetStringLength();
             if (len > 0) {
                 // First resolve $ref against the in-scope id
-                UriType scopeId = id;
+                UriType scopeId = UriType(id, allocator_);
                 UriType ref = UriType(itr->value, allocator_).Resolve(scopeId, allocator_);
                 // See if the resolved $ref minus the fragment matches a resolved id in this document
                 // Search from the root. Returns the subschema in the document and its absolute JSON pointer.
@@ -1838,7 +1838,8 @@ private:
                                 if (pointer.IsValid() && !IsCyclicRef(pointer)) {
                                     // Call CreateSchema recursively, but first compute the in-scope id for the $ref target as we have jumped there
                                     // TODO: cache pointer <-> id mapping
-                                    scopeId = pointer.GetUri(document, docId_);
+                                    size_t unresolvedTokenIndex;
+                                    scopeId = pointer.GetUri(document, docId_, &unresolvedTokenIndex, allocator_);
                                     CreateSchema(schema, pointer, *pv, document, scopeId);
                                     return true;
                                 }
@@ -1855,7 +1856,8 @@ private:
                                 //pointer.StringifyUriFragment(sb);
                                 // Call CreateSchema recursively, but first compute the in-scope id for the $ref target as we have jumped there
                                 // TODO: cache pointer <-> id mapping
-                                scopeId = pointer.GetUri(document, docId_);
+                                size_t unresolvedTokenIndex;
+                                scopeId = pointer.GetUri(document, docId_, &unresolvedTokenIndex, allocator_);
                                 CreateSchema(schema, pointer, *pv, document, scopeId);
                                 return true;
                             }
@@ -1879,8 +1881,8 @@ private:
     ValueType* FindId(const ValueType& doc, const UriType& finduri, PointerType& resptr, const UriType& baseuri, bool full, const PointerType& here = PointerType()) const {
         SizeType i = 0;
         ValueType* resval = 0;
-        UriType tempuri = finduri;
-        UriType localuri = baseuri;
+        UriType tempuri = UriType(finduri, allocator_);
+        UriType localuri = UriType(baseuri, allocator_);
         if (doc.GetType() == kObjectType) {
             // Establish the base URI of this object
             typename ValueType::ConstMemberIterator m = doc.FindMember(SchemaType::GetIdString());

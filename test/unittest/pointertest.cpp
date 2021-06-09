@@ -659,6 +659,7 @@ static const char kJsonIds[] = "{\n"
 
 
 TEST(Pointer, GetUri) {
+    CrtAllocator allocator;
     Document d;
     d.Parse(kJsonIds);
     Pointer::UriType doc("http://doc");
@@ -677,15 +678,16 @@ TEST(Pointer, GetUri) {
     EXPECT_TRUE(Pointer("/jbo").GetUri(d, doc) == root);
     EXPECT_TRUE(Pointer("/jbo/child").GetUri(d, doc) == root); // id not string
 
-    EXPECT_TRUE(Pointer("/abc").GetUri(d, doc) == empty); // Out of boundary
     size_t unresolvedTokenIndex;
-    EXPECT_TRUE(Pointer("/foo/3").GetUri(d, doc, &unresolvedTokenIndex) == empty); // Out of boundary
+    EXPECT_TRUE(Pointer("/abc").GetUri(d, doc, &unresolvedTokenIndex, &allocator) == empty); // Out of boundary
+    EXPECT_EQ(0u, unresolvedTokenIndex);
+    EXPECT_TRUE(Pointer("/foo/3").GetUri(d, doc, &unresolvedTokenIndex, &allocator) == empty); // Out of boundary
     EXPECT_EQ(1u, unresolvedTokenIndex);
-    EXPECT_TRUE(Pointer("/foo/a").GetUri(d, doc, &unresolvedTokenIndex) == empty); // "/foo" is an array, cannot query by "a"
+    EXPECT_TRUE(Pointer("/foo/a").GetUri(d, doc, &unresolvedTokenIndex, &allocator) == empty); // "/foo" is an array, cannot query by "a"
     EXPECT_EQ(1u, unresolvedTokenIndex);
-    EXPECT_TRUE(Pointer("/foo/0/0").GetUri(d, doc, &unresolvedTokenIndex) == empty); // "/foo/0" is an string, cannot further query
+    EXPECT_TRUE(Pointer("/foo/0/0").GetUri(d, doc, &unresolvedTokenIndex, &allocator) == empty); // "/foo/0" is an string, cannot further query
     EXPECT_EQ(2u, unresolvedTokenIndex);
-    EXPECT_TRUE(Pointer("/foo/0/a").GetUri(d, doc, &unresolvedTokenIndex) == empty); // "/foo/0" is an string, cannot further query
+    EXPECT_TRUE(Pointer("/foo/0/a").GetUri(d, doc, &unresolvedTokenIndex, &allocator) == empty); // "/foo/0" is an string, cannot further query
     EXPECT_EQ(2u, unresolvedTokenIndex);
 
     Pointer::Token tokens[] = { { "foo ...", 3, kPointerInvalidIndex } };
