@@ -134,7 +134,7 @@ public:
         return !Match(rhs, true);
     }
 
-    bool Match(const GenericUri& uri, bool full) const {
+    bool Match(const GenericUri& uri, bool full = true) const {
         Ch* s1;
         Ch* s2;
         if (full) {
