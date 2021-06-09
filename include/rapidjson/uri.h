@@ -417,11 +417,8 @@ private:
             if (slashpos == 2 && path_[pathpos] == '.' && path_[pathpos + 1] == '.') {
                 // Backup a .. segment in the new path_
                 // We expect to find a previously added slash at the end or nothing
+                RAPIDJSON_ASSERT(newpos == 0 || path_[newpos - 1] == '/');
                 size_t lastslashpos = newpos;
-                while (lastslashpos > 0) {
-                    if (path_[lastslashpos - 1] == '/') break;
-                    lastslashpos--;
-                }
                 // Make sure we don't go beyond the start segment
                 if (lastslashpos > 1) {
                     // Find the next to last slash and back up to it
