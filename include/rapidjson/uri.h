@@ -62,7 +62,7 @@ public:
 #endif
 
     //! Copy constructor
-    GenericUri(const GenericUri& rhs) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(rhs.allocator_), ownAllocator_() {
+    GenericUri(const GenericUri& rhs) : uri_(), base_(), scheme_(), auth_(), path_(), query_(), frag_(), allocator_(), ownAllocator_() {
         *this = rhs;
     }
 
@@ -101,19 +101,19 @@ public:
     }
 
     const Ch* GetString() const { return uri_; }
-    SizeType GetStringLength() const { return internal::StrLen<Ch>(uri_); }
+    SizeType GetStringLength() const { return uri_ == 0 ? 0 : internal::StrLen<Ch>(uri_); }
     const Ch* GetBaseString() const { return base_; }
-    SizeType GetBaseStringLength() const { return internal::StrLen<Ch>(base_); }
+    SizeType GetBaseStringLength() const { return base_ == 0 ? 0 : internal::StrLen<Ch>(base_); }
     const Ch* GetSchemeString() const { return scheme_; }
-    SizeType GetSchemeStringLength() const { return internal::StrLen<Ch>(scheme_); }
+    SizeType GetSchemeStringLength() const { return scheme_ == 0 ? 0 : internal::StrLen<Ch>(scheme_); }
     const Ch* GetAuthString() const { return auth_; }
-    SizeType GetAuthStringLength() const { return internal::StrLen<Ch>(auth_); }
+    SizeType GetAuthStringLength() const { return auth_ == 0 ? 0 : internal::StrLen<Ch>(auth_); }
     const Ch* GetPathString() const { return path_; }
-    SizeType GetPathStringLength() const { return internal::StrLen<Ch>(path_); }
+    SizeType GetPathStringLength() const { return path_ == 0 ? 0 : internal::StrLen<Ch>(path_); }
     const Ch* GetQueryString() const { return query_; }
-    SizeType GetQueryStringLength() const { return internal::StrLen<Ch>(query_); }
+    SizeType GetQueryStringLength() const { return query_ == 0 ? 0 : internal::StrLen<Ch>(query_); }
     const Ch* GetFragString() const { return frag_; }
-    SizeType GetFragStringLength() const { return internal::StrLen<Ch>(frag_); }
+    SizeType GetFragStringLength() const { return frag_ == 0 ? 0 : internal::StrLen<Ch>(frag_); }
 
 #if RAPIDJSON_HAS_STDSTRING
     static String Get(const GenericUri& uri) { return String(uri.GetString(), uri.GetStringLength()); }

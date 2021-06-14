@@ -29,6 +29,26 @@ RAPIDJSON_DIAG_OFF(4822) // local class member function does not have a body
 
 using namespace rapidjson;
 
+TEST(Uri, DefaultConstructor) {
+    typedef GenericUri<Value> UriType;
+    UriType u;
+    EXPECT_TRUE(u.GetSchemeString() == 0);
+    EXPECT_TRUE(u.GetAuthString() == 0);
+    EXPECT_TRUE(u.GetPathString() == 0);
+    EXPECT_TRUE(u.GetBaseString() == 0);
+    EXPECT_TRUE(u.GetQueryString() == 0);
+    EXPECT_TRUE(u.GetFragString() == 0);
+    EXPECT_TRUE(u.GetString() == 0);
+    EXPECT_TRUE(u.GetSchemeStringLength() == 0);
+    EXPECT_TRUE(u.GetAuthStringLength() == 0);
+    EXPECT_TRUE(u.GetPathStringLength() == 0);
+    EXPECT_TRUE(u.GetBaseStringLength() == 0);
+    EXPECT_TRUE(u.GetQueryStringLength() == 0);
+    EXPECT_TRUE(u.GetFragStringLength() == 0);
+    EXPECT_TRUE(u.GetStringLength() == 0);
+}
+
+
 TEST(Uri, Parse) {
     typedef GenericUri<Value, MemoryPoolAllocator<> > UriType;
     MemoryPoolAllocator<CrtAllocator> allocator;
@@ -254,6 +274,27 @@ TEST(Uri, Parse_UTF16) {
     EXPECT_TRUE(u.GetBaseStringLength() == 0);
     EXPECT_TRUE(StrCmp(u.GetFragString(), L"#frag/stuff") == 0);
     EXPECT_TRUE(u.GetFragStringLength() == len);
+}
+
+TEST(Uri, CopyConstructor) {
+    typedef GenericUri<Value> UriType;
+    CrtAllocator allocator;
+
+    UriType u("http://auth/path/xxx?query#frag", &allocator);
+    UriType u2(u);
+    EXPECT_TRUE(u == u2);
+    EXPECT_NE(&u.GetAllocator(), &u2.GetAllocator());
+}
+
+TEST(Uri, Assignment) {
+    typedef GenericUri<Value> UriType;
+    CrtAllocator allocator;
+
+    UriType u("http://auth/path/xxx?query#frag", &allocator);
+    UriType u2;
+    u2 = u;
+    EXPECT_TRUE(u == u2);
+    EXPECT_NE(&u.GetAllocator(), &u2.GetAllocator());
 }
 
 TEST(Uri, Resolve) {
@@ -646,6 +687,15 @@ TEST(Uri, Match) {
     EXPECT_TRUE(a.Match(b, false));  // Base Uri same
     EXPECT_FALSE(a.Match(d));
     EXPECT_FALSE(d.Match(a));
+}
+
+TEST(Uri, Issue1899) {
+    typedef GenericUri<Value, MemoryPoolAllocator<> > UriType;
+
+    UriType base = UriType("http://auth/path/#frag");
+    UriType ref = UriType("http://newauth/newpath#newfrag");
+    UriType res = ref.Resolve(base);
+    EXPECT_TRUE(StrCmp(res.GetString(), "http://newauth/newpath#newfrag") == 0);
 }
 
 #if defined(_MSC_VER) || defined(__clang__)
