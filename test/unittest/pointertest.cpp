@@ -475,7 +475,9 @@ TEST(Pointer, CopyConstructor) {
         EXPECT_EQ(1u, q.GetTokens()[1].length);
         EXPECT_STREQ("0", q.GetTokens()[1].name);
         EXPECT_EQ(0u, q.GetTokens()[1].index);
-        EXPECT_EQ(&p.GetAllocator(), &q.GetAllocator());
+        
+        // Copied pointer needs to have its own allocator
+        EXPECT_NE(&p.GetAllocator(), &q.GetAllocator());
     }
 
     // Static tokens
@@ -1667,4 +1669,15 @@ TEST(Pointer, Issue483) {
     myjson::Value value(rapidjson::kStringType);
     value.SetString(mystr.c_str(), static_cast<SizeType>(mystr.length()), document.GetAllocator());
     myjson::Pointer(path.c_str()).Set(document, value, document.GetAllocator());
+}
+
+TEST(Pointer, Issue1899) {
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    PointerType p;
+    PointerType q = p.Append("foo");
+    EXPECT_TRUE(PointerType("/foo") == q);
+    q = q.Append(1234);
+    EXPECT_TRUE(PointerType("/foo/1234") == q);
+    q = q.Append("");
+    EXPECT_TRUE(PointerType("/foo/1234/") == q);
 }
