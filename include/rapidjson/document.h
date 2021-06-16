@@ -1951,7 +1951,7 @@ public:
         case kArrayType:
             if (RAPIDJSON_UNLIKELY(!handler.StartArray()))
                 return false;
-            for (const GenericValue* v = Begin(); v != End(); ++v)
+            for (ConstValueIterator v = Begin(); v != End(); ++v)
                 if (RAPIDJSON_UNLIKELY(!v->Accept(handler)))
                     return false;
             return handler.EndArray(data_.a.size);

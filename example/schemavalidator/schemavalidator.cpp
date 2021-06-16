@@ -2,6 +2,8 @@
 
 // The example validates JSON text from stdin with a JSON schema specified in the argument.
 
+#define RAPIDJSON_HAS_STDSTRING 1
+
 #include "rapidjson/error/en.h"
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/schema.h"
