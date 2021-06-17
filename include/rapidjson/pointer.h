@@ -18,6 +18,7 @@
 #include "document.h"
 #include "uri.h"
 #include "internal/itoa.h"
+#include "error/error.h" // PointerParseErrorCode
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
@@ -30,19 +31,6 @@ RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
 RAPIDJSON_NAMESPACE_BEGIN
 
 static const SizeType kPointerInvalidIndex = ~SizeType(0);  //!< Represents an invalid index in GenericPointer::Token
-
-//! Error code of parsing.
-/*! \ingroup RAPIDJSON_ERRORS
-    \see GenericPointer::GenericPointer, GenericPointer::GetParseErrorCode
-*/
-enum PointerParseErrorCode {
-    kPointerParseErrorNone = 0,                     //!< The parse is successful
-
-    kPointerParseErrorTokenMustBeginWithSolidus,    //!< A token must begin with a '/'
-    kPointerParseErrorInvalidEscape,                //!< Invalid escape
-    kPointerParseErrorInvalidPercentEncoding,       //!< Invalid percent encoding in URI fragment
-    kPointerParseErrorCharacterMustPercentEncode    //!< A character must percent encoded in URI fragment
-};
 
 ///////////////////////////////////////////////////////////////////////////////
 // GenericPointer
