@@ -217,9 +217,6 @@ typedef const RAPIDJSON_ERROR_CHARTYPE* (*GetValidateErrorFunc)(ValidateErrorCod
 enum SchemaErrorCode {
     kSchemaErrorNone = 0,                      //!< No error.
 
-    kSchemaErrorSpecUnknown,                   //!< JSON schema draft or OpenAPI version is not recognized
-    kSchemaErrorSpecUnsupported,               //!< JSON schema draft or OpenAPI version is not supported
-    kSchemaErrorSpecIllegal,                   //!< Both JSON schema draft and OpenAPI version found in document
     kSchemaErrorStartUnknown,                  //!< Pointer to start of schema does not resolve to a location in the document
     kSchemaErrorRefPlainName,                  //!< $ref fragment must be a JSON pointer
     kSchemaErrorRefInvalid,                    //!< $ref must not be an empty string
@@ -228,7 +225,6 @@ enum SchemaErrorCode {
     kSchemaErrorRefCyclical,                   //!< $ref is cyclical
     kSchemaErrorRefNoRemoteProvider,           //!< $ref is remote but there is no remote provider
     kSchemaErrorRefNoRemoteSchema,             //!< $ref is remote but the remote provider did not return a schema
-    kSchemaErrorReadOnlyAndWriteOnly,          //!< Property must not be both 'readOnly' and 'writeOnly'
     kSchemaErrorRegexInvalid                   //!< Invalid regular expression in 'pattern' or 'patternProperties'
 };
 

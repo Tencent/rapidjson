@@ -2152,7 +2152,7 @@ public:
 
     virtual const SchemaDocumentType* GetRemoteDocument(const char* uri, SizeType length) {
         for (size_t i = 0; i < kCount; i++)
-            if (typename SchemaDocumentType::SValue(uri, length) == sd_[i]->GetURI())
+            if (typename SchemaDocumentType::GValue(uri, length) == sd_[i]->GetURI())
                 return sd_[i];
         return 0;
     }
@@ -2993,15 +2993,6 @@ TEST(SchemaValidator, Schema_StartUnknown) {
     ASSERT_FALSE(sd.HasParseError());
     SchemaDocument s(sd, 0, 0, 0, 0, SchemaDocument::PointerType("/nowhere"));
     SCHEMAERROR(s, "{\"StartUnknown\":{\"errorCode\":1,\"instanceRef\":\"#\", \"value\":\"#/nowhere\"}}");
-}
-
-// $ref is a non-JSON pointer fragment - not allowed when OpenAPI
-TEST(SchemaValidator, Schema_RefPlainNameOpenApi) {
-    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
-    Document sd;
-    sd.Parse("{\"swagger\": \"2.0\", \"type\": \"object\", \"properties\": {\"myInt1\": {\"$ref\": \"#myId\"}, \"myStr\": {\"type\": \"string\", \"id\": \"#myStrId\"}, \"myInt2\": {\"type\": \"integer\", \"id\": \"#myId\"}}}");
-    SchemaDocumentType s(sd);
-    SCHEMAERROR(s, "{\"RefPlainName\":{\"errorCode\":2,\"instanceRef\":\"#/properties/myInt1\",\"value\":\"#myId\"}}");
 }
 
 // $ref is a non-JSON pointer fragment - not allowed when remote document
