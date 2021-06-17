@@ -125,9 +125,6 @@ inline const RAPIDJSON_ERROR_CHARTYPE* GetValidateError_En(ValidateErrorCode val
       switch (schemaErrorCode) {
           case kSchemaErrorNone:                        return RAPIDJSON_ERROR_STRING("No error.");
 
-          case kSchemaErrorSpecUnknown:                 return RAPIDJSON_ERROR_STRING("JSON schema draft or OpenAPI version is not recognized.");
-          case kSchemaErrorSpecUnsupported:             return RAPIDJSON_ERROR_STRING("JSON schema draft or OpenAPI version is not supported.");
-          case kSchemaErrorSpecIllegal:                 return RAPIDJSON_ERROR_STRING("Both JSON schema draft and OpenAPI version found in document.");
           case kSchemaErrorStartUnknown:                return RAPIDJSON_ERROR_STRING("Pointer '%value' to start of schema does not resolve to a location in the document.");
           case kSchemaErrorRefPlainName:                return RAPIDJSON_ERROR_STRING("$ref fragment '%value' must be a JSON pointer.");
           case kSchemaErrorRefInvalid:                  return RAPIDJSON_ERROR_STRING("$ref must not be an empty string.");
@@ -136,7 +133,6 @@ inline const RAPIDJSON_ERROR_CHARTYPE* GetValidateError_En(ValidateErrorCode val
           case kSchemaErrorRefCyclical:                 return RAPIDJSON_ERROR_STRING("$ref '%value' is cyclical.");
           case kSchemaErrorRefNoRemoteProvider:         return RAPIDJSON_ERROR_STRING("$ref is remote but there is no remote provider.");
           case kSchemaErrorRefNoRemoteSchema:           return RAPIDJSON_ERROR_STRING("$ref '%value' is remote but the remote provider did not return a schema.");
-          case kSchemaErrorReadOnlyAndWriteOnly:        return RAPIDJSON_ERROR_STRING("Property must not be both 'readOnly' and 'writeOnly'.");
           case kSchemaErrorRegexInvalid:                return RAPIDJSON_ERROR_STRING("Invalid regular expression '%value' in 'pattern' or 'patternProperties'.");
 
           default:                                      return RAPIDJSON_ERROR_STRING("Unknown error.");
