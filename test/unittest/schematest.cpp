@@ -13,6 +13,7 @@
 // specific language governing permissions and limitations under the License.
 
 #define RAPIDJSON_SCHEMA_VERBOSE 0
+#define RAPIDJSON_HAS_STDSTRING 1
 
 #include "unittest.h"
 #include "rapidjson/schema.h"
@@ -1811,6 +1812,189 @@ TEST(SchemaValidator, EscapedPointer) {
         "}}");
 }
 
+TEST(SchemaValidator, SchemaPointer) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "  \"swagger\": \"2.0\","
+        "  \"paths\": {"
+        "    \"/some/path\": {"
+        "      \"post\": {"
+        "        \"parameters\": ["
+        "          {"
+        "            \"in\": \"body\","
+        "            \"name\": \"body\","
+        "            \"schema\": {"
+        "              \"properties\": {"
+        "                \"a\": {"
+        "                  \"$ref\": \"#/definitions/Prop_a\""
+        "                },"
+        "                \"b\": {"
+        "                  \"type\": \"integer\""
+        "                }"
+        "              },"
+        "              \"type\": \"object\""
+        "            }"
+        "          }"
+        "        ],"
+        "        \"responses\": {"
+        "          \"200\": {"
+        "            \"schema\": {"
+        "              \"$ref\": \"#/definitions/Resp_200\""
+        "            }"
+        "          }"
+        "        }"
+        "      }"
+        "    }"
+        "  },"
+        "  \"definitions\": {"
+        "    \"Prop_a\": {"
+        "      \"properties\": {"
+        "        \"c\": {"
+        "          \"enum\": ["
+        "            \"C1\","
+        "            \"C2\","
+        "            \"C3\""
+        "          ],"
+        "          \"type\": \"string\""
+        "        },"
+        "        \"d\": {"
+        "          \"$ref\": \"#/definitions/Prop_d\""
+        "        },"
+        "        \"s\": {"
+        "          \"type\": \"string\""
+        "        }"
+        "      },"
+        "      \"required\": [\"c\"],"
+        "      \"type\": \"object\""
+        "    },"
+        "    \"Prop_d\": {"
+        "      \"properties\": {"
+        "        \"a\": {"
+        "          \"$ref\": \"#/definitions/Prop_a\""
+        "        },"
+        "        \"c\": {"
+        "          \"$ref\": \"#/definitions/Prop_a/properties/c\""
+        "        }"
+        "      },"
+        "      \"type\": \"object\""
+        "    },"
+        "    \"Resp_200\": {"
+        "      \"properties\": {"
+        "        \"e\": {"
+        "          \"type\": \"string\""
+        "        },"
+        "        \"f\": {"
+        "          \"type\": \"boolean\""
+        "        },"
+        "        \"cyclic_source\": {"
+        "          \"$ref\": \"#/definitions/Resp_200/properties/cyclic_target\""
+        "        },"
+        "        \"cyclic_target\": {"
+        "          \"$ref\": \"#/definitions/Resp_200/properties/cyclic_source\""
+        "        }"
+        "      },"
+        "      \"type\": \"object\""
+        "    }"
+        "  }"
+        "}");
+    SchemaDocument s1(sd, NULL, 0, NULL, NULL, Pointer("#/paths/~1some~1path/post/parameters/0/schema"));
+    VALIDATE(s1,
+        "{"
+        "  \"a\": {"
+        "    \"c\": \"C1\","
+        "    \"d\": {"
+        "      \"a\": {"
+        "        \"c\": \"C2\""
+        "      },"
+        "      \"c\": \"C3\""
+        "    }"
+        "  },"
+        "  \"b\": 123"
+        "}",
+         true);
+    INVALIDATE(s1,
+        "{"
+        "  \"a\": {"
+        "    \"c\": \"C1\","
+        "    \"d\": {"
+        "      \"a\": {"
+        "        \"c\": \"C2\""
+        "      },"
+        "      \"c\": \"C3\""
+        "    }"
+        "  },"
+        "  \"b\": \"should be an int\""
+        "}",
+        "#/paths/~1some~1path/post/parameters/0/schema/properties/b", "type", "#/b",
+        "{ \"type\": {"
+        "    \"errorCode\": 20,"
+        "    \"instanceRef\":\"#/b\","
+        "    \"schemaRef\":\"#/paths/~1some~1path/post/parameters/0/schema/properties/b\","
+        "    \"expected\": [\"integer\"], \"actual\":\"string\""
+        "}}");
+    INVALIDATE(s1,
+        "{"
+        "  \"a\": {"
+        "    \"c\": \"C1\","
+        "    \"d\": {"
+        "      \"a\": {"
+        "        \"c\": \"should be within enum\""
+        "      },"
+        "      \"c\": \"C3\""
+        "    }"
+        "  },"
+        "  \"b\": 123"
+        "}",
+        "#/definitions/Prop_a/properties/c", "enum", "#/a/d/a/c",
+        "{ \"enum\": {"
+        "    \"errorCode\": 19,"
+        "    \"instanceRef\":\"#/a/d/a/c\","
+        "    \"schemaRef\":\"#/definitions/Prop_a/properties/c\""
+        "}}");
+    INVALIDATE(s1,
+        "{"
+        "  \"a\": {"
+        "    \"c\": \"C1\","
+        "    \"d\": {"
+        "      \"a\": {"
+        "        \"s\": \"required 'c' is missing\""
+        "      }"
+        "    }"
+        "  },"
+        "  \"b\": 123"
+        "}",
+        "#/definitions/Prop_a", "required", "#/a/d/a",
+        "{ \"required\": {"
+        "    \"errorCode\": 15,"
+        "    \"missing\":[\"c\"],"
+        "    \"instanceRef\":\"#/a/d/a\","
+        "    \"schemaRef\":\"#/definitions/Prop_a\""
+        "}}");
+    SchemaDocument s2(sd, NULL, 0, NULL, NULL, Pointer("#/paths/~1some~1path/post/responses/200/schema"));
+    VALIDATE(s2,
+        "{ \"e\": \"some string\", \"f\": false }",
+        true);
+    INVALIDATE(s2,
+        "{ \"e\": true, \"f\": false }",
+        "#/definitions/Resp_200/properties/e", "type", "#/e",
+        "{ \"type\": {"
+        "    \"errorCode\": 20,"
+        "    \"instanceRef\":\"#/e\","
+        "    \"schemaRef\":\"#/definitions/Resp_200/properties/e\","
+        "    \"expected\": [\"string\"], \"actual\":\"boolean\""
+        "}}");
+    INVALIDATE(s2,
+        "{ \"e\": \"some string\", \"f\": 123 }",
+        "#/definitions/Resp_200/properties/f", "type", "#/f",
+        "{ \"type\": {"
+        "    \"errorCode\": 20,"
+        "    \"instanceRef\":\"#/f\","
+        "    \"schemaRef\":\"#/definitions/Resp_200/properties/f\","
+        "    \"expected\": [\"boolean\"], \"actual\":\"integer\""
+        "}}");
+}
+
 template <typename Allocator>
 static char* ReadFile(const char* filename, Allocator& allocator) {
     const char *paths[] = {
@@ -1952,7 +2136,7 @@ public:
 
     virtual const SchemaDocumentType* GetRemoteDocument(const char* uri, SizeType length) {
         for (size_t i = 0; i < kCount; i++)
-            if (typename SchemaDocumentType::URIType(uri, length) == sd_[i]->GetURI())
+            if (typename SchemaDocumentType::SValue(uri, length) == sd_[i]->GetURI())
                 return sd_[i];
         return 0;
     }
@@ -2032,7 +2216,7 @@ TEST(SchemaValidator, TestSuite) {
             ADD_FAILURE();
         }
         else {
-            //printf("json test suite file %s parsed ok\n", filename);
+            //printf("\njson test suite file %s parsed ok\n", filename);
             GenericDocument<UTF8<>, MemoryPoolAllocator<>, MemoryPoolAllocator<> > d(&documentAllocator, 1024, &documentStackAllocator);
             d.Parse(json);
             if (d.HasParseError()) {
@@ -2042,12 +2226,14 @@ TEST(SchemaValidator, TestSuite) {
             else {
                 for (Value::ConstValueIterator schemaItr = d.Begin(); schemaItr != d.End(); ++schemaItr) {
                     {
+                        const char* description1 = (*schemaItr)["description"].GetString();
+                        //printf("\ncompiling schema for json test %s \n", description1);
                         SchemaDocumentType schema((*schemaItr)["schema"], filenames[i], static_cast<SizeType>(strlen(filenames[i])), &provider, &schemaAllocator);
                         GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > validator(schema, &validatorAllocator);
-                        const char* description1 = (*schemaItr)["description"].GetString();
                         const Value& tests = (*schemaItr)["tests"];
                         for (Value::ConstValueIterator testItr = tests.Begin(); testItr != tests.End(); ++testItr) {
                             const char* description2 = (*testItr)["description"].GetString();
+                            //printf("running json test %s \n", description2);
                             if (!onlyRunDescription || strcmp(description2, onlyRunDescription) == 0) {
                                 const Value& data = (*testItr)["data"];
                                 bool expected = (*testItr)["valid"].GetBool();
@@ -2075,8 +2261,8 @@ TEST(SchemaValidator, TestSuite) {
         jsonAllocator.Clear();
     }
     printf("%d / %d passed (%2d%%)\n", passCount, testCount, passCount * 100 / testCount);
-//    if (passCount != testCount)
-//        ADD_FAILURE();
+    if (passCount != testCount)
+        ADD_FAILURE();
 }
 
 TEST(SchemaValidatingReader, Simple) {
@@ -2114,7 +2300,7 @@ TEST(SchemaValidatingReader, Invalid) {
     Document e;
     e.Parse(
         "{ \"maxLength\": {"
-"            \"errorCode\": 6,"
+        "     \"errorCode\": 6,"
         "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
         "    \"expected\": 3, \"actual\": \"ABCD\""
         "}}");
@@ -2244,6 +2430,185 @@ TEST(SchemaValidator, Ref_remote) {
         kValidateDefaultFlags, SchemaValidatorType, PointerType);
 }
 
+// Merge with id where $ref is full URI
+TEST(SchemaValidator, Ref_remote_change_resolution_scope_uri) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
+    Document sd;
+    sd.Parse("{\"id\": \"http://ignore/blah#/ref\", \"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"http://localhost:1234/subSchemas.json#/integer\"}}}");
+    SchemaDocumentType s(sd, 0, 0, &provider);
+    typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    INVALIDATE_(s, "{\"myInt\": null}", "/integer", "type", "/myInt",
+        "{ \"type\": {"
+        "    \"errorCode\": 20,"
+        "    \"instanceRef\": \"#/myInt\","
+        "    \"schemaRef\": \"http://localhost:1234/subSchemas.json#/integer\","
+        "    \"expected\": [\"integer\"], \"actual\": \"null\""
+        "}}",
+        kValidateDefaultFlags, SchemaValidatorType, PointerType);
+}
+
+// Merge with id where $ref is a relative path
+TEST(SchemaValidator, Ref_remote_change_resolution_scope_relative_path) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
+    Document sd;
+    sd.Parse("{\"id\": \"http://localhost:1234/\", \"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"subSchemas.json#/integer\"}}}");
+    SchemaDocumentType s(sd, 0, 0, &provider);
+    typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    INVALIDATE_(s, "{\"myInt\": null}", "/integer", "type", "/myInt",
+        "{ \"type\": {"
+        "    \"errorCode\": 20,"
+        "    \"instanceRef\": \"#/myInt\","
+        "    \"schemaRef\": \"http://localhost:1234/subSchemas.json#/integer\","
+        "    \"expected\": [\"integer\"], \"actual\": \"null\""
+        "}}",
+        kValidateDefaultFlags, SchemaValidatorType, PointerType);
+}
+
+// Merge with id where $ref is an absolute path
+TEST(SchemaValidator, Ref_remote_change_resolution_scope_absolute_path) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
+    Document sd;
+    sd.Parse("{\"id\": \"http://localhost:1234/xxxx\", \"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"/subSchemas.json#/integer\"}}}");
+    SchemaDocumentType s(sd, 0, 0, &provider);
+    typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    INVALIDATE_(s, "{\"myInt\": null}", "/integer", "type", "/myInt",
+        "{ \"type\": {"
+        "    \"errorCode\": 20,"
+        "    \"instanceRef\": \"#/myInt\","
+        "    \"schemaRef\": \"http://localhost:1234/subSchemas.json#/integer\","
+        "    \"expected\": [\"integer\"], \"actual\": \"null\""
+        "}}",
+        kValidateDefaultFlags, SchemaValidatorType, PointerType);
+}
+
+// Merge with id where $ref is an absolute path, and the document has a base URI
+TEST(SchemaValidator, Ref_remote_change_resolution_scope_absolute_path_document) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"/subSchemas.json#/integer\"}}}");
+    SchemaDocumentType s(sd, "http://localhost:1234/xxxx", 26, &provider);
+    typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    INVALIDATE_(s, "{\"myInt\": null}", "/integer", "type", "/myInt",
+        "{ \"type\": {"
+        "    \"errorCode\": 20,"
+        "    \"instanceRef\": \"#/myInt\","
+        "    \"schemaRef\": \"http://localhost:1234/subSchemas.json#/integer\","
+        "    \"expected\": [\"integer\"], \"actual\": \"null\""
+        "}}",
+        kValidateDefaultFlags, SchemaValidatorType, PointerType);
+}
+
+// $ref is a non-JSON pointer fragment and there a matching id
+TEST(SchemaValidator, Ref_internal_id_1) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt1\": {\"$ref\": \"#myId\"}, \"myStr\": {\"type\": \"string\", \"id\": \"#myStrId\"}, \"myInt2\": {\"type\": \"integer\", \"id\": \"#myId\"}}}");
+    SchemaDocumentType s(sd);
+    typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    INVALIDATE_(s, "{\"myInt1\": null}", "/properties/myInt2", "type", "/myInt1",
+        "{ \"type\": {"
+        "    \"errorCode\": 20,"
+        "    \"instanceRef\": \"#/myInt1\","
+        "    \"schemaRef\": \"#/properties/myInt2\","
+        "    \"expected\": [\"integer\"], \"actual\": \"null\""
+        "}}",
+        kValidateDefaultFlags, SchemaValidatorType, PointerType);
+}
+
+// $ref is a non-JSON pointer fragment and there are two matching ids so we take the first
+TEST(SchemaValidator, Ref_internal_id_2) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt1\": {\"$ref\": \"#myId\"}, \"myInt2\": {\"type\": \"integer\", \"id\": \"#myId\"}, \"myStr\": {\"type\": \"string\", \"id\": \"#myId\"}}}");
+    SchemaDocumentType s(sd);
+    typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    INVALIDATE_(s, "{\"myInt1\": null}", "/properties/myInt2", "type", "/myInt1",
+        "{ \"type\": {"
+        "    \"errorCode\": 20,"
+        "    \"instanceRef\": \"#/myInt1\","
+        "    \"schemaRef\": \"#/properties/myInt2\","
+        "    \"expected\": [\"integer\"], \"actual\": \"null\""
+        "}}",
+        kValidateDefaultFlags, SchemaValidatorType, PointerType);
+}
+
+// $ref is a non-JSON pointer fragment and there is a matching id within array
+TEST(SchemaValidator, Ref_internal_id_in_array) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt1\": {\"$ref\": \"#myId\"}, \"myInt2\": {\"anyOf\": [{\"type\": \"string\", \"id\": \"#myStrId\"}, {\"type\": \"integer\", \"id\": \"#myId\"}]}}}");
+    SchemaDocumentType s(sd);
+    typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    INVALIDATE_(s, "{\"myInt1\": null}", "/properties/myInt2/anyOf/1", "type", "/myInt1",
+        "{ \"type\": {"
+        "    \"errorCode\": 20,"
+        "    \"instanceRef\": \"#/myInt1\","
+        "    \"schemaRef\": \"#/properties/myInt2/anyOf/1\","
+        "    \"expected\": [\"integer\"], \"actual\": \"null\""
+        "}}",
+        kValidateDefaultFlags, SchemaValidatorType, PointerType);
+}
+
+// $ref is a non-JSON pointer fragment and there is a matching id, and the schema is embedded in the document
+TEST(SchemaValidator, Ref_internal_id_and_schema_pointer) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    Document sd;
+    sd.Parse("{ \"schema\": {\"type\": \"object\", \"properties\": {\"myInt1\": {\"$ref\": \"#myId\"}, \"myInt2\": {\"anyOf\": [{\"type\": \"integer\", \"id\": \"#myId\"}]}}}}");
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    SchemaDocumentType s(sd, 0, 0, 0, 0, PointerType("/schema"));
+    typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
+    INVALIDATE_(s, "{\"myInt1\": null}", "/schema/properties/myInt2/anyOf/0", "type", "/myInt1",
+        "{ \"type\": {"
+        "    \"errorCode\": 20,"
+        "    \"instanceRef\": \"#/myInt1\","
+        "    \"schemaRef\": \"#/schema/properties/myInt2/anyOf/0\","
+        "    \"expected\": [\"integer\"], \"actual\": \"null\""
+        "}}",
+        kValidateDefaultFlags, SchemaValidatorType, PointerType);
+}
+
+// Test that $refs are correctly resolved when intermediate multiple ids are present
+// Includes $ref to a part of the document with a different in-scope id, which also contains $ref..
+TEST(SchemaValidator, Ref_internal_multiple_ids) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    //RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
+    CrtAllocator allocator;
+    char* schema = ReadFile("unittestschema/idandref.json", allocator);
+    Document sd;
+    sd.Parse(schema);
+    ASSERT_FALSE(sd.HasParseError());
+    SchemaDocumentType s(sd, "http://xyz", 10/*, &provider*/);
+    typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    INVALIDATE_(s, "{\"PA1\": \"s\", \"PA2\": \"t\", \"PA3\": \"r\", \"PX1\": 1, \"PX2Y\": 2, \"PX3Z\": 3, \"PX4\": 4, \"PX5\": 5, \"PX6\": 6, \"PX7W\": 7, \"PX8N\": { \"NX\": 8}}", "#", "errors", "#",
+        "{ \"type\": ["
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PA1\", \"schemaRef\": \"http://xyz#/definitions/A\", \"expected\": [\"integer\"], \"actual\": \"string\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PA2\", \"schemaRef\": \"http://xyz#/definitions/A\", \"expected\": [\"integer\"], \"actual\": \"string\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PA3\", \"schemaRef\": \"http://xyz#/definitions/A\", \"expected\": [\"integer\"], \"actual\": \"string\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX1\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX2Y\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX3Z\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX4\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX5\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX6\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX7W\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"},"
+        "    {\"errorCode\": 20, \"instanceRef\": \"#/PX8N/NX\", \"schemaRef\": \"http://xyz#/definitions/B/definitions/X\", \"expected\": [\"boolean\"], \"actual\": \"integer\"}"
+        "]}",
+        kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidatorType, PointerType);
+    CrtAllocator::Free(schema);
+}
+
 TEST(SchemaValidator, Ref_remote_issue1210) {
     class SchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
         SchemaDocument** collection;
@@ -2260,7 +2625,7 @@ TEST(SchemaValidator, Ref_remote_issue1210) {
           SchemaDocumentProvider(SchemaDocument** collection) : collection(collection) { }
           virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
             int i = 0;
-            while (collection[i] && SchemaDocument::URIType(uri, length) != collection[i]->GetURI()) ++i;
+            while (collection[i] && SchemaDocument::SValue(uri, length) != collection[i]->GetURI()) ++i;
             return collection[i];
           }
     };
