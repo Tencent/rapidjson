@@ -160,6 +160,14 @@ TEST(Uri, Parse) {
     EXPECT_TRUE(u.GetBaseStringLength() == 0);
     EXPECT_TRUE(StrCmp(u.GetFragString(), "#frag/stuff") == 0);
     EXPECT_TRUE(u.GetFragStringLength() == len);
+
+    // Incomplete auth treated as path
+    str = "http:/";
+    const UriType u2 = UriType(str);
+    EXPECT_TRUE(StrCmp(u2.GetSchemeString(), "http:") == 0);
+    EXPECT_TRUE(u2.GetAuthStringLength() == 0);
+    EXPECT_TRUE(StrCmp(u2.GetPathString(), "/") == 0);
+    EXPECT_TRUE(StrCmp(u2.GetBaseString(), "http:/") == 0);
 }
 
 TEST(Uri, Parse_UTF16) {
@@ -274,6 +282,13 @@ TEST(Uri, Parse_UTF16) {
     EXPECT_TRUE(u.GetBaseStringLength() == 0);
     EXPECT_TRUE(StrCmp(u.GetFragString(), L"#frag/stuff") == 0);
     EXPECT_TRUE(u.GetFragStringLength() == len);
+
+    // Incomplete auth treated as path
+    u = UriType(L"http:/");
+    EXPECT_TRUE(StrCmp(u.GetSchemeString(), L"http:") == 0);
+    EXPECT_TRUE(u.GetAuthStringLength() == 0);
+    EXPECT_TRUE(StrCmp(u.GetPathString(), L"/") == 0);
+    EXPECT_TRUE(StrCmp(u.GetBaseString(), L"http:/") == 0);
 }
 
 TEST(Uri, CopyConstructor) {

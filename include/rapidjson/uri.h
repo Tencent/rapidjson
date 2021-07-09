@@ -295,24 +295,17 @@ private:
         // Look for auth (//([^/?#]*))?
         auth_ = scheme_ + GetSchemeStringLength() + 1;
         *auth_ = '\0';
-        if (start < len) {
-            pos1 = start;
-            while (pos1 < len) {
-                if (uri[pos1] == '/' && uri[pos1 + 1] == '/') break;
-                pos1++;
+        if (start < len - 1 && uri[start] == '/' && uri[start + 1] == '/') {
+            pos2 = start + 2;
+            while (pos2 < len) {
+                if (uri[pos2] == '/') break;
+                if (uri[pos2] == '?') break;
+                if (uri[pos2] == '#') break;
+                pos2++;
             }
-            if (pos1 == start) {
-                pos2 = start + 2;
-                while (pos2 < len) {
-                    if (uri[pos2] == '/') break;
-                    if (uri[pos2] == '?') break;
-                    if (uri[pos2] == '#') break;
-                    pos2++;
-                }
-                std::memcpy(auth_, &uri[start], (pos2 - start) * sizeof(Ch));
-                auth_[pos2 - start] = '\0';
-                start = pos2;
-            }
+            std::memcpy(auth_, &uri[start], (pos2 - start) * sizeof(Ch));
+            auth_[pos2 - start] = '\0';
+            start = pos2;
         }
         // Look for path ([^?#]*)
         path_ = auth_ + GetAuthStringLength() + 1;
@@ -335,8 +328,8 @@ private:
         // Look for query (\?([^#]*))?
         query_ = path_ + GetPathStringLength() + 1;
         *query_ = '\0';
-        if (start < len) {
-            pos2 = start;
+        if (start < len && uri[start] == '?') {
+            pos2 = start + 1;
             while (pos2 < len) {
                 if (uri[pos2] == '#') break;
                 pos2++;
@@ -350,7 +343,7 @@ private:
         // Look for fragment (#(.*))?
         frag_ = query_ + GetQueryStringLength() + 1;
         *frag_ = '\0';
-        if (start < len) {
+        if (start < len && uri[start] == '#') {
             std::memcpy(frag_, &uri[start], (len - start) * sizeof(Ch));
             frag_[len - start] = '\0';
         }
