@@ -118,6 +118,12 @@ TEST(SchemaValidator, Hasher) {
 #define VALIDATE_(schema, json, expected, expected2) \
 {\
     EXPECT_TRUE(expected2 == schema.GetError().ObjectEmpty());\
+    if (expected2 && !schema.GetError().ObjectEmpty()) {\
+        StringBuffer ssb;\
+        Writer<StringBuffer> ws(ssb);\
+        schema.GetError().Accept(ws);\
+        printf("Schema error: %s\n", ssb.GetString());\
+    }\
     SchemaValidator validator(schema);\
     Document d;\
     /*printf("\n%s\n", json);*/\
@@ -156,6 +162,12 @@ TEST(SchemaValidator, Hasher) {
     flags, SchemaValidatorType, PointerType) \
 {\
     EXPECT_TRUE(schema.GetError().ObjectEmpty());\
+    if (!schema.GetError().ObjectEmpty()) {\
+        StringBuffer ssb;\
+        Writer<StringBuffer> ws(ssb);\
+        schema.GetError().Accept(ws);\
+        printf("Schema error: %s\n", ssb.GetString());\
+    }\
     SchemaValidatorType validator(schema);\
     validator.SetValidateFlags(flags);\
     Document d;\
