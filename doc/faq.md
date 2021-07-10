@@ -6,7 +6,7 @@
 
 1. What is RapidJSON?
 
-   RapidJSON is a C++ library for parsing and generating JSON. You may check all [features](doc/features.md) of it.
+   RapidJSON is a C++ library for parsing and generating JSON. You may check all [features](./features.md) of it.
 
 2. Why is RapidJSON named so?
 
@@ -88,11 +88,11 @@
 
 4. What is *in situ* parsing?
 
-   *in situ* parsing decodes the JSON strings directly into the input JSON. This is an optimization which can reduce memory consumption and improve performance, but the input JSON will be modified. Check [in-situ parsing](doc/dom.md) for details.
+   *in situ* parsing decodes the JSON strings directly into the input JSON. This is an optimization which can reduce memory consumption and improve performance, but the input JSON will be modified. Check [in-situ parsing](./dom.md) for details.
 
 5. When does parsing generate an error?
 
-   The parser generates an error when the input JSON contains invalid syntax, or a value can not be represented (a number is too big), or the handler of parsers terminate the parsing. Check [parse error](doc/dom.md) for details.
+   The parser generates an error when the input JSON contains invalid syntax, or a value can not be represented (a number is too big), or the handler of parsers terminate the parsing. Check [parse error](./dom.md) for details.
 
 6. What error information is provided? 
 
@@ -170,7 +170,7 @@ Alternatively, if we don't want to explicitly refer to the root value of `addres
 
 2. How to copy a value?
 
-   There are two APIs: constructor with allocator, and `CopyFrom()`. See [Deep Copy Value](doc/tutorial.md) for an example.
+   There are two APIs: constructor with allocator, and `CopyFrom()`. See [Deep Copy Value](./tutorial.md) for an example.
 
 3. Why do I need to provide the length of string?
 
@@ -238,7 +238,7 @@ Alternatively, if we don't want to explicitly refer to the root value of `addres
 
    [Byte order mark (BOM)](http://en.wikipedia.org/wiki/Byte_order_mark) sometimes reside at the beginning of file/stream to indicate the UTF encoding type of it.
 
-   RapidJSON's `EncodedInputStream` can detect/consume BOM. `EncodedOutputStream` can optionally write a BOM. See [Encoded Streams](doc/stream.md) for example.
+   RapidJSON's `EncodedInputStream` can detect/consume BOM. `EncodedOutputStream` can optionally write a BOM. See [Encoded Streams](./stream.md) for example.
 
 5. Why little/big endian is related?
 

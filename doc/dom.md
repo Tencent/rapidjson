@@ -1,6 +1,6 @@
 # DOM
 
-Document Object Model(DOM) is an in-memory representation of JSON for query and manipulation. The basic usage of DOM is described in [Tutorial](doc/tutorial.md). This section will describe some details and more advanced usages.
+Document Object Model(DOM) is an in-memory representation of JSON for query and manipulation. The basic usage of DOM is described in [Tutorial](./tutorial.md). This section will describe some details and more advanced usages.
 
 [TOC]
 
@@ -31,7 +31,7 @@ User can customize these template parameters.
 
 ## Encoding {#Encoding}
 
-The `Encoding` parameter specifies the encoding of JSON String value in memory. Possible options are `UTF8`, `UTF16`, `UTF32`. Note that, these 3 types are also template class. `UTF8<>` is `UTF8<char>`, which means using char to store the characters. You may refer to [Encoding](doc/encoding.md) for details.
+The `Encoding` parameter specifies the encoding of JSON String value in memory. Possible options are `UTF8`, `UTF16`, `UTF32`. Note that, these 3 types are also template class. `UTF8<>` is `UTF8<char>`, which means using char to store the characters. You may refer to [Encoding](./encoding.md) for details.
 
 Suppose a Windows application would query localization strings stored in JSON files. Unicode-enabled functions in Windows use UTF-16 (wide character) encoding. No matter what encoding was used in JSON files, we can store the strings in UTF-16 in memory.
 
@@ -102,7 +102,7 @@ GenericDocument& GenericDocument::Parse(const Ch* str);
 GenericDocument& GenericDocument::Parse(const Ch* str);
 ~~~~~~~~~~
 
-The examples of [tutorial](doc/tutorial.md) uses (8) for normal parsing of string. The examples of [stream](doc/stream.md) uses the first three. *In situ* parsing will be described soon.
+The examples of [tutorial](./tutorial.md) uses (8) for normal parsing of string. The examples of [stream](./stream.md) uses the first three. *In situ* parsing will be described soon.
 
 The `parseFlags` are combination of the following bit-flags:
 
@@ -228,9 +228,9 @@ There are some limitations of *in situ* parsing:
 
 ## Transcoding and Validation {#TranscodingAndValidation}
 
-RapidJSON supports conversion between Unicode formats (officially termed UCS Transformation Format) internally. During DOM parsing, the source encoding of the stream can be different from the encoding of the DOM. For example, the source stream contains a UTF-8 JSON, while the DOM is using UTF-16 encoding. There is an example code in [EncodedInputStream](doc/stream.md).
+RapidJSON supports conversion between Unicode formats (officially termed UCS Transformation Format) internally. During DOM parsing, the source encoding of the stream can be different from the encoding of the DOM. For example, the source stream contains a UTF-8 JSON, while the DOM is using UTF-16 encoding. There is an example code in [EncodedInputStream](./stream.md).
 
-When writing a JSON from DOM to output stream, transcoding can also be used. An example is in [EncodedOutputStream](doc/stream.md).
+When writing a JSON from DOM to output stream, transcoding can also be used. An example is in [EncodedOutputStream](./stream.md).
 
 During transcoding, the source string is decoded to into Unicode code points, and then the code points are encoded in the target format. During decoding, it will validate the byte sequence in the source string. If it is not a valid sequence, the parser will be stopped with `kParseErrorStringInvalidEncoding` error.
 
@@ -254,7 +254,7 @@ Actually, `Value::Accept()` is responsible for publishing SAX events about the v
 
 User may create custom handlers for transforming the DOM into other formats. For example, a handler which converts the DOM into XML.
 
-For more about SAX events and handler, please refer to [SAX](doc/sax.md).
+For more about SAX events and handler, please refer to [SAX](./sax.md).
 
 ## User Buffer {#UserBuffer}
 

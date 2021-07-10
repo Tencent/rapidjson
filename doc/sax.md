@@ -172,7 +172,7 @@ template <typename InputStream, typename Handler>
 bool Parse(InputStream& is, Handler& handler);
 ~~~~~~~~~~
 
-If an error occurs during parsing, it will return `false`. User can also call `bool HasParseError()`, `ParseErrorCode GetParseErrorCode()` and `size_t GetErrorOffset()` to obtain the error states. In fact, `Document` uses these `Reader` functions to obtain parse errors. Please refer to [DOM](doc/dom.md) for details about parse errors.
+If an error occurs during parsing, it will return `false`. User can also call `bool HasParseError()`, `ParseErrorCode GetParseErrorCode()` and `size_t GetErrorOffset()` to obtain the error states. In fact, `Document` uses these `Reader` functions to obtain parse errors. Please refer to [DOM](./dom.md) for details about parse errors.
 
 ## Token-by-Token Parsing {#TokenByTokenParsing}
 
