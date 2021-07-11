@@ -107,14 +107,14 @@ public:
     //@{
 
     //! Default constructor.
-    GenericPointer(Allocator* allocator = 0) : allocator_(allocator), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {}
+    GenericPointer(Allocator* allocator = RAPIDJSON_NULLPTR) : allocator_(allocator), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {}
 
     //! Constructor that parses a string or URI fragment representation.
     /*!
         \param source A null-terminated, string or URI fragment representation of JSON pointer.
         \param allocator User supplied allocator for this pointer. If no allocator is provided, it creates a self-owned one.
     */
-    explicit GenericPointer(const Ch* source, Allocator* allocator = 0) : allocator_(allocator), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
+    explicit GenericPointer(const Ch* source, Allocator* allocator = RAPIDJSON_NULLPTR) : allocator_(allocator), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
         Parse(source, internal::StrLen(source));
     }
 
@@ -125,7 +125,7 @@ public:
         \param allocator User supplied allocator for this pointer. If no allocator is provided, it creates a self-owned one.
         \note Requires the definition of the preprocessor symbol \ref RAPIDJSON_HAS_STDSTRING.
     */
-    explicit GenericPointer(const std::basic_string<Ch>& source, Allocator* allocator = 0) : allocator_(allocator), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
+    explicit GenericPointer(const std::basic_string<Ch>& source, Allocator* allocator = RAPIDJSON_NULLPTR) : allocator_(allocator), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
         Parse(source.c_str(), source.size());
     }
 #endif
@@ -137,7 +137,7 @@ public:
         \param allocator User supplied allocator for this pointer. If no allocator is provided, it creates a self-owned one.
         \note Slightly faster than the overload without length.
     */
-    GenericPointer(const Ch* source, size_t length, Allocator* allocator = 0) : allocator_(allocator), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
+    GenericPointer(const Ch* source, size_t length, Allocator* allocator = RAPIDJSON_NULLPTR) : allocator_(allocator), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
         Parse(source, length);
     }
 
@@ -177,7 +177,7 @@ public:
 
     //! Destructor.
     ~GenericPointer() {
-        if (nameBuffer_)    // If user-supplied tokens constructor is used, nameBuffer_ is nullptr and tokens_ are not deallocated.
+        if (nameBuffer_)    // If user-supplied tokens constructor is used, nameBuffer_ is RAPIDJSON_NULLPTR and tokens_ are not deallocated.
             Allocator::Free(tokens_);
         RAPIDJSON_DELETE(ownAllocator_);
     }
@@ -197,7 +197,7 @@ public:
                 CopyFromRaw(rhs); // Normally parsed tokens.
             else {
                 tokens_ = rhs.tokens_; // User supplied const tokens.
-                nameBuffer_ = 0;
+                nameBuffer_ = RAPIDJSON_NULLPTR;
             }
         }
         return *this;
@@ -244,7 +244,7 @@ public:
         \param allocator Allocator for the newly return Pointer.
         \return A new Pointer with appended token.
     */
-    GenericPointer Append(const Token& token, Allocator* allocator = 0) const {
+    GenericPointer Append(const Token& token, Allocator* allocator = RAPIDJSON_NULLPTR) const {
         GenericPointer r;
         r.allocator_ = allocator;
         Ch *p = r.CopyFromRaw(*this, 1, token.length + 1);
@@ -262,7 +262,7 @@ public:
         \param allocator Allocator for the newly return Pointer.
         \return A new Pointer with appended token.
     */
-    GenericPointer Append(const Ch* name, SizeType length, Allocator* allocator = 0) const {
+    GenericPointer Append(const Ch* name, SizeType length, Allocator* allocator = RAPIDJSON_NULLPTR) const {
         Token token = { name, length, kPointerInvalidIndex };
         return Append(token, allocator);
     }
@@ -275,7 +275,7 @@ public:
     */
     template <typename T>
     RAPIDJSON_DISABLEIF_RETURN((internal::NotExpr<internal::IsSame<typename internal::RemoveConst<T>::Type, Ch> >), (GenericPointer))
-    Append(T* name, Allocator* allocator = 0) const {
+    Append(T* name, Allocator* allocator = RAPIDJSON_NULLPTR) const {
         return Append(name, internal::StrLen(name), allocator);
     }
 
@@ -286,7 +286,7 @@ public:
         \param allocator Allocator for the newly return Pointer.
         \return A new Pointer with appended token.
     */
-    GenericPointer Append(const std::basic_string<Ch>& name, Allocator* allocator = 0) const {
+    GenericPointer Append(const std::basic_string<Ch>& name, Allocator* allocator = RAPIDJSON_NULLPTR) const {
         return Append(name.c_str(), static_cast<SizeType>(name.size()), allocator);
     }
 #endif
@@ -297,7 +297,7 @@ public:
         \param allocator Allocator for the newly return Pointer.
         \return A new Pointer with appended token.
     */
-    GenericPointer Append(SizeType index, Allocator* allocator = 0) const {
+    GenericPointer Append(SizeType index, Allocator* allocator = RAPIDJSON_NULLPTR) const {
         char buffer[21];
         char* end = sizeof(SizeType) == 4 ? internal::u32toa(index, buffer) : internal::u64toa(index, buffer);
         SizeType length = static_cast<SizeType>(end - buffer);
@@ -322,7 +322,7 @@ public:
         \param allocator Allocator for the newly return Pointer.
         \return A new Pointer with appended token.
     */
-    GenericPointer Append(const ValueType& token, Allocator* allocator = 0) const {
+    GenericPointer Append(const ValueType& token, Allocator* allocator = RAPIDJSON_NULLPTR) const {
         if (token.IsString())
             return Append(token.GetString(), token.GetStringLength(), allocator);
         else {
@@ -461,7 +461,7 @@ public:
         \param alreadyExist If non-null, it stores whether the resolved value is already exist.
         \return The resolved newly created (a JSON Null value), or already exists value.
     */
-    ValueType& Create(ValueType& root, typename ValueType::AllocatorType& allocator, bool* alreadyExist = 0) const {
+    ValueType& Create(ValueType& root, typename ValueType::AllocatorType& allocator, bool* alreadyExist = RAPIDJSON_NULLPTR) const {
         RAPIDJSON_ASSERT(IsValid());
         ValueType* v = &root;
         bool exist = true;
@@ -517,7 +517,7 @@ public:
         \return The resolved newly created, or already exists value.
     */
     template <typename stackAllocator>
-    ValueType& Create(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, bool* alreadyExist = 0) const {
+    ValueType& Create(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, bool* alreadyExist = RAPIDJSON_NULLPTR) const {
         return Create(document, document.GetAllocator(), alreadyExist);
     }
 
@@ -543,7 +543,7 @@ public:
 
         Use unresolvedTokenIndex to retrieve the token index.
     */
-    UriType GetUri(ValueType& root, const UriType& rootUri, size_t* unresolvedTokenIndex = 0, Allocator* allocator = 0) const {
+    UriType GetUri(ValueType& root, const UriType& rootUri, size_t* unresolvedTokenIndex = RAPIDJSON_NULLPTR, Allocator* allocator = RAPIDJSON_NULLPTR) const {
         static const Ch kIdString[] = { 'i', 'd', '\0' };
         static const ValueType kIdValue(kIdString, 2);
         UriType base = UriType(rootUri, allocator);
@@ -582,7 +582,7 @@ public:
         return base;
     }
 
-    UriType GetUri(const ValueType& root, const UriType& rootUri, size_t* unresolvedTokenIndex = 0, Allocator* allocator = 0) const {
+    UriType GetUri(const ValueType& root, const UriType& rootUri, size_t* unresolvedTokenIndex = RAPIDJSON_NULLPTR, Allocator* allocator = RAPIDJSON_NULLPTR) const {
       return GetUri(const_cast<ValueType&>(root), rootUri, unresolvedTokenIndex, allocator);
     }
 
@@ -604,7 +604,7 @@ public:
 
         Use unresolvedTokenIndex to retrieve the token index.
     */
-    ValueType* Get(ValueType& root, size_t* unresolvedTokenIndex = 0) const {
+    ValueType* Get(ValueType& root, size_t* unresolvedTokenIndex = RAPIDJSON_NULLPTR) const {
         RAPIDJSON_ASSERT(IsValid());
         ValueType* v = &root;
         for (const Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
@@ -629,7 +629,7 @@ public:
             // Error: unresolved token
             if (unresolvedTokenIndex)
                 *unresolvedTokenIndex = static_cast<size_t>(t - tokens_);
-            return 0;
+            return RAPIDJSON_NULLPTR;
         }
         return v;
     }
@@ -639,7 +639,7 @@ public:
         \param root Root value of a DOM sub-tree to be resolved. It can be any value other than document root.
         \return Pointer to the value if it can be resolved. Otherwise null.
     */
-    const ValueType* Get(const ValueType& root, size_t* unresolvedTokenIndex = 0) const { 
+    const ValueType* Get(const ValueType& root, size_t* unresolvedTokenIndex = RAPIDJSON_NULLPTR) const { 
         return Get(const_cast<ValueType&>(root), unresolvedTokenIndex);
     }
 
@@ -928,9 +928,9 @@ private:
     */
 #endif
     void Parse(const Ch* source, size_t length) {
-        RAPIDJSON_ASSERT(source != NULL);
-        RAPIDJSON_ASSERT(nameBuffer_ == 0);
-        RAPIDJSON_ASSERT(tokens_ == 0);
+        RAPIDJSON_ASSERT(source != RAPIDJSON_NULLPTR);
+        RAPIDJSON_ASSERT(nameBuffer_ == RAPIDJSON_NULLPTR);
+        RAPIDJSON_ASSERT(tokens_ == RAPIDJSON_NULLPTR);
 
         // Create own allocator if user did not supply.
         if (!allocator_)
@@ -1052,8 +1052,8 @@ private:
 
     error:
         Allocator::Free(tokens_);
-        nameBuffer_ = 0;
-        tokens_ = 0;
+        nameBuffer_ = RAPIDJSON_NULLPTR;
+        tokens_ = RAPIDJSON_NULLPTR;
         tokenCount_ = 0;
         parseErrorOffset_ = i;
         return;
@@ -1206,22 +1206,22 @@ typename DocumentType::ValueType& CreateValueByPointer(DocumentType& document, c
 //////////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-typename T::ValueType* GetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, size_t* unresolvedTokenIndex = 0) {
+typename T::ValueType* GetValueByPointer(T& root, const GenericPointer<typename T::ValueType>& pointer, size_t* unresolvedTokenIndex = RAPIDJSON_NULLPTR) {
     return pointer.Get(root, unresolvedTokenIndex);
 }
 
 template <typename T>
-const typename T::ValueType* GetValueByPointer(const T& root, const GenericPointer<typename T::ValueType>& pointer, size_t* unresolvedTokenIndex = 0) {
+const typename T::ValueType* GetValueByPointer(const T& root, const GenericPointer<typename T::ValueType>& pointer, size_t* unresolvedTokenIndex = RAPIDJSON_NULLPTR) {
     return pointer.Get(root, unresolvedTokenIndex);
 }
 
 template <typename T, typename CharType, size_t N>
-typename T::ValueType* GetValueByPointer(T& root, const CharType (&source)[N], size_t* unresolvedTokenIndex = 0) {
+typename T::ValueType* GetValueByPointer(T& root, const CharType (&source)[N], size_t* unresolvedTokenIndex = RAPIDJSON_NULLPTR) {
     return GenericPointer<typename T::ValueType>(source, N - 1).Get(root, unresolvedTokenIndex);
 }
 
 template <typename T, typename CharType, size_t N>
-const typename T::ValueType* GetValueByPointer(const T& root, const CharType(&source)[N], size_t* unresolvedTokenIndex = 0) {
+const typename T::ValueType* GetValueByPointer(const T& root, const CharType(&source)[N], size_t* unresolvedTokenIndex = RAPIDJSON_NULLPTR) {
     return GenericPointer<typename T::ValueType>(source, N - 1).Get(root, unresolvedTokenIndex);
 }
 

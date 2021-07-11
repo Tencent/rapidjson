@@ -71,15 +71,15 @@ private:
 
 class Dependent : public Person {
 public:
-    Dependent(const std::string& name, unsigned age, Education* education = 0) : Person(name, age), education_(education) {}
-    Dependent(const Dependent& rhs) : Person(rhs), education_(0) { education_ = (rhs.education_ == 0) ? 0 : new Education(*rhs.education_); }
+    Dependent(const std::string& name, unsigned age, Education* education = RAPIDJSON_NULLPTR) : Person(name, age), education_(education) {}
+    Dependent(const Dependent& rhs) : Person(rhs), education_(RAPIDJSON_NULLPTR) { education_ = (rhs.education_ == RAPIDJSON_NULLPTR) ? RAPIDJSON_NULLPTR : new Education(*rhs.education_); }
     virtual ~Dependent();
 
     Dependent& operator=(const Dependent& rhs) {
         if (this == &rhs)
             return *this;
         delete education_;
-        education_ = (rhs.education_ == 0) ? 0 : new Education(*rhs.education_);
+        education_ = (rhs.education_ == RAPIDJSON_NULLPTR) ? RAPIDJSON_NULLPTR : new Education(*rhs.education_);
         return *this;
     }
 

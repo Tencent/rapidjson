@@ -55,11 +55,11 @@ public:
         \param allocator User supplied allocator. If it is null, it will create a private one.
         \param levelDepth Initial capacity of stack.
     */
-    explicit PrettyWriter(OutputStream& os, StackAllocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
+    explicit PrettyWriter(OutputStream& os, StackAllocator* allocator = RAPIDJSON_NULLPTR, size_t levelDepth = Base::kDefaultLevelDepth) : 
         Base(os, allocator, levelDepth), indentChar_(' '), indentCharCount_(4), formatOptions_(kFormatDefault) {}
 
 
-    explicit PrettyWriter(StackAllocator* allocator = 0, size_t levelDepth = Base::kDefaultLevelDepth) : 
+    explicit PrettyWriter(StackAllocator* allocator = RAPIDJSON_NULLPTR, size_t levelDepth = Base::kDefaultLevelDepth) : 
         Base(allocator, levelDepth), indentChar_(' '), indentCharCount_(4), formatOptions_(kFormatDefault) {}
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
@@ -101,14 +101,14 @@ public:
     bool Double(double d)       { PrettyPrefix(kNumberType); return Base::EndValue(Base::WriteDouble(d)); }
 
     bool RawNumber(const Ch* str, SizeType length, bool copy = false) {
-        RAPIDJSON_ASSERT(str != 0);
+        RAPIDJSON_ASSERT(str != RAPIDJSON_NULLPTR);
         (void)copy;
         PrettyPrefix(kNumberType);
         return Base::EndValue(Base::WriteString(str, length));
     }
 
     bool String(const Ch* str, SizeType length, bool copy = false) {
-        RAPIDJSON_ASSERT(str != 0);
+        RAPIDJSON_ASSERT(str != RAPIDJSON_NULLPTR);
         (void)copy;
         PrettyPrefix(kStringType);
         return Base::EndValue(Base::WriteString(str, length));
@@ -199,7 +199,7 @@ public:
         \note When using PrettyWriter::RawValue(), the result json may not be indented correctly.
     */
     bool RawValue(const Ch* json, size_t length, Type type) {
-        RAPIDJSON_ASSERT(json != 0);
+        RAPIDJSON_ASSERT(json != RAPIDJSON_NULLPTR);
         PrettyPrefix(type);
         return Base::EndValue(Base::WriteRawValue(json, length));
     }

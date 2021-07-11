@@ -37,7 +37,7 @@ template <typename Allocator = CrtAllocator>
 struct GenericMemoryBuffer {
     typedef char Ch; // byte
 
-    GenericMemoryBuffer(Allocator* allocator = 0, size_t capacity = kDefaultCapacity) : stack_(allocator, capacity) {}
+    GenericMemoryBuffer(Allocator* allocator = RAPIDJSON_NULLPTR, size_t capacity = kDefaultCapacity) : stack_(allocator, capacity) {}
 
     void Put(Ch c) { *stack_.template Push<Ch>() = c; }
     void Flush() {}

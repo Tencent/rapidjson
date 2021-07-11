@@ -409,7 +409,7 @@ struct GenericStringRef {
      */
 #endif
     GenericStringRef(const CharType* str, SizeType len)
-        : s(RAPIDJSON_LIKELY(str) ? str : emptyString), length(len) { RAPIDJSON_ASSERT(str != 0 || len == 0u); }
+        : s(RAPIDJSON_LIKELY(str) ? str : emptyString), length(len) { RAPIDJSON_ASSERT(str != RAPIDJSON_NULLPTR || len == 0u); }
 
     GenericStringRef(const GenericStringRef& rhs) : s(rhs.s), length(rhs.length) {}
 
@@ -421,7 +421,7 @@ struct GenericStringRef {
 
 private:
     SizeType NotNullStrLen(const CharType* str) {
-        RAPIDJSON_ASSERT(str != 0);
+        RAPIDJSON_ASSERT(str != RAPIDJSON_NULLPTR);
         return internal::StrLen(str);
     }
 
@@ -1548,7 +1548,7 @@ public:
     MemberIterator RemoveMember(MemberIterator m) {
         RAPIDJSON_ASSERT(IsObject());
         RAPIDJSON_ASSERT(data_.o.size > 0);
-        RAPIDJSON_ASSERT(GetMembersPointer() != 0);
+        RAPIDJSON_ASSERT(GetMembersPointer() != RAPIDJSON_NULLPTR);
         RAPIDJSON_ASSERT(m >= MemberBegin() && m < MemberEnd());
         return DoRemoveMember(m);
     }
@@ -1578,7 +1578,7 @@ public:
     MemberIterator EraseMember(ConstMemberIterator first, ConstMemberIterator last) {
         RAPIDJSON_ASSERT(IsObject());
         RAPIDJSON_ASSERT(data_.o.size > 0);
-        RAPIDJSON_ASSERT(GetMembersPointer() != 0);
+        RAPIDJSON_ASSERT(GetMembersPointer() != RAPIDJSON_NULLPTR);
         RAPIDJSON_ASSERT(first >= MemberBegin());
         RAPIDJSON_ASSERT(first <= last);
         RAPIDJSON_ASSERT(last <= MemberEnd());
@@ -1779,7 +1779,7 @@ public:
     ValueIterator Erase(ConstValueIterator first, ConstValueIterator last) {
         RAPIDJSON_ASSERT(IsArray());
         RAPIDJSON_ASSERT(data_.a.size > 0);
-        RAPIDJSON_ASSERT(GetElementsPointer() != 0);
+        RAPIDJSON_ASSERT(GetElementsPointer() != RAPIDJSON_NULLPTR);
         RAPIDJSON_ASSERT(first >= Begin());
         RAPIDJSON_ASSERT(first <= last);
         RAPIDJSON_ASSERT(last <= End());
@@ -2034,7 +2034,7 @@ private:
     // This allows to store 13-chars strings in 32-bit mode, 21-chars strings in 64-bit mode,
     // 13-chars strings for RAPIDJSON_48BITPOINTER_OPTIMIZATION=1 inline (for `UTF8`-encoded strings).
     struct ShortString {
-        enum { MaxChars = sizeof(static_cast<Flag*>(0)->payload) / sizeof(Ch), MaxSize = MaxChars - 1, LenPos = MaxSize };
+        enum { MaxChars = sizeof(static_cast<Flag*>(RAPIDJSON_NULLPTR)->payload) / sizeof(Ch), MaxSize = MaxChars - 1, LenPos = MaxSize };
         Ch str[MaxChars];
 
         inline static bool Usable(SizeType len) { return                       (MaxSize >= len); }
@@ -2392,7 +2392,7 @@ private:
             std::memcpy(static_cast<void*>(e), values, count * sizeof(GenericValue));
         }
         else
-            SetElementsPointer(0);
+            SetElementsPointer(RAPIDJSON_NULLPTR);
         data_.a.size = data_.a.capacity = count;
     }
 
@@ -2412,7 +2412,7 @@ private:
 #endif
         }
         else
-            SetMembersPointer(0);
+            SetMembersPointer(RAPIDJSON_NULLPTR);
         data_.o.size = data_.o.capacity = count;
     }
 
@@ -2425,7 +2425,7 @@ private:
 
     //! Initialize this value as copy string with initial data, without calling destructor.
     void SetStringRaw(StringRefType s, Allocator& allocator) {
-        Ch* str = 0;
+        Ch* str = RAPIDJSON_NULLPTR;
         if (ShortString::Usable(s.length)) {
             data_.f.flags = kShortStringFlag;
             data_.ss.SetLength(s.length);
@@ -2494,8 +2494,8 @@ public:
         \param stackCapacity    Optional initial capacity of stack in bytes.
         \param stackAllocator   Optional allocator for allocating memory for stack.
     */
-    explicit GenericDocument(Type type, Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity, StackAllocator* stackAllocator = 0) :
-        GenericValue<Encoding, Allocator>(type),  allocator_(allocator), ownAllocator_(0), stack_(stackAllocator, stackCapacity), parseResult_()
+    explicit GenericDocument(Type type, Allocator* allocator = RAPIDJSON_NULLPTR, size_t stackCapacity = kDefaultStackCapacity, StackAllocator* stackAllocator = RAPIDJSON_NULLPTR) :
+        GenericValue<Encoding, Allocator>(type),  allocator_(allocator), ownAllocator_(RAPIDJSON_NULLPTR), stack_(stackAllocator, stackCapacity), parseResult_()
     {
         if (!allocator_)
             ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
@@ -2507,8 +2507,8 @@ public:
         \param stackCapacity    Optional initial capacity of stack in bytes.
         \param stackAllocator   Optional allocator for allocating memory for stack.
     */
-    GenericDocument(Allocator* allocator = 0, size_t stackCapacity = kDefaultStackCapacity, StackAllocator* stackAllocator = 0) : 
-        allocator_(allocator), ownAllocator_(0), stack_(stackAllocator, stackCapacity), parseResult_()
+    GenericDocument(Allocator* allocator = RAPIDJSON_NULLPTR, size_t stackCapacity = kDefaultStackCapacity, StackAllocator* stackAllocator = RAPIDJSON_NULLPTR) : 
+        allocator_(allocator), ownAllocator_(RAPIDJSON_NULLPTR), stack_(stackAllocator, stackCapacity), parseResult_()
     {
         if (!allocator_)
             ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
@@ -2523,8 +2523,8 @@ public:
           stack_(std::move(rhs.stack_)),
           parseResult_(rhs.parseResult_)
     {
-        rhs.allocator_ = 0;
-        rhs.ownAllocator_ = 0;
+        rhs.allocator_ = RAPIDJSON_NULLPTR;
+        rhs.ownAllocator_ = RAPIDJSON_NULLPTR;
         rhs.parseResult_ = ParseResult();
     }
 #endif
@@ -2556,8 +2556,8 @@ public:
         stack_ = std::move(rhs.stack_);
         parseResult_ = rhs.parseResult_;
 
-        rhs.allocator_ = 0;
-        rhs.ownAllocator_ = 0;
+        rhs.allocator_ = RAPIDJSON_NULLPTR;
+        rhs.ownAllocator_ = RAPIDJSON_NULLPTR;
         rhs.parseResult_ = ParseResult();
 
         return *this;
@@ -2625,7 +2625,7 @@ public:
     template <unsigned parseFlags, typename SourceEncoding, typename InputStream>
     GenericDocument& ParseStream(InputStream& is) {
         GenericReader<SourceEncoding, Encoding, StackAllocator> reader(
-            stack_.HasAllocator() ? &stack_.GetAllocator() : 0);
+            stack_.HasAllocator() ? &stack_.GetAllocator() : RAPIDJSON_NULLPTR);
         ClearStackOnExit scope(*this);
         parseResult_ = reader.template Parse<parseFlags>(is, *this);
         if (parseResult_) {

@@ -114,7 +114,7 @@ private:
         size_t Tell() const { return count_; }
 
         // Not implemented
-        char* PutBegin() { return 0; }
+        char* PutBegin() { return RAPIDJSON_NULLPTR; }
         void Put(char) {}
         void Flush() {}
         size_t PutEnd(char*) { return 0; }

@@ -37,7 +37,7 @@ inline const char* GetDigitsLut() {
 }
 
 inline char* u32toa(uint32_t value, char* buffer) {
-    RAPIDJSON_ASSERT(buffer != 0);
+    RAPIDJSON_ASSERT(buffer != RAPIDJSON_NULLPTR);
 
     const char* cDigitsLut = GetDigitsLut();
 
@@ -113,7 +113,7 @@ inline char* u32toa(uint32_t value, char* buffer) {
 }
 
 inline char* i32toa(int32_t value, char* buffer) {
-    RAPIDJSON_ASSERT(buffer != 0);
+    RAPIDJSON_ASSERT(buffer != RAPIDJSON_NULLPTR);
     uint32_t u = static_cast<uint32_t>(value);
     if (value < 0) {
         *buffer++ = '-';
@@ -124,7 +124,7 @@ inline char* i32toa(int32_t value, char* buffer) {
 }
 
 inline char* u64toa(uint64_t value, char* buffer) {
-    RAPIDJSON_ASSERT(buffer != 0);
+    RAPIDJSON_ASSERT(buffer != RAPIDJSON_NULLPTR);
     const char* cDigitsLut = GetDigitsLut();
     const uint64_t  kTen8 = 100000000;
     const uint64_t  kTen9 = kTen8 * 10;
@@ -292,7 +292,7 @@ inline char* u64toa(uint64_t value, char* buffer) {
 }
 
 inline char* i64toa(int64_t value, char* buffer) {
-    RAPIDJSON_ASSERT(buffer != 0);
+    RAPIDJSON_ASSERT(buffer != RAPIDJSON_NULLPTR);
     uint64_t u = static_cast<uint64_t>(value);
     if (value < 0) {
         *buffer++ = '-';

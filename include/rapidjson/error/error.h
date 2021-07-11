@@ -118,7 +118,7 @@ public:
     size_t Offset() const { return offset_; }
 
     //! Explicit conversion to \c bool, returns \c true, iff !\ref IsError().
-    operator BooleanType() const { return !IsError() ? &ParseResult::IsError : NULL; }
+    operator BooleanType() const { return !IsError() ? &ParseResult::IsError : RAPIDJSON_NULLPTR; }
     //! Whether the result is an error.
     bool IsError() const { return code_ != kParseErrorNone; }
 

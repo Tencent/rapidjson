@@ -27,7 +27,7 @@ static char* ReadFile(const char* filename, size_t& length) {
         "../../../bin/jsonchecker"
     };
     char buffer[1024];
-    FILE *fp = 0;
+    FILE *fp = RAPIDJSON_NULLPTR;
     for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
         sprintf(buffer, "%s/%s", paths[i], filename);
         fp = fopen(buffer, "rb");
@@ -36,7 +36,7 @@ static char* ReadFile(const char* filename, size_t& length) {
     }
 
     if (!fp)
-        return 0;
+        return RAPIDJSON_NULLPTR;
 
     fseek(fp, 0, SEEK_END);
     length = static_cast<size_t>(ftell(fp));

@@ -59,7 +59,7 @@ public:
     char Peek() const { RAPIDJSON_ASSERT(false); return 0; }
     char Take() { RAPIDJSON_ASSERT(false); return 0; }
     size_t Tell() const { RAPIDJSON_ASSERT(false); return 0; }
-    char* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
+    char* PutBegin() { RAPIDJSON_ASSERT(false); return RAPIDJSON_NULLPTR; }
     size_t PutEnd(char*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:

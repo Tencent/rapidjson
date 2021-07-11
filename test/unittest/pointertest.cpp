@@ -713,15 +713,15 @@ TEST(Pointer, Get) {
     EXPECT_EQ(&d[" "], Pointer("/ ").Get(d));
     EXPECT_EQ(&d["m~n"], Pointer("/m~0n").Get(d));
 
-    EXPECT_TRUE(Pointer("/abc").Get(d) == 0);  // Out of boundary
+    EXPECT_TRUE(Pointer("/abc").Get(d) == RAPIDJSON_NULLPTR);  // Out of boundary
     size_t unresolvedTokenIndex;
-    EXPECT_TRUE(Pointer("/foo/2").Get(d, &unresolvedTokenIndex) == 0); // Out of boundary
+    EXPECT_TRUE(Pointer("/foo/2").Get(d, &unresolvedTokenIndex) == RAPIDJSON_NULLPTR); // Out of boundary
     EXPECT_EQ(1u, unresolvedTokenIndex);
-    EXPECT_TRUE(Pointer("/foo/a").Get(d, &unresolvedTokenIndex) == 0); // "/foo" is an array, cannot query by "a"
+    EXPECT_TRUE(Pointer("/foo/a").Get(d, &unresolvedTokenIndex) == RAPIDJSON_NULLPTR); // "/foo" is an array, cannot query by "a"
     EXPECT_EQ(1u, unresolvedTokenIndex);
-    EXPECT_TRUE(Pointer("/foo/0/0").Get(d, &unresolvedTokenIndex) == 0); // "/foo/0" is an string, cannot further query
+    EXPECT_TRUE(Pointer("/foo/0/0").Get(d, &unresolvedTokenIndex) == RAPIDJSON_NULLPTR); // "/foo/0" is an string, cannot further query
     EXPECT_EQ(2u, unresolvedTokenIndex);
-    EXPECT_TRUE(Pointer("/foo/0/a").Get(d, &unresolvedTokenIndex) == 0); // "/foo/0" is an string, cannot further query
+    EXPECT_TRUE(Pointer("/foo/0/a").Get(d, &unresolvedTokenIndex) == RAPIDJSON_NULLPTR); // "/foo/0" is an string, cannot further query
     EXPECT_EQ(2u, unresolvedTokenIndex);
 
     Pointer::Token tokens[] = { { "foo ...", 3, kPointerInvalidIndex } };
@@ -987,25 +987,25 @@ TEST(Pointer, Erase) {
     EXPECT_TRUE(Pointer("/foo/0").Erase(d));
     EXPECT_TRUE(d["foo"].Empty());
     EXPECT_TRUE(Pointer("/foo").Erase(d));
-    EXPECT_TRUE(Pointer("/foo").Get(d) == 0);
+    EXPECT_TRUE(Pointer("/foo").Get(d) == RAPIDJSON_NULLPTR);
 
     Pointer("/a/0/b/0").Create(d);
 
-    EXPECT_TRUE(Pointer("/a/0/b/0").Get(d) != 0);
+    EXPECT_TRUE(Pointer("/a/0/b/0").Get(d) != RAPIDJSON_NULLPTR);
     EXPECT_TRUE(Pointer("/a/0/b/0").Erase(d));
-    EXPECT_TRUE(Pointer("/a/0/b/0").Get(d) == 0);
+    EXPECT_TRUE(Pointer("/a/0/b/0").Get(d) == RAPIDJSON_NULLPTR);
 
-    EXPECT_TRUE(Pointer("/a/0/b").Get(d) != 0);
+    EXPECT_TRUE(Pointer("/a/0/b").Get(d) != RAPIDJSON_NULLPTR);
     EXPECT_TRUE(Pointer("/a/0/b").Erase(d));
-    EXPECT_TRUE(Pointer("/a/0/b").Get(d) == 0);
+    EXPECT_TRUE(Pointer("/a/0/b").Get(d) == RAPIDJSON_NULLPTR);
 
-    EXPECT_TRUE(Pointer("/a/0").Get(d) != 0);
+    EXPECT_TRUE(Pointer("/a/0").Get(d) != RAPIDJSON_NULLPTR);
     EXPECT_TRUE(Pointer("/a/0").Erase(d));
-    EXPECT_TRUE(Pointer("/a/0").Get(d) == 0);
+    EXPECT_TRUE(Pointer("/a/0").Get(d) == RAPIDJSON_NULLPTR);
 
-    EXPECT_TRUE(Pointer("/a").Get(d) != 0);
+    EXPECT_TRUE(Pointer("/a").Get(d) != RAPIDJSON_NULLPTR);
     EXPECT_TRUE(Pointer("/a").Erase(d));
-    EXPECT_TRUE(Pointer("/a").Get(d) == 0);
+    EXPECT_TRUE(Pointer("/a").Get(d) == RAPIDJSON_NULLPTR);
 }
 
 TEST(Pointer, CreateValueByPointer) {
@@ -1043,13 +1043,13 @@ TEST(Pointer, GetValueByPointer) {
     EXPECT_EQ(&d["foo"][0], GetValueByPointer(d, "/foo/0"));
 
     size_t unresolvedTokenIndex;
-    EXPECT_TRUE(GetValueByPointer(d, "/foo/2", &unresolvedTokenIndex) == 0); // Out of boundary
+    EXPECT_TRUE(GetValueByPointer(d, "/foo/2", &unresolvedTokenIndex) == RAPIDJSON_NULLPTR); // Out of boundary
     EXPECT_EQ(1u, unresolvedTokenIndex);
-    EXPECT_TRUE(GetValueByPointer(d, "/foo/a", &unresolvedTokenIndex) == 0); // "/foo" is an array, cannot query by "a"
+    EXPECT_TRUE(GetValueByPointer(d, "/foo/a", &unresolvedTokenIndex) == RAPIDJSON_NULLPTR); // "/foo" is an array, cannot query by "a"
     EXPECT_EQ(1u, unresolvedTokenIndex);
-    EXPECT_TRUE(GetValueByPointer(d, "/foo/0/0", &unresolvedTokenIndex) == 0); // "/foo/0" is an string, cannot further query
+    EXPECT_TRUE(GetValueByPointer(d, "/foo/0/0", &unresolvedTokenIndex) == RAPIDJSON_NULLPTR); // "/foo/0" is an string, cannot further query
     EXPECT_EQ(2u, unresolvedTokenIndex);
-    EXPECT_TRUE(GetValueByPointer(d, "/foo/0/a", &unresolvedTokenIndex) == 0); // "/foo/0" is an string, cannot further query
+    EXPECT_TRUE(GetValueByPointer(d, "/foo/0/a", &unresolvedTokenIndex) == RAPIDJSON_NULLPTR); // "/foo/0" is an string, cannot further query
     EXPECT_EQ(2u, unresolvedTokenIndex);
 
     // const version
@@ -1057,13 +1057,13 @@ TEST(Pointer, GetValueByPointer) {
     EXPECT_EQ(&d["foo"][0], GetValueByPointer(v, Pointer("/foo/0")));
     EXPECT_EQ(&d["foo"][0], GetValueByPointer(v, "/foo/0"));
 
-    EXPECT_TRUE(GetValueByPointer(v, "/foo/2", &unresolvedTokenIndex) == 0); // Out of boundary
+    EXPECT_TRUE(GetValueByPointer(v, "/foo/2", &unresolvedTokenIndex) == RAPIDJSON_NULLPTR); // Out of boundary
     EXPECT_EQ(1u, unresolvedTokenIndex);
-    EXPECT_TRUE(GetValueByPointer(v, "/foo/a", &unresolvedTokenIndex) == 0); // "/foo" is an array, cannot query by "a"
+    EXPECT_TRUE(GetValueByPointer(v, "/foo/a", &unresolvedTokenIndex) == RAPIDJSON_NULLPTR); // "/foo" is an array, cannot query by "a"
     EXPECT_EQ(1u, unresolvedTokenIndex);
-    EXPECT_TRUE(GetValueByPointer(v, "/foo/0/0", &unresolvedTokenIndex) == 0); // "/foo/0" is an string, cannot further query
+    EXPECT_TRUE(GetValueByPointer(v, "/foo/0/0", &unresolvedTokenIndex) == RAPIDJSON_NULLPTR); // "/foo/0" is an string, cannot further query
     EXPECT_EQ(2u, unresolvedTokenIndex);
-    EXPECT_TRUE(GetValueByPointer(v, "/foo/0/a", &unresolvedTokenIndex) == 0); // "/foo/0" is an string, cannot further query
+    EXPECT_TRUE(GetValueByPointer(v, "/foo/0/a", &unresolvedTokenIndex) == RAPIDJSON_NULLPTR); // "/foo/0" is an string, cannot further query
     EXPECT_EQ(2u, unresolvedTokenIndex);
 
 }
@@ -1541,7 +1541,7 @@ TEST(Pointer, EraseValueByPointer_Pointer) {
     EXPECT_TRUE(EraseValueByPointer(d, Pointer("/foo/0")));
     EXPECT_TRUE(d["foo"].Empty());
     EXPECT_TRUE(EraseValueByPointer(d, Pointer("/foo")));
-    EXPECT_TRUE(Pointer("/foo").Get(d) == 0);
+    EXPECT_TRUE(Pointer("/foo").Get(d) == RAPIDJSON_NULLPTR);
 }
 
 TEST(Pointer, EraseValueByPointer_String) {
@@ -1556,7 +1556,7 @@ TEST(Pointer, EraseValueByPointer_String) {
     EXPECT_TRUE(EraseValueByPointer(d, "/foo/0"));
     EXPECT_TRUE(d["foo"].Empty());
     EXPECT_TRUE(EraseValueByPointer(d, "/foo"));
-    EXPECT_TRUE(Pointer("/foo").Get(d) == 0);
+    EXPECT_TRUE(Pointer("/foo").Get(d) == RAPIDJSON_NULLPTR);
 }
 
 TEST(Pointer, Ambiguity) {
@@ -1647,8 +1647,8 @@ TEST(Pointer, LessThan) {
         "/d/2/z",
         "/d/2/z",
         "/d/2/zz",
-        NULL,       // was invalid "/e/f~g"
-        NULL        // was invalid "/e/f~~g"
+        RAPIDJSON_NULLPTR,       // was invalid "/e/f~g"
+        RAPIDJSON_NULLPTR        // was invalid "/e/f~~g"
     };
     typedef MemoryPoolAllocator<> AllocatorType;
     typedef GenericPointer<Value, AllocatorType> PointerType;

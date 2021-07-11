@@ -374,7 +374,7 @@ TEST_F(RapidJson, Writer_NullStream) {
 
 TEST_F(RapidJson, SIMD_SUFFIX(Writer_StringBuffer)) {
     for (size_t i = 0; i < kTrialCount; i++) {
-        StringBuffer s(0, 1024 * 1024);
+        StringBuffer s(RAPIDJSON_NULLPTR, 1024 * 1024);
         Writer<StringBuffer> writer(s);
         doc_.Accept(writer);
         const char* str = s.GetString();
@@ -387,7 +387,7 @@ TEST_F(RapidJson, SIMD_SUFFIX(Writer_StringBuffer)) {
 #define TEST_TYPED(index, Name)\
 TEST_F(RapidJson, SIMD_SUFFIX(Writer_StringBuffer_##Name)) {\
     for (size_t i = 0; i < kTrialCount * 10; i++) {\
-        StringBuffer s(0, 1024 * 1024);\
+        StringBuffer s(RAPIDJSON_NULLPTR, 1024 * 1024);\
         Writer<StringBuffer> writer(s);\
         typesDoc_[index].Accept(writer);\
         const char* str = s.GetString();\
@@ -407,7 +407,7 @@ TEST_TYPED(6, Paragraphs)
 
 TEST_F(RapidJson, SIMD_SUFFIX(PrettyWriter_StringBuffer)) {
     for (size_t i = 0; i < kTrialCount; i++) {
-        StringBuffer s(0, 2048 * 1024);
+        StringBuffer s(RAPIDJSON_NULLPTR, 2048 * 1024);
         PrettyWriter<StringBuffer> writer(s);
         writer.SetIndent(' ', 1);
         doc_.Accept(writer);
