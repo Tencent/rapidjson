@@ -882,7 +882,7 @@ TEST(Value, String) {
 TEST(Value, SetStringNull) {
 
     MemoryPoolAllocator<> allocator;
-    const char* nullPtr = 0;
+    const char* nullPtr = NULL;
     {
         // Construction with string type creates empty string
         Value v(kStringType);

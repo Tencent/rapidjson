@@ -168,7 +168,7 @@ static FILE* OpenEncodedFile(const char* filename) {
         if (fp)
             return fp;
     }
-    return 0;
+    return NULL;
 }
 
 TEST(Document, Parse_Encoding) {

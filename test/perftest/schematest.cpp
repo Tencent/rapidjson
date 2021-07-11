@@ -26,7 +26,7 @@ static char* ReadFile(const char* filename, Allocator& allocator) {
         "../../../bin/"
     };
     char buffer[1024];
-    FILE *fp = 0;
+    FILE *fp = NULL;
     for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
         sprintf(buffer, "%s%s", paths[i], filename);
         fp = fopen(buffer, "rb");
@@ -35,7 +35,7 @@ static char* ReadFile(const char* filename, Allocator& allocator) {
     }
 
     if (!fp)
-        return 0;
+        return NULL;
 
     fseek(fp, 0, SEEK_END);
     size_t length = static_cast<size_t>(ftell(fp));

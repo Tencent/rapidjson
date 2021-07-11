@@ -754,15 +754,15 @@ TEST(Reader, ParseNumberError_FullPrecisionDouble) {
 
 template <typename Encoding>
 struct ParseStringHandler : BaseReaderHandler<Encoding, ParseStringHandler<Encoding> > {
-    ParseStringHandler() : str_(0), length_(0), copy_() {}
-    ~ParseStringHandler() { EXPECT_TRUE(str_ != 0); if (copy_) free(const_cast<typename Encoding::Ch*>(str_)); }
+    ParseStringHandler() : str_(NULL), length_(0), copy_() {}
+    ~ParseStringHandler() { EXPECT_TRUE(str_ != NULL); if (copy_) free(const_cast<typename Encoding::Ch*>(str_)); }
 
     ParseStringHandler(const ParseStringHandler&);
     ParseStringHandler& operator=(const ParseStringHandler&);
 
     bool Default() { ADD_FAILURE(); return false; }
     bool String(const typename Encoding::Ch* str, size_t length, bool copy) {
-        EXPECT_EQ(0, str_);
+        EXPECT_EQ(NULL, str_);
         if (copy) {
             str_ = static_cast<typename Encoding::Ch*>(malloc((length + 1) * sizeof(typename Encoding::Ch)));
             memcpy(const_cast<typename Encoding::Ch*>(str_), str, (length + 1) * sizeof(typename Encoding::Ch));
@@ -1324,7 +1324,7 @@ public:
     Ch Take() { return *src_++; }
     size_t Tell() const { return static_cast<size_t>(src_ - head_); }
 
-    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
+    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return NULL; }
     void Put(Ch) { RAPIDJSON_ASSERT(false); }
     void Flush() { RAPIDJSON_ASSERT(false); }
     size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
@@ -1380,7 +1380,7 @@ public:
 
     size_t Tell() const { return static_cast<size_t>(is_.tellg()); }
 
-    Ch* PutBegin() { assert(false); return 0; }
+    Ch* PutBegin() { assert(false); return NULL; }
     void Put(Ch) { assert(false); }
     void Flush() { assert(false); }
     size_t PutEnd(Ch*) { assert(false); return 0; }
@@ -1410,7 +1410,7 @@ public:
 
   size_t Tell() const { return static_cast<size_t>(is_.tellg()); }
 
-  Ch* PutBegin() { assert(false); return 0; }
+  Ch* PutBegin() { assert(false); return NULL; }
   void Put(Ch) { assert(false); }
   void Flush() { assert(false); }
   size_t PutEnd(Ch*) { assert(false); return 0; }
@@ -1919,7 +1919,7 @@ struct NumbersAsStringsHandler {
     bool Double(double) { return true; }
     // 'str' is not null-terminated
     bool RawNumber(const char* str, SizeType length, bool) {
-        EXPECT_TRUE(str != 0);
+        EXPECT_TRUE(str != NULL);
         EXPECT_TRUE(expected_len_ == length);
         EXPECT_TRUE(strncmp(str, expected_, length) == 0);
         return true;
@@ -2031,7 +2031,7 @@ struct NumbersAsStringsHandlerWChar_t {
   bool Double(double) { return true; }
   // 'str' is not null-terminated
   bool RawNumber(const wchar_t* str, SizeType length, bool) {
-    EXPECT_TRUE(str != 0);
+    EXPECT_TRUE(str != NULL);
     EXPECT_TRUE(expected_len_ == length);
     EXPECT_TRUE(wcsncmp(str, expected_, length) == 0);
     return true;

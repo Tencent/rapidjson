@@ -33,7 +33,7 @@ public:
 
     virtual void TearDown() {
         free(json_);
-        json_ = 0;
+        json_ = NULL;
     }
 
 private:
@@ -56,7 +56,7 @@ protected:
             if (fp)
                 return fp;
         }
-        return 0;
+        return NULL;
     }
 
     static char *ReadFile(const char* filename, bool appendPath, size_t* outLength) {
@@ -64,7 +64,7 @@ protected:
 
         if (!fp) {
             *outLength = 0;
-            return 0;
+            return NULL;
         }
 
         fseek(fp, 0, SEEK_END);
@@ -83,7 +83,7 @@ protected:
         {
             char buffer[16];
             FILE *fp = Open(filename);
-            ASSERT_TRUE(fp != 0);
+            ASSERT_TRUE(fp != NULL);
             FileReadStream fs(fp, buffer, sizeof(buffer));
             EncodedInputStream<FileEncoding, FileReadStream> eis(fs);
             StringStream s(json_);
@@ -123,7 +123,7 @@ protected:
         {
             char buffer[16];
             FILE *fp = Open(filename);
-            ASSERT_TRUE(fp != 0);
+            ASSERT_TRUE(fp != NULL);
             FileReadStream fs(fp, buffer, sizeof(buffer));
             AutoUTFInputStream<unsigned, FileReadStream> eis(fs);
             EXPECT_EQ(expectHasBOM, eis.HasBOM());

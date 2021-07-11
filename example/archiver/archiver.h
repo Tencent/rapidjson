@@ -74,7 +74,7 @@ public:
     bool HasMember(const char* name) const;
     JsonReader& EndObject();
 
-    JsonReader& StartArray(size_t* size = 0);
+    JsonReader& StartArray(size_t* size = NULL);
     JsonReader& EndArray();
 
     JsonReader& operator&(bool& b);
@@ -120,7 +120,7 @@ public:
     bool HasMember(const char* name) const;
     JsonWriter& EndObject();
 
-    JsonWriter& StartArray(size_t* size = 0);
+    JsonWriter& StartArray(size_t* size = NULL);
     JsonWriter& EndArray();
 
     JsonWriter& operator&(bool& b);

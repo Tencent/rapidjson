@@ -25,16 +25,16 @@ using namespace rapidjson;
 
 template <typename Allocator>
 void TestAllocator(Allocator& a) {
-    EXPECT_TRUE(a.Malloc(0) == 0);
+    EXPECT_TRUE(a.Malloc(0) == NULL);
 
     uint8_t* p = static_cast<uint8_t*>(a.Malloc(100));
-    EXPECT_TRUE(p != 0);
+    EXPECT_TRUE(p != NULL);
     for (size_t i = 0; i < 100; i++)
         p[i] = static_cast<uint8_t>(i);
 
     // Expand
     uint8_t* q = static_cast<uint8_t*>(a.Realloc(p, 100, 200));
-    EXPECT_TRUE(q != 0);
+    EXPECT_TRUE(q != NULL);
     for (size_t i = 0; i < 100; i++)
         EXPECT_EQ(i, q[i]);
     for (size_t i = 100; i < 200; i++)
@@ -42,14 +42,14 @@ void TestAllocator(Allocator& a) {
 
     // Shrink
     uint8_t *r = static_cast<uint8_t*>(a.Realloc(q, 200, 150));
-    EXPECT_TRUE(r != 0);
+    EXPECT_TRUE(r != NULL);
     for (size_t i = 0; i < 150; i++)
         EXPECT_EQ(i, r[i]);
 
     Allocator::Free(r);
 
     // Realloc to zero size
-    EXPECT_TRUE(a.Realloc(a.Malloc(1), 1, 0) == 0);
+    EXPECT_TRUE(a.Realloc(a.Malloc(1), 1, 0) == NULL);
 }
 
 struct TestStdAllocatorData {
@@ -108,18 +108,18 @@ void TestStdAllocator(const Allocator& a) {
     int *arr;
     StdAllocator<int, Allocator> ia(a);
     arr = ia.allocate(10 * sizeof(int));
-    EXPECT_TRUE(arr != 0);
+    EXPECT_TRUE(arr != NULL);
     for (int i = 0; i < 10; ++i) {
         arr[i] = 0x0f0f0f0f;
     }
     ia.deallocate(arr, 10);
     arr = Malloc<int>(ia, 10);
-    EXPECT_TRUE(arr != 0);
+    EXPECT_TRUE(arr != NULL);
     for (int i = 0; i < 10; ++i) {
         arr[i] = 0x0f0f0f0f;
     }
     arr = Realloc<int>(ia, arr, 10, 20);
-    EXPECT_TRUE(arr != 0);
+    EXPECT_TRUE(arr != NULL);
     for (int i = 0; i < 10; ++i) {
         EXPECT_EQ(arr[i], 0x0f0f0f0f);
     }
@@ -132,7 +132,7 @@ void TestStdAllocator(const Allocator& a) {
     StdAllocator<TestStdAllocatorData, Allocator> da(a);
     for (int i = 1; i < 10; i++) {
         TestStdAllocatorData *d = da.allocate();
-        EXPECT_TRUE(d != 0);
+        EXPECT_TRUE(d != NULL);
 
         da.destroy(new(d) TestStdAllocatorData(cons, dest));
         EXPECT_EQ(cons, i);
@@ -216,7 +216,7 @@ TEST(Allocator, MemoryPoolAllocator) {
     TestStdAllocator(a);
 
     for (size_t i = 1; i < 1000; i++) {
-        EXPECT_TRUE(a.Malloc(i) != 0);
+        EXPECT_TRUE(a.Malloc(i) != NULL);
         EXPECT_LE(a.Size(), a.Capacity());
     }
 

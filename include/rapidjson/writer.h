@@ -99,17 +99,17 @@ public:
         \param levelDepth Initial capacity of stack.
     */
     explicit
-    Writer(OutputStream& os, StackAllocator* stackAllocator = 0, size_t levelDepth = kDefaultLevelDepth) : 
+    Writer(OutputStream& os, StackAllocator* stackAllocator = NULL, size_t levelDepth = kDefaultLevelDepth) : 
         os_(&os), level_stack_(stackAllocator, levelDepth * sizeof(Level)), maxDecimalPlaces_(kDefaultMaxDecimalPlaces), hasRoot_(false) {}
 
     explicit
-    Writer(StackAllocator* allocator = 0, size_t levelDepth = kDefaultLevelDepth) :
-        os_(0), level_stack_(allocator, levelDepth * sizeof(Level)), maxDecimalPlaces_(kDefaultMaxDecimalPlaces), hasRoot_(false) {}
+    Writer(StackAllocator* allocator = NULL, size_t levelDepth = kDefaultLevelDepth) :
+        os_(NULL), level_stack_(allocator, levelDepth * sizeof(Level)), maxDecimalPlaces_(kDefaultMaxDecimalPlaces), hasRoot_(false) {}
 
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
     Writer(Writer&& rhs) :
         os_(rhs.os_), level_stack_(std::move(rhs.level_stack_)), maxDecimalPlaces_(rhs.maxDecimalPlaces_), hasRoot_(rhs.hasRoot_) {
-        rhs.os_ = 0;
+        rhs.os_ = NULL;
     }
 #endif
 
@@ -194,14 +194,14 @@ public:
     bool Double(double d)       { Prefix(kNumberType); return EndValue(WriteDouble(d)); }
 
     bool RawNumber(const Ch* str, SizeType length, bool copy = false) {
-        RAPIDJSON_ASSERT(str != 0);
+        RAPIDJSON_ASSERT(str != NULL);
         (void)copy;
         Prefix(kNumberType);
         return EndValue(WriteString(str, length));
     }
 
     bool String(const Ch* str, SizeType length, bool copy = false) {
-        RAPIDJSON_ASSERT(str != 0);
+        RAPIDJSON_ASSERT(str != NULL);
         (void)copy;
         Prefix(kStringType);
         return EndValue(WriteString(str, length));
@@ -270,7 +270,7 @@ public:
         \param type Type of the root of json.
     */
     bool RawValue(const Ch* json, size_t length, Type type) {
-        RAPIDJSON_ASSERT(json != 0);
+        RAPIDJSON_ASSERT(json != NULL);
         Prefix(type);
         return EndValue(WriteRawValue(json, length));
     }

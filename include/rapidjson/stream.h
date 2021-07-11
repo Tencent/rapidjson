@@ -160,7 +160,7 @@ struct GenericStringStream {
     Ch Take() { return *src_++; }
     size_t Tell() const { return static_cast<size_t>(src_ - head_); }
 
-    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
+    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return NULL; }
     void Put(Ch) { RAPIDJSON_ASSERT(false); }
     void Flush() { RAPIDJSON_ASSERT(false); }
     size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
@@ -188,7 +188,7 @@ template <typename Encoding>
 struct GenericInsituStringStream {
     typedef typename Encoding::Ch Ch;
 
-    GenericInsituStringStream(Ch *src) : src_(src), dst_(0), head_(src) {}
+    GenericInsituStringStream(Ch *src) : src_(src), dst_(NULL), head_(src) {}
 
     // Read
     Ch Peek() { return *src_; }
@@ -196,7 +196,7 @@ struct GenericInsituStringStream {
     size_t Tell() { return static_cast<size_t>(src_ - head_); }
 
     // Write
-    void Put(Ch c) { RAPIDJSON_ASSERT(dst_ != 0); *dst_++ = c; }
+    void Put(Ch c) { RAPIDJSON_ASSERT(dst_ != NULL); *dst_++ = c; }
 
     Ch* PutBegin() { return dst_ = src_; }
     size_t PutEnd(Ch* begin) { return static_cast<size_t>(dst_ - begin); }

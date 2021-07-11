@@ -110,7 +110,7 @@ static void HandleError(const char* errorName, const ValueType& error, size_t de
 
 // Create error message for all errors in an error structure
 // Context is used to indicate whether the error structure has a parent 'dependencies', 'allOf', 'anyOf' or 'oneOf' error
-static void CreateErrorMessages(const ValueType& errors, size_t depth = 0, const char* context = 0) {
+static void CreateErrorMessages(const ValueType& errors, size_t depth = 0, const char* context = NULL) {
     // Each member property contains one or more errors of a given type
     for (ValueType::ConstMemberIterator errorTypeItr = errors.MemberBegin(); errorTypeItr != errors.MemberEnd(); ++errorTypeItr) {
         const char* errorName = errorTypeItr->name.GetString();

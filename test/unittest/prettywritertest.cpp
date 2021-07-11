@@ -135,7 +135,7 @@ public:
     Ch Take() { assert(false); return '\0'; }
     size_t Tell() const { return 0; }
 
-    Ch* PutBegin() { assert(false); return 0; }
+    Ch* PutBegin() { assert(false); return NULL; }
     void Put(Ch c) { os_.put(c); }
     void Flush() { os_.flush(); }
     size_t PutEnd(Ch*) { assert(false); return 0; }

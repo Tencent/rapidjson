@@ -52,7 +52,7 @@ public:
     // Not implemented
     void Put(Ch) { RAPIDJSON_ASSERT(false); }
     void Flush() { RAPIDJSON_ASSERT(false); } 
-    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
+    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return NULL; }
     size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:
@@ -81,7 +81,7 @@ public:
     // Not implemented
     void Put(Ch) {}
     void Flush() {} 
-    Ch* PutBegin() { return 0; }
+    Ch* PutBegin() { return NULL; }
     size_t PutEnd(Ch*) { return 0; }
 
     MemoryStream& is_;
@@ -160,7 +160,7 @@ public:
     // Not implemented
     void Put(Ch) { RAPIDJSON_ASSERT(false); }
     void Flush() { RAPIDJSON_ASSERT(false); } 
-    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
+    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return NULL; }
     size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:
