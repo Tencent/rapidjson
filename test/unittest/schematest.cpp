@@ -3019,10 +3019,9 @@ TEST(SchemaValidator, Schema_RefPlainNameRemote) {
 
 // $ref is an empty string
 TEST(SchemaValidator, Schema_RefEmptyString) {
-    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
     Document sd;
     sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt1\": {\"$ref\": \"\"}}}");
-    SchemaDocumentType s(sd);
+    SchemaDocument s(sd);
     SCHEMAERROR(s, "{\"RefInvalid\":{\"errorCode\":3,\"instanceRef\":\"#/properties/myInt1\"}}");
 }
 
@@ -3047,10 +3046,9 @@ TEST(SchemaValidator, Schema_RefNoRemoteSchema) {
 
 // $ref pointer is invalid
 TEST(SchemaValidator, Schema_RefPointerInvalid) {
-    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
     Document sd;
     sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"#/&&&&&\"}}}");
-    SchemaDocumentType s(sd);
+    SchemaDocument s(sd);
     SCHEMAERROR(s, "{\"RefPointerInvalid\":{\"errorCode\":4,\"instanceRef\":\"#/properties/myInt\",\"value\":\"#/&&&&&\",\"offset\":2}}");
 }
 
@@ -3066,19 +3064,17 @@ TEST(SchemaValidator, Schema_RefPointerInvalidRemote) {
 
 // $ref is unknown non-pointer
 TEST(SchemaValidator, Schema_RefUnknownPlainName) {
-    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
     Document sd;
     sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"#plainname\"}}}");
-    SchemaDocumentType s(sd);
+    SchemaDocument s(sd);
     SCHEMAERROR(s, "{\"RefUnknown\":{\"errorCode\":5,\"instanceRef\":\"#/properties/myInt\",\"value\":\"#plainname\"}}");
 }
 
 /// $ref is unknown pointer
 TEST(SchemaValidator, Schema_RefUnknownPointer) {
-    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
     Document sd;
     sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"#/a/b\"}}}");
-    SchemaDocumentType s(sd);
+    SchemaDocument s(sd);
     SCHEMAERROR(s, "{\"RefUnknown\":{\"errorCode\":5,\"instanceRef\":\"#/properties/myInt\",\"value\":\"#/a/b\"}}");
 }
 
@@ -3094,7 +3090,6 @@ TEST(SchemaValidator, Schema_RefUnknownPointerRemote) {
 
 // $ref is cyclical
 TEST(SchemaValidator, Schema_RefCyclical) {
-    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
     Document sd;
     sd.Parse("{\"type\": \"object\", \"properties\": {"
              "    \"cyclic_source\": {"
@@ -3104,7 +3099,7 @@ TEST(SchemaValidator, Schema_RefCyclical) {
              "        \"$ref\": \"#/properties/cyclic_source\""
              "    }"
              "}}");
-    SchemaDocumentType s(sd);
+    SchemaDocument s(sd);
     SCHEMAERROR(s, "{\"RefCyclical\":{\"errorCode\":6,\"instanceRef\":\"#/properties/cyclic_target\",\"value\":\"#/properties/cyclic_source\"}}");
 }
 
