@@ -37,7 +37,7 @@ public:
         digits_[0] = u;
     }
 
-    template<typename Ch = char>
+    template<typename Ch>
     BigInteger(const Ch* decimals, size_t length) : count_(1) {
         RAPIDJSON_ASSERT(length > 0);
         digits_[0] = 0;
