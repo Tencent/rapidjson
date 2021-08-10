@@ -222,7 +222,7 @@ public:
     bool IsZero() const { return count_ == 1 && digits_[0] == 0; }
 
 private:
-    template<typename Ch = char>
+    template<typename Ch>
     void AppendDecimal64(const Ch* begin, const Ch* end) {
         uint64_t u = ParseUint64(begin, end);
         if (IsZero())
@@ -238,7 +238,7 @@ private:
         digits_[count_++] = digit;
     }
 
-    template<typename Ch = char>
+    template<typename Ch>
     static uint64_t ParseUint64(const Ch* begin, const Ch* end) {
         uint64_t r = 0;
         for (const Ch* p = begin; p != end; ++p) {
