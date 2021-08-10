@@ -1464,9 +1464,24 @@ private:
         RAPIDJSON_FORCEINLINE Ch Take() { return Base::TakePush(); }
     };
 
+    template <bool test>
+    struct NumberCharacterConditional {
+        typedef char type;
+    };
+
+    template<>
+    struct NumberCharacterConditional<true> {
+        typedef typename TargetEncoding::Ch type;
+    };
+
+    template<>
+    struct NumberCharacterConditional<false> {
+        typedef char type;
+    };
+
     template<unsigned parseFlags, typename InputStream, typename Handler>
     void ParseNumber(InputStream& is, Handler& handler) {
-        typedef typename std::conditional<(parseFlags & kParseNumbersAsStringsFlag) != 0, typename TargetEncoding::Ch, char>::type NumberCharacter;
+        typedef NumberCharacterConditional<(parseFlags& kParseNumbersAsStringsFlag) != 0 >::type NumberCharacter;
 
         internal::StreamLocalCopy<InputStream> copy(is);
         NumberStream<InputStream, NumberCharacter,
