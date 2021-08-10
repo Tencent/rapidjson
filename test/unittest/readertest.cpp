@@ -1416,8 +1416,8 @@ public:
   size_t PutEnd(Ch*) { assert(false); return 0; }
 
 private:
-  WIStreamWrapper(const IStreamWrapper&);
-  WIStreamWrapper& operator=(const IStreamWrapper&);
+  WIStreamWrapper(const WIStreamWrapper&);
+  WIStreamWrapper& operator=(const WIStreamWrapper&);
 
   std::wistream& is_;
 };
