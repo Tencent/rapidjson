@@ -1466,7 +1466,7 @@ private:
 
     template<unsigned parseFlags, typename InputStream, typename Handler>
     void ParseNumber(InputStream& is, Handler& handler) {
-        typedef std::conditional<(parseFlags & kParseNumbersAsStringsFlag) != 0, typename TargetEncoding::Ch, char>::type NumberCharacter;
+        typedef typename std::conditional<(parseFlags & kParseNumbersAsStringsFlag) != 0, typename TargetEncoding::Ch, char>::type NumberCharacter;
 
         internal::StreamLocalCopy<InputStream> copy(is);
         NumberStream<InputStream, NumberCharacter,
