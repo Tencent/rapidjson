@@ -46,14 +46,14 @@ struct MemoryStream {
     Ch Take() { return RAPIDJSON_UNLIKELY(src_ == end_) ? '\0' : *src_++; }
     size_t Tell() const { return static_cast<size_t>(src_ - begin_); }
 
-    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
+    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return RAPIDJSON_NULLPTR; }
     void Put(Ch) { RAPIDJSON_ASSERT(false); }
     void Flush() { RAPIDJSON_ASSERT(false); }
     size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
     // For encoding detection only.
     const Ch* Peek4() const {
-        return Tell() + 4 <= size_ ? src_ : 0;
+        return Tell() + 4 <= size_ ? src_ : RAPIDJSON_NULLPTR;
     }
 
     const Ch* src_;     //!< Current read position.

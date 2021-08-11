@@ -121,8 +121,8 @@ Foo::Foo() :
     memorypoolallocator(RAPIDJSON_NEW(MemoryPoolAllocator<>)),
 
     // stream.h
-    stringstream(RAPIDJSON_NEW(StringStream)(NULL)),
-    insitustringstream(RAPIDJSON_NEW(InsituStringStream)(NULL)),
+    stringstream(RAPIDJSON_NEW(StringStream)(RAPIDJSON_NULLPTR)),
+    insitustringstream(RAPIDJSON_NEW(InsituStringStream)(RAPIDJSON_NULLPTR)),
 
     // stringbuffer.h
     stringbuffer(RAPIDJSON_NEW(StringBuffer)),
@@ -137,7 +137,7 @@ Foo::Foo() :
     memorybuffer(RAPIDJSON_NEW(MemoryBuffer)),
 
     // memorystream.h
-    memorystream(RAPIDJSON_NEW(MemoryStream)(NULL, 0)),
+    memorystream(RAPIDJSON_NEW(MemoryStream)(RAPIDJSON_NULLPTR, 0)),
 
     // reader.h
     basereaderhandler(RAPIDJSON_NEW(BaseReaderHandlerUtf8Void)),

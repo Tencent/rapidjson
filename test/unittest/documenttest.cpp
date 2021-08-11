@@ -168,7 +168,7 @@ static FILE* OpenEncodedFile(const char* filename) {
         if (fp)
             return fp;
     }
-    return 0;
+    return RAPIDJSON_NULLPTR;
 }
 
 TEST(Document, Parse_Encoding) {

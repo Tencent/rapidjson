@@ -64,6 +64,14 @@
 #pragma warning(disable : 4996) // 'function': was declared deprecated
 #endif
 
+#ifndef RAPIDJSON_NULLPTR
+#if __cplusplus >= 201103L
+#define RAPIDJSON_NULLPTR nullptr
+#else
+#define RAPIDJSON_NULLPTR 0
+#endif
+#endif
+
 //! Base class for all performance tests
 class PerfTest : public ::testing::Test {
 public:
@@ -79,13 +87,13 @@ public:
                 "../../../bin/data/sample.json"
             };
 
-            FILE *fp = 0;
+            FILE *fp = RAPIDJSON_NULLPTR;
             for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
                 fp = fopen(filename_ = paths[i], "rb");
                 if (fp)
                     break;
             }
-            ASSERT_TRUE(fp != 0);
+            ASSERT_TRUE(fp != RAPIDJSON_NULLPTR);
 
             fseek(fp, 0, SEEK_END);
             length_ = (size_t)ftell(fp);
@@ -135,7 +143,7 @@ public:
             };
 
             for (size_t j = 0; j < sizeof(typesfilenames) / sizeof(typesfilenames[0]); j++) {
-                types_[j] = 0;
+                types_[j] = RAPIDJSON_NULLPTR;
                 for (size_t i = 0; i < sizeof(typespaths) / sizeof(typespaths[0]); i++) {
                     char filename[256];
                     sprintf(filename, "%s/%s", typespaths[i], typesfilenames[j]);
@@ -157,11 +165,11 @@ public:
     virtual void TearDown() {
         free(json_);
         free(whitespace_);
-        json_ = 0;
-        whitespace_ = 0;
+        json_ = RAPIDJSON_NULLPTR;
+        whitespace_ = RAPIDJSON_NULLPTR;
         for (size_t i = 0; i < 8; i++) {
             free(types_[i]);
-            types_[i] = 0;
+            types_[i] = RAPIDJSON_NULLPTR;
         }
     }
 

@@ -113,8 +113,8 @@ public:
     typedef typename Encoding::Ch Ch;
     template <typename, typename> friend class GenericRegexSearch;
 
-    GenericRegex(const Ch* source, Allocator* allocator = 0) : 
-        ownAllocator_(allocator ? 0 : RAPIDJSON_NEW(Allocator)()), allocator_(allocator ? allocator : ownAllocator_), 
+    GenericRegex(const Ch* source, Allocator* allocator = RAPIDJSON_NULLPTR) : 
+        ownAllocator_(allocator ? RAPIDJSON_NULLPTR : RAPIDJSON_NEW(Allocator)()), allocator_(allocator ? allocator : ownAllocator_), 
         states_(allocator_, 256), ranges_(allocator_, 256), root_(kRegexInvalidState), stateCount_(), rangeCount_(), 
         anchorBegin_(), anchorEnd_()
     {
@@ -608,8 +608,8 @@ public:
     typedef typename RegexType::EncodingType Encoding;
     typedef typename Encoding::Ch Ch;
 
-    GenericRegexSearch(const RegexType& regex, Allocator* allocator = 0) : 
-        regex_(regex), allocator_(allocator), ownAllocator_(0),
+    GenericRegexSearch(const RegexType& regex, Allocator* allocator = RAPIDJSON_NULLPTR) : 
+        regex_(regex), allocator_(allocator), ownAllocator_(RAPIDJSON_NULLPTR),
         state0_(allocator, 0), state1_(allocator, 0), stateSet_()
     {
         RAPIDJSON_ASSERT(regex_.IsValid());

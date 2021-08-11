@@ -153,11 +153,11 @@ const char* LookaheadParser::NextObjectKey() {
     
     if (st_ != kExitingObject) {
         st_ = kError;
-        return 0;
+        return RAPIDJSON_NULLPTR;
     }
     
     ParseNext();
-    return 0;
+    return RAPIDJSON_NULLPTR;
 }
 
 bool LookaheadParser::NextArrayValue() {
@@ -219,7 +219,7 @@ void LookaheadParser::GetNull() {
 const char* LookaheadParser::GetString() {
     if (st_ != kHasString) {
         st_  = kError;
-        return 0;
+        return RAPIDJSON_NULLPTR;
     }
     
     const char* result = v_.GetString();
@@ -261,7 +261,7 @@ Value* LookaheadParser::PeekValue() {
         return &v_;
     }
     
-    return 0;
+    return RAPIDJSON_NULLPTR;
 }
 
 int LookaheadParser::PeekType() {

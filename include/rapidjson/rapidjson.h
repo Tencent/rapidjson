@@ -723,6 +723,23 @@ RAPIDJSON_NAMESPACE_END
     \brief main RapidJSON namespace
     \see RAPIDJSON_NAMESPACE
 */
+
+///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_NULLPTR
+//
+// If a C++ standard older than C++11 is used, '0' is used as the null pointer literal.
+// If at least C++ 11 is used, nullptr is used instead.
+// This fixes GCCs  -Wzero-as-null-pointer-constant warning.
+//
+
+#ifndef RAPIDJSON_NULLPTR
+#if RAPIDJSON_HAS_CXX11 == 1
+#define RAPIDJSON_NULLPTR nullptr
+#else
+#define RAPIDJSON_NULLPTR 0
+#endif
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 //! Type of JSON value

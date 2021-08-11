@@ -32,7 +32,7 @@ public:
             "../../bin/data/sample.json",
             "../../../bin/data/sample.json"
         };
-        FILE* fp = 0;
+        FILE* fp = RAPIDJSON_NULLPTR;
         for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
             fp = fopen(paths[i], "rb");
             if (fp) {
@@ -40,7 +40,7 @@ public:
                 break;
             }
         }
-        ASSERT_TRUE(fp != 0);
+        ASSERT_TRUE(fp != RAPIDJSON_NULLPTR);
 
         fseek(fp, 0, SEEK_END);
         length_ = static_cast<size_t>(ftell(fp));
@@ -57,7 +57,7 @@ public:
             "../../bin/data/abcde.txt",
             "../../../bin/data/abcde.txt"
         };
-        fp = 0;
+        fp = RAPIDJSON_NULLPTR;
         for (size_t i = 0; i < sizeof(abcde_paths) / sizeof(abcde_paths[0]); i++) {
             fp = fopen(abcde_paths[i], "rb");
             if (fp) {
@@ -65,13 +65,13 @@ public:
                 break;
             }
         }
-        ASSERT_TRUE(fp != 0);
+        ASSERT_TRUE(fp != RAPIDJSON_NULLPTR);
         fclose(fp);
     }
 
     virtual void TearDown() {
         free(json_);
-        json_ = 0;
+        json_ = RAPIDJSON_NULLPTR;
     }
 
 private:
@@ -89,7 +89,7 @@ FileStreamTest::~FileStreamTest() {}
 
 TEST_F(FileStreamTest, FileReadStream) {
     FILE *fp = fopen(filename_, "rb");
-    ASSERT_TRUE(fp != 0);
+    ASSERT_TRUE(fp != RAPIDJSON_NULLPTR);
     char buffer[65536];
     FileReadStream s(fp, buffer, sizeof(buffer));
 
@@ -107,7 +107,7 @@ TEST_F(FileStreamTest, FileReadStream) {
 
 TEST_F(FileStreamTest, FileReadStream_Peek4) {
     FILE *fp = fopen(abcde_, "rb");
-    ASSERT_TRUE(fp != 0);
+    ASSERT_TRUE(fp != RAPIDJSON_NULLPTR);
     char buffer[4];
     FileReadStream s(fp, buffer, sizeof(buffer));
 

@@ -135,7 +135,7 @@ public:
     Ch Take() { assert(false); return '\0'; }
     size_t Tell() const { return 0; }
 
-    Ch* PutBegin() { assert(false); return 0; }
+    Ch* PutBegin() { assert(false); return RAPIDJSON_NULLPTR; }
     void Put(Ch c) { os_.put(c); }
     void Flush() { os_.flush(); }
     size_t PutEnd(Ch*) { assert(false); return 0; }
@@ -167,7 +167,7 @@ TEST(PrettyWriter, OStreamWrapper) {
 TEST(PrettyWriter, FileWriteStream) {
     char filename[L_tmpnam];
     FILE* fp = TempFile(filename);
-    ASSERT_TRUE(fp!=NULL);
+    ASSERT_TRUE(fp!=RAPIDJSON_NULLPTR);
     char buffer[16];
     FileWriteStream os(fp, buffer, sizeof(buffer));
     PrettyWriter<FileWriteStream> writer(os);
