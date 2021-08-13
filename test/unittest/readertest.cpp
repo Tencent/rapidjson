@@ -1392,6 +1392,36 @@ private:
     std::istream& is_;
 };
 
+class WIStreamWrapper {
+public:
+  typedef wchar_t Ch;
+
+  WIStreamWrapper(std::wistream& is) : is_(is) {}
+
+  Ch Peek() const {
+    unsigned c = is_.peek();
+    return c == std::char_traits<wchar_t>::eof() ? Ch('\0') : static_cast<Ch>(c);
+  }
+
+  Ch Take() {
+    unsigned c = is_.get();
+    return c == std::char_traits<wchar_t>::eof() ? Ch('\0') : static_cast<Ch>(c);
+  }
+
+  size_t Tell() const { return static_cast<size_t>(is_.tellg()); }
+
+  Ch* PutBegin() { assert(false); return 0; }
+  void Put(Ch) { assert(false); }
+  void Flush() { assert(false); }
+  size_t PutEnd(Ch*) { assert(false); return 0; }
+
+private:
+  WIStreamWrapper(const WIStreamWrapper&);
+  WIStreamWrapper& operator=(const WIStreamWrapper&);
+
+  std::wistream& is_;
+};
+
 TEST(Reader, Parse_IStreamWrapper_StringStream) {
     const char* json = "[1,2,3,4]";
 
@@ -1989,6 +2019,118 @@ TEST(Reader, NumbersAsStrings) {
         Reader reader;
         EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
     }
+}
+
+struct NumbersAsStringsHandlerWChar_t {
+  bool Null() { return true; }
+  bool Bool(bool) { return true; }
+  bool Int(int) { return true; }
+  bool Uint(unsigned) { return true; }
+  bool Int64(int64_t) { return true; }
+  bool Uint64(uint64_t) { return true; }
+  bool Double(double) { return true; }
+  // 'str' is not null-terminated
+  bool RawNumber(const wchar_t* str, SizeType length, bool) {
+    EXPECT_TRUE(str != 0);
+    EXPECT_TRUE(expected_len_ == length);
+    EXPECT_TRUE(wcsncmp(str, expected_, length) == 0);
+    return true;
+  }
+  bool String(const wchar_t*, SizeType, bool) { return true; }
+  bool StartObject() { return true; }
+  bool Key(const wchar_t*, SizeType, bool) { return true; }
+  bool EndObject(SizeType) { return true; }
+  bool StartArray() { return true; }
+  bool EndArray(SizeType) { return true; }
+
+  NumbersAsStringsHandlerWChar_t(const wchar_t* expected)
+    : expected_(expected)
+    , expected_len_(wcslen(expected)) {}
+
+  const wchar_t* expected_;
+  size_t expected_len_;
+};
+
+TEST(Reader, NumbersAsStringsWChar_t) {
+  {
+    const wchar_t* json = L"{ \"pi\": 3.1416 } ";
+    GenericStringStream<UTF16<>> s(json);
+    NumbersAsStringsHandlerWChar_t h(L"3.1416");
+    GenericReader<UTF16<>, UTF16<>> reader;
+    EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+  }
+  {
+    wchar_t* json = StrDup(L"{ \"pi\": 3.1416 } ");
+    GenericInsituStringStream<UTF16<>> s(json);
+    NumbersAsStringsHandlerWChar_t h(L"3.1416");
+    GenericReader<UTF16<>, UTF16<>> reader;
+    EXPECT_TRUE(reader.Parse<kParseInsituFlag | kParseNumbersAsStringsFlag>(s, h));
+    free(json);
+  }
+  {
+    const wchar_t* json = L"{ \"gigabyte\": 1.0e9 } ";
+    GenericStringStream<UTF16<>> s(json);
+    NumbersAsStringsHandlerWChar_t h(L"1.0e9");
+    GenericReader<UTF16<>, UTF16<>> reader;
+    EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+  }
+  {
+    wchar_t* json = StrDup(L"{ \"gigabyte\": 1.0e9 } ");
+    GenericInsituStringStream<UTF16<>> s(json);
+    NumbersAsStringsHandlerWChar_t h(L"1.0e9");
+    GenericReader<UTF16<>, UTF16<>> reader;
+    EXPECT_TRUE(reader.Parse<kParseInsituFlag | kParseNumbersAsStringsFlag>(s, h));
+    free(json);
+  }
+  {
+    const wchar_t* json = L"{ \"pi\": 314.159e-2 } ";
+    GenericStringStream<UTF16<>> s(json);
+    NumbersAsStringsHandlerWChar_t h(L"314.159e-2");
+    GenericReader<UTF16<>, UTF16<>> reader;
+    EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+  }
+  {
+    wchar_t* json = StrDup(L"{ \"gigabyte\": 314.159e-2 } ");
+    GenericInsituStringStream<UTF16<>> s(json);
+    NumbersAsStringsHandlerWChar_t h(L"314.159e-2");
+    GenericReader<UTF16<>, UTF16<>> reader;
+    EXPECT_TRUE(reader.Parse<kParseInsituFlag | kParseNumbersAsStringsFlag>(s, h));
+    free(json);
+  }
+  {
+    const wchar_t* json = L"{ \"negative\": -1.54321 } ";
+    GenericStringStream<UTF16<>> s(json);
+    NumbersAsStringsHandlerWChar_t h(L"-1.54321");
+    GenericReader<UTF16<>, UTF16<>> reader;
+    EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+  }
+  {
+    wchar_t* json = StrDup(L"{ \"negative\": -1.54321 } ");
+    GenericInsituStringStream<UTF16<>> s(json);
+    NumbersAsStringsHandlerWChar_t h(L"-1.54321");
+    GenericReader<UTF16<>, UTF16<>> reader;
+    EXPECT_TRUE(reader.Parse<kParseInsituFlag | kParseNumbersAsStringsFlag>(s, h));
+    free(json);
+  }
+  {
+    const wchar_t* json = L"{ \"pi\": 314.159e-2 } ";
+    std::wstringstream ss(json);
+    WIStreamWrapper s(ss);
+    NumbersAsStringsHandlerWChar_t h(L"314.159e-2");
+    GenericReader<UTF16<>, UTF16<>> reader;
+    EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+  }
+  {
+    wchar_t n1e319[321];   // '1' followed by 319 '0'
+    n1e319[0] = L'1';
+    for(int i = 1; i < 320; i++)
+      n1e319[i] = L'0';
+    n1e319[320] = L'\0';
+    GenericStringStream<UTF16<>> s(n1e319);
+    NumbersAsStringsHandlerWChar_t h(n1e319);
+    GenericReader<UTF16<>, UTF16<>> reader;
+    EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
+  }
 }
 
 template <unsigned extraFlags>
