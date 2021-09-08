@@ -152,7 +152,8 @@ enum ParseFlag {
     kParseCommentsFlag = 32,        //!< Allow one-line (//) and multi-line (/**/) comments.
     kParseNumbersAsStringsFlag = 64,    //!< Parse all numbers (ints/doubles) as strings.
     kParseTrailingCommasFlag = 128, //!< Allow trailing commas at the end of objects and arrays.
-    kParseNanAndInfFlag = 256,      //!< Allow parsing NaN, Inf, Infinity, -Inf and -Infinity as doubles.
+	kParseNanAndInfFlag = 256,      //!< Allow parsing NaN, Inf, Infinity, -Inf and -Infinity as doubles.
+	kParseMultiLineValueFlag = 512, //!< Allow parsing multi-line string values
     kParseDefaultFlags = RAPIDJSON_PARSE_DEFAULT_FLAGS  //!< Default parse flags. Can be customized by defining RAPIDJSON_PARSE_DEFAULT_FLAGS
 };
 
@@ -973,7 +974,7 @@ private:
         }
         else {
             StackStream<typename TargetEncoding::Ch> stackStream(stack_);
-            ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
+            ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream, isKey);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
             SizeType length = static_cast<SizeType>(stackStream.Length()) - 1;
             const typename TargetEncoding::Ch* const str = stackStream.Pop();
@@ -986,7 +987,7 @@ private:
     // Parse string to an output is
     // This function handles the prefix/suffix double quotes, escaping, and optional encoding validation.
     template<unsigned parseFlags, typename SEncoding, typename TEncoding, typename InputStream, typename OutputStream>
-    RAPIDJSON_FORCEINLINE void ParseStringToStream(InputStream& is, OutputStream& os) {
+    RAPIDJSON_FORCEINLINE void ParseStringToStream(InputStream& is, OutputStream& os, bool isKey = false) {
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
 #define Z16 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
         static const char escape[256] = {
@@ -1039,7 +1040,17 @@ private:
             }
             else if (RAPIDJSON_UNLIKELY(static_cast<unsigned>(c) < 0x20)) { // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
                 if (c == '\0')
-                    RAPIDJSON_PARSE_ERROR(kParseErrorStringMissQuotationMark, is.Tell());
+					RAPIDJSON_PARSE_ERROR(kParseErrorStringMissQuotationMark, is.Tell());
+				else if (!isKey && c == '\n' && (parseFlags & kParseMultiLineValueFlag)) {
+					is.Take();
+					os.Put('\\');
+					os.Put('n');
+				}
+				else if (!isKey && c == '\t' && (parseFlags & kParseMultiLineValueFlag)) {
+					is.Take();
+					os.Put('\\');
+					os.Put('t');
+				}
                 else
                     RAPIDJSON_PARSE_ERROR(kParseErrorStringInvalidEncoding, is.Tell());
             }
