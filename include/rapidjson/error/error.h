@@ -86,7 +86,9 @@ enum ParseErrorCode {
     kParseErrorNumberMissExponent,              //!< Miss exponent in number.
 
     kParseErrorTermination,                     //!< Parsing was terminated.
-    kParseErrorUnspecificSyntaxError            //!< Unspecific syntax error.
+    kParseErrorUnspecificSyntaxError,            //!< Unspecific syntax error.
+
+    kParseErrorInvalidFlagCombination           //!< Invalid combination of ParseFlags.
 };
 
 //! Result of parsing (wraps ParseErrorCode)
