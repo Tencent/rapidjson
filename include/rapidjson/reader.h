@@ -152,8 +152,8 @@ enum ParseFlag {
     kParseCommentsFlag = 32,        //!< Allow one-line (//) and multi-line (/**/) comments.
     kParseNumbersAsStringsFlag = 64,    //!< Parse all numbers (ints/doubles) as strings.
     kParseTrailingCommasFlag = 128, //!< Allow trailing commas at the end of objects and arrays.
-	kParseNanAndInfFlag = 256,      //!< Allow parsing NaN, Inf, Infinity, -Inf and -Infinity as doubles.
-	kParseMultiLineStringValueFlag = 512, //!< Allow parsing multi-line string values.
+    kParseNanAndInfFlag = 256,      //!< Allow parsing NaN, Inf, Infinity, -Inf and -Infinity as doubles.
+    kParseMultiLineStringValueFlag = 512, //!< Allow parsing multi-line string values.
     kParseDefaultFlags = RAPIDJSON_PARSE_DEFAULT_FLAGS  //!< Default parse flags. Can be customized by defining RAPIDJSON_PARSE_DEFAULT_FLAGS
 };
 
@@ -1044,18 +1044,18 @@ private:
             else if (RAPIDJSON_UNLIKELY(static_cast<unsigned>(c) < 0x20)) { // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
                 if (c == '\0')
 					RAPIDJSON_PARSE_ERROR(kParseErrorStringMissQuotationMark, is.Tell());
-				else if (!isKey && c == '\n' && (parseFlags & kParseMultiLineStringValueFlag)) {
-					is.Take();
-					os.Put('\n');
-				}
-				else if (!isKey && c == '\t' && (parseFlags & kParseMultiLineStringValueFlag)) {
-					is.Take();
-					os.Put('\t');
-				}
-				else if (!isKey && c == '\r' && (parseFlags & kParseMultiLineStringValueFlag)) {
-					is.Take();
-					os.Put('\r');
-				}
+                else if (!isKey && c == '\n' && (parseFlags & kParseMultiLineStringValueFlag)) {
+                    is.Take();
+                    os.Put('\n');
+                }
+                else if (!isKey && c == '\t' && (parseFlags & kParseMultiLineStringValueFlag)) {
+                    is.Take();
+                    os.Put('\t');
+                }
+                else if (!isKey && c == '\r' && (parseFlags & kParseMultiLineStringValueFlag)) {
+                    is.Take();
+                    os.Put('\r');
+                }
                 else
                     RAPIDJSON_PARSE_ERROR(kParseErrorStringInvalidEncoding, is.Tell());
             }
