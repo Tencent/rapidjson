@@ -1046,18 +1046,15 @@ private:
 					RAPIDJSON_PARSE_ERROR(kParseErrorStringMissQuotationMark, is.Tell());
 				else if (!isKey && c == '\n' && (parseFlags & kParseMultiLineStringValueFlag)) {
 					is.Take();
-					os.Put('\\');
-					os.Put('n');
+					os.Put('\n');
 				}
 				else if (!isKey && c == '\t' && (parseFlags & kParseMultiLineStringValueFlag)) {
 					is.Take();
-					os.Put('\\');
-					os.Put('t');
+					os.Put('\t');
 				}
 				else if (!isKey && c == '\r' && (parseFlags & kParseMultiLineStringValueFlag)) {
 					is.Take();
-					os.Put('\\');
-					os.Put('r');
+					os.Put('\r');
 				}
                 else
                     RAPIDJSON_PARSE_ERROR(kParseErrorStringInvalidEncoding, is.Tell());
