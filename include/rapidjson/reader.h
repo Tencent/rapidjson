@@ -955,9 +955,9 @@ private:
 
     // Parse string and generate String event. Different code paths for kParseInsituFlag.
     template<unsigned parseFlags, typename InputStream, typename Handler>
-	void ParseString(InputStream& is, Handler& handler, bool isKey = false) {
-		if ((parseFlags & kParseInsituFlag) && (parseFlags & kParseMultiLineStringValueFlag))
-			RAPIDJSON_PARSE_ERROR(kParseErrorInvalidFlagCombination, is.Tell());
+    void ParseString(InputStream& is, Handler& handler, bool isKey = false) {
+        if ((parseFlags & kParseInsituFlag) && (parseFlags & kParseMultiLineStringValueFlag))
+            RAPIDJSON_PARSE_ERROR(kParseErrorInvalidFlagCombination, is.Tell());
 
         internal::StreamLocalCopy<InputStream> copy(is);
         InputStream& s(copy.s);
@@ -1043,7 +1043,7 @@ private:
             }
             else if (RAPIDJSON_UNLIKELY(static_cast<unsigned>(c) < 0x20)) { // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
                 if (c == '\0')
-					RAPIDJSON_PARSE_ERROR(kParseErrorStringMissQuotationMark, is.Tell());
+                    RAPIDJSON_PARSE_ERROR(kParseErrorStringMissQuotationMark, is.Tell());
                 else if (!isKey && c == '\n' && (parseFlags & kParseMultiLineStringValueFlag)) {
                     is.Take();
                     os.Put('\n');
