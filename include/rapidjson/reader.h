@@ -1044,17 +1044,9 @@ private:
             else if (RAPIDJSON_UNLIKELY(static_cast<unsigned>(c) < 0x20)) { // RFC 4627: unescaped = %x20-21 / %x23-5B / %x5D-10FFFF
                 if (c == '\0')
                     RAPIDJSON_PARSE_ERROR(kParseErrorStringMissQuotationMark, is.Tell());
-                else if (!isKey && c == '\n' && (parseFlags & kParseMultiLineStringValueFlag)) {
+                else if (!isKey && (parseFlags & kParseMultiLineStringValueFlag) && (c == '\n' || c == '\r' || c == '\t')) {
                     is.Take();
-                    os.Put('\n');
-                }
-                else if (!isKey && c == '\t' && (parseFlags & kParseMultiLineStringValueFlag)) {
-                    is.Take();
-                    os.Put('\t');
-                }
-                else if (!isKey && c == '\r' && (parseFlags & kParseMultiLineStringValueFlag)) {
-                    is.Take();
-                    os.Put('\r');
+                    os.Put(c);
                 }
                 else
                     RAPIDJSON_PARSE_ERROR(kParseErrorStringInvalidEncoding, is.Tell());
