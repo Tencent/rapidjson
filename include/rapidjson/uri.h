@@ -238,20 +238,27 @@ private:
 
         // Allocate one block containing each part of the URI (5) plus base plus full URI, all null terminated.
         // Order: scheme, auth, path, query, frag, base, uri
+        // Note need to set, increment, assign in 3 stages to avoid compiler warning bug.
         size_t total = (3 * len + 7) * sizeof(Ch);
         scheme_ = static_cast<Ch*>(allocator_->Malloc(total));
         *scheme_ = '\0';
-        auth_ = scheme_ + 1;
+        auth_ = scheme_;
+        auth_++;
         *auth_ = '\0';
-        path_ = auth_ + 1;
+        path_ = auth_;
+        path_++;
         *path_ = '\0';
-        query_ = path_ + 1;
+        query_ = path_;
+        query_++;
         *query_ = '\0';
-        frag_ = query_ + 1;
+        frag_ = query_;
+        frag_++;
         *frag_ = '\0';
-        base_ = frag_ + 1;
+        base_ = frag_;
+        base_++;
         *base_ = '\0';
-        uri_ = base_ + 1;
+        uri_ = base_;
+        uri_++;
         *uri_ = '\0';
         return total;
     }
@@ -293,7 +300,9 @@ private:
             }
         }
         // Look for auth (//([^/?#]*))?
-        auth_ = scheme_ + GetSchemeStringLength() + 1;
+        // Note need to set, increment, assign in 3 stages to avoid compiler warning bug.
+        auth_ = scheme_ + GetSchemeStringLength();
+        auth_++;
         *auth_ = '\0';
         if (start < len - 1 && uri[start] == '/' && uri[start + 1] == '/') {
             pos2 = start + 2;
@@ -308,7 +317,9 @@ private:
             start = pos2;
         }
         // Look for path ([^?#]*)
-        path_ = auth_ + GetAuthStringLength() + 1;
+        // Note need to set, increment, assign in 3 stages to avoid compiler warning bug.
+        path_ = auth_ + GetAuthStringLength();
+        path_++;
         *path_ = '\0';
         if (start < len) {
             pos2 = start;
@@ -326,7 +337,9 @@ private:
             }
         }
         // Look for query (\?([^#]*))?
-        query_ = path_ + GetPathStringLength() + 1;
+        // Note need to set, increment, assign in 3 stages to avoid compiler warning bug.
+        query_ = path_ + GetPathStringLength();
+        query_++;
         *query_ = '\0';
         if (start < len && uri[start] == '?') {
             pos2 = start + 1;
@@ -341,7 +354,9 @@ private:
             }
         }
         // Look for fragment (#(.*))?
-        frag_ = query_ + GetQueryStringLength() + 1;
+        // Note need to set, increment, assign in 3 stages to avoid compiler warning bug.
+        frag_ = query_ + GetQueryStringLength();
+        frag_++;
         *frag_ = '\0';
         if (start < len && uri[start] == '#') {
             std::memcpy(frag_, &uri[start], (len - start) * sizeof(Ch));
