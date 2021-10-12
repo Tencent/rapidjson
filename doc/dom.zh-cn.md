@@ -1,6 +1,6 @@
 # DOM
 
-文档对象模型（Document Object Model, DOM）是一种罝于内存中的 JSON 表示方式，以供查询及操作。我们己于 [教程](doc/tutorial.zh-cn.md) 中介绍了 DOM 的基本用法，本节将讲述一些细节及高级用法。
+文档对象模型（Document Object Model, DOM）是一种罝于内存中的 JSON 表示方式，以供查询及操作。我们已于 [教程](doc/tutorial.zh-cn.md) 中介绍了 DOM 的基本用法，本节将讲述一些细节及高级用法。
 
 [TOC]
 
@@ -119,6 +119,7 @@ GenericDocument& GenericDocument::Parse(const Ch* str);
 `kParseNumbersAsStringsFlag`  | 把数字类型解析成字符串。
 `kParseTrailingCommasFlag`    | 容许在对象和数组结束前含有逗号（放宽的 JSON 语法）。
 `kParseNanAndInfFlag`         | 容许 `NaN`、`Inf`、`Infinity`、`-Inf` 及 `-Infinity` 作为 `double` 值（放宽的 JSON 语法）。
+`kParseEscapedApostropheFlag` | 容许字符串中转义单引号 `\'` （放宽的 JSON 语法）。
 
 由于使用了非类型模板参数，而不是函数参数，C++ 编译器能为个别组合生成代码，以改善性能及减少代码尺寸（当只用单种特化）。缺点是需要在编译期决定标志。
 

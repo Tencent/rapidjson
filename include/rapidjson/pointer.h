@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #define RAPIDJSON_POINTER_H_
 
 #include "document.h"
+#include "uri.h"
 #include "internal/itoa.h"
 
 #ifdef __clang__
@@ -80,6 +81,8 @@ class GenericPointer {
 public:
     typedef typename ValueType::EncodingType EncodingType;  //!< Encoding type from Value
     typedef typename ValueType::Ch Ch;                      //!< Character type from Value
+    typedef GenericUri<ValueType, Allocator> UriType;
+
 
     //! A token is the basic units of internal representation.
     /*!
@@ -163,7 +166,7 @@ public:
     GenericPointer(const Token* tokens, size_t tokenCount) : allocator_(), ownAllocator_(), nameBuffer_(), tokens_(const_cast<Token*>(tokens)), tokenCount_(tokenCount), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {}
 
     //! Copy constructor.
-    GenericPointer(const GenericPointer& rhs) : allocator_(rhs.allocator_), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
+    GenericPointer(const GenericPointer& rhs) : allocator_(), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
         *this = rhs;
     }
 
@@ -488,10 +491,11 @@ public:
                     v = &((*v)[t->index]);
                 }
                 else {
-                    typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
+                    typename ValueType::MemberIterator m = v->FindMember(GenericValue<EncodingType>(GenericStringRef<Ch>(t->name, t->length)));
                     if (m == v->MemberEnd()) {
                         v->AddMember(ValueType(t->name, t->length, allocator).Move(), ValueType().Move(), allocator);
-                        v = &(--v->MemberEnd())->value; // Assumes AddMember() appends at the end
+                        m = v->MemberEnd();
+                        v = &(--m)->value; // Assumes AddMember() appends at the end
                         exist = false;
                     }
                     else
@@ -519,6 +523,70 @@ public:
 
     //@}
 
+    //!@name Compute URI
+    //@{
+
+    //! Compute the in-scope URI for a subtree.
+    //  For use with JSON pointers into JSON schema documents.
+    /*!
+        \param root Root value of a DOM sub-tree to be resolved. It can be any value other than document root.
+        \param rootUri Root URI
+        \param unresolvedTokenIndex If the pointer cannot resolve a token in the pointer, this parameter can obtain the index of unresolved token.
+        \param allocator Allocator for Uris
+        \return Uri if it can be resolved. Otherwise null.
+
+        \note
+        There are only 3 situations when a URI cannot be resolved:
+        1. A value in the path is not an array nor object.
+        2. An object value does not contain the token.
+        3. A token is out of range of an array value.
+
+        Use unresolvedTokenIndex to retrieve the token index.
+    */
+    UriType GetUri(ValueType& root, const UriType& rootUri, size_t* unresolvedTokenIndex = 0, Allocator* allocator = 0) const {
+        static const Ch kIdString[] = { 'i', 'd', '\0' };
+        static const ValueType kIdValue(kIdString, 2);
+        UriType base = UriType(rootUri, allocator);
+        RAPIDJSON_ASSERT(IsValid());
+        ValueType* v = &root;
+        for (const Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
+            switch (v->GetType()) {
+                case kObjectType:
+                {
+                    // See if we have an id, and if so resolve with the current base
+                    typename ValueType::MemberIterator m = v->FindMember(kIdValue);
+                    if (m != v->MemberEnd() && (m->value).IsString()) {
+                        UriType here = UriType(m->value, allocator).Resolve(base, allocator);
+                        base = here;
+                    }
+                    m = v->FindMember(GenericValue<EncodingType>(GenericStringRef<Ch>(t->name, t->length)));
+                    if (m == v->MemberEnd())
+                        break;
+                    v = &m->value;
+                }
+                  continue;
+                case kArrayType:
+                    if (t->index == kPointerInvalidIndex || t->index >= v->Size())
+                        break;
+                    v = &((*v)[t->index]);
+                    continue;
+                default:
+                    break;
+            }
+
+            // Error: unresolved token
+            if (unresolvedTokenIndex)
+                *unresolvedTokenIndex = static_cast<size_t>(t - tokens_);
+            return UriType(allocator);
+        }
+        return base;
+    }
+
+    UriType GetUri(const ValueType& root, const UriType& rootUri, size_t* unresolvedTokenIndex = 0, Allocator* allocator = 0) const {
+      return GetUri(const_cast<ValueType&>(root), rootUri, unresolvedTokenIndex, allocator);
+    }
+
+
     //!@name Query value
     //@{
 
@@ -543,7 +611,7 @@ public:
             switch (v->GetType()) {
             case kObjectType:
                 {
-                    typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
+                    typename ValueType::MemberIterator m = v->FindMember(GenericValue<EncodingType>(GenericStringRef<Ch>(t->name, t->length)));
                     if (m == v->MemberEnd())
                         break;
                     v = &m->value;
@@ -779,7 +847,7 @@ public:
             switch (v->GetType()) {
             case kObjectType:
                 {
-                    typename ValueType::MemberIterator m = v->FindMember(GenericStringRef<Ch>(t->name, t->length));
+                    typename ValueType::MemberIterator m = v->FindMember(GenericValue<EncodingType>(GenericStringRef<Ch>(t->name, t->length)));
                     if (m == v->MemberEnd())
                         return false;
                     v = &m->value;

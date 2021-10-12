@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -38,6 +38,7 @@ TEST(dtoa, normal) {
     TEST_DTOA(0.123456789012, "0.123456789012");
     TEST_DTOA(1234567.8, "1234567.8");
     TEST_DTOA(-79.39773355813419, "-79.39773355813419");
+    TEST_DTOA(-36.973846435546875, "-36.973846435546875");
     TEST_DTOA(0.000001, "0.000001");
     TEST_DTOA(0.0000001, "1e-7");
     TEST_DTOA(1e30, "1e30");

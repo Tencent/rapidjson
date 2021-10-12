@@ -64,11 +64,11 @@
 
    JSON are commonly used in web applications for transferring structured data. It is also used as a file format for data persistence.
 
-2. Does RapidJSON conform to the JSON standard?
+3. Does RapidJSON conform to the JSON standard?
 
    Yes. RapidJSON is fully compliance with [RFC7159](http://www.ietf.org/rfc/rfc7159.txt) and [ECMA-404](http://www.ecma-international.org/publications/standards/Ecma-404.htm). It can handle corner cases, such as supporting null character and surrogate pairs in JSON strings.
 
-3. Does RapidJSON support relaxed syntax?
+4. Does RapidJSON support relaxed syntax?
 
    Currently no. RapidJSON only support the strict standardized format. Support on related syntax is under discussion in this [issue](https://github.com/Tencent/rapidjson/issues/36).
 

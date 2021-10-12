@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -15,6 +15,11 @@
 #include "unittest.h"
 
 #include "rapidjson/allocators.h"
+
+#include <map>
+#include <string>
+#include <utility>
+#include <functional>
 
 using namespace rapidjson;
 
@@ -47,18 +52,205 @@ void TestAllocator(Allocator& a) {
     EXPECT_TRUE(a.Realloc(a.Malloc(1), 1, 0) == 0);
 }
 
+struct TestStdAllocatorData {
+    TestStdAllocatorData(int &constructions, int &destructions) :
+        constructions_(&constructions),
+        destructions_(&destructions)
+    {
+        ++*constructions_;
+    }
+    TestStdAllocatorData(const TestStdAllocatorData& rhs) :
+        constructions_(rhs.constructions_),
+        destructions_(rhs.destructions_)
+    {
+        ++*constructions_;
+    }
+    TestStdAllocatorData& operator=(const TestStdAllocatorData& rhs)
+    {
+        this->~TestStdAllocatorData();
+        constructions_ = rhs.constructions_;
+        destructions_ = rhs.destructions_;
+        ++*constructions_;
+        return *this;
+    }
+    ~TestStdAllocatorData()
+    {
+        ++*destructions_;
+    }
+private:
+    TestStdAllocatorData();
+    int *constructions_,
+        *destructions_;
+};
+
+template <typename Allocator>
+void TestStdAllocator(const Allocator& a) {
+#if RAPIDJSON_HAS_CXX17
+    typedef StdAllocator<bool, Allocator> BoolAllocator;
+#else
+    typedef StdAllocator<void, Allocator> VoidAllocator;
+    typedef typename VoidAllocator::template rebind<bool>::other BoolAllocator;
+#endif
+    BoolAllocator ba(a), ba2(a);
+    EXPECT_TRUE(ba == ba2);
+    EXPECT_FALSE(ba!= ba2);
+    ba.deallocate(ba.allocate());
+    EXPECT_TRUE(ba == ba2);
+    EXPECT_FALSE(ba != ba2);
+
+    unsigned long long ll = 0, *llp = &ll;
+    const unsigned long long cll = 0, *cllp = &cll;
+    StdAllocator<unsigned long long, Allocator> lla(a);
+    EXPECT_EQ(lla.address(ll), llp);
+    EXPECT_EQ(lla.address(cll), cllp);
+    EXPECT_TRUE(lla.max_size() > 0 && lla.max_size() <= SIZE_MAX / sizeof(unsigned long long));
+
+    int *arr;
+    StdAllocator<int, Allocator> ia(a);
+    arr = ia.allocate(10 * sizeof(int));
+    EXPECT_TRUE(arr != 0);
+    for (int i = 0; i < 10; ++i) {
+        arr[i] = 0x0f0f0f0f;
+    }
+    ia.deallocate(arr, 10);
+    arr = Malloc<int>(ia, 10);
+    EXPECT_TRUE(arr != 0);
+    for (int i = 0; i < 10; ++i) {
+        arr[i] = 0x0f0f0f0f;
+    }
+    arr = Realloc<int>(ia, arr, 10, 20);
+    EXPECT_TRUE(arr != 0);
+    for (int i = 0; i < 10; ++i) {
+        EXPECT_EQ(arr[i], 0x0f0f0f0f);
+    }
+    for (int i = 10; i < 20; i++) {
+        arr[i] = 0x0f0f0f0f;
+    }
+    Free<int>(ia, arr, 20);
+
+    int cons = 0, dest = 0;
+    StdAllocator<TestStdAllocatorData, Allocator> da(a);
+    for (int i = 1; i < 10; i++) {
+        TestStdAllocatorData *d = da.allocate();
+        EXPECT_TRUE(d != 0);
+
+        da.destroy(new(d) TestStdAllocatorData(cons, dest));
+        EXPECT_EQ(cons, i);
+        EXPECT_EQ(dest, i);
+
+        da.deallocate(d);
+    }
+
+    typedef StdAllocator<char, Allocator> CharAllocator;
+    typedef std::basic_string<char, std::char_traits<char>, CharAllocator> String;
+#if RAPIDJSON_HAS_CXX11
+    String s(CharAllocator{a});
+#else
+    CharAllocator ca(a);
+    String s(ca);
+#endif
+    for (int i = 0; i < 26; i++) {
+        s.push_back(static_cast<char>('A' + i));
+    }
+    EXPECT_TRUE(s == "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
+    typedef StdAllocator<std::pair<const int, bool>, Allocator> MapAllocator;
+    typedef std::map<int, bool, std::less<int>, MapAllocator> Map;
+#if RAPIDJSON_HAS_CXX11
+    Map map(std::less<int>(), MapAllocator{a});
+#else
+    MapAllocator ma(a);
+    Map map(std::less<int>(), ma);
+#endif
+    for (int i = 0; i < 10; i++) {
+        map.insert(std::make_pair(i, (i % 2) == 0));
+    }
+    EXPECT_TRUE(map.size() == 10);
+    for (int i = 0; i < 10; i++) {
+        typename Map::iterator it = map.find(i);
+        EXPECT_TRUE(it != map.end());
+        EXPECT_TRUE(it->second == ((i % 2) == 0));
+    }
+}
+
 TEST(Allocator, CrtAllocator) {
     CrtAllocator a;
+
     TestAllocator(a);
+    TestStdAllocator(a);
+
+    CrtAllocator a2;
+    EXPECT_TRUE(a == a2);
+    EXPECT_FALSE(a != a2);
+    a2.Free(a2.Malloc(1));
+    EXPECT_TRUE(a == a2);
+    EXPECT_FALSE(a != a2);
 }
 
 TEST(Allocator, MemoryPoolAllocator) {
-    MemoryPoolAllocator<> a;
+    const size_t capacity = RAPIDJSON_ALLOCATOR_DEFAULT_CHUNK_CAPACITY;
+    MemoryPoolAllocator<> a(capacity);
+
+    a.Clear(); // noop
+    EXPECT_EQ(a.Size(), 0u);
+    EXPECT_EQ(a.Capacity(), 0u);
+    EXPECT_EQ(a.Shared(), false);
+    {
+        MemoryPoolAllocator<> a2(a);
+        EXPECT_EQ(a2.Shared(), true);
+        EXPECT_EQ(a.Shared(), true);
+        EXPECT_TRUE(a == a2);
+        EXPECT_FALSE(a != a2);
+        a2.Free(a2.Malloc(1));
+        EXPECT_TRUE(a == a2);
+        EXPECT_FALSE(a != a2);
+    }
+    EXPECT_EQ(a.Shared(), false);
+    EXPECT_EQ(a.Capacity(), capacity);
+    EXPECT_EQ(a.Size(), 8u); // aligned
+    a.Clear();
+    EXPECT_EQ(a.Capacity(), 0u);
+    EXPECT_EQ(a.Size(), 0u);
+
     TestAllocator(a);
+    TestStdAllocator(a);
 
     for (size_t i = 1; i < 1000; i++) {
         EXPECT_TRUE(a.Malloc(i) != 0);
         EXPECT_LE(a.Size(), a.Capacity());
+    }
+
+    CrtAllocator baseAllocator;
+    a = MemoryPoolAllocator<>(capacity, &baseAllocator);
+    EXPECT_EQ(a.Capacity(), 0u);
+    EXPECT_EQ(a.Size(), 0u);
+    a.Free(a.Malloc(1));
+    EXPECT_EQ(a.Capacity(), capacity);
+    EXPECT_EQ(a.Size(), 8u); // aligned
+
+    {
+        a.Clear();
+        const size_t bufSize = 1024;
+        char *buffer = (char *)a.Malloc(bufSize);
+        MemoryPoolAllocator<> aligned_a(buffer, bufSize);
+        EXPECT_TRUE(aligned_a.Capacity() > 0 && aligned_a.Capacity() <= bufSize);
+        EXPECT_EQ(aligned_a.Size(), 0u);
+        aligned_a.Free(aligned_a.Malloc(1));
+        EXPECT_TRUE(aligned_a.Capacity() > 0 && aligned_a.Capacity() <= bufSize);
+        EXPECT_EQ(aligned_a.Size(), 8u); // aligned
+    }
+
+    {
+        a.Clear();
+        const size_t bufSize = 1024;
+        char *buffer = (char *)a.Malloc(bufSize);
+        RAPIDJSON_ASSERT(bufSize % sizeof(void*) == 0);
+        MemoryPoolAllocator<> unaligned_a(buffer + 1, bufSize - 1);
+        EXPECT_TRUE(unaligned_a.Capacity() > 0 && unaligned_a.Capacity() <= bufSize - sizeof(void*));
+        EXPECT_EQ(unaligned_a.Size(), 0u);
+        unaligned_a.Free(unaligned_a.Malloc(1));
+        EXPECT_TRUE(unaligned_a.Capacity() > 0 && unaligned_a.Capacity() <= bufSize - sizeof(void*));
+        EXPECT_EQ(unaligned_a.Size(), 8u); // aligned
     }
 }
 

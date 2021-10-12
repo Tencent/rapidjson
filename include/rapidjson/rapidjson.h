@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -125,6 +125,19 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// __cplusplus macro
+
+//!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
+
+#if defined(_MSC_VER)
+#define RAPIDJSON_CPLUSPLUS _MSVC_LANG
+#else
+#define RAPIDJSON_CPLUSPLUS __cplusplus
+#endif
+
+//!@endcond
+
+///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_HAS_STDSTRING
 
 #ifndef RAPIDJSON_HAS_STDSTRING
@@ -148,6 +161,24 @@
 #if RAPIDJSON_HAS_STDSTRING
 #include <string>
 #endif // RAPIDJSON_HAS_STDSTRING
+
+///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_USE_MEMBERSMAP
+
+/*! \def RAPIDJSON_USE_MEMBERSMAP
+    \ingroup RAPIDJSON_CONFIG
+    \brief Enable RapidJSON support for object members handling in a \c std::multimap
+
+    By defining this preprocessor symbol to \c 1, \ref rapidjson::GenericValue object
+    members are stored in a \c std::multimap for faster lookup and deletion times, a
+    trade off with a slightly slower insertion time and a small object allocat(or)ed
+    memory overhead.
+
+    \hideinitializer
+*/
+#ifndef RAPIDJSON_USE_MEMBERSMAP
+#define RAPIDJSON_USE_MEMBERSMAP 0 // not by default
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NO_INT64DEFINE
@@ -411,7 +442,7 @@ RAPIDJSON_NAMESPACE_END
 
 // Prefer C++11 static_assert, if available
 #ifndef RAPIDJSON_STATIC_ASSERT
-#if __cplusplus >= 201103L || ( defined(_MSC_VER) && _MSC_VER >= 1800 )
+#if RAPIDJSON_CPLUSPLUS >= 201103L || ( defined(_MSC_VER) && _MSC_VER >= 1800 )
 #define RAPIDJSON_STATIC_ASSERT(x) \
    static_assert(x, RAPIDJSON_STRINGIFY(x))
 #endif // C++11
@@ -490,6 +521,12 @@ RAPIDJSON_NAMESPACE_END
 #define RAPIDJSON_VERSION_CODE(x,y,z) \
   (((x)*100000) + ((y)*100) + (z))
 
+#if defined(__has_builtin)
+#define RAPIDJSON_HAS_BUILTIN(x) __has_builtin(x)
+#else
+#define RAPIDJSON_HAS_BUILTIN(x) 0
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_DIAG_PUSH/POP, RAPIDJSON_DIAG_OFF
 
@@ -535,8 +572,14 @@ RAPIDJSON_NAMESPACE_END
 ///////////////////////////////////////////////////////////////////////////////
 // C++11 features
 
+#ifndef RAPIDJSON_HAS_CXX11
+#define RAPIDJSON_HAS_CXX11 (RAPIDJSON_CPLUSPLUS >= 201103L)
+#endif
+
 #ifndef RAPIDJSON_HAS_CXX11_RVALUE_REFS
-#if defined(__clang__)
+#if RAPIDJSON_HAS_CXX11
+#define RAPIDJSON_HAS_CXX11_RVALUE_REFS 1
+#elif defined(__clang__)
 #if __has_feature(cxx_rvalue_references) && \
     (defined(_MSC_VER) || defined(_LIBCPP_VERSION) || defined(__GLIBCXX__) && __GLIBCXX__ >= 20080306)
 #define RAPIDJSON_HAS_CXX11_RVALUE_REFS 1
@@ -553,8 +596,14 @@ RAPIDJSON_NAMESPACE_END
 #endif
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
+#if RAPIDJSON_HAS_CXX11_RVALUE_REFS
+#include <utility> // std::move
+#endif
+
 #ifndef RAPIDJSON_HAS_CXX11_NOEXCEPT
-#if defined(__clang__)
+#if RAPIDJSON_HAS_CXX11
+#define RAPIDJSON_HAS_CXX11_NOEXCEPT 1
+#elif defined(__clang__)
 #define RAPIDJSON_HAS_CXX11_NOEXCEPT __has_feature(cxx_noexcept)
 #elif (defined(RAPIDJSON_GNUC) && (RAPIDJSON_GNUC >= RAPIDJSON_VERSION_CODE(4,6,0)) && defined(__GXX_EXPERIMENTAL_CXX0X__)) || \
     (defined(_MSC_VER) && _MSC_VER >= 1900) || \
@@ -564,11 +613,13 @@ RAPIDJSON_NAMESPACE_END
 #define RAPIDJSON_HAS_CXX11_NOEXCEPT 0
 #endif
 #endif
+#ifndef RAPIDJSON_NOEXCEPT
 #if RAPIDJSON_HAS_CXX11_NOEXCEPT
 #define RAPIDJSON_NOEXCEPT noexcept
 #else
-#define RAPIDJSON_NOEXCEPT /* noexcept */
+#define RAPIDJSON_NOEXCEPT throw()
 #endif // RAPIDJSON_HAS_CXX11_NOEXCEPT
+#endif
 
 // no automatic detection, yet
 #ifndef RAPIDJSON_HAS_CXX11_TYPETRAITS
@@ -591,6 +642,27 @@ RAPIDJSON_NAMESPACE_END
 #endif
 #endif // RAPIDJSON_HAS_CXX11_RANGE_FOR
 
+///////////////////////////////////////////////////////////////////////////////
+// C++17 features
+
+#ifndef RAPIDJSON_HAS_CXX17
+#define RAPIDJSON_HAS_CXX17 (RAPIDJSON_CPLUSPLUS >= 201703L)
+#endif
+
+#if RAPIDJSON_HAS_CXX17
+# define RAPIDJSON_DELIBERATE_FALLTHROUGH [[fallthrough]]
+#elif defined(__has_cpp_attribute)
+# if __has_cpp_attribute(clang::fallthrough)
+#  define RAPIDJSON_DELIBERATE_FALLTHROUGH [[clang::fallthrough]]
+# elif __has_cpp_attribute(fallthrough)
+#  define RAPIDJSON_DELIBERATE_FALLTHROUGH __attribute__((fallthrough))
+# else
+#  define RAPIDJSON_DELIBERATE_FALLTHROUGH
+# endif
+#else
+# define RAPIDJSON_DELIBERATE_FALLTHROUGH
+#endif
+
 //!@endcond
 
 //! Assertion (in non-throwing contexts).
@@ -609,15 +681,28 @@ RAPIDJSON_NAMESPACE_END
 
 #ifndef RAPIDJSON_NOEXCEPT_ASSERT
 #ifdef RAPIDJSON_ASSERT_THROWS
-#if RAPIDJSON_HAS_CXX11_NOEXCEPT
-#define RAPIDJSON_NOEXCEPT_ASSERT(x)
-#else
-#define RAPIDJSON_NOEXCEPT_ASSERT(x) RAPIDJSON_ASSERT(x)
-#endif // RAPIDJSON_HAS_CXX11_NOEXCEPT
+#include <cassert>
+#define RAPIDJSON_NOEXCEPT_ASSERT(x) assert(x)
 #else
 #define RAPIDJSON_NOEXCEPT_ASSERT(x) RAPIDJSON_ASSERT(x)
 #endif // RAPIDJSON_ASSERT_THROWS
 #endif // RAPIDJSON_NOEXCEPT_ASSERT
+
+///////////////////////////////////////////////////////////////////////////////
+// malloc/realloc/free
+
+#ifndef RAPIDJSON_MALLOC
+///! customization point for global \c malloc
+#define RAPIDJSON_MALLOC(size) std::malloc(size)
+#endif
+#ifndef RAPIDJSON_REALLOC
+///! customization point for global \c realloc
+#define RAPIDJSON_REALLOC(ptr, new_size) std::realloc(ptr, new_size)
+#endif
+#ifndef RAPIDJSON_FREE
+///! customization point for global \c free
+#define RAPIDJSON_FREE(ptr) std::free(ptr)
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // new/delete

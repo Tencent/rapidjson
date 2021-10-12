@@ -12,7 +12,7 @@ Each JSON value is stored in a type called `Value`. A `Document`, representing t
 
 # Query Value {#QueryValue}
 
-In this section, we will use excerpt of `example/tutorial/tutorial.cpp`.
+In this section, we will use excerpt from `example/tutorial/tutorial.cpp`.
 
 Assume we have the following JSON stored in a C string (`const char* json`):
 ~~~~~~~~~~js
@@ -82,10 +82,10 @@ JSON number type represents all numeric values. However, C++ needs more specific
 ~~~~~~~~~~cpp
 assert(document["i"].IsNumber());
 
-// In this case, IsUint()/IsInt64()/IsUInt64() also return true.
+// In this case, IsUint()/IsInt64()/IsUint64() also return true.
 assert(document["i"].IsInt());          
 printf("i = %d\n", document["i"].GetInt());
-// Alternative (int)document["i"]
+// Alternatively (int)document["i"]
 
 assert(document["pi"].IsNumber());
 assert(document["pi"].IsDouble());
@@ -113,7 +113,7 @@ a[2] = 3
 a[3] = 4
 ~~~~~~~~~~
 
-Note that, RapidJSON does not automatically convert values between JSON types. If a value is a string, it is invalid to call `GetInt()`, for example. In debug mode it will fail an assertion. In release mode, the behavior is undefined.
+Note that, RapidJSON does not automatically convert values between JSON types. For example, if a value is a string, it is invalid to call `GetInt()`. In debug mode it will fail on assertion. In release mode, the behavior is undefined.
 
 In the following sections we discuss details about querying individual types.
 
@@ -168,9 +168,9 @@ Type of member pi is Number
 Type of member a is Array
 ~~~~~~~~~~
 
-Note that, when `operator[](const char*)` cannot find the member, it will fail an assertion.
+Note that, when `operator[](const char*)` cannot find the member, it will fail on assertion.
 
-If we are unsure whether a member exists, we need to call `HasMember()` before calling `operator[](const char*)`. However, this incurs two lookup. A better way is to call `FindMember()`, which can check the existence of member and obtain its value at once:
+If we are unsure whether a member exists, we need to call `HasMember()` before calling `operator[](const char*)`. However, this incurs two lookup. A better way is to call `FindMember()`, which can check the existence of a member and obtain its value at once:
 
 ~~~~~~~~~~cpp
 Value::ConstMemberIterator itr = document.FindMember("hello");
@@ -221,18 +221,18 @@ When obtaining the numeric values, `GetDouble()` will convert internal integer r
 
 ## Query String {#QueryString}
 
-In addition to `GetString()`, the `Value` class also contains `GetStringLength()`. Here explains why.
+In addition to `GetString()`, the `Value` class also contains `GetStringLength()`. Here explains why:
 
-According to RFC 4627, JSON strings can contain Unicode character `U+0000`, which must be escaped as `"\u0000"`. The problem is that, C/C++ often uses null-terminated string, which treats ``\0'` as the terminator symbol.
+According to RFC 4627, JSON strings can contain Unicode character `U+0000`, which must be escaped as `"\u0000"`. The problem is that, C/C++ often uses null-terminated string, which treats `\0` as the terminator symbol.
 
-To conform RFC 4627, RapidJSON supports string containing `U+0000`. If you need to handle this, you can use `GetStringLength()` to obtain the correct string length.
+To conform with RFC 4627, RapidJSON supports string containing `U+0000` character. If you need to handle this, you can use `GetStringLength()` to obtain the correct string length.
 
-For example, after parsing a the following JSON to `Document d`:
+For example, after parsing the following JSON to `Document d`:
 
 ~~~~~~~~~~js
 { "s" :  "a\u0000b" }
 ~~~~~~~~~~
-The correct length of the value `"a\u0000b"` is 3. But `strlen()` returns 1.
+The correct length of the string `"a\u0000b"` is 3, as returned by `GetStringLength()`. But `strlen()` returns 1.
 
 `GetStringLength()` can also improve performance, as user may often need to call `strlen()` for allocating buffer.
 
@@ -246,7 +246,7 @@ which accepts the length of string as parameter. This constructor supports stori
 
 ## Comparing values
 
-You can use `==` and `!=` to compare values. Two values are equal if and only if they are have same type and contents. You can also compare values with primitive types. Here is an example.
+You can use `==` and `!=` to compare values. Two values are equal if and only if they have same type and contents. You can also compare values with primitive types. Here is an example:
 
 ~~~~~~~~~~cpp
 if (document["hello"] == document["n"]) /*...*/;    // Compare values
@@ -264,7 +264,7 @@ Note that, currently if an object contains duplicated named member, comparing eq
 There are several ways to create values. After a DOM tree is created and/or modified, it can be saved as JSON again using `Writer`.
 
 ## Change Value Type {#ChangeValueType}
-When creating a Value or Document by default constructor, its type is Null. To change its type, call `SetXXX()` or assignment operator, for example:
+When creating a `Value` or `Document` by default constructor, its type is Null. To change its type, call `SetXXX()` or assignment operator, for example:
 
 ~~~~~~~~~~cpp
 Document d; // Null
@@ -285,7 +285,7 @@ Value u(123u);    // calls Value(unsigned)
 Value d(1.5);     // calls Value(double)
 ~~~~~~~~~~
 
-To create empty object or array, you may use `SetObject()`/`SetArray()` after default constructor, or using the `Value(Type)` in one shot:
+To create empty object or array, you may use `SetObject()`/`SetArray()` after default constructor, or using the `Value(Type)` in one call:
 
 ~~~~~~~~~~cpp
 Value o(kObjectType);
@@ -299,7 +299,7 @@ A very special decision during design of RapidJSON is that, assignment of value 
 ~~~~~~~~~~cpp
 Value a(123);
 Value b(456);
-b = a;         // a becomes a Null value, b becomes number 123.
+a = b;         // b becomes a Null value, a becomes number 456.
 ~~~~~~~~~~
 
 ![Assignment with move semantics.](diagram/move1.png)
@@ -367,7 +367,7 @@ RapidJSON provides two strategies for storing string.
 
 Copy-string is always safe because it owns a copy of the data. Const-string can be used for storing a string literal, and for in-situ parsing which will be mentioned in the DOM section.
 
-To make memory allocation customizable, RapidJSON requires users to pass an instance of allocator, whenever an operation may require allocation. This design is needed to prevent storing a allocator (or Document) pointer per Value.
+To make memory allocation customizable, RapidJSON requires users to pass an instance of allocator, whenever an operation may require allocation. This design is needed to prevent storing an allocator (or Document) pointer per Value.
 
 Therefore, when we assign a copy-string, we call this overloaded `SetString()` with allocator:
 

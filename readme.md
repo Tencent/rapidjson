@@ -6,7 +6,7 @@
 
 Tencent is pleased to support the open source community by making RapidJSON available.
 
-Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 
 * [RapidJSON GitHub](https://github.com/Tencent/rapidjson/)
 * RapidJSON Documentation
@@ -71,6 +71,9 @@ Users can build and run the unit tests on their platform/compiler.
 ## Installation
 
 RapidJSON is a header-only C++ library. Just copy the `include/rapidjson` folder to system or project's include path.
+
+Alternatively, if you are using the [vcpkg](https://github.com/Microsoft/vcpkg/) dependency manager you can download and install rapidjson with CMake integration in a single command:
+* vcpkg install rapidjson
 
 RapidJSON uses following software as its dependencies:
 * [CMake](https://cmake.org/) as a general build tool
@@ -158,3 +161,50 @@ More [examples](https://github.com/Tencent/rapidjson/tree/master/example) are av
   * [parsebyparts](https://github.com/Tencent/rapidjson/blob/master/example/parsebyparts/parsebyparts.cpp): Implements an `AsyncDocumentParser` which can parse JSON in parts, using C++11 thread.
   * [filterkey](https://github.com/Tencent/rapidjson/blob/master/example/filterkey/filterkey.cpp): A command line tool to remove all values with user-specified key.
   * [filterkeydom](https://github.com/Tencent/rapidjson/blob/master/example/filterkeydom/filterkeydom.cpp): Same tool as above, but it demonstrates how to use a generator to populate a `Document`.
+
+## Contributing
+
+RapidJSON welcomes contributions. When contributing, please follow the code below.
+
+### Issues
+
+Feel free to submit issues and enhancement requests.
+
+Please help us by providing **minimal reproducible examples**, because source code is easier to let other people understand what happens.
+For crash problems on certain platforms, please bring stack dump content with the detail of the OS, compiler, etc.
+
+Please try breakpoint debugging first, tell us what you found, see if we can start exploring based on more information been prepared.
+
+### Workflow
+
+In general, we follow the "fork-and-pull" Git workflow.
+
+ 1. **Fork** the repo on GitHub
+ 2. **Clone** the project to your own machine
+ 3. **Checkout** a new branch on your fork, start developing on the branch
+ 4. **Test** the change before commit, Make sure the changes pass all the tests, including `unittest` and `preftest`, please add test case for each new feature or bug-fix if needed.
+ 5. **Commit** changes to your own branch
+ 6. **Push** your work back up to your fork
+ 7. Submit a **Pull request** so that we can review your changes
+
+NOTE: Be sure to merge the latest from "upstream" before making a pull request!
+
+### Copyright and Licensing
+
+You can copy and paste the license summary from below.
+
+```
+Tencent is pleased to support the open source community by making RapidJSON available.
+
+Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
+
+Licensed under the MIT License (the "License"); you may not use this file except
+in compliance with the License. You may obtain a copy of the License at
+
+http://opensource.org/licenses/MIT
+
+Unless required by applicable law or agreed to in writing, software distributed 
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
+CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+specific language governing permissions and limitations under the License.
+```

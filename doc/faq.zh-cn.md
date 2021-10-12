@@ -18,7 +18,7 @@
 
 4. RapidJSON 是免费的么？
 
-   是的，它在 MIT 特許條款下免费。它可用于商业软件。详情请参看 [license.txt](https://github.com/Tencent/rapidjson/blob/master/license.txt)。
+   是的，它在 MIT 协议下免费。它可用于商业软件。详情请参看 [license.txt](https://github.com/Tencent/rapidjson/blob/master/license.txt)。
 
 5. RapidJSON 很小么？它有何依赖？
 
@@ -64,13 +64,13 @@
 
    JSON 常用于网页应用程序，以传送结构化数据。它也可作为文件格式用于数据持久化。
 
-2. RapidJSON 是否符合 JSON 标准？
+3. RapidJSON 是否符合 JSON 标准？
 
    是。RapidJSON 完全符合 [RFC7159](http://www.ietf.org/rfc/rfc7159.txt) 及 [ECMA-404](http://www.ecma-international.org/publications/standards/Ecma-404.htm)。它能处理一些特殊情况，例如支持 JSON 字符串中含有空字符及代理对（surrogate pair）。
 
-3. RapidJSON 是否支持宽松的语法？
+4. RapidJSON 是否支持宽松的语法？
 
-   现时不支持。RapidJSON 只支持严格的标准格式。宽松语法现时在这 [issue](https://github.com/Tencent/rapidjson/issues/36) 中进行讨论。
+   目前不支持。RapidJSON 只支持严格的标准格式。宽松语法可以在这个 [issue](https://github.com/Tencent/rapidjson/issues/36) 中进行讨论。
 
 ## DOM 与 SAX
 
@@ -271,7 +271,7 @@
 
    有些应用程序需要处理非常大的 JSON 文件。而有些后台应用程序需要处理大量的 JSON。达到高性能同时改善延时及吞吐量。更广义来说，这也可以节省能源。
 
-## 八挂
+## 八卦
 
 1. 谁是 RapidJSON 的开发者？
 
@@ -279,11 +279,11 @@
 
 2. 为何你要开发 RapidJSON？
 
-   在 2011 年开始这项目是，它仅一个兴趣项目。Milo Yip 是一个游戏程序员，他在那时候认识到 JSON 并希望在未来的项目中使用。由于 JSON 好像很简单，他希望写一个仅有头文件并且快速的程序库。
+   在 2011 年开始这项目时，它只是一个兴趣项目。Milo Yip 是一个游戏程序员，他在那时候认识到 JSON 并希望在未来的项目中使用。由于 JSON 好像很简单，他希望写一个快速的仅有头文件的程序库。
 
 3. 为什么开发中段有一段长期空档？
 
-   主要是个人因素，例如加入新家庭成员。另外，Milo Yip 也花了许多业馀时间去翻译 Jason Gregory 的《Game Engine Architecture》至中文版《游戏引擎架构》。
+   主要是个人因素，例如加入新家庭成员。另外，Milo Yip 也花了许多业余时间去翻译 Jason Gregory 的《Game Engine Architecture》至中文版《游戏引擎架构》。
 
 4. 为什么这个项目从 Google Code 搬到 GitHub？
 

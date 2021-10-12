@@ -82,7 +82,7 @@ JSON Number 类型表示所有数值。然而，C++ 需要使用更专门的类�
 ~~~~~~~~~~cpp
 assert(document["i"].IsNumber());
 
-// 在此情况下，IsUint()/IsInt64()/IsUInt64() 也会返回 true
+// 在此情况下，IsUint()/IsInt64()/IsUint64() 也会返回 true
 assert(document["i"].IsInt());          
 printf("i = %d\n", document["i"].GetInt());
 // 另一种用法： (int)document["i"]
@@ -250,7 +250,7 @@ string(const char* s, size_t count);
 
 ~~~~~~~~~~cpp
 if (document["hello"] == document["n"]) /*...*/;    // 比较两个值
-if (document["hello"] == "world") /*...*/;          // 与字符串家面量作比较
+if (document["hello"] == "world") /*...*/;          // 与字符串字面量作比较
 if (document["i"] != 123) /*...*/;                  // 与整数作比较
 if (document["pi"] != 3.14) /*...*/;                // 与 double 作比较
 ~~~~~~~~~~
@@ -388,7 +388,7 @@ allocator 参数。对于字符串字面量（或字符数组常量），只需�
 
 ~~~~~~~~~~cpp
 Value s;
-s.SetString("rapidjson");    // 可包含空字符，长度在编译萁推导
+s.SetString("rapidjson");    // 可包含空字符，长度在编译期推导
 s = "rapidjson";             // 上行的缩写
 ~~~~~~~~~~
 
@@ -447,7 +447,7 @@ contact.PushBack(val, document.GetAllocator());
 ~~~~~~~~~~
 
 ## 修改 Object {#ModifyObject}
-Object 是键值对的集合。每个键必须为 String。要修改 Object，方法是增加或移除成员。以下的 API 用来增加城员：
+Object 是键值对的集合。每个键必须为 String。要修改 Object，方法是增加或移除成员。以下的 API 用来增加成员：
 
 * `Value& AddMember(Value&, Value&, Allocator& allocator)`
 * `Value& AddMember(StringRefType, Value&, Allocator&)`

@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -1078,9 +1078,9 @@ static void TestArray(T& x, Allocator& allocator) {
 }
 
 TEST(Value, Array) {
+    Value::AllocatorType allocator;
     Value x(kArrayType);
     const Value& y = x;
-    Value::AllocatorType allocator;
 
     EXPECT_EQ(kArrayType, x.GetType());
     EXPECT_TRUE(x.IsArray());
@@ -1119,6 +1119,16 @@ TEST(Value, Array) {
     z.SetArray();
     EXPECT_TRUE(z.IsArray());
     EXPECT_TRUE(z.Empty());
+
+    // PR #1503: assign from inner Value
+    {
+        CrtAllocator a; // Free() is not a noop
+        GenericValue<UTF8<>, CrtAllocator> nullValue;
+        GenericValue<UTF8<>, CrtAllocator> arrayValue(kArrayType);
+        arrayValue.PushBack(nullValue, a);
+        arrayValue = arrayValue[0]; // shouldn't crash (use after free)
+        EXPECT_TRUE(arrayValue.IsNull());
+    }
 }
 
 TEST(Value, ArrayHelper) {
@@ -1481,9 +1491,9 @@ static void TestObject(T& x, Allocator& allocator) {
 }
 
 TEST(Value, Object) {
+    Value::AllocatorType allocator;
     Value x(kObjectType);
     const Value& y = x; // const version
-    Value::AllocatorType allocator;
 
     EXPECT_EQ(kObjectType, x.GetType());
     EXPECT_TRUE(x.IsObject());
