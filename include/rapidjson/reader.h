@@ -1694,7 +1694,7 @@ private:
             }
             else {
                 SizeType numCharsToCopy = static_cast<SizeType>(s.Length());
-                GenericStringStream<UTF8<NumberCharacter>> srcStream(s.Pop());
+                GenericStringStream<UTF8<NumberCharacter> > srcStream(s.Pop());
                 StackStream<typename TargetEncoding::Ch> dstStream(stack_);
                 while (numCharsToCopy--) {
                     Transcoder<UTF8<typename TargetEncoding::Ch>, TargetEncoding>::Transcode(srcStream, dstStream);
