@@ -323,6 +323,13 @@ namespace jsonstruct
         
         Object& operator=(const Object& rhs) = default;
 
+        template<typename Field, unsigned parseFlags, typename... Args>
+            auto ParseField(Args&&... args)
+        {
+            return &Fields::template Parse<parseFlags, Args...>(
+                std::forward<Args...>(args));
+        }
+
         template<unsigned parseFlags, typename... Args>
         static auto objectIndex(bool (Object::*parseMethod)(Args&...))
         {
@@ -359,7 +366,7 @@ namespace jsonstruct
                 parseField = nullptr;
                 return true;
             }
-        };        
+        };
         
         template<unsigned parseFlags, typename Reader, typename Stream>
         bool ParseContent(Reader& r, Stream& s)
@@ -406,13 +413,13 @@ namespace jsonstruct
         }
 
         template<typename Name> const auto& get() const { return get(Name{}); }
-        template<typename Name>       auto& get()       { return get(Name{}); }
+        template<typename Name, typename T> void set(T&& t)       { return get(Name{}, t); }
 
         template<typename Name>
         const auto& get(Name nm) const { return getImpl(nm, *this); }
 
-        template<typename Name>
-              auto& get(Name nm)       { return getImpl(nm, *this); }
+        template<typename Name, typename T>
+            void set(Name nm, T&& t)       { return getImpl(nm, *this) = t; }
     };
 
     template<typename... Names, typename... Values>

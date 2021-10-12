@@ -358,7 +358,25 @@ namespace jsonstruct
         ASSERT_TRUE(underTest.Parse<rj::kParseIterativeFlag>(reader, buf));
         EXPECT_THAT(underTest[0].get<rate>(), Eq(0.234));
         EXPECT_THAT(underTest[0].get<lockSide>(), Eq("foo"));
-    }    
+    }
+
+    namespace detail
+    {
+        template<typename T, typename... Mbrs, std::size_t... indices>
+        constexpr auto findImpl(std::index_sequence<indices...>)
+        {
+            return std::min({(std::is_same<T, Mbr>::value ? indices: std::string::npos)...});
+        }
+    }
+
+    template<typename T, typename... Mbrs>
+    constexpr auto find()
+    {
+        return detail::findImpl<T, Mbrs...>(std::index_sequence_for<Mbrs>());
+    }
+
+    static_assert(find<int, int, double, float>() == 0, "");
+    
 }
 
 int main(int argc, char **argv)
