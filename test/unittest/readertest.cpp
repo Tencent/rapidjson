@@ -2054,61 +2054,61 @@ struct NumbersAsStringsHandlerWChar_t {
 TEST(Reader, NumbersAsStringsWChar_t) {
   {
     const wchar_t* json = L"{ \"pi\": 3.1416 } ";
-    GenericStringStream<UTF16<>> s(json);
+    GenericStringStream<UTF16<> > s(json);
     NumbersAsStringsHandlerWChar_t h(L"3.1416");
-    GenericReader<UTF16<>, UTF16<>> reader;
+    GenericReader<UTF16<>, UTF16<> > reader;
     EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
   }
   {
     wchar_t* json = StrDup(L"{ \"pi\": 3.1416 } ");
-    GenericInsituStringStream<UTF16<>> s(json);
+    GenericInsituStringStream<UTF16<> > s(json);
     NumbersAsStringsHandlerWChar_t h(L"3.1416");
-    GenericReader<UTF16<>, UTF16<>> reader;
+    GenericReader<UTF16<>, UTF16<> > reader;
     EXPECT_TRUE(reader.Parse<kParseInsituFlag | kParseNumbersAsStringsFlag>(s, h));
     free(json);
   }
   {
     const wchar_t* json = L"{ \"gigabyte\": 1.0e9 } ";
-    GenericStringStream<UTF16<>> s(json);
+    GenericStringStream<UTF16<> > s(json);
     NumbersAsStringsHandlerWChar_t h(L"1.0e9");
-    GenericReader<UTF16<>, UTF16<>> reader;
+    GenericReader<UTF16<>, UTF16<> > reader;
     EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
   }
   {
     wchar_t* json = StrDup(L"{ \"gigabyte\": 1.0e9 } ");
-    GenericInsituStringStream<UTF16<>> s(json);
+    GenericInsituStringStream<UTF16<> > s(json);
     NumbersAsStringsHandlerWChar_t h(L"1.0e9");
-    GenericReader<UTF16<>, UTF16<>> reader;
+    GenericReader<UTF16<>, UTF16<> > reader;
     EXPECT_TRUE(reader.Parse<kParseInsituFlag | kParseNumbersAsStringsFlag>(s, h));
     free(json);
   }
   {
     const wchar_t* json = L"{ \"pi\": 314.159e-2 } ";
-    GenericStringStream<UTF16<>> s(json);
+    GenericStringStream<UTF16<> > s(json);
     NumbersAsStringsHandlerWChar_t h(L"314.159e-2");
-    GenericReader<UTF16<>, UTF16<>> reader;
+    GenericReader<UTF16<>, UTF16<> > reader;
     EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
   }
   {
     wchar_t* json = StrDup(L"{ \"gigabyte\": 314.159e-2 } ");
-    GenericInsituStringStream<UTF16<>> s(json);
+    GenericInsituStringStream<UTF16<> > s(json);
     NumbersAsStringsHandlerWChar_t h(L"314.159e-2");
-    GenericReader<UTF16<>, UTF16<>> reader;
+    GenericReader<UTF16<>, UTF16<> > reader;
     EXPECT_TRUE(reader.Parse<kParseInsituFlag | kParseNumbersAsStringsFlag>(s, h));
     free(json);
   }
   {
     const wchar_t* json = L"{ \"negative\": -1.54321 } ";
-    GenericStringStream<UTF16<>> s(json);
+    GenericStringStream<UTF16<> > s(json);
     NumbersAsStringsHandlerWChar_t h(L"-1.54321");
-    GenericReader<UTF16<>, UTF16<>> reader;
+    GenericReader<UTF16<>, UTF16<> > reader;
     EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
   }
   {
     wchar_t* json = StrDup(L"{ \"negative\": -1.54321 } ");
-    GenericInsituStringStream<UTF16<>> s(json);
+    GenericInsituStringStream<UTF16<> > s(json);
     NumbersAsStringsHandlerWChar_t h(L"-1.54321");
-    GenericReader<UTF16<>, UTF16<>> reader;
+    GenericReader<UTF16<>, UTF16<> > reader;
     EXPECT_TRUE(reader.Parse<kParseInsituFlag | kParseNumbersAsStringsFlag>(s, h));
     free(json);
   }
@@ -2117,7 +2117,7 @@ TEST(Reader, NumbersAsStringsWChar_t) {
     std::wstringstream ss(json);
     WIStreamWrapper s(ss);
     NumbersAsStringsHandlerWChar_t h(L"314.159e-2");
-    GenericReader<UTF16<>, UTF16<>> reader;
+    GenericReader<UTF16<>, UTF16<> > reader;
     EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
   }
   {
@@ -2126,9 +2126,9 @@ TEST(Reader, NumbersAsStringsWChar_t) {
     for(int i = 1; i < 320; i++)
       n1e319[i] = L'0';
     n1e319[320] = L'\0';
-    GenericStringStream<UTF16<>> s(n1e319);
+    GenericStringStream<UTF16<> > s(n1e319);
     NumbersAsStringsHandlerWChar_t h(n1e319);
-    GenericReader<UTF16<>, UTF16<>> reader;
+    GenericReader<UTF16<>, UTF16<> > reader;
     EXPECT_TRUE(reader.Parse<kParseNumbersAsStringsFlag>(s, h));
   }
 }
