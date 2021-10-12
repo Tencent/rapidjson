@@ -1,4 +1,4 @@
-#include "jsonstruct.h"
+#include "rapidjson/jsonstruct.h"
 
 #include "rapidjson/writer.h"
 
@@ -316,8 +316,8 @@ namespace jsonstruct
 
     TEST_F(ANestedObject, canWrite)
     {
-        underTest.get(field1{}) = 42;
-        underTest.get<content>().get(lockSide{}) = "foo";
+        underTest.set(field1{}, 42);
+        underTest.get<content>().set(lockSide{}, "foo");
         underTest.get<content>().get(rate{}) = 0.234;
         
         rj::StringBuffer buffer;
@@ -365,22 +365,22 @@ namespace jsonstruct
         template<typename T, typename... Mbrs, std::size_t... indices>
         constexpr auto findImpl(std::index_sequence<indices...>)
         {
-            return std::min({(std::is_same<T, Mbr>::value ? indices: std::string::npos)...});
+            return std::min({(std::is_same<T, Mbrs>::value ? indices: std::string::npos)...});
         }
     }
 
     template<typename T, typename... Mbrs>
     constexpr auto find()
     {
-        return detail::findImpl<T, Mbrs...>(std::index_sequence_for<Mbrs>());
+        return detail::findImpl<T, Mbrs...>(std::index_sequence_for<Mbrs...>());
     }
 
     static_assert(find<int, int, double, float>() == 0, "");
     
 }
 
-int main(int argc, char **argv)
-{
-  ::testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-}
+// int main(int argc, char **argv)
+// {
+//   ::testing::InitGoogleTest(&argc, argv);
+//   return RUN_ALL_TESTS();
+// }

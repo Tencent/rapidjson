@@ -652,9 +652,9 @@ TEST(Value, Double) {
 
     // Templated functions
     EXPECT_TRUE(z.Is<double>());
-    EXPECT_EQ(56.78, z.Get<double>());
-    EXPECT_EQ(57.78, z.Set(57.78).Get<double>());
-    EXPECT_EQ(58.78, z.Set<double>(58.78).Get<double>());
+    EXPECT_DOUBLE_EQ(56.78, z.Get<double>());
+    EXPECT_DOUBLE_EQ(57.78, z.Set(57.78).Get<double>());
+    EXPECT_DOUBLE_EQ(58.78, z.Set<double>(58.78).Get<double>());
 }
 
 TEST(Value, Float) {
@@ -682,16 +682,16 @@ TEST(Value, Float) {
 
     // Issue 573
     z.SetInt(0);
-    EXPECT_EQ(0.0f, z.GetFloat());
+    EXPECT_FLOAT_EQ(0.0f, z.GetFloat());
 
     z = 56.78f;
     EXPECT_NEAR(56.78f, z.GetFloat(), 0.0f);
 
     // Templated functions
     EXPECT_TRUE(z.Is<float>());
-    EXPECT_EQ(56.78f, z.Get<float>());
-    EXPECT_EQ(57.78f, z.Set(57.78f).Get<float>());
-    EXPECT_EQ(58.78f, z.Set<float>(58.78f).Get<float>());
+    EXPECT_FLOAT_EQ(56.78f, z.Get<float>());
+    EXPECT_FLOAT_EQ(57.78f, z.Set(57.78f).Get<float>());
+    EXPECT_FLOAT_EQ(58.78f, z.Set<float>(58.78f).Get<float>());
 }
 
 TEST(Value, IsLosslessDouble) {

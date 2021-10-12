@@ -22,7 +22,7 @@ namespace jsonstruct
             Base(base), gotEnd(b) {}
             
         bool& gotEnd;
-        bool EndArray(rj::SizeType elementCount){ return gotEnd = true; }
+        bool EndArray(rj::SizeType){ return gotEnd = true; }
     };
 
     template<unsigned parseFlags, typename Reader, typename Stream>
@@ -71,7 +71,7 @@ namespace jsonstruct
     {
         using BaseHandler::BaseHandler;
         bool Int(int i)       { return set(i); }
-        bool Uint(unsigned i) { return set(i); }
+        bool Uint(unsigned i) { return set(static_cast<int>(i)); }
     };
     using Int = Value<int, IntHandler>;
 
@@ -86,7 +86,7 @@ namespace jsonstruct
     {
         using BaseHandler::BaseHandler;
         bool Int64(int64_t i)   { return set(i); }
-        bool Uint64(uint64_t i) { return set(i); }
+        bool Uint64(uint64_t i) { return set(static_cast<int64_t>(i)); }
         bool Int(int i)         { return set(i); }
         bool Uint(unsigned i)   { return set(i); }
     };
@@ -113,7 +113,7 @@ namespace jsonstruct
     {
         using BaseHandler::BaseHandler;
         template<typename Ch>
-        bool RawNumber(const Ch* str, rj::SizeType length, bool copy)
+        bool RawNumber(const Ch* str, rj::SizeType length, bool)
         {
             target->assign(str, length);
             return true;
@@ -125,7 +125,7 @@ namespace jsonstruct
     {
         using BaseHandler::BaseHandler;
         template<typename Ch>
-        bool String(const Ch* str, rj::SizeType length, bool copy)
+        bool String(const Ch* str, rj::SizeType length, bool)
         {
             target->assign(str, length);
             return true;
@@ -162,7 +162,7 @@ namespace jsonstruct
         template<typename W>
         inline bool Accept(const String& str, W& writer)
         {
-            return writer.String(str.value.c_str(), str.value.size(), true);
+            return writer.String(str.value.c_str(), static_cast<rj::SizeType>(str.value.size()), true);
         }
     }
 
@@ -239,7 +239,7 @@ namespace jsonstruct
                 std::all_of(
                     begin(), end(),
                     [&](auto&& v){ return v.Accept(handler); }) &&
-                handler.EndArray(size());
+                handler.EndArray(static_cast<rj::SizeType>(size()));
         }
     };
 
@@ -326,8 +326,8 @@ namespace jsonstruct
         template<typename Field, unsigned parseFlags, typename... Args>
             auto ParseField(Args&&... args)
         {
-            return &Fields::template Parse<parseFlags, Args...>(
-                std::forward<Args...>(args));
+            return &Field::template Parse<parseFlags, Args...>(
+                std::forward<Args>(args)...);
         }
 
         template<unsigned parseFlags, typename... Args>
@@ -349,7 +349,7 @@ namespace jsonstruct
             FieldParseMethod parseField;
 
             template<typename Ch>
-            bool Key(const Ch* str, rj::SizeType length, bool copy)
+            bool Key(const Ch* str, rj::SizeType length, bool)
             {
                 static const auto& index = objectIndex<parseFlags>(parseField);
                 const auto found = index.find(std::string(str, length));
@@ -361,7 +361,7 @@ namespace jsonstruct
                 return false;
             }
 
-            bool EndObject(rj::SizeType memberCount)
+            bool EndObject(rj::SizeType)
             {
                 parseField = nullptr;
                 return true;
@@ -413,13 +413,17 @@ namespace jsonstruct
         }
 
         template<typename Name> const auto& get() const { return get(Name{}); }
+        template<typename Name> auto& get() { return get(Name{}); }
         template<typename Name, typename T> void set(T&& t)       { return get(Name{}, t); }
 
         template<typename Name>
         const auto& get(Name nm) const { return getImpl(nm, *this); }
 
+        template<typename Name>
+        auto& get(Name nm) { return getImpl(nm, *this); }
+        
         template<typename Name, typename T>
-            void set(Name nm, T&& t)       { return getImpl(nm, *this) = t; }
+        void set(Name nm, T&& t)       { getImpl(nm, *this) = t; }
     };
 
     template<typename... Names, typename... Values>
