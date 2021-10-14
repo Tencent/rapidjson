@@ -22,7 +22,7 @@ namespace internal {
 
 class Double {
 public:
-    Double() {}
+    Double() : d_(0.0) {}
     Double(double d) : d_(d) {}
     Double(uint64_t u) : u_(u) {}
 
