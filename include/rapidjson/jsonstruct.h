@@ -1,6 +1,7 @@
 #include <rapidjson/reader.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -33,8 +34,6 @@ namespace jsonstruct
             return reader.template IterativeParseNext<parseFlags>(s, handler);
         };
     }
-
-    // bool Null();
 
     template<typename T, typename HANDLER>
     struct Value
@@ -82,30 +81,30 @@ namespace jsonstruct
     };
     using Uint = Value<unsigned, UintHandler>;
 
-    struct Int64Handler: BaseHandler<int64_t>
+    struct Int64Handler: BaseHandler<std::int64_t>
     {
         using BaseHandler::BaseHandler;
-        bool Int64(int64_t i)   { return set(i); }
-        bool Uint64(uint64_t i) { return set(static_cast<int64_t>(i)); }
-        bool Int(int i)         { return set(i); }
-        bool Uint(unsigned i)   { return set(i); }
+        bool Int64(std::int64_t i)   { return set(i); }
+        bool Uint64(std::uint64_t i) { return set(static_cast<std::int64_t>(i)); }
+        bool Int(int i)              { return set(i); }
+        bool Uint(unsigned i)        { return set(i); }
     };
-    using Int64 = Value<int64_t, Int64Handler>;
+    using Int64 = Value<std::int64_t, Int64Handler>;
 
-    struct Uint64Handler: BaseHandler<uint64_t>
+    struct Uint64Handler: BaseHandler<std::uint64_t>
     {
         using BaseHandler::BaseHandler;
-        bool Uint64(uint64_t i){ return set(i); }
+        bool Uint64(std::uint64_t i){ return set(i); }
     };
-    using Uint64 = Value<uint64_t, Uint64Handler>;
+    using Uint64 = Value<std::uint64_t, Uint64Handler>;
 
     struct DoubleHandler: BaseHandler<double>
     {
         using BaseHandler::BaseHandler;
-        bool Double(double d)   { return set(d); }
-        bool Uint64(uint64_t i) { return set(i); }
-        bool Int64(int64_t i)   { return set(i); }
-        bool Uint(unsigned i)   { return set(i); }
+        bool Double(double d)        { return set(d); }
+        bool Uint64(std::uint64_t i) { return set(i); }
+        bool Int64(std::int64_t i)   { return set(i); }
+        bool Uint(unsigned i)        { return set(i); }
     };
     using Double = Value<double, DoubleHandler>;
 
@@ -432,5 +431,4 @@ namespace jsonstruct
     {
         return std::min({(lhs.get(Names{}) == rhs.get(Names{}))...});
     }
-    
 }
