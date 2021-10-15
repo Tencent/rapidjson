@@ -1,5 +1,5 @@
 #include <rapidjson/reader.h>
-
+#if RAPIDJSON_HAS_CXX17
 #include <algorithm>
 #include <cstdint>
 #include <iostream>
@@ -432,3 +432,4 @@ namespace jsonstruct
         return std::min({(lhs.get(Names{}) == rhs.get(Names{}))...});
     }
 }
+#endif

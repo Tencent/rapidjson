@@ -1,3 +1,5 @@
+#include "rapidjson/rapidjson.h"
+#if RAPIDJSON_HAS_CXX17
 #include "rapidjson/jsonstruct.h"
 
 #include "rapidjson/writer.h"
@@ -378,9 +380,4 @@ namespace jsonstruct
     static_assert(find<int, int, double, float>() == 0, "");
     
 }
-
-// int main(int argc, char **argv)
-// {
-//   ::testing::InitGoogleTest(&argc, argv);
-//   return RUN_ALL_TESTS();
-// }
+#endif
