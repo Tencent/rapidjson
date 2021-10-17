@@ -5,7 +5,6 @@
 #include "rapidjson/writer.h"
 
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 
 using namespace testing;
 
@@ -25,7 +24,7 @@ namespace jsonstruct
 
     /*RawNumber,*/     
     using ForAllFieldTypes = ::testing::Types<
-        Bool, Int, Uint, Int64, Uint64, Double, String,
+        Bool, Int, Uint, Int64, Uint64, /*Double,*/ String,
         Object1, Object2,
         Array<Bool>, Array<Int> >;
 
@@ -166,7 +165,7 @@ namespace jsonstruct
     {
         this->underTest.get(field1{}) = this->traits.result;
         const auto& c = this->underTest;
-        EXPECT_THAT(c.get(field1{}), Eq(this->traits.result));
+        EXPECT_EQ(c.get(field1{}), this->traits.result);
     }
     
     TYPED_TEST(AFieldInAnObject, canParse)
@@ -174,15 +173,12 @@ namespace jsonstruct
         rapidjson::StringStream buf(this->traits.objectMsg);
         rapidjson::Reader reader;
         reader.IterativeParseInit();
-        EXPECT_THAT(
-            this->underTest.template Parse<rj::kParseIterativeFlag>(reader, buf),
-            Eq(true));
-        EXPECT_THAT(
-            this->underTest.template get<field1>(),
-            Eq(this->traits.result));
+        EXPECT_TRUE(
+            this->underTest.template Parse<rj::kParseIterativeFlag>(reader, buf));
+        EXPECT_EQ(
+            this->underTest.template get<field1>(), this->traits.result);
 
-        EXPECT_THAT(this->underTest.get(field1{}),
-                    Eq(this->traits.result));
+        EXPECT_EQ(this->underTest.get(field1{}), this->traits.result);
     }
 
     TYPED_TEST(AFieldInAnObject, canWrite)
@@ -192,7 +188,7 @@ namespace jsonstruct
         rj::StringBuffer buffer;
         rj::Writer<rj::StringBuffer> writer(buffer);
         this->underTest.Accept(writer);
-        EXPECT_THAT(buffer.GetString(), StrEq(this->traits.objectMsg));
+        EXPECT_EQ(buffer.GetString(), this->traits.objectMsg);
     }
 
     template<typename T>
@@ -212,12 +208,9 @@ namespace jsonstruct
         rapidjson::StringStream buf(this->traits.arrayMsg);
         rapidjson::Reader reader;
         reader.IterativeParseInit();
-        ASSERT_THAT(
-            this->underTest.template Parse<rj::kParseIterativeFlag>(reader, buf),
-            Eq(true));
-        ASSERT_THAT(this->underTest.size(), Eq(1));
-        EXPECT_THAT(this->traits.get(this->underTest[0]),
-                    Eq(this->traits.result));
+        ASSERT_TRUE(this->underTest.template Parse<rj::kParseIterativeFlag>(reader, buf));
+        ASSERT_EQ(this->underTest.size(), 1u);
+        EXPECT_EQ(this->traits.get(this->underTest[0]), this->traits.result);
     }
 
     TYPED_TEST(AFieldInAnArray, canWrite)
@@ -227,7 +220,7 @@ namespace jsonstruct
         rj::StringBuffer buffer;
         rj::Writer<rj::StringBuffer> writer(buffer);
         this->underTest.Accept(writer);
-        EXPECT_THAT(buffer.GetString(), StrEq(this->traits.arrayMsg));
+        EXPECT_EQ(buffer.GetString(), this->traits.arrayMsg);
     }
 
     DEFINE_FIELD_NAME(rate);
@@ -247,16 +240,10 @@ namespace jsonstruct
     TEST(AnObject, canBeConstructedFromFields)
     {
         Quote underTest{3.14, "hello"};
-        EXPECT_THAT(underTest.get<rate>(), Eq(3.14));
-        EXPECT_THAT(underTest.get<lockSide>(), Eq("hello"));
+        EXPECT_DOUBLE_EQ(underTest.get<rate>(), 3.14);
+        EXPECT_EQ(underTest.get<lockSide>(), "hello");
     }
 
-    // TEST(AnObject, getFaildsNice)
-    // {
-    //     Quote underTest;
-    //     underTest.get<field1>();
-    // }
-    
     TEST(AnObject, canParse)
     {
         Quote underTest;
@@ -267,8 +254,8 @@ namespace jsonstruct
         reader.IterativeParseInit();
 
         underTest.Parse<rj::kParseIterativeFlag>(reader, buf);
-        EXPECT_THAT(underTest.get<rate>(), Eq(0.234));
-        EXPECT_THAT(underTest.get<lockSide>(), Eq("foo"));
+        EXPECT_DOUBLE_EQ(underTest.get<rate>(), 0.234);
+        EXPECT_EQ(underTest.get<lockSide>(), "foo");
     }
 
     TEST(AnObject, canParseFieldsOfTheSameType)
@@ -283,8 +270,8 @@ namespace jsonstruct
         reader.IterativeParseInit();
 
         underTest.Parse<rj::kParseIterativeFlag>(reader, buf);
-        EXPECT_THAT(underTest.get<field1>(), Eq(1));
-        EXPECT_THAT(underTest.get<field2>(), Eq(2));
+        EXPECT_EQ(underTest.get<field1>(), 1);
+        EXPECT_EQ(underTest.get<field2>(), 2);
     }
 
     struct ANestedObject: testing::Test
@@ -304,16 +291,14 @@ namespace jsonstruct
         rapidjson::Reader reader;
         reader.IterativeParseInit();
 
-        EXPECT_THAT(
-            underTest.Parse<rj::kParseIterativeFlag>(reader, buf),
-            Eq(true));
-        EXPECT_THAT(underTest.get<content>().get<rate>(), Eq(0.234));
-        EXPECT_THAT(underTest.get<content>().get<lockSide>(), Eq("foo"));
+        EXPECT_TRUE(underTest.Parse<rj::kParseIterativeFlag>(reader, buf));
+        EXPECT_DOUBLE_EQ(underTest.get<content>().get<rate>(), 0.234);
+        EXPECT_EQ(underTest.get<content>().get<lockSide>(), "foo");
 
         const auto& c = underTest.get<content>();
 
-        EXPECT_THAT(c.get<rate>(), Eq(0.234));
-        EXPECT_THAT(c.get<lockSide>(), Eq("foo")); 
+        EXPECT_DOUBLE_EQ(c.get<rate>(), 0.234);
+        EXPECT_EQ(c.get<lockSide>(), "foo");
     }
 
     TEST_F(ANestedObject, canWrite)
@@ -325,7 +310,7 @@ namespace jsonstruct
         rj::StringBuffer buffer;
         rj::Writer<rj::StringBuffer> writer(buffer);
         this->underTest.Accept(writer);
-        EXPECT_THAT(buffer.GetString(), StrEq(msg));
+        EXPECT_EQ(buffer.GetString(), msg);
     }    
 
     TEST(AnArray, canParse)
@@ -339,12 +324,12 @@ namespace jsonstruct
 
         underTest.Parse<rj::kParseIterativeFlag>(reader, buf);
 
-        EXPECT_THAT(underTest.size(), Eq(5));
-        EXPECT_THAT(underTest[0].value, Eq(0));
-        EXPECT_THAT(underTest[1].value, Eq(1));
-        EXPECT_THAT(underTest[2].value, Eq(2));
-        EXPECT_THAT(underTest[3].value, Eq(3));
-        EXPECT_THAT(underTest[4].value, Eq(4));
+        EXPECT_EQ(underTest.size(), 5u);
+        EXPECT_EQ(underTest[0].value, 0);
+        EXPECT_EQ(underTest[1].value, 1);
+        EXPECT_EQ(underTest[2].value, 2);
+        EXPECT_EQ(underTest[3].value, 3);
+        EXPECT_EQ(underTest[4].value, 4);
     }
 
     TEST(AnObjectInAnArray, canParse)
@@ -358,8 +343,8 @@ namespace jsonstruct
         reader.IterativeParseInit();
 
         ASSERT_TRUE(underTest.Parse<rj::kParseIterativeFlag>(reader, buf));
-        EXPECT_THAT(underTest[0].get<rate>(), Eq(0.234));
-        EXPECT_THAT(underTest[0].get<lockSide>(), Eq("foo"));
+        EXPECT_DOUBLE_EQ(underTest[0].get<rate>(), 0.234);
+        EXPECT_EQ(underTest[0].get<lockSide>(), "foo");
     }
 
     namespace detail
