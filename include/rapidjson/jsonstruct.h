@@ -102,7 +102,7 @@ namespace jsonstruct
     {
         using BaseHandler::BaseHandler;
         bool Double(double d)        { return set(d); }
-        bool Uint64(std::uint64_t i) { return set(i); }
+        bool Uint64(std::uint64_t i) { return set(static_cast<double>(i)); }
         bool Int64(std::int64_t i)   { return set(static_cast<double>(i)); }
         bool Uint(unsigned i)        { return set(i); }
     };
