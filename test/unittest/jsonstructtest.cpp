@@ -10,10 +10,200 @@ using namespace testing;
 
 namespace jsonstruct
 {
+    //
+    // Adhoc tests which are a bit easier to follow and give a feel for what the code does:
+    //
+
+    //
+    // Define some fields.
+    //
+    // This requires a macro because pre c++17 there's no standard way
+    // of making compile time string objects.
+    //
+    DEFINE_FIELD_NAME(price);
+    DEFINE_FIELD_NAME(description);
+    DEFINE_FIELD_NAME(content);
+
+    //
+    // Define a message structure.
+    //
+    // Order becomes a strongly typed struct-like type capable of
+    // holding a double and a string.
+    //
+    using Order = Object<
+        Field<price, Double>,
+        Field<description, String> >;
+    //
+    // There is not space or time overhead incurred compared to using
+    // the equivalent struct definition. In particular.
+    //
+    struct OrderStruct
+    {
+        Double price;
+        String description;
+    };
+    static_assert(sizeof(Order) == sizeof(OrderStruct), "no space overhead");
+    
+    TEST(AnObject, hasGetMethod)
+    {
+        Order underTest;
+        //
+        // Get method is srongly type with field access checked at
+        // compile time. Generated code is equivalent to struct field
+        // access.
+        //
+        underTest.get<price>();
+    }
+
+    TEST(AnObject, canBeConstructedFromFields)
+    {
+        Order underTest{3.14, "hello"};
+        EXPECT_DOUBLE_EQ(underTest.get<price>(), 3.14);
+        EXPECT_EQ(underTest.get<description>(), "hello");
+    }
+
+    //
+    // Objects defined in this way conform to the sax like reader API
+    // of rapid json and so can store the result of a parse directly.
+    //
+    TEST(AnObject, canParse)
+    {
+        Order underTest;
+
+        auto msg = "{ \"price\": 0.234, \"description\": \"foo\" }";
+        rapidjson::StringStream buf(msg);
+        rapidjson::Reader reader;
+        reader.IterativeParseInit();
+
+        underTest.Parse<rj::kParseIterativeFlag>(reader, buf);
+        EXPECT_DOUBLE_EQ(underTest.get<price>(), 0.234);
+        EXPECT_EQ(underTest.get<description>(), "foo");
+    }
+
+    TEST(AnObject, ignoresUnknownFields)
+    {
+        Order underTest;
+
+        auto msg = "{ \"price\": 0.234, \"description\": \"foo\", \"that_not_be_there\": \"bar\" }";
+        rapidjson::StringStream buf(msg);
+        rapidjson::Reader reader;
+        reader.IterativeParseInit();
+
+        underTest.Parse<rj::kParseIterativeFlag>(reader, buf);
+        EXPECT_DOUBLE_EQ(underTest.get<price>(), 0.234);
+        EXPECT_EQ(underTest.get<description>(), "foo");
+    }
+
+    TEST(AnObject, DISABLED_ignoresUnknownFieldsAtBeginning)
+    {
+        Order underTest;
+
+        auto msg = "{ \"that_not_be_there\": \"bar\", \"price\": 0.234, \"description\": \"foo\" }";
+        rapidjson::StringStream buf(msg);
+        rapidjson::Reader reader;
+        reader.IterativeParseInit();
+
+        underTest.Parse<rj::kParseIterativeFlag>(reader, buf);
+        EXPECT_DOUBLE_EQ(underTest.get<price>(), 0.234);
+        EXPECT_EQ(underTest.get<description>(), "foo");
+    }    
+
     DEFINE_FIELD_NAME(field1);
     DEFINE_FIELD_NAME(field2);
     DEFINE_FIELD_NAME(field3);
 
+    TEST(AnObject, canParseFieldsOfTheSameType)
+    {
+        using UnderTest = Object<Field<field1, Int>,
+                                 Field<field2, Int> >;
+        UnderTest underTest;
+
+        auto msg = "{ \"field1\": 1, \"field2\": 2 }";
+        rapidjson::StringStream buf(msg);
+        rapidjson::Reader reader;
+        reader.IterativeParseInit();
+
+        underTest.Parse<rj::kParseIterativeFlag>(reader, buf);
+        EXPECT_EQ(underTest.get<field1>(), 1);
+        EXPECT_EQ(underTest.get<field2>(), 2);
+    }
+
+    struct ANestedObject: testing::Test
+    {
+        using UnderTest = Object<
+            Field<field1, Int>,
+            Field<content, Order> >;
+        UnderTest underTest;
+        
+        const char* msg =
+            R"___({"field1":42,"content":{"price":0.234,"description":"foo"}})___";
+    };
+
+    TEST_F(ANestedObject, canParse)
+    {
+        rapidjson::StringStream buf(msg);
+        rapidjson::Reader reader;
+        reader.IterativeParseInit();
+
+        EXPECT_TRUE(underTest.Parse<rj::kParseIterativeFlag>(reader, buf));
+        EXPECT_DOUBLE_EQ(underTest.get<content>().get<price>(), 0.234);
+        EXPECT_EQ(underTest.get<content>().get<description>(), "foo");
+
+        const auto& c = underTest.get<content>();
+
+        EXPECT_DOUBLE_EQ(c.get<price>(), 0.234);
+        EXPECT_EQ(c.get<description>(), "foo");
+    }
+
+    TEST_F(ANestedObject, canWrite)
+    {
+        underTest.set(field1{}, 42);
+        underTest.get<content>().set(description{}, "foo");
+        underTest.get<content>().get(price{}) = 0.234;
+        
+        rj::StringBuffer buffer;
+        rj::Writer<rj::StringBuffer> writer(buffer);
+        this->underTest.Accept(writer);
+        EXPECT_STREQ(buffer.GetString(), msg);
+    }    
+
+    TEST(AnArray, canParse)
+    {
+        Array<Int> underTest;
+
+        auto msg = "[0, 1, 2, 3, 4]";
+        rapidjson::StringStream buf(msg);
+        rapidjson::Reader reader;
+        reader.IterativeParseInit();
+
+        underTest.Parse<rj::kParseIterativeFlag>(reader, buf);
+
+        EXPECT_EQ(underTest.size(), 5u);
+        EXPECT_EQ(underTest[0].value, 0);
+        EXPECT_EQ(underTest[1].value, 1);
+        EXPECT_EQ(underTest[2].value, 2);
+        EXPECT_EQ(underTest[3].value, 3);
+        EXPECT_EQ(underTest[4].value, 4);
+    }
+
+    TEST(AnObjectInAnArray, canParse)
+    {
+        using UnderTest = Array<Order>;
+        UnderTest underTest;
+
+        auto msg = "[{ \"price\": 0.234, \"description\": \"foo\" }]";
+        rapidjson::StringStream buf(msg);
+        rapidjson::Reader reader;
+        reader.IterativeParseInit();
+
+        ASSERT_TRUE(underTest.Parse<rj::kParseIterativeFlag>(reader, buf));
+        EXPECT_DOUBLE_EQ(underTest[0].get<price>(), 0.234);
+        EXPECT_EQ(underTest[0].get<description>(), "foo");
+    }
+
+    //
+    // Full tests are parametised and a bit harder to follow.
+    //
     using Object1 = Object<Field<field2, Bool> >;
     static_assert(sizeof(Object1) == sizeof(bool), "");
 
@@ -22,9 +212,10 @@ namespace jsonstruct
         Field<field3, Int> >;
     static_assert(sizeof(Object2) == 2 * sizeof(int), "");
 
-    /*RawNumber,*/     
+    /*RawNumber, Double - omitted because of warnings about floating
+     * point comparisons. */
     using ForAllFieldTypes = ::testing::Types<
-        Bool, Int, Uint, Int64, Uint64, /*Double,*/ String,
+        Bool, Int, Uint, Int64, Uint64, String,
         Object1, Object2,
         Array<Bool>, Array<Int> >;
 
@@ -188,7 +379,7 @@ namespace jsonstruct
         rj::StringBuffer buffer;
         rj::Writer<rj::StringBuffer> writer(buffer);
         this->underTest.Accept(writer);
-        EXPECT_EQ(buffer.GetString(), this->traits.objectMsg);
+        EXPECT_STREQ(buffer.GetString(), this->traits.objectMsg);
     }
 
     template<typename T>
@@ -220,149 +411,8 @@ namespace jsonstruct
         rj::StringBuffer buffer;
         rj::Writer<rj::StringBuffer> writer(buffer);
         this->underTest.Accept(writer);
-        EXPECT_EQ(buffer.GetString(), this->traits.arrayMsg);
+        EXPECT_STREQ(buffer.GetString(), this->traits.arrayMsg);
     }
 
-    DEFINE_FIELD_NAME(rate);
-    DEFINE_FIELD_NAME(lockSide);
-    DEFINE_FIELD_NAME(content);
-
-    using Quote = Object<
-        Field<rate, Double>,
-        Field<lockSide, String> >;
-
-    TEST(AnObject, hasGetMethod)
-    {
-        Quote underTest;
-        underTest.get<rate>();
-    }
-
-    TEST(AnObject, canBeConstructedFromFields)
-    {
-        Quote underTest{3.14, "hello"};
-        EXPECT_DOUBLE_EQ(underTest.get<rate>(), 3.14);
-        EXPECT_EQ(underTest.get<lockSide>(), "hello");
-    }
-
-    TEST(AnObject, canParse)
-    {
-        Quote underTest;
-
-        auto msg = "{ \"rate\": 0.234, \"lockSide\": \"foo\" }";
-        rapidjson::StringStream buf(msg);
-        rapidjson::Reader reader;
-        reader.IterativeParseInit();
-
-        underTest.Parse<rj::kParseIterativeFlag>(reader, buf);
-        EXPECT_DOUBLE_EQ(underTest.get<rate>(), 0.234);
-        EXPECT_EQ(underTest.get<lockSide>(), "foo");
-    }
-
-    TEST(AnObject, canParseFieldsOfTheSameType)
-    {
-        using UnderTest = Object<Field<field1, Int>,
-                                 Field<field2, Int> >;
-        UnderTest underTest;
-
-        auto msg = "{ \"field1\": 1, \"field2\": 2 }";
-        rapidjson::StringStream buf(msg);
-        rapidjson::Reader reader;
-        reader.IterativeParseInit();
-
-        underTest.Parse<rj::kParseIterativeFlag>(reader, buf);
-        EXPECT_EQ(underTest.get<field1>(), 1);
-        EXPECT_EQ(underTest.get<field2>(), 2);
-    }
-
-    struct ANestedObject: testing::Test
-    {
-        using UnderTest = Object<
-            Field<field1, Int>,
-            Field<content, Quote> >;
-        UnderTest underTest;
-        
-        const char* msg =
-            R"___({"field1":42,"content":{"rate":0.234,"lockSide":"foo"}})___";
-    };
-
-    TEST_F(ANestedObject, canParse)
-    {
-        rapidjson::StringStream buf(msg);
-        rapidjson::Reader reader;
-        reader.IterativeParseInit();
-
-        EXPECT_TRUE(underTest.Parse<rj::kParseIterativeFlag>(reader, buf));
-        EXPECT_DOUBLE_EQ(underTest.get<content>().get<rate>(), 0.234);
-        EXPECT_EQ(underTest.get<content>().get<lockSide>(), "foo");
-
-        const auto& c = underTest.get<content>();
-
-        EXPECT_DOUBLE_EQ(c.get<rate>(), 0.234);
-        EXPECT_EQ(c.get<lockSide>(), "foo");
-    }
-
-    TEST_F(ANestedObject, canWrite)
-    {
-        underTest.set(field1{}, 42);
-        underTest.get<content>().set(lockSide{}, "foo");
-        underTest.get<content>().get(rate{}) = 0.234;
-        
-        rj::StringBuffer buffer;
-        rj::Writer<rj::StringBuffer> writer(buffer);
-        this->underTest.Accept(writer);
-        EXPECT_EQ(buffer.GetString(), msg);
-    }    
-
-    TEST(AnArray, canParse)
-    {
-        Array<Int> underTest;
-
-        auto msg = "[0, 1, 2, 3, 4]";
-        rapidjson::StringStream buf(msg);
-        rapidjson::Reader reader;
-        reader.IterativeParseInit();
-
-        underTest.Parse<rj::kParseIterativeFlag>(reader, buf);
-
-        EXPECT_EQ(underTest.size(), 5u);
-        EXPECT_EQ(underTest[0].value, 0);
-        EXPECT_EQ(underTest[1].value, 1);
-        EXPECT_EQ(underTest[2].value, 2);
-        EXPECT_EQ(underTest[3].value, 3);
-        EXPECT_EQ(underTest[4].value, 4);
-    }
-
-    TEST(AnObjectInAnArray, canParse)
-    {
-        using UnderTest = Array<Quote>;
-        UnderTest underTest;
-
-        auto msg = "[{ \"rate\": 0.234, \"lockSide\": \"foo\" }]";
-        rapidjson::StringStream buf(msg);
-        rapidjson::Reader reader;
-        reader.IterativeParseInit();
-
-        ASSERT_TRUE(underTest.Parse<rj::kParseIterativeFlag>(reader, buf));
-        EXPECT_DOUBLE_EQ(underTest[0].get<rate>(), 0.234);
-        EXPECT_EQ(underTest[0].get<lockSide>(), "foo");
-    }
-
-    namespace detail
-    {
-        template<typename T, typename... Mbrs, std::size_t... indices>
-        constexpr auto findImpl(std::index_sequence<indices...>)
-        {
-            return std::min({(std::is_same<T, Mbrs>::value ? indices: std::string::npos)...});
-        }
-    }
-
-    template<typename T, typename... Mbrs>
-    constexpr auto find()
-    {
-        return detail::findImpl<T, Mbrs...>(std::index_sequence_for<Mbrs...>());
-    }
-
-    static_assert(find<int, int, double, float>() == 0, "");
-    
 }
 #endif
