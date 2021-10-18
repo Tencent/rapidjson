@@ -186,8 +186,9 @@ public:
     bool Difference(const BigInteger& rhs, BigInteger* out) const {
         int cmp = Compare(rhs);
         RAPIDJSON_ASSERT(cmp != 0);
-        const BigInteger *a, *b;  // Makes a > b
-        bool ret;
+        const BigInteger* a = nullptr;  // Makes a > b
+        const BigInteger* b = nullptr;
+        bool ret = false;
         if (cmp < 0) { a = &rhs; b = this; ret = true; }
         else         { a = this; b = &rhs; ret = false; }
 

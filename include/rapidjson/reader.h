@@ -1575,7 +1575,7 @@ private:
 
         // Parse frac = decimal-point 1*DIGIT
         int expFrac = 0;
-        size_t decimalPosition;
+        size_t decimalPosition = 0;
         if (Consume(s, '.')) {
             decimalPosition = s.Length();
 

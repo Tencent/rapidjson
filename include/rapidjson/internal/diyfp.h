@@ -142,7 +142,7 @@ struct DiyFp {
         union {
             double d;
             uint64_t u64;
-        }u;
+        }u = {};
         RAPIDJSON_ASSERT(f <= kDpHiddenBit + kDpSignificandMask);
         if (e < kDpDenormalExponent) {
             // Underflow.

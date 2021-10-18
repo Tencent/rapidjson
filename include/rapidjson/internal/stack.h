@@ -182,7 +182,7 @@ private:
     template<typename T>
     void Expand(size_t count) {
         // Only expand the capacity if the current stack exists. Otherwise just create a stack with initial capacity.
-        size_t newCapacity;
+        size_t newCapacity = 0;
         if (stack_ == 0) {
             if (!allocator_)
                 ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
