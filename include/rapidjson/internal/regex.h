@@ -402,7 +402,7 @@ private:
                 }
                 return false;
 
-            case kLeftParenthesis: [[fallthrough]];
+            case kLeftParenthesis: RAPIDJSON_DELIBERATE_FALLTHROUGH;
             default: 
                 // syntax error (e.g. unclosed kLeftParenthesis)
                 return false;

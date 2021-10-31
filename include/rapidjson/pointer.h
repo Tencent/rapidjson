@@ -570,11 +570,11 @@ public:
                         break;
                     v = &((*v)[t->index]);
                     continue;
-                case kNullType: [[fallthrough]];
-                case kNumberType: [[fallthrough]];
-                case kStringType: [[fallthrough]];
-                case kFalseType: [[fallthrough]];
-                case kTrueType: [[fallthrough]];
+                case kNullType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
+                case kNumberType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
+                case kStringType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
+                case kFalseType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
+                case kTrueType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
                 default:
                     break;
             }
@@ -627,11 +627,11 @@ public:
                     break;
                 v = &((*v)[t->index]);
                 continue;
-            case kNullType: [[fallthrough]];
-            case kNumberType: [[fallthrough]];
-            case kStringType: [[fallthrough]];
-            case kFalseType: [[fallthrough]];
-            case kTrueType: [[fallthrough]];
+            case kNullType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
+            case kNumberType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
+            case kStringType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
+            case kFalseType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
+            case kTrueType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
             default:
                 break;
             }

@@ -1111,8 +1111,8 @@ public:
             case kValidateErrorAnyOf:                   return GetAnyOfString();
             case kValidateErrorNot:                     return GetNotString();
 
-            case kValidateErrors: [[fallthrough]];
-            case kValidateErrorNone: [[fallthrough]];
+            case kValidateErrors: RAPIDJSON_DELIBERATE_FALLTHROUGH;
+            case kValidateErrorNone: RAPIDJSON_DELIBERATE_FALLTHROUGH;
             default:                                    return GetNullString();
         }
     }
