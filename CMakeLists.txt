@@ -57,6 +57,8 @@ if(RAPIDJSON_USE_MEMBERSMAP)
     add_definitions(-DRAPIDJSON_USE_MEMBERSMAP=1)
 endif()
 
+option(RAPIDJSON_INSTALL "" ON)
+
 find_program(CCACHE_FOUND ccache)
 if(CCACHE_FOUND)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
@@ -180,69 +182,73 @@ if(RAPIDJSON_BUILD_TESTS)
     include(CTest)
 endif()
 
-# pkg-config
-IF (UNIX OR CYGWIN)
-  CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
-                  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
-                  @ONLY)
-  INSTALL (FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
-      DESTINATION "${LIB_INSTALL_DIR}/pkgconfig"
-      COMPONENT pkgconfig)
-ENDIF()
+# ========================== installations ================================== #
 
-install(FILES readme.md
-        DESTINATION "${DOC_INSTALL_DIR}"
-        COMPONENT doc)
+if(RAPIDJSON_INSTALL)
+    # pkg-config
+    IF (UNIX OR CYGWIN)
+      CONFIGURE_FILE (${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}.pc.in
+                      ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
+                      @ONLY)
+      INSTALL (FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
+          DESTINATION "${LIB_INSTALL_DIR}/pkgconfig"
+          COMPONENT pkgconfig)
+    ENDIF()
 
-install(DIRECTORY include/rapidjson
-    DESTINATION "${INCLUDE_INSTALL_DIR}"
-    COMPONENT dev)
+    install(FILES readme.md
+            DESTINATION "${DOC_INSTALL_DIR}"
+            COMPONENT doc)
 
-install(DIRECTORY example/
-    DESTINATION "${DOC_INSTALL_DIR}/examples"
-    COMPONENT examples
-    # Following patterns are for excluding the intermediate/object files
-    # from an install of in-source CMake build.
-    PATTERN "CMakeFiles" EXCLUDE
-    PATTERN "Makefile" EXCLUDE
-    PATTERN "cmake_install.cmake" EXCLUDE)
+    install(DIRECTORY include/rapidjson
+        DESTINATION "${INCLUDE_INSTALL_DIR}"
+        COMPONENT dev)
 
-# Provide config and version files to be used by other applications
-# ===============================
+    install(DIRECTORY example/
+        DESTINATION "${DOC_INSTALL_DIR}/examples"
+        COMPONENT examples
+        # Following patterns are for excluding the intermediate/object files
+        # from an install of in-source CMake build.
+        PATTERN "CMakeFiles" EXCLUDE
+        PATTERN "Makefile" EXCLUDE
+        PATTERN "cmake_install.cmake" EXCLUDE)
 
-################################################################################
-# Export package for use from the build tree
-EXPORT( PACKAGE ${PROJECT_NAME} )
+    # Provide config and version files to be used by other applications
+    # ===============================
 
-# Create the RapidJSONConfig.cmake file for other cmake projects.
-# ... for the build tree
-SET( CONFIG_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-SET( CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR})
-SET( ${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_SOURCE_DIR}/include" )
+    ################################################################################
+    # Export package for use from the build tree
+    EXPORT( PACKAGE ${PROJECT_NAME} )
 
-CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY )
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake @ONLY)
+    # Create the RapidJSONConfig.cmake file for other cmake projects.
+    # ... for the build tree
+    SET( CONFIG_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+    SET( CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR})
+    SET( ${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_SOURCE_DIR}/include" )
 
-# ... for the install tree
-SET( CMAKECONFIG_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME} )
-FILE( RELATIVE_PATH REL_INCLUDE_DIR
-    "${CMAKECONFIG_INSTALL_DIR}"
-    "${CMAKE_INSTALL_PREFIX}/include" )
+    CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY )
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake @ONLY)
 
-SET( ${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_CMAKE_DIR}/${REL_INCLUDE_DIR}" )
-SET( CONFIG_SOURCE_DIR )
-SET( CONFIG_DIR )
-CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake @ONLY )
+    # ... for the install tree
+    SET( CMAKECONFIG_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME} )
+    FILE( RELATIVE_PATH REL_INCLUDE_DIR
+        "${CMAKECONFIG_INSTALL_DIR}"
+        "${CMAKE_INSTALL_PREFIX}/include" )
 
-INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
-        DESTINATION ${CMAKECONFIG_INSTALL_DIR} )
+    SET( ${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_CMAKE_DIR}/${REL_INCLUDE_DIR}" )
+    SET( CONFIG_SOURCE_DIR )
+    SET( CONFIG_DIR )
+    CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake @ONLY )
 
-# Install files
-INSTALL(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    DESTINATION "${CMAKE_INSTALL_DIR}"
-    COMPONENT dev)
+    INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
+            DESTINATION ${CMAKECONFIG_INSTALL_DIR} )
+
+    # Install files
+    INSTALL(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+        DESTINATION "${CMAKE_INSTALL_DIR}"
+        COMPONENT dev)
+endif()
