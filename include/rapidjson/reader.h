@@ -2137,6 +2137,10 @@ private:
             }
         }
 
+        case IterativeParsingValueState: [[fallthrough]];
+        case IterativeParsingStartState: [[fallthrough]];
+        case IterativeParsingFinishState: [[fallthrough]];
+        case cIterativeParsingStateCount: [[fallthrough]];
         default:
             // This branch is for IterativeParsingValueState actually.
             // Use `default:` rather than
@@ -2176,6 +2180,12 @@ private:
         case IterativeParsingKeyValueDelimiterState:
         case IterativeParsingArrayInitialState:
         case IterativeParsingElementDelimiterState: RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell()); return;
+        case IterativeParsingErrorState: [[fallthrough]];
+        case IterativeParsingObjectFinishState: [[fallthrough]];
+        case IterativeParsingElementState: [[fallthrough]];
+        case IterativeParsingArrayFinishState: [[fallthrough]];
+        case IterativeParsingValueState: [[fallthrough]];
+        case cIterativeParsingStateCount: [[fallthrough]];
         default: RAPIDJSON_ASSERT(src == IterativeParsingElementState); RAPIDJSON_PARSE_ERROR(kParseErrorArrayMissCommaOrSquareBracket, is.Tell()); return;
         }
     }

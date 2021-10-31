@@ -1111,6 +1111,8 @@ public:
             case kValidateErrorAnyOf:                   return GetAnyOfString();
             case kValidateErrorNot:                     return GetNotString();
 
+            case kValidateErrors: [[fallthrough]];
+            case kValidateErrorNone: [[fallthrough]];
             default:                                    return GetNullString();
         }
     }

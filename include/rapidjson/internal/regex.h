@@ -402,6 +402,7 @@ private:
                 }
                 return false;
 
+            case kLeftParenthesis: [[fallthrough]];
             default: 
                 // syntax error (e.g. unclosed kLeftParenthesis)
                 return false;

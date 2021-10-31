@@ -31,6 +31,8 @@ struct MessageHandler
         case kExpectObjectStart:
             state_ = kExpectNameOrObjectEnd;
             return true;
+        case kExpectNameOrObjectEnd: [[fallthrough]];
+        case kExpectValue: [[fallthrough]];
         default:
             return false;
         }
@@ -46,6 +48,7 @@ struct MessageHandler
             messages_.insert(MessageMap::value_type(name_, string(str, length)));
             state_ = kExpectNameOrObjectEnd;
             return true;
+        case kExpectObjectStart: [[fallthrough]];
         default:
             return false;
         }

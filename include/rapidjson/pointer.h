@@ -570,6 +570,11 @@ public:
                         break;
                     v = &((*v)[t->index]);
                     continue;
+                case kNullType: [[fallthrough]];
+                case kNumberType: [[fallthrough]];
+                case kStringType: [[fallthrough]];
+                case kFalseType: [[fallthrough]];
+                case kTrueType: [[fallthrough]];
                 default:
                     break;
             }
@@ -622,6 +627,11 @@ public:
                     break;
                 v = &((*v)[t->index]);
                 continue;
+            case kNullType: [[fallthrough]];
+            case kNumberType: [[fallthrough]];
+            case kStringType: [[fallthrough]];
+            case kFalseType: [[fallthrough]];
+            case kTrueType: [[fallthrough]];
             default:
                 break;
             }
