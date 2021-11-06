@@ -132,12 +132,12 @@ inline char* WriteExponent(int K, char* buffer) {
     if (K >= 100) {
         *buffer++ = static_cast<char>('0' + static_cast<char>(K / 100));
         K %= 100;
-        const char* d = GetDigitsLut() + K * 2;
+        const char* d = GetDigitsLut() + static_cast<int64_t>(K) * 2;
         *buffer++ = d[0];
         *buffer++ = d[1];
     }
     else if (K >= 10) {
-        const char* d = GetDigitsLut() + K * 2;
+        const char* d = GetDigitsLut() + static_cast<int64_t>(K) * 2;
         *buffer++ = d[0];
         *buffer++ = d[1];
     }
@@ -160,7 +160,7 @@ inline char* Prettify(char* buffer, int length, int k, int maxDecimalPlaces) {
     }
     else if (0 < kk && kk <= 21) {
         // 1234e-2 -> 12.34
-        std::memmove(&buffer[kk + 1], &buffer[kk], static_cast<size_t>(length - kk));
+        std::memmove(&buffer[kk + 1], &buffer[kk], static_cast<size_t>(length) - kk);
         buffer[kk] = '.';
         if (0 > k + maxDecimalPlaces) {
             // When maxDecimalPlaces = 2, 1.2345 -> 1.23, 1.102 -> 1.1
@@ -206,7 +206,7 @@ inline char* Prettify(char* buffer, int length, int k, int maxDecimalPlaces) {
     }
     else {
         // 1234e30 -> 1.234e33
-        std::memmove(&buffer[2], &buffer[1], static_cast<size_t>(length - 1));
+        std::memmove(&buffer[2], &buffer[1], static_cast<size_t>(length) - 1);
         buffer[1] = '.';
         buffer[length + 1] = 'e';
         return WriteExponent(kk - 1, &buffer[0 + length + 2]);

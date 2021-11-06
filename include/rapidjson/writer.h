@@ -388,9 +388,9 @@ protected:
         };
 
         if (TargetEncoding::supportUnicode)
-            PutReserve(*os_, 2 + length * 6); // "\uxxxx..."
+            PutReserve(*os_, static_cast<size_t>(2) + static_cast<size_t>(length) * 6); // "\uxxxx..."
         else
-            PutReserve(*os_, 2 + length * 12);  // "\uxxxx\uyyyy..."
+            PutReserve(*os_, static_cast<size_t>(2) + static_cast<size_t>(length) * 12);  // "\uxxxx\uyyyy..."
 
         PutUnsafe(*os_, '\"');
         GenericStringStream<SourceEncoding> is(str);

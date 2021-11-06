@@ -2073,7 +2073,7 @@ private:
         } else {
             data_.f.flags = kCopyStringFlag;
             data_.s.length = s.length;
-            str = static_cast<Ch *>(allocator.Malloc((s.length + 1) * sizeof(Ch)));
+            str = static_cast<Ch *>(allocator.Malloc(( static_cast<uint64_t>(s.length) + 1) * sizeof(Ch)));
             SetStringPointer(str);
         }
         std::memcpy(str, s, s.length * sizeof(Ch));

@@ -1496,7 +1496,7 @@ private:
                             break;
                         }
                     }
-                    i = i * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                    i = i * 10 + static_cast<unsigned>(static_cast<unsigned int>(s.TakePush()) - '0');
                     significandDigit++;
                 }
             else
@@ -1550,7 +1550,7 @@ private:
                             useDouble = true;
                             break;
                         }
-                    i64 = i64 * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                    i64 = i64 * 10 + static_cast<unsigned>(static_cast<uint64_t>(s.TakePush()) - '0');
                     significandDigit++;
                 }
             else
@@ -1561,7 +1561,7 @@ private:
                             useDouble = true;
                             break;
                         }
-                    i64 = i64 * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                    i64 = i64 * 10 + static_cast<unsigned>(static_cast<uint64_t>(s.TakePush()) - '0');
                     significandDigit++;
                 }
         }
@@ -1569,7 +1569,7 @@ private:
         // Force double for big integer
         if (useDouble) {
             while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
-                d = d * 10 + (s.TakePush() - '0');
+                d = d * 10 + (static_cast<uint64_t>(s.TakePush()) - '0');
             }
         }
 
@@ -1592,7 +1592,7 @@ private:
                     if (i64 > RAPIDJSON_UINT64_C2(0x1FFFFF, 0xFFFFFFFF)) // 2^53 - 1 for fast path
                         break;
                     else {
-                        i64 = i64 * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                        i64 = i64 * 10 + static_cast<unsigned>(static_cast<uint64_t>(s.TakePush()) - '0');
                         --expFrac;
                         if (i64 != 0)
                             significandDigit++;
@@ -1609,7 +1609,7 @@ private:
 
             while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
                 if (significandDigit < 17) {
-                    d = d * 10.0 + (s.TakePush() - '0');
+                    d = d * 10.0 + (static_cast<uint64_t>(s.TakePush()) - '0');
                     --expFrac;
                     if (RAPIDJSON_LIKELY(d > 0.0))
                         significandDigit++;
