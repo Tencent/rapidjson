@@ -61,7 +61,7 @@ RAPIDJSON_NAMESPACE_BEGIN
 /*! \ingroup RAPIDJSON_ERRORS
     \see GenericReader::Parse, GenericReader::GetParseErrorCode
 */
-enum ParseErrorCode {
+enum ParseErrorCode : uint32_t {
     kParseErrorNone = 0,                        //!< No error.
 
     kParseErrorDocumentEmpty,                   //!< The document is empty.
@@ -159,7 +159,7 @@ typedef const RAPIDJSON_ERROR_CHARTYPE* (*GetParseErrorFunc)(ParseErrorCode);
 /*! \ingroup RAPIDJSON_ERRORS
     \see GenericSchemaValidator
 */
-enum ValidateErrorCode {
+enum ValidateErrorCode : int32_t {
     kValidateErrors    = -1,                   //!< Top level error code when kValidateContinueOnErrorsFlag set.
     kValidateErrorNone = 0,                    //!< No error.
 

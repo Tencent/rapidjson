@@ -63,7 +63,7 @@ RAPIDJSON_NAMESPACE_BEGIN
 #endif
 
 //! Combination of writeFlags
-enum WriteFlag {
+enum WriteFlag : uint32_t {
     kWriteNoFlags = 0,              //!< No flags are set.
     kWriteValidateEncodingFlag = 1, //!< Validate encoding of JSON strings.
     kWriteNanAndInfFlag = 2,        //!< Allow writing of Infinity, -Infinity and NaN.

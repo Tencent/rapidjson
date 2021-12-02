@@ -139,7 +139,7 @@ RAPIDJSON_MULTILINEMACRO_END
 //! Combination of validate flags
 /*! \see
  */
-enum ValidateFlag {
+enum ValidateFlag : uint32_t {
     kValidateNoFlags = 0,                                       //!< No flags are set.
     kValidateContinueOnErrorFlag = 1,                           //!< Don't stop after first validation error.
     kValidateDefaultFlags = RAPIDJSON_VALIDATE_DEFAULT_FLAGS    //!< Default validate flags. Can be customized by defining RAPIDJSON_VALIDATE_DEFAULT_FLAGS
@@ -347,7 +347,7 @@ struct SchemaValidationContext {
     typedef typename SchemaType::ValueType ValueType;
     typedef typename ValueType::Ch Ch;
 
-    enum PatternValidatorType {
+    enum PatternValidatorType : uint32_t {
         kPatternValidatorOnly,
         kPatternValidatorWithProperty,
         kPatternValidatorWithAdditionalProperty
@@ -1171,7 +1171,7 @@ public:
 #undef RAPIDJSON_STRING_
 
 private:
-    enum SchemaValueType {
+    enum SchemaValueType : uint32_t {
         kNullSchemaType,
         kBooleanSchemaType,
         kObjectSchemaType,

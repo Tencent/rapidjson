@@ -1973,7 +1973,7 @@ private:
     template <typename, typename> friend class GenericValue;
     template <typename, typename, typename> friend class GenericDocument;
 
-    enum {
+    enum : uint32_t {
         kBoolFlag       = 0x0008,
         kNumberFlag     = 0x0010,
         kIntFlag        = 0x0020,

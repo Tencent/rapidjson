@@ -600,7 +600,7 @@ struct ASCII {
 // AutoUTF
 
 //! Runtime-specified UTF encoding type of a stream.
-enum UTFType {
+enum UTFType : uint32_t {
     kUTF8 = 0,      //!< UTF-8.
     kUTF16LE = 1,   //!< UTF-16 little endian.
     kUTF16BE = 2,   //!< UTF-16 big endian.

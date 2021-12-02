@@ -32,7 +32,7 @@ RAPIDJSON_NAMESPACE_BEGIN
 //! Combination of PrettyWriter format flags.
 /*! \see PrettyWriter::SetFormatOptions
  */
-enum PrettyFormatOptions {
+enum PrettyFormatOptions : uint32_t {
     kFormatDefault = 0,         //!< Default pretty formatting.
     kFormatSingleLineArray = 1  //!< Format arrays on a single line.
 };

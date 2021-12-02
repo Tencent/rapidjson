@@ -35,7 +35,7 @@ static const SizeType kPointerInvalidIndex = ~SizeType(0);  //!< Represents an i
 /*! \ingroup RAPIDJSON_ERRORS
     \see GenericPointer::GenericPointer, GenericPointer::GetParseErrorCode
 */
-enum PointerParseErrorCode {
+enum PointerParseErrorCode : uint32_t {
     kPointerParseErrorNone = 0,                     //!< The parse is successful
 
     kPointerParseErrorTokenMustBeginWithSolidus,    //!< A token must begin with a '/'

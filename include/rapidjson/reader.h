@@ -143,7 +143,7 @@ RAPIDJSON_NAMESPACE_BEGIN
 //! Combination of parseFlags
 /*! \see Reader::Parse, Document::Parse, Document::ParseInsitu, Document::ParseStream
  */
-enum ParseFlag {
+enum ParseFlag : uint32_t {
     kParseNoFlags = 0,              //!< No flags are set.
     kParseInsituFlag = 1,           //!< In-situ(destructive) parsing.
     kParseValidateEncodingFlag = 2, //!< Validate encoding of JSON strings.
@@ -1767,7 +1767,7 @@ private:
     // Iterative Parsing
 
     // States
-    enum IterativeParsingState {
+    enum IterativeParsingState : uint32_t {
         IterativeParsingFinishState = 0, // sink states at top
         IterativeParsingErrorState,      // sink states at top
         IterativeParsingStartState,
@@ -1795,7 +1795,7 @@ private:
     };
 
     // Tokens
-    enum Token {
+    enum Token : uint32_t {
         LeftBracketToken = 0,
         RightBracketToken,
 
