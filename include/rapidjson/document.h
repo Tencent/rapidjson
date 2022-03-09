@@ -1235,10 +1235,12 @@ public:
             // return NullValue;
 
             // Use static buffer and placement-new to prevent destruction
-#if defined(_MSC_VER) && _MSC_VER < 1900
+#if defined(RAPIDJSON_HAS_CXX11)
+            thread_local static GenericValue buffer;
+#elif defined(_MSC_VER)
             __declspec(thread) static GenericValue buffer;
 #else
-            thread_local static GenericValue buffer;
+            __thread static GenericValue buffer;
 #endif
             return *new (reinterpret_cast<char *>(&buffer)) GenericValue();
         }
