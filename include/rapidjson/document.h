@@ -1235,7 +1235,7 @@ public:
             // return NullValue;
 
             // Use static buffer and placement-new to prevent destruction
-            static GenericValue buffer;
+            thread_local static GenericValue buffer;
             return *new (reinterpret_cast<char *>(&buffer)) GenericValue();
         }
     }
