@@ -1236,13 +1236,16 @@ public:
 
             // Use static buffer and placement-new to prevent destruction
 #if defined(_MSC_VER) && _MSC_VER < 1900
-            __declspec(thread) static GenericValue buffer;
-#elif defined(RAPIDJSON_HAS_CXX11)
+            __declspec(thread) static char buffer[sizeof(GenericValue)];
+            return *new (buffer) GenericValue();
+#else
+#if defined(RAPIDJSON_HAS_CXX11)
             thread_local static GenericValue buffer;
 #else
             __thread static GenericValue buffer;
 #endif
             return *new (reinterpret_cast<char *>(&buffer)) GenericValue();
+#endif
         }
     }
     template <typename SourceAllocator>
