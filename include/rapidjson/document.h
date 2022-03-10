@@ -1235,14 +1235,21 @@ public:
             // return NullValue;
 
             // Use static buffer and placement-new to prevent destruction
+            // Note that we use the thread-local storage to prevent race-condition.
+            //   Ref: https://github.com/Tencent/rapidjson/pull/2001
+
+            // MSVC 2013 or earlier does not support `thread_local` attribute even in C++11 mode.
 #if defined(_MSC_VER) && _MSC_VER < 1900
             __declspec(thread) static char buffer[sizeof(GenericValue)];
             return *new (buffer) GenericValue();
 #else
 #if defined(RAPIDJSON_HAS_CXX11)
             thread_local static GenericValue buffer;
-#else
+#elif defined(__GNUC__) || defined(__clang__)
             __thread static GenericValue buffer;
+#else
+            // In case we don't recognize the compiler, fall back to normal static storage.
+            static GenericValue buffer;
 #endif
             return *new (reinterpret_cast<char *>(&buffer)) GenericValue();
 #endif
