@@ -85,7 +85,7 @@ class GenericDocument;
     User can define this to use CrtAllocator or MemoryPoolAllocator.
 */
 #ifndef RAPIDJSON_DEFAULT_STACK_ALLOCATOR
-#define RAPIDJSON_DEFAULT_STACK_ALLOCATOR CrtAllocator
+#define RAPIDJSON_DEFAULT_STACK_ALLOCATOR ::RAPIDJSON_NAMESPACE::CrtAllocator
 #endif
 
 /*! \def RAPIDJSON_VALUE_DEFAULT_OBJECT_CAPACITY
