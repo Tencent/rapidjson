@@ -2486,6 +2486,7 @@ public:
     typedef typename Encoding::Ch Ch;                       //!< Character type derived from Encoding.
     typedef GenericValue<Encoding, Allocator> ValueType;    //!< Value type of the document.
     typedef Allocator AllocatorType;                        //!< Allocator type from template parameter.
+    typedef StackAllocator StackAllocatorType;              //!< StackAllocator type from template parameter.
 
     //! Constructor
     /*! Creates an empty document of specified type.
