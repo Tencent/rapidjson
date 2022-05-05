@@ -25,7 +25,11 @@
 
 #if defined(_MSC_VER) && defined(_M_AMD64) && !defined(__INTEL_COMPILER)
 #include <intrin.h>
+#if !defined(_ARM64EC_)
 #pragma intrinsic(_umul128)
+#else
+#pragma comment(lib,"softintrin")
+#endif
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN

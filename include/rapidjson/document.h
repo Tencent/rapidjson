@@ -75,7 +75,7 @@ class GenericDocument;
     User can define this to use CrtAllocator or MemoryPoolAllocator.
 */
 #ifndef RAPIDJSON_DEFAULT_ALLOCATOR
-#define RAPIDJSON_DEFAULT_ALLOCATOR MemoryPoolAllocator<CrtAllocator>
+#define RAPIDJSON_DEFAULT_ALLOCATOR ::RAPIDJSON_NAMESPACE::MemoryPoolAllocator<::RAPIDJSON_NAMESPACE::CrtAllocator>
 #endif
 
 /*! \def RAPIDJSON_DEFAULT_STACK_ALLOCATOR
@@ -85,7 +85,7 @@ class GenericDocument;
     User can define this to use CrtAllocator or MemoryPoolAllocator.
 */
 #ifndef RAPIDJSON_DEFAULT_STACK_ALLOCATOR
-#define RAPIDJSON_DEFAULT_STACK_ALLOCATOR CrtAllocator
+#define RAPIDJSON_DEFAULT_STACK_ALLOCATOR ::RAPIDJSON_NAMESPACE::CrtAllocator
 #endif
 
 /*! \def RAPIDJSON_VALUE_DEFAULT_OBJECT_CAPACITY
@@ -1235,8 +1235,8 @@ public:
             // return NullValue;
 
             // Use static buffer and placement-new to prevent destruction
-            static char buffer[sizeof(GenericValue)];
-            return *new (buffer) GenericValue();
+            static GenericValue buffer;
+            return *new (reinterpret_cast<char *>(&buffer)) GenericValue();
         }
     }
     template <typename SourceAllocator>
@@ -1951,7 +1951,7 @@ public:
         case kArrayType:
             if (RAPIDJSON_UNLIKELY(!handler.StartArray()))
                 return false;
-            for (const GenericValue* v = Begin(); v != End(); ++v)
+            for (ConstValueIterator v = Begin(); v != End(); ++v)
                 if (RAPIDJSON_UNLIKELY(!v->Accept(handler)))
                     return false;
             return handler.EndArray(data_.a.size);
@@ -2486,6 +2486,7 @@ public:
     typedef typename Encoding::Ch Ch;                       //!< Character type derived from Encoding.
     typedef GenericValue<Encoding, Allocator> ValueType;    //!< Value type of the document.
     typedef Allocator AllocatorType;                        //!< Allocator type from template parameter.
+    typedef StackAllocator StackAllocatorType;              //!< StackAllocator type from template parameter.
 
     //! Constructor
     /*! Creates an empty document of specified type.

@@ -475,7 +475,9 @@ TEST(Pointer, CopyConstructor) {
         EXPECT_EQ(1u, q.GetTokens()[1].length);
         EXPECT_STREQ("0", q.GetTokens()[1].name);
         EXPECT_EQ(0u, q.GetTokens()[1].index);
-        EXPECT_EQ(&p.GetAllocator(), &q.GetAllocator());
+        
+        // Copied pointer needs to have its own allocator
+        EXPECT_NE(&p.GetAllocator(), &q.GetAllocator());
     }
 
     // Static tokens
@@ -648,6 +650,52 @@ TEST(Pointer, Create) {
     }
 }
 
+static const char kJsonIds[] = "{\n"
+   "    \"id\": \"/root/\","
+   "    \"foo\":[\"bar\", \"baz\", {\"id\": \"inarray\", \"child\": 1}],\n"
+   "    \"int\" : 2,\n"
+   "    \"str\" : \"val\",\n"
+   "    \"obj\": {\"id\": \"inobj\", \"child\": 3},\n"
+   "    \"jbo\": {\"id\": true, \"child\": 4}\n"
+   "}";
+
+
+TEST(Pointer, GetUri) {
+    CrtAllocator allocator;
+    Document d;
+    d.Parse(kJsonIds);
+    Pointer::UriType doc("http://doc");
+    Pointer::UriType root("http://doc/root/");
+    Pointer::UriType empty = Pointer::UriType();
+
+    EXPECT_TRUE(Pointer("").GetUri(d, doc) == doc);
+    EXPECT_TRUE(Pointer("/foo").GetUri(d, doc) == root);
+    EXPECT_TRUE(Pointer("/foo/0").GetUri(d, doc) == root);
+    EXPECT_TRUE(Pointer("/foo/2").GetUri(d, doc) == root);
+    EXPECT_TRUE(Pointer("/foo/2/child").GetUri(d, doc) == Pointer::UriType("http://doc/root/inarray"));
+    EXPECT_TRUE(Pointer("/int").GetUri(d, doc) == root);
+    EXPECT_TRUE(Pointer("/str").GetUri(d, doc) == root);
+    EXPECT_TRUE(Pointer("/obj").GetUri(d, doc) == root);
+    EXPECT_TRUE(Pointer("/obj/child").GetUri(d, doc) == Pointer::UriType("http://doc/root/inobj"));
+    EXPECT_TRUE(Pointer("/jbo").GetUri(d, doc) == root);
+    EXPECT_TRUE(Pointer("/jbo/child").GetUri(d, doc) == root); // id not string
+
+    size_t unresolvedTokenIndex;
+    EXPECT_TRUE(Pointer("/abc").GetUri(d, doc, &unresolvedTokenIndex, &allocator) == empty); // Out of boundary
+    EXPECT_EQ(0u, unresolvedTokenIndex);
+    EXPECT_TRUE(Pointer("/foo/3").GetUri(d, doc, &unresolvedTokenIndex, &allocator) == empty); // Out of boundary
+    EXPECT_EQ(1u, unresolvedTokenIndex);
+    EXPECT_TRUE(Pointer("/foo/a").GetUri(d, doc, &unresolvedTokenIndex, &allocator) == empty); // "/foo" is an array, cannot query by "a"
+    EXPECT_EQ(1u, unresolvedTokenIndex);
+    EXPECT_TRUE(Pointer("/foo/0/0").GetUri(d, doc, &unresolvedTokenIndex, &allocator) == empty); // "/foo/0" is an string, cannot further query
+    EXPECT_EQ(2u, unresolvedTokenIndex);
+    EXPECT_TRUE(Pointer("/foo/0/a").GetUri(d, doc, &unresolvedTokenIndex, &allocator) == empty); // "/foo/0" is an string, cannot further query
+    EXPECT_EQ(2u, unresolvedTokenIndex);
+
+    Pointer::Token tokens[] = { { "foo ...", 3, kPointerInvalidIndex } };
+    EXPECT_TRUE(Pointer(tokens, 1).GetUri(d, doc) == root);
+}
+
 TEST(Pointer, Get) {
     Document d;
     d.Parse(kJson);
@@ -664,7 +712,8 @@ TEST(Pointer, Get) {
     EXPECT_EQ(&d["k\"l"], Pointer("/k\"l").Get(d));
     EXPECT_EQ(&d[" "], Pointer("/ ").Get(d));
     EXPECT_EQ(&d["m~n"], Pointer("/m~0n").Get(d));
-    EXPECT_TRUE(Pointer("/abc").Get(d) == 0);
+
+    EXPECT_TRUE(Pointer("/abc").Get(d) == 0);  // Out of boundary
     size_t unresolvedTokenIndex;
     EXPECT_TRUE(Pointer("/foo/2").Get(d, &unresolvedTokenIndex) == 0); // Out of boundary
     EXPECT_EQ(1u, unresolvedTokenIndex);
@@ -1667,4 +1716,15 @@ TEST(Pointer, Issue483) {
     myjson::Value value(rapidjson::kStringType);
     value.SetString(mystr.c_str(), static_cast<SizeType>(mystr.length()), document.GetAllocator());
     myjson::Pointer(path.c_str()).Set(document, value, document.GetAllocator());
+}
+
+TEST(Pointer, Issue1899) {
+    typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
+    PointerType p;
+    PointerType q = p.Append("foo");
+    EXPECT_TRUE(PointerType("/foo") == q);
+    q = q.Append(1234);
+    EXPECT_TRUE(PointerType("/foo/1234") == q);
+    q = q.Append("");
+    EXPECT_TRUE(PointerType("/foo/1234/") == q);
 }
