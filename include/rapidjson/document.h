@@ -1235,8 +1235,8 @@ public:
             // return NullValue;
 
             // Use static buffer and placement-new to prevent destruction
-            static GenericValue buffer;
-            return *new (reinterpret_cast<char *>(&buffer)) GenericValue();
+            alignas(GenericValue) static char buffer[sizeof(GenericValue)];
+            return *new (buffer) GenericValue();
         }
     }
     template <typename SourceAllocator>
