@@ -1230,6 +1230,7 @@ public:
         else {
             RAPIDJSON_ASSERT(false);    // see above note
 
+#if defined(__cplusplus) && (__cplusplus >= 201103L)
             // This will generate -Wexit-time-destructors in clang
             // static GenericValue NullValue;
             // return NullValue;
@@ -1237,6 +1238,10 @@ public:
             // Use static buffer and placement-new to prevent destruction
             alignas(GenericValue) static char buffer[sizeof(GenericValue)];
             return *new (buffer) GenericValue();
+#else
+            static GenericValue buffer;
+            return *new (reinterpret_cast<char *>(&buffer)) GenericValue();
+#endif
         }
     }
     template <typename SourceAllocator>
