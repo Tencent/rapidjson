@@ -303,7 +303,7 @@ public:
         SizeType length = static_cast<SizeType>(end - buffer);
         buffer[length] = '\0';
 
-        if (sizeof(Ch) == 1) {
+        if RAPIDJSON_CONSTEXPR (sizeof(Ch) == 1) {
             Token token = { reinterpret_cast<Ch*>(buffer), length, index };
             return Append(token, allocator);
         }

@@ -1571,7 +1571,7 @@ struct TokenHelper {
 template <typename Stack>
 struct TokenHelper<Stack, char> {
     RAPIDJSON_FORCEINLINE static void AppendIndexToken(Stack& documentStack, SizeType index) {
-        if (sizeof(SizeType) == 4) {
+        if RAPIDJSON_CONSTEXPR (sizeof(SizeType) == 4) {
             char *buffer = documentStack.template Push<char>(1 + 10); // '/' + uint
             *buffer++ = '/';
             const char* end = internal::u32toa(index, buffer);
