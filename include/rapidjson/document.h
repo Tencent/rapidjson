@@ -75,7 +75,7 @@ class GenericDocument;
     User can define this to use CrtAllocator or MemoryPoolAllocator.
 */
 #ifndef RAPIDJSON_DEFAULT_ALLOCATOR
-#define RAPIDJSON_DEFAULT_ALLOCATOR MemoryPoolAllocator<CrtAllocator>
+#define RAPIDJSON_DEFAULT_ALLOCATOR ::RAPIDJSON_NAMESPACE::MemoryPoolAllocator<::RAPIDJSON_NAMESPACE::CrtAllocator>
 #endif
 
 /*! \def RAPIDJSON_DEFAULT_STACK_ALLOCATOR
@@ -85,7 +85,7 @@ class GenericDocument;
     User can define this to use CrtAllocator or MemoryPoolAllocator.
 */
 #ifndef RAPIDJSON_DEFAULT_STACK_ALLOCATOR
-#define RAPIDJSON_DEFAULT_STACK_ALLOCATOR CrtAllocator
+#define RAPIDJSON_DEFAULT_STACK_ALLOCATOR ::RAPIDJSON_NAMESPACE::CrtAllocator
 #endif
 
 /*! \def RAPIDJSON_VALUE_DEFAULT_OBJECT_CAPACITY
@@ -2502,6 +2502,7 @@ public:
     typedef typename Encoding::Ch Ch;                       //!< Character type derived from Encoding.
     typedef GenericValue<Encoding, Allocator> ValueType;    //!< Value type of the document.
     typedef Allocator AllocatorType;                        //!< Allocator type from template parameter.
+    typedef StackAllocator StackAllocatorType;              //!< StackAllocator type from template parameter.
 
     //! Constructor
     /*! Creates an empty document of specified type.
