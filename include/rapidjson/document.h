@@ -1230,19 +1230,29 @@ public:
         else {
             RAPIDJSON_ASSERT(false);    // see above note
 
-#if defined(__cplusplus) && (__cplusplus >= 201103L)
-            // This will generate -Wexit-time-destructors in clang
-            // static GenericValue NullValue;
-            // return NullValue;
+            // Use thread-local storage to prevent races between threads.
+#if defined(_MSC_VER) && _MSC_VER < 1900
+// MSVC 2013 or earlier does not support `thread_local` attribute even in C++11
+// mode.
+#define RAPIDJSON_THREAD_LOCAL __declspec(thread)
+#elif RAPIDJSON_HAS_CXX11
+#define RAPIDJSON_THREAD_LOCAL thread_local
+#elif defined(__GNUC__) || defined(__clang__)
+#define RAPIDJSON_THREAD_LOCAL __thread
+#else
+#define RAPIDJSON_THREAD_LOCAL
+#endif
 
-            // Use static buffer and placement-new to prevent destruction
-            alignas(GenericValue) static char buffer[sizeof(GenericValue)];
+#if RAPIDJSON_HAS_CXX11
+            // Use static buffer and placement-new to prevent destruction.
+            alignas(GenericValue) RAPIDJSON_THREAD_LOCAL static char buffer[sizeof(GenericValue)];
             return *new (buffer) GenericValue();
 #else
-            static GenericValue buffer;
-            return *new (reinterpret_cast<char *>(&buffer)) GenericValue();
+            // This will generate -Wexit-time-destructors in clang.
+            RAPIDJSON_THREAD_LOCAL static GenericValue buffer;
+            return buffer;
 #endif
-        }
+    }
     }
     template <typename SourceAllocator>
     const GenericValue& operator[](const GenericValue<Encoding, SourceAllocator>& name) const { return const_cast<GenericValue&>(*this)[name]; }
