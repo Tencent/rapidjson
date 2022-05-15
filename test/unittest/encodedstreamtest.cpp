@@ -113,8 +113,8 @@ protected:
                 EXPECT_EQ(expected, actual);
             }
             EXPECT_EQ('\0', s.Peek());
-            free(data);
             EXPECT_EQ(size, eis.Tell());
+            free(data);
         }
     }
 
