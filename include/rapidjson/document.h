@@ -1230,28 +1230,27 @@ public:
         else {
             RAPIDJSON_ASSERT(false);    // see above note
 
-            // This will generate -Wexit-time-destructors in clang
-            // static GenericValue NullValue;
-            // return NullValue;
-
-            // Use static buffer and placement-new to prevent destruction
-            // Note that we use the thread-local storage to prevent race-condition.
-            //   Ref: https://github.com/Tencent/rapidjson/pull/2001
-
-            // MSVC 2013 or earlier does not support `thread_local` attribute even in C++11 mode.
-#if defined(_MSC_VER) && _MSC_VER < 1900
+#if RAPIDJSON_HAS_CXX11
+            // Use thread-local storage to prevent races between threads.
+            // Use static buffer and placement-new to prevent destruction, with
+            // alignas() to ensure proper alignment.
+            alignas(GenericValue) thread_local static char buffer[sizeof(GenericValue)];
+            return *new (buffer) GenericValue();
+#elif defined(_MSC_VER) && _MSC_VER < 1900
+            // There's no way to solve both thread locality and proper alignment
+            // simultaneously.
             __declspec(thread) static char buffer[sizeof(GenericValue)];
             return *new (buffer) GenericValue();
-#else
-#if defined(RAPIDJSON_HAS_CXX11)
-            thread_local static GenericValue buffer;
 #elif defined(__GNUC__) || defined(__clang__)
+            // This will generate -Wexit-time-destructors in clang, but that's
+            // better than having under-alignment.
             __thread static GenericValue buffer;
+            return buffer;
 #else
-            // In case we don't recognize the compiler, fall back to normal static storage.
+            // Don't know what compiler this is, so don't know how to ensure
+            // thread-locality.
             static GenericValue buffer;
-#endif
-            return *new (reinterpret_cast<char *>(&buffer)) GenericValue();
+            return buffer;
 #endif
         }
     }
