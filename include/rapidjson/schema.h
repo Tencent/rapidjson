@@ -380,13 +380,19 @@ struct SchemaValidationContext {
         if (hasher)
             factory.DestroryHasher(hasher);
         if (validators) {
-            for (SizeType i = 0; i < validatorCount; i++)
-                factory.DestroySchemaValidator(validators[i]);
+            for (SizeType i = 0; i < validatorCount; i++) {
+                if (validators[i]) {
+                    factory.DestroySchemaValidator(validators[i]);
+                }
+            }
             factory.FreeState(validators);
         }
         if (patternPropertiesValidators) {
-            for (SizeType i = 0; i < patternPropertiesValidatorCount; i++)
-                factory.DestroySchemaValidator(patternPropertiesValidators[i]);
+            for (SizeType i = 0; i < patternPropertiesValidatorCount; i++) {
+                if (patternPropertiesValidators[i]) {
+                    factory.DestroySchemaValidator(patternPropertiesValidators[i]);
+                }
+            }
             factory.FreeState(patternPropertiesValidators);
         }
         if (patternPropertiesSchemas)
@@ -1301,6 +1307,7 @@ private:
         if (validatorCount_) {
             RAPIDJSON_ASSERT(context.validators == 0);
             context.validators = static_cast<ISchemaValidator**>(context.factory.MallocState(sizeof(ISchemaValidator*) * validatorCount_));
+            std::memset(context.validators, 0, sizeof(ISchemaValidator*) * validatorCount_);
             context.validatorCount = validatorCount_;
 
             // Always return after first failure for these sub-validators
@@ -2544,6 +2551,7 @@ private:
                 ISchemaValidator**& va = CurrentContext().patternPropertiesValidators;
                 SizeType& validatorCount = CurrentContext().patternPropertiesValidatorCount;
                 va = static_cast<ISchemaValidator**>(MallocState(sizeof(ISchemaValidator*) * count));
+                std::memset(va, 0, sizeof(ISchemaValidator*) * count);
                 for (SizeType i = 0; i < count; i++)
                     va[validatorCount++] = CreateSchemaValidator(*sa[i], true);  // Inherit continueOnError
             }
