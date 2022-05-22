@@ -1235,12 +1235,14 @@ public:
             // Use static buffer and placement-new to prevent destruction, with
             // alignas() to ensure proper alignment.
             alignas(GenericValue) thread_local static char buffer[sizeof(GenericValue)];
-            return *new (buffer) GenericValue();
+            thread_local static GenericValue* nullValue = new (buffer) GenericValue();
+            return *nullValue;
 #elif defined(_MSC_VER) && _MSC_VER < 1900
             // There's no way to solve both thread locality and proper alignment
             // simultaneously.
             __declspec(thread) static char buffer[sizeof(GenericValue)];
-            return *new (buffer) GenericValue();
+            __declspec(thread) static GenericValue* nullValue = new (buffer) GenericValue();
+            return *nullValue;
 #elif defined(__GNUC__) || defined(__clang__)
             // This will generate -Wexit-time-destructors in clang, but that's
             // better than having under-alignment.
