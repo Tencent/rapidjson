@@ -1259,12 +1259,26 @@ public:
             // This will generate -Wexit-time-destructors in clang, but that's
             // better than having under-alignment.
             __thread static GenericValue buffer;
-            return buffer;
+            __thread static GenericValue* nullValue = NULL;
+            if (nullValue) {
+                // Reset to null since the user can change this value to other types.
+                nullValue->SetNull();
+            } else {
+                nullValue = &buffer;
+            }
+            return *nullValue;
 #else
             // Don't know what compiler this is, so don't know how to ensure
             // thread-locality.
             static GenericValue buffer;
-            return buffer;
+            static GenericValue* nullValue = NULL;
+            if (nullValue) {
+                // Reset to null since the user can change this value to other types.
+                nullValue->SetNull();
+            } else {
+                nullValue = &buffer;
+            }
+            return *nullValue;
 #endif
         }
     }
