@@ -1230,13 +1230,28 @@ public:
         else {
             RAPIDJSON_ASSERT(false);    // see above note
 
-            // This will generate -Wexit-time-destructors in clang
-            // static GenericValue NullValue;
-            // return NullValue;
-
-            // Use static buffer and placement-new to prevent destruction
+#if RAPIDJSON_HAS_CXX11
+            // Use thread-local storage to prevent races between threads.
+            // Use static buffer and placement-new to prevent destruction, with
+            // alignas() to ensure proper alignment.
+            alignas(GenericValue) thread_local static char buffer[sizeof(GenericValue)];
+            return *new (buffer) GenericValue();
+#elif defined(_MSC_VER) && _MSC_VER < 1900
+            // There's no way to solve both thread locality and proper alignment
+            // simultaneously.
+            __declspec(thread) static char buffer[sizeof(GenericValue)];
+            return *new (buffer) GenericValue();
+#elif defined(__GNUC__) || defined(__clang__)
+            // This will generate -Wexit-time-destructors in clang, but that's
+            // better than having under-alignment.
+            __thread static GenericValue buffer;
+            return buffer;
+#else
+            // Don't know what compiler this is, so don't know how to ensure
+            // thread-locality.
             static GenericValue buffer;
-            return *new (reinterpret_cast<char *>(&buffer)) GenericValue();
+            return buffer;
+#endif
         }
     }
     template <typename SourceAllocator>
