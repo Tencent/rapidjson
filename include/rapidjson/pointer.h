@@ -104,7 +104,7 @@ public:
     };
 
     //!@name Constructors and destructor.
-    //@{
+    ///@{
 
     //! Default constructor.
     GenericPointer(Allocator* allocator = 0) : allocator_(allocator), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {}
@@ -233,10 +233,10 @@ public:
      */
     friend inline void swap(GenericPointer& a, GenericPointer& b) RAPIDJSON_NOEXCEPT { a.Swap(b); }
 
-    //@}
+    ///@}
 
     //!@name Append token
-    //@{
+    ///@{
 
     //! Append a token and return a new Pointer
     /*!
@@ -333,7 +333,7 @@ public:
     }
 
     //!@name Handling Parse Error
-    //@{
+    ///@{
 
     //! Check whether this is a valid pointer.
     bool IsValid() const { return parseErrorCode_ == kPointerParseErrorNone; }
@@ -344,13 +344,13 @@ public:
     //! Get the parsing error code.
     PointerParseErrorCode GetParseErrorCode() const { return parseErrorCode_; }
 
-    //@}
+    ///@}
 
     //! Get the allocator of this pointer.
     Allocator& GetAllocator() { return *allocator_; }
 
     //!@name Tokens
-    //@{
+    ///@{
 
     //! Get the token array (const version only).
     const Token* GetTokens() const { return tokens_; }
@@ -358,10 +358,10 @@ public:
     //! Get the number of tokens.
     size_t GetTokenCount() const { return tokenCount_; }
 
-    //@}
+    ///@}
 
     //!@name Equality/inequality operators
-    //@{
+    ///@{
 
     //! Equality operator.
     /*!
@@ -416,10 +416,10 @@ public:
         return false;
     }
 
-    //@}
+    ///@}
 
     //!@name Stringify
-    //@{
+    ///@{
 
     //! Stringify the pointer into string representation.
     /*!
@@ -441,10 +441,10 @@ public:
         return Stringify<true, OutputStream>(os);
     }
 
-    //@}
+    ///@}
 
     //!@name Create value
-    //@{
+    ///@{
 
     //! Create a value in a subtree.
     /*!
@@ -521,10 +521,10 @@ public:
         return Create(document, document.GetAllocator(), alreadyExist);
     }
 
-    //@}
+    ///@}
 
     //!@name Compute URI
-    //@{
+    ///@{
 
     //! Compute the in-scope URI for a subtree.
     //  For use with JSON pointers into JSON schema documents.
@@ -588,7 +588,7 @@ public:
 
 
     //!@name Query value
-    //@{
+    ///@{
 
     //! Query a value in a subtree.
     /*!
@@ -643,10 +643,10 @@ public:
         return Get(const_cast<ValueType&>(root), unresolvedTokenIndex);
     }
 
-    //@}
+    ///@}
 
     //!@name Query a value with default
-    //@{
+    ///@{
 
     //! Query a value in a subtree with default value.
     /*!
@@ -720,10 +720,10 @@ public:
         return GetWithDefault(document, defaultValue, document.GetAllocator());
     }
 
-    //@}
+    ///@}
 
     //!@name Set a value
-    //@{
+    ///@{
 
     //! Set a value in a subtree, with move semantics.
     /*!
@@ -802,10 +802,10 @@ public:
             return Create(document) = value;
     }
 
-    //@}
+    ///@}
 
     //!@name Swap a value
-    //@{
+    ///@{
 
     //! Swap a value with a value in a subtree.
     /*!
@@ -827,7 +827,7 @@ public:
         return Create(document).Swap(value);
     }
 
-    //@}
+    ///@}
 
     //! Erase a value in a subtree.
     /*!

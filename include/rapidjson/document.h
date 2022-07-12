@@ -200,13 +200,13 @@ public:
     typedef GenericMemberIterator<false,Encoding,Allocator> NonConstIterator;
 
     /** \name std::iterator_traits support */
-    //@{
+    ///@{
     typedef ValueType      value_type;
     typedef ValueType *    pointer;
     typedef ValueType &    reference;
     typedef std::ptrdiff_t difference_type;
     typedef std::random_access_iterator_tag iterator_category;
-    //@}
+    ///@}
 
     //! Pointer to (const) GenericMember
     typedef pointer         Pointer;
@@ -241,24 +241,24 @@ public:
     Iterator& operator=(const NonConstIterator & it) { ptr_ = it.ptr_; return *this; }
 
     //! @name stepping
-    //@{
+    ///@{
     Iterator& operator++(){ ++ptr_; return *this; }
     Iterator& operator--(){ --ptr_; return *this; }
     Iterator  operator++(int){ Iterator old(*this); ++ptr_; return old; }
     Iterator  operator--(int){ Iterator old(*this); --ptr_; return old; }
-    //@}
+    ///@}
 
     //! @name increment/decrement
-    //@{
+    ///@{
     Iterator operator+(DifferenceType n) const { return Iterator(ptr_+n); }
     Iterator operator-(DifferenceType n) const { return Iterator(ptr_-n); }
 
     Iterator& operator+=(DifferenceType n) { ptr_+=n; return *this; }
     Iterator& operator-=(DifferenceType n) { ptr_-=n; return *this; }
-    //@}
+    ///@}
 
     //! @name relations
-    //@{
+    ///@{
     template <bool Const_> bool operator==(const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ == that.ptr_; }
     template <bool Const_> bool operator!=(const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ != that.ptr_; }
     template <bool Const_> bool operator<=(const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ <= that.ptr_; }
@@ -269,14 +269,14 @@ public:
 #ifdef __cpp_lib_three_way_comparison
     template <bool Const_> std::strong_ordering operator<=>(const GenericMemberIterator<Const_, Encoding, Allocator>& that) const { return ptr_ <=> that.ptr_; }
 #endif
-    //@}
+    ///@}
 
     //! @name dereference
-    //@{
+    ///@{
     Reference operator*() const { return *ptr_; }
     Pointer   operator->() const { return ptr_; }
     Reference operator[](DifferenceType n) const { return ptr_[n]; }
-    //@}
+    ///@}
 
     //! Distance
     DifferenceType operator-(ConstIterator that) const { return ptr_-that.ptr_; }
@@ -684,7 +684,7 @@ public:
     typedef GenericObject<true, ValueType> ConstObject;
 
     //!@name Constructors and destructor.
-    //@{
+    ///@{
 
     //! Default constructor creates a null value.
     GenericValue() RAPIDJSON_NOEXCEPT : data_() { data_.f.flags = kNullFlag; }
@@ -910,10 +910,10 @@ public:
         }
     }
 
-    //@}
+    ///@}
 
     //!@name Assignment operators
-    //@{
+    ///@{
 
     //! Assignment with move semantics.
     /*! \param rhs Source of the assignment. It will become a null value after assignment.
@@ -1012,10 +1012,10 @@ public:
     //! Prepare Value for move semantics
     /*! \return *this */
     GenericValue& Move() RAPIDJSON_NOEXCEPT { return *this; }
-    //@}
+    ///@}
 
     //!@name Equal-to and not-equal-to operators
-    //@{
+    ///@{
     //! Equal-to operator
     /*!
         \note If an object contains duplicated named member, comparing equality with any object is always \c false.
@@ -1102,11 +1102,11 @@ public:
     /*! \return !(rhs == lhs)
      */
     template <typename T> friend RAPIDJSON_DISABLEIF_RETURN((internal::IsGenericValue<T>), (bool)) operator!=(const T& lhs, const GenericValue& rhs) { return !(rhs == lhs); }
-    //@}
+    ///@}
 #endif
 
     //!@name Type
-    //@{
+    ///@{
 
     Type GetType()  const { return static_cast<Type>(data_.f.flags & kTypeMask); }
     bool IsNull()   const { return data_.f.flags == kNullFlag; }
@@ -1161,27 +1161,27 @@ public:
         return a >= b && a <= b;    // Prevent -Wfloat-equal
     }
 
-    //@}
+    ///@}
 
     //!@name Null
-    //@{
+    ///@{
 
     GenericValue& SetNull() { this->~GenericValue(); new (this) GenericValue(); return *this; }
 
-    //@}
+    ///@}
 
     //!@name Bool
-    //@{
+    ///@{
 
     bool GetBool() const { RAPIDJSON_ASSERT(IsBool()); return data_.f.flags == kTrueFlag; }
     //!< Set boolean value
     /*! \post IsBool() == true */
     GenericValue& SetBool(bool b) { this->~GenericValue(); new (this) GenericValue(b); return *this; }
 
-    //@}
+    ///@}
 
     //!@name Object
-    //@{
+    ///@{
 
     //! Set this value as an empty object.
     /*! \post IsObject() == true */
@@ -1630,10 +1630,10 @@ public:
     ConstObject GetObject() const { RAPIDJSON_ASSERT(IsObject()); return ConstObject(*this); }
     ConstObject GetObj() const { RAPIDJSON_ASSERT(IsObject()); return ConstObject(*this); }
 
-    //@}
+    ///@}
 
     //!@name Array
-    //@{
+    ///@{
 
     //! Set this value as an empty array.
     /*! \post IsArray == true */
@@ -1809,10 +1809,10 @@ public:
     Array GetArray() { RAPIDJSON_ASSERT(IsArray()); return Array(*this); }
     ConstArray GetArray() const { RAPIDJSON_ASSERT(IsArray()); return ConstArray(*this); }
 
-    //@}
+    ///@}
 
     //!@name Number
-    //@{
+    ///@{
 
     int GetInt() const          { RAPIDJSON_ASSERT(data_.f.flags & kIntFlag);   return data_.n.i.i;   }
     unsigned GetUint() const    { RAPIDJSON_ASSERT(data_.f.flags & kUintFlag);  return data_.n.u.u;   }
@@ -1845,10 +1845,10 @@ public:
     GenericValue& SetDouble(double d)       { this->~GenericValue(); new (this) GenericValue(d);    return *this; }
     GenericValue& SetFloat(float f)         { this->~GenericValue(); new (this) GenericValue(static_cast<double>(f)); return *this; }
 
-    //@}
+    ///@}
 
     //!@name String
-    //@{
+    ///@{
 
     const Ch* GetString() const { RAPIDJSON_ASSERT(IsString()); return DataString(data_); }
 
@@ -1911,10 +1911,10 @@ public:
     GenericValue& SetString(const std::basic_string<Ch>& s, Allocator& allocator) { return SetString(StringRef(s), allocator); }
 #endif
 
-    //@}
+    ///@}
 
     //!@name Array
-    //@{
+    ///@{
 
     //! Templated version for checking whether this value is type T.
     /*!
@@ -1935,7 +1935,7 @@ public:
     template<typename T>
     ValueType& Set(const T& data, AllocatorType& allocator) { return internal::TypeHelper<ValueType, T>::Set(*this, data, allocator); }
 
-    //@}
+    ///@}
 
     //! Generate events of this value to a Handler.
     /*! This function adopts the GoF visitor pattern.

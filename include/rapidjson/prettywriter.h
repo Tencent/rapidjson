@@ -90,7 +90,7 @@ public:
     /*! @name Implementation of Handler
         \see Handler
     */
-    //@{
+    ///@{
 
     bool Null()                 { PrettyPrefix(kNullType);   return Base::EndValue(Base::WriteNull()); }
     bool Bool(bool b)           { PrettyPrefix(b ? kTrueType : kFalseType); return Base::EndValue(Base::WriteBool(b)); }
@@ -178,16 +178,16 @@ public:
         return true;
     }
 
-    //@}
+    ///@}
 
     /*! @name Convenience extensions */
-    //@{
+    ///@{
 
     //! Simpler but slower overload.
     bool String(const Ch* str) { return String(str, internal::StrLen(str)); }
     bool Key(const Ch* str) { return Key(str, internal::StrLen(str)); }
 
-    //@}
+    ///@}
 
     //! Write a raw JSON value.
     /*!

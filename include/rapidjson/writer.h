@@ -177,7 +177,7 @@ public:
     /*!@name Implementation of Handler
         \see Handler
     */
-    //@{
+    ///@{
 
     bool Null()                 { Prefix(kNullType);   return EndValue(WriteNull()); }
     bool Bool(bool b)           { Prefix(b ? kTrueType : kFalseType); return EndValue(WriteBool(b)); }
@@ -250,16 +250,16 @@ public:
         level_stack_.template Pop<Level>(1);
         return EndValue(WriteEndArray());
     }
-    //@}
+    ///@}
 
     /*! @name Convenience extensions */
-    //@{
+    ///@{
 
     //! Simpler but slower overload.
     bool String(const Ch* const& str) { return String(str, internal::StrLen(str)); }
     bool Key(const Ch* const& str) { return Key(str, internal::StrLen(str)); }
     
-    //@}
+    ///@}
 
     //! Write a raw JSON value.
     /*!
