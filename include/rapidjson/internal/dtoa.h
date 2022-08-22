@@ -58,11 +58,11 @@ inline int CountDecimalDigit32(uint32_t n) {
 }
 
 inline void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buffer, int* len, int* K) {
-    static const uint64_t kPow10[] = { 1U, 10U, 100U, 1000U, 10000U, 100000U, 1000000U, 10000000U, 100000000U,
-                                       1000000000U, 10000000000U, 100000000000U, 1000000000000U,
-                                       10000000000000U, 100000000000000U, 1000000000000000U,
-                                       10000000000000000U, 100000000000000000U, 1000000000000000000U,
-                                       10000000000000000000U };
+    static const uint64_t kPow10[] = { 1ULL, 10ULL, 100ULL, 1000ULL, 10000ULL, 100000ULL, 1000000ULL, 10000000ULL, 100000000ULL,
+                                       1000000000ULL, 10000000000ULL, 100000000000ULL, 1000000000000ULL,
+                                       10000000000000ULL, 100000000000000ULL, 1000000000000000ULL,
+                                       10000000000000000ULL, 100000000000000000ULL, 1000000000000000000ULL,
+                                       10000000000000000000ULL };
     const DiyFp one(uint64_t(1) << -Mp.e, Mp.e);
     const DiyFp wp_w = Mp - W;
     uint32_t p1 = static_cast<uint32_t>(Mp.f >> -one.e);
