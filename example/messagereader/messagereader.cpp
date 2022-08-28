@@ -31,6 +31,8 @@ struct MessageHandler
         case kExpectObjectStart:
             state_ = kExpectNameOrObjectEnd;
             return true;
+        case kExpectNameOrObjectEnd: RAPIDJSON_DELIBERATE_FALLTHROUGH;
+        case kExpectValue: RAPIDJSON_DELIBERATE_FALLTHROUGH;
         default:
             return false;
         }
@@ -46,6 +48,7 @@ struct MessageHandler
             messages_.insert(MessageMap::value_type(name_, string(str, length)));
             state_ = kExpectNameOrObjectEnd;
             return true;
+        case kExpectObjectStart: RAPIDJSON_DELIBERATE_FALLTHROUGH;
         default:
             return false;
         }

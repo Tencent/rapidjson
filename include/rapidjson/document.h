@@ -763,6 +763,10 @@ public:
             else
                 SetStringRaw(StringRef(rhs.GetString(), rhs.GetStringLength()), allocator);
             break;
+        case kNullType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
+        case kNumberType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
+        case kFalseType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
+        case kTrueType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
         default:
             data_.f.flags = rhs.data_.f.flags;
             data_  = *reinterpret_cast<const Data*>(&rhs.data_);
@@ -1058,6 +1062,9 @@ public:
             else
                 return data_.n.u64 == rhs.data_.n.u64;
 
+            case kNullType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
+            case kFalseType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
+            case kTrueType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
         default:
             return true;
         }
@@ -1974,6 +1981,7 @@ public:
         case kStringType:
             return handler.String(GetString(), GetStringLength(), (data_.f.flags & kCopyFlag) != 0);
     
+        case kNumberType: RAPIDJSON_DELIBERATE_FALLTHROUGH;
         default:
             RAPIDJSON_ASSERT(GetType() == kNumberType);
             if (IsDouble())         return handler.Double(data_.n.d);
