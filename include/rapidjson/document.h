@@ -22,6 +22,7 @@
 #include "internal/strfunc.h"
 #include "memorystream.h"
 #include "encodedstream.h"
+#include "typetraits.h"
 #include <new>      // placement new
 #include <limits>
 #ifdef __cpp_lib_three_way_comparison
@@ -1064,7 +1065,31 @@ public:
     }
 
     //! Equal-to operator with const C-string pointer
-    bool operator==(const Ch* rhs) const { return *this == GenericValue(StringRef(rhs)); }
+    template<class StringType, std::enable_if_t<IsSpecificString<Ch, StringType>::value, int> = 1>
+    bool operator==(const StringType& rhs) const
+    {
+        if constexpr(IsSpecificStringLiteral<Ch, StringType>::value)
+        {
+            /*constexpr*/ SizeType N = std::extent<StringType>::value;
+            return *this == GenericValue(StringRef(rhs, N - 1));
+        }
+        return *this == GenericValue(StringRef(rhs));
+    }
+
+    //! Equal-to operator with primitive types
+    /*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c double, \c true, \c false
+    */
+    template <typename T, std::enable_if_t<!IsSpecificString<Ch, T>::value, int> = 1>
+    RAPIDJSON_DISABLEIF_RETURN(
+        (
+//internal::OrExpr<
+            internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >
+//            , IsSpecificString<Ch, T>
+//>
+            ), (bool))
+    operator==(const T& rhs) const
+    { return *this == GenericValue(rhs); }
+
 
 #if RAPIDJSON_HAS_STDSTRING
     //! Equal-to operator with string object
@@ -1072,11 +1097,6 @@ public:
      */
     bool operator==(const std::basic_string<Ch>& rhs) const { return *this == GenericValue(StringRef(rhs)); }
 #endif
-
-    //! Equal-to operator with primitive types
-    /*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t, \c double, \c true, \c false
-    */
-    template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>,internal::IsGenericValue<T> >), (bool)) operator==(const T& rhs) const { return *this == GenericValue(rhs); }
 
     //! Not-equal-to operator
     /*! \return !(*this == rhs)
