@@ -41,8 +41,8 @@ public:
         \param buffer user-supplied buffer.
         \param bufferSize size of buffer in bytes. Must >=4 bytes.
     */
-    FileReadStream(std::FILE* fp, char* buffer, size_t bufferSize) : fp_(fp), buffer_(buffer), bufferSize_(bufferSize), bufferLast_(0), current_(buffer_), readCount_(0), count_(0), eof_(false) { 
-        RAPIDJSON_ASSERT(fp_ != 0);
+    FileReadStream(std::FILE* fp, char* buffer, size_t bufferSize) : fp_(fp), buffer_(buffer), bufferSize_(bufferSize), bufferLast_(NULL), current_(buffer_), readCount_(0), count_(0), eof_(false) { 
+        RAPIDJSON_ASSERT(fp_ != NULL);
         RAPIDJSON_ASSERT(bufferSize >= 4);
         Read();
     }
@@ -54,12 +54,12 @@ public:
     // Not implemented
     void Put(Ch) { RAPIDJSON_ASSERT(false); }
     void Flush() { RAPIDJSON_ASSERT(false); } 
-    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
+    Ch* PutBegin() { RAPIDJSON_ASSERT(false); return NULL; }
     size_t PutEnd(Ch*) { RAPIDJSON_ASSERT(false); return 0; }
 
     // For encoding detection only.
     const Ch* Peek4() const {
-        return (current_ + 4 - !eof_ <= bufferLast_) ? current_ : 0;
+        return (current_ + 4 - !eof_ <= bufferLast_) ? current_ : NULL;
     }
 
 private:

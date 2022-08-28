@@ -37,7 +37,7 @@ static void TestStringStream() {
         BasicIStreamWrapper<StringStreamType> is(iss);
         EXPECT_EQ(0u, is.Tell());
         if (sizeof(Ch) == 1) {
-            EXPECT_EQ(0, is.Peek4());
+            EXPECT_EQ(NULL, is.Peek4());
             EXPECT_EQ(0u, is.Tell());
         }
         EXPECT_EQ(0, is.Peek());
@@ -51,7 +51,7 @@ static void TestStringStream() {
         BasicIStreamWrapper<StringStreamType> is(iss);
         EXPECT_EQ(0u, is.Tell());
         if (sizeof(Ch) == 1) {
-            EXPECT_EQ(0, is.Peek4()); // less than 4 bytes
+            EXPECT_EQ(NULL, is.Peek4()); // less than 4 bytes
         }
         for (int i = 0; i < 3; i++) {
             EXPECT_EQ(static_cast<size_t>(i), is.Tell());

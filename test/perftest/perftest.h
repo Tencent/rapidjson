@@ -79,13 +79,13 @@ public:
                 "../../../bin/data/sample.json"
             };
 
-            FILE *fp = 0;
+            FILE *fp = NULL;
             for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
                 fp = fopen(filename_ = paths[i], "rb");
                 if (fp)
                     break;
             }
-            ASSERT_TRUE(fp != 0);
+            ASSERT_TRUE(fp != NULL);
 
             fseek(fp, 0, SEEK_END);
             length_ = (size_t)ftell(fp);
@@ -135,7 +135,7 @@ public:
             };
 
             for (size_t j = 0; j < sizeof(typesfilenames) / sizeof(typesfilenames[0]); j++) {
-                types_[j] = 0;
+                types_[j] = NULL;
                 for (size_t i = 0; i < sizeof(typespaths) / sizeof(typespaths[0]); i++) {
                     char filename[256];
                     sprintf(filename, "%s/%s", typespaths[i], typesfilenames[j]);
@@ -157,11 +157,11 @@ public:
     virtual void TearDown() {
         free(json_);
         free(whitespace_);
-        json_ = 0;
-        whitespace_ = 0;
+        json_ = NULL;
+        whitespace_ = NULL;
         for (size_t i = 0; i < 8; i++) {
             free(types_[i]);
-            types_[i] = 0;
+            types_[i] = NULL;
         }
     }
 

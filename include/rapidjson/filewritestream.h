@@ -34,7 +34,7 @@ public:
     typedef char Ch;    //!< Character type. Only support char.
 
     FileWriteStream(std::FILE* fp, char* buffer, size_t bufferSize) : fp_(fp), buffer_(buffer), bufferEnd_(buffer + bufferSize), current_(buffer_) { 
-        RAPIDJSON_ASSERT(fp_ != 0);
+        RAPIDJSON_ASSERT(fp_ != NULL);
     }
 
     void Put(char c) { 
@@ -75,7 +75,7 @@ public:
     char Peek() const { RAPIDJSON_ASSERT(false); return 0; }
     char Take() { RAPIDJSON_ASSERT(false); return 0; }
     size_t Tell() const { RAPIDJSON_ASSERT(false); return 0; }
-    char* PutBegin() { RAPIDJSON_ASSERT(false); return 0; }
+    char* PutBegin() { RAPIDJSON_ASSERT(false); return NULL; }
     size_t PutEnd(char*) { RAPIDJSON_ASSERT(false); return 0; }
 
 private:

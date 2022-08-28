@@ -122,7 +122,7 @@ TEST(SchemaValidator, Hasher) {
     ValidateErrorCode code = validator.GetInvalidSchemaCode();\
     if (expected) {\
       EXPECT_TRUE(code == kValidateErrorNone);\
-      EXPECT_TRUE(validator.GetInvalidSchemaKeyword() == 0);\
+      EXPECT_TRUE(validator.GetInvalidSchemaKeyword() == NULL);\
     }\
     if ((expected) && !validator.IsValid()) {\
         StringBuffer sb;\
@@ -166,7 +166,7 @@ TEST(SchemaValidator, Hasher) {
         printf("GetInvalidSchemaPointer() Expected: %s Actual: %s\n", invalidSchemaPointer, sb.GetString());\
         ADD_FAILURE();\
     }\
-    ASSERT_TRUE(validator.GetInvalidSchemaKeyword() != 0);\
+    ASSERT_TRUE(validator.GetInvalidSchemaKeyword() != NULL);\
     if (strcmp(validator.GetInvalidSchemaKeyword(), invalidSchemaKeyword) != 0) {\
         printf("GetInvalidSchemaKeyword() Expected: %s Actual %s\n", invalidSchemaKeyword, validator.GetInvalidSchemaKeyword());\
         ADD_FAILURE();\
@@ -2005,7 +2005,7 @@ static char* ReadFile(const char* filename, Allocator& allocator) {
         "../../../bin/"
     };
     char buffer[1024];
-    FILE *fp = 0;
+    FILE *fp = NULL;
     for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
         sprintf(buffer, "%s%s", paths[i], filename);
         fp = fopen(buffer, "rb");
@@ -2014,7 +2014,7 @@ static char* ReadFile(const char* filename, Allocator& allocator) {
     }
 
     if (!fp)
-        return 0;
+        return NULL;
 
     fseek(fp, 0, SEEK_END);
     size_t length = static_cast<size_t>(ftell(fp));
@@ -2109,7 +2109,7 @@ public:
         };
 
         for (size_t i = 0; i < kCount; i++) {
-            sd_[i] = 0;
+            sd_[i] = NULL;
 
             char jsonBuffer[8192];
             MemoryPoolAllocator<> jsonAllocator(jsonBuffer, sizeof(jsonBuffer));
@@ -2123,7 +2123,7 @@ public:
                 MemoryPoolAllocator<> stackAllocator(stackBuffer, sizeof(stackBuffer));
                 DocumentType d(&documentAllocator_, 1024, &stackAllocator);
                 d.Parse(json);
-                sd_[i] = new SchemaDocumentType(d, uris[i], static_cast<SizeType>(strlen(uris[i])), 0, &schemaAllocator_);
+                sd_[i] = new SchemaDocumentType(d, uris[i], static_cast<SizeType>(strlen(uris[i])), NULL, &schemaAllocator_);
                 MemoryPoolAllocator<>::Free(json);
             }
         };
@@ -2138,7 +2138,7 @@ public:
         for (size_t i = 0; i < kCount; i++)
             if (typename SchemaDocumentType::SValue(uri, length) == sd_[i]->GetURI())
                 return sd_[i];
-        return 0;
+        return NULL;
     }
 
 private:
@@ -2187,7 +2187,7 @@ TEST(SchemaValidator, TestSuite) {
         "uniqueItems.json"
     };
 
-    const char* onlyRunDescription = 0;
+    const char* onlyRunDescription = NULL;
     //const char* onlyRunDescription = "a string is a string";
 
     unsigned testCount = 0;
@@ -2417,7 +2417,7 @@ TEST(SchemaValidator, Ref_remote) {
     RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
     Document sd;
     sd.Parse("{\"$ref\": \"http://localhost:1234/subSchemas.json#/integer\"}");
-    SchemaDocumentType s(sd, 0, 0, &provider);
+    SchemaDocumentType s(sd, NULL, 0, &provider);
     typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
     typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
     INVALIDATE_(s, "null", "/integer", "type", "",
@@ -2436,7 +2436,7 @@ TEST(SchemaValidator, Ref_remote_change_resolution_scope_uri) {
     RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
     Document sd;
     sd.Parse("{\"id\": \"http://ignore/blah#/ref\", \"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"http://localhost:1234/subSchemas.json#/integer\"}}}");
-    SchemaDocumentType s(sd, 0, 0, &provider);
+    SchemaDocumentType s(sd, NULL, 0, &provider);
     typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
     typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
     INVALIDATE_(s, "{\"myInt\": null}", "/integer", "type", "/myInt",
@@ -2455,7 +2455,7 @@ TEST(SchemaValidator, Ref_remote_change_resolution_scope_relative_path) {
     RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
     Document sd;
     sd.Parse("{\"id\": \"http://localhost:1234/\", \"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"subSchemas.json#/integer\"}}}");
-    SchemaDocumentType s(sd, 0, 0, &provider);
+    SchemaDocumentType s(sd, NULL, 0, &provider);
     typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
     typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
     INVALIDATE_(s, "{\"myInt\": null}", "/integer", "type", "/myInt",
@@ -2474,7 +2474,7 @@ TEST(SchemaValidator, Ref_remote_change_resolution_scope_absolute_path) {
     RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
     Document sd;
     sd.Parse("{\"id\": \"http://localhost:1234/xxxx\", \"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"/subSchemas.json#/integer\"}}}");
-    SchemaDocumentType s(sd, 0, 0, &provider);
+    SchemaDocumentType s(sd, NULL, 0, &provider);
     typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
     typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
     INVALIDATE_(s, "{\"myInt\": null}", "/integer", "type", "/myInt",
@@ -2566,7 +2566,7 @@ TEST(SchemaValidator, Ref_internal_id_and_schema_pointer) {
     Document sd;
     sd.Parse("{ \"schema\": {\"type\": \"object\", \"properties\": {\"myInt1\": {\"$ref\": \"#myId\"}, \"myInt2\": {\"anyOf\": [{\"type\": \"integer\", \"id\": \"#myId\"}]}}}}");
     typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
-    SchemaDocumentType s(sd, 0, 0, 0, 0, PointerType("/schema"));
+    SchemaDocumentType s(sd, NULL, 0, NULL, NULL, PointerType("/schema"));
     typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
     INVALIDATE_(s, "{\"myInt1\": null}", "/schema/properties/myInt2/anyOf/0", "type", "/myInt1",
         "{ \"type\": {"
@@ -2629,7 +2629,7 @@ TEST(SchemaValidator, Ref_remote_issue1210) {
             return collection[i];
           }
     };
-    SchemaDocument* collection[] = { 0, 0, 0 };
+    SchemaDocument* collection[] = { NULL, NULL, NULL };
     SchemaDocumentProvider provider(collection);
 
     Document x, y, z;
@@ -2748,7 +2748,7 @@ TEST(SchemaValidator, ContinueOnErrors_OneOf) {
     Document sd;
     sd.Parse(schema);
     ASSERT_FALSE(sd.HasParseError());
-    SchemaDocumentType s(sd, 0, 0, &provider);
+    SchemaDocumentType s(sd, NULL, 0, &provider);
     typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
     typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
     INVALIDATE_(s, "{\"version\": 1.01, \"address\": {\"number\": 0, \"street2\": false,  \"street3\": \"Ham\", \"city\": \"RomseyTownFC\", \"area\": \"BC\", \"country\": \"USA\", \"postcode\": \"999ABC\"}, \"phones\": [], \"planet\": \"Earth\", \"extra\": {\"S_xxx\": 123}}", "#", "errors", "#",
@@ -2774,7 +2774,7 @@ TEST(SchemaValidator, ContinueOnErrors_AllOf) {
     Document sd;
     sd.Parse(schema);
     ASSERT_FALSE(sd.HasParseError());
-    SchemaDocumentType s(sd, 0, 0, &provider);
+    SchemaDocumentType s(sd, NULL, 0, &provider);
     typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
     typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
     INVALIDATE_(s, "{\"version\": 1.01, \"address\": {\"number\": 0, \"street2\": false,  \"street3\": \"Ham\", \"city\": \"RomseyTownFC\", \"area\": \"BC\", \"country\": \"USA\", \"postcode\": \"999ABC\"}, \"phones\": [], \"planet\": \"Earth\", \"extra\": {\"S_xxx\": 123}}", "#", "errors", "#",
@@ -2800,7 +2800,7 @@ TEST(SchemaValidator, ContinueOnErrors_AnyOf) {
     Document sd;
     sd.Parse(schema);
     ASSERT_FALSE(sd.HasParseError());
-    SchemaDocumentType s(sd, 0, 0, &provider);
+    SchemaDocumentType s(sd, NULL, 0, &provider);
     typedef GenericSchemaValidator<SchemaDocumentType, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> > SchemaValidatorType;
     typedef GenericPointer<Value, MemoryPoolAllocator<> > PointerType;
     INVALIDATE_(s, "{\"version\": 1.01, \"address\": {\"number\": 0, \"street2\": false,  \"street3\": \"Ham\", \"city\": \"RomseyTownFC\", \"area\": \"BC\", \"country\": \"USA\", \"postcode\": \"999ABC\"}, \"phones\": [], \"planet\": \"Earth\", \"extra\": {\"S_xxx\": 123}}", "#", "errors", "#",

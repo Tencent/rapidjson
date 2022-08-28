@@ -71,15 +71,15 @@ private:
 
 class Dependent : public Person {
 public:
-    Dependent(const std::string& name, unsigned age, Education* education = 0) : Person(name, age), education_(education) {}
-    Dependent(const Dependent& rhs) : Person(rhs), education_(0) { education_ = (rhs.education_ == 0) ? 0 : new Education(*rhs.education_); }
+    Dependent(const std::string& name, unsigned age, Education* education = NULL) : Person(name, age), education_(education) {}
+    Dependent(const Dependent& rhs) : Person(rhs), education_(NULL) { education_ = (rhs.education_ == NULL) ? NULL : new Education(*rhs.education_); }
     virtual ~Dependent();
 
     Dependent& operator=(const Dependent& rhs) {
         if (this == &rhs)
             return *this;
         delete education_;
-        education_ = (rhs.education_ == 0) ? 0 : new Education(*rhs.education_);
+        education_ = (rhs.education_ == NULL) ? NULL : new Education(*rhs.education_);
         return *this;
     }
 

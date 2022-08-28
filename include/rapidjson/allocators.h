@@ -167,15 +167,15 @@ public:
         \param baseAllocator The allocator for allocating memory chunks.
     */
     explicit
-    MemoryPoolAllocator(size_t chunkSize = kDefaultChunkCapacity, BaseAllocator* baseAllocator = 0) : 
+    MemoryPoolAllocator(size_t chunkSize = kDefaultChunkCapacity, BaseAllocator* baseAllocator = NULL) : 
         chunk_capacity_(chunkSize),
         baseAllocator_(baseAllocator ? baseAllocator : RAPIDJSON_NEW(BaseAllocator)()),
-        shared_(static_cast<SharedData*>(baseAllocator_ ? baseAllocator_->Malloc(SIZEOF_SHARED_DATA + SIZEOF_CHUNK_HEADER) : 0))
+        shared_(static_cast<SharedData*>(baseAllocator_ ? baseAllocator_->Malloc(SIZEOF_SHARED_DATA + SIZEOF_CHUNK_HEADER) : NULL))
     {
-        RAPIDJSON_ASSERT(baseAllocator_ != 0);
-        RAPIDJSON_ASSERT(shared_ != 0);
+        RAPIDJSON_ASSERT(baseAllocator_ != NULL);
+        RAPIDJSON_ASSERT(shared_ != NULL);
         if (baseAllocator) {
-            shared_->ownBaseAllocator = 0;
+            shared_->ownBaseAllocator = NULL;
         }
         else {
             shared_->ownBaseAllocator = baseAllocator_;
@@ -183,7 +183,7 @@ public:
         shared_->chunkHead = GetChunkHead(shared_);
         shared_->chunkHead->capacity = 0;
         shared_->chunkHead->size = 0;
-        shared_->chunkHead->next = 0;
+        shared_->chunkHead->next = NULL;
         shared_->ownBuffer = true;
         shared_->refcount = 1;
     }
@@ -198,7 +198,7 @@ public:
         \param chunkSize The size of memory chunk. The default is kDefaultChunkSize.
         \param baseAllocator The allocator for allocating memory chunks.
     */
-    MemoryPoolAllocator(void *buffer, size_t size, size_t chunkSize = kDefaultChunkCapacity, BaseAllocator* baseAllocator = 0) :
+    MemoryPoolAllocator(void *buffer, size_t size, size_t chunkSize = kDefaultChunkCapacity, BaseAllocator* baseAllocator = NULL) :
         chunk_capacity_(chunkSize),
         baseAllocator_(baseAllocator),
         shared_(static_cast<SharedData*>(AlignBuffer(buffer, size)))
@@ -207,8 +207,8 @@ public:
         shared_->chunkHead = GetChunkHead(shared_);
         shared_->chunkHead->capacity = size - SIZEOF_SHARED_DATA - SIZEOF_CHUNK_HEADER;
         shared_->chunkHead->size = 0;
-        shared_->chunkHead->next = 0;
-        shared_->ownBaseAllocator = 0;
+        shared_->chunkHead->next = NULL;
+        shared_->ownBaseAllocator = NULL;
         shared_->ownBuffer = false;
         shared_->refcount = 1;
     }
@@ -239,7 +239,7 @@ public:
         shared_(rhs.shared_)
     {
         RAPIDJSON_NOEXCEPT_ASSERT(rhs.shared_->refcount > 0);
-        rhs.shared_ = 0;
+        rhs.shared_ = NULL;
     }
     MemoryPoolAllocator& operator=(MemoryPoolAllocator&& rhs) RAPIDJSON_NOEXCEPT
     {
@@ -248,7 +248,7 @@ public:
         baseAllocator_ = rhs.baseAllocator_;
         chunk_capacity_ = rhs.chunk_capacity_;
         shared_ = rhs.shared_;
-        rhs.shared_ = 0;
+        rhs.shared_ = NULL;
         return *this;
     }
 #endif
@@ -293,7 +293,7 @@ public:
     size_t Capacity() const RAPIDJSON_NOEXCEPT {
         RAPIDJSON_NOEXCEPT_ASSERT(shared_->refcount > 0);
         size_t capacity = 0;
-        for (ChunkHeader* c = shared_->chunkHead; c != 0; c = c->next)
+        for (ChunkHeader* c = shared_->chunkHead; c != NULL; c = c->next)
             capacity += c->capacity;
         return capacity;
     }
@@ -304,7 +304,7 @@ public:
     size_t Size() const RAPIDJSON_NOEXCEPT {
         RAPIDJSON_NOEXCEPT_ASSERT(shared_->refcount > 0);
         size_t size = 0;
-        for (ChunkHeader* c = shared_->chunkHead; c != 0; c = c->next)
+        for (ChunkHeader* c = shared_->chunkHead; c != NULL; c = c->next)
             size += c->size;
         return size;
     }
@@ -335,7 +335,7 @@ public:
 
     //! Resizes a memory block (concept Allocator)
     void* Realloc(void* originalPtr, size_t originalSize, size_t newSize) {
-        if (originalPtr == 0)
+        if (originalPtr == NULL)
             return Malloc(newSize);
 
         RAPIDJSON_NOEXCEPT_ASSERT(shared_->refcount > 0);
@@ -577,7 +577,7 @@ public:
 #endif // !RAPIDJSON_HAS_CXX11
 
     template <typename U>
-    U* allocate(size_type n = 1, const void* = 0)
+    U* allocate(size_type n = 1, const void* = NULL)
     {
         return RAPIDJSON_NAMESPACE::Malloc<U>(baseAllocator_, n);
     }
@@ -587,7 +587,7 @@ public:
         RAPIDJSON_NAMESPACE::Free<U>(baseAllocator_, p, n);
     }
 
-    pointer allocate(size_type n = 1, const void* = 0)
+    pointer allocate(size_type n = 1, const void* = NULL)
     {
         return allocate<value_type>(n);
     }
