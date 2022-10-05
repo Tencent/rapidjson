@@ -19,7 +19,11 @@
 
 #if defined(_MSC_VER) && !defined(__INTEL_COMPILER) && defined(_M_AMD64)
 #include <intrin.h> // for _umul128
+#if !defined(_ARM64EC_)
 #pragma intrinsic(_umul128)
+#else
+#pragma comment(lib,"softintrin")
+#endif
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN
@@ -37,7 +41,8 @@ public:
         digits_[0] = u;
     }
 
-    BigInteger(const char* decimals, size_t length) : count_(1) {
+    template<typename Ch>
+    BigInteger(const Ch* decimals, size_t length) : count_(1) {
         RAPIDJSON_ASSERT(length > 0);
         digits_[0] = 0;
         size_t i = 0;
@@ -221,7 +226,8 @@ public:
     bool IsZero() const { return count_ == 1 && digits_[0] == 0; }
 
 private:
-    void AppendDecimal64(const char* begin, const char* end) {
+    template<typename Ch>
+    void AppendDecimal64(const Ch* begin, const Ch* end) {
         uint64_t u = ParseUint64(begin, end);
         if (IsZero())
             *this = u;
@@ -236,11 +242,12 @@ private:
         digits_[count_++] = digit;
     }
 
-    static uint64_t ParseUint64(const char* begin, const char* end) {
+    template<typename Ch>
+    static uint64_t ParseUint64(const Ch* begin, const Ch* end) {
         uint64_t r = 0;
-        for (const char* p = begin; p != end; ++p) {
-            RAPIDJSON_ASSERT(*p >= '0' && *p <= '9');
-            r = r * 10u + static_cast<unsigned>(*p - '0');
+        for (const Ch* p = begin; p != end; ++p) {
+            RAPIDJSON_ASSERT(*p >= Ch('0') && *p <= Ch('9'));
+            r = r * 10u + static_cast<unsigned>(*p - Ch('0'));
         }
         return r;
     }

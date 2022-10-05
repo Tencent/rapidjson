@@ -381,13 +381,19 @@ struct SchemaValidationContext {
         if (hasher)
             factory.DestroryHasher(hasher);
         if (validators) {
-            for (SizeType i = 0; i < validatorCount; i++)
-                factory.DestroySchemaValidator(validators[i]);
+            for (SizeType i = 0; i < validatorCount; i++) {
+                if (validators[i]) {
+                    factory.DestroySchemaValidator(validators[i]);
+                }
+            }
             factory.FreeState(validators);
         }
         if (patternPropertiesValidators) {
-            for (SizeType i = 0; i < patternPropertiesValidatorCount; i++)
-                factory.DestroySchemaValidator(patternPropertiesValidators[i]);
+            for (SizeType i = 0; i < patternPropertiesValidatorCount; i++) {
+                if (patternPropertiesValidators[i]) {
+                    factory.DestroySchemaValidator(patternPropertiesValidators[i]);
+                }
+            }
             factory.FreeState(patternPropertiesValidators);
         }
         if (patternPropertiesSchemas)
@@ -1310,6 +1316,7 @@ private:
         if (validatorCount_) {
             RAPIDJSON_ASSERT(context.validators == 0);
             context.validators = static_cast<ISchemaValidator**>(context.factory.MallocState(sizeof(ISchemaValidator*) * validatorCount_));
+            std::memset(context.validators, 0, sizeof(ISchemaValidator*) * validatorCount_);
             context.validatorCount = validatorCount_;
 
             // Always return after first failure for these sub-validators
@@ -2482,7 +2489,8 @@ RAPIDJSON_MULTILINEMACRO_END
     if (!valid_) return false; \
     if ((!BeginValue() && !GetContinueOnErrors()) || (!CurrentSchema().method arg1 && !GetContinueOnErrors())) {\
         RAPIDJSON_SCHEMA_HANDLE_BEGIN_VERBOSE_();\
-        return valid_ = false;\
+        valid_ = false;\
+        return valid_;\
     }
 
 #define RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(method, arg2)\
@@ -2521,34 +2529,46 @@ RAPIDJSON_MULTILINEMACRO_END
     bool StartObject() {
         RAPIDJSON_SCHEMA_HANDLE_BEGIN_(StartObject, (CurrentContext()));
         RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(StartObject, ());
-        return valid_ = !outputHandler_ || outputHandler_->StartObject();
+        valid_ = !outputHandler_ || outputHandler_->StartObject();
+        return valid_;
     }
     
     bool Key(const Ch* str, SizeType len, bool copy) {
         if (!valid_) return false;
         AppendToken(str, len);
-        if (!CurrentSchema().Key(CurrentContext(), str, len, copy) && !GetContinueOnErrors()) return valid_ = false;
+        if (!CurrentSchema().Key(CurrentContext(), str, len, copy) && !GetContinueOnErrors()) {
+            valid_ = false;
+            return valid_;
+        }
         RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(Key, (str, len, copy));
-        return valid_ = !outputHandler_ || outputHandler_->Key(str, len, copy);
+        valid_ = !outputHandler_ || outputHandler_->Key(str, len, copy);
+        return valid_;
     }
     
     bool EndObject(SizeType memberCount) {
         if (!valid_) return false;
         RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(EndObject, (memberCount));
-        if (!CurrentSchema().EndObject(CurrentContext(), memberCount) && !GetContinueOnErrors()) return valid_ = false;
+        if (!CurrentSchema().EndObject(CurrentContext(), memberCount) && !GetContinueOnErrors()) { 
+            valid_ = false; 
+            return valid_; 
+        }
         RAPIDJSON_SCHEMA_HANDLE_END_(EndObject, (memberCount));
     }
 
     bool StartArray() {
         RAPIDJSON_SCHEMA_HANDLE_BEGIN_(StartArray, (CurrentContext()));
         RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(StartArray, ());
-        return valid_ = !outputHandler_ || outputHandler_->StartArray();
+        valid_ = !outputHandler_ || outputHandler_->StartArray();
+        return valid_;
     }
     
     bool EndArray(SizeType elementCount) {
         if (!valid_) return false;
         RAPIDJSON_SCHEMA_HANDLE_PARALLEL_(EndArray, (elementCount));
-        if (!CurrentSchema().EndArray(CurrentContext(), elementCount) && !GetContinueOnErrors()) return valid_ = false;
+        if (!CurrentSchema().EndArray(CurrentContext(), elementCount) && !GetContinueOnErrors()) {
+            valid_ = false;
+            return valid_;
+        }
         RAPIDJSON_SCHEMA_HANDLE_END_(EndArray, (elementCount));
     }
 
@@ -2665,6 +2685,7 @@ private:
                 ISchemaValidator**& va = CurrentContext().patternPropertiesValidators;
                 SizeType& validatorCount = CurrentContext().patternPropertiesValidatorCount;
                 va = static_cast<ISchemaValidator**>(MallocState(sizeof(ISchemaValidator*) * count));
+                std::memset(va, 0, sizeof(ISchemaValidator*) * count);
                 for (SizeType i = 0; i < count; i++)
                     va[validatorCount++] = CreateSchemaValidator(*sa[i], true);  // Inherit continueOnError
             }

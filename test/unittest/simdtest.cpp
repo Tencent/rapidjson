@@ -87,14 +87,12 @@ TEST(SIMD, SIMD_SUFFIX(SkipWhitespace_EncodedMemoryStream)) {
 
         MemoryStream ms(buffer, 1024);
         EncodedInputStream<UTF8<>, MemoryStream> s(ms);
-        size_t i = 0;
         for (;;) {
             SkipWhitespace(s);
             if (s.Peek() == '\0')
                 break;
             //EXPECT_EQ(i, s.Tell());
             EXPECT_EQ('X', s.Take());
-            i += step;
         }
     }
 }

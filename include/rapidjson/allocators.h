@@ -19,6 +19,7 @@
 #include "internal/meta.h"
 
 #include <memory>
+#include <limits>
 
 #if RAPIDJSON_HAS_CXX11
 #include <type_traits>
@@ -433,7 +434,7 @@ namespace internal {
 template<typename T, typename A>
 inline T* Realloc(A& a, T* old_p, size_t old_n, size_t new_n)
 {
-    RAPIDJSON_NOEXCEPT_ASSERT(old_n <= SIZE_MAX / sizeof(T) && new_n <= SIZE_MAX / sizeof(T));
+    RAPIDJSON_NOEXCEPT_ASSERT(old_n <= std::numeric_limits<size_t>::max() / sizeof(T) && new_n <= std::numeric_limits<size_t>::max() / sizeof(T));
     return static_cast<T*>(a.Realloc(old_p, old_n * sizeof(T), new_n * sizeof(T)));
 }
 

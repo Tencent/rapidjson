@@ -1404,11 +1404,11 @@ private:
     }
 #endif // RAPIDJSON_NEON
 
-    template<typename InputStream, bool backup, bool pushOnTake>
+    template<typename InputStream, typename StackCharacter, bool backup, bool pushOnTake>
     class NumberStream;
 
-    template<typename InputStream>
-    class NumberStream<InputStream, false, false> {
+    template<typename InputStream, typename StackCharacter>
+    class NumberStream<InputStream, StackCharacter, false, false> {
     public:
         typedef typename InputStream::Ch Ch;
 
@@ -1421,7 +1421,7 @@ private:
 
         size_t Tell() { return is.Tell(); }
         size_t Length() { return 0; }
-        const char* Pop() { return 0; }
+        const StackCharacter* Pop() { return 0; }
 
     protected:
         NumberStream& operator=(const NumberStream&);
@@ -1429,45 +1429,47 @@ private:
         InputStream& is;
     };
 
-    template<typename InputStream>
-    class NumberStream<InputStream, true, false> : public NumberStream<InputStream, false, false> {
-        typedef NumberStream<InputStream, false, false> Base;
+    template<typename InputStream, typename StackCharacter>
+    class NumberStream<InputStream, StackCharacter, true, false> : public NumberStream<InputStream, StackCharacter, false, false> {
+        typedef NumberStream<InputStream, StackCharacter, false, false> Base;
     public:
-        NumberStream(GenericReader& reader, InputStream& is) : Base(reader, is), stackStream(reader.stack_) {}
+        NumberStream(GenericReader& reader, InputStream& s) : Base(reader, s), stackStream(reader.stack_) {}
 
         RAPIDJSON_FORCEINLINE Ch TakePush() {
-            stackStream.Put(static_cast<char>(Base::is.Peek()));
+            stackStream.Put(static_cast<StackCharacter>(Base::is.Peek()));
             return Base::is.Take();
         }
 
-        RAPIDJSON_FORCEINLINE void Push(char c) {
+        RAPIDJSON_FORCEINLINE void Push(StackCharacter c) {
             stackStream.Put(c);
         }
 
         size_t Length() { return stackStream.Length(); }
 
-        const char* Pop() {
+        const StackCharacter* Pop() {
             stackStream.Put('\0');
             return stackStream.Pop();
         }
 
     private:
-        StackStream<char> stackStream;
+        StackStream<StackCharacter> stackStream;
     };
 
-    template<typename InputStream>
-    class NumberStream<InputStream, true, true> : public NumberStream<InputStream, true, false> {
-        typedef NumberStream<InputStream, true, false> Base;
+    template<typename InputStream, typename StackCharacter>
+    class NumberStream<InputStream, StackCharacter, true, true> : public NumberStream<InputStream, StackCharacter, true, false> {
+        typedef NumberStream<InputStream, StackCharacter, true, false> Base;
     public:
-        NumberStream(GenericReader& reader, InputStream& is) : Base(reader, is) {}
+        NumberStream(GenericReader& reader, InputStream& s) : Base(reader, s) {}
 
         RAPIDJSON_FORCEINLINE Ch Take() { return Base::TakePush(); }
     };
 
     template<unsigned parseFlags, typename InputStream, typename Handler>
     void ParseNumber(InputStream& is, Handler& handler) {
+        typedef typename internal::SelectIf<internal::BoolType<(parseFlags & kParseNumbersAsStringsFlag) != 0>, typename TargetEncoding::Ch, char>::Type NumberCharacter;
+
         internal::StreamLocalCopy<InputStream> copy(is);
-        NumberStream<InputStream,
+        NumberStream<InputStream, NumberCharacter,
             ((parseFlags & kParseNumbersAsStringsFlag) != 0) ?
                 ((parseFlags & kParseInsituFlag) == 0) :
                 ((parseFlags & kParseFullPrecisionFlag) != 0),
@@ -1692,10 +1694,10 @@ private:
             }
             else {
                 SizeType numCharsToCopy = static_cast<SizeType>(s.Length());
-                StringStream srcStream(s.Pop());
+                GenericStringStream<UTF8<NumberCharacter> > srcStream(s.Pop());
                 StackStream<typename TargetEncoding::Ch> dstStream(stack_);
                 while (numCharsToCopy--) {
-                    Transcoder<UTF8<>, TargetEncoding>::Transcode(srcStream, dstStream);
+                    Transcoder<UTF8<typename TargetEncoding::Ch>, TargetEncoding>::Transcode(srcStream, dstStream);
                 }
                 dstStream.Put('\0');
                 const typename TargetEncoding::Ch* str = dstStream.Pop();
@@ -1705,7 +1707,7 @@ private:
         }
         else {
            size_t length = s.Length();
-           const char* decimal = s.Pop();  // Pop stack no matter if it will be used or not.
+           const NumberCharacter* decimal = s.Pop();  // Pop stack no matter if it will be used or not.
 
            if (useDouble) {
                int p = exp + expFrac;
