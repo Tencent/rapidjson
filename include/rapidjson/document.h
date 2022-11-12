@@ -1670,7 +1670,11 @@ public:
         RAPIDJSON_ASSERT(index < data_.a.size);
         return GetElementsPointer()[index];
     }
-    const GenericValue& operator[](SizeType index) const { return const_cast<GenericValue&>(*this)[index]; }
+    const GenericValue& operator[](SizeType index) const {
+        RAPIDJSON_ASSERT(IsArray());
+        RAPIDJSON_ASSERT(index < data_.a.size);
+        return const_cast<GenericValue&>(*this)[index];
+    }
 
     //! Element iterator
     /*! \pre IsArray() == true */
