@@ -191,7 +191,7 @@ TEST(Uri, Parse_UTF16) {
 #if RAPIDJSON_HAS_STDSTRING
     typedef std::basic_string<Value16::Ch> String;
     String str = L"http://auth/path/xxx?query#frag";
-    const UriType uri = UriType(str);
+    const UriType uri = UriType(str, &allocator);
     EXPECT_TRUE(UriType::GetScheme(uri) == L"http:");
     EXPECT_TRUE(UriType::GetAuth(uri) == L"//auth");
     EXPECT_TRUE(UriType::GetPath(uri) == L"/path/xxx");

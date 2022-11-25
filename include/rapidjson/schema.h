@@ -50,10 +50,6 @@
 #define RAPIDJSON_SCHEMA_VERBOSE 0
 #endif
 
-#if RAPIDJSON_SCHEMA_VERBOSE
-#include "stringbuffer.h"
-#endif
-
 RAPIDJSON_DIAG_PUSH
 
 #if defined(__GNUC__)
@@ -1309,6 +1305,8 @@ private:
         else if (type == GetNumberString() ) type_ |= (1 << kNumberSchemaType) | (1 << kIntegerSchemaType);
     }
 
+    // Creates parallel validators for allOf, anyOf, oneOf, not and schema dependencies, if required.
+    // Also creates a hasher for enums and array uniqueness, if required.
     bool CreateParallelValidator(Context& context) const {
         if (enum_ || context.arrayUniqueness)
             context.hasher = context.factory.CreateHasher();
