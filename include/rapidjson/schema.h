@@ -1733,6 +1733,10 @@ public:
             Allocator::Free(typeless_);
         }
 
+        uri_.SetNull();
+        error_.SetNull();
+        currentError_.SetNull();
+
         RAPIDJSON_DELETE(ownAllocator_);
     }
 
