@@ -442,7 +442,7 @@ public:
     Schema(SchemaDocumentType* schemaDocument, const PointerType& p, const ValueType& value, const ValueType& document, AllocatorType* allocator, const UriType& id = UriType()) :
         allocator_(allocator),
         uri_(schemaDocument->GetURI(), *allocator),
-        id_(id),
+        id_(id, allocator),
         pointer_(p, allocator),
         typeless_(schemaDocument->GetTypeless()),
         enum_(),
@@ -1614,7 +1614,7 @@ public:
 
     virtual ~IGenericRemoteSchemaDocumentProvider() {}
     virtual const SchemaDocumentType* GetRemoteDocument(const Ch* uri, SizeType length) = 0;
-    virtual const SchemaDocumentType* GetRemoteDocument(GenericUri<ValueType, AllocatorType> uri) { return GetRemoteDocument(uri.GetBaseString(), uri.GetBaseStringLength()); }
+    virtual const SchemaDocumentType* GetRemoteDocument(const GenericUri<ValueType, AllocatorType> uri) { return GetRemoteDocument(uri.GetBaseString(), uri.GetBaseStringLength()); }
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1712,7 +1712,7 @@ public:
         schemaMap_(std::move(rhs.schemaMap_)),
         schemaRef_(std::move(rhs.schemaRef_)),
         uri_(std::move(rhs.uri_)),
-        docId_(rhs.docId_),
+        docId_(std::move(rhs.docId_)),
         error_(std::move(rhs.error_)),
         currentError_(std::move(rhs.currentError_))
     {
@@ -1733,6 +1733,7 @@ public:
             Allocator::Free(typeless_);
         }
 
+        // these may contain some allocator data so clear before deleting ownAllocator_
         uri_.SetNull();
         error_.SetNull();
         currentError_.SetNull();
@@ -1960,7 +1961,7 @@ public:
                             // Get the subschema
                             if (const ValueType *pv = relPointer.Get(*base)) {
                                 // Now get the absolute JSON pointer by adding relative to base
-                                PointerType pointer(basePointer);
+                                PointerType pointer(basePointer, allocator_);
                                 for (SizeType i = 0; i < relPointer.GetTokenCount(); i++)
                                     pointer = pointer.Append(relPointer.GetTokens()[i], allocator_);
                                 if (IsCyclicRef(pointer))
@@ -1978,7 +1979,7 @@ public:
                         }
                     } else {
                         // Plain name fragment, relative to the resolved URI
-                        PointerType pointer = PointerType();
+                        PointerType pointer(allocator_);
                         // See if the fragment matches an id in this document.
                         // Search from the base we just established. Returns the subschema in the document and its absolute JSON pointer.
                         if (const ValueType *pv = FindId(*base, ref, pointer, UriType(ref.GetBaseString(), ref.GetBaseStringLength(), allocator_), true, basePointer)) {
