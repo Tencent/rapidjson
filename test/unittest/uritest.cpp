@@ -69,7 +69,7 @@ TEST(Uri, Parse) {
 #if RAPIDJSON_HAS_STDSTRING
     typedef std::basic_string<Value::Ch> String;
     String str = "http://auth/path/xxx?query#frag";
-    const UriType uri = UriType(str);
+    const UriType uri = UriType(str, &allocator);
     EXPECT_TRUE(UriType::GetScheme(uri) == "http:");
     EXPECT_TRUE(UriType::GetAuth(uri) == "//auth");
     EXPECT_TRUE(UriType::GetPath(uri) == "/path/xxx");
