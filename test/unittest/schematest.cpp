@@ -112,6 +112,18 @@ TEST(SchemaValidator, Hasher) {
 
 #define VALIDATE(schema, json, expected) \
 {\
+    VALIDATE_(schema, json, expected, true) \
+}
+
+#define VALIDATE_(schema, json, expected, expected2) \
+{\
+    EXPECT_TRUE(expected2 == schema.GetError().ObjectEmpty());\
+    if (expected2 && !schema.GetError().ObjectEmpty()) {\
+        StringBuffer ssb;\
+        Writer<StringBuffer> ws(ssb);\
+        schema.GetError().Accept(ws);\
+        printf("Schema error: %s\n", ssb.GetString());\
+    }\
     SchemaValidator validator(schema);\
     Document d;\
     /*printf("\n%s\n", json);*/\
@@ -149,6 +161,13 @@ TEST(SchemaValidator, Hasher) {
 #define INVALIDATE_(schema, json, invalidSchemaPointer, invalidSchemaKeyword, invalidDocumentPointer, error, \
     flags, SchemaValidatorType, PointerType) \
 {\
+    EXPECT_TRUE(schema.GetError().ObjectEmpty());\
+    if (!schema.GetError().ObjectEmpty()) {\
+        StringBuffer ssb;\
+        Writer<StringBuffer> ws(ssb);\
+        schema.GetError().Accept(ws);\
+        printf("Schema error: %s\n", ssb.GetString());\
+    }\
     SchemaValidatorType validator(schema);\
     validator.SetValidateFlags(flags);\
     Document d;\
@@ -183,6 +202,20 @@ TEST(SchemaValidator, Hasher) {
         StringBuffer sb;\
         Writer<StringBuffer> w(sb);\
         validator.GetError().Accept(w);\
+        printf("GetError() Expected: %s Actual: %s\n", error, sb.GetString());\
+        ADD_FAILURE();\
+    }\
+}
+
+// Use for checking whether a compiled schema document contains errors
+#define SCHEMAERROR(schema, error) \
+{\
+    Document e;\
+    e.Parse(error);\
+    if (schema.GetError() != e) {\
+        StringBuffer sb;\
+        Writer<StringBuffer> w(sb);\
+        schema.GetError().Accept(w);\
         printf("GetError() Expected: %s Actual: %s\n", error, sb.GetString());\
         ADD_FAILURE();\
     }\
@@ -223,7 +256,7 @@ TEST(SchemaValidator, Enum_Typed) {
         "{ \"enum\": { \"errorCode\": 19, \"instanceRef\": \"#\", \"schemaRef\": \"#\" }}");
 }
 
-TEST(SchemaValidator, Enum_Typless) {
+TEST(SchemaValidator, Enum_Typeless) {
     Document sd;
     sd.Parse("{  \"enum\": [\"red\", \"amber\", \"green\", null, 42] }");
     SchemaDocument s(sd);
@@ -333,7 +366,7 @@ TEST(SchemaValidator, OneOf) {
         "    ]"
         "}}");
     INVALIDATE(s, "15", "", "oneOf", "",
-        "{ \"oneOf\": { \"errorCode\": 22, \"instanceRef\": \"#\", \"schemaRef\": \"#\", \"errors\": [{}, {}]}}");
+        "{ \"oneOf\": { \"errorCode\": 22, \"instanceRef\": \"#\", \"schemaRef\": \"#\", \"matches\": [0,1]}}");
 }
 
 TEST(SchemaValidator, Not) {
@@ -502,12 +535,13 @@ TEST(SchemaValidator, String_Pattern) {
 
 TEST(SchemaValidator, String_Pattern_Invalid) {
     Document sd;
-    sd.Parse("{\"type\":\"string\",\"pattern\":\"a{0}\"}"); // TODO: report regex is invalid somehow
+    sd.Parse("{\"type\":\"string\",\"pattern\":\"a{0}\"}");
     SchemaDocument s(sd);
+    SCHEMAERROR(s, "{\"RegexInvalid\":{\"errorCode\":9,\"instanceRef\":\"#/pattern\",\"value\":\"a{0}\"}}");
 
-    VALIDATE(s, "\"\"", true);
-    VALIDATE(s, "\"a\"", true);
-    VALIDATE(s, "\"aa\"", true);
+    VALIDATE_(s, "\"\"", true, false);
+    VALIDATE_(s, "\"a\"", true, false);
+    VALIDATE_(s, "\"aa\"", true, false);
 }
 #endif
 
@@ -1886,12 +1920,6 @@ TEST(SchemaValidator, SchemaPointer) {
         "        },"
         "        \"f\": {"
         "          \"type\": \"boolean\""
-        "        },"
-        "        \"cyclic_source\": {"
-        "          \"$ref\": \"#/definitions/Resp_200/properties/cyclic_target\""
-        "        },"
-        "        \"cyclic_target\": {"
-        "          \"$ref\": \"#/definitions/Resp_200/properties/cyclic_source\""
         "        }"
         "      },"
         "      \"type\": \"object\""
@@ -2136,7 +2164,7 @@ public:
 
     virtual const SchemaDocumentType* GetRemoteDocument(const char* uri, SizeType length) {
         for (size_t i = 0; i < kCount; i++)
-            if (typename SchemaDocumentType::SValue(uri, length) == sd_[i]->GetURI())
+            if (typename SchemaDocumentType::GValue(uri, length) == sd_[i]->GetURI())
                 return sd_[i];
         return 0;
     }
@@ -2390,7 +2418,9 @@ TEST(SchemaValidator, Issue728_AllOfRef) {
     Document sd;
     sd.Parse("{\"allOf\": [{\"$ref\": \"#/abc\"}]}");
     SchemaDocument s(sd);
-    VALIDATE(s, "{\"key1\": \"abc\", \"key2\": \"def\"}", true);
+    SCHEMAERROR(s, "{\"RefUnknown\":{\"errorCode\":5,\"instanceRef\":\"#/allOf/0\",\"value\":\"#/abc\"}}");
+
+    VALIDATE_(s, "{\"key1\": \"abc\", \"key2\": \"def\"}", true, false);
 }
 
 TEST(SchemaValidator, Issue1017_allOfHandler) {
@@ -2625,7 +2655,7 @@ TEST(SchemaValidator, Ref_remote_issue1210) {
           SchemaDocumentProvider(SchemaDocument** collection) : collection(collection) { }
           virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
             int i = 0;
-            while (collection[i] && SchemaDocument::SValue(uri, length) != collection[i]->GetURI()) ++i;
+            while (collection[i] && SchemaDocument::GValue(uri, length) != collection[i]->GetURI()) ++i;
             return collection[i];
           }
     };
@@ -2656,7 +2686,7 @@ TEST(SchemaValidator, ContinueOnErrors) {
     ASSERT_FALSE(sd.HasParseError());
     SchemaDocument s(sd);
     VALIDATE(s, "{\"version\": 1.0, \"address\": {\"number\": 24, \"street1\": \"The Woodlands\", \"street3\": \"Ham\", \"city\": \"Romsey\", \"area\": \"Kent\", \"country\": \"UK\", \"postcode\": \"SO51 0GP\"}, \"phones\": [\"0111-222333\", \"0777-666888\"], \"names\": [\"Fred\", \"Bloggs\"]}", true);
-    INVALIDATE_(s, "{\"version\": 1.01, \"address\": {\"number\": 0, \"street2\": false,  \"street3\": \"Ham\", \"city\": \"RomseyTownFC\", \"area\": \"BC\", \"country\": \"USA\", \"postcode\": \"999ABC\"}, \"phones\": [], \"planet\": \"Earth\", \"extra\": {\"S_xxx\": 123}}", "#", "errors", "#",
+    INVALIDATE_(s, "{\"version\": 1.01, \"address\": {\"number\": 0, \"street2\": false,  \"street3\": \"Ham\", \"city\": \"RomseyTownFC\", \"area\": \"Narnia\", \"country\": \"USA\", \"postcode\": \"999ABC\"}, \"phones\": [], \"planet\": \"Earth\", \"extra\": {\"S_xxx\": 123}}", "#", "errors", "#",
         "{ \"multipleOf\": {"
         "    \"errorCode\": 1, \"instanceRef\": \"#/version\", \"schemaRef\": \"#/definitions/decimal_type\", \"expected\": 1.0, \"actual\": 1.01"
         "  },"
@@ -2691,6 +2721,9 @@ TEST(SchemaValidator, ContinueOnErrors) {
         "  },"
         "  \"required\": {"
         "    \"missing\": [\"street1\"], \"errorCode\": 15, \"instanceRef\": \"#/address\", \"schemaRef\": \"#/definitions/address_type\""
+        "  },"
+        "  \"oneOf\": {"
+        "    \"matches\": [0, 1], \"errorCode\": 22, \"instanceRef\": \"#/address/area\", \"schemaRef\": \"#/definitions/address_type/properties/area\""
         "  }"
         "}",
         kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
@@ -2917,7 +2950,7 @@ TEST(SchemaValidator, ContinueOnErrors_RogueString) {
 
 // Test that when kValidateContinueOnErrorFlag is set, an incorrect simple type with a sub-schema is handled correctly.
 // This tests that we don't blow up when there is a type mismatch but there is a sub-schema present
-TEST(SchemaValidator, ContinueOnErrors_Issue2) {
+TEST(SchemaValidator, ContinueOnErrors_BadSimpleType) {
     Document sd;
     sd.Parse("{\"type\":\"string\", \"anyOf\":[{\"maxLength\":2}]}");
     ASSERT_FALSE(sd.HasParseError());
@@ -2943,9 +2976,133 @@ TEST(SchemaValidator, ContinueOnErrors_Issue2) {
         kValidateDefaultFlags | kValidateContinueOnErrorFlag, SchemaValidator, Pointer);
 }
 
-TEST(SchemaValidator, Schema_UnknownError) {
+
+TEST(SchemaValidator, UnknownValidationError) {
     ASSERT_TRUE(SchemaValidator::SchemaType::GetValidateErrorKeyword(kValidateErrors).GetString() == std::string("null"));
 }
+
+// The first occurrence of a duplicate keyword is taken
+TEST(SchemaValidator, DuplicateKeyword) {
+    Document sd;
+    sd.Parse("{ \"title\": \"test\",\"type\": \"number\", \"type\": \"string\" }");
+    EXPECT_FALSE(sd.HasParseError());
+    SchemaDocument s(sd);
+    VALIDATE(s, "42", true);
+    INVALIDATE(s, "\"Life, the universe, and everything\"", "", "type", "",
+        "{ \"type\": {"
+        "    \"errorCode\": 20,"
+        "    \"instanceRef\": \"#\", \"schemaRef\": \"#\","
+        "    \"expected\": [\"number\"], \"actual\": \"string\""
+        "}}");
+}
+
+
+// SchemaDocument tests
+
+TEST(SchemaValidator, Schema_StartUnknown) {
+    Document sd;
+    sd.Parse("{\"type\": \"integer\"}");
+    ASSERT_FALSE(sd.HasParseError());
+    SchemaDocument s(sd, 0, 0, 0, 0, SchemaDocument::PointerType("/nowhere"));
+    SCHEMAERROR(s, "{\"StartUnknown\":{\"errorCode\":1,\"instanceRef\":\"#\", \"value\":\"#/nowhere\"}}");
+}
+
+// $ref is a non-JSON pointer fragment - not allowed when remote document
+TEST(SchemaValidator, Schema_RefPlainNameRemote) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"/subSchemas.json#plainname\"}}}");
+    SchemaDocumentType s(sd, "http://localhost:1234/xxxx", 26, &provider);
+    SCHEMAERROR(s, "{\"RefPlainName\":{\"errorCode\":2,\"instanceRef\":\"#/properties/myInt\",\"value\":\"#plainname\"}}");
+}
+
+// $ref is an empty string
+TEST(SchemaValidator, Schema_RefEmptyString) {
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt1\": {\"$ref\": \"\"}}}");
+    SchemaDocument s(sd);
+    SCHEMAERROR(s, "{\"RefInvalid\":{\"errorCode\":3,\"instanceRef\":\"#/properties/myInt1\"}}");
+}
+
+// $ref is remote but no provider
+TEST(SchemaValidator, Schema_RefNoRemoteProvider) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"/subSchemas.json#plainname\"}}}");
+    SchemaDocumentType s(sd, "http://localhost:1234/xxxx", 26, 0);
+    SCHEMAERROR(s, "{\"RefNoRemoteProvider\":{\"errorCode\":7,\"instanceRef\":\"#/properties/myInt\"}}");
+}
+
+// $ref is remote but no schema returned
+TEST(SchemaValidator, Schema_RefNoRemoteSchema) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"/will-not-resolve.json\"}}}");
+    SchemaDocumentType s(sd, "http://localhost:1234/xxxx", 26, &provider);
+    SCHEMAERROR(s, "{\"RefNoRemoteSchema\":{\"errorCode\":8,\"instanceRef\":\"#/properties/myInt\",\"value\":\"http://localhost:1234/will-not-resolve.json\"}}");
+}
+
+// $ref pointer is invalid
+TEST(SchemaValidator, Schema_RefPointerInvalid) {
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"#/&&&&&\"}}}");
+    SchemaDocument s(sd);
+    SCHEMAERROR(s, "{\"RefPointerInvalid\":{\"errorCode\":4,\"instanceRef\":\"#/properties/myInt\",\"value\":\"#/&&&&&\",\"offset\":2}}");
+}
+
+// $ref is remote and pointer is invalid
+TEST(SchemaValidator, Schema_RefPointerInvalidRemote) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"/subSchemas.json#/abc&&&&&\"}}}");
+    SchemaDocumentType s(sd, "http://localhost:1234/xxxx", 26, &provider);
+    SCHEMAERROR(s, "{\"RefPointerInvalid\":{\"errorCode\":4,\"instanceRef\":\"#/properties/myInt\",\"value\":\"#/abc&&&&&\",\"offset\":5}}");
+}
+
+// $ref is unknown non-pointer
+TEST(SchemaValidator, Schema_RefUnknownPlainName) {
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"#plainname\"}}}");
+    SchemaDocument s(sd);
+    SCHEMAERROR(s, "{\"RefUnknown\":{\"errorCode\":5,\"instanceRef\":\"#/properties/myInt\",\"value\":\"#plainname\"}}");
+}
+
+/// $ref is unknown pointer
+TEST(SchemaValidator, Schema_RefUnknownPointer) {
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"#/a/b\"}}}");
+    SchemaDocument s(sd);
+    SCHEMAERROR(s, "{\"RefUnknown\":{\"errorCode\":5,\"instanceRef\":\"#/properties/myInt\",\"value\":\"#/a/b\"}}");
+}
+
+// $ref is remote and unknown pointer
+TEST(SchemaValidator, Schema_RefUnknownPointerRemote) {
+    typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
+    RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"/subSchemas.json#/a/b\"}}}");
+    SchemaDocumentType s(sd, "http://localhost:1234/xxxx", 26, &provider);
+    SCHEMAERROR(s, "{\"RefUnknown\":{\"errorCode\":5,\"instanceRef\":\"#/properties/myInt\",\"value\":\"http://localhost:1234/subSchemas.json#/a/b\"}}");
+}
+
+// $ref is cyclical
+TEST(SchemaValidator, Schema_RefCyclical) {
+    Document sd;
+    sd.Parse("{\"type\": \"object\", \"properties\": {"
+             "    \"cyclic_source\": {"
+             "         \"$ref\": \"#/properties/cyclic_target\""
+             "    },"
+             "    \"cyclic_target\": {"
+             "        \"$ref\": \"#/properties/cyclic_source\""
+             "    }"
+             "}}");
+    SchemaDocument s(sd);
+    SCHEMAERROR(s, "{\"RefCyclical\":{\"errorCode\":6,\"instanceRef\":\"#/properties/cyclic_target\",\"value\":\"#/properties/cyclic_source\"}}");
+}
+
 
 #if defined(_MSC_VER) || defined(__clang__)
 RAPIDJSON_DIAG_POP
