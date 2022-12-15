@@ -185,8 +185,8 @@ enum ValidateErrorCode {
     kValidateErrorPatternProperties,           //!< See other errors.
     kValidateErrorDependencies,                //!< Object has missing property or schema dependencies.
 
-    kValidateErrorEnum,                        //!< Property has a value that is not one of its allowed enumerated values
-    kValidateErrorType,                        //!< Property has a type that is not allowed by the schema..
+    kValidateErrorEnum,                        //!< Property has a value that is not one of its allowed enumerated values.
+    kValidateErrorType,                        //!< Property has a type that is not allowed by the schema.
 
     kValidateErrorOneOf,                       //!< Property did not match any of the sub-schemas specified by 'oneOf'.
     kValidateErrorOneOfMatch,                  //!< Property matched more than one of the sub-schemas specified by 'oneOf'.
@@ -206,6 +206,68 @@ enum ValidateErrorCode {
 \endcode
 */
 typedef const RAPIDJSON_ERROR_CHARTYPE* (*GetValidateErrorFunc)(ValidateErrorCode);
+
+///////////////////////////////////////////////////////////////////////////////
+// SchemaErrorCode
+
+//! Error codes when validating.
+/*! \ingroup RAPIDJSON_ERRORS
+    \see GenericSchemaValidator
+*/
+enum SchemaErrorCode {
+    kSchemaErrorNone = 0,                      //!< No error.
+
+    kSchemaErrorStartUnknown,                  //!< Pointer to start of schema does not resolve to a location in the document
+    kSchemaErrorRefPlainName,                  //!< $ref fragment must be a JSON pointer
+    kSchemaErrorRefInvalid,                    //!< $ref must not be an empty string
+    kSchemaErrorRefPointerInvalid,             //!< $ref fragment is not a valid JSON pointer at offset
+    kSchemaErrorRefUnknown,                    //!< $ref does not resolve to a location in the target document
+    kSchemaErrorRefCyclical,                   //!< $ref is cyclical
+    kSchemaErrorRefNoRemoteProvider,           //!< $ref is remote but there is no remote provider
+    kSchemaErrorRefNoRemoteSchema,             //!< $ref is remote but the remote provider did not return a schema
+    kSchemaErrorRegexInvalid                   //!< Invalid regular expression in 'pattern' or 'patternProperties'
+};
+
+//! Function pointer type of GetSchemaError().
+/*! \ingroup RAPIDJSON_ERRORS
+
+    This is the prototype for \c GetSchemaError_X(), where \c X is a locale.
+    User can dynamically change locale in runtime, e.g.:
+\code
+    GetSchemaErrorFunc GetSchemaError = GetSchemaError_En; // or whatever
+    const RAPIDJSON_ERROR_CHARTYPE* s = GetSchemaError(validator.GetInvalidSchemaCode());
+\endcode
+*/
+typedef const RAPIDJSON_ERROR_CHARTYPE* (*GetSchemaErrorFunc)(SchemaErrorCode);
+
+///////////////////////////////////////////////////////////////////////////////
+// PointerParseErrorCode
+
+//! Error code of JSON pointer parsing.
+/*! \ingroup RAPIDJSON_ERRORS
+    \see GenericPointer::GenericPointer, GenericPointer::GetParseErrorCode
+*/
+enum PointerParseErrorCode {
+    kPointerParseErrorNone = 0,                     //!< The parse is successful
+
+    kPointerParseErrorTokenMustBeginWithSolidus,    //!< A token must begin with a '/'
+    kPointerParseErrorInvalidEscape,                //!< Invalid escape
+    kPointerParseErrorInvalidPercentEncoding,       //!< Invalid percent encoding in URI fragment
+    kPointerParseErrorCharacterMustPercentEncode    //!< A character must percent encoded in URI fragment
+};
+
+//! Function pointer type of GetPointerParseError().
+/*! \ingroup RAPIDJSON_ERRORS
+
+    This is the prototype for \c GetPointerParseError_X(), where \c X is a locale.
+    User can dynamically change locale in runtime, e.g.:
+\code
+    GetPointerParseErrorFunc GetPointerParseError = GetPointerParseError_En; // or whatever
+    const RAPIDJSON_ERROR_CHARTYPE* s = GetPointerParseError(pointer.GetParseErrorCode());
+\endcode
+*/
+typedef const RAPIDJSON_ERROR_CHARTYPE* (*GetPointerParseErrorFunc)(PointerParseErrorCode);
+
 
 RAPIDJSON_NAMESPACE_END
 

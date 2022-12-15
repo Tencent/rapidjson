@@ -475,7 +475,7 @@ TEST(Pointer, CopyConstructor) {
         EXPECT_EQ(1u, q.GetTokens()[1].length);
         EXPECT_STREQ("0", q.GetTokens()[1].name);
         EXPECT_EQ(0u, q.GetTokens()[1].index);
-        
+
         // Copied pointer needs to have its own allocator
         EXPECT_NE(&p.GetAllocator(), &q.GetAllocator());
     }

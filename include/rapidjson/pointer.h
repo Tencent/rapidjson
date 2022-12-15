@@ -18,6 +18,7 @@
 #include "document.h"
 #include "uri.h"
 #include "internal/itoa.h"
+#include "error/error.h" // PointerParseErrorCode
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
@@ -30,19 +31,6 @@ RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
 RAPIDJSON_NAMESPACE_BEGIN
 
 static const SizeType kPointerInvalidIndex = ~SizeType(0);  //!< Represents an invalid index in GenericPointer::Token
-
-//! Error code of parsing.
-/*! \ingroup RAPIDJSON_ERRORS
-    \see GenericPointer::GenericPointer, GenericPointer::GetParseErrorCode
-*/
-enum PointerParseErrorCode {
-    kPointerParseErrorNone = 0,                     //!< The parse is successful
-
-    kPointerParseErrorTokenMustBeginWithSolidus,    //!< A token must begin with a '/'
-    kPointerParseErrorInvalidEscape,                //!< Invalid escape
-    kPointerParseErrorInvalidPercentEncoding,       //!< Invalid percent encoding in URI fragment
-    kPointerParseErrorCharacterMustPercentEncode    //!< A character must percent encoded in URI fragment
-};
 
 ///////////////////////////////////////////////////////////////////////////////
 // GenericPointer
@@ -69,10 +57,10 @@ enum PointerParseErrorCode {
     supplied tokens eliminates these.
 
     GenericPointer depends on GenericDocument and GenericValue.
-    
+
     \tparam ValueType The value type of the DOM tree. E.g. GenericValue<UTF8<> >
     \tparam Allocator The allocator type for allocating memory for internal representation.
-    
+
     \note GenericPointer uses same encoding of ValueType.
     However, Allocator of GenericPointer is independent of Allocator of Value.
 */
@@ -84,7 +72,7 @@ public:
     typedef GenericUri<ValueType, Allocator> UriType;
 
 
-    //! A token is the basic units of internal representation.
+  //! A token is the basic units of internal representation.
     /*!
         A JSON pointer string representation "/foo/123" is parsed to two tokens: 
         "foo" and 123. 123 will be represented in both numeric form and string form.
@@ -701,7 +689,7 @@ public:
     ValueType& GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, const Ch* defaultValue) const {
         return GetWithDefault(document, defaultValue, document.GetAllocator());
     }
-    
+
 #if RAPIDJSON_HAS_STDSTRING
     //! Query a value in a document with default std::basic_string.
     template <typename stackAllocator>
@@ -995,7 +983,7 @@ private:
                 }
 
                 i++;
-                
+
                 // Escaping "~0" -> '~', "~1" -> '/'
                 if (c == '~') {
                     if (i < length) {
