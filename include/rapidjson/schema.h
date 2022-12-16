@@ -1794,7 +1794,8 @@ public:
     virtual const SchemaDocumentType* GetRemoteDocument(const GenericUri<ValueType, AllocatorType> uri, Specification& spec) {
         // Default implementation just calls through for compatibility
         // Following line suppresses unused parameter warning
-        if (false) printf("GetRemoteDocument: %d %d\n", spec.draft, spec.oapi);
+        (void)spec;
+        // printf("GetRemoteDocument: %d %d\n", spec.draft, spec.oapi);
         return GetRemoteDocument(uri.GetBaseString(), uri.GetBaseStringLength());
     }
 };
