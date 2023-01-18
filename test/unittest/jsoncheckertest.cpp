@@ -29,7 +29,7 @@ static char* ReadFile(const char* filename, size_t& length) {
     char buffer[1024];
     FILE *fp = 0;
     for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
-        sprintf(buffer, "%s/%s", paths[i], filename);
+        snprintf(buffer, sizeof(buffer), "%s/%s", paths[i], filename);
         fp = fopen(buffer, "rb");
         if (fp)
             break;
@@ -76,7 +76,7 @@ TEST(JsonChecker, Reader) {
         if (i == 18)    // fail18.json is valid in rapidjson, which has no limitation on depth of nesting.
             continue;
 
-        sprintf(filename, "fail%d.json", i);
+        snprintf(filename, sizeof(filename), "fail%d.json", i);
         size_t length;
         char* json = ReadFile(filename, length);
         if (!json) {
@@ -110,7 +110,7 @@ TEST(JsonChecker, Reader) {
 
     // passX.json
     for (int i = 1; i <= 3; i++) {
-        sprintf(filename, "pass%d.json", i);
+        snprintf(filename, sizeof(filename), "pass%d.json", i);
         size_t length;
         char* json = ReadFile(filename, length);
         if (!json) {

@@ -113,7 +113,7 @@ static bool Open(FileStreamType& fs, const char* filename) {
     };
     char buffer[1024];
     for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
-        sprintf(buffer, "%s/%s", paths[i], filename);
+        snprintf(buffer, sizeof(buffer), "%s/%s", paths[i], filename);
         fs.open(buffer, ios_base::in | ios_base::binary);
         if (fs.is_open())
             return true;

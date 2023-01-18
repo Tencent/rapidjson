@@ -138,7 +138,7 @@ public:
                 types_[j] = 0;
                 for (size_t i = 0; i < sizeof(typespaths) / sizeof(typespaths[0]); i++) {
                     char filename[256];
-                    sprintf(filename, "%s/%s", typespaths[i], typesfilenames[j]);
+                    snprintf(filename, sizeof(filename), "%s/%s", typespaths[i], typesfilenames[j]);
                     if (FILE* fp = fopen(filename, "rb")) {
                         fseek(fp, 0, SEEK_END);
                         typesLength_[j] = (size_t)ftell(fp);

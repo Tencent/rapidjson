@@ -764,7 +764,7 @@ void itoa_Writer_StringBufferVerify() {
     Writer writer(sb);
     for (size_t j = 0; j < randvalCount; j++) {
         char buffer[32];
-        sprintf(buffer, "%d", randval[j]);
+        snprintf(buffer, sizeof(buffer), "%d", randval[j]);
         writer.WriteInt(randval[j]);
         ASSERT_STREQ(buffer, sb.GetString());
         sb.Clear();
@@ -776,7 +776,7 @@ void itoa_Writer_InsituStringStreamVerify() {
     Writer writer;
     for (size_t j = 0; j < randvalCount; j++) {
         char buffer[32];
-        sprintf(buffer, "%d", randval[j]);
+        snprintf(buffer, sizeof(buffer), "%d", randval[j]);
         char buffer2[32];
         rapidjson::InsituStringStream ss(buffer2);
         writer.Reset(ss);
@@ -830,7 +830,7 @@ void itoa64_Writer_StringBufferVerify() {
     for (size_t j = 0; j < randvalCount; j++) {
         char buffer[32];
         int64_t x = randval[j] * randval[j];
-        sprintf(buffer, "%" PRIi64, x);
+        snprintf(buffer, sizeof(buffer), "%" PRIi64, x);
         writer.WriteInt64(x);
         ASSERT_STREQ(buffer, sb.GetString());
         sb.Clear();
@@ -843,7 +843,7 @@ void itoa64_Writer_InsituStringStreamVerify() {
     for (size_t j = 0; j < randvalCount; j++) {
         char buffer[32];
         int64_t x = randval[j] * randval[j];
-        sprintf(buffer, "%" PRIi64, x);
+        snprintf(buffer, sizeof(buffer), "%" PRIi64, x);
         char buffer2[32];
         rapidjson::InsituStringStream ss(buffer2);
         writer.Reset(ss);

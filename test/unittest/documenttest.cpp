@@ -163,7 +163,7 @@ static FILE* OpenEncodedFile(const char* filename) {
     };
     char buffer[1024];
     for (size_t i = 0; i < sizeof(paths) / sizeof(paths[0]); i++) {
-        sprintf(buffer, "%s/%s", paths[i], filename);
+        snprintf(buffer, sizeof(buffer), "%s/%s", paths[i], filename);
         FILE *fp = fopen(buffer, "rb");
         if (fp)
             return fp;

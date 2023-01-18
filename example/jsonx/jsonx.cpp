@@ -34,27 +34,27 @@ public:
     
     bool Int(int i) {
         char buffer[12];
-        return WriteNumberElement(buffer, sprintf(buffer, "%d", i));
+        return WriteNumberElement(buffer, snprintf(buffer, sizeof(buffer), "%d", i));
     }
     
     bool Uint(unsigned i) {
         char buffer[11];
-        return WriteNumberElement(buffer, sprintf(buffer, "%u", i));
+        return WriteNumberElement(buffer, snprintf(buffer, sizeof(buffer), "%u", i));
     }
     
     bool Int64(int64_t i) {
         char buffer[21];
-        return WriteNumberElement(buffer, sprintf(buffer, "%" PRId64, i));
+        return WriteNumberElement(buffer, snprintf(buffer, sizeof(buffer), "%" PRId64, i));
     }
     
     bool Uint64(uint64_t i) {
         char buffer[21];
-        return WriteNumberElement(buffer, sprintf(buffer, "%" PRIu64, i));
+        return WriteNumberElement(buffer, snprintf(buffer, sizeof(buffer), "%" PRIu64, i));
     }
     
     bool Double(double d) {
         char buffer[30];
-        return WriteNumberElement(buffer, sprintf(buffer, "%.17g", d));
+        return WriteNumberElement(buffer, snprintf(buffer, sizeof(buffer), "%.17g", d));
     }
 
     bool RawNumber(const char* str, SizeType length, bool) {

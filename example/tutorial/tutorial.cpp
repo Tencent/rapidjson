@@ -122,7 +122,7 @@ int main(int, char*[]) {
     Value author;
     {
         char buffer2[10];
-        int len = sprintf(buffer2, "%s %s", "Milo", "Yip");  // synthetic example of dynamically created string.
+        int len = snprintf(buffer2, sizeof(buffer2), "%s %s", "Milo", "Yip");  // synthetic example of dynamically created string.
 
         author.SetString(buffer2, static_cast<SizeType>(len), document.GetAllocator());
         // Shorter but slower version:
