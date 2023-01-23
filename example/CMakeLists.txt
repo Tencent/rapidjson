@@ -22,7 +22,8 @@ set(EXAMPLES
     simplepullreader
     simplewriter
     sortkeys
-    tutorial)
+    tutorial
+    hello_world)
     
 include_directories("../include/")
 

@@ -9,8 +9,6 @@
 using namespace rapidjson;
 
 int main() {
-    std::cout << "This is Manoj version!" << std::endl;
-
     // 1. Parse a JSON string into DOM.
     const char* json = "{\"project\":\"rapidjson\",\"stars\":10}";
     Document d;
