@@ -18,6 +18,8 @@
 
 using namespace rapidjson;
 
+bool testJson(const char *json, size_t &line, size_t &col);
+
 // static const char json[] = "{\"string\"\n\n:\"my string\",\"array\"\n:[\"1\", \"2\", \"3\"]}";
 
 bool testJson(const char *json, size_t &line, size_t &col) {
