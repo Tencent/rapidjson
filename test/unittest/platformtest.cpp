@@ -18,6 +18,10 @@
 // including windows.h on purpose to provoke a compile time problem as GetObject is a 
 // macro that gets defined when windows.h is included
 #ifdef _WIN32
+// Define NOMINMAX to prevent the inclusion of max() from minwindef.h, which is included
+// by windows.h and may conflict with the max() function from the standard library.
+#define NOMINMAX
+
 #include <windows.h>
 #endif
 
