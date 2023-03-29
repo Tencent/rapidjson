@@ -1490,11 +1490,12 @@ private:
         if (RAPIDJSON_UNLIKELY(s.Peek() == '0')) {
           s.TakePush();
           // Parse hexadecimal
-          if ((s.Peek() == 'x' || s.Peek() == 'X') && (kParseHexadecimalsFlag & parseFlags))
+          if ((s.Peek() == 'x' || s.Peek() == 'X') )// && (kParseHexadecimalsFlag & parseFlags))  // TODO: Investigate branch prediction
           {
             s.TakePush();
-            use64bit = true;
             hex = true;
+            use64bit = true;
+            int l_nHexSize = 0; // how many hex-digits is hex value long? Case 0 -> throw error; case <= 8 -> uint32_t; case <= 16 -> uint64_t; case >= 16 -> throw error.
             int ASCIIHexToInt[] =
             {
               // ASCII
@@ -1519,16 +1520,23 @@ private:
             };
             while (RAPIDJSON_LIKELY(ASCIIHexToInt[s.Peek()] >= 0))
             {
-              s.TakePush();                               // Look-up table conversion
-              int iDehexed = ASCIIHexToInt[s.TakePush()]; // Look-up table conversion
+              if (RAPIDJSON_UNLIKELY(l_nHexSize == 16))
+              {
+                RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
+                break;
+              }
+              int iDehexed = ASCIIHexToInt[static_cast<unsigned>(s.TakePush())];   // Look-up table conversion
               //char chsm = s.TakePush();                   // Stdlib function conversion. ~4x slower.
               //int iDehexed = strtoul(&chsm, nullptr, 16); // Stdlib function conversion. ~4x slower.
-              i64 = (i64 << 4) + iDehexed;
+              i = (i << 4) + iDehexed;
+              l_nHexSize++;
+            }
+            if (RAPIDJSON_UNLIKELY(l_nHexSize == 0)) {
+              RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
             }
           }
           // Parse base10 '0'
-          else
-          {
+          else {
             i = 0;
           }
         }
