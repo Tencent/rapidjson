@@ -1488,57 +1488,58 @@ private:
         bool hex = false;
         int significandDigit = 0;
         if (RAPIDJSON_UNLIKELY(s.Peek() == '0')) {
-          s.TakePush();
-          // Parse hexadecimal
-          if ((s.Peek() == 'x' || s.Peek() == 'X') )// && RAPIDJSON_LIKELY(kParseHexadecimalsFlag & parseFlags))  // TODO: Investigate branch prediction
-          {
             s.TakePush();
-            hex = true;
-            use64bit = true;
-            int l_nHexSize = 0; // how many hex-digits is hex value long? Case 0 -> throw error; case <= 8 -> uint32_t; case <= 16 -> uint64_t; case >= 16 -> throw error.
-            int ASCIIHexToInt[] =
-            {
-              // ASCII
-              -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-              -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-              -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-               0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, -1, -1, -1, -1, -1,
-              -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-              -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-              -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-              -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            // Parse hexadecimal
+            if (s.Peek() == 'x' || s.Peek() == 'X') {
+                if (RAPIDJSON_LIKELY(kParseHexadecimalsFlag & parseFlags)) {
+                    s.TakePush();
+                    hex = true;
+                    use64bit = true;
+                    int l_nHexSize = 0; // how many hex-digits is hex value long? Case 0 -> throw error; case <= 8 -> uint32_t; case <= 16 -> uint64_t; case >= 16 -> throw error.
+                    int ASCIIHexToInt[] =
+                    {
+                        // ASCII
+                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                         0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, -1, -1, -1, -1, -1,
+                        -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                        -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 
-              // 0x80-FF (Omit this if you don't need to check for non-ASCII)
-              -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-              -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-              -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-              -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-              -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-              -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-              -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-              -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-            };
-            while (RAPIDJSON_LIKELY(ASCIIHexToInt[s.Peek()] >= 0))
-            {
-              if (RAPIDJSON_UNLIKELY(l_nHexSize == 16))
-              {
-                RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
-                break;
-              }
-              int iDehexed = ASCIIHexToInt[static_cast<unsigned>(s.TakePush())];   // Look-up table conversion
-              //char chsm = s.TakePush();                   // Stdlib function conversion. ~4x slower.
-              //int iDehexed = strtoul(&chsm, nullptr, 16); // Stdlib function conversion. ~4x slower.
-              i64 = (i64 << 4) + iDehexed;
-              l_nHexSize++;
+                        // 0x80-FF (Omit this if you don't need to check for non-ASCII)
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                    };
+                    while (RAPIDJSON_LIKELY(ASCIIHexToInt[s.Peek()] >= 0)) {
+                        if (RAPIDJSON_UNLIKELY(l_nHexSize == 16))
+                        {
+                          RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
+                          break;
+                        }
+                        int iDehexed = ASCIIHexToInt[static_cast<unsigned>(s.TakePush())];   // Look-up table conversion
+                        //char chsm = s.TakePush();                   // Stdlib function conversion. ~4x slower.
+                        //int iDehexed = strtoul(&chsm, nullptr, 16); // Stdlib function conversion. ~4x slower.
+                        i64 = (i64 << 4) + iDehexed;
+                        l_nHexSize++;
+                    }
+                    if (RAPIDJSON_UNLIKELY(l_nHexSize == 0)) {
+                        RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
+                    }
+                }
+                else RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
             }
-            if (RAPIDJSON_UNLIKELY(l_nHexSize == 0)) {
-              RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
+            // Parse base10 '0'
+            else {
+              i = 0;
             }
-          }
-          // Parse base10 '0'
-          else {
-            i = 0;
-          }
         }
         else if (RAPIDJSON_LIKELY(s.Peek() >= '1' && s.Peek() <= '9')) {
             i = static_cast<unsigned>(s.TakePush() - '0');

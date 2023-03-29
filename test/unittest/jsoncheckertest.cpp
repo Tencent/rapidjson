@@ -70,7 +70,7 @@ TEST(JsonChecker, Reader) {
     char filename[256];
 
     // jsonchecker/failXX.json
-    for (int i = 1; i <= 33; i++) {
+    for (int i = 1; i <= 35; i++) {
         if (i == 1) // fail1.json is valid in rapidjson, which has no limitation on type of root element (RFC 7159).
             continue;
         if (i == 18)    // fail18.json is valid in rapidjson, which has no limitation on depth of nesting.
@@ -87,11 +87,22 @@ TEST(JsonChecker, Reader) {
 
         // Test stack-based parsing.
         GenericDocument<UTF8<>, CrtAllocator> document; // Use Crt allocator to check exception-safety (no memory leak)
-        document.Parse(json);
+        if (i >= 34 && i <= 35) {
+            document.Parse<kParseHexadecimalsFlag>(json);
+        }
+        else {
+            document.Parse(json);
+        }
         EXPECT_TRUE(document.HasParseError()) << filename;
 
         // Test iterative parsing.
-        document.Parse<kParseIterativeFlag>(json);
+        if (i >= 34 && i <= 35) {
+          document.Parse<kParseIterativeFlag | kParseHexadecimalsFlag>(json);
+        }
+        else {
+          document.Parse<kParseIterativeFlag>(json);
+        }
+
         EXPECT_TRUE(document.HasParseError()) << filename;
 
         // Test iterative pull-parsing.
@@ -99,17 +110,28 @@ TEST(JsonChecker, Reader) {
         StringStream ss(json);
         NoOpHandler h;
         reader.IterativeParseInit();
-        while (!reader.IterativeParseComplete()) {
-            if (!reader.IterativeParseNext<kParseDefaultFlags>(ss, h))
-                break;
+        if (i >= 34 && i <= 35) {
+            while (!reader.IterativeParseComplete()) {
+                //if (!reader.IterativeParseNext<kParseDefaultFlags | kParseHexadecimalsFlag>(ss, h))
+                if (!reader.IterativeParseNext<kParseDefaultFlags>(ss, h))
+                    break;
+            }
+        }
+        else {
+            while (!reader.IterativeParseComplete()) {
+                if (!reader.IterativeParseNext<kParseDefaultFlags>(ss, h))
+                    break;
+            }
         }
         EXPECT_TRUE(reader.HasParseError()) << filename;
         
         free(json);
     }
 
+
+
     // passX.json
-    for (int i = 1; i <= 3; i++) {
+    for (int i = 1; i <= 4; i++) {
         sprintf(filename, "pass%d.json", i);
         size_t length;
         char* json = ReadFile(filename, length);
@@ -120,11 +142,21 @@ TEST(JsonChecker, Reader) {
 
         // Test stack-based parsing.
         GenericDocument<UTF8<>, CrtAllocator> document; // Use Crt allocator to check exception-safety (no memory leak)
-        document.Parse(json);
+        if (i == 4) {
+          document.Parse<kParseHexadecimalsFlag>(json);
+        }
+        else {
+          document.Parse(json);
+        }
         EXPECT_FALSE(document.HasParseError()) << filename;
 
         // Test iterative parsing.
-        document.Parse<kParseIterativeFlag>(json);
+        if (i == 4) {
+          document.Parse<kParseHexadecimalsFlag | kParseIterativeFlag>(json);
+        }
+        else {
+          document.Parse<kParseIterativeFlag>(json);
+        }
         EXPECT_FALSE(document.HasParseError()) << filename;
         
         // Test iterative pull-parsing.
@@ -132,9 +164,17 @@ TEST(JsonChecker, Reader) {
         StringStream ss(json);
         NoOpHandler h;
         reader.IterativeParseInit();
-        while (!reader.IterativeParseComplete()) {
-            if (!reader.IterativeParseNext<kParseDefaultFlags>(ss, h))
-                break;
+        if (i == 4) {
+            while (!reader.IterativeParseComplete()) {
+                if (!reader.IterativeParseNext<kParseDefaultFlags | kParseHexadecimalsFlag>(ss, h))
+                    break;
+            }
+        }
+        else {
+            while (!reader.IterativeParseComplete()) {
+                if (!reader.IterativeParseNext<kParseDefaultFlags>(ss, h))
+                  break;
+            }
         }
         EXPECT_FALSE(reader.HasParseError()) << filename;
 
