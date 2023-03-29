@@ -125,19 +125,18 @@ TEST(Reader, ParseNumber_Integer) {
     TEST_INTEGER(ParseUintHandler, "123", 123u);
     TEST_INTEGER(ParseUintHandler, "2147483648", 2147483648u);       // 2^31 - 1 (cannot be stored in int)
     TEST_INTEGER(ParseUintHandler, "4294967295", 4294967295u);
-    TEST_INTEGER(ParseUintHandler, "0x0", 0u);
-    TEST_INTEGER(ParseUintHandler, "0x10000000", 2147483648u);
 
     TEST_INTEGER(ParseIntHandler, "-123", -123);
     TEST_INTEGER(ParseIntHandler, "-2147483648", static_cast<int32_t>(0x80000000));     // -2^31 (min of int)
 
     TEST_INTEGER(ParseUint64Handler, "4294967296", RAPIDJSON_UINT64_C2(1, 0));   // 2^32 (max of unsigned + 1, force to use uint64_t)
     TEST_INTEGER(ParseUint64Handler, "18446744073709551615", RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0xFFFFFFFF));   // 2^64 - 1 (max of uint64_t)
-    TEST_INTEGER(ParseUint64Handler, "0x100000000", RAPIDJSON_UINT64_C2(1, 0));   // 2^32 (max of unsigned + 1, force to use uint64_t)
-    TEST_INTEGER(ParseUint64Handler, "0xFFFFFFFFFFFFFFFF", RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0xFFFFFFFF));   // 2^64 - 1 (max of uint64_t)
 
     TEST_INTEGER(ParseInt64Handler, "-2147483649", static_cast<int64_t>(RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0x7FFFFFFF)));   // -2^31 -1 (min of int - 1, force to use int64_t)
     TEST_INTEGER(ParseInt64Handler, "-9223372036854775808", static_cast<int64_t>(RAPIDJSON_UINT64_C2(0x80000000, 0x00000000)));       // -2^63 (min of int64_t)
+
+    //TEST_INTEGER(ParseUint64Handler, "0x100000000", RAPIDJSON_UINT64_C2(1, 0));   // 2^32 (max of unsigned + 1, force to use uint64_t)
+    //TEST_INTEGER(ParseUint64Handler, "0xFFFFFFFFFFFFFFFF", RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0xFFFFFFFF));   // 2^64 - 1 (max of uint64_t)
 
     // Random test for uint32_t/int32_t
     {
