@@ -19,6 +19,7 @@
 #include "rapidjson/internal/itoa.h"
 #include "rapidjson/memorystream.h"
 
+#include <algorithm>
 #include <limits>
 
 using namespace rapidjson;

@@ -16,6 +16,8 @@
 
 #include "rapidjson/internal/strtod.h"
 
+#include <algorithm>
+
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(unreachable-code)
