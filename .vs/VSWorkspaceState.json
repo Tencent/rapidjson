@@ -1,0 +1,19 @@
+{
+  "OutputFoldersPerTargetSystem": {
+    "Local Machine": [
+      "out\\build\\x64-Debug",
+      "out\\install\\x64-Debug"
+    ]
+  },
+  "ExpandedNodes": [
+    "",
+    "\\include\\rapidjson",
+    "\\include\\rapidjson\\error",
+    "\\include\\rapidjson\\msinttypes",
+    "\\test",
+    "\\test\\perftest",
+    "\\test\\unittest"
+  ],
+  "SelectedNode": "\\test\\unittest\\readertest.cpp",
+  "PreviewInSolutionExplorer": false
+}
