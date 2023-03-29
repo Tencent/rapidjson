@@ -1,5 +1,5 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
-// 
+//
 // Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
@@ -7,9 +7,9 @@
 //
 // http://opensource.org/licenses/MIT
 //
-// Unless required by applicable law or agreed to in writing, software distributed 
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// Unless required by applicable law or agreed to in writing, software distributed
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
 #ifndef RAPIDJSON_ERROR_ERROR_H_
@@ -42,7 +42,7 @@ RAPIDJSON_DIAG_OFF(padded)
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_ERROR_STRING
 
-//! Macro for converting string literial to \ref RAPIDJSON_ERROR_CHARTYPE[].
+//! Macro for converting string literal to \ref RAPIDJSON_ERROR_CHARTYPE[].
 /*! \ingroup RAPIDJSON_ERRORS
     By default this conversion macro does nothing.
     On Windows, user can define this macro as \c _T(x) for supporting both
@@ -192,7 +192,10 @@ enum ValidateErrorCode {
     kValidateErrorOneOfMatch,                  //!< Property matched more than one of the sub-schemas specified by 'oneOf'.
     kValidateErrorAllOf,                       //!< Property did not match all of the sub-schemas specified by 'allOf'.
     kValidateErrorAnyOf,                       //!< Property did not match any of the sub-schemas specified by 'anyOf'.
-    kValidateErrorNot                          //!< Property matched the sub-schema specified by 'not'.
+    kValidateErrorNot,                         //!< Property matched the sub-schema specified by 'not'.
+
+    kValidateErrorReadOnly,                    //!< Property is read-only but has been provided when validation is for writing
+    kValidateErrorWriteOnly                    //!< Property is write-only but has been provided when validation is for reading
 };
 
 //! Function pointer type of GetValidateError().
@@ -225,7 +228,11 @@ enum SchemaErrorCode {
     kSchemaErrorRefCyclical,                   //!< $ref is cyclical
     kSchemaErrorRefNoRemoteProvider,           //!< $ref is remote but there is no remote provider
     kSchemaErrorRefNoRemoteSchema,             //!< $ref is remote but the remote provider did not return a schema
-    kSchemaErrorRegexInvalid                   //!< Invalid regular expression in 'pattern' or 'patternProperties'
+    kSchemaErrorRegexInvalid,                  //!< Invalid regular expression in 'pattern' or 'patternProperties'
+    kSchemaErrorSpecUnknown,                   //!< JSON schema draft or OpenAPI version is not recognized
+    kSchemaErrorSpecUnsupported,               //!< JSON schema draft or OpenAPI version is not supported
+    kSchemaErrorSpecIllegal,                   //!< Both JSON schema draft and OpenAPI version found in document
+    kSchemaErrorReadOnlyAndWriteOnly           //!< Property must not be both 'readOnly' and 'writeOnly'
 };
 
 //! Function pointer type of GetSchemaError().
