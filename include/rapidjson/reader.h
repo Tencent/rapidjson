@@ -1490,7 +1490,7 @@ private:
         if (RAPIDJSON_UNLIKELY(s.Peek() == '0')) {
           s.TakePush();
           // Parse hexadecimal
-          if ((s.Peek() == 'x' || s.Peek() == 'X') )// && (kParseHexadecimalsFlag & parseFlags))  // TODO: Investigate branch prediction
+          if ((s.Peek() == 'x' || s.Peek() == 'X') )// && RAPIDJSON_LIKELY(kParseHexadecimalsFlag & parseFlags))  // TODO: Investigate branch prediction
           {
             s.TakePush();
             hex = true;
@@ -1528,7 +1528,7 @@ private:
               int iDehexed = ASCIIHexToInt[static_cast<unsigned>(s.TakePush())];   // Look-up table conversion
               //char chsm = s.TakePush();                   // Stdlib function conversion. ~4x slower.
               //int iDehexed = strtoul(&chsm, nullptr, 16); // Stdlib function conversion. ~4x slower.
-              i = (i << 4) + iDehexed;
+              i64 = (i64 << 4) + iDehexed;
               l_nHexSize++;
             }
             if (RAPIDJSON_UNLIKELY(l_nHexSize == 0)) {
