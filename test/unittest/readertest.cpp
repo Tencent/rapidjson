@@ -184,6 +184,26 @@ TEST(Reader, ParseNumber_Integer) {
 #undef TEST_INTEGER
 }
 
+TEST(Reader, ParseNumber_Hexadecimal) {
+#define TEST_INTEGER(Handler, str, x) \
+    { \
+        StringStream s(str); \
+        Handler h; \
+        Reader reader; \
+        reader.Parse<kParseHexadecimalsFlag>(s, h); \
+        EXPECT_EQ(1u, h.step_); \
+        EXPECT_EQ(x, h.actual_); \
+    }
+
+  TEST_INTEGER(ParseUint64Handler, "0x0", RAPIDJSON_UINT64_C2(0, 0));
+  TEST_INTEGER(ParseUint64Handler, "0x0000000000000000", RAPIDJSON_UINT64_C2(0, 0));
+  TEST_INTEGER(ParseUint64Handler, "0x00000000000000000", RAPIDJSON_UINT64_C2(0, 0));
+  TEST_INTEGER(ParseUint64Handler, "0XabcdefABCDEF0123", RAPIDJSON_UINT64_C2(0xABCDEFAB, 0xCDEF0123));
+  TEST_INTEGER(ParseUint64Handler, "0xFFFFFFFFFFFFFFFF", RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0xFFFFFFFF));
+
+#undef TEST_INTEGER
+}
+
 template<bool fullPrecision>
 static void TestParseDouble() {
 #define TEST_DOUBLE(fullPrecision, str, x) \
