@@ -185,7 +185,7 @@ TEST(Reader, ParseNumber_Integer) {
 }
 
 TEST(Reader, ParseNumber_Hexadecimal) {
-#define TEST_INTEGER(Handler, str, x) \
+#define TEST_HEXADECIMAL(Handler, str, x) \
     { \
         StringStream s(str); \
         Handler h; \
@@ -195,13 +195,52 @@ TEST(Reader, ParseNumber_Hexadecimal) {
         EXPECT_EQ(x, h.actual_); \
     }
 
-  TEST_INTEGER(ParseUint64Handler, "0x0", RAPIDJSON_UINT64_C2(0, 0));
-  TEST_INTEGER(ParseUint64Handler, "0x0000000000000000", RAPIDJSON_UINT64_C2(0, 0));
-  TEST_INTEGER(ParseUint64Handler, "0x00000000000000000", RAPIDJSON_UINT64_C2(0, 0));
-  TEST_INTEGER(ParseUint64Handler, "0XabcdefABCDEF0123", RAPIDJSON_UINT64_C2(0xABCDEFAB, 0xCDEF0123));
-  TEST_INTEGER(ParseUint64Handler, "0xFFFFFFFFFFFFFFFF", RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0xFFFFFFFF));
+    TEST_HEXADECIMAL(ParseUintHandler, "0x0", RAPIDJSON_UINT64_C2(0, 0));
+    TEST_HEXADECIMAL(ParseUintHandler, "0", RAPIDJSON_UINT64_C2(0, 0));
+    TEST_HEXADECIMAL(ParseDoubleHandler, "0.125", 0.125);
+    TEST_HEXADECIMAL(ParseDoubleHandler, "1e4", 10000);
+    TEST_HEXADECIMAL(ParseDoubleHandler, "1E4", 10000);
+    TEST_HEXADECIMAL(ParseIntHandler, "-0x0", RAPIDJSON_UINT64_C2(0, 0));
+    TEST_HEXADECIMAL(ParseIntHandler, "-0x1", -0x1);
+    TEST_HEXADECIMAL(ParseIntHandler, "-0x10", -0x10);
+    TEST_HEXADECIMAL(ParseIntHandler, "-16", -0x10);
+    TEST_HEXADECIMAL(ParseUintHandler, "0x13ac_54fe", 0x13AC54FEu);
+    TEST_HEXADECIMAL(ParseIntHandler, "-0x13ac_54fe", -0x13AC54FE);
+    TEST_HEXADECIMAL(ParseUintHandler, "0x1234", 0x1234u);
+    TEST_HEXADECIMAL(ParseIntHandler, "-0x1234", -0x1234);
+    TEST_HEXADECIMAL(ParseUintHandler, "0x1234_56", 0x123456u);
+    TEST_HEXADECIMAL(ParseIntHandler, "-0x1234_56", -0x123456);
+    TEST_HEXADECIMAL(ParseUint64Handler, "0x1234_abcd_f1f1", RAPIDJSON_UINT64_C2(0x1234, 0xABCDF1F1));
+    TEST_HEXADECIMAL(ParseInt64Handler, "-0x1234_abcd_f1f1", -0x1234ABCDF1F1);
+    TEST_HEXADECIMAL(ParseUintHandler, "0x0000_0000_0000_0000", RAPIDJSON_UINT64_C2(0, 0));
+    TEST_HEXADECIMAL(ParseUintHandler, "0x0_0000_0000_0000_0000", RAPIDJSON_UINT64_C2(0, 0));
+    TEST_HEXADECIMAL(ParseUint64Handler, "0Xabcd_efAB_CDEF_0123", RAPIDJSON_UINT64_C2(0xABCDEFAB, 0xCDEF0123));
+    TEST_HEXADECIMAL(ParseUint64Handler, "0xFFFF_FFFF_FFFF_FFFF", RAPIDJSON_UINT64_C2(0xFFFFFFFF, 0xFFFFFFFF));
 
-#undef TEST_INTEGER
+#undef TEST_HEXADECIMAL
+}
+
+TEST(Reader, ParseNumberError_Hexadecimal) {
+# define TEST_HEXADECIMAL_ERROR(Handler, str, errorCode, errorOffset) \
+    { \
+        StringStream s(str); \
+        Handler h; \
+        Reader reader; \
+        EXPECT_FALSE(reader.Parse<kParseHexadecimalsFlag>(s, h)); \
+        EXPECT_EQ(errorCode, reader.GetParseErrorCode());\
+        EXPECT_EQ(errorOffset, reader.GetErrorOffset());\
+    }
+
+    TEST_HEXADECIMAL_ERROR(ParseUintHandler, "0x.", kParseErrorValueInvalid, 2u);
+    TEST_HEXADECIMAL_ERROR(ParseUintHandler, "0x", kParseErrorValueInvalid, 2u);
+    TEST_HEXADECIMAL_ERROR(ParseUintHandler, "0x_", kParseErrorValueInvalid, 2u);
+    TEST_HEXADECIMAL_ERROR(ParseUintHandler, "0x1111.2222", kParseErrorValueInvalid, 7u);
+    TEST_HEXADECIMAL_ERROR(ParseUintHandler, "0x2g", kParseErrorDocumentRootNotSingular, 3u);
+    TEST_HEXADECIMAL_ERROR(ParseUintHandler, "0x2X", kParseErrorDocumentRootNotSingular, 3u);
+    TEST_HEXADECIMAL_ERROR(ParseUint64Handler, "-0x8000_0000_0000_0001", kParseErrorValueInvalid, 22u);  // unrepresentable as signed long
+    TEST_HEXADECIMAL_ERROR(ParseUint64Handler, "0x1_0000_0000_0000_0000", kParseErrorNumberTooBig, 23u); // too big
+
+# undef TEST_HEXADECIMAL_ERROR
 }
 
 template<bool fullPrecision>

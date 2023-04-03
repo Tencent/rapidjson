@@ -70,7 +70,7 @@ TEST(JsonChecker, Reader) {
     char filename[256];
 
     // jsonchecker/failXX.json
-    for (int i = 1; i <= 35; i++) {
+    for (int i = 1; i <= 37; i++) {
         if (i == 1) // fail1.json is valid in rapidjson, which has no limitation on type of root element (RFC 7159).
             continue;
         if (i == 18)    // fail18.json is valid in rapidjson, which has no limitation on depth of nesting.
@@ -87,7 +87,7 @@ TEST(JsonChecker, Reader) {
 
         // Test stack-based parsing.
         GenericDocument<UTF8<>, CrtAllocator> document; // Use Crt allocator to check exception-safety (no memory leak)
-        if (i >= 34 && i <= 35) {
+        if (i >= 34 && i <= 37) {
             document.Parse<kParseHexadecimalsFlag>(json);
         }
         else {
@@ -96,7 +96,7 @@ TEST(JsonChecker, Reader) {
         EXPECT_TRUE(document.HasParseError()) << filename;
 
         // Test iterative parsing.
-        if (i >= 34 && i <= 35) {
+        if (i >= 34 && i <= 37) {
           document.Parse<kParseIterativeFlag | kParseHexadecimalsFlag>(json);
         }
         else {
@@ -110,7 +110,7 @@ TEST(JsonChecker, Reader) {
         StringStream ss(json);
         NoOpHandler h;
         reader.IterativeParseInit();
-        if (i >= 34 && i <= 35) {
+        if (i >= 34 && i <= 37) {
             while (!reader.IterativeParseComplete()) {
                 if (!reader.IterativeParseNext<kParseDefaultFlags | kParseHexadecimalsFlag>(ss, h))
                     break;

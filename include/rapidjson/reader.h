@@ -1493,8 +1493,9 @@ private:
         // Parse hxadecimal
         if (RAPIDJSON_UNLIKELY(s.Peek() == '0')) {
             s.TakePush();
-            if (RAPIDJSON_UNLIKELY(kParseHexadecimalsFlag & parseFlags))  {
-                static int asciiHexToInt[] =
+            unsigned peekVal = s.Peek();
+            if (peekVal == 'x' || peekVal == 'X') {
+                static const signed char asciiHexToInt[] =
                 {
                   // ASCII
                   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -1502,7 +1503,7 @@ private:
                   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
                    0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, -1, -1, -1, -1, -1,
                   -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 16, // Ignore digit separator (_)
                   -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
                   -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
                   // 0x80-FF (Omit this if you don't need to check for non-ASCII)
@@ -1515,37 +1516,50 @@ private:
                   -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
                   -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
                 };
-                unsigned peekVal = s.Peek();
-                if (peekVal == 'x' || peekVal == 'X') {
+                if (kParseHexadecimalsFlag & parseFlags) {
                     s.TakePush();  // Or should "0x" be Consumed?
                     hex = true;
-                    use64bit = true;
                     int l_nPeeked = asciiHexToInt[static_cast<unsigned>(s.Peek())];
                     if (RAPIDJSON_UNLIKELY(l_nPeeked < 0)) {
                         // case "0x":
                         RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
                     }
+                    else if(RAPIDJSON_UNLIKELY(l_nPeeked == 16)) {
+                        // case "0x_"
+                        RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
+                    }
                     while (RAPIDJSON_LIKELY(l_nPeeked >= 0)) {
-                        int iDehexed = asciiHexToInt[static_cast<unsigned>(s.TakePush())];
+                        signed char iDehexed = asciiHexToInt[static_cast<unsigned>(s.TakePush())];
                         l_nPeeked = asciiHexToInt[static_cast<unsigned>(s.Peek())];
-                        if (RAPIDJSON_LIKELY(!use64bit)) {
-                            if (RAPIDJSON_LIKELY(i & 0xF0000000)) {
-                                use64bit = true;
-                                i64 = i;
-                                i64 = (i64 << 4) + iDehexed;
-                            }
-                            else {
-                                i = (i << 4) + iDehexed;
-                            }
+                        if (iDehexed == 16) continue;
+                        if (RAPIDJSON_UNLIKELY(i & 0xF0000000)) {
+                            use64bit = true;
+                            i64 = i;
+                            i64 = (i64 << 4) + iDehexed;
+                            break;
                         }
                         else {
-                            if (RAPIDJSON_UNLIKELY(i64 & 0XF000000000000000)) {
-                                RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
-                            }
-                            else {
-                                i64 = (i64 << 4) + iDehexed;
-                            }
+                            i = (i << 4) + iDehexed;
                         }
+                    }
+                    while (RAPIDJSON_LIKELY(l_nPeeked >= 0)) {
+                        signed char iDehexed = asciiHexToInt[static_cast<unsigned>(s.TakePush())];
+                        l_nPeeked = asciiHexToInt[static_cast<unsigned>(s.Peek())];
+                        if (iDehexed == 16) continue;  // Skip underscore digit separator
+                        if (RAPIDJSON_UNLIKELY(i64 & RAPIDJSON_UINT64_C2(0xF0000000, 0))) {
+                            RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, s.Tell());
+                            break;
+                        }
+                        else {
+                            i64 = (i64 << 4) + iDehexed;
+                        }
+                    }
+                    if (RAPIDJSON_UNLIKELY(minus && !use64bit && (i & 0x80000000))) {
+                        use64bit = true;
+                        i64 = i;
+                    }
+                    if (RAPIDJSON_UNLIKELY(minus && use64bit && (i64 & RAPIDJSON_UINT64_C2(0x80000000, 0)))) {
+                        RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
                     }
                 }
                 else RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
@@ -1648,6 +1662,9 @@ private:
         int expFrac = 0;
         size_t decimalPosition;
         if (Consume(s, '.')) {
+            if (RAPIDJSON_UNLIKELY(hex)) {
+                RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
+            }
             decimalPosition = s.Length();
 
             if (RAPIDJSON_UNLIKELY(!(s.Peek() >= '0' && s.Peek() <= '9')))
@@ -1694,7 +1711,7 @@ private:
 
         // Parse exp = e [ minus / plus ] 1*DIGIT
         int exp = 0;
-        if (Consume(s, 'e') || Consume(s, 'E')) {
+        if ((Consume(s, 'e') || Consume(s, 'E')) && RAPIDJSON_LIKELY(!hex)) {
             if (!useDouble) {
                 d = static_cast<double>(use64bit ? i64 : i);
                 useDouble = true;

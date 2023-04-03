@@ -2,8 +2,13 @@
     0x0,
     0x0000000000000000,
     0x00000000000000000,
-    0x00001000,
-    0XABCdef123,
-    0xfFfFfFfFfFfFfFfF,
-    0x0000fFfFfFfFfFfFfFfF
+    0x0000_1000,
+    0XA_BCde_f123,
+    0xfFfF_fFfF_fFfF_fFfF,
+    0x0000_fFfF_fFfF_fFfF_fFfF,
+    -0x0,
+    -0x1,
+    -0x8000_0000,
+    -0x7fff_ffff_ffff_ffff,
+    -0x00_7fff_ffff_ffff_ffff
 ]
