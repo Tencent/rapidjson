@@ -1484,47 +1484,46 @@ private:
         // Parse minus
         bool minus = Consume(s, '-');
 
-        // Parse int: zero / hexadecimal / ( digit1-9 *DIGIT )
+        // Parse int: ( digit1-9 *DIGIT ) / hexadecimal
         unsigned i = 0;
         uint64_t i64 = 0;
         bool use64bit = false;
-        bool hex = false;
         int significandDigit = 0;
-        // Parse hxadecimal
+        bool cont = true;
+        // Parse hexadecimal
         if (RAPIDJSON_UNLIKELY(s.Peek() == '0')) {
             s.TakePush();
-            unsigned peekVal = s.Peek();
-            if (peekVal == 'x' || peekVal == 'X') {
-                static const signed char asciiHexToInt[] =
-                {
-                  // ASCII
-                  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                   0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, -1, -1, -1, -1, -1,
-                  -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 16, // Ignore digit separator (_)
-                  -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-                  // 0x80-FF (Omit this if you don't need to check for non-ASCII)
-                  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-                  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-                  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-                  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-                  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-                  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-                  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-                  -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
-                };
-                if (kParseHexadecimalsFlag & parseFlags) {
-                    s.TakePush();  // Or should "0x" be Consumed?
-                    hex = true;
+            if (kParseHexadecimalsFlag & parseFlags) {
+                unsigned peekVal = s.Peek();
+                if (peekVal == 'x' || peekVal == 'X') {
+                    static const signed char asciiHexToInt[] =
+                    {
+                        // ASCII
+                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                         0,  1,  2,  3,  4,  5,  6,  7,  8,  9, -1, -1, -1, -1, -1, -1,
+                        -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 16, // Ignore digit separator (_)
+                        -1, 10, 11, 12, 13, 14, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                        // 0x80-FF (Omit this if you don't need to check for non-ASCII)
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                        -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2,
+                    };
+                    s.TakePush();
                     int l_nPeeked = asciiHexToInt[static_cast<unsigned>(s.Peek())];
                     if (RAPIDJSON_UNLIKELY(l_nPeeked < 0)) {
                         // case "0x":
                         RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
                     }
-                    else if(RAPIDJSON_UNLIKELY(l_nPeeked == 16)) {
+                    else if (RAPIDJSON_UNLIKELY(l_nPeeked == 16)) {
                         // case "0x_"
                         RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
                     }
@@ -1561,12 +1560,8 @@ private:
                     if (RAPIDJSON_UNLIKELY(minus && use64bit && (i64 & RAPIDJSON_UINT64_C2(0x80000000, 0)))) {
                         RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
                     }
+                    goto Hexadecimal_label;
                 }
-                else RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
-            }
-            // Parse base10 zero
-            else {
-                i = 0;
             }
         }
         else if (RAPIDJSON_LIKELY(s.Peek() >= '1' && s.Peek() <= '9')) {
@@ -1626,7 +1621,7 @@ private:
 
         // Parse 64bit int
         bool useDouble = false;
-        if (use64bit && !hex) {
+        if (use64bit) {
             if (minus)
                 while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
                      if (RAPIDJSON_UNLIKELY(i64 >= RAPIDJSON_UINT64_C2(0x0CCCCCCC, 0xCCCCCCCC))) // 2^63 = 9223372036854775808
@@ -1662,9 +1657,6 @@ private:
         int expFrac = 0;
         size_t decimalPosition;
         if (Consume(s, '.')) {
-            if (RAPIDJSON_UNLIKELY(hex)) {
-                RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
-            }
             decimalPosition = s.Length();
 
             if (RAPIDJSON_UNLIKELY(!(s.Peek() >= '0' && s.Peek() <= '9')))
@@ -1711,7 +1703,7 @@ private:
 
         // Parse exp = e [ minus / plus ] 1*DIGIT
         int exp = 0;
-        if ((Consume(s, 'e') || Consume(s, 'E')) && RAPIDJSON_LIKELY(!hex)) {
+        if ((Consume(s, 'e') || Consume(s, 'E'))) {
             if (!useDouble) {
                 d = static_cast<double>(use64bit ? i64 : i);
                 useDouble = true;
@@ -1760,9 +1752,9 @@ private:
         }
 
         // Finish parsing, call event according to the type of number.
-        bool cont = true;
+        // bool cont = true;  // moved, as goto after hexadecimal parsing would skip initialization of this value.
 
-        if (parseFlags & kParseNumbersAsStringsFlag && !hex) {
+        if (parseFlags & kParseNumbersAsStringsFlag) {
             if (parseFlags & kParseInsituFlag) {
                 s.Pop();  // Pop stack no matter if it will be used or not.
                 typename InputStream::Ch* head = is.PutBegin();
@@ -1809,6 +1801,7 @@ private:
                cont = handler.Double(d);
            }
            else {
+               Hexadecimal_label:  // Goto point after hexadecimal parsing
                if (use64bit) {
                    if (minus)
                        cont = handler.Int64(static_cast<int64_t>(~i64 + 1));

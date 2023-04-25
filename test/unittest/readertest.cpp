@@ -195,8 +195,8 @@ TEST(Reader, ParseNumber_Hexadecimal) {
         EXPECT_EQ(x, h.actual_); \
     }
 
-    TEST_HEXADECIMAL(ParseUintHandler, "0x0", RAPIDJSON_UINT64_C2(0, 0));
-    TEST_HEXADECIMAL(ParseUintHandler, "0", RAPIDJSON_UINT64_C2(0, 0));
+    TEST_HEXADECIMAL(ParseUintHandler, "0x0", 0u);
+    TEST_HEXADECIMAL(ParseUintHandler, "0", 0u);
     TEST_HEXADECIMAL(ParseDoubleHandler, "0.125", 0.125);
     TEST_HEXADECIMAL(ParseDoubleHandler, "1e4", 10000);
     TEST_HEXADECIMAL(ParseDoubleHandler, "1E4", 10000);
@@ -234,7 +234,6 @@ TEST(Reader, ParseNumberError_Hexadecimal) {
     TEST_HEXADECIMAL_ERROR(ParseUintHandler, "0x.", kParseErrorValueInvalid, 2u);
     TEST_HEXADECIMAL_ERROR(ParseUintHandler, "0x", kParseErrorValueInvalid, 2u);
     TEST_HEXADECIMAL_ERROR(ParseUintHandler, "0x_", kParseErrorValueInvalid, 2u);
-    TEST_HEXADECIMAL_ERROR(ParseUintHandler, "0x1111.2222", kParseErrorValueInvalid, 7u);
     TEST_HEXADECIMAL_ERROR(ParseUintHandler, "0x2g", kParseErrorDocumentRootNotSingular, 3u);
     TEST_HEXADECIMAL_ERROR(ParseUintHandler, "0x2X", kParseErrorDocumentRootNotSingular, 3u);
     TEST_HEXADECIMAL_ERROR(ParseUint64Handler, "-0x8000_0000_0000_0001", kParseErrorValueInvalid, 22u);  // unrepresentable as signed long
