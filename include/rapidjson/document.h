@@ -749,7 +749,7 @@ public:
                 GenericValue* le = reinterpret_cast<GenericValue*>(allocator.Malloc(count * sizeof(GenericValue)));
                 const GenericValue<Encoding,SourceAllocator>* re = rhs.GetElementsPointer();
                 for (SizeType i = 0; i < count; i++)
-                    new (&le[i]) GenericValue(re[i], allocator, copyConstStrings);
+                    new (&le[i]) GenericValue(re[i], allocator, copyConstStrings); // NOLINT(clang-analyzer-cplusplus.PlacementNew)
                 data_.f.flags = kArrayFlag;
                 data_.a.size = data_.a.capacity = count;
                 SetElementsPointer(le);
