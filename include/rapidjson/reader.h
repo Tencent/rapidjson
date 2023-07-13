@@ -1523,7 +1523,7 @@ private:
                         }
                     }
 					i64 = i * 10LL + static_cast<unsigned>(s.TakePush() - '0');
-					if (RAPIDJSON_UNLIKELY(i64 >= 214748364)) {
+					if (RAPIDJSON_UNLIKELY(i64 >= 429496729)) {
 						use64bit = true;
 						break;
 					}
