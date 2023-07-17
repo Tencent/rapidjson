@@ -211,14 +211,9 @@ install(DIRECTORY example/
 # Provide config and version files to be used by other applications
 # ===============================
 
-################################################################################
-# Export package for use from the build tree
-EXPORT( PACKAGE ${PROJECT_NAME} )
-
 # Create the RapidJSONConfig.cmake file for other cmake projects.
 # ... for the build tree
 SET( CONFIG_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-SET( CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR})
 SET( ${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_SOURCE_DIR}/include" )
 
 CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
@@ -234,7 +229,6 @@ FILE( RELATIVE_PATH REL_INCLUDE_DIR
 
 SET( ${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_CMAKE_DIR}/${REL_INCLUDE_DIR}" )
 SET( CONFIG_SOURCE_DIR )
-SET( CONFIG_DIR )
 CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake @ONLY )
 

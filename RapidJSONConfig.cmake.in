@@ -7,19 +7,20 @@ cmake_minimum_required(VERSION 3.0)
 set( RapidJSON_SOURCE_DIR "@CONFIG_SOURCE_DIR@")
 
 ################################################################################
-# RapidJSON build dir
-set( RapidJSON_DIR "@CONFIG_DIR@")
-
-################################################################################
 # Compute paths
 get_filename_component(RapidJSON_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
 set( RapidJSON_INCLUDE_DIR  "@RapidJSON_INCLUDE_DIR@" )
 set( RapidJSON_INCLUDE_DIRS  "@RapidJSON_INCLUDE_DIR@" )
-message(STATUS "RapidJSON found. Headers: ${RapidJSON_INCLUDE_DIRS}")
+if (NOT RapidJSON_FIND_QUIETLY)
+  message(STATUS "RapidJSON found. Headers: ${RapidJSON_INCLUDE_DIRS}")
+endif ()
 
-if(NOT TARGET rapidjson)
-  add_library(rapidjson INTERFACE IMPORTED)
-  set_property(TARGET rapidjson PROPERTY
-    INTERFACE_INCLUDE_DIRECTORIES ${RapidJSON_INCLUDE_DIRS})
+unset(RapidJSON_SOURCE_DIR)
+unset(RapidJSON_CMAKE_DIR)
+
+if(NOT TARGET RapidJSON::RapidJSON)
+  add_library(RapidJSON::RapidJSON INTERFACE IMPORTED)
+  set_property(TARGET RapidJSON::RapidJSON PROPERTY
+    INTERFACE_INCLUDE_DIRECTORIES "${RapidJSON_INCLUDE_DIRS}")
 endif()
