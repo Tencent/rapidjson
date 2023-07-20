@@ -14,7 +14,7 @@
 
 3. RapidJSON 与 RapidXML 相似么？
 
-   RapidJSON 借镜了 RapidXML 的一些设计, 包括原位（*in situ*）解析、只有头文件的库。但两者的 API 是完全不同的。此外 RapidJSON 也提供许多 RapidXML 没有的特点。
+   RapidJSON 借鉴了 RapidXML 的一些设计, 包括原位（*in situ*）解析、只有头文件的库。但两者的 API 是完全不同的。此外 RapidJSON 也提供许多 RapidXML 没有的特点。
 
 4. RapidJSON 是免费的么？
 
