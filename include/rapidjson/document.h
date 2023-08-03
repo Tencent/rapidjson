@@ -413,9 +413,6 @@ struct GenericStringRef {
 
     GenericStringRef(const GenericStringRef& rhs) : s(rhs.s), length(rhs.length) {}
 
-    //! implicit conversion to plain CharType pointer
-    operator const Ch *() const { return s; }
-
     const Ch* const s; //!< plain CharType pointer
     const SizeType length; //!< length of the string (excluding the trailing NULL terminator)
 
@@ -2434,7 +2431,7 @@ private:
     //! Initialize this value as constant string, without calling destructor.
     void SetStringRaw(StringRefType s) RAPIDJSON_NOEXCEPT {
         data_.f.flags = kConstStringFlag;
-        SetStringPointer(s);
+        SetStringPointer(s.s);
         data_.s.length = s.length;
     }
 
@@ -2451,7 +2448,7 @@ private:
             str = static_cast<Ch *>(allocator.Malloc((s.length + 1) * sizeof(Ch)));
             SetStringPointer(str);
         }
-        std::memcpy(str, s, s.length * sizeof(Ch));
+        std::memcpy(str, s.s, s.length * sizeof(Ch));
         str[s.length] = '\0';
     }
 
