@@ -179,8 +179,6 @@ RAPIDJSON_MULTILINEMACRO_END
 #endif
 
 //! Combination of validate flags
-/*! \see
- */
 enum ValidateFlag {
     kValidateNoFlags = 0,                                       //!< No flags are set.
     kValidateContinueOnErrorFlag = 1,                           //!< Don't stop after first validation error.
