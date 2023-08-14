@@ -1649,10 +1649,11 @@ TEST(Value, BigNestedObject) {
     MemoryPoolAllocator<> allocator;
     Value x(kObjectType);
     static const SizeType n = 200;
+    const char* format = std::numeric_limits<SizeType>::is_signed ? "%d" : "%u";
 
     for (SizeType i = 0; i < n; i++) {
         char name1[10];
-        sprintf(name1, "%d", i);
+        sprintf(name1, format, i);
 
         // Value name(name1); // should not compile
         Value name(name1, static_cast<SizeType>(strlen(name1)), allocator);
@@ -1660,7 +1661,7 @@ TEST(Value, BigNestedObject) {
 
         for (SizeType j = 0; j < n; j++) {
             char name2[10];
-            sprintf(name2, "%d", j);
+            sprintf(name2, format, j);
 
             Value name3(name2, static_cast<SizeType>(strlen(name2)), allocator);
             Value number(static_cast<int>(i * n + j));
@@ -1673,11 +1674,11 @@ TEST(Value, BigNestedObject) {
 
     for (SizeType i = 0; i < n; i++) {
         char name1[10];
-        sprintf(name1, "%d", i);
+        sprintf(name1, format, i);
 
         for (SizeType j = 0; j < n; j++) {
             char name2[10];
-            sprintf(name2, "%d", j);
+            sprintf(name2, format, j);
             x[name1];
             EXPECT_EQ(static_cast<int>(i * n + j), x[name1][name2].GetInt());
         }
