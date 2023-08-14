@@ -303,7 +303,7 @@ TEST(Pointer, Parse_URIFragment) {
     }
 
     {
-        // Decode UTF-8 perecent encoding to UTF-8
+        // Decode UTF-8 percent encoding to UTF-8
         Pointer p("#/%C2%A2");
         EXPECT_TRUE(p.IsValid());
         EXPECT_EQ(1u, p.GetTokenCount());
@@ -311,7 +311,7 @@ TEST(Pointer, Parse_URIFragment) {
     }
 
     {
-        // Decode UTF-8 perecent encoding to UTF-16
+        // Decode UTF-8 percent encoding to UTF-16
         GenericPointer<GenericValue<UTF16<> > > p(L"#/%C2%A2");
         EXPECT_TRUE(p.IsValid());
         EXPECT_EQ(1u, p.GetTokenCount());
@@ -320,7 +320,7 @@ TEST(Pointer, Parse_URIFragment) {
     }
 
     {
-        // Decode UTF-8 perecent encoding to UTF-16
+        // Decode UTF-8 percent encoding to UTF-16
         GenericPointer<GenericValue<UTF16<> > > p(L"#/%E2%82%AC");
         EXPECT_TRUE(p.IsValid());
         EXPECT_EQ(1u, p.GetTokenCount());
@@ -475,7 +475,7 @@ TEST(Pointer, CopyConstructor) {
         EXPECT_EQ(1u, q.GetTokens()[1].length);
         EXPECT_STREQ("0", q.GetTokens()[1].name);
         EXPECT_EQ(0u, q.GetTokens()[1].index);
-        
+
         // Copied pointer needs to have its own allocator
         EXPECT_NE(&p.GetAllocator(), &q.GetAllocator());
     }

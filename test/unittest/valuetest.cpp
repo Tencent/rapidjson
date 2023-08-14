@@ -1060,7 +1060,7 @@ static void TestArray(T& x, Allocator& allocator) {
             x.Clear();
             for (unsigned i = 0; i < n; i++)
                 x.PushBack(Value(kArrayType).PushBack(i, allocator).Move(), allocator);
-            
+
             itr = x.Erase(x.Begin() + first, x.Begin() + last);
             if (last == n)
                 EXPECT_EQ(x.End(), itr);
@@ -1556,7 +1556,7 @@ TEST(Value, ObjectHelper) {
         EXPECT_STREQ("apple", y["a"].GetString());
         EXPECT_TRUE(x.IsObject());  // Invariant
     }
-    
+
     {
         Value x(kObjectType);
         x.AddMember("a", "apple", allocator);
@@ -1581,7 +1581,7 @@ TEST(Value, ObjectHelperRangeFor) {
     {
         int i = 0;
         for (auto& m : x.GetObject()) {
-            char name[10];
+            char name[11];
             sprintf(name, "%d", i);
             EXPECT_STREQ(name, m.name.GetString());
             EXPECT_EQ(i, m.value.GetInt());
@@ -1592,7 +1592,7 @@ TEST(Value, ObjectHelperRangeFor) {
     {
         int i = 0;
         for (const auto& m : const_cast<const Value&>(x).GetObject()) {
-            char name[10];
+            char name[11];
             sprintf(name, "%d", i);
             EXPECT_STREQ(name, m.name.GetString());
             EXPECT_EQ(i, m.value.GetInt());
@@ -1674,7 +1674,7 @@ TEST(Value, BigNestedObject) {
     for (SizeType i = 0; i < n; i++) {
         char name1[10];
         sprintf(name1, "%d", i);
-        
+
         for (SizeType j = 0; j < n; j++) {
             char name2[10];
             sprintf(name2, "%d", j);
@@ -1689,8 +1689,8 @@ TEST(Value, BigNestedObject) {
 TEST(Value, RemoveLastElement) {
     rapidjson::Document doc;
     rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
-    rapidjson::Value objVal(rapidjson::kObjectType);        
-    objVal.AddMember("var1", 123, allocator);       
+    rapidjson::Value objVal(rapidjson::kObjectType);
+    objVal.AddMember("var1", 123, allocator);
     objVal.AddMember("var2", "444", allocator);
     objVal.AddMember("var3", 555, allocator);
     EXPECT_TRUE(objVal.HasMember("var3"));
@@ -1712,22 +1712,22 @@ TEST(Document, CrtAllocator) {
 
 static void TestShortStringOptimization(const char* str) {
     const rapidjson::SizeType len = static_cast<rapidjson::SizeType>(strlen(str));
-	
+
     rapidjson::Document doc;
     rapidjson::Value val;
     val.SetString(str, len, doc.GetAllocator());
-	
-	EXPECT_EQ(val.GetStringLength(), len);
-	EXPECT_STREQ(val.GetString(), str);
+
+    EXPECT_EQ(val.GetStringLength(), len);
+    EXPECT_STREQ(val.GetString(), str);
 }
 
 TEST(Value, AllocateShortString) {
-	TestShortStringOptimization("");                 // edge case: empty string
-	TestShortStringOptimization("12345678");         // regular case for short strings: 8 chars
-	TestShortStringOptimization("12345678901");      // edge case: 11 chars in 32-bit mode (=> short string)
-	TestShortStringOptimization("123456789012");     // edge case: 12 chars in 32-bit mode (=> regular string)
-	TestShortStringOptimization("123456789012345");  // edge case: 15 chars in 64-bit mode (=> short string)
-	TestShortStringOptimization("1234567890123456"); // edge case: 16 chars in 64-bit mode (=> regular string)
+    TestShortStringOptimization("");                 // edge case: empty string
+    TestShortStringOptimization("12345678");         // regular case for short strings: 8 chars
+    TestShortStringOptimization("12345678901");      // edge case: 11 chars in 32-bit mode (=> short string)
+    TestShortStringOptimization("123456789012");     // edge case: 12 chars in 32-bit mode (=> regular string)
+    TestShortStringOptimization("123456789012345");  // edge case: 15 chars in 64-bit mode (=> short string)
+    TestShortStringOptimization("1234567890123456"); // edge case: 16 chars in 64-bit mode (=> regular string)
 }
 
 template <int e>
@@ -1802,7 +1802,7 @@ static void MergeDuplicateKey(Value& v, Value::AllocatorType& a) {
         // Convert all key:value into key:[value]
         for (Value::MemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr)
             itr->value = Value(kArrayType).Move().PushBack(itr->value, a);
-        
+
         // Merge arrays if key is duplicated
         for (Value::MemberIterator itr = v.MemberBegin(); itr != v.MemberEnd();) {
             Value::MemberIterator itr2 = v.FindMember(itr->name);

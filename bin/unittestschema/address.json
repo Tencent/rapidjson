@@ -97,11 +97,11 @@
     },
     "county_type": {
       "type": "string",
-      "enum": ["Sussex", "Surrey", "Kent"]
+      "enum": ["Sussex", "Surrey", "Kent", "Narnia"]
     },
     "province_type": {
       "type": "string",
-      "enum": ["Quebec", "BC", "Alberta"]
+      "enum": ["Quebec", "Narnia", "BC", "Alberta"]
     },
     "date_type": {
       "pattern": "^([0-9]([0-9]([0-9][1-9]|[1-9]0)|[1-9]00)|[1-9]000)(-(0[1-9]|1[0-2])(-(0[1-9]|[1-2][0-9]|3[0-1]))?)?$",
@@ -132,7 +132,6 @@
       "type": "string"
     },
     "url_type": {
-      "pattern": "^\\S*$",
       "type": "string"
     }
   }
