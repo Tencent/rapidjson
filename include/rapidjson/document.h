@@ -1937,6 +1937,16 @@ public:
         \note Requires the definition of the preprocessor symbol \ref RAPIDJSON_HAS_STDSTRING.
     */
     GenericValue& SetString(const std::basic_string<Ch>& s, Allocator& allocator) { return SetString(StringRef(s), allocator); }
+
+    std::basic_string<Ch> ToString() const {
+        return std::basic_string<Ch> {GetString(), GetStringLength()};
+    }
+#endif
+
+#if RAPIDJSON_HAS_STD_STRING_VIEW
+    std::basic_string_view<Ch> ToStringView() const {
+        return std::basic_string_view<Ch> {GetString(), GetStringLength()};
+    }
 #endif
 
     //@}

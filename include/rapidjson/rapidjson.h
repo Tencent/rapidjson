@@ -163,6 +163,31 @@
 #endif // RAPIDJSON_HAS_STDSTRING
 
 ///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_HAS_STD_STRING_VIEW
+
+#ifndef RAPIDJSON_HAS_STD_STRING_VIEW
+#ifdef RAPIDJSON_DOXYGEN_RUNNING
+#define RAPIDJSON_HAS_STD_STRING_VIEW 1 // force generation of documentation
+#else
+#define RAPIDJSON_HAS_STD_STRING_VIEW 0 // no std::string support by default
+#endif
+/*! \def RAPIDJSON_HAS_STD_STRING_VIEW
+    \ingroup RAPIDJSON_CONFIG
+    \brief Enable RapidJSON support for \c std::string_view
+
+    By defining this preprocessor symbol to \c 1, several convenience functions for using
+    \ref rapidjson::GenericValue with \c std::string_view are enabled, especially
+    for construction and comparison.
+
+    \hideinitializer
+*/
+#endif // !defined(RAPIDJSON_HAS_STD_STRING_VIEW)
+
+#if RAPIDJSON_HAS_STD_STRING_VIEW
+#include <string_view>
+#endif // RAPIDJSON_HAS_STD_STRING_VIEW
+
+///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_USE_MEMBERSMAP
 
 /*! \def RAPIDJSON_USE_MEMBERSMAP
