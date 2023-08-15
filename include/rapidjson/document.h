@@ -413,9 +413,6 @@ struct GenericStringRef {
 
     GenericStringRef(const GenericStringRef& rhs) : s(rhs.s), length(rhs.length) {}
 
-    //! implicit conversion to plain CharType pointer
-    operator const Ch *() const { return s; }
-
     const Ch* const s; //!< plain CharType pointer
     const SizeType length; //!< length of the string (excluding the trailing NULL terminator)
 
@@ -844,6 +841,9 @@ public:
 
     //! Constructor for copy-string (i.e. do make a copy of string)
     GenericValue(const Ch*s, Allocator& allocator) : data_() { SetStringRaw(StringRef(s), allocator); }
+
+    //! Constructor for copy-string (i.e. do make a copy of string)
+    GenericValue(StringRefType s, Allocator& allocator) : data_() { SetStringRaw(s, allocator); }
 
 #if RAPIDJSON_HAS_STDSTRING
     //! Constructor for copy-string from a string object (i.e. do make a copy of string)
@@ -1598,6 +1598,16 @@ public:
         RAPIDJSON_ASSERT(first <= last);
         RAPIDJSON_ASSERT(last <= MemberEnd());
         return DoEraseMembers(first, last);
+    }
+
+    //! Erase a member in object by its name.
+    /*! \param name Name of member to be removed.
+        \return Whether the member existed.
+        \note Linear time complexity.
+    */
+    bool EraseMember(StringRefType name) {
+        GenericValue n(name);
+        return EraseMember(n);
     }
 
     //! Erase a member in object by its name.
@@ -2434,7 +2444,7 @@ private:
     //! Initialize this value as constant string, without calling destructor.
     void SetStringRaw(StringRefType s) RAPIDJSON_NOEXCEPT {
         data_.f.flags = kConstStringFlag;
-        SetStringPointer(s);
+        SetStringPointer(s.s);
         data_.s.length = s.length;
     }
 
@@ -2451,7 +2461,7 @@ private:
             str = static_cast<Ch *>(allocator.Malloc((s.length + 1) * sizeof(Ch)));
             SetStringPointer(str);
         }
-        std::memcpy(str, s, s.length * sizeof(Ch));
+        std::memcpy(str, s.s, s.length * sizeof(Ch));
         str[s.length] = '\0';
     }
 

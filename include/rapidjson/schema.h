@@ -2558,7 +2558,7 @@ public:
     //  If reporting all errors, the stack will be empty, so return "errors".
     const Ch* GetInvalidSchemaKeyword() const {
         if (!schemaStack_.Empty()) return CurrentContext().invalidKeyword;
-        if (GetContinueOnErrors() && !error_.ObjectEmpty()) return (const Ch*)GetErrorsString();
+        if (GetContinueOnErrors() && !error_.ObjectEmpty()) return (const Ch*)GetErrorsString().s;
         return 0;
     }
 
