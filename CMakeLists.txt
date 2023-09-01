@@ -7,6 +7,11 @@ if(POLICY CMP0054)
   cmake_policy(SET CMP0054 NEW)
 endif()
 
+# MSVC runtime library flags
+if (POLICY CMP0091)
+  cmake_policy(SET CMP0091 NEW)
+endif()
+
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
 
 set(LIB_MAJOR_VERSION "1")
@@ -131,9 +136,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_definitions(-DNOMINMAX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
     # CMake >= 3.10 should handle the above CMAKE_CXX_STANDARD fine, otherwise use /std:c++XX with MSVC >= 19.10
-    if (RAPIDJSON_BUILD_CXX11 AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "19.10")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++11")
-    elseif (RAPIDJSON_BUILD_CXX17 AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "19.14")
+    if (RAPIDJSON_BUILD_CXX17 AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "19.14")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
     endif()
     # Always compile with /WX

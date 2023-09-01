@@ -24,6 +24,7 @@ Doxyfile
 Doxyfile.zh-cn
 DartConfiguration.tcl
 *.nupkg
+/.vs
 
 # Files created by OS
 *.DS_Store
