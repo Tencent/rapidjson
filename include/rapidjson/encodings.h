@@ -83,6 +83,10 @@ concept Encoding {
 \endcode
 */
 
+// Forward declaration.
+template<typename Stream>
+inline void PutUnsafe(Stream& stream, typename Stream::Ch c);
+
 ///////////////////////////////////////////////////////////////////////////////
 // UTF8
 
@@ -681,10 +685,6 @@ struct Transcoder {
         return Transcode(is, os);   // Since source/target encoding is different, must transcode.
     }
 };
-
-// Forward declaration.
-template<typename Stream>
-inline void PutUnsafe(Stream& stream, typename Stream::Ch c);
 
 //! Specialization of Transcoder with same source and target encoding.
 template<typename Encoding>
