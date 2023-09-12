@@ -231,7 +231,7 @@ TEST(Allocator, MemoryPoolAllocator) {
     {
         a.Clear();
         const size_t bufSize = 1024;
-        char *buffer = (char *)a.Malloc(bufSize);
+        char *buffer = static_cast<char *>(a.Malloc(bufSize));
         MemoryPoolAllocator<> aligned_a(buffer, bufSize);
         EXPECT_TRUE(aligned_a.Capacity() > 0 && aligned_a.Capacity() <= bufSize);
         EXPECT_EQ(aligned_a.Size(), 0u);
@@ -243,7 +243,7 @@ TEST(Allocator, MemoryPoolAllocator) {
     {
         a.Clear();
         const size_t bufSize = 1024;
-        char *buffer = (char *)a.Malloc(bufSize);
+        char *buffer = static_cast<char *>(a.Malloc(bufSize));
         RAPIDJSON_ASSERT(bufSize % sizeof(void*) == 0);
         MemoryPoolAllocator<> unaligned_a(buffer + 1, bufSize - 1);
         EXPECT_TRUE(unaligned_a.Capacity() > 0 && unaligned_a.Capacity() <= bufSize - sizeof(void*));
