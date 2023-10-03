@@ -1,0 +1,248 @@
+<!-- HTML header for doxygen 1.8.7-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.2"/>
+<title>RapidJSON: 特点</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="topbanner"><a href="https://github.com/Tencent/rapidjson" title="RapidJSON GitHub"><i class="githublogo"></i></a></div>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.svg"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.2 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search",'搜索','.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('md_doc_features_zh_cn.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div><div class="header">
+  <div class="headertitle"><div class="title">特点 </div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><h1><a class="anchor" id="autotoc_md31"></a>
+总体</h1>
+<ul>
+<li>跨平台<ul>
+<li>编译器：Visual Studio、gcc、clang 等</li>
+<li>架构：x86、x64、ARM 等</li>
+<li>操作系统：Windows、Mac OS X、Linux、iOS、Android 等</li>
+</ul>
+</li>
+<li>容易安装<ul>
+<li>只有头文件的库。只需把头文件复制至你的项目中。</li>
+</ul>
+</li>
+<li>独立、最小依赖<ul>
+<li>不需依赖 STL、BOOST 等。</li>
+<li>只包含 <code>&lt;cstdio&gt;</code>, <code>&lt;cstdlib&gt;</code>, <code>&lt;cstring&gt;</code>, <code>&lt;inttypes.h&gt;</code>, <code>&lt;new&gt;</code>, <code>&lt;stdint.h&gt;</code>。</li>
+</ul>
+</li>
+<li>没使用 C++ 异常、RTTI</li>
+<li>高性能<ul>
+<li>使用模版及内联函数去降低函数调用开销。</li>
+<li>内部经优化的 Grisu2 及浮点数解析实现。</li>
+<li>可选的 SSE2/SSE4.2 支持。</li>
+</ul>
+</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md32"></a>
+符合标准</h1>
+<ul>
+<li>RapidJSON 应完全符合 RFC4627/ECMA-404 标准。</li>
+<li>支持 JSON Pointer (RFC6901).</li>
+<li>支持 JSON Schema Draft v4.</li>
+<li>支持 Unicode 代理对（surrogate pair）。</li>
+<li>支持空字符（<code>"\u0000"</code>）。<ul>
+<li>例如，可以优雅地解析及处理 <code>["Hello\u0000World"]</code>。含读写字符串长度的 API。</li>
+</ul>
+</li>
+<li>支持可选的放宽语法<ul>
+<li>单行（<code>// ...</code>）及多行（<code>/* ... */</code>） 注释 (<code>kParseCommentsFlag</code>)。</li>
+<li>在对象和数组结束前含逗号 (<code>kParseTrailingCommasFlag</code>)。</li>
+<li><code>NaN</code>、<code>Inf</code>、<code>Infinity</code>、<code>-Inf</code> 及 <code>-Infinity</code> 作为 <code>double</code> 值 (<code>kParseNanAndInfFlag</code>)</li>
+</ul>
+</li>
+<li><a href="https://github.com/Tencent/rapidjson/blob/master/doc/npm.md">NPM 兼容</a>.</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md33"></a>
+Unicode</h1>
+<ul>
+<li>支持 UTF-8、UTF-16、UTF-32 编码，包括小端序和大端序。<ul>
+<li>这些编码用于输入输出流，以及内存中的表示。</li>
+</ul>
+</li>
+<li>支持从输入流自动检测编码。</li>
+<li>内部支持编码的转换。<ul>
+<li>例如，你可以读取一个 UTF-8 文件，让 RapidJSON 把 JSON 字符串转换至 UTF-16 的 DOM。</li>
+</ul>
+</li>
+<li>内部支持编码校验。<ul>
+<li>例如，你可以读取一个 UTF-8 文件，让 RapidJSON 检查是否所有 JSON 字符串是合法的 UTF-8 字节序列。</li>
+</ul>
+</li>
+<li>支持自定义的字符类型。<ul>
+<li>预设的字符类型是：UTF-8 为 <code>char</code>，UTF-16 为 <code>wchar_t</code>，UTF32 为 <code>uint32_t</code>。</li>
+</ul>
+</li>
+<li>支持自定义的编码。</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md34"></a>
+API 风格</h1>
+<ul>
+<li>SAX（Simple API for XML）风格 API<ul>
+<li>类似于 <a href="http://en.wikipedia.org/wiki/Simple_API_for_XML">SAX</a>, RapidJSON 提供一个事件循序访问的解析器 API（<code><a class="el" href="classrapidjson_1_1_generic_reader.html" title="SAX-style JSON parser. Use Reader for UTF8 encoding and default allocator.">rapidjson::GenericReader</a></code>）。RapidJSON 也提供一个生成器 API（<code><a class="el" href="classrapidjson_1_1_writer.html" title="JSON writer">rapidjson::Writer</a></code>），可以处理相同的事件集合。</li>
+</ul>
+</li>
+<li>DOM（Document Object Model）风格 API<ul>
+<li>类似于 HTML／XML 的 <a href="http://en.wikipedia.org/wiki/Document_Object_Model">DOM</a>，RapidJSON 可把 JSON 解析至一个 DOM 表示方式（<code><a class="el" href="classrapidjson_1_1_generic_document.html" title="A document for parsing JSON text as DOM.">rapidjson::GenericDocument</a></code>），以方便操作。如有需要，可把 DOM 转换（stringify）回 JSON。</li>
+<li>DOM 风格 API（<code><a class="el" href="classrapidjson_1_1_generic_document.html" title="A document for parsing JSON text as DOM.">rapidjson::GenericDocument</a></code>）实际上是由 SAX 风格 API（<code><a class="el" href="classrapidjson_1_1_generic_reader.html" title="SAX-style JSON parser. Use Reader for UTF8 encoding and default allocator.">rapidjson::GenericReader</a></code>）实现的。SAX 更快，但有时 DOM 更易用。用户可根据情况作出选择。</li>
+</ul>
+</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md35"></a>
+解析</h1>
+<ul>
+<li>递归式（预设）及迭代式解析器<ul>
+<li>递归式解析器较快，但在极端情况下可出现堆栈溢出。</li>
+<li>迭代式解析器使用自定义的堆栈去维持解析状态。</li>
+</ul>
+</li>
+<li>支持原位（*in situ*）解析。<ul>
+<li>把 JSON 字符串的值解析至原 JSON 之中，然后让 DOM 指向那些字符串。</li>
+<li>比常规分析更快：不需字符串的内存分配、不需复制（如字符串不含转义符）、缓存友好。</li>
+</ul>
+</li>
+<li>对于 JSON 数字类型，支持 32-bit/64-bit 的有号／无号整数，以及 <code>double</code>。</li>
+<li>错误处理<ul>
+<li>支持详尽的解析错误代号。</li>
+<li>支持本地化错误信息。</li>
+</ul>
+</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md36"></a>
+DOM (Document)</h1>
+<ul>
+<li>RapidJSON 在类型转换时会检查数值的范围。</li>
+<li>字符串字面量的优化<ul>
+<li>只储存指针，不作复制</li>
+</ul>
+</li>
+<li>优化“短”字符串<ul>
+<li>在 <code>Value</code> 内储存短字符串，无需额外分配。</li>
+<li>对 UTF-8 字符串来说，32 位架构下可存储最多 11 字符，64 位下 21 字符（x86-64 下 13 字符）。</li>
+</ul>
+</li>
+<li>可选地支持 <code>std::string</code>（定义 <code>RAPIDJSON_HAS_STDSTRING=1</code>）</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md37"></a>
+生成</h1>
+<ul>
+<li>支持 <code><a class="el" href="classrapidjson_1_1_pretty_writer.html" title="Writer with indentation and spacing.">rapidjson::PrettyWriter</a></code> 去加入换行及缩进。</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md38"></a>
+输入输出流</h1>
+<ul>
+<li>支持 <code><a class="el" href="classrapidjson_1_1_generic_string_buffer.html" title="Represents an in-memory output stream.">rapidjson::GenericStringBuffer</a></code>，把输出的 JSON 储存于字符串内。</li>
+<li>支持 <code><a class="el" href="classrapidjson_1_1_file_read_stream.html" title="File byte stream for input using fread().">rapidjson::FileReadStream</a></code> 及 <code><a class="el" href="classrapidjson_1_1_file_write_stream.html" title="Wrapper of C file stream for output using fwrite().">rapidjson::FileWriteStream</a></code>，使用 <code>FILE</code> 对象作输入输出。</li>
+<li>支持自定义输入输出流。</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md39"></a>
+内存</h1>
+<ul>
+<li>最小化 DOM 的内存开销。<ul>
+<li>对大部分 32／64 位机器而言，每个 JSON 值只占 16 或 20 字节（不包含字符串）。</li>
+</ul>
+</li>
+<li>支持快速的预设分配器。<ul>
+<li>它是一个堆栈形式的分配器（顺序分配，不容许单独释放，适合解析过程之用）。</li>
+<li>使用者也可提供一个预分配的缓冲区。（有可能达至无需 CRT 分配就能解析多个 JSON）</li>
+</ul>
+</li>
+<li>支持标准 CRT（C-runtime）分配器。</li>
+<li>支持自定义分配器。</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md40"></a>
+其他</h1>
+<ul>
+<li>一些 C++11 的支持（可选）<ul>
+<li>右值引用（rvalue reference）</li>
+<li><code>noexcept</code> 修饰符</li>
+<li>范围 for 循环 </li>
+</ul>
+</li>
+</ul>
+</div></div><!-- contents -->
+</div><!-- PageDoc -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.8.7-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+  </ul>
+</div>
+</body>
+</html>

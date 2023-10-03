@@ -1,0 +1,237 @@
+<!-- HTML header for doxygen 1.8.7-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.2"/>
+<title>RapidJSON: RapidJSON</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="topbanner"><a href="https://github.com/Tencent/rapidjson" title="RapidJSON GitHub"><i class="githublogo"></i></a></div>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.svg"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.2 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search",'搜索','.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('index.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div><div class="header">
+  <div class="headertitle"><div class="title">RapidJSON </div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><p ><a class="anchor" id="md_readme_zh_cn"></a> <img src="rapidjson.png" alt="" class="inline" title="RapidJSON logo"/></p>
+<p ><img src="https://img.shields.io/badge/release-v1.1.0-blue.svg" alt="Release version" style="pointer-events: none;" class="inline"/></p>
+<h2><a class="anchor" id="autotoc_md23"></a>
+高效的 C++ JSON 解析／生成器，提供 SAX 及 DOM 风格 API</h2>
+<p >Tencent is pleased to support the open source community by making RapidJSON available.</p>
+<p >Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.</p>
+<ul>
+<li><a href="https://github.com/Tencent/rapidjson/">RapidJSON GitHub</a></li>
+<li>RapidJSON 文档<ul>
+<li><a href="http://rapidjson.org/">English</a></li>
+<li><a href="http://rapidjson.org/zh-cn/">简体中文</a></li>
+<li><a href="https://www.gitbook.com/book/miloyip/rapidjson/details/zh-cn">GitBook</a> 可下载 PDF/EPUB/MOBI，但不含 API 参考手册。</li>
+</ul>
+</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md24"></a>
+Build 状态</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadCenter"><a href="https://travis-ci.org/Tencent/rapidjson" title="Travis build status">Linux</a>   </th><th class="markdownTableHeadCenter"><a href="https://ci.appveyor.com/project/miloyip/rapidjson-0fdqj/branch/master" title="AppVeyor build status">Windows</a>   </th><th class="markdownTableHeadCenter"><a href="https://coveralls.io/r/Tencent/rapidjson?branch=master" title="Coveralls coverage">Coveralls</a>    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyCenter"><img src="https://travis-ci.org/Tencent/rapidjson.svg?branch=master" alt="lin-badge" style="pointer-events: none;" title="Travis build status" class="inline"/>   </td><td class="markdownTableBodyCenter"><img src="https://ci.appveyor.com/api/projects/status/l6qulgqahcayidrf/branch/master?svg=true" alt="win-badge" title="AppVeyor build status" class="inline"/>   </td><td class="markdownTableBodyCenter"><img src="https://coveralls.io/repos/Tencent/rapidjson/badge.svg?branch=master" alt="cov-badge" style="pointer-events: none;" title="Coveralls coverage" class="inline"/>   </td></tr>
+</table>
+<h2><a class="anchor" id="autotoc_md25"></a>
+简介</h2>
+<p >RapidJSON 是一个 C++ 的 JSON 解析器及生成器。它的灵感来自 <a href="http://rapidxml.sourceforge.net/">RapidXml</a>。</p>
+<ul>
+<li>RapidJSON 小而全。它同时支持 SAX 和 DOM 风格的 API。SAX 解析器只有约 500 行代码。</li>
+<li>RapidJSON 快。它的性能可与 <code>strlen()</code> 相比。可支持 SSE2/SSE4.2 加速。</li>
+<li>RapidJSON 独立。它不依赖于 BOOST 等外部库。它甚至不依赖于 STL。</li>
+<li>RapidJSON 对内存友好。在大部分 32/64 位机器上，每个 JSON 值只占 16 字节（除字符串外）。它预设使用一个快速的内存分配器，令分析器可以紧凑地分配内存。</li>
+<li>RapidJSON 对 Unicode 友好。它支持 UTF-8、UTF-16、UTF-32 (大端序／小端序)，并内部支持这些编码的检测、校验及转码。例如，RapidJSON 可以在分析一个 UTF-8 文件至 DOM 时，把当中的 JSON 字符串转码至 UTF-16。它也支持代理对（surrogate pair）及 <code>"\u0000"</code>（空字符）。</li>
+</ul>
+<p >在 <a class="el" href="md_doc_features_zh_cn.html">这里</a> 可读取更多特点。</p>
+<p >JSON（JavaScript Object Notation）是一个轻量的数据交换格式。RapidJSON 应该完全遵从 RFC7159/ECMA-404，并支持可选的放宽语法。 关于 JSON 的更多信息可参考：</p><ul>
+<li><a href="http://json.org/">Introducing JSON</a></li>
+<li><a href="https://tools.ietf.org/html/rfc7159">RFC7159: The JavaScript Object Notation (JSON) Data Interchange Format</a></li>
+<li><a href="https://www.ecma-international.org/publications/standards/Ecma-404.htm">Standard ECMA-404: The JSON Data Interchange Format</a></li>
+</ul>
+<h2><a class="anchor" id="autotoc_md26"></a>
+v1.1 中的亮点 (2016-8-25)</h2>
+<ul>
+<li>加入 <a class="el" href="md_doc_pointer_zh_cn.html">JSON Pointer</a> 功能，可更简单地访问及更改 DOM。</li>
+<li>加入 <a class="el" href="md_doc_schema_zh_cn.html">JSON Schema</a> 功能，可在解析或生成 JSON 时进行校验。</li>
+<li>加入 <a class="el" href="md_doc_dom_zh_cn.html">放宽的 JSON 语法</a> （注释、尾随逗号、NaN/Infinity）</li>
+<li>使用 <a class="el" href="md_doc_tutorial_zh_cn.html">C++11 范围 for 循环</a> 去遍历 array 和 object。</li>
+<li>在 x86-64 架构下，缩减每个 <code>Value</code> 的内存开销从 24 字节至 16 字节。</li>
+</ul>
+<p >其他改动请参考 <a class="el" href="md__c_h_a_n_g_e_l_o_g.html">change log</a>.</p>
+<h2><a class="anchor" id="autotoc_md27"></a>
+兼容性</h2>
+<p >RapidJSON 是跨平台的。以下是一些曾测试的平台／编译器组合：</p><ul>
+<li>Visual C++ 2008/2010/2013 在 Windows (32/64-bit)</li>
+<li>GNU C++ 3.8.x 在 Cygwin</li>
+<li>Clang 3.4 在 Mac OS X (32/64-bit) 及 iOS</li>
+<li>Clang 3.4 在 Android NDK</li>
+</ul>
+<p >用户也可以在他们的平台上生成及执行单元测试。</p>
+<h2><a class="anchor" id="autotoc_md28"></a>
+安装</h2>
+<p >RapidJSON 是只有头文件的 C++ 库。只需把 <code>include/rapidjson</code> 目录复制至系统或项目的 include 目录中。</p>
+<p >RapidJSON 依赖于以下软件：</p><ul>
+<li><a href="https://cmake.org/">CMake</a> 作为通用生成工具</li>
+<li>(optional) <a href="http://www.doxygen.org">Doxygen</a> 用于生成文档</li>
+<li>(optional) <a href="https://github.com/google/googletest">googletest</a> 用于单元及性能测试</li>
+</ul>
+<p >生成测试及例子的步骤：</p>
+<ol type="1">
+<li>执行 <code>git submodule update --init</code> 去获取 thirdparty submodules (google test)。</li>
+<li>在 rapidjson 目录下，建立一个 <code>build</code> 目录。</li>
+<li>在 <code>build</code> 目录下执行 <code>cmake ..</code> 命令以设置生成。Windows 用户可使用 cmake-gui 应用程序。</li>
+<li>在 Windows 下，编译生成在 build 目录中的 solution。在 Linux 下，于 build 目录运行 <code>make</code>。</li>
+</ol>
+<p >成功生成后，你会在 <code>bin</code> 的目录下找到编译后的测试及例子可执行文件。而生成的文档将位于 build 下的 <code>doc/html</code> 目录。要执行测试，请在 build 下执行 <code>make test</code> 或 <code>ctest</code>。使用 <code>ctest -V</code> 命令可获取详细的输出。</p>
+<p >我们也可以把程序库安装至全系统中，只要在具管理权限下从 build 目录执行 <code>make install</code> 命令。这样会按系统的偏好设置安装所有文件。当安装 RapidJSON 后，其他的 CMake 项目需要使用它时，可以通过在 <code>CMakeLists.txt</code> 加入一句 <code>find_package(RapidJSON)</code>。</p>
+<h2><a class="anchor" id="autotoc_md29"></a>
+用法一览</h2>
+<p >此简单例子解析一个 JSON 字符串至一个 document (DOM)，对 DOM 作出简单修改，最终把 DOM 转换（stringify）至 JSON 字符串。</p>
+<div class="fragment"><div class="line"><span class="comment">// rapidjson/example/simpledom/simpledom.cpp`</span></div>
+<div class="line"><span class="preprocessor">#include &quot;<a class="code" href="document_8h.html">rapidjson/document.h</a>&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;rapidjson/writer.h&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &quot;rapidjson/stringbuffer.h&quot;</span></div>
+<div class="line"><span class="preprocessor">#include &lt;iostream&gt;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">using namespace </span><a class="code hl_namespace" href="namespacerapidjson.html">rapidjson</a>;</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">int</span> main() {</div>
+<div class="line">    <span class="comment">// 1. 把 JSON 解析至 DOM。</span></div>
+<div class="line">    <span class="keyword">const</span> <span class="keywordtype">char</span>* json = <span class="stringliteral">&quot;{\&quot;project\&quot;:\&quot;rapidjson\&quot;,\&quot;stars\&quot;:10}&quot;</span>;</div>
+<div class="line">    <a class="code hl_typedef" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
+<div class="line">    d.Parse(json);</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// 2. 利用 DOM 作出修改。</span></div>
+<div class="line">    <a class="code hl_typedef" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>&amp; s = d[<span class="stringliteral">&quot;stars&quot;</span>];</div>
+<div class="line">    s.SetInt(s.GetInt() + 1);</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// 3. 把 DOM 转换（stringify）成 JSON。</span></div>
+<div class="line">    <a class="code hl_typedef" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> buffer;</div>
+<div class="line">    Writer&lt;StringBuffer&gt; writer(buffer);</div>
+<div class="line">    d.Accept(writer);</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// Output {&quot;project&quot;:&quot;rapidjson&quot;,&quot;stars&quot;:11}</span></div>
+<div class="line">    std::cout &lt;&lt; buffer.GetString() &lt;&lt; std::endl;</div>
+<div class="line">    <span class="keywordflow">return</span> 0;</div>
+<div class="line">}</div>
+<div class="ttc" id="adocument_8h_html"><div class="ttname"><a href="document_8h.html">document.h</a></div></div>
+<div class="ttc" id="anamespacerapidjson_html"><div class="ttname"><a href="namespacerapidjson.html">rapidjson</a></div><div class="ttdoc">main RapidJSON namespace</div><div class="ttdef"><b>Definition:</b> allocators.h:28</div></div>
+<div class="ttc" id="anamespacerapidjson_html_aa65fc9fb381b2cbc54f98673eadd6505"><div class="ttname"><a href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">rapidjson::Value</a></div><div class="ttdeci">GenericValue&lt; UTF8&lt;&gt; &gt; Value</div><div class="ttdoc">GenericValue with UTF8 encoding</div><div class="ttdef"><b>Definition:</b> document.h:2485</div></div>
+<div class="ttc" id="anamespacerapidjson_html_ac0765ea91f41539645c4b78689d03f21"><div class="ttname"><a href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">rapidjson::StringBuffer</a></div><div class="ttdeci">GenericStringBuffer&lt; UTF8&lt; char &gt;, CrtAllocator &gt; StringBuffer</div><div class="ttdoc">String buffer with UTF8 encoding</div><div class="ttdef"><b>Definition:</b> fwd.h:59</div></div>
+<div class="ttc" id="anamespacerapidjson_html_ace11b5b575baf1cccd5ba5f8586dcdc8"><div class="ttname"><a href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">rapidjson::Document</a></div><div class="ttdeci">GenericDocument&lt; UTF8&lt;&gt; &gt; Document</div><div class="ttdoc">GenericDocument with UTF8 encoding</div><div class="ttdef"><b>Definition:</b> document.h:2889</div></div>
+</div><!-- fragment --><p >注意此例子并没有处理潜在错误。</p>
+<p >下图展示执行过程。</p>
+<p ><img src="simpledom.png" alt="" class="inline" title="simpledom"/></p>
+<p >还有许多 <a href="https://github.com/Tencent/rapidjson/tree/master/example">例子</a> 可供参考：</p>
+<ul>
+<li>DOM API<ul>
+<li><a href="https://github.com/Tencent/rapidjson/blob/master/example/tutorial/tutorial.cpp">tutorial</a>: DOM API 的基本使用方法。</li>
+</ul>
+</li>
+<li>SAX API<ul>
+<li><a href="https://github.com/Tencent/rapidjson/blob/master/example/simplereader/simplereader.cpp">simplereader</a>: 使用 <code>Reader</code> 解析 JSON 时，打印所有 SAX 事件。</li>
+<li><a href="https://github.com/Tencent/rapidjson/blob/master/example/condense/condense.cpp">condense</a>: 移除 JSON 中所有空白符的命令行工具。</li>
+<li><a href="https://github.com/Tencent/rapidjson/blob/master/example/pretty/pretty.cpp">pretty</a>: 为 JSON 加入缩进与换行的命令行工具，当中使用了 <code>PrettyWriter</code>。</li>
+<li><a href="https://github.com/Tencent/rapidjson/blob/master/example/capitalize/capitalize.cpp">capitalize</a>: 把 JSON 中所有字符串改为大写的命令行工具。</li>
+<li><a href="https://github.com/Tencent/rapidjson/blob/master/example/messagereader/messagereader.cpp">messagereader</a>: 使用 SAX API 去解析一个 JSON 报文。</li>
+<li><a href="https://github.com/Tencent/rapidjson/blob/master/example/serialize/serialize.cpp">serialize</a>: 使用 SAX API 去序列化 C++ 对象，生成 JSON。</li>
+<li><a href="https://github.com/Tencent/rapidjson/blob/master/example/jsonx/jsonx.cpp">jsonx</a>: 实现了一个 <code>JsonxWriter</code>，它能把 SAX 事件写成 <a href="https://www-01.ibm.com/support/knowledgecenter/SS9H2Y_7.1.0/com.ibm.dp.doc/json_jsonx.html">JSONx</a>（一种 XML）格式。这个例子是把 JSON 输入转换成 JSONx 格式的命令行工具。</li>
+</ul>
+</li>
+<li>Schema API<ul>
+<li><a href="https://github.com/Tencent/rapidjson/blob/master/example/schemavalidator/schemavalidator.cpp">schemavalidator</a>: 使用 JSON Schema 去校验 JSON 的命令行工具。</li>
+</ul>
+</li>
+<li>进阶<ul>
+<li><a href="https://github.com/Tencent/rapidjson/blob/master/example/prettyauto/prettyauto.cpp">prettyauto</a>: <a href="https://github.com/Tencent/rapidjson/blob/master/example/pretty/pretty.cpp">pretty</a> 的修改版本，可自动处理任何 UTF 编码的 JSON。</li>
+<li><a href="https://github.com/Tencent/rapidjson/blob/master/example/parsebyparts/parsebyparts.cpp">parsebyparts</a>: 这例子中的 <code>AsyncDocumentParser</code> 类使用 C++ 线程来逐段解析 JSON。</li>
+<li><a href="https://github.com/Tencent/rapidjson/blob/master/example/filterkey/filterkey.cpp">filterkey</a>: 移取使用者指定的键值的命令行工具。</li>
+<li><a href="https://github.com/Tencent/rapidjson/blob/master/example/filterkey/filterkey.cpp">filterkeydom</a>: 如上的工具，但展示如何使用生成器（generator）去填充一个 <code>Document</code>。 </li>
+</ul>
+</li>
+</ul>
+</div></div><!-- PageDoc -->
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.8.7-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+  </ul>
+</div>
+</body>
+</html>

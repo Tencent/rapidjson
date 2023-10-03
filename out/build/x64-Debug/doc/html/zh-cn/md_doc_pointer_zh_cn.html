@@ -1,0 +1,294 @@
+<!-- HTML header for doxygen 1.8.7-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.2"/>
+<title>RapidJSON: Pointer</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="topbanner"><a href="https://github.com/Tencent/rapidjson" title="RapidJSON GitHub"><i class="githublogo"></i></a></div>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.svg"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.2 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search",'搜索','.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('md_doc_pointer_zh_cn.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div><div class="header">
+  <div class="headertitle"><div class="title">Pointer </div></div>
+</div><!--header-->
+<div class="contents">
+<div class="toc"><h3>目录</h3>
+<ul><li class="level1"><a href="#JsonPointer">JSON Pointer</a></li>
+<li class="level1"><a href="#BasicUsage">基本使用方法</a></li>
+<li class="level1"><a href="#HelperFunctions">辅助函数</a></li>
+<li class="level1"><a href="#ResolvingPointer">解析 Pointer</a><ul><li class="level2"><a href="#autotoc_md47">解析负号 token</a></li>
+<li class="level2"><a href="#autotoc_md48">解析 Document 及 Value</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#ErrorHandling">错误处理</a></li>
+<li class="level1"><a href="#URIFragment">URI 片段表示方式</a></li>
+<li class="level1"><a href="#autotoc_md49">字符串化</a></li>
+<li class="level1"><a href="#UserSuppliedTokens">使用者提供的 tokens</a></li>
+</ul>
+</div>
+<div class="textblock"><p >（本功能于 v1.1.0 发布）</p>
+<p >JSON Pointer 是一个标准化（<a href="https://tools.ietf.org/html/rfc6901">RFC6901</a>）的方式去选取一个 JSON Document（DOM）中的值。这类似于 XML 的 XPath。然而，JSON Pointer 简单得多，而且每个 JSON Pointer 仅指向单个值。</p>
+<p >使用 RapidJSON 的 JSON Pointer 实现能简化一些 DOM 的操作。</p>
+<h1><a class="anchor" id="JsonPointer"></a>
+JSON Pointer</h1>
+<p >一个 JSON Pointer 由一串（零至多个）token 所组成，每个 token 都有 <code>/</code> 前缀。每个 token 可以是一个字符串或数字。例如，给定一个 JSON： </p><div class="fragment"><div class="line">{</div>
+<div class="line">    &quot;foo&quot; : [&quot;bar&quot;, &quot;baz&quot;],</div>
+<div class="line">    &quot;pi&quot; : 3.1416</div>
+<div class="line">}</div>
+</div><!-- fragment --><p >以下的 JSON Pointer 解析为：</p>
+<ol type="1">
+<li><code>"/foo"</code> → <code>[ "bar", "baz" ]</code></li>
+<li><code>"/foo/0"</code> → <code>"bar"</code></li>
+<li><code>"/foo/1"</code> → <code>"baz"</code></li>
+<li><code>"/pi"</code> → <code>3.1416</code></li>
+</ol>
+<p >要注意，一个空 JSON Pointer <code>""</code> （零个 token）解析为整个 JSON。</p>
+<h1><a class="anchor" id="BasicUsage"></a>
+基本使用方法</h1>
+<p >以下的代码范例不解自明。</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/pointer.h&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// ...</span></div>
+<div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// 使用 Set() 创建 DOM</span></div>
+<div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a>(<span class="stringliteral">&quot;/project&quot;</span>).Set(d, <span class="stringliteral">&quot;RapidJSON&quot;</span>);</div>
+<div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a>(<span class="stringliteral">&quot;/stars&quot;</span>).Set(d, 10);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 10 }</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// 使用 Get() 访问 DOM。若该值不存在则返回 nullptr。</span></div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_typedef" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>* stars = <a class="code hl_typedef" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a>(<span class="stringliteral">&quot;/stars&quot;</span>).Get(d))</div>
+<div class="line">    stars-&gt;SetInt(stars-&gt;GetInt() + 1);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11 }</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Set() 和 Create() 自动生成父值（如果它们不存在）。</span></div>
+<div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a>(<span class="stringliteral">&quot;/a/b/0&quot;</span>).Create(d);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11, &quot;a&quot; : { &quot;b&quot; : [ null ] } }</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// GetWithDefault() 返回引用。若该值不存在则会深拷贝缺省值。</span></div>
+<div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>&amp; hello = <a class="code hl_typedef" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a>(<span class="stringliteral">&quot;/hello&quot;</span>).GetWithDefault(d, <span class="stringliteral">&quot;world&quot;</span>);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11, &quot;a&quot; : { &quot;b&quot; : [ null ] }, &quot;hello&quot; : &quot;world&quot; }</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// Swap() 和 Set() 相似</span></div>
+<div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> x(<span class="stringliteral">&quot;C++&quot;</span>);</div>
+<div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a>(<span class="stringliteral">&quot;/hello&quot;</span>).Swap(d, x);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 11, &quot;a&quot; : { &quot;b&quot; : [ null ] }, &quot;hello&quot; : &quot;C++&quot; }</span></div>
+<div class="line"><span class="comment">// x 变成 &quot;world&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// 删去一个成员或元素，若值存在返回 true</span></div>
+<div class="line"><span class="keywordtype">bool</span> success = <a class="code hl_typedef" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a>(<span class="stringliteral">&quot;/a&quot;</span>).Erase(d);</div>
+<div class="line">assert(success);</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// { &quot;project&quot; : &quot;RapidJSON&quot;, &quot;stars&quot; : 10 }</span></div>
+<div class="ttc" id="anamespacerapidjson_html_a080910f74d2f5046e6724280159cf374"><div class="ttname"><a href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">rapidjson::Pointer</a></div><div class="ttdeci">GenericPointer&lt; Value, CrtAllocator &gt; Pointer</div><div class="ttdoc">GenericPointer for Value (UTF-8, default allocator).</div><div class="ttdef"><b>Definition:</b> fwd.h:126</div></div>
+<div class="ttc" id="anamespacerapidjson_html_aa65fc9fb381b2cbc54f98673eadd6505"><div class="ttname"><a href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">rapidjson::Value</a></div><div class="ttdeci">GenericValue&lt; UTF8&lt;&gt; &gt; Value</div><div class="ttdoc">GenericValue with UTF8 encoding</div><div class="ttdef"><b>Definition:</b> document.h:2485</div></div>
+<div class="ttc" id="anamespacerapidjson_html_ace11b5b575baf1cccd5ba5f8586dcdc8"><div class="ttname"><a href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">rapidjson::Document</a></div><div class="ttdeci">GenericDocument&lt; UTF8&lt;&gt; &gt; Document</div><div class="ttdoc">GenericDocument with UTF8 encoding</div><div class="ttdef"><b>Definition:</b> document.h:2889</div></div>
+</div><!-- fragment --><h1><a class="anchor" id="HelperFunctions"></a>
+辅助函数</h1>
+<p >由于面向对象的调用习惯可能不符直觉，RapidJSON 也提供了一些辅助函数，它们把成员函数包装成自由函数。</p>
+<p >以下的例子与上面例子所做的事情完全相同。</p>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
+<div class="line"> </div>
+<div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;/project&quot;</span>, <span class="stringliteral">&quot;RapidJSON&quot;</span>);</div>
+<div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;/stars&quot;</span>, 10);</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordflow">if</span> (<a class="code hl_typedef" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>* stars = GetValueByPointer(d, <span class="stringliteral">&quot;/stars&quot;</span>))</div>
+<div class="line">    stars-&gt;SetInt(stars-&gt;GetInt() + 1);</div>
+<div class="line"> </div>
+<div class="line">CreateValueByPointer(d, <span class="stringliteral">&quot;/a/b/0&quot;</span>);</div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>&amp; hello = GetValueByPointerWithDefault(d, <span class="stringliteral">&quot;/hello&quot;</span>, <span class="stringliteral">&quot;world&quot;</span>);</div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a> x(<span class="stringliteral">&quot;C++&quot;</span>);</div>
+<div class="line">SwapValueByPointer(d, <span class="stringliteral">&quot;/hello&quot;</span>, x);</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">bool</span> success = EraseValueByPointer(d, <span class="stringliteral">&quot;/a&quot;</span>);</div>
+<div class="line">assert(success);</div>
+</div><!-- fragment --><p >以下对比 3 种调用方式：</p>
+<ol type="1">
+<li><code>Pointer(source).&lt;Method&gt;(root, ...)</code></li>
+<li><code>&lt;Method&gt;ValueByPointer(root, Pointer(source), ...)</code></li>
+<li><code>&lt;Method&gt;ValueByPointer(root, source, ...)</code></li>
+</ol>
+<h1><a class="anchor" id="ResolvingPointer"></a>
+解析 Pointer</h1>
+<p ><code>Pointer::Get()</code> 或 <code>GetValueByPointer()</code> 函数并不修改 DOM。若那些 token 不能匹配 DOM 里的值，这些函数便返回 <code>nullptr</code>。使用者可利用这个方法来检查一个值是否存在。</p>
+<p >注意，数值 token 可表示数组索引或成员名字。解析过程中会按值的类型来匹配。</p>
+<div class="fragment"><div class="line">{</div>
+<div class="line">    &quot;0&quot; : 123,</div>
+<div class="line">    &quot;1&quot; : [456]</div>
+<div class="line">}</div>
+</div><!-- fragment --><ol type="1">
+<li><code>"/0"</code> → <code>123</code></li>
+<li><code>"/1/0"</code> → <code>456</code></li>
+</ol>
+<p >Token <code>"0"</code> 在第一个 pointer 中被当作成员名字。它在第二个 pointer 中被当作成数组索引。</p>
+<p >其他函数会改变 DOM，包括 <code>Create()</code>、<code>GetWithDefault()</code>、<code>Set()</code>、<code>Swap()</code>。这些函数总是成功的。若一些父值不存在，就会创建它们。若父值类型不匹配 token，也会强行改变其类型。改变类型也意味着完全移除其 DOM 子树的内容。</p>
+<p >例如，把上面的 JSON 解译至 <code>d</code> 之后，</p>
+<div class="fragment"><div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;1/a&quot;</span>, 789); <span class="comment">// { &quot;0&quot; : 123, &quot;1&quot; : { &quot;a&quot; : 789 } }</span></div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md47"></a>
+解析负号 token</h2>
+<p >另外，<a href="https://tools.ietf.org/html/rfc6901">RFC6901</a> 定义了一个特殊 token <code>-</code> （单个负号），用于表示数组最后元素的下一个元素。 <code>Get()</code> 只会把此 token 当作成员名字 '"-"'。而其他函数则会以此解析数组，等同于对数组调用 <code>Value::PushBack()</code> 。</p>
+<div class="fragment"><div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
+<div class="line">d.Parse(<span class="stringliteral">&quot;{\&quot;foo\&quot;:[123]}&quot;</span>);</div>
+<div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;/foo/-&quot;</span>, 456); <span class="comment">// { &quot;foo&quot; : [123, 456] }</span></div>
+<div class="line">SetValueByPointer(d, <span class="stringliteral">&quot;/-&quot;</span>, 789);    <span class="comment">// { &quot;foo&quot; : [123, 456], &quot;-&quot; : 789 }</span></div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md48"></a>
+解析 Document 及 Value</h2>
+<p >当使用 <code>p.Get(root)</code> 或 <code>GetValueByPointer(root, p)</code>，<code>root</code> 是一个（常数） <code>Value&amp;</code>。这意味着，它也可以是 DOM 里的一个子树。</p>
+<p >其他函数有两组签名。一组使用 <code>Document&amp; document</code> 作为参数，另一组使用 <code>Value&amp; root</code>。第一组使用 <code>document.GetAllocator()</code> 去创建值，而第二组则需要使用者提供一个 allocator，如同 DOM 里的函数。</p>
+<p >以上例子都不需要 allocator 参数，因为它的第一个参数是 <code>Document&amp;</code>。但如果你需要对一个子树进行解析，就需要如下面的例子般提供 allocator：</p>
+<div class="fragment"><div class="line"><span class="keyword">class </span>Person {</div>
+<div class="line"><span class="keyword">public</span>:</div>
+<div class="line">    Person() {</div>
+<div class="line">        document_ = <span class="keyword">new</span> <a class="code hl_typedef" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a>();</div>
+<div class="line">        <span class="comment">// CreateValueByPointer() here no need allocator</span></div>
+<div class="line">        SetLocation(CreateValueByPointer(*document_, <span class="stringliteral">&quot;/residence&quot;</span>), ...);</div>
+<div class="line">        SetLocation(CreateValueByPointer(*document_, <span class="stringliteral">&quot;/office&quot;</span>), ...);</div>
+<div class="line">    };</div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">private</span>:</div>
+<div class="line">    <span class="keywordtype">void</span> SetLocation(<a class="code hl_typedef" href="namespacerapidjson.html#aa65fc9fb381b2cbc54f98673eadd6505">Value</a>&amp; location, <span class="keyword">const</span> <span class="keywordtype">char</span>* country, <span class="keyword">const</span> <span class="keywordtype">char</span>* addresses[2]) {</div>
+<div class="line">        Value::Allocator&amp; a = document_-&gt;GetAllocator();</div>
+<div class="line">        <span class="comment">// SetValueByPointer() here need allocator</span></div>
+<div class="line">        SetValueByPointer(location, <span class="stringliteral">&quot;/country&quot;</span>, country, a);</div>
+<div class="line">        SetValueByPointer(location, <span class="stringliteral">&quot;/address/0&quot;</span>, address[0], a);</div>
+<div class="line">        SetValueByPointer(location, <span class="stringliteral">&quot;/address/1&quot;</span>, address[1], a);</div>
+<div class="line">    }</div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// ...</span></div>
+<div class="line"> </div>
+<div class="line">    <a class="code hl_typedef" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a>* document_;</div>
+<div class="line">};</div>
+</div><!-- fragment --><p ><code>Erase()</code> 或 <code>EraseValueByPointer()</code> 不需要 allocator。而且它们成功删除值之后会返回 <code>true</code>。</p>
+<h1><a class="anchor" id="ErrorHandling"></a>
+错误处理</h1>
+<p ><code>Pointer</code> 在其建构函数里会解译源字符串。若有解析错误，<code>Pointer::IsValid()</code> 返回 <code>false</code>。你可使用 <code>Pointer::GetParseErrorCode()</code> 和 <code>GetParseErrorOffset()</code> 去获取错信息。</p>
+<p >要注意的是，所有解析函数都假设 pointer 是合法的。对一个非法 pointer 解析会造成断言失败。</p>
+<h1><a class="anchor" id="URIFragment"></a>
+URI 片段表示方式</h1>
+<p >除了我们一直在使用的字符串方式表示 JSON pointer，<a href="https://tools.ietf.org/html/rfc6901">RFC6901</a> 也定义了一个 JSON Pointer 的 URI 片段（fragment）表示方式。URI 片段是定义于 <a href="https://tools.ietf.org/html/rfc3986">RFC3986</a> "Uniform Resource Identifier (URI): Generic Syntax"。</p>
+<p >URI 片段的主要分别是必然以 <code>#</code> （pound sign）开头，而一些字符也会以百分比编码成 UTF-8 序列。例如，以下的表展示了不同表示法下的 C/C++ 字符串常数。</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">字符串表示方式   </th><th class="markdownTableHeadNone">URI 片段表示方式   </th><th class="markdownTableHeadNone">Pointer Tokens （UTF-8）    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>"/foo/0"</code>   </td><td class="markdownTableBodyNone"><code>"#/foo/0"</code>   </td><td class="markdownTableBodyNone"><code>{"foo", 0}</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>"/a~1b"</code>   </td><td class="markdownTableBodyNone"><code>"#/a~1b"</code>   </td><td class="markdownTableBodyNone"><code>{"a/b"}</code>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>"/m~0n"</code>   </td><td class="markdownTableBodyNone"><code>"#/m~0n"</code>   </td><td class="markdownTableBodyNone"><code>{"m~n"}</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>"/ "</code>   </td><td class="markdownTableBodyNone"><code>"#/%20"</code>   </td><td class="markdownTableBodyNone"><code>{" "}</code>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>"/\0"</code>   </td><td class="markdownTableBodyNone"><code>"#/%00"</code>   </td><td class="markdownTableBodyNone"><code>{"\0"}</code>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>"/€"</code>   </td><td class="markdownTableBodyNone"><code>"#/%E2%82%AC"</code>   </td><td class="markdownTableBodyNone"><code>{"€"}</code>   </td></tr>
+</table>
+<p >RapidJSON 完全支持 URI 片段表示方式。它在解译时会自动检测 <code>#</code> 号。</p>
+<h1><a class="anchor" id="autotoc_md49"></a>
+字符串化</h1>
+<p >你也可以把一个 <code>Pointer</code> 字符串化，储存于字符串或其他输出流。例如：</p>
+<div class="fragment"><div class="line">Pointer p(...);</div>
+<div class="line">StringBuffer sb;</div>
+<div class="line">p.Stringify(sb);</div>
+<div class="line">std::cout &lt;&lt; sb.GetString() &lt;&lt; std::endl;</div>
+</div><!-- fragment --><p >使用 <code>StringifyUriFragment()</code> 可以把 pointer 字符串化为 URI 片段表示法。</p>
+<h1><a class="anchor" id="UserSuppliedTokens"></a>
+使用者提供的 tokens</h1>
+<p >若一个 pointer 会用于多次解析，它应该只被创建一次，然后再施于不同的 DOM ，或在不同时间做解析。这样可以避免多次创键 <code>Pointer</code>，节省时间和内存分配。</p>
+<p >我们甚至可以再更进一步，完全消去解析过程及动态内存分配。我们可以直接生成 token 数组：</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#define NAME(s) { s, sizeof(s) / sizeof(s[0]) - 1, kPointerInvalidIndex }</span></div>
+<div class="line"><span class="preprocessor">#define INDEX(i) { #i, sizeof(#i) - 1, i }</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> Pointer::Token kTokens[] = { NAME(<span class="stringliteral">&quot;foo&quot;</span>), INDEX(123) };</div>
+<div class="line"><span class="keyword">static</span> <span class="keyword">const</span> <a class="code hl_typedef" href="namespacerapidjson.html#a080910f74d2f5046e6724280159cf374">Pointer</a> p(kTokens, <span class="keyword">sizeof</span>(kTokens) / <span class="keyword">sizeof</span>(kTokens[0]));</div>
+<div class="line"><span class="comment">// Equivalent to static const Pointer p(&quot;/foo/123&quot;);</span></div>
+</div><!-- fragment --><p >这种做法可能适合内存受限的系统。 </p>
+</div></div><!-- contents -->
+</div><!-- PageDoc -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.8.7-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,136 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install",
+			"INSTALL"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 194,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 203,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 207,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 247,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 252,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 259,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "doc",
+			"destination" : "C:/rapidjson/python-rapidjson/rapidjson_hex/out/install/x64-Debug/share/doc/RapidJSON",
+			"paths" : 
+			[
+				"readme.md"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "dev",
+			"destination" : "C:/rapidjson/python-rapidjson/rapidjson_hex/out/install/x64-Debug/include",
+			"paths" : 
+			[
+				"include/rapidjson"
+			],
+			"type" : "directory"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "examples",
+			"destination" : "C:/rapidjson/python-rapidjson/rapidjson_hex/out/install/x64-Debug/share/doc/RapidJSON/examples",
+			"paths" : 
+			[
+				{
+					"from" : "example",
+					"to" : "."
+				}
+			],
+			"type" : "directory"
+		},
+		{
+			"backtrace" : 4,
+			"component" : "Unspecified",
+			"destination" : "C:/rapidjson/python-rapidjson/rapidjson_hex/out/install/x64-Debug/lib/cmake/RapidJSON",
+			"paths" : 
+			[
+				"out/build/x64-Debug/CMakeFiles/RapidJSONConfig.cmake"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 5,
+			"component" : "dev",
+			"destination" : "C:/rapidjson/python-rapidjson/rapidjson_hex/out/install/x64-Debug/cmake",
+			"paths" : 
+			[
+				"out/build/x64-Debug/RapidJSONConfig.cmake",
+				"out/build/x64-Debug/RapidJSONConfigVersion.cmake"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 6,
+			"component" : "Unspecified",
+			"destination" : "C:/rapidjson/python-rapidjson/rapidjson_hex/out/install/x64-Debug/cmake",
+			"exportName" : "RapidJSON-targets",
+			"exportTargets" : 
+			[
+				{
+					"id" : "RapidJSON::@6890427a1f51a3e7e1df",
+					"index" : 0
+				}
+			],
+			"paths" : 
+			[
+				"CMakeFiles/Export/94be33f4dbe3190797afb4e668c82d69/RapidJSON-targets.cmake"
+			],
+			"type" : "export"
+		}
+	],
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	}
+}

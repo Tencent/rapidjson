@@ -1,0 +1,338 @@
+<!-- HTML header for doxygen 1.8.7-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.9.2"/>
+<title>RapidJSON: Schema</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+  $(document).ready(function() { init_search(); });
+/* @license-end */
+</script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygenextra.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="topbanner"><a href="https://github.com/Tencent/rapidjson" title="RapidJSON GitHub"><i class="githublogo"></i></a></div>
+        <div id="MSearchBox" class="MSearchBoxInactive">
+        <span class="left">
+          <img id="MSearchSelect" src="search/mag_sel.svg"
+               onmouseover="return searchBox.OnSearchSelectShow()"
+               onmouseout="return searchBox.OnSearchSelectHide()"
+               alt=""/>
+          <input type="text" id="MSearchField" value="搜索" accesskey="S"
+               onfocus="searchBox.OnSearchFieldFocus(true)" 
+               onblur="searchBox.OnSearchFieldFocus(false)" 
+               onkeyup="searchBox.OnSearchFieldChange(event)"/>
+          </span><span class="right">
+            <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" border="0" src="search/close.svg" alt=""/></a>
+          </span>
+        </div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.2 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search",'搜索','.html');
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('md_doc_schema_zh_cn.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
+</iframe>
+</div>
+
+<div><div class="header">
+  <div class="headertitle"><div class="title">Schema </div></div>
+</div><!--header-->
+<div class="contents">
+<div class="toc"><h3>目录</h3>
+<ul><li class="level1"><a href="#ParsingSerialization">在解析／生成时进行校验</a><ul><li class="level2"><a href="#DomParsing">DOM 解析</a></li>
+<li class="level2"><a href="#Serialization">生成</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#RemoteSchema">远程 Schema</a></li>
+<li class="level1"><a href="#Conformance">标准的符合程度</a><ul><li class="level2"><a href="#RegEx">正则表达式</a></li>
+</ul>
+</li>
+<li class="level1"><a href="#Performance">性能</a></li>
+</ul>
+</div>
+<div class="textblock"><p >（本功能于 v1.1.0 发布）</p>
+<p >JSON Schema 是描述 JSON 格式的一个标准草案。一个 schema 本身也是一个 JSON。使用 JSON Schema 去校验 JSON，可以让你的代码安全地访问 DOM，而无须检查类型或键值是否存在等。这也能确保输出的 JSON 是符合指定的 schema。</p>
+<p >RapidJSON 实现了一个 <a href="http://json-schema.org/documentation.html">JSON Schema Draft v4</a> 的校验器。若你不熟悉 JSON Schema，可以参考 <a href="http://spacetelescope.github.io/understanding-json-schema/">Understanding JSON Schema</a>。</p>
+<h1><a class="anchor" id="BasicUsage"></a>
+基本使用方法</h1>
+<p >首先，你要把 JSON Schema 解析成 <code>Document</code>，再把它编译成一个 <code>SchemaDocument</code>。</p>
+<p >然后，利用该 <code>SchemaDocument</code> 创建一个 <code>SchemaValidator</code>。它与 <code>Writer</code> 相似，都是能够处理 SAX 事件的。因此，你可以用 <code>document.Accept(validator)</code> 去校验一个 JSON，然后再获取校验结果。</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/schema.h&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// ...</span></div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> sd;</div>
+<div class="line"><span class="keywordflow">if</span> (sd.Parse(schemaJson).HasParseError()) {</div>
+<div class="line">    <span class="comment">// 此 schema 不是合法的 JSON</span></div>
+<div class="line">    <span class="comment">// ...       </span></div>
+<div class="line">}</div>
+<div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#a52bbb5d64d1319495089e1713a0653cf">SchemaDocument</a> schema(sd); <span class="comment">// 把一个 Document 编译至 SchemaDocument</span></div>
+<div class="line"><span class="comment">// 之后不再需要 sd</span></div>
+<div class="line"> </div>
+<div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
+<div class="line"><span class="keywordflow">if</span> (d.Parse(inputJson).HasParseError()) {</div>
+<div class="line">    <span class="comment">// 输入不是一个合法的 JSON</span></div>
+<div class="line">    <span class="comment">// ...       </span></div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line">SchemaValidator validator(schema);</div>
+<div class="line"><span class="keywordflow">if</span> (!d.Accept(validator)) {</div>
+<div class="line">    <span class="comment">// 输入的 JSON 不合乎 schema</span></div>
+<div class="line">    <span class="comment">// 打印诊断信息</span></div>
+<div class="line">    <a class="code hl_typedef" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> sb;</div>
+<div class="line">    validator.GetInvalidSchemaPointer().StringifyUriFragment(sb);</div>
+<div class="line">    printf(<span class="stringliteral">&quot;Invalid schema: %s\n&quot;</span>, sb.GetString());</div>
+<div class="line">    printf(<span class="stringliteral">&quot;Invalid keyword: %s\n&quot;</span>, validator.GetInvalidSchemaKeyword());</div>
+<div class="line">    sb.Clear();</div>
+<div class="line">    validator.GetInvalidDocumentPointer().StringifyUriFragment(sb);</div>
+<div class="line">    printf(<span class="stringliteral">&quot;Invalid document: %s\n&quot;</span>, sb.GetString());</div>
+<div class="line">}</div>
+<div class="ttc" id="anamespacerapidjson_html_a52bbb5d64d1319495089e1713a0653cf"><div class="ttname"><a href="namespacerapidjson.html#a52bbb5d64d1319495089e1713a0653cf">rapidjson::SchemaDocument</a></div><div class="ttdeci">GenericSchemaDocument&lt; Value, CrtAllocator &gt; SchemaDocument</div><div class="ttdoc">GenericSchemaDocument using Value type.</div><div class="ttdef"><b>Definition:</b> fwd.h:136</div></div>
+<div class="ttc" id="anamespacerapidjson_html_ac0765ea91f41539645c4b78689d03f21"><div class="ttname"><a href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">rapidjson::StringBuffer</a></div><div class="ttdeci">GenericStringBuffer&lt; UTF8&lt; char &gt;, CrtAllocator &gt; StringBuffer</div><div class="ttdoc">String buffer with UTF8 encoding</div><div class="ttdef"><b>Definition:</b> fwd.h:59</div></div>
+<div class="ttc" id="anamespacerapidjson_html_ace11b5b575baf1cccd5ba5f8586dcdc8"><div class="ttname"><a href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">rapidjson::Document</a></div><div class="ttdeci">GenericDocument&lt; UTF8&lt;&gt; &gt; Document</div><div class="ttdoc">GenericDocument with UTF8 encoding</div><div class="ttdef"><b>Definition:</b> document.h:2889</div></div>
+</div><!-- fragment --><p >一些注意点：</p>
+<ul>
+<li>一个 <code>SchemaDocment</code> 能被多个 <code>SchemaValidator</code> 引用。它不会被 <code>SchemaValidator</code> 修改。</li>
+<li>可以重复使用一个 <code>SchemaValidator</code> 来校验多个文件。在校验其他文件前，须先调用 <code>validator.Reset()</code>。</li>
+</ul>
+<h1><a class="anchor" id="ParsingSerialization"></a>
+在解析／生成时进行校验</h1>
+<p >与大部分 JSON Schema 校验器有所不同，RapidJSON 提供了一个基于 SAX 的 schema 校验器实现。因此，你可以在输入流解析 JSON 的同时进行校验。若校验器遇到一个与 schema 不符的值，就会立即终止解析。这设计对于解析大型 JSON 文件时特别有用。</p>
+<h2><a class="anchor" id="DomParsing"></a>
+DOM 解析</h2>
+<p >在使用 DOM 进行解析时，<code>Document</code> 除了接收 SAX 事件外，还需做一些准备及结束工作，因此，为了连接 <code>Reader</code>、<code>SchemaValidator</code> 和 <code>Document</code> 要做多一点事情。<code>SchemaValidatingReader</code> 是一个辅助类去做那些工作。</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;rapidjson/filereadstream.h&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// ...</span></div>
+<div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#a52bbb5d64d1319495089e1713a0653cf">SchemaDocument</a> schema(sd); <span class="comment">// 把一个 Document 编译至 SchemaDocument</span></div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// 使用 reader 解析 JSON</span></div>
+<div class="line">FILE* fp = fopen(<span class="stringliteral">&quot;big.json&quot;</span>, <span class="stringliteral">&quot;r&quot;</span>);</div>
+<div class="line">FileReadStream is(fp, buffer, <span class="keyword">sizeof</span>(buffer));</div>
+<div class="line"> </div>
+<div class="line"><span class="comment">// 用 reader 解析 JSON，校验它的 SAX 事件，并存储至 d</span></div>
+<div class="line"><a class="code hl_typedef" href="namespacerapidjson.html#ace11b5b575baf1cccd5ba5f8586dcdc8">Document</a> d;</div>
+<div class="line">SchemaValidatingReader&lt;kParseDefaultFlags, FileReadStream, UTF8&lt;&gt; &gt; reader(is, schema);</div>
+<div class="line">d.Populate(reader);</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordflow">if</span> (!reader.GetParseResult()) {</div>
+<div class="line">    <span class="comment">// 不是一个合法的 JSON</span></div>
+<div class="line">    <span class="comment">// 当 reader.GetParseResult().Code() == kParseErrorTermination,</span></div>
+<div class="line">    <span class="comment">// 它可能是被以下原因中止：</span></div>
+<div class="line">    <span class="comment">// (1) 校验器发现 JSON 不合乎 schema；或</span></div>
+<div class="line">    <span class="comment">// (2) 输入流有 I/O 错误。</span></div>
+<div class="line"> </div>
+<div class="line">    <span class="comment">// 检查校验结果</span></div>
+<div class="line">    <span class="keywordflow">if</span> (!reader.IsValid()) {</div>
+<div class="line">        <span class="comment">// 输入的 JSON 不合乎 schema</span></div>
+<div class="line">        <span class="comment">// 打印诊断信息</span></div>
+<div class="line">        <a class="code hl_typedef" href="namespacerapidjson.html#ac0765ea91f41539645c4b78689d03f21">StringBuffer</a> sb;</div>
+<div class="line">        reader.GetInvalidSchemaPointer().StringifyUriFragment(sb);</div>
+<div class="line">        printf(<span class="stringliteral">&quot;Invalid schema: %s\n&quot;</span>, sb.GetString());</div>
+<div class="line">        printf(<span class="stringliteral">&quot;Invalid keyword: %s\n&quot;</span>, reader.GetInvalidSchemaKeyword());</div>
+<div class="line">        sb.Clear();</div>
+<div class="line">        reader.GetInvalidDocumentPointer().StringifyUriFragment(sb);</div>
+<div class="line">        printf(<span class="stringliteral">&quot;Invalid document: %s\n&quot;</span>, sb.GetString());</div>
+<div class="line">    }</div>
+<div class="line">}</div>
+</div><!-- fragment --><h2><a class="anchor" id="SaxParsing"></a>
+解析</h2>
+<p >使用 SAX 解析时，情况就简单得多。若只需要校验 JSON 而无需进一步处理，那么仅需要：</p>
+<div class="fragment"><div class="line">SchemaValidator validator(schema);</div>
+<div class="line">Reader reader;</div>
+<div class="line">if (!reader.Parse(stream, validator)) {</div>
+<div class="line">    if (!validator.IsValid()) {</div>
+<div class="line">        // ...    </div>
+<div class="line">    }</div>
+<div class="line">}</div>
+</div><!-- fragment --><p >这种方式和 <a href="example/schemavalidator/schemavalidator.cpp">schemavalidator</a> 例子完全相同。这带来的独特优势是，无论 JSON 多巨大，永远维持低内存用量（内存用量只与 Schema 的复杂度相关）。</p>
+<p >若你需要进一步处理 SAX 事件，便可使用模板类 <code>GenericSchemaValidator</code> 去设置校验器的输出 <code>Handler</code>：</p>
+<div class="fragment"><div class="line">MyHandler handler;</div>
+<div class="line">GenericSchemaValidator&lt;SchemaDocument, MyHandler&gt; validator(schema, handler);</div>
+<div class="line">Reader reader;</div>
+<div class="line">if (!reader.Parse(ss, validator)) {</div>
+<div class="line">    if (!validator.IsValid()) {</div>
+<div class="line">        // ...    </div>
+<div class="line">    }</div>
+<div class="line">}</div>
+</div><!-- fragment --><h2><a class="anchor" id="Serialization"></a>
+生成</h2>
+<p >我们也可以在生成（serialization）的时候进行校验。这能确保输出的 JSON 符合一个 JSON Schema。</p>
+<div class="fragment"><div class="line">StringBuffer sb;</div>
+<div class="line">Writer&lt;StringBuffer&gt; writer(sb);</div>
+<div class="line">GenericSchemaValidator&lt;SchemaDocument, Writer&lt;StringBuffer&gt; &gt; validator(s, writer);</div>
+<div class="line">if (!d.Accept(validator)) {</div>
+<div class="line">    // Some problem during Accept(), it may be validation or encoding issues.</div>
+<div class="line">    if (!validator.IsValid()) {</div>
+<div class="line">        // ...</div>
+<div class="line">    }</div>
+<div class="line">}</div>
+</div><!-- fragment --><p >当然，如果你的应用仅需要 SAX 风格的生成，那么只需要把 SAX 事件由原来发送到 <code>Writer</code>，改为发送到 <code>SchemaValidator</code>。</p>
+<h1><a class="anchor" id="RemoteSchema"></a>
+远程 Schema</h1>
+<p >JSON Schema 支持 <a href="http://spacetelescope.github.io/understanding-json-schema/structuring.html"><code>$ref</code> 关键字</a>，它是一个 <a class="el" href="md_doc_pointer_zh_cn.html">JSON pointer</a> 引用至一个本地（local）或远程（remote） schema。本地指针的首字符是 <code>#</code>，而远程指针是一个相对或绝对 URI。例如：</p>
+<div class="fragment"><div class="line">{ &quot;$ref&quot;: &quot;definitions.json#/address&quot; }</div>
+</div><!-- fragment --><p >由于 <code>SchemaDocument</code> 并不知道如何处理那些 URI，它需要使用者提供一个 <code>IRemoteSchemaDocumentProvider</code> 的实例去处理。</p>
+<div class="fragment"><div class="line">class MyRemoteSchemaDocumentProvider : public IRemoteSchemaDocumentProvider {</div>
+<div class="line">public:</div>
+<div class="line">    virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {</div>
+<div class="line">        // Resolve the uri and returns a pointer to that schema.</div>
+<div class="line">    }</div>
+<div class="line">};</div>
+<div class="line"> </div>
+<div class="line">// ...</div>
+<div class="line"> </div>
+<div class="line">MyRemoteSchemaDocumentProvider provider;</div>
+<div class="line">SchemaDocument schema(sd, &amp;provider);</div>
+</div><!-- fragment --><h1><a class="anchor" id="Conformance"></a>
+标准的符合程度</h1>
+<p >RapidJSON 通过了 <a href="https://github.com/json-schema/JSON-Schema-Test-Suite">JSON Schema Test Suite</a> (Json Schema draft 4) 中 263 个测试的 262 个。</p>
+<p >没通过的测试是 <code>refRemote.json</code> 中的 "change resolution scope" - "changed scope ref invalid"。这是由于未实现 <code>id</code> schema 关键字及 URI 合并功能。</p>
+<p >除此以外，关于字符串类型的 <code>format</code> schema 关键字也会被忽略，因为标准中并没需求必须实现。</p>
+<h2><a class="anchor" id="RegEx"></a>
+正则表达式</h2>
+<p ><code>pattern</code> 及 <code>patternProperties</code> 这两个 schema 关键字使用了正则表达式去匹配所需的模式。</p>
+<p >RapidJSON 实现了一个简单的 NFA 正则表达式引擎，并预设使用。它支持以下语法。</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">语法   </th><th class="markdownTableHeadNone">描述    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>ab</code>   </td><td class="markdownTableBodyNone">串联    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>a&amp;#124;b</code>   </td><td class="markdownTableBodyNone">交替    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>a?</code>   </td><td class="markdownTableBodyNone">零或一次    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>a*</code>   </td><td class="markdownTableBodyNone">零或多次    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>a+</code>   </td><td class="markdownTableBodyNone">一或多次    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>a{3}</code>   </td><td class="markdownTableBodyNone">刚好 3 次    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>a{3,}</code>   </td><td class="markdownTableBodyNone">至少 3 次    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>a{3,5}</code>   </td><td class="markdownTableBodyNone">3 至 5 次    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>(ab)</code>   </td><td class="markdownTableBodyNone">分组    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>^a</code>   </td><td class="markdownTableBodyNone">在开始处    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>a$</code>   </td><td class="markdownTableBodyNone">在结束处    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>.</code>   </td><td class="markdownTableBodyNone">任何字符    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>[abc]</code>   </td><td class="markdownTableBodyNone">字符组    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>[a-c]</code>   </td><td class="markdownTableBodyNone">字符组范围    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>[a-z0-9_]</code>   </td><td class="markdownTableBodyNone">字符组组合    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>[^abc]</code>   </td><td class="markdownTableBodyNone">字符组取反    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>[^a-c]</code>   </td><td class="markdownTableBodyNone">字符组范围取反    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>[\b]</code>   </td><td class="markdownTableBodyNone">退格符 (U+0008)    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>\&amp;#124;</code>, <code>\\</code>, ...   </td><td class="markdownTableBodyNone">转义字符    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>\f</code>   </td><td class="markdownTableBodyNone">馈页 (U+000C)    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>\n</code>   </td><td class="markdownTableBodyNone">馈行 (U+000A)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>\r</code>   </td><td class="markdownTableBodyNone">回车 (U+000D)    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><code>\t</code>   </td><td class="markdownTableBodyNone">制表 (U+0009)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><code>\v</code>   </td><td class="markdownTableBodyNone">垂直制表 (U+000B)   </td></tr>
+</table>
+<p >对于使用 C++11 编译器的使用者，也可使用 <code>std::regex</code>，只需定义 <code>RAPIDJSON_SCHEMA_USE_INTERNALREGEX=0</code> 及 <code>RAPIDJSON_SCHEMA_USE_STDREGEX=1</code>。若你的 schema 无需使用 <code>pattern</code> 或 <code>patternProperties</code>，可以把两个宏都设为零，以禁用此功能，这样做可节省一些代码体积。</p>
+<h1><a class="anchor" id="Performance"></a>
+性能</h1>
+<p >大部分 C++ JSON 库都未支持 JSON Schema。因此我们尝试按照 <a href="https://github.com/ebdrup/json-schema-benchmark">json-schema-benchmark</a> 去评估 RapidJSON 的 JSON Schema 校验器。该评测测试了 11 个运行在 node.js 上的 JavaScript 库。</p>
+<p >该评测校验 <a href="https://github.com/json-schema/JSON-Schema-Test-Suite">JSON Schema Test Suite</a> 中的测试，当中排除了一些测试套件及个别测试。我们在 <a href="test/perftest/schematest.cpp"><code>schematest.cpp</code></a> 实现了相同的评测。</p>
+<p >在 MacBook Pro (2.8 GHz Intel Core i7) 上收集到以下结果。</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">校验器   </th><th class="markdownTableHeadCenter">相对速度   </th><th class="markdownTableHeadCenter">每秒执行的测试数目    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">RapidJSON   </td><td class="markdownTableBodyCenter">155%   </td><td class="markdownTableBodyCenter">30682    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a href="https://github.com/epoberezkin/ajv"><code>ajv</code></a>   </td><td class="markdownTableBodyCenter">100%   </td><td class="markdownTableBodyCenter">19770 (± 1.31%)    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a href="https://github.com/mafintosh/is-my-json-valid"><code>is-my-json-valid</code></a>   </td><td class="markdownTableBodyCenter">70%   </td><td class="markdownTableBodyCenter">13835 (± 2.84%)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a href="https://github.com/bugventure/jsen"><code>jsen</code></a>   </td><td class="markdownTableBodyCenter">57.7%   </td><td class="markdownTableBodyCenter">11411 (± 1.27%)    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a href="https://github.com/AlexeyGrishin/schemasaurus"><code>schemasaurus</code></a>   </td><td class="markdownTableBodyCenter">26%   </td><td class="markdownTableBodyCenter">5145 (± 1.62%)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a href="https://github.com/playlyfe/themis"><code>themis</code></a>   </td><td class="markdownTableBodyCenter">19.9%   </td><td class="markdownTableBodyCenter">3935 (± 2.69%)    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a href="https://github.com/zaggino/z-schema"><code>z-schema</code></a>   </td><td class="markdownTableBodyCenter">7%   </td><td class="markdownTableBodyCenter">1388 (± 0.84%)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a href="https://github.com/pandastrike/jsck#readme"><code>jsck</code></a>   </td><td class="markdownTableBodyCenter">3.1%   </td><td class="markdownTableBodyCenter">606 (± 2.84%)    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><a href="https://github.com/tdegrunt/jsonschema#readme"><code>jsonschema</code></a>   </td><td class="markdownTableBodyCenter">0.9%   </td><td class="markdownTableBodyCenter">185 (± 1.01%)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a href="https://github.com/Prestaul/skeemas#readme"><code>skeemas</code></a>   </td><td class="markdownTableBodyCenter">0.8%   </td><td class="markdownTableBodyCenter">154 (± 0.79%)    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">tv4   </td><td class="markdownTableBodyCenter">0.5%   </td><td class="markdownTableBodyCenter">93 (± 0.94%)    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><a href="https://github.com/natesilva/jayschema"><code>jayschema</code></a>   </td><td class="markdownTableBodyCenter">0.1%   </td><td class="markdownTableBodyCenter">21 (± 1.14%)   </td></tr>
+</table>
+<p >换言之，RapidJSON 比最快的 JavaScript 库（ajv）快约 1.5x。比最慢的快 1400x。 </p>
+</div></div><!-- contents -->
+</div><!-- PageDoc -->
+</div><!-- doc-content -->
+<!-- HTML footer for doxygen 1.8.7-->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+  </ul>
+</div>
+</body>
+</html>
