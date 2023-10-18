@@ -367,7 +367,9 @@ public:
         uint64_t h = Hash(0, kObjectType);
         uint64_t* kv = stack_.template Pop<uint64_t>(memberCount * 2);
         for (SizeType i = 0; i < memberCount; i++)
-            h ^= Hash(kv[i * 2], kv[i * 2 + 1]);  // Use xor to achieve member order insensitive
+            // Issue #2205
+            // Hasing the key to avoid key=value cases with bug-prone zero-value hash
+            h ^= Hash(Hash(0, kv[i * 2]), kv[i * 2 + 1]);  // Use xor to achieve member order insensitive
         *stack_.template Push<uint64_t>() = h;
         return true;
     }
@@ -405,7 +407,7 @@ private:
     
     bool WriteBuffer(Type type, const void* data, size_t len) {
         // FNV-1a from http://isthe.com/chongo/tech/comp/fnv/
-        uint64_t h = Hash(RAPIDJSON_UINT64_C2(0x84222325, 0xcbf29ce4), type);
+        uint64_t h = Hash(RAPIDJSON_UINT64_C2(0xcbf29ce4, 0x84222325), type);
         const unsigned char* d = static_cast<const unsigned char*>(data);
         for (size_t i = 0; i < len; i++)
             h = Hash(h, d[i]);
