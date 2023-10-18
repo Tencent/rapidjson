@@ -1703,7 +1703,7 @@ private:
 
         // Parse exp = e [ minus / plus ] 1*DIGIT
         int exp = 0;
-        if ((Consume(s, 'e') || Consume(s, 'E'))) {
+        if (Consume(s, 'e') || Consume(s, 'E')) {
             if (!useDouble) {
                 d = static_cast<double>(use64bit ? i64 : i);
                 useDouble = true;
@@ -1752,7 +1752,6 @@ private:
         }
 
         // Finish parsing, call event according to the type of number.
-        // bool cont = true;  // moved, as goto after hexadecimal parsing would skip initialization of this value.
 
         if (parseFlags & kParseNumbersAsStringsFlag) {
             if (parseFlags & kParseInsituFlag) {
