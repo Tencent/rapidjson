@@ -412,7 +412,7 @@ struct GenericStringRef {
         : s(RAPIDJSON_LIKELY(str) ? str : emptyString), length(len) { RAPIDJSON_ASSERT(str != 0 || len == 0u); }
 
 #if RAPIDJSON_HAS_STD_STRING_VIEW
-    GenericStringRef(const std::basic_string_view<CharType>& s) : s(s.data()), length(s.length()) {}
+    GenericStringRef(const std::basic_string_view<CharType>& str) : s(str.data()), length(static_cast<SizeType>(str.size())) {}
 #endif
 
     GenericStringRef(const GenericStringRef& rhs) : s(rhs.s), length(rhs.length) {}
