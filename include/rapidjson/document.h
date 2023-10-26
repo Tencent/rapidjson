@@ -411,6 +411,10 @@ struct GenericStringRef {
     GenericStringRef(const CharType* str, SizeType len)
         : s(RAPIDJSON_LIKELY(str) ? str : emptyString), length(len) { RAPIDJSON_ASSERT(str != 0 || len == 0u); }
 
+#if RAPIDJSON_HAS_STD_STRING_VIEW
+    GenericStringRef(const std::basic_string_view<CharType>& s) : s(s.data()), length(s.length()) {}
+#endif
+
     GenericStringRef(const GenericStringRef& rhs) : s(rhs.s), length(rhs.length) {}
 
     //! implicit conversion to plain CharType pointer
@@ -872,12 +876,9 @@ public:
     GenericValue(const Ch* s, SizeType length, Allocator& allocator) : data_() { SetStringRaw(StringRef(s, length), allocator); }
 
     //! Constructor for copy-string (i.e. do make a copy of string)
-    GenericValue(const Ch*s, Allocator& allocator) : data_() { SetStringRaw(StringRef(s), allocator); }
+    GenericValue(const Ch* s, Allocator& allocator) : data_() { SetStringRaw(StringRef(s), allocator); }
 
 #if RAPIDJSON_HAS_STD_STRING_VIEW
-    //! Constructor for constant string (i.e. do not make a copy of string)
-    explicit GenericValue(const std::basic_string_view<Ch>& s) RAPIDJSON_NOEXCEPT : data_() { SetStringRaw(StringRef(s.data(), static_cast<SizeType>(s.size()))); }
-
     //! Constructor for copy-string from a string object (i.e. do make a copy of string)
     /*! \note Requires the definition of the preprocessor symbol \ref RAPIDJSON_HAS_STD_STRING_VIEW.
      */
