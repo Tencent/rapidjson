@@ -1574,73 +1574,12 @@ public:
     GenericValue& AddMember(GenericValue& name, GenericValue&& value, Allocator& allocator) {
         return AddMember(name, value, allocator);
     }
-#if RAPIDJSON_HAS_STD_STRING_VIEW
-    GenericValue& AddMember(const std::basic_string_view<Ch>& name, GenericValue&& value, Allocator& allocator) {
-        GenericValue n(name);
-        return AddMember(n, value, allocator);
-    }
-#else
     GenericValue& AddMember(StringRefType name, GenericValue&& value, Allocator& allocator) {
         GenericValue n(name);
         return AddMember(n, value, allocator);
     }
-#endif
 #endif // RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
-#if RAPIDJSON_HAS_STD_STRING_VIEW
-    //! Add a member (name-value pair) to the object.
-    /*! \param name A constant string reference as name of member.
-        \param value Value of any type.
-        \param allocator    Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
-        \return The value itself for fluent API.
-        \note The ownership of \c value will be transferred to this object on success.
-        \pre  IsObject()
-        \post value.IsNull()
-        \note Amortized Constant time complexity.
-    */
-    GenericValue& AddMember(const std::basic_string_view<Ch>& name, GenericValue& value, Allocator& allocator) {
-        GenericValue n(name);
-        return AddMember(n, value, allocator);
-    }
-
-    //! Add a constant string value as member (name-value pair) to the object.
-    /*! \param name A constant string reference as name of member.
-        \param value constant string reference as value of member.
-        \param allocator    Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
-        \return The value itself for fluent API.
-        \pre  IsObject()
-        \note This overload is needed to avoid clashes with the generic primitive type AddMember(StringRefType,T,Allocator&) overload below.
-        \note Amortized Constant time complexity.
-    */
-    GenericValue& AddMember(const std::basic_string_view<Ch>& name, const std::basic_string_view<Ch>& value, Allocator& allocator) {
-        GenericValue v(value);
-        return AddMember(name, v, allocator);
-    }
-
-    //! Add any primitive value as member (name-value pair) to the object.
-    /*! \tparam T Either \ref Type, \c int, \c unsigned, \c int64_t, \c uint64_t
-        \param name A constant string reference as name of member.
-        \param value Value of primitive type \c T as value of member
-        \param allocator Allocator for reallocating memory. Commonly use GenericDocument::GetAllocator().
-        \return The value itself for fluent API.
-        \pre  IsObject()
-
-        \note The source type \c T explicitly disallows all pointer types,
-            especially (\c const) \ref Ch*.  This helps avoiding implicitly
-            referencing character strings with insufficient lifetime, use
-            \ref AddMember(StringRefType, GenericValue&, Allocator&) or \ref
-            AddMember(StringRefType, StringRefType, Allocator&).
-            All other pointer types would implicitly convert to \c bool,
-            use an explicit cast instead, if needed.
-        \note Amortized Constant time complexity.
-    */
-    template <typename T>
-    RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>, internal::IsGenericValue<T> >), (GenericValue&))
-    AddMember(const std::basic_string_view<Ch>& name, T value, Allocator& allocator) {
-        GenericValue n(name);
-        return AddMember(n, value, allocator);
-    }
-#else
     //! Add a member (name-value pair) to the object.
     /*! \param name A constant string reference as name of member.
         \param value Value of any type.
@@ -1693,7 +1632,6 @@ public:
         GenericValue n(name);
         return AddMember(n, value, allocator);
     }
-#endif
 
     //! Remove all members in the object.
     /*! This function do not deallocate memory in the object, i.e. the capacity is unchanged.
