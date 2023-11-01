@@ -1004,8 +1004,9 @@ private:
 
         for (;;) {
             // Scan and copy string before "\\\"" or < 0x20. This is an optional optimzation.
-            if (!(parseFlags & kParseValidateEncodingFlag))
-                ScanCopyUnescapedString(is, os);
+            //!DEPRECATED: 16-bytes null sting check causes buffer overflow
+            // if (!(parseFlags & kParseValidateEncodingFlag))
+            //     ScanCopyUnescapedString(is, os);
 
             Ch c = is.Peek();
             if (RAPIDJSON_UNLIKELY(c == '\\')) {    // Escape
