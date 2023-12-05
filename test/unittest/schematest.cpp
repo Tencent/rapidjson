@@ -2285,7 +2285,7 @@ TEST(SchemaValidator, TestSuite) {
         MemoryPoolAllocator<>::Free(json);
         jsonAllocator.Clear();
     }
-    printf("%d / %d passed (%2d%%)\n", passCount, testCount, passCount * 100 / testCount);
+    printf("%u / %u passed (%2u%%)\n", passCount, testCount, passCount * 100 / testCount);
     if (passCount != testCount)
         ADD_FAILURE();
 }
