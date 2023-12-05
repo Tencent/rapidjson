@@ -20,6 +20,7 @@
 #include "rapidjson/memorystream.h"
 
 #include <limits>
+#include <vector>
 
 using namespace rapidjson;
 
@@ -1483,66 +1484,61 @@ TEST(Reader, IterativeParsing_ErrorHandling) {
     TESTERRORHANDLING("1a", kParseErrorDocumentRootNotSingular, 1u);
 }
 
+const static uint32_t LOG_NULL        = 0x10000000;
+const static uint32_t LOG_BOOL        = 0x20000000;
+const static uint32_t LOG_INT         = 0x30000000;
+//const static uint32_t LOG_UINT        = 0x40000000;
+const static uint32_t LOG_INT64       = 0x50000000;
+const static uint32_t LOG_UINT64      = 0x60000000;
+const static uint32_t LOG_DOUBLE      = 0x70000000;
+const static uint32_t LOG_STRING      = 0x80000000;
+const static uint32_t LOG_STARTOBJECT = 0x90000000;
+const static uint32_t LOG_KEY         = 0xA0000000;
+const static uint32_t LOG_ENDOBJECT   = 0xB0000000;
+const static uint32_t LOG_STARTARRAY  = 0xC0000000;
+const static uint32_t LOG_ENDARRAY    = 0xD0000000;
+
 template<typename Encoding = UTF8<> >
 struct IterativeParsingReaderHandler {
     typedef typename Encoding::Ch Ch;
 
-    const static uint32_t LOG_NULL        = 0x10000000;
-    const static uint32_t LOG_BOOL        = 0x20000000;
-    const static uint32_t LOG_INT         = 0x30000000;
-    const static uint32_t LOG_UINT        = 0x40000000;
-    const static uint32_t LOG_INT64       = 0x50000000;
-    const static uint32_t LOG_UINT64      = 0x60000000;
-    const static uint32_t LOG_DOUBLE      = 0x70000000;
-    const static uint32_t LOG_STRING      = 0x80000000;
-    const static uint32_t LOG_STARTOBJECT = 0x90000000;
-    const static uint32_t LOG_KEY         = 0xA0000000;
-    const static uint32_t LOG_ENDOBJECT   = 0xB0000000;
-    const static uint32_t LOG_STARTARRAY  = 0xC0000000;
-    const static uint32_t LOG_ENDARRAY    = 0xD0000000;
+    std::vector<uint32_t> Logs;
 
-    const static size_t LogCapacity = 256;
-    uint32_t Logs[LogCapacity];
-    size_t LogCount;
+    IterativeParsingReaderHandler() {}
 
-    IterativeParsingReaderHandler() : LogCount(0) {
-    }
+    bool Null() { Logs.push_back(LOG_NULL); return true; }
 
-    bool Null() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_NULL; return true; }
+    bool Bool(bool) { Logs.push_back(LOG_BOOL); return true; }
 
-    bool Bool(bool) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_BOOL; return true; }
+    bool Int(int) { Logs.push_back(LOG_INT); return true; }
 
-    bool Int(int) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_INT; return true; }
+    bool Uint(unsigned) { Logs.push_back(LOG_INT); return true; }
 
-    bool Uint(unsigned) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_INT; return true; }
+    bool Int64(int64_t) { Logs.push_back(LOG_INT64); return true; }
 
-    bool Int64(int64_t) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_INT64; return true; }
+    bool Uint64(uint64_t) { Logs.push_back(LOG_UINT64); return true; }
 
-    bool Uint64(uint64_t) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_UINT64; return true; }
+    bool Double(double) { Logs.push_back(LOG_DOUBLE); return true; }
 
-    bool Double(double) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_DOUBLE; return true; }
+    bool RawNumber(const Ch*, SizeType, bool) { Logs.push_back(LOG_STRING); return true; }
 
-    bool RawNumber(const Ch*, SizeType, bool) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STRING; return true; }
+    bool String(const Ch*, SizeType, bool) { Logs.push_back(LOG_STRING); return true; }
 
-    bool String(const Ch*, SizeType, bool) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STRING; return true; }
+    bool StartObject() { Logs.push_back(LOG_STARTOBJECT); return true; }
 
-    bool StartObject() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STARTOBJECT; return true; }
-
-    bool Key (const Ch*, SizeType, bool) { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_KEY; return true; }
+    bool Key (const Ch*, SizeType, bool) { Logs.push_back(LOG_KEY); return true; }
 
     bool EndObject(SizeType c) {
-        RAPIDJSON_ASSERT(LogCount < LogCapacity);
         RAPIDJSON_ASSERT((static_cast<uint32_t>(c) & 0xF0000000) == 0);
-        Logs[LogCount++] = LOG_ENDOBJECT | static_cast<uint32_t>(c);
+        Logs.push_back(LOG_ENDOBJECT | static_cast<uint32_t>(c));
         return true;
     }
 
-    bool StartArray() { RAPIDJSON_ASSERT(LogCount < LogCapacity); Logs[LogCount++] = LOG_STARTARRAY; return true; }
+    bool StartArray() { Logs.push_back(LOG_STARTARRAY); return true; }
 
     bool EndArray(SizeType c) {
-        RAPIDJSON_ASSERT(LogCount < LogCapacity);
         RAPIDJSON_ASSERT((static_cast<uint32_t>(c) & 0xF0000000) == 0);
-        Logs[LogCount++] = LOG_ENDARRAY | static_cast<uint32_t>(c);
+        Logs.push_back(LOG_ENDARRAY | static_cast<uint32_t>(c));
         return true;
     }
 };
@@ -1559,26 +1555,26 @@ TEST(Reader, IterativeParsing_General) {
         EXPECT_FALSE(reader.HasParseError());
 
         uint32_t e[] = {
-            handler.LOG_STARTARRAY,
-            handler.LOG_INT,
-            handler.LOG_STARTOBJECT,
-            handler.LOG_KEY,
-            handler.LOG_STARTARRAY,
-            handler.LOG_INT,
-            handler.LOG_INT,
-            handler.LOG_ENDARRAY | 2,
-            handler.LOG_ENDOBJECT | 1,
-            handler.LOG_NULL,
-            handler.LOG_BOOL,
-            handler.LOG_BOOL,
-            handler.LOG_STRING,
-            handler.LOG_DOUBLE,
-            handler.LOG_ENDARRAY | 7
+            LOG_STARTARRAY,
+            LOG_INT,
+            LOG_STARTOBJECT,
+            LOG_KEY,
+            LOG_STARTARRAY,
+            LOG_INT,
+            LOG_INT,
+            LOG_ENDARRAY | 2,
+            LOG_ENDOBJECT | 1,
+            LOG_NULL,
+            LOG_BOOL,
+            LOG_BOOL,
+            LOG_STRING,
+            LOG_DOUBLE,
+            LOG_ENDARRAY | 7
         };
 
-        EXPECT_EQ(sizeof(e) / sizeof(int), handler.LogCount);
+        EXPECT_EQ(sizeof(e) / sizeof(int), handler.Logs.size());
 
-        for (size_t i = 0; i < handler.LogCount; ++i) {
+        for (size_t i = 0; i < handler.Logs.size(); ++i) {
             EXPECT_EQ(e[i], handler.Logs[i]) << "i = " << i;
         }
     }
@@ -1596,24 +1592,24 @@ TEST(Reader, IterativeParsing_Count) {
         EXPECT_FALSE(reader.HasParseError());
 
         uint32_t e[] = {
-            handler.LOG_STARTARRAY,
-            handler.LOG_STARTOBJECT,
-            handler.LOG_ENDOBJECT | 0,
-            handler.LOG_STARTOBJECT,
-            handler.LOG_KEY,
-            handler.LOG_INT,
-            handler.LOG_ENDOBJECT | 1,
-            handler.LOG_STARTARRAY,
-            handler.LOG_INT,
-            handler.LOG_ENDARRAY | 1,
-            handler.LOG_STARTARRAY,
-            handler.LOG_ENDARRAY | 0,
-            handler.LOG_ENDARRAY | 4
+            LOG_STARTARRAY,
+            LOG_STARTOBJECT,
+            LOG_ENDOBJECT | 0,
+            LOG_STARTOBJECT,
+            LOG_KEY,
+            LOG_INT,
+            LOG_ENDOBJECT | 1,
+            LOG_STARTARRAY,
+            LOG_INT,
+            LOG_ENDARRAY | 1,
+            LOG_STARTARRAY,
+            LOG_ENDARRAY | 0,
+            LOG_ENDARRAY | 4
         };
 
-        EXPECT_EQ(sizeof(e) / sizeof(int), handler.LogCount);
+        EXPECT_EQ(sizeof(e) / sizeof(int), handler.Logs.size());
 
-        for (size_t i = 0; i < handler.LogCount; ++i) {
+        for (size_t i = 0; i < handler.Logs.size(); ++i) {
             EXPECT_EQ(e[i], handler.Logs[i]) << "i = " << i;
         }
     }
@@ -1623,21 +1619,21 @@ TEST(Reader, IterativePullParsing_General) {
     {
         IterativeParsingReaderHandler<> handler;
         uint32_t e[] = {
-            handler.LOG_STARTARRAY,
-            handler.LOG_INT,
-            handler.LOG_STARTOBJECT,
-            handler.LOG_KEY,
-            handler.LOG_STARTARRAY,
-            handler.LOG_INT,
-            handler.LOG_INT,
-            handler.LOG_ENDARRAY | 2,
-            handler.LOG_ENDOBJECT | 1,
-            handler.LOG_NULL,
-            handler.LOG_BOOL,
-            handler.LOG_BOOL,
-            handler.LOG_STRING,
-            handler.LOG_DOUBLE,
-            handler.LOG_ENDARRAY | 7
+            LOG_STARTARRAY,
+            LOG_INT,
+            LOG_STARTOBJECT,
+            LOG_KEY,
+            LOG_STARTARRAY,
+            LOG_INT,
+            LOG_INT,
+            LOG_ENDARRAY | 2,
+            LOG_ENDOBJECT | 1,
+            LOG_NULL,
+            LOG_BOOL,
+            LOG_BOOL,
+            LOG_STRING,
+            LOG_DOUBLE,
+            LOG_ENDARRAY | 7
         };
 
         StringStream is("[1, {\"k\": [1, 2]}, null, false, true, \"string\", 1.2]");
@@ -1645,21 +1641,21 @@ TEST(Reader, IterativePullParsing_General) {
 
         reader.IterativeParseInit();
         while (!reader.IterativeParseComplete()) {
-            size_t oldLogCount = handler.LogCount;
+            size_t oldLogCount = handler.Logs.size();
             EXPECT_TRUE(oldLogCount < sizeof(e) / sizeof(int)) << "overrun";
 
             EXPECT_TRUE(reader.IterativeParseNext<kParseDefaultFlags>(is, handler)) << "parse fail";
-            EXPECT_EQ(handler.LogCount, oldLogCount + 1) << "handler should be invoked exactly once each time";
+            EXPECT_EQ(handler.Logs.size(), oldLogCount + 1) << "handler should be invoked exactly once each time";
             EXPECT_EQ(e[oldLogCount], handler.Logs[oldLogCount]) << "wrong event returned";
         }
 
         EXPECT_FALSE(reader.HasParseError());
-        EXPECT_EQ(sizeof(e) / sizeof(int), handler.LogCount) << "handler invoked wrong number of times";
+        EXPECT_EQ(sizeof(e) / sizeof(int), handler.Logs.size()) << "handler invoked wrong number of times";
 
         // The handler should not be invoked when the JSON has been fully read, but it should not fail
-        size_t oldLogCount = handler.LogCount;
+        size_t oldLogCount = handler.Logs.size();
         EXPECT_TRUE(reader.IterativeParseNext<kParseDefaultFlags>(is, handler)) << "parse-next past complete is allowed";
-        EXPECT_EQ(handler.LogCount, oldLogCount) << "parse-next past complete should not invoke handler";
+        EXPECT_EQ(handler.Logs.size(), oldLogCount) << "parse-next past complete should not invoke handler";
         EXPECT_FALSE(reader.HasParseError()) << "parse-next past complete should not generate parse error";
     }
 }
