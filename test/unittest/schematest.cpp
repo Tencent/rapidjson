@@ -2645,6 +2645,7 @@ TEST(SchemaValidator, Ref_remote_issue1210) {
         SchemaDocumentProvider(const SchemaDocumentProvider&) : collection(NULL) {
         }
         SchemaDocumentProvider& operator=(const SchemaDocumentProvider&) {
+            collection = NULL;
             return *this;
         }
 
