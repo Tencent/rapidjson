@@ -179,8 +179,6 @@ RAPIDJSON_MULTILINEMACRO_END
 #endif
 
 //! Combination of validate flags
-/*! \see
- */
 enum ValidateFlag {
     kValidateNoFlags = 0,                                       //!< No flags are set.
     kValidateContinueOnErrorFlag = 1,                           //!< Don't stop after first validation error.
@@ -369,7 +367,9 @@ public:
         uint64_t h = Hash(0, kObjectType);
         uint64_t* kv = stack_.template Pop<uint64_t>(memberCount * 2);
         for (SizeType i = 0; i < memberCount; i++)
-            h ^= Hash(kv[i * 2], kv[i * 2 + 1]);  // Use xor to achieve member order insensitive
+            // Issue #2205
+            // Hasing the key to avoid key=value cases with bug-prone zero-value hash
+            h ^= Hash(Hash(0, kv[i * 2]), kv[i * 2 + 1]);  // Use xor to achieve member order insensitive
         *stack_.template Push<uint64_t>() = h;
         return true;
     }
@@ -407,7 +407,7 @@ private:
     
     bool WriteBuffer(Type type, const void* data, size_t len) {
         // FNV-1a from http://isthe.com/chongo/tech/comp/fnv/
-        uint64_t h = Hash(RAPIDJSON_UINT64_C2(0x84222325, 0xcbf29ce4), type);
+        uint64_t h = Hash(RAPIDJSON_UINT64_C2(0xcbf29ce4, 0x84222325), type);
         const unsigned char* d = static_cast<const unsigned char*>(data);
         for (size_t i = 0; i < len; i++)
             h = Hash(h, d[i]);
@@ -2560,7 +2560,7 @@ public:
     //  If reporting all errors, the stack will be empty, so return "errors".
     const Ch* GetInvalidSchemaKeyword() const {
         if (!schemaStack_.Empty()) return CurrentContext().invalidKeyword;
-        if (GetContinueOnErrors() && !error_.ObjectEmpty()) return (const Ch*)GetErrorsString();
+        if (GetContinueOnErrors() && !error_.ObjectEmpty()) return static_cast<const Ch*>(GetErrorsString());
         return 0;
     }
 
@@ -2902,7 +2902,7 @@ public:
         ISchemaValidator* sv = new (GetStateAllocator().Malloc(sizeof(GenericSchemaValidator))) GenericSchemaValidator(*schemaDocument_, root, documentStack_.template Bottom<char>(), documentStack_.GetSize(),
         depth_ + 1,
         &GetStateAllocator());
-        sv->SetValidateFlags(inheritContinueOnErrors ? GetValidateFlags() : GetValidateFlags() & ~(unsigned)kValidateContinueOnErrorFlag);
+        sv->SetValidateFlags(inheritContinueOnErrors ? GetValidateFlags() : GetValidateFlags() & ~static_cast<unsigned>(kValidateContinueOnErrorFlag));
         return sv;
     }
 

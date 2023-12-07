@@ -99,6 +99,9 @@ TEST(SchemaValidator, Hasher) {
     TEST_HASHER("{\"a\":1}", "{\"a\":1}", true);
     TEST_HASHER("{\"a\":1}", "{\"b\":1}", false);
     TEST_HASHER("{\"a\":1}", "{\"a\":2}", false);
+    TEST_HASHER("{\"a\":\"a\"}", "{\"b\":\"b\"}", false); // Key equals value hashing
+    TEST_HASHER("{\"a\":\"a\", \"b\":\"b\"}", "{\"c\":\"c\", \"d\":\"d\"}", false);
+    TEST_HASHER("{\"a\":\"a\"}", "{\"b\":\"b\", \"c\":\"c\"}", false);
     TEST_HASHER("{\"a\":1, \"b\":2}", "{\"b\":2, \"a\":1}", true); // Member order insensitive
     TEST_HASHER("{}", "null", false);
     TEST_HASHER("{}", "false", false);
@@ -2282,7 +2285,7 @@ TEST(SchemaValidator, TestSuite) {
         MemoryPoolAllocator<>::Free(json);
         jsonAllocator.Clear();
     }
-    printf("%d / %d passed (%2d%%)\n", passCount, testCount, passCount * 100 / testCount);
+    printf("%u / %u passed (%2u%%)\n", passCount, testCount, passCount * 100 / testCount);
     if (passCount != testCount)
         ADD_FAILURE();
 }
