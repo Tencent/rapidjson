@@ -20,7 +20,7 @@ using namespace rapidjson;
 
 // static const char json[] = "{\"string\"\n\n:\"my string\",\"array\"\n:[\"1\", \"2\", \"3\"]}";
 
-bool testJson(const char *json, size_t &line, size_t &col) {
+static bool testJson(const char *json, size_t &line, size_t &col) {
     StringStream ss(json);
     CursorStreamWrapper<StringStream> csw(ss);
     Document document;
