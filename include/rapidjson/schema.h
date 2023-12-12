@@ -1645,9 +1645,13 @@ private:
 
     bool CheckDoubleMultipleOf(Context& context, double d) const {
         double a = std::abs(d), b = std::abs(multipleOf_.GetDouble());
-        double q = std::floor(a / b);
-        double r = a - q * b;
-        if (r > 0.0) {
+        double q = a / b;
+        double qRounded = std::floor(q + 0.5);
+        double scaledEpsilon = (q + qRounded) * std::numeric_limits<double>::epsilon();
+        double difference = std::abs(qRounded - q);
+        bool isMultiple = (difference <= scaledEpsilon)
+                                        || (difference < std::numeric_limits<double>::min());
+        if (!isMultiple) {
             context.error_handler.NotMultipleOf(d, multipleOf_);
             RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorMultipleOf);
         }
