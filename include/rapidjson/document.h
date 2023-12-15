@@ -2521,7 +2521,9 @@ private:
 
                 RawAssign(*e);
                 e->~GenericValue();
-                Allocator::Free(e);
+                if (Allocator::kNeedFree) {
+                    Allocator::Free(e);
+                }
             } else {
                 Member* m = GetMembersPointer();
 
