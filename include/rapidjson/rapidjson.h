@@ -39,6 +39,10 @@
 #include <cstdlib>  // malloc(), realloc(), free(), size_t
 #include <cstring>  // memset(), memcpy(), memmove(), memcmp()
 
+#ifndef __has_attribute
+#define __has_attribute(x) 0
+#endif
+
 ///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_VERSION_STRING
 //
@@ -242,6 +246,8 @@
 #if defined(_MSC_VER) && defined(NDEBUG)
 #define RAPIDJSON_FORCEINLINE __forceinline
 #elif defined(__GNUC__) && __GNUC__ >= 4 && defined(NDEBUG)
+#define RAPIDJSON_FORCEINLINE __attribute__((always_inline))
+#elif defined(__clang__) && __has_attribute(always_inline) && defined(NDEBUG)
 #define RAPIDJSON_FORCEINLINE __attribute__((always_inline))
 #else
 #define RAPIDJSON_FORCEINLINE
