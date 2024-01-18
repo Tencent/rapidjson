@@ -461,15 +461,7 @@ struct DocumentMove: public ::testing::Test {
 };
 
 typedef ::testing::Types< CrtAllocator, MemoryPoolAllocator<> > MoveAllocatorTypes;
-class TypeTestNames {
-public:
-    template <typename T>
-    static std::string GetName(int) {
-        if (std::is_same<T, CrtAllocator>()) return "CrtAllocator";
-        if (std::is_same<T, MemoryPoolAllocator<>>()) return "MemoryPoolAllocator<>";
-    }
-};
-TYPED_TEST_CASE(DocumentMove, MoveAllocatorTypes, TypeTestNames);
+TYPED_TEST_CASE(DocumentMove, MoveAllocatorTypes);
 
 TYPED_TEST(DocumentMove, MoveConstructor) {
     typedef TypeParam Allocator;
