@@ -288,6 +288,12 @@ private:
     Pointer ptr_; //!< raw pointer
 };
 
+template <bool Const, typename Encoding, typename Allocator> GenericMemberIterator<Const, Encoding, Allocator> 
+operator+(typename GenericMemberIterator<Const, Encoding, Allocator>::DifferenceType diff, GenericMemberIterator<Const, Encoding, Allocator> const& iter) {
+    return iter + diff;
+}
+
+
 #else // RAPIDJSON_NOMEMBERITERATORCLASS
 
 // class-based member iterator implementation disabled, use plain pointers
