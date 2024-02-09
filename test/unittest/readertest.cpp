@@ -184,6 +184,27 @@ TEST(Reader, ParseNumber_Integer) {
 #undef TEST_INTEGER
 }
 
+TEST(Reader, TestIssue1255) {
+    const char* str =
+        "6223372036854775296.1701512723685473547372536854755293372036854685477"
+        "529752233737201701512337200972013723685473123372036872036854236854737"
+        "247372368372367752975258547752975254729752547372368737201701512354737"
+        "83723677529752585477247372368372368547354737253685475529752\x03\xe8"
+        "18 9\xce";
+    const double x = 6223372036854775296.17;
+  
+    StringStream s(str);
+    ParseDoubleHandler h;
+    Reader reader;
+    ASSERT_EQ(kParseErrorDocumentRootNotSingular, reader.Parse<kParseFullPrecisionFlag>(s, h).Code());
+    EXPECT_EQ(1u, h.step_);
+    internal::Double e(x), a(h.actual_);
+    EXPECT_EQ(e.Uint64Value(), a.Uint64Value());
+    if (e.Uint64Value() != a.Uint64Value()) {
+        printf("  String: %s\n  Actual: %.17g\nExpected: %.17g\n", str, h.actual_, x);
+    }
+}
+
 template<bool fullPrecision>
 static void TestParseDouble() {
 #define TEST_DOUBLE(fullPrecision, str, x) \
@@ -192,6 +213,7 @@ static void TestParseDouble() {
         ParseDoubleHandler h; \
         Reader reader; \
         ASSERT_EQ(kParseErrorNone, reader.Parse<fullPrecision ? kParseFullPrecisionFlag : 0>(s, h).Code()); \
+        EXPECT_EQ(h.actual_, h.actual_); /* detect generation of NAN */ \
         EXPECT_EQ(1u, h.step_); \
         internal::Double e(x), a(h.actual_); \
         if (fullPrecision) { \
@@ -225,6 +247,7 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "1.234E-10", 1.234E-10);
     TEST_DOUBLE(fullPrecision, "1.79769e+308", 1.79769e+308);
     TEST_DOUBLE(fullPrecision, "2.22507e-308", 2.22507e-308);
+    TEST_DOUBLE(fullPrecision, "2e308", std::numeric_limits<double>::infinity());
     TEST_DOUBLE(fullPrecision, "-1.79769e+308", -1.79769e+308);
     TEST_DOUBLE(fullPrecision, "-2.22507e-308", -2.22507e-308);
     TEST_DOUBLE(fullPrecision, "4.9406564584124654e-324", 4.9406564584124654e-324); // minimum denormal
@@ -240,12 +263,13 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "2.2250738585072011e-308", 2.2250738585072011e-308); // http://www.exploringbinary.com/php-hangs-on-numeric-value-2-2250738585072011e-308/
     TEST_DOUBLE(fullPrecision, "1e-00011111111111", 0.0);                           // Issue #313
     TEST_DOUBLE(fullPrecision, "-1e-00011111111111", -0.0);
-    TEST_DOUBLE(fullPrecision, "1e-214748363", 0.0);                                  // Maximum supported negative exponent
+    TEST_DOUBLE(fullPrecision, "1e-214748363", 0.0);                                // Maximum supported negative exponent
     TEST_DOUBLE(fullPrecision, "1e-214748364", 0.0);
     TEST_DOUBLE(fullPrecision, "1e-21474836311", 0.0);
     TEST_DOUBLE(fullPrecision, "1.00000000001e-2147483638", 0.0);
     TEST_DOUBLE(fullPrecision, "0.017976931348623157e+310", 1.7976931348623157e+308); // Max double in another form
-    TEST_DOUBLE(fullPrecision, "128.74836467836484838364836483643636483648e-336", 0.0); // Issue #1251
+    TEST_DOUBLE(fullPrecision, "8847432036854773723683723677529854735473725368547554755293372036854685477529752529337203685468547770151233720097201372368547312337203687203685423685123372036872036854737247372368372367752975258547752975254729752547372368737201701512354737837236737247372368772473723683723456789012E66",
+              std::numeric_limits<double>::infinity());                             // For checking issue #1259
 
     // Since
     // abs((2^-1022 - 2^-1074) - 2.2250738585072012e-308) = 3.109754131239141401123495768877590405345064751974375599... x 10^-324
