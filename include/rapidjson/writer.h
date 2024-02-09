@@ -434,7 +434,7 @@ protected:
                     PutUnsafe(*os_, hexDigits[(trail      ) & 15]);                    
                 }
             }
-            else if ((sizeof(Ch) == 1 || static_cast<unsigned>(c) < 256) && RAPIDJSON_UNLIKELY(escape[static_cast<unsigned char>(c)]))  {
+            else if ((sizeof(Ch) == 1) && RAPIDJSON_UNLIKELY(escape[static_cast<unsigned char>(c)]))  {
                 is.Take();
                 PutUnsafe(*os_, '\\');
                 PutUnsafe(*os_, static_cast<typename OutputStream::Ch>(escape[static_cast<unsigned char>(c)]));
