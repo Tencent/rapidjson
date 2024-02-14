@@ -80,7 +80,7 @@ add_test(NAME unittest
     COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
-if(NOT MSVC)
+if(NOT MSVC AND VALGRIND_FOUND)
     # Not running SIMD.* unit test cases for Valgrind
     add_test(NAME valgrind_unittest
         COMMAND valgrind --suppressions=${CMAKE_SOURCE_DIR}/test/valgrind.supp --leak-check=full --error-exitcode=1 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/unittest --gtest_filter=-SIMD.*
