@@ -2021,6 +2021,174 @@ TEST(Reader, NumbersAsStrings) {
     }
 }
 
+struct BigIntsAsStringsHandler {
+    bool Null() { return true; }
+    bool Bool(bool) { return true; }
+    bool Int(int) { return true; }
+    bool Uint(unsigned) { return true; }
+    bool Int64(int64_t) { return true; }
+    bool Uint64(uint64_t) { return true;  }
+    bool Double(double) { return true; }
+    // 'str' is not null-terminated
+    bool RawNumber(const char* str, SizeType length, bool) {
+        if (expected_len_ > 0) {
+            EXPECT_TRUE(str != 0);
+            if (expected_len_ != length) {
+                std::cerr << "DEBUG: " << expected_len_ << " != " << length << "\n";
+            }
+            EXPECT_TRUE(expected_len_ == length);
+            EXPECT_TRUE(strncmp(str, expected_, length) == 0);
+        }
+        called = true;
+        return true;
+    }
+    bool String(const char*, SizeType, bool) { return true; }
+    bool StartObject() { return true; }
+    bool Key(const char*, SizeType, bool) { return true; }
+    bool EndObject(SizeType) { return true; }
+    bool StartArray() { return true; }
+    bool EndArray(SizeType) { return true; }
+
+    BigIntsAsStringsHandler(bool expected)
+        : expected_(expected ? "ERR" : NULL), expected_len_(0) {
+            called = false;
+        }
+
+    BigIntsAsStringsHandler(const char* expected)
+        : expected_(expected)
+        , expected_len_(strlen(expected)) {
+             called = false;
+        }
+
+    const char* expected_;
+    size_t expected_len_;
+    bool called;
+};
+
+TEST(Reader, BigIntsAsStrings) {
+    {
+        const char* json = "{ \"pi\": 3.1416 } ";
+        StringStream s(json);
+        BigIntsAsStringsHandler h(false);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseBigIntsAsStringsFlag>(s, h));
+        EXPECT_FALSE(h.called);
+    }
+    {
+        char* json = StrDup("{ \"pi\": 3.1416 } ");
+        InsituStringStream s(json);
+        BigIntsAsStringsHandler h(false);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseInsituFlag|kParseBigIntsAsStringsFlag>(s, h));
+        EXPECT_FALSE(h.called);
+        free(json);
+    }
+    {
+        const char* json = "{ \"gigabyte\": 1.0e9 } ";
+        StringStream s(json);
+        BigIntsAsStringsHandler h(false);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseBigIntsAsStringsFlag>(s, h));
+        EXPECT_FALSE(h.called);
+    }
+    {
+        char* json = StrDup("{ \"gigabyte\": 1.0e9 } ");
+        InsituStringStream s(json);
+        BigIntsAsStringsHandler h(false);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseInsituFlag|kParseBigIntsAsStringsFlag>(s, h));
+        EXPECT_FALSE(h.called);
+        free(json);
+    }
+    {
+        const char* json = "{ \"pi\": 314.159e-2 } ";
+        StringStream s(json);
+        BigIntsAsStringsHandler h(false);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseBigIntsAsStringsFlag>(s, h));
+        EXPECT_FALSE(h.called);
+    }
+    {
+        char* json = StrDup("{ \"gigabyte\": 314.159e-2 } ");
+        InsituStringStream s(json);
+        BigIntsAsStringsHandler h(false);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseInsituFlag|kParseBigIntsAsStringsFlag>(s, h));
+        EXPECT_FALSE(h.called);
+        free(json);
+    }
+    {
+        const char* json = "{ \"negative\": -1.54321 } ";
+        StringStream s(json);
+        BigIntsAsStringsHandler h(false);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseBigIntsAsStringsFlag>(s, h));
+        EXPECT_FALSE(h.called);
+    }
+    {
+        char* json = StrDup("{ \"negative\": -1.54321 } ");
+        InsituStringStream s(json);
+        BigIntsAsStringsHandler h(false);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseInsituFlag|kParseBigIntsAsStringsFlag>(s, h));
+        EXPECT_FALSE(h.called);
+        free(json);
+    }
+    {
+        const char* json = "{ \"pi\": 314.159e-2 } ";
+        std::stringstream ss(json);
+        IStreamWrapper s(ss);
+        BigIntsAsStringsHandler h(false);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseBigIntsAsStringsFlag>(s, h));
+        EXPECT_FALSE(h.called);
+    }
+    {
+        const char* json = "1234567";
+        std::stringstream ss(json);
+        IStreamWrapper s(ss);
+        BigIntsAsStringsHandler h(false);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseBigIntsAsStringsFlag>(s, h));
+        EXPECT_FALSE(h.called);
+    }
+    {
+        const char* json = "-1234567";
+        std::stringstream ss(json);
+        IStreamWrapper s(ss);
+        BigIntsAsStringsHandler h(false);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseBigIntsAsStringsFlag>(s, h));
+        EXPECT_FALSE(h.called);
+    }
+    {
+        char n1e319[321];   // '1' followed by 319 '0'
+        n1e319[0] = '1';
+        for (int i = 1; i < 320; i++)
+            n1e319[i] = '0';
+        n1e319[320] = '\0';
+        StringStream s(n1e319);
+        BigIntsAsStringsHandler h(n1e319);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseBigIntsAsStringsFlag>(s, h));
+        EXPECT_TRUE(h.called);
+    }
+    {
+        char n1e120[123];   // '1' followed by 120 '0' and `.5`
+        n1e120[0] = '1';
+        for (int i = 1; i < 120; i++)
+            n1e120[i] = '0';
+        n1e120[120] = '.';
+        n1e120[121] = '5';
+        n1e120[122] = '\0';
+        StringStream s(n1e120);
+        BigIntsAsStringsHandler h(false);
+        Reader reader;
+        EXPECT_TRUE(reader.Parse<kParseBigIntsAsStringsFlag>(s, h));
+        EXPECT_FALSE(h.called);
+    }
+}
+
 struct NumbersAsStringsHandlerWChar_t {
   bool Null() { return true; }
   bool Bool(bool) { return true; }
