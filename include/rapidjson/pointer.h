@@ -395,7 +395,7 @@ public:
                 return tokens_[i].index < rhs.tokens_[i].index;
 
             if (tokens_[i].length != rhs.tokens_[i].length)
-                return tokens_[i].length < rhs.tokens_[i].length;
+                return (tokens_[i].length) < (rhs.tokens_[i].length);
 
             if (int cmp = std::memcmp(tokens_[i].name, rhs.tokens_[i].name, sizeof(Ch) * tokens_[i].length))
                 return cmp < 0;
