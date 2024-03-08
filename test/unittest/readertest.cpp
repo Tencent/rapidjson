@@ -2324,17 +2324,21 @@ TEST(Reader, ParseNanAndInfinity) {
     double nan = std::numeric_limits<double>::quiet_NaN();
     double inf = std::numeric_limits<double>::infinity();
 
+    TEST_NAN_INF("nan", nan);
     TEST_NAN_INF("NaN", nan);
-    TEST_NAN_INF("-NaN", nan);
     TEST_NAN_INF("Inf", inf);
+    TEST_NAN_INF("inf", inf);
     TEST_NAN_INF("Infinity", inf);
+    TEST_NAN_INF("infinity", inf);
     TEST_NAN_INF("-Inf", -inf);
+    TEST_NAN_INF("-inf", -inf);
     TEST_NAN_INF("-Infinity", -inf);
+    TEST_NAN_INF("-infinity", -inf);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NInf", 1u);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NaInf", 2u);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "INan", 1u);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "InNan", 2u);
-    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "nan", 1u);
+    TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-NaN", 1u);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-nan", 1u);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NAN", 1u);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-Infinty", 6u);
