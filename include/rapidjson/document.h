@@ -878,10 +878,15 @@ public:
     /*! Need to destruct elements of array, members of object, or copy-string.
     */
     ~GenericValue() {
+        if (data_.f.flags == kNullFlag) return;
+
         // With RAPIDJSON_USE_MEMBERSMAP, the maps need to be destroyed to release
         // their Allocator if it's refcounted (e.g. MemoryPoolAllocator).
         if (Allocator::kNeedFree || (RAPIDJSON_USE_MEMBERSMAP+0 &&
                                      internal::IsRefCounted<Allocator>::Value)) {
+#if RAPIDJSON_ITERATIVE_DESTRUCTOR
+            CleanupIteratively();
+#endif
             switch(data_.f.flags) {
             case kArrayFlag:
                 {
@@ -2476,6 +2481,87 @@ private:
         if(str1 == str2) { return true; } // fast path for constant string
 
         return (std::memcmp(str1, str2, sizeof(Ch) * len1) == 0);
+    }
+
+    void CleanupIteratively() {
+        // The algorithm goes like this: we maintain the leftmost node of the JSON tree (it's called sink below),
+        // and until our value is simple (not an object nor array) we do:
+        // 1. For each but first child of the node move it into sink and update the sink pointer
+        // 2. Copy first child into temporary
+        // 3. Deallocate self
+        // 4. Move temporary child copy into self
+        //
+        // This way we basically transform the tree into linked list, and deallocate it on the go.
+        GenericValue* sink = this;
+        SizeType depth_left = 0;
+
+        const auto update_sink = [&depth_left, &sink] {
+            while (true) {
+                ++depth_left;
+                if (sink->IsObject() && sink->data_.o.size) { sink = &sink->MemberBegin()->value; }
+                else if (sink->IsArray() && sink->data_.a.size){ sink = sink->Begin(); }
+                else { --depth_left; break; }
+            }
+
+            // Invariant to uphold: sink doesn't have children and it's data is destroyed
+            sink->FreeValueData();
+        };
+        update_sink();
+
+        while (depth_left > 0) {
+            RAPIDJSON_ASSERT(IsObject() || IsArray());
+            if (IsArray()) {
+                GenericValue* e = GetElementsPointer();
+
+                for (GenericValue* v = e + 1; v != e + data_.a.size; ++v) {
+                    sink->RawAssign(*v);
+                    update_sink();
+                    v->~GenericValue();
+                }
+
+                RawAssign(*e);
+                e->~GenericValue();
+                if (Allocator::kNeedFree) {
+                    Allocator::Free(e);
+                }
+            } else {
+                Member* m = GetMembersPointer();
+
+                for (Member* v = m + 1; v != m + data_.o.size; ++v) {
+                    sink->RawAssign(v->value);
+                    update_sink();
+                }
+
+                Data child_data{m->value.data_};
+                m->value.data_.f.flags = kNullFlag;
+                DoFreeMembers();
+
+                data_ = child_data;
+            }
+
+            --depth_left;
+        }
+    }
+
+    // Only used from CleanupIteratively,
+    // precondition: if array or object, then empty
+    void FreeValueData() {
+        if (Allocator::kNeedFree) {
+            if (data_.f.flags == kCopyStringFlag) {
+                // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+                Allocator::Free(const_cast<Ch*>(GetStringPointer()));
+            }
+            else if (IsObject()) {
+                RAPIDJSON_ASSERT(data_.o.size == 0);
+                DoFreeMembers();
+            }
+            else if (IsArray()) {
+                RAPIDJSON_ASSERT(data_.a.size == 0);
+                Allocator::Free(GetElementsPointer());
+            }
+        }
+
+        data_.f.flags = kNullFlag;
     }
 
     Data data_;
