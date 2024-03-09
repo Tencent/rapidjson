@@ -28,69 +28,69 @@ env:
 matrix:
   include:
     # gcc
-    - env: CONF=release ARCH=x86     CXX11=ON  CXX17=OFF MEMBERSMAP=OFF
+    - env: CONF=release ARCH=x86     CXX11=ON  CXX17=OFF CXX20=OFF MEMBERSMAP=OFF
       compiler: gcc
       arch: amd64
-    - env: CONF=release ARCH=x86_64  CXX11=ON  CXX17=OFF MEMBERSMAP=OFF
+    - env: CONF=release ARCH=x86_64  CXX11=ON  CXX17=OFF CXX20=OFF MEMBERSMAP=OFF
       compiler: gcc
       arch: amd64
-    - env: CONF=release ARCH=x86_64  CXX11=ON  CXX17=OFF MEMBERSMAP=ON
+    - env: CONF=release ARCH=x86_64  CXX11=ON  CXX17=OFF CXX20=OFF MEMBERSMAP=ON
       compiler: gcc
       arch: amd64
-    - env: CONF=debug   ARCH=x86     CXX11=OFF CXX17=OFF MEMBERSMAP=OFF
+    - env: CONF=debug   ARCH=x86     CXX11=OFF CXX17=OFF CXX20=OFF MEMBERSMAP=OFF
       compiler: gcc
       arch: amd64
-    - env: CONF=debug   ARCH=x86_64  CXX11=OFF CXX17=OFF MEMBERSMAP=OFF
+    - env: CONF=debug   ARCH=x86_64  CXX11=OFF CXX17=OFF CXX20=OFF MEMBERSMAP=OFF
       compiler: gcc
       arch: amd64
-    - env: CONF=debug   ARCH=x86     CXX11=OFF CXX17=ON  MEMBERSMAP=ON CXX_FLAGS='-D_GLIBCXX_DEBUG'
+    - env: CONF=debug   ARCH=x86     CXX11=OFF CXX17=ON  CXX20=OFF MEMBERSMAP=ON CXX_FLAGS='-D_GLIBCXX_DEBUG'
       compiler: gcc
       arch: amd64
-    - env: CONF=debug   ARCH=x86_64  CXX11=OFF CXX17=ON  MEMBERSMAP=ON CXX_FLAGS='-D_GLIBCXX_DEBUG'
+    - env: CONF=debug   ARCH=x86_64  CXX11=OFF CXX17=ON  CXX20=OFF MEMBERSMAP=ON CXX_FLAGS='-D_GLIBCXX_DEBUG'
       compiler: gcc
       arch: amd64
-    - env: CONF=release ARCH=aarch64 CXX11=ON  CXX17=OFF MEMBERSMAP=OFF
+    - env: CONF=release ARCH=aarch64 CXX11=ON  CXX17=OFF CXX20=OFF MEMBERSMAP=OFF
       compiler: gcc
       arch: arm64
-    - env: CONF=release ARCH=aarch64 CXX11=OFF CXX17=OFF MEMBERSMAP=OFF
+    - env: CONF=release ARCH=aarch64 CXX11=OFF CXX17=OFF CXX20=OFF MEMBERSMAP=OFF
       compiler: gcc
       arch: arm64
-    - env: CONF=release ARCH=aarch64 CXX11=OFF CXX17=ON  MEMBERSMAP=ON
+    - env: CONF=release ARCH=aarch64 CXX11=OFF CXX17=ON  CXX20=OFF MEMBERSMAP=ON
       compiler: gcc
       arch: arm64
     # clang
-    - env: CONF=release ARCH=x86     CXX11=ON  CXX17=OFF MEMBERSMAP=ON  CCACHE_CPP2=yes
+    - env: CONF=release ARCH=x86     CXX11=ON  CXX17=OFF CXX20=OFF MEMBERSMAP=ON  CCACHE_CPP2=yes
       compiler: clang
       arch: amd64
-    - env: CONF=release ARCH=x86_64  CXX11=ON  CXX17=OFF MEMBERSMAP=ON  CCACHE_CPP2=yes
+    - env: CONF=release ARCH=x86_64  CXX11=ON  CXX17=OFF CXX20=OFF MEMBERSMAP=ON  CCACHE_CPP2=yes
       compiler: clang
       arch: amd64
-    - env: CONF=release ARCH=x86_64  CXX11=ON  CXX17=OFF MEMBERSMAP=OFF CCACHE_CPP2=yes
+    - env: CONF=release ARCH=x86_64  CXX11=ON  CXX17=OFF CXX20=OFF MEMBERSMAP=OFF CCACHE_CPP2=yes
       compiler: clang
       arch: amd64
-    - env: CONF=debug   ARCH=x86     CXX11=OFF CXX17=OFF MEMBERSMAP=ON  CCACHE_CPP2=yes
+    - env: CONF=debug   ARCH=x86     CXX11=OFF CXX17=OFF CXX20=OFF MEMBERSMAP=ON  CCACHE_CPP2=yes
       compiler: clang
       arch: amd64
-    - env: CONF=debug   ARCH=x86_64  CXX11=OFF CXX17=OFF MEMBERSMAP=ON  CCACHE_CPP2=yes
+    - env: CONF=debug   ARCH=x86_64  CXX11=OFF CXX17=OFF CXX20=OFF MEMBERSMAP=ON  CCACHE_CPP2=yes
       compiler: clang
       arch: amd64
-    - env: CONF=debug   ARCH=x86     CXX11=OFF CXX17=ON  MEMBERSMAP=OFF CCACHE_CPP2=yes
+    - env: CONF=debug   ARCH=x86     CXX11=OFF CXX17=ON  CXX20=OFF MEMBERSMAP=OFF CCACHE_CPP2=yes
       compiler: clang
       arch: amd64
-    - env: CONF=debug   ARCH=x86_64  CXX11=OFF CXX17=ON  MEMBERSMAP=OFF CCACHE_CPP2=yes
+    - env: CONF=debug   ARCH=x86_64  CXX11=OFF CXX17=ON  CXX20=OFF MEMBERSMAP=OFF CCACHE_CPP2=yes
       compiler: clang
       arch: amd64
-    - env: CONF=debug   ARCH=aarch64 CXX11=ON  CXX17=OFF MEMBERSMAP=ON  CCACHE_CPP2=yes
+    - env: CONF=debug   ARCH=aarch64 CXX11=ON  CXX17=OFF CXX20=OFF MEMBERSMAP=ON  CCACHE_CPP2=yes
       compiler: clang
       arch: arm64
-    - env: CONF=debug   ARCH=aarch64 CXX11=OFF CXX17=OFF MEMBERSMAP=ON  CCACHE_CPP2=yes
+    - env: CONF=debug   ARCH=aarch64 CXX11=OFF CXX17=OFF CXX20=OFF MEMBERSMAP=ON  CCACHE_CPP2=yes
       compiler: clang
       arch: arm64
-    - env: CONF=debug   ARCH=aarch64 CXX11=OFF CXX17=ON  MEMBERSMAP=OFF CCACHE_CPP2=yes
+    - env: CONF=debug   ARCH=aarch64 CXX11=OFF CXX17=ON  CXX20=OFF MEMBERSMAP=OFF CCACHE_CPP2=yes
       compiler: clang
       arch: arm64
     # coverage report
-    - env: CONF=debug   ARCH=x86     GCOV_FLAGS='--coverage' CXX_FLAGS='-O0' CXX11=OFF CXX17=OFF
+    - env: CONF=debug   ARCH=x86     GCOV_FLAGS='--coverage' CXX_FLAGS='-O0' CXX11=OFF CXX17=OFF CXX20=OFF
       compiler: gcc
       arch: amd64
       cache:
@@ -99,7 +99,7 @@ matrix:
       after_success:
         - pip install --user cpp-coveralls
         - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
-    - env: CONF=debug   ARCH=x86_64  GCOV_FLAGS='--coverage' CXX_FLAGS='-O0' CXX11=ON  CXX17=OFF MEMBERSMAP=ON
+    - env: CONF=debug   ARCH=x86_64  GCOV_FLAGS='--coverage' CXX_FLAGS='-O0' CXX11=ON  CXX17=OFF CXX20=OFF MEMBERSMAP=ON
       compiler: gcc
       arch: amd64
       cache:
@@ -108,7 +108,7 @@ matrix:
       after_success:
         - pip install --user cpp-coveralls
         - coveralls -r .. --gcov-options '\-lp' -e thirdparty -e example -e test -e build/CMakeFiles -e include/rapidjson/msinttypes -e include/rapidjson/internal/meta.h -e include/rapidjson/error/en.h
-    - env: CONF=debug   ARCH=aarch64 GCOV_FLAGS='--coverage' CXX_FLAGS='-O0' CXX11=OFF CXX17=ON
+    - env: CONF=debug   ARCH=aarch64 GCOV_FLAGS='--coverage' CXX_FLAGS='-O0' CXX11=OFF CXX17=ON  CXX20=OFF
       compiler: gcc
       arch: arm64
       cache:
@@ -155,6 +155,7 @@ script:
       -DRAPIDJSON_USE_MEMBERSMAP=$MEMBERSMAP
       -DRAPIDJSON_BUILD_CXX11=$CXX11
       -DRAPIDJSON_BUILD_CXX17=$CXX17
+      -DRAPIDJSON_BUILD_CXX20=$CXX20
       -DCMAKE_VERBOSE_MAKEFILE=ON
       -DCMAKE_BUILD_TYPE=$CONF
       -DCMAKE_CXX_FLAGS="$ARCH_FLAGS $GCOV_FLAGS $CXX_FLAGS"
