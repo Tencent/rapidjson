@@ -265,5 +265,7 @@ IF(CMAKE_INSTALL_DIR)
         COMPONENT dev)
 
     INSTALL(TARGETS RapidJSON EXPORT RapidJSON-targets)
+    # Generate the export targets for the build tree
+    EXPORT(EXPORT RapidJSON-targets)
     INSTALL(EXPORT RapidJSON-targets DESTINATION ${CMAKE_INSTALL_DIR})
 ENDIF()
