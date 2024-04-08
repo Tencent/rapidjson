@@ -8,7 +8,7 @@ IF(GTESTSRC_FOUND)
         set(gtest_force_shared_crt ON)
     endif()
 
-    add_subdirectory(${GTEST_SOURCE_DIR} ${CMAKE_BINARY_DIR}/googletest)
+    add_subdirectory(${GTEST_SOURCE_DIR}/../ ${CMAKE_BINARY_DIR}/gtest)
     include_directories(SYSTEM ${GTEST_INCLUDE_DIR})
 
     set(TEST_LIBRARIES gtest gtest_main)
