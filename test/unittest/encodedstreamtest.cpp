@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -113,8 +113,8 @@ protected:
                 EXPECT_EQ(expected, actual);
             }
             EXPECT_EQ('\0', s.Peek());
-            free(data);
             EXPECT_EQ(size, eis.Tell());
+            free(data);
         }
     }
 

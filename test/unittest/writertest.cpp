@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -500,6 +500,18 @@ TEST(Writer, NaN) {
     EXPECT_FALSE(writer2.Double(nan));
 }
 
+TEST(Writer, NaNToNull) {
+    double nan = std::numeric_limits<double>::quiet_NaN();
+
+    EXPECT_TRUE(internal::Double(nan).IsNan());
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfNullFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(nan));
+        EXPECT_STREQ("null", buffer.GetString());
+    }
+}
+
 TEST(Writer, Inf) {
     double inf = std::numeric_limits<double>::infinity();
 
@@ -522,6 +534,24 @@ TEST(Writer, Inf) {
         EXPECT_TRUE(writer.Double(-inf));
     }
     EXPECT_STREQ("Infinity-Infinity", buffer.GetString());
+}
+
+TEST(Writer, InfToNull) {
+    double inf = std::numeric_limits<double>::infinity();
+
+    EXPECT_TRUE(internal::Double(inf).IsInf());
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfNullFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(inf));
+        EXPECT_STREQ("null", buffer.GetString());
+    }
+    {
+        StringBuffer buffer;
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfNullFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(-inf));
+        EXPECT_STREQ("null", buffer.GetString());
+    }
 }
 
 TEST(Writer, RawValue) {

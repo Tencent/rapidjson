@@ -1,6 +1,6 @@
 # DOM
 
-文档对象模型（Document Object Model, DOM）是一种罝于内存中的 JSON 表示方式，以供查询及操作。我们己于 [教程](doc/tutorial.zh-cn.md) 中介绍了 DOM 的基本用法，本节将讲述一些细节及高级用法。
+文档对象模型（Document Object Model, DOM）是一种罝于内存中的 JSON 表示方式，以供查询及操作。我们已于 [教程](doc/tutorial.zh-cn.md) 中介绍了 DOM 的基本用法，本节将讲述一些细节及高级用法。
 
 [TOC]
 

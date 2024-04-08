@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -26,6 +26,7 @@
 #include "rapidjson/memorystream.h"
 
 #include <fstream>
+#include <vector>
 
 #ifdef RAPIDJSON_SSE2
 #define SIMD_SUFFIX(name) name##_SSE2
@@ -52,7 +53,7 @@ public:
         // Parse as a document
         EXPECT_FALSE(doc_.Parse(json_).HasParseError());
 
-        for (size_t i = 0; i < 7; i++)
+        for (size_t i = 0; i < 8; i++)
             EXPECT_FALSE(typesDoc_[i].Parse(types_[i]).HasParseError());
     }
 
@@ -68,7 +69,7 @@ private:
 protected:
     char *temp_;
     Document doc_;
-    Document typesDoc_[7];
+    Document typesDoc_[8];
 };
 
 TEST_F(RapidJson, SIMD_SUFFIX(ReaderParseInsitu_DummyHandler)) {
@@ -332,6 +333,23 @@ TEST_F(RapidJson, DocumentAccept) {
         ValueCounter counter;
         doc_.Accept(counter);
         EXPECT_EQ(4339u, counter.count_);
+    }
+}
+
+TEST_F(RapidJson, DocumentFind) {
+    typedef Document::ValueType ValueType;
+    typedef ValueType::ConstMemberIterator ConstMemberIterator;
+    const Document &doc = typesDoc_[7]; // alotofkeys.json
+    if (doc.IsObject()) {
+        std::vector<const ValueType*> keys;
+        for (ConstMemberIterator it = doc.MemberBegin(); it != doc.MemberEnd(); ++it) {
+            keys.push_back(&it->name);
+        }
+        for (size_t i = 0; i < kTrialCount; i++) {
+            for (size_t j = 0; j < keys.size(); j++) {
+                EXPECT_TRUE(doc.FindMember(*keys[j]) != doc.MemberEnd());
+            }
+        }
     }
 }
 

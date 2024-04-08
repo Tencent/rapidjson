@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -325,6 +325,8 @@ TEST(Document, Swap) {
     EXPECT_TRUE(d1.IsNull());
 
     // reset document, including allocator
+    // so clear o before so that it doesnt contain dangling elements
+    o.Clear();
     Document().Swap(d2);
     EXPECT_TRUE(d2.IsNull());
     EXPECT_NE(&d2.GetAllocator(), &a);

@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -1060,7 +1060,7 @@ static void TestArray(T& x, Allocator& allocator) {
             x.Clear();
             for (unsigned i = 0; i < n; i++)
                 x.PushBack(Value(kArrayType).PushBack(i, allocator).Move(), allocator);
-            
+
             itr = x.Erase(x.Begin() + first, x.Begin() + last);
             if (last == n)
                 EXPECT_EQ(x.End(), itr);
@@ -1078,9 +1078,9 @@ static void TestArray(T& x, Allocator& allocator) {
 }
 
 TEST(Value, Array) {
+    Value::AllocatorType allocator;
     Value x(kArrayType);
     const Value& y = x;
-    Value::AllocatorType allocator;
 
     EXPECT_EQ(kArrayType, x.GetType());
     EXPECT_TRUE(x.IsArray());
@@ -1119,6 +1119,16 @@ TEST(Value, Array) {
     z.SetArray();
     EXPECT_TRUE(z.IsArray());
     EXPECT_TRUE(z.Empty());
+
+    // PR #1503: assign from inner Value
+    {
+        CrtAllocator a; // Free() is not a noop
+        GenericValue<UTF8<>, CrtAllocator> nullValue;
+        GenericValue<UTF8<>, CrtAllocator> arrayValue(kArrayType);
+        arrayValue.PushBack(nullValue, a);
+        arrayValue = arrayValue[0]; // shouldn't crash (use after free)
+        EXPECT_TRUE(arrayValue.IsNull());
+    }
 }
 
 TEST(Value, ArrayHelper) {
@@ -1481,9 +1491,9 @@ static void TestObject(T& x, Allocator& allocator) {
 }
 
 TEST(Value, Object) {
+    Value::AllocatorType allocator;
     Value x(kObjectType);
     const Value& y = x; // const version
-    Value::AllocatorType allocator;
 
     EXPECT_EQ(kObjectType, x.GetType());
     EXPECT_TRUE(x.IsObject());
@@ -1546,7 +1556,7 @@ TEST(Value, ObjectHelper) {
         EXPECT_STREQ("apple", y["a"].GetString());
         EXPECT_TRUE(x.IsObject());  // Invariant
     }
-    
+
     {
         Value x(kObjectType);
         x.AddMember("a", "apple", allocator);
@@ -1571,7 +1581,7 @@ TEST(Value, ObjectHelperRangeFor) {
     {
         int i = 0;
         for (auto& m : x.GetObject()) {
-            char name[10];
+            char name[11];
             sprintf(name, "%d", i);
             EXPECT_STREQ(name, m.name.GetString());
             EXPECT_EQ(i, m.value.GetInt());
@@ -1582,7 +1592,7 @@ TEST(Value, ObjectHelperRangeFor) {
     {
         int i = 0;
         for (const auto& m : const_cast<const Value&>(x).GetObject()) {
-            char name[10];
+            char name[11];
             sprintf(name, "%d", i);
             EXPECT_STREQ(name, m.name.GetString());
             EXPECT_EQ(i, m.value.GetInt());
@@ -1639,10 +1649,11 @@ TEST(Value, BigNestedObject) {
     MemoryPoolAllocator<> allocator;
     Value x(kObjectType);
     static const SizeType n = 200;
+    const char* format = std::numeric_limits<SizeType>::is_signed ? "%d" : "%u";
 
     for (SizeType i = 0; i < n; i++) {
         char name1[10];
-        sprintf(name1, "%d", i);
+        sprintf(name1, format, i);
 
         // Value name(name1); // should not compile
         Value name(name1, static_cast<SizeType>(strlen(name1)), allocator);
@@ -1650,7 +1661,7 @@ TEST(Value, BigNestedObject) {
 
         for (SizeType j = 0; j < n; j++) {
             char name2[10];
-            sprintf(name2, "%d", j);
+            sprintf(name2, format, j);
 
             Value name3(name2, static_cast<SizeType>(strlen(name2)), allocator);
             Value number(static_cast<int>(i * n + j));
@@ -1663,11 +1674,11 @@ TEST(Value, BigNestedObject) {
 
     for (SizeType i = 0; i < n; i++) {
         char name1[10];
-        sprintf(name1, "%d", i);
-        
+        sprintf(name1, format, i);
+
         for (SizeType j = 0; j < n; j++) {
             char name2[10];
-            sprintf(name2, "%d", j);
+            sprintf(name2, format, j);
             x[name1];
             EXPECT_EQ(static_cast<int>(i * n + j), x[name1][name2].GetInt());
         }
@@ -1679,8 +1690,8 @@ TEST(Value, BigNestedObject) {
 TEST(Value, RemoveLastElement) {
     rapidjson::Document doc;
     rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
-    rapidjson::Value objVal(rapidjson::kObjectType);        
-    objVal.AddMember("var1", 123, allocator);       
+    rapidjson::Value objVal(rapidjson::kObjectType);
+    objVal.AddMember("var1", 123, allocator);
     objVal.AddMember("var2", "444", allocator);
     objVal.AddMember("var3", 555, allocator);
     EXPECT_TRUE(objVal.HasMember("var3"));
@@ -1702,22 +1713,22 @@ TEST(Document, CrtAllocator) {
 
 static void TestShortStringOptimization(const char* str) {
     const rapidjson::SizeType len = static_cast<rapidjson::SizeType>(strlen(str));
-	
+
     rapidjson::Document doc;
     rapidjson::Value val;
     val.SetString(str, len, doc.GetAllocator());
-	
-	EXPECT_EQ(val.GetStringLength(), len);
-	EXPECT_STREQ(val.GetString(), str);
+
+    EXPECT_EQ(val.GetStringLength(), len);
+    EXPECT_STREQ(val.GetString(), str);
 }
 
 TEST(Value, AllocateShortString) {
-	TestShortStringOptimization("");                 // edge case: empty string
-	TestShortStringOptimization("12345678");         // regular case for short strings: 8 chars
-	TestShortStringOptimization("12345678901");      // edge case: 11 chars in 32-bit mode (=> short string)
-	TestShortStringOptimization("123456789012");     // edge case: 12 chars in 32-bit mode (=> regular string)
-	TestShortStringOptimization("123456789012345");  // edge case: 15 chars in 64-bit mode (=> short string)
-	TestShortStringOptimization("1234567890123456"); // edge case: 16 chars in 64-bit mode (=> regular string)
+    TestShortStringOptimization("");                 // edge case: empty string
+    TestShortStringOptimization("12345678");         // regular case for short strings: 8 chars
+    TestShortStringOptimization("12345678901");      // edge case: 11 chars in 32-bit mode (=> short string)
+    TestShortStringOptimization("123456789012");     // edge case: 12 chars in 32-bit mode (=> regular string)
+    TestShortStringOptimization("123456789012345");  // edge case: 15 chars in 64-bit mode (=> short string)
+    TestShortStringOptimization("1234567890123456"); // edge case: 16 chars in 64-bit mode (=> regular string)
 }
 
 template <int e>
@@ -1792,7 +1803,7 @@ static void MergeDuplicateKey(Value& v, Value::AllocatorType& a) {
         // Convert all key:value into key:[value]
         for (Value::MemberIterator itr = v.MemberBegin(); itr != v.MemberEnd(); ++itr)
             itr->value = Value(kArrayType).Move().PushBack(itr->value, a);
-        
+
         // Merge arrays if key is duplicated
         for (Value::MemberIterator itr = v.MemberBegin(); itr != v.MemberEnd();) {
             Value::MemberIterator itr2 = v.FindMember(itr->name);

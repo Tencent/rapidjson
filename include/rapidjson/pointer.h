@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -16,7 +16,9 @@
 #define RAPIDJSON_POINTER_H_
 
 #include "document.h"
+#include "uri.h"
 #include "internal/itoa.h"
+#include "error/error.h" // PointerParseErrorCode
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
@@ -29,19 +31,6 @@ RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
 RAPIDJSON_NAMESPACE_BEGIN
 
 static const SizeType kPointerInvalidIndex = ~SizeType(0);  //!< Represents an invalid index in GenericPointer::Token
-
-//! Error code of parsing.
-/*! \ingroup RAPIDJSON_ERRORS
-    \see GenericPointer::GenericPointer, GenericPointer::GetParseErrorCode
-*/
-enum PointerParseErrorCode {
-    kPointerParseErrorNone = 0,                     //!< The parse is successful
-
-    kPointerParseErrorTokenMustBeginWithSolidus,    //!< A token must begin with a '/'
-    kPointerParseErrorInvalidEscape,                //!< Invalid escape
-    kPointerParseErrorInvalidPercentEncoding,       //!< Invalid percent encoding in URI fragment
-    kPointerParseErrorCharacterMustPercentEncode    //!< A character must percent encoded in URI fragment
-};
 
 ///////////////////////////////////////////////////////////////////////////////
 // GenericPointer
@@ -68,10 +57,10 @@ enum PointerParseErrorCode {
     supplied tokens eliminates these.
 
     GenericPointer depends on GenericDocument and GenericValue.
-    
+
     \tparam ValueType The value type of the DOM tree. E.g. GenericValue<UTF8<> >
     \tparam Allocator The allocator type for allocating memory for internal representation.
-    
+
     \note GenericPointer uses same encoding of ValueType.
     However, Allocator of GenericPointer is independent of Allocator of Value.
 */
@@ -80,8 +69,10 @@ class GenericPointer {
 public:
     typedef typename ValueType::EncodingType EncodingType;  //!< Encoding type from Value
     typedef typename ValueType::Ch Ch;                      //!< Character type from Value
+    typedef GenericUri<ValueType, Allocator> UriType;
 
-    //! A token is the basic units of internal representation.
+
+  //! A token is the basic units of internal representation.
     /*!
         A JSON pointer string representation "/foo/123" is parsed to two tokens: 
         "foo" and 123. 123 will be represented in both numeric form and string form.
@@ -163,7 +154,7 @@ public:
     GenericPointer(const Token* tokens, size_t tokenCount) : allocator_(), ownAllocator_(), nameBuffer_(), tokens_(const_cast<Token*>(tokens)), tokenCount_(tokenCount), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {}
 
     //! Copy constructor.
-    GenericPointer(const GenericPointer& rhs) : allocator_(rhs.allocator_), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
+    GenericPointer(const GenericPointer& rhs) : allocator_(), ownAllocator_(), nameBuffer_(), tokens_(), tokenCount_(), parseErrorOffset_(), parseErrorCode_(kPointerParseErrorNone) {
         *this = rhs;
     }
 
@@ -520,6 +511,70 @@ public:
 
     //@}
 
+    //!@name Compute URI
+    //@{
+
+    //! Compute the in-scope URI for a subtree.
+    //  For use with JSON pointers into JSON schema documents.
+    /*!
+        \param root Root value of a DOM sub-tree to be resolved. It can be any value other than document root.
+        \param rootUri Root URI
+        \param unresolvedTokenIndex If the pointer cannot resolve a token in the pointer, this parameter can obtain the index of unresolved token.
+        \param allocator Allocator for Uris
+        \return Uri if it can be resolved. Otherwise null.
+
+        \note
+        There are only 3 situations when a URI cannot be resolved:
+        1. A value in the path is not an array nor object.
+        2. An object value does not contain the token.
+        3. A token is out of range of an array value.
+
+        Use unresolvedTokenIndex to retrieve the token index.
+    */
+    UriType GetUri(ValueType& root, const UriType& rootUri, size_t* unresolvedTokenIndex = 0, Allocator* allocator = 0) const {
+        static const Ch kIdString[] = { 'i', 'd', '\0' };
+        static const ValueType kIdValue(kIdString, 2);
+        UriType base = UriType(rootUri, allocator);
+        RAPIDJSON_ASSERT(IsValid());
+        ValueType* v = &root;
+        for (const Token *t = tokens_; t != tokens_ + tokenCount_; ++t) {
+            switch (v->GetType()) {
+                case kObjectType:
+                {
+                    // See if we have an id, and if so resolve with the current base
+                    typename ValueType::MemberIterator m = v->FindMember(kIdValue);
+                    if (m != v->MemberEnd() && (m->value).IsString()) {
+                        UriType here = UriType(m->value, allocator).Resolve(base, allocator);
+                        base = here;
+                    }
+                    m = v->FindMember(GenericValue<EncodingType>(GenericStringRef<Ch>(t->name, t->length)));
+                    if (m == v->MemberEnd())
+                        break;
+                    v = &m->value;
+                }
+                  continue;
+                case kArrayType:
+                    if (t->index == kPointerInvalidIndex || t->index >= v->Size())
+                        break;
+                    v = &((*v)[t->index]);
+                    continue;
+                default:
+                    break;
+            }
+
+            // Error: unresolved token
+            if (unresolvedTokenIndex)
+                *unresolvedTokenIndex = static_cast<size_t>(t - tokens_);
+            return UriType(allocator);
+        }
+        return base;
+    }
+
+    UriType GetUri(const ValueType& root, const UriType& rootUri, size_t* unresolvedTokenIndex = 0, Allocator* allocator = 0) const {
+      return GetUri(const_cast<ValueType&>(root), rootUri, unresolvedTokenIndex, allocator);
+    }
+
+
     //!@name Query value
     //@{
 
@@ -634,7 +689,7 @@ public:
     ValueType& GetWithDefault(GenericDocument<EncodingType, typename ValueType::AllocatorType, stackAllocator>& document, const Ch* defaultValue) const {
         return GetWithDefault(document, defaultValue, document.GetAllocator());
     }
-    
+
 #if RAPIDJSON_HAS_STDSTRING
     //! Query a value in a document with default std::basic_string.
     template <typename stackAllocator>
@@ -835,10 +890,16 @@ private:
             std::memcpy(nameBuffer_, rhs.nameBuffer_, nameBufferSize * sizeof(Ch));
         }
 
-        // Adjust pointers to name buffer
-        std::ptrdiff_t diff = nameBuffer_ - rhs.nameBuffer_;
-        for (Token *t = tokens_; t != tokens_ + rhs.tokenCount_; ++t)
-            t->name += diff;
+        // The names of each token point to a string in the nameBuffer_. The
+        // previous memcpy copied over string pointers into the rhs.nameBuffer_,
+        // but they should point to the strings in the new nameBuffer_.
+        for (size_t i = 0; i < rhs.tokenCount_; ++i) {
+          // The offset between the string address and the name buffer should
+          // still be constant, so we can just get this offset and set each new
+          // token name according the new buffer start + the known offset.
+          std::ptrdiff_t name_offset = rhs.tokens_[i].name - rhs.nameBuffer_;
+          tokens_[i].name = nameBuffer_ + name_offset;
+        }
 
         return nameBuffer_ + nameBufferSize;
     }
@@ -928,7 +989,7 @@ private:
                 }
 
                 i++;
-                
+
                 // Escaping "~0" -> '~', "~1" -> '/'
                 if (c == '~') {
                     if (i < length) {

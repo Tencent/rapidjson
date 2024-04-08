@@ -3,6 +3,7 @@
 !/bin/encodings
 !/bin/jsonchecker
 !/bin/types
+!/bin/unittestschema
 /build
 /doc/html
 /doc/doxygen_*.db

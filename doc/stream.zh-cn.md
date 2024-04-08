@@ -231,7 +231,7 @@ FileWriteStream bos(fp, writeBuffer, sizeof(writeBuffer));
 typedef EncodedOutputStream<UTF32LE<>, FileWriteStream> OutputStream;
 OutputStream eos(bos, true);   // 写入 BOM
 
-Writer<OutputStream, UTF32LE<>, UTF8<>> writer(eos);
+Writer<OutputStream, UTF8<>, UTF32LE<>> writer(eos);
 d.Accept(writer);   // 这里从内存的 UTF-8 生成 UTF32-LE 文件
 
 fclose(fp);
