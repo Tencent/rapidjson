@@ -663,6 +663,12 @@ RAPIDJSON_NAMESPACE_END
 # define RAPIDJSON_DELIBERATE_FALLTHROUGH
 #endif
 
+#if RAPIDJSON_HAS_CXX17
+# define RAPIDJSON_CONSTEXPR_IF if constexpr
+#else
+# define RAPIDJSON_CONSTEXPR_IF if
+#endif
+
 //!@endcond
 
 //! Assertion (in non-throwing contexts).
