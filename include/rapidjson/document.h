@@ -632,6 +632,7 @@ struct TypeHelper<ValueType, std::basic_string<typename ValueType::Ch> > {
     typedef std::basic_string<typename ValueType::Ch> StringType;
     static bool Is(const ValueType& v) { return v.IsString(); }
     static StringType Get(const ValueType& v) { return StringType(v.GetString(), v.GetStringLength()); }
+    static ValueType& Set(ValueType& v, const StringType& data) { return v.SetString(typename ValueType::StringRefType(data)); }
     static ValueType& Set(ValueType& v, const StringType& data, typename ValueType::AllocatorType& a) { return v.SetString(data, a); }
 };
 #endif
@@ -642,6 +643,7 @@ struct TypeHelper<ValueType, std::basic_string_view<typename ValueType::Ch> > {
     typedef std::basic_string_view<typename ValueType::Ch> StringType;
     static bool Is(const ValueType& v) { return v.IsString(); }
     static StringType Get(const ValueType& v) { return StringType(v.GetString(), v.GetStringLength()); }
+    static ValueType& Set(ValueType& v, const StringType& data) { return v.SetString(typename ValueType::StringRefType(data)); }
     static ValueType& Set(ValueType& v, const StringType& data, typename ValueType::AllocatorType& a) { return v.SetString(data, a); }
 };
 #endif
@@ -2034,7 +2036,7 @@ public:
         \post IsString() == true && GetString() != s.data() && strcmp(GetString(),s.data() == 0 && GetStringLength() == s.size()
         \note Requires the definition of the preprocessor symbol \ref RAPIDJSON_HAS_STDSTRING.
     */
-    GenericValue& SetString(const std::basic_string<Ch>& s, Allocator& allocator) { return SetString(StringRef(s), allocator); }
+    GenericValue& SetString(const std::basic_string<Ch>& s, Allocator& allocator) { return SetString(StringRef(s.data(), s.size()), allocator); }
 
     std::basic_string<Ch> ToString() const {
         return std::basic_string<Ch> {GetString(), GetStringLength()};
