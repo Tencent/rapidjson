@@ -884,12 +884,12 @@ public:
     //! Constructor for copy-string from a string object (i.e. do make a copy of string)
     /*! \note Requires the definition of the preprocessor symbol \ref RAPIDJSON_HAS_STD_STRING_VIEW.
      */
-    GenericValue(const std::basic_string_view<Ch>& s, Allocator& allocator) : data_() { SetStringRaw(StringRef(s), allocator); }
+    GenericValue(const std::basic_string_view<Ch>& s, Allocator& allocator) : data_() { SetStringRaw(StringRef(s.data(), s.size()), allocator); }
 #elif RAPIDJSON_HAS_STDSTRING 
     //! Constructor for copy-string from a string object (i.e. do make a copy of string)
     /*! \note Requires the definition of the preprocessor symbol \ref RAPIDJSON_HAS_STDSTRING.
      */
-    GenericValue(const std::basic_string<Ch>& s, Allocator& allocator) : data_() { SetStringRaw(StringRef(s), allocator); }
+    GenericValue(const std::basic_string<Ch>& s, Allocator& allocator) : data_() { SetStringRaw(StringRef(s.data(), s.size()), allocator); }
 #endif
 
     //! Constructor for Array.
