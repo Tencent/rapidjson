@@ -15,8 +15,5 @@ set( RapidJSON_DIR "@CONFIG_DIR@")
 get_filename_component(RapidJSON_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 
 get_target_property(RapidJSON_INCLUDE_DIR RapidJSON INTERFACE_INCLUDE_DIRECTORIES)
-if (NOT RapidJSON_INCLUDE_DIR)
-    set(RapidJSON_INCLUDE_DIR "${RapidJSON_SOURCE_DIR}/include/rapidjson")
-endif()
 
 set( RapidJSON_INCLUDE_DIRS ${RapidJSON_INCLUDE_DIR} )
