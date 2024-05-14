@@ -2155,6 +2155,7 @@ public:
             delete sd_[i];
     }
 
+    using IGenericRemoteSchemaDocumentProvider<SchemaDocumentType>::GetRemoteDocument;
     virtual const SchemaDocumentType* GetRemoteDocument(const char* uri, SizeType length) {
         //printf("GetRemoteDocument : %s\n", uri);
         for (size_t i = 0; i < kCount; i++)
@@ -2636,26 +2637,28 @@ TEST(SchemaValidator, Ref_internal_multiple_ids) {
     CrtAllocator::Free(schema);
 }
 
+class SchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
+    SchemaDocument** collection;
+
+    // Dummy private copy constructor & assignment operator.
+    // Function bodies added so that they compile in MSVC 2019.
+    SchemaDocumentProvider(const SchemaDocumentProvider&) : collection(NULL) {
+    }
+    SchemaDocumentProvider& operator=(const SchemaDocumentProvider&) {
+        return *this;
+    }
+
+public:
+    SchemaDocumentProvider(SchemaDocument** collection) : collection(collection) { }
+    using IGenericRemoteSchemaDocumentProvider::GetRemoteDocument;
+    virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
+        int i = 0;
+        while (collection[i] && SchemaDocument::GValue(uri, length) != collection[i]->GetURI()) ++i;
+        return collection[i];
+    }
+};
+
 TEST(SchemaValidator, Ref_remote_issue1210) {
-    class SchemaDocumentProvider : public IRemoteSchemaDocumentProvider {
-        SchemaDocument** collection;
-
-        // Dummy private copy constructor & assignment operator.
-        // Function bodies added so that they compile in MSVC 2019.
-        SchemaDocumentProvider(const SchemaDocumentProvider&) : collection(NULL) {
-        }
-        SchemaDocumentProvider& operator=(const SchemaDocumentProvider&) {
-            return *this;
-        }
-
-        public:
-          SchemaDocumentProvider(SchemaDocument** collection) : collection(collection) { }
-          virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
-            int i = 0;
-            while (collection[i] && SchemaDocument::GValue(uri, length) != collection[i]->GetURI()) ++i;
-            return collection[i];
-          }
-    };
     SchemaDocument* collection[] = { 0, 0, 0 };
     SchemaDocumentProvider provider(collection);
 
