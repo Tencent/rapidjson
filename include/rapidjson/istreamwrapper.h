@@ -117,7 +117,9 @@ private:
 };
 
 typedef BasicIStreamWrapper<std::istream> IStreamWrapper;
+#if RAPIDJSON_HAS_WCHAR_FUNCTIONS
 typedef BasicIStreamWrapper<std::wistream> WIStreamWrapper;
+#endif
 
 #if defined(__clang__) || defined(_MSC_VER)
 RAPIDJSON_DIAG_POP

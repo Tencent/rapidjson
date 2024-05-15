@@ -210,6 +210,19 @@
 #endif // RAPIDJSON_NO_INT64TYPEDEF
 
 ///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_HAS_WCHAR_FUNCTIONS
+
+#ifndef RAPIDJSON_HAS_WCHAR_FUNCTIONS
+//!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
+#if defined(__GLIBCXX__) && !defined(_GLIBCXX_USE_WCHAR_T)
+#define RAPIDJSON_HAS_WCHAR_FUNCTIONS 0
+#else
+#define RAPIDJSON_HAS_WCHAR_FUNCTIONS 1
+#endif
+//!@endcond
+#endif // RAPIDJSON_HAS_WCHAR_FUNCTIONS
+
+///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_FORCEINLINE
 
 #ifndef RAPIDJSON_FORCEINLINE
