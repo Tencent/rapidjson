@@ -155,6 +155,7 @@ enum ParseFlag {
     kParseTrailingCommasFlag = 128, //!< Allow trailing commas at the end of objects and arrays.
     kParseNanAndInfFlag = 256,      //!< Allow parsing NaN, Inf, Infinity, -Inf and -Infinity as doubles.
     kParseEscapedApostropheFlag = 512,  //!< Allow escaped apostrophe in strings.
+    kParseBigIntsAsStringsFlag = 1024, //!< Parse oversized numbers (not fitting in int64_t / uint64_t) as strings.
     kParseDefaultFlags = RAPIDJSON_PARSE_DEFAULT_FLAGS  //!< Default parse flags. Can be customized by defining RAPIDJSON_PARSE_DEFAULT_FLAGS
 };
 
@@ -1466,14 +1467,14 @@ private:
 
     template<unsigned parseFlags, typename InputStream, typename Handler>
     void ParseNumber(InputStream& is, Handler& handler) {
-        typedef typename internal::SelectIf<internal::BoolType<(parseFlags & kParseNumbersAsStringsFlag) != 0>, typename TargetEncoding::Ch, char>::Type NumberCharacter;
+        typedef typename internal::SelectIf<internal::BoolType<(parseFlags & (kParseNumbersAsStringsFlag | kParseBigIntsAsStringsFlag)) != 0>, typename TargetEncoding::Ch, char>::Type NumberCharacter;
 
         internal::StreamLocalCopy<InputStream> copy(is);
         NumberStream<InputStream, NumberCharacter,
-            ((parseFlags & kParseNumbersAsStringsFlag) != 0) ?
+            ((parseFlags & (kParseNumbersAsStringsFlag | kParseBigIntsAsStringsFlag)) != 0) ?
                 ((parseFlags & kParseInsituFlag) == 0) :
                 ((parseFlags & kParseFullPrecisionFlag) != 0),
-            (parseFlags & kParseNumbersAsStringsFlag) != 0 &&
+            (parseFlags & (kParseNumbersAsStringsFlag | kParseBigIntsAsStringsFlag)) != 0 &&
                 (parseFlags & kParseInsituFlag) == 0> s(*this, copy.s);
 
         size_t startOffset = s.Tell();
@@ -1486,6 +1487,7 @@ private:
         // Parse int: zero / ( digit1-9 *DIGIT )
         unsigned i = 0;
         uint64_t i64 = 0;
+        bool isInteger = true;
         bool use64bit = false;
         int significandDigit = 0;
         if (RAPIDJSON_UNLIKELY(s.Peek() == '0')) {
@@ -1526,12 +1528,14 @@ private:
                 if (Consume(s, 'a') && Consume(s, 'N')) {
                     d = std::numeric_limits<double>::quiet_NaN();
                     useNanOrInf = true;
+                    isInteger = false;
                 }
             }
             else if (RAPIDJSON_LIKELY(Consume(s, 'I'))) {
                 if (Consume(s, 'n') && Consume(s, 'f')) {
                     d = (minus ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity());
                     useNanOrInf = true;
+                    isInteger = false;
 
                     if (RAPIDJSON_UNLIKELY(s.Peek() == 'i' && !(Consume(s, 'i') && Consume(s, 'n')
                                                                 && Consume(s, 'i') && Consume(s, 't') && Consume(s, 'y')))) {
@@ -1585,6 +1589,7 @@ private:
         int expFrac = 0;
         size_t decimalPosition;
         if (Consume(s, '.')) {
+            isInteger = false;
             decimalPosition = s.Length();
 
             if (RAPIDJSON_UNLIKELY(!(s.Peek() >= '0' && s.Peek() <= '9')))
@@ -1632,6 +1637,7 @@ private:
         // Parse exp = e [ minus / plus ] 1*DIGIT
         int exp = 0;
         if (Consume(s, 'e') || Consume(s, 'E')) {
+            isInteger = false;
             if (!useDouble) {
                 d = static_cast<double>(use64bit ? i64 : i);
                 useDouble = true;
@@ -1682,7 +1688,7 @@ private:
         // Finish parsing, call event according to the type of number.
         bool cont = true;
 
-        if (parseFlags & kParseNumbersAsStringsFlag) {
+        if ((parseFlags & kParseNumbersAsStringsFlag) || ((parseFlags & kParseBigIntsAsStringsFlag) && useDouble && isInteger)) {
             if (parseFlags & kParseInsituFlag) {
                 s.Pop();  // Pop stack no matter if it will be used or not.
                 typename InputStream::Ch* head = is.PutBegin();
