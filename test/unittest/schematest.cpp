@@ -2649,7 +2649,7 @@ TEST(SchemaValidator, Ref_remote_issue1210) {
         }
 
         public:
-          SchemaDocumentProvider(SchemaDocument** collection) : collection(collection) { }
+          SchemaDocumentProvider(SchemaDocument** documentCollection) : collection(documentCollection) { }
           virtual const SchemaDocument* GetRemoteDocument(const char* uri, SizeType length) {
             int i = 0;
             while (collection[i] && SchemaDocument::GValue(uri, length) != collection[i]->GetURI()) ++i;
