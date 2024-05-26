@@ -650,6 +650,12 @@ RAPIDJSON_NAMESPACE_END
 #endif
 
 #if RAPIDJSON_HAS_CXX17
+# define RAPIDJSON_CONSTEXPR constexpr
+#else
+# define RAPIDJSON_CONSTEXPR
+#endif
+
+#if RAPIDJSON_HAS_CXX17
 # define RAPIDJSON_DELIBERATE_FALLTHROUGH [[fallthrough]]
 #elif defined(__has_cpp_attribute)
 # if __has_cpp_attribute(clang::fallthrough)
