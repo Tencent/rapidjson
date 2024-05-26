@@ -703,6 +703,9 @@ RAPIDJSON_NAMESPACE_END
 ///! customization point for global \c free
 #define RAPIDJSON_FREE(ptr) std::free(ptr)
 #endif
+#ifndef RAPIDJSON_OUT_OF_MEMORY
+#define RAPIDJSON_OUT_OF_MEMORY() throw std::bad_alloc()
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // new/delete
