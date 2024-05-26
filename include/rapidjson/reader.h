@@ -1504,7 +1504,13 @@ private:
                             break;
                         }
                     }
-                    i = i * 10 + static_cast<unsigned>(s.TakePush() - '0');
+					i64 = i * 10LL + static_cast<unsigned>(s.TakePush() - '0');
+					if (RAPIDJSON_UNLIKELY(i64 >= 214748364)) {
+						use64bit = true;
+						break;
+					}
+					else
+						i = (unsigned)i64;
                     significandDigit++;
                 }
             else
@@ -1516,7 +1522,13 @@ private:
                             break;
                         }
                     }
-                    i = i * 10 + static_cast<unsigned>(s.TakePush() - '0');
+					i64 = i * 10LL + static_cast<unsigned>(s.TakePush() - '0');
+					if (RAPIDJSON_UNLIKELY(i64 >= 429496729)) {
+						use64bit = true;
+						break;
+					}
+					else
+						i = (unsigned)i64;
                     significandDigit++;
                 }
         }
