@@ -253,7 +253,7 @@ public:
 template <typename SchemaType>
 class ISchemaStateFactory {
 public:
-    virtual ~ISchemaStateFactory() {}
+    virtual ~ISchemaStateFactory() = default;
     virtual ISchemaValidator* CreateSchemaValidator(const SchemaType&, const bool inheritContinueOnErrors) = 0;
     virtual void DestroySchemaValidator(ISchemaValidator* validator) = 0;
     virtual void* CreateHasher() = 0;
@@ -272,7 +272,7 @@ public:
     typedef typename SchemaType::Ch Ch;
     typedef typename SchemaType::SValue SValue;
 
-    virtual ~IValidationErrorHandler() {}
+    virtual ~IValidationErrorHandler() = default;
 
     virtual void NotMultipleOf(int64_t actual, const SValue& expected) = 0;
     virtual void NotMultipleOf(uint64_t actual, const SValue& expected) = 0;
@@ -1789,7 +1789,7 @@ public:
     typedef typename SchemaDocumentType::ValueType ValueType;
     typedef typename SchemaDocumentType::AllocatorType AllocatorType;
 
-    virtual ~IGenericRemoteSchemaDocumentProvider() {}
+    virtual ~IGenericRemoteSchemaDocumentProvider() = default;
     virtual const SchemaDocumentType* GetRemoteDocument(const Ch* uri, SizeType length) = 0;
     virtual const SchemaDocumentType* GetRemoteDocument(const GenericUri<ValueType, AllocatorType> uri, Specification& spec) {
         // Default implementation just calls through for compatibility
@@ -2672,7 +2672,7 @@ public:
             return false;
         ValueType error(kObjectType);
         error.AddMember(GetMissingString(), currentError_, GetStateAllocator());
-        currentError_ = error;
+        currentError_ = std::move(error);
         AddCurrentError(kValidateErrorRequired);
         return true;
     }
@@ -2720,7 +2720,7 @@ public:
             return false;
         ValueType error(kObjectType);
         error.AddMember(GetErrorsString(), currentError_, GetStateAllocator());
-        currentError_ = error;
+        currentError_ = std::move(error);
         AddCurrentError(kValidateErrorDependencies);
         return true;
     }
@@ -2739,7 +2739,7 @@ public:
         ValueType error(kObjectType);
         error.AddMember(GetExpectedString(), currentError_, GetStateAllocator());
         error.AddMember(GetActualString(), ValueType(actualType, GetStateAllocator()).Move(), GetStateAllocator());
-        currentError_ = error;
+        currentError_ = std::move(error);
         AddCurrentError(kValidateErrorType);
     }
     void NotAllOf(ISchemaValidator** subvalidators, SizeType count) {
