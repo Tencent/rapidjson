@@ -42,6 +42,7 @@ template <typename T> struct Void { typedef void Type; };
 // BoolType, TrueType, FalseType
 //
 template <bool Cond> struct BoolType {
+    virtual ~BoolType();
     static const bool Value = Cond;
     typedef BoolType Type;
 };
