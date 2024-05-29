@@ -27,6 +27,10 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(c++98-compat)
 #endif
 
+#if defined(__ARMCC_VERSION) && (__ARMCC_VERSION < 6000000)
+RAPIDJSON_DIAG_OFF(550) // variable was set but never used
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 //! Combination of PrettyWriter format flags.
