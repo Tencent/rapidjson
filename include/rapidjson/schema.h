@@ -59,6 +59,9 @@ RAPIDJSON_DIAG_OFF(c++98-compat-pedantic)
 RAPIDJSON_DIAG_OFF(variadic-macros)
 #elif defined(_MSC_VER)
 RAPIDJSON_DIAG_OFF(4512) // assignment operator could not be generated
+#elif defined(__ARMCC_VERSION) && (__ARMCC_VERSION < 6000000)
+RAPIDJSON_DIAG_OFF(1300) // inherits implicit virtual
+RAPIDJSON_DIAG_OFF(2815) // empty dependent statement in while-statement
 #endif
 
 RAPIDJSON_NAMESPACE_BEGIN

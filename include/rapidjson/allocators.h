@@ -267,9 +267,7 @@ public:
         }
         Clear();
         BaseAllocator *a = shared_->ownBaseAllocator;
-        if (shared_->ownBuffer) {
-            baseAllocator_->Free(shared_);
-        }
+        baseAllocator_->Free(shared_->ownBuffer ? shared_ : nullptr);
         RAPIDJSON_DELETE(a);
     }
 
