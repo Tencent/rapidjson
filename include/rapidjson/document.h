@@ -1,5 +1,8 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
+// Copyright (c) 2023-2024 Jaepil Jeong.
+//   - All works done by Jaepil Jeong is licensed under the GPLv3.
+//
 // Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
