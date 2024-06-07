@@ -1640,7 +1640,7 @@ TEST(Reader, IterativePullParsing_General) {
             handler.LOG_ENDARRAY | 7
         };
 
-        StringStream is("[1, {\"k\": [1, 2]}, null, false, true, \"string\", 1.2]");
+        StringStream is("   [1,   {\"k\"  :   [1, 2]}, null, false, true, \"string\", 1.2]");
         Reader reader;
 
         reader.IterativeParseInit();
@@ -1661,6 +1661,56 @@ TEST(Reader, IterativePullParsing_General) {
         EXPECT_TRUE(reader.IterativeParseNext<kParseDefaultFlags>(is, handler)) << "parse-next past complete is allowed";
         EXPECT_EQ(handler.LogCount, oldLogCount) << "parse-next past complete should not invoke handler";
         EXPECT_FALSE(reader.HasParseError()) << "parse-next past complete should not generate parse error";
+    }
+
+    {
+        IterativeParsingReaderHandler<> handler;
+        StringStream is("   ");
+        Reader reader;
+        reader.IterativeParseInit();
+        while (!reader.IterativeParseComplete()) {
+            EXPECT_FALSE(reader.IterativeParseNext<kParseDefaultFlags>(is, handler));
+            break;
+        }
+        EXPECT_TRUE(reader.HasParseError());
+        EXPECT_EQ(kParseErrorDocumentEmpty, reader.GetParseErrorCode());
+    }
+
+    {
+        IterativeParsingReaderHandler<> handler;
+        StringStream is("   /x");
+        Reader reader;
+        reader.IterativeParseInit();
+        EXPECT_FALSE(reader.IterativeParseComplete());
+        EXPECT_FALSE(reader.IterativeParseNext<kParseDefaultFlags|kParseCommentsFlag>(is, handler));
+        EXPECT_TRUE(reader.HasParseError());
+        EXPECT_EQ(kParseErrorUnspecificSyntaxError, reader.GetParseErrorCode());
+    }
+
+    {
+        IterativeParsingReaderHandler<> handler;
+        StringStream is("   { \"a\" : /x");
+        Reader reader;
+        reader.IterativeParseInit();
+        EXPECT_FALSE(reader.IterativeParseComplete());
+        EXPECT_TRUE(reader.IterativeParseNext<kParseDefaultFlags|kParseCommentsFlag>(is, handler));  // {
+        EXPECT_FALSE(reader.IterativeParseComplete());
+        EXPECT_TRUE(reader.IterativeParseNext<kParseDefaultFlags|kParseCommentsFlag>(is, handler));  // key: a
+        EXPECT_FALSE(reader.IterativeParseComplete());
+        EXPECT_FALSE(reader.IterativeParseNext<kParseDefaultFlags|kParseCommentsFlag>(is, handler));
+        EXPECT_TRUE(reader.HasParseError());
+        EXPECT_EQ(kParseErrorUnspecificSyntaxError, reader.GetParseErrorCode());
+    }
+
+    {
+        IterativeParsingReaderHandler<> handler;
+        StringStream is("   20181218114533 /x");
+        Reader reader;
+        reader.IterativeParseInit();
+        EXPECT_FALSE(reader.IterativeParseComplete());
+        EXPECT_FALSE(reader.IterativeParseNext<kParseDefaultFlags|kParseCommentsFlag>(is, handler));  // 20181218114533
+        EXPECT_TRUE(reader.HasParseError());
+        EXPECT_EQ(kParseErrorUnspecificSyntaxError, reader.GetParseErrorCode());
     }
 }
 

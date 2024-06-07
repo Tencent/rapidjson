@@ -605,6 +605,7 @@ public:
     /*!
      */
     void IterativeParseInit() {
+        ClearStack();
         parseResult_.Clear();
         state_ = IterativeParsingStartState;
     }
@@ -618,9 +619,9 @@ public:
      */
     template <unsigned parseFlags, typename InputStream, typename Handler>
     bool IterativeParseNext(InputStream& is, Handler& handler) {
+        SkipWhitespaceAndComments<parseFlags>(is);
+        RAPIDJSON_PARSE_ERROR_EARLY_RETURN(false);
         while (RAPIDJSON_LIKELY(is.Peek() != '\0')) {
-            SkipWhitespaceAndComments<parseFlags>(is);
-
             Token t = Tokenize(is.Peek());
             IterativeParsingState n = Predict(state_, t);
             IterativeParsingState d = Transit<parseFlags>(state_, t, n, is, handler);
@@ -641,6 +642,7 @@ public:
                 if (!(parseFlags & kParseStopWhenDoneFlag)) {
                     // ... and extra non-whitespace data is found...
                     SkipWhitespaceAndComments<parseFlags>(is);
+                    RAPIDJSON_PARSE_ERROR_EARLY_RETURN(false);
                     if (is.Peek() != '\0') {
                         // ... this is considered an error.
                         HandleError(state_, is);
@@ -658,6 +660,8 @@ public:
             // If we parsed anything other than a delimiter, we invoked the handler, so we can return true now.
             if (!IsIterativeParsingDelimiterState(n))
                 return true;
+            SkipWhitespaceAndComments<parseFlags>(is);
+            RAPIDJSON_PARSE_ERROR_EARLY_RETURN(false);
         }
 
         // We reached the end of file.
