@@ -457,7 +457,7 @@ The Object class is a collection of key-value pairs (members). Each key must be 
 Here is an example.
 
 ~~~~~~~~~~cpp
-Value contact(kObject);
+Value contact(kObjectType);
 contact.AddMember("name", "Milo", document.GetAllocator());
 contact.AddMember("married", true, document.GetAllocator());
 ~~~~~~~~~~
