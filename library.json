@@ -24,6 +24,6 @@
   "platforms": "*",
   "build": {
     "srcDir": ".",
-    "srcFilter": "+<*> -<examples> -<test> -<thirdparty>"
+    "srcFilter": "+<*> -<example> -<test> -<thirdparty>"
   }
 }
