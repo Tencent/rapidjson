@@ -4,12 +4,18 @@
   "keywords": "json, sax, dom, parser, generator",
   "description": "A fast JSON parser/generator for C++ with both SAX/DOM style API",
   "export": {
-    "include": "include"
+    "include": 
+    [
+      "include/rapidjson/*.h", 
+      "include/rapidjson/*/*.h"
+    ]
   },
   "examples": "example/*/*.cpp",
   "repository":
   {
     "type": "git",
     "url": "https://github.com/Tencent/rapidjson"
-  }
+  },  
+  "frameworks": "*",
+  "platforms": "*"
 }
