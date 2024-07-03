@@ -21,5 +21,9 @@
     "url": "https://github.com/Tencent/rapidjson"
   },  
   "frameworks": "*",
-  "platforms": "*"
+  "platforms": "*",
+  "build": {
+    "srcDir": ".",
+    "srcFilter": "+<*> -<examples> -<test> -<thirdparty>"
+  }
 }
