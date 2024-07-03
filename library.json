@@ -6,8 +6,12 @@
   "export": {
     "include": 
     [
-      "include/rapidjson/*.h", 
-      "include/rapidjson/*/*.h"
+      "include"
+    ],
+    "exclude": 
+    [
+      "thirdparty",
+      "test"
     ]
   },
   "examples": "example/*/*.cpp",
