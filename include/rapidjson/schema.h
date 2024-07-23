@@ -1645,8 +1645,7 @@ private:
         double qRounded = std::floor(q + 0.5);
         double scaledEpsilon = (q + qRounded) * std::numeric_limits<double>::epsilon();
         double difference = std::abs(qRounded - q);
-        bool isMultiple = (difference <= scaledEpsilon)
-                                        || (difference < std::numeric_limits<double>::min());
+        bool isMultiple = difference <= scaledEpsilon || difference < (std::numeric_limits<double>::min)();
         if (!isMultiple) {
             context.error_handler.NotMultipleOf(d, multipleOf_);
             RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorMultipleOf);
