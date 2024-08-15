@@ -2338,6 +2338,9 @@ TEST(Reader, ParseNanAndInfinity) {
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-nan", 1u);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NAN", 1u);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-Infinty", 6u);
+    TEST_NAN_INF_ERROR(kParseErrorDocumentRootNotSingular, "NaN.2e2", 3u);
+    TEST_NAN_INF_ERROR(kParseErrorDocumentRootNotSingular, "Inf.2", 3u);
+    TEST_NAN_INF_ERROR(kParseErrorDocumentRootNotSingular, "-InfE2", 4u);
 
 #undef TEST_NAN_INF_ERROR
 #undef TEST_NAN_INF
