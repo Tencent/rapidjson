@@ -1857,6 +1857,14 @@ TEST(Value, MergeDuplicateKey) {
     EXPECT_EQ(d2, d);
 }
 
+TEST(Value, SSOMemoryOverlapTest) {
+    Document d;
+    d.Parse("{\"project\":\"rapidjson\",\"stars\":\"ssovalue\"}");
+    Value &s = d["stars"];
+    s.SetString(GenericStringRef<char>(&(s.GetString()[1]), 5), d.GetAllocator());
+    EXPECT_TRUE(strcmp(s.GetString(),"soval") == 0);
+}
+
 #ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
