@@ -2445,13 +2445,14 @@ private:
             data_.f.flags = kShortStringFlag;
             data_.ss.SetLength(s.length);
             str = data_.ss.str;
+            std::memmove(str, s, s.length * sizeof(Ch));
         } else {
             data_.f.flags = kCopyStringFlag;
             data_.s.length = s.length;
             str = static_cast<Ch *>(allocator.Malloc((s.length + 1) * sizeof(Ch)));
             SetStringPointer(str);
+            std::memcpy(str, s, s.length * sizeof(Ch));
         }
-        std::memcpy(str, s, s.length * sizeof(Ch));
         str[s.length] = '\0';
     }
 
