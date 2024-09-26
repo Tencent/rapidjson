@@ -98,9 +98,9 @@ TEST(BigInteger, MultiplyUint32) {
     BigInteger c(123);
     c *= static_cast<uint32_t>(456u);
     EXPECT_TRUE(BigInteger(123u * 456u) == c);
-    c *= 0xFFFFFFFFu;
+    c *= static_cast<uint64_t>(0xFFFFFFFFu);
     EXPECT_TRUE(BIGINTEGER_LITERAL("240896125641960") == c);
-    c *= 0xFFFFFFFFu;
+    c *= static_cast<uint64_t>(0xFFFFFFFFu);
     EXPECT_TRUE(BIGINTEGER_LITERAL("1034640981124429079698200") == c);
 }
 
