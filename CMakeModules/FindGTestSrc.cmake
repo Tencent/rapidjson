@@ -12,7 +12,7 @@ IF(UNIX)
 ENDIF()
 
 FIND_PATH(GTEST_SOURCE_DIR
-    NAMES CMakeLists.txt src/gtest_main.cc
+    NAMES src/gtest_main.cc
     PATHS ${GTEST_SEARCH_PATH})
 
 
