@@ -215,6 +215,7 @@ TEST(Document, Parse_Encoding) {
 TEST(Document, ParseStream_EncodedInputStream) {
     // UTF8 -> UTF16
     FILE* fp = OpenEncodedFile("utf8.json");
+    ASSERT_TRUE(fp != 0);
     char buffer[256];
     FileReadStream bis(fp, buffer, sizeof(buffer));
     EncodedInputStream<UTF8<>, FileReadStream> eis(bis);
@@ -242,6 +243,7 @@ TEST(Document, ParseStream_EncodedInputStream) {
 
     // Condense the original file and compare.
     fp = OpenEncodedFile("utf8.json");
+    ASSERT_TRUE(fp != 0);
     FileReadStream is(fp, buffer, sizeof(buffer));
     Reader reader;
     StringBuffer bos2;
@@ -256,6 +258,7 @@ TEST(Document, ParseStream_EncodedInputStream) {
 TEST(Document, ParseStream_AutoUTFInputStream) {
     // Any -> UTF8
     FILE* fp = OpenEncodedFile("utf32be.json");
+    ASSERT_TRUE(fp != 0);
     char buffer[256];
     FileReadStream bis(fp, buffer, sizeof(buffer));
     AutoUTFInputStream<unsigned, FileReadStream> eis(bis);
@@ -279,6 +282,7 @@ TEST(Document, ParseStream_AutoUTFInputStream) {
 
     // Condense the original file and compare.
     fp = OpenEncodedFile("utf8.json");
+    ASSERT_TRUE(fp != 0);
     FileReadStream is(fp, buffer, sizeof(buffer));
     Reader reader;
     StringBuffer bos2;
