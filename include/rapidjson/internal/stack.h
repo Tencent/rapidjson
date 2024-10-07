@@ -113,24 +113,46 @@ public:
     // Optimization note: try to minimize the size of this function for force inline.
     // Expansion is run very infrequently, so it is moved to another (probably non-inline) function.
     template<typename T>
-    RAPIDJSON_FORCEINLINE void Reserve(size_t count = 1) {
+    RAPIDJSON_FORCEINLINE void Reserve(size_t count) {
          // Expand the stack if needed
         if (RAPIDJSON_UNLIKELY(static_cast<std::ptrdiff_t>(sizeof(T) * count) > (stackEnd_ - stackTop_)))
             Expand<T>(count);
     }
 
     template<typename T>
-    RAPIDJSON_FORCEINLINE T* Push(size_t count = 1) {
+    RAPIDJSON_FORCEINLINE T* Push(size_t count) {
         Reserve<T>(count);
         return PushUnsafe<T>(count);
     }
 
     template<typename T>
-    RAPIDJSON_FORCEINLINE T* PushUnsafe(size_t count = 1) {
+    RAPIDJSON_FORCEINLINE T* PushUnsafe(size_t count) {
         RAPIDJSON_ASSERT(stackTop_);
         RAPIDJSON_ASSERT(static_cast<std::ptrdiff_t>(sizeof(T) * count) <= (stackEnd_ - stackTop_));
         T* ret = reinterpret_cast<T*>(stackTop_);
         stackTop_ += sizeof(T) * count;
+        return ret;
+    }
+
+    template<typename T>
+    RAPIDJSON_FORCEINLINE void Reserve() {
+         // Expand the stack if needed
+        if (RAPIDJSON_UNLIKELY(static_cast<std::ptrdiff_t>(sizeof(T)) > (stackEnd_ - stackTop_)))
+            Expand<T>(1);
+    }
+
+    template<typename T>
+    RAPIDJSON_FORCEINLINE T* Push() {
+        Reserve<T>();
+        return PushUnsafe<T>();
+    }
+
+    template<typename T>
+    RAPIDJSON_FORCEINLINE T* PushUnsafe() {
+        RAPIDJSON_ASSERT(stackTop_);
+        RAPIDJSON_ASSERT(static_cast<std::ptrdiff_t>(sizeof(T)) <= (stackEnd_ - stackTop_));
+        T* ret = reinterpret_cast<T*>(stackTop_);
+        stackTop_ += sizeof(T);
         return ret;
     }
 
