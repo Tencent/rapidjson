@@ -312,7 +312,7 @@ protected:
     }
 
     bool WriteInt(int i) {
-        char buffer[11];
+        char buffer[11]={0};
         const char* end = internal::i32toa(i, buffer);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (const char* p = buffer; p != end; ++p)
@@ -321,7 +321,7 @@ protected:
     }
 
     bool WriteUint(unsigned u) {
-        char buffer[10];
+        char buffer[10]={0};
         const char* end = internal::u32toa(u, buffer);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (const char* p = buffer; p != end; ++p)
@@ -330,7 +330,7 @@ protected:
     }
 
     bool WriteInt64(int64_t i64) {
-        char buffer[21];
+        char buffer[21]={0};
         const char* end = internal::i64toa(i64, buffer);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (const char* p = buffer; p != end; ++p)
@@ -339,7 +339,7 @@ protected:
     }
 
     bool WriteUint64(uint64_t u64) {
-        char buffer[20];
+        char buffer[20]={0};
         char* end = internal::u64toa(u64, buffer);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (char* p = buffer; p != end; ++p)
@@ -372,7 +372,7 @@ protected:
             return true;
         }
 
-        char buffer[25];
+        char buffer[25]={0};
         char* end = internal::dtoa(d, buffer, maxDecimalPlaces_);
         PutReserve(*os_, static_cast<size_t>(end - buffer));
         for (char* p = buffer; p != end; ++p)
