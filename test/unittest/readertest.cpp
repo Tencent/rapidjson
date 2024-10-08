@@ -1399,12 +1399,12 @@ public:
   WIStreamWrapper(std::wistream& is) : is_(is) {}
 
   Ch Peek() const {
-    unsigned c = is_.peek();
+    std::wistream::int_type c = is_.peek();
     return c == std::char_traits<wchar_t>::eof() ? Ch('\0') : static_cast<Ch>(c);
   }
 
   Ch Take() {
-    unsigned c = is_.get();
+    std::wistream::int_type c = is_.get();
     return c == std::char_traits<wchar_t>::eof() ? Ch('\0') : static_cast<Ch>(c);
   }
 
