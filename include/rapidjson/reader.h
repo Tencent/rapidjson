@@ -2055,13 +2055,6 @@ private:
             return dst;
 
         case IterativeParsingMemberValueState:
-            // Must be non-compound value. Or it would be ObjectInitial or ArrayInitial state.
-            ParseValue<parseFlags>(is, handler);
-            if (HasParseError()) {
-                return IterativeParsingErrorState;
-            }
-            return dst;
-
         case IterativeParsingElementState:
             // Must be non-compound value. Or it would be ObjectInitial or ArrayInitial state.
             ParseValue<parseFlags>(is, handler);
