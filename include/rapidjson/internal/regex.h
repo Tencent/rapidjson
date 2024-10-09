@@ -649,6 +649,9 @@ private:
     typedef typename RegexType::State State;
     typedef typename RegexType::Range Range;
 
+    GenericRegexSearch(const GenericRegexSearch&);
+    GenericRegexSearch& operator=(const GenericRegexSearch&);
+
     template <typename InputStream>
     bool SearchWithAnchoring(InputStream& is, bool anchorBegin, bool anchorEnd) {
         DecodedStream<InputStream, Encoding> ds(is);
