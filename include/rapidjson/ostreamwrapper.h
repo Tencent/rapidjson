@@ -70,7 +70,9 @@ private:
 };
 
 typedef BasicOStreamWrapper<std::ostream> OStreamWrapper;
+#if RAPIDJSON_HAS_WCHAR_FUNCTIONS
 typedef BasicOStreamWrapper<std::wostream> WOStreamWrapper;
+#endif
 
 #ifdef __clang__
 RAPIDJSON_DIAG_POP
