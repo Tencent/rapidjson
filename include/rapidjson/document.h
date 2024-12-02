@@ -2382,6 +2382,7 @@ private:
         data_.f.flags = kObjectFlag;
         SizeType count = rhs.data_.o.size;
         Member* lm = DoAllocMembers(count, allocator);
+        RAPIDJSON_ASSERT(nullptr!=lm);
         const typename GenericValue<Encoding,SourceAllocator>::Member* rm = rhs.GetMembersPointer();
 #if RAPIDJSON_USE_MEMBERSMAP
         Map* &map = GetMap(lm);
@@ -2403,6 +2404,7 @@ private:
         data_.f.flags = kArrayFlag;
         if (count) {
             GenericValue* e = static_cast<GenericValue*>(allocator.Malloc(count * sizeof(GenericValue)));
+            RAPIDJSON_ASSERT(nullptr!=e);
             SetElementsPointer(e);
             std::memcpy(static_cast<void*>(e), values, count * sizeof(GenericValue));
         }
@@ -2416,6 +2418,7 @@ private:
         data_.f.flags = kObjectFlag;
         if (count) {
             Member* m = DoAllocMembers(count, allocator);
+            RAPIDJSON_ASSERT(nullptr!=m);
             SetMembersPointer(m);
             std::memcpy(static_cast<void*>(m), members, count * sizeof(Member));
 #if RAPIDJSON_USE_MEMBERSMAP
@@ -2450,6 +2453,7 @@ private:
             data_.f.flags = kCopyStringFlag;
             data_.s.length = s.length;
             str = static_cast<Ch *>(allocator.Malloc((s.length + 1) * sizeof(Ch)));
+            RAPIDJSON_ASSERT(nullptr!=str);
             SetStringPointer(str);
             std::memcpy(str, s, s.length * sizeof(Ch));
         }
