@@ -129,7 +129,7 @@ public:
     RAPIDJSON_FORCEINLINE T* PushUnsafe(size_t count = 1) {
         RAPIDJSON_ASSERT(stackTop_);
         RAPIDJSON_ASSERT(static_cast<std::ptrdiff_t>(sizeof(T) * count) <= (stackEnd_ - stackTop_));
-        T* ret = reinterpret_cast<T*>(stackTop_);
+        T* ret = static_cast<T*>(static_cast<void*>(stackTop_));
         stackTop_ += sizeof(T) * count;
         return ret;
     }
@@ -138,32 +138,32 @@ public:
     T* Pop(size_t count) {
         RAPIDJSON_ASSERT(GetSize() >= count * sizeof(T));
         stackTop_ -= count * sizeof(T);
-        return reinterpret_cast<T*>(stackTop_);
+        return static_cast<T*>(static_cast<void*>(stackTop_));
     }
 
     template<typename T>
     T* Top() { 
         RAPIDJSON_ASSERT(GetSize() >= sizeof(T));
-        return reinterpret_cast<T*>(stackTop_ - sizeof(T));
+        return static_cast<T*>(static_cast<void*>(stackTop_ - sizeof(T)));
     }
 
     template<typename T>
     const T* Top() const {
         RAPIDJSON_ASSERT(GetSize() >= sizeof(T));
-        return reinterpret_cast<T*>(stackTop_ - sizeof(T));
+        return static_cast<const T*>(static_cast<const void*>(stackTop_ - sizeof(T)));
     }
 
     template<typename T>
-    T* End() { return reinterpret_cast<T*>(stackTop_); }
+    T* End() { return static_cast<T*>(static_cast<void*>(stackTop_)); }
 
     template<typename T>
-    const T* End() const { return reinterpret_cast<T*>(stackTop_); }
+    const T* End() const { return static_cast<const T*>(static_cast<const void*>(stackTop_)); }
 
     template<typename T>
-    T* Bottom() { return reinterpret_cast<T*>(stack_); }
+    T* Bottom() { return static_cast<T*>(static_cast<void*>(stack_)); }
 
     template<typename T>
-    const T* Bottom() const { return reinterpret_cast<T*>(stack_); }
+    const T* Bottom() const { return static_cast<const T*>(static_cast<const void*>(stack_)); }
 
     bool HasAllocator() const {
         return allocator_ != 0;
