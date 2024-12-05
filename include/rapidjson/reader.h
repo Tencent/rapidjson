@@ -956,34 +956,66 @@ private:
 
     // Parse string and generate String event. Different code paths for kParseInsituFlag.
     template<unsigned parseFlags, typename InputStream, typename Handler>
-    void ParseString(InputStream& is, Handler& handler, bool isKey = false) {
-        internal::StreamLocalCopy<InputStream> copy(is);
-        InputStream& s(copy.s);
+void ParseString(InputStream& is, Handler& handler, bool isKey = false) {
+    internal::StreamLocalCopy<InputStream> copy(is);
+    InputStream& s(copy.s);
+    RAPIDJSON_ASSERT(s.Peek() == '\"');
+    s.Take();  // Skip '\"'
+    bool success = false;
 
-        RAPIDJSON_ASSERT(s.Peek() == '\"');
-        s.Take();  // Skip '\"'
-
-        bool success = false;
-        if (parseFlags & kParseInsituFlag) {
-            typename InputStream::Ch *head = s.PutBegin();
-            ParseStringToStream<parseFlags, SourceEncoding, SourceEncoding>(s, s);
-            RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
-            size_t length = s.PutEnd(head) - 1;
-            RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
-            const typename TargetEncoding::Ch* const str = reinterpret_cast<typename TargetEncoding::Ch*>(head);
-            success = (isKey ? handler.Key(str, SizeType(length), false) : handler.String(str, SizeType(length), false));
+    if (parseFlags & kParseInsituFlag) {
+        typename InputStream::Ch *head = s.PutBegin();
+        ParseStringToStream<parseFlags, SourceEncoding, SourceEncoding>(s, s);
+        RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
+        
+        size_t length = s.PutEnd(head) - 1;
+        RAPIDJSON_ASSERT(length <= 0xFFFFFFFF);
+        
+        // Safe conversion using proper type casting
+        const typename TargetEncoding::Ch* str;
+        if (sizeof(typename TargetEncoding::Ch) == sizeof(typename InputStream::Ch)) {
+            // If character types are the same size, use void* intermediary
+            str = static_cast<const typename TargetEncoding::Ch*>(
+                static_cast<const void*>(head)
+            );
+        } else {
+            // If sizes differ, perform conversion
+            typedef typename TargetEncoding::Ch TargetChar;
+            TargetChar* converted = static_cast<TargetChar*>(
+                handler.GetAllocator().Malloc(sizeof(TargetChar) * (length + 1))
+            );
+            
+            for (size_t i = 0; i < length; i++) {
+                converted[i] = static_cast<TargetChar>(head[i]);
+            }
+            converted[length] = static_cast<TargetChar>('\0');
+            str = converted;
         }
-        else {
-            StackStream<typename TargetEncoding::Ch> stackStream(stack_);
-            ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
-            RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
-            SizeType length = static_cast<SizeType>(stackStream.Length()) - 1;
-            const typename TargetEncoding::Ch* const str = stackStream.Pop();
-            success = (isKey ? handler.Key(str, length, true) : handler.String(str, length, true));
+        
+        success = (isKey ? 
+            handler.Key(str, SizeType(length), false) : 
+            handler.String(str, SizeType(length), false));
+        
+        // Cleanup if we allocated memory for conversion
+        if (sizeof(typename TargetEncoding::Ch) != sizeof(typename InputStream::Ch)) {
+            handler.GetAllocator().Free(const_cast<typename TargetEncoding::Ch*>(str));
         }
-        if (RAPIDJSON_UNLIKELY(!success))
-            RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
     }
+    else {
+        StackStream<typename TargetEncoding::Ch> stackStream(stack_);
+        ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
+        RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
+        
+        SizeType length = static_cast<SizeType>(stackStream.Length()) - 1;
+        const typename TargetEncoding::Ch* const str = stackStream.Pop();
+        success = (isKey ? 
+            handler.Key(str, length, true) : 
+            handler.String(str, length, true));
+    }
+    
+    if (RAPIDJSON_UNLIKELY(!success))
+        RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());
+}
 
     // Parse string to an output is
     // This function handles the prefix/suffix double quotes, escaping, and optional encoding validation.
@@ -1636,13 +1668,11 @@ private:
                 d = static_cast<double>(use64bit ? i64 : i);
                 useDouble = true;
             }
-
             bool expMinus = false;
             if (Consume(s, '+'))
                 ;
             else if (Consume(s, '-'))
                 expMinus = true;
-
             if (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
                 exp = static_cast<int>(s.Take() - '0');
                 if (expMinus) {
@@ -1654,27 +1684,31 @@ private:
                     //   <=>  exp <= (expFrac - INT_MIN - 9) / 10
                     RAPIDJSON_ASSERT(expFrac <= 0);
                     int maxExp = (expFrac + 2147483639) / 10;
-
                     while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
-                        exp = exp * 10 + static_cast<int>(s.Take() - '0');
-                        if (RAPIDJSON_UNLIKELY(exp > maxExp)) {
+                        int digit = static_cast<int>(s.Take() - '0');
+                        if (RAPIDJSON_UNLIKELY(exp > maxExp || 
+                            (exp == maxExp && digit > 9))) {  // Check for overflow
                             while (RAPIDJSON_UNLIKELY(s.Peek() >= '0' && s.Peek() <= '9'))  // Consume the rest of exponent
                                 s.Take();
+                            break;
                         }
+                        exp = exp * 10 + digit;
                     }
                 }
                 else {  // positive exp
                     int maxExp = 308 - expFrac;
                     while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
-                        exp = exp * 10 + static_cast<int>(s.Take() - '0');
-                        if (RAPIDJSON_UNLIKELY(exp > maxExp))
+                        int digit = static_cast<int>(s.Take() - '0');
+                        if (RAPIDJSON_UNLIKELY(exp > maxExp || 
+                            (exp == maxExp && digit > 9))) {  // Check for overflow
                             RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, startOffset);
+                        }
+                        exp = exp * 10 + digit;
                     }
                 }
             }
             else
                 RAPIDJSON_PARSE_ERROR(kParseErrorNumberMissExponent, s.Tell());
-
             if (expMinus)
                 exp = -exp;
         }
