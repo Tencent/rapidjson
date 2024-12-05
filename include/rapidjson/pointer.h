@@ -297,20 +297,27 @@ public:
         \param allocator Allocator for the newly return Pointer.
         \return A new Pointer with appended token.
     */
-    GenericPointer Append(SizeType index, Allocator* allocator = 0) const {
-        char buffer[21];
+     GenericPointer Append(SizeType index, Allocator* allocator = 0) const {
+        char buffer[21];  // Buffer for maximum uint64 representation including null terminator
         char* end = sizeof(SizeType) == 4 ? internal::u32toa(index, buffer) : internal::u64toa(index, buffer);
         SizeType length = static_cast<SizeType>(end - buffer);
         buffer[length] = '\0';
 
         if (sizeof(Ch) == 1) {
-            Token token = { reinterpret_cast<Ch*>(buffer), length, index };
+            // Safe casting for single-byte characters
+            Token token = { 
+                static_cast<Ch*>(static_cast<void*>(buffer)), 
+                length, 
+                index 
+            };
             return Append(token, allocator);
         }
         else {
-            Ch name[21];
-            for (size_t i = 0; i <= length; i++)
-                name[i] = static_cast<Ch>(buffer[i]);
+            // For wide characters, create a properly sized buffer and convert
+            Ch name[21];  // Same size as source buffer
+            for (size_t i = 0; i <= length; i++) {  // Include null terminator
+                name[i] = static_cast<Ch>(static_cast<unsigned char>(buffer[i]));
+            }
             Token token = { name, length, index };
             return Append(token, allocator);
         }
