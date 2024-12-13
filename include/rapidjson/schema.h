@@ -1645,8 +1645,7 @@ private:
         double qRounded = std::floor(q + 0.5);
         double scaledEpsilon = (q + qRounded) * std::numeric_limits<double>::epsilon();
         double difference = std::abs(qRounded - q);
-        bool isMultiple = (difference <= scaledEpsilon)
-                                        || (difference < std::numeric_limits<double>::min());
+        bool isMultiple = difference <= scaledEpsilon || difference < (std::numeric_limits<double>::min)();
         if (!isMultiple) {
             context.error_handler.NotMultipleOf(d, multipleOf_);
             RAPIDJSON_INVALID_KEYWORD_RETURN(kValidateErrorMultipleOf);
@@ -1762,7 +1761,7 @@ struct TokenHelper {
 template <typename Stack>
 struct TokenHelper<Stack, char> {
     RAPIDJSON_FORCEINLINE static void AppendIndexToken(Stack& documentStack, SizeType index) {
-        if (sizeof(SizeType) == 4) {
+        RAPIDJSON_IF_CONSTEXPR (sizeof(SizeType) == 4) {
             char *buffer = documentStack.template Push<char>(1 + 10); // '/' + uint
             *buffer++ = '/';
             const char* end = internal::u32toa(index, buffer);
