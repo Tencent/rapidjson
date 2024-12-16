@@ -1433,6 +1433,7 @@ private:
     class NumberStream<InputStream, StackCharacter, true, false> : public NumberStream<InputStream, StackCharacter, false, false> {
         typedef NumberStream<InputStream, StackCharacter, false, false> Base;
     public:
+        typedef typename InputStream::Ch Ch;
         NumberStream(GenericReader& reader, InputStream& s) : Base(reader, s), stackStream(reader.stack_) {}
 
         RAPIDJSON_FORCEINLINE Ch TakePush() {
@@ -1459,6 +1460,7 @@ private:
     class NumberStream<InputStream, StackCharacter, true, true> : public NumberStream<InputStream, StackCharacter, true, false> {
         typedef NumberStream<InputStream, StackCharacter, true, false> Base;
     public:
+        typedef typename InputStream::Ch Ch;
         NumberStream(GenericReader& reader, InputStream& s) : Base(reader, s) {}
 
         RAPIDJSON_FORCEINLINE Ch Take() { return Base::TakePush(); }
