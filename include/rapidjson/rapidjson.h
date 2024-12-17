@@ -276,6 +276,13 @@
 #    define RAPIDJSON_ENDIAN RAPIDJSON_LITTLEENDIAN
 #  elif defined(RAPIDJSON_DOXYGEN_RUNNING)
 #    define RAPIDJSON_ENDIAN
+// Detect with armcc macros
+#  elif defined(__ARMCC_VERSION) && (__ARMCC_VERSION < 6000000)
+#    if defined(__BIG_ENDIAN)
+#      define RAPIDJSON_ENDIAN RAPIDJSON_BIGENDIAN
+#    else
+#      define RAPIDJSON_ENDIAN RAPIDJSON_LITTLEENDIAN
+#    endif
 #  else
 #    error Unknown machine endianness detected. User needs to define RAPIDJSON_ENDIAN.
 #  endif
@@ -560,6 +567,15 @@ RAPIDJSON_NAMESPACE_END
 #define RAPIDJSON_DIAG_OFF(x) RAPIDJSON_DIAG_PRAGMA(disable: x)
 #define RAPIDJSON_DIAG_PUSH RAPIDJSON_DIAG_PRAGMA(push)
 #define RAPIDJSON_DIAG_POP  RAPIDJSON_DIAG_PRAGMA(pop)
+
+#elif defined(__ARMCC_VERSION) && (__ARMCC_VERSION < 6000000)
+
+#define RAPIDJSON_PRAGMA(x) _Pragma(RAPIDJSON_STRINGIFY(x))
+#define RAPIDJSON_DIAG_PRAGMA(x) RAPIDJSON_PRAGMA(diag_##x)
+
+#define RAPIDJSON_DIAG_OFF(x) RAPIDJSON_DIAG_PRAGMA(suppress x)
+#define RAPIDJSON_DIAG_PUSH /* ignored */
+#define RAPIDJSON_DIAG_POP /* ignored */
 
 #else
 
