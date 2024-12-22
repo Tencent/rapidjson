@@ -987,6 +987,24 @@ TEST(Reader, ParseString_Error) {
         }
     }
 
+    // 3.6 Lonely start characters near the end of the input
+    {
+        char e[] = { '\"', 0, '\"', '\0' };
+        for (unsigned c = 0xC0u; c <= 0xFFu; c++) {
+            e[1] = static_cast<char>(c);
+            unsigned streamPos;
+            if (c <= 0xC1u)
+                streamPos = 2; // 0xC0 - 0xC1
+            else if (c <= 0xDFu)
+                streamPos = 3; // 0xC2 - 0xDF
+            else if (c <= 0xF4u)
+                streamPos = 4; // 0xE0 - 0xF4
+            else
+                streamPos = 2; // 0xF5 - 0xFF
+            TEST_STRING_ERROR(kParseErrorStringInvalidEncoding, e, 1u, streamPos);
+        }
+    }
+
     // 4  Overlong sequences
 
     // 4.1  Examples of an overlong ASCII character
