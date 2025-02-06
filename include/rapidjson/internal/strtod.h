@@ -28,10 +28,7 @@ namespace internal {
 inline double FastPath(double significand, int exp) {
     if (exp < -308)
         return 0.0;
-    else if (exp >= 0)
-        return significand * internal::Pow10(exp);
-    else
-        return significand / internal::Pow10(-exp);
+    return significand * internal::Pow10(exp);
 }
 
 inline double StrtodNormalPrecision(double d, int p) {
