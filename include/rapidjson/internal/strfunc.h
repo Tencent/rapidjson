@@ -59,6 +59,43 @@ inline int StrCmp(const Ch* s1, const Ch* s2) {
     return static_cast<unsigned>(*s1) < static_cast<unsigned>(*s2) ? -1 : static_cast<unsigned>(*s1) > static_cast<unsigned>(*s2);
 }
 
+template<>
+inline int StrCmp<char>(const char* s1, const char* s2) 
+{
+    RAPIDJSON_ASSERT(s1 != 0);
+    RAPIDJSON_ASSERT(s2 != 0);
+    int res = strcmp(s1, s2);
+    if (res == 0)
+    {
+        return 0;
+    }
+
+    // This will return -1 or 1 without if
+    size_t size_int = sizeof(int);
+    res >>= (size_int - 1); // if is negative so it will be in binary 111111.. else 0
+    return res | 1; // return -1 or 1
+
+}
+
+template<>
+inline int StrCmp<wchar_t>(const wchar_t* s1, const wchar_t* s2)
+{
+    RAPIDJSON_ASSERT(s1 != 0);
+    RAPIDJSON_ASSERT(s2 != 0);
+    int res = wcscmp(s1, s2);
+    if (res == 0)
+    {
+        return 0;
+    }
+
+    // This will return -1 or 1 without if
+    size_t size_int = sizeof(int);
+    res >>= (size_int - 1); // if is negative so it will be in binary 111111.. else 0
+    return res | 1; // return -1 or 1
+}
+
+
+
 //! Returns number of code points in a encoded string.
 template<typename Encoding>
 bool CountStringCodePoint(const typename Encoding::Ch* s, SizeType length, SizeType* outCount) {
