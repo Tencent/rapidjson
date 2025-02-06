@@ -1011,7 +1011,7 @@ private:
                 size_t escapeOffset = is.Tell();    // For invalid escaping, report the initial '\\' as error offset
                 is.Take();
                 Ch e = is.Peek();
-                if ((sizeof(Ch) == 1 || unsigned(e) < 256) && RAPIDJSON_LIKELY(escape[static_cast<unsigned char>(e)])) {
+                if ((sizeof(Ch) == 1) && RAPIDJSON_LIKELY(escape[static_cast<unsigned char>(e)])) {
                     is.Take();
                     os.Put(static_cast<typename TEncoding::Ch>(escape[static_cast<unsigned char>(e)]));
                 }
@@ -1835,7 +1835,7 @@ private:
 #undef N16
 //!@endcond
 
-        if (sizeof(Ch) == 1 || static_cast<unsigned>(c) < 256)
+        if (sizeof(Ch) == 1)
             return static_cast<Token>(tokenMap[static_cast<unsigned char>(c)]);
         else
             return NumberToken;
