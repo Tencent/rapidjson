@@ -66,6 +66,16 @@ TEST(PrettyWriter, Basic) {
     EXPECT_STREQ(kPrettyJson, buffer.GetString());
 }
 
+TEST(PrettyWriter, Polymorphism) {
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    Writer<StringBuffer>* ugly_writer = dynamic_cast<Writer<StringBuffer>*>(&writer);
+    Reader reader;
+    StringStream s(kJson);
+    reader.Parse(s, *ugly_writer);
+    EXPECT_STREQ(kPrettyJson, buffer.GetString());
+}
+
 TEST(PrettyWriter, FormatOptions) {
     StringBuffer buffer;
     PrettyWriter<StringBuffer> writer(buffer);
