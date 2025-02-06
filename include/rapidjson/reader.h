@@ -52,6 +52,7 @@ RAPIDJSON_DIAG_OFF(4702)  // unreachable code
 #ifdef __GNUC__
 RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(effc++)
+RAPIDJSON_DIAG_OFF(type-limits)
 #endif
 
 //!@cond RAPIDJSON_HIDDEN_FROM_DOXYGEN
