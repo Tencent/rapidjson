@@ -501,15 +501,16 @@ inline const char *SkipWhitespace_SIMD(const char* p, const char* end) {
 #endif // RAPIDJSON_NEON
 
 #ifdef RAPIDJSON_SIMD
-//! Template function specialization for InsituStringStream
-template<> inline void SkipWhitespace(InsituStringStream& is) {
-    is.src_ = const_cast<char*>(SkipWhitespace_SIMD(is.src_));
-}
+//!DEPRECATED: 16-bytes null sting check causes buffer overflow
+// //! Template function specialization for InsituStringStream
+// template<> inline void SkipWhitespace(InsituStringStream& is) {
+//     is.src_ = const_cast<char*>(SkipWhitespace_SIMD(is.src_));
+// }
 
-//! Template function specialization for StringStream
-template<> inline void SkipWhitespace(StringStream& is) {
-    is.src_ = SkipWhitespace_SIMD(is.src_);
-}
+// //! Template function specialization for StringStream
+// template<> inline void SkipWhitespace(StringStream& is) {
+//     is.src_ = SkipWhitespace_SIMD(is.src_);
+// }
 
 template<> inline void SkipWhitespace(EncodedInputStream<UTF8<>, MemoryStream>& is) {
     is.is_.src_ = SkipWhitespace_SIMD(is.is_.src_, is.is_.end_);
@@ -1003,8 +1004,9 @@ private:
 
         for (;;) {
             // Scan and copy string before "\\\"" or < 0x20. This is an optional optimzation.
-            if (!(parseFlags & kParseValidateEncodingFlag))
-                ScanCopyUnescapedString(is, os);
+            //!DEPRECATED: 16-bytes null sting check causes buffer overflow
+            // if (!(parseFlags & kParseValidateEncodingFlag))
+            //     ScanCopyUnescapedString(is, os);
 
             Ch c = is.Peek();
             if (RAPIDJSON_UNLIKELY(c == '\\')) {    // Escape
