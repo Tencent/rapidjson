@@ -853,13 +853,18 @@ private:
     }
 
     template<unsigned parseFlags, typename InputStream, typename Handler>
-    void ParseNull(InputStream& is, Handler& handler) {
-        RAPIDJSON_ASSERT(is.Peek() == 'n');
+    void ParseNullOrNaN(InputStream& is, Handler& handler) {
+        RAPIDJSON_ASSERT(is.Peek() == 'n' || is.Peek() == 'N');
         is.Take();
 
         if (RAPIDJSON_LIKELY(Consume(is, 'u') && Consume(is, 'l') && Consume(is, 'l'))) {
             if (RAPIDJSON_UNLIKELY(!handler.Null()))
                 RAPIDJSON_PARSE_ERROR(kParseErrorTermination, is.Tell());
+        }
+        // Parse 'nan' and 'NaN' here
+        else if ((parseFlags & kParseNanAndInfFlag) && RAPIDJSON_LIKELY(Consume(is, 'a') && (Consume(is, 'n') || Consume(is, 'N')))) {
+            if (RAPIDJSON_UNLIKELY(!handler.Double(std::numeric_limits<double>::quiet_NaN())))
+                RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell());
         }
         else
             RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, is.Tell());
@@ -1478,7 +1483,7 @@ private:
 
         size_t startOffset = s.Tell();
         double d = 0.0;
-        bool useNanOrInf = false;
+        bool useInf = false;
 
         // Parse minus
         bool minus = Consume(s, '-');
@@ -1520,27 +1525,21 @@ private:
                     significandDigit++;
                 }
         }
-        // Parse NaN or Infinity here
-        else if ((parseFlags & kParseNanAndInfFlag) && RAPIDJSON_LIKELY((s.Peek() == 'I' || s.Peek() == 'N'))) {
-            if (Consume(s, 'N')) {
-                if (Consume(s, 'a') && Consume(s, 'N')) {
-                    d = std::numeric_limits<double>::quiet_NaN();
-                    useNanOrInf = true;
-                }
-            }
-            else if (RAPIDJSON_LIKELY(Consume(s, 'I'))) {
-                if (Consume(s, 'n') && Consume(s, 'f')) {
-                    d = (minus ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity());
-                    useNanOrInf = true;
+        // Here parsing '+/-Infinity', '+/-infinity', '+/-Inf' or '+/-inf'.
+        else if ((parseFlags & kParseNanAndInfFlag) && RAPIDJSON_LIKELY((s.Peek() == 'I' || s.Peek() == 'i'))) {
+            s.Take();
 
-                    if (RAPIDJSON_UNLIKELY(s.Peek() == 'i' && !(Consume(s, 'i') && Consume(s, 'n')
-                                                                && Consume(s, 'i') && Consume(s, 't') && Consume(s, 'y')))) {
-                        RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
-                    }
+            if (Consume(s, 'n') && Consume(s, 'f')) {
+                d = (minus ? -std::numeric_limits<double>::infinity() : std::numeric_limits<double>::infinity());
+                useInf = true;
+
+                if (RAPIDJSON_UNLIKELY(s.Peek() == 'i' && !(Consume(s, 'i') && Consume(s, 'n')
+                                                            && Consume(s, 'i') && Consume(s, 't') && Consume(s, 'y')))) {
+                    RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
                 }
             }
 
-            if (RAPIDJSON_UNLIKELY(!useNanOrInf)) {
+            if (RAPIDJSON_UNLIKELY(!useInf)) {
                 RAPIDJSON_PARSE_ERROR(kParseErrorValueInvalid, s.Tell());
             }
         }
@@ -1725,7 +1724,7 @@ private:
 
                cont = handler.Double(minus ? -d : d);
            }
-           else if (useNanOrInf) {
+           else if (useInf) {
                cont = handler.Double(d);
            }
            else {
@@ -1751,12 +1750,13 @@ private:
     template<unsigned parseFlags, typename InputStream, typename Handler>
     void ParseValue(InputStream& is, Handler& handler) {
         switch (is.Peek()) {
-            case 'n': ParseNull  <parseFlags>(is, handler); break;
-            case 't': ParseTrue  <parseFlags>(is, handler); break;
-            case 'f': ParseFalse <parseFlags>(is, handler); break;
-            case '"': ParseString<parseFlags>(is, handler); break;
-            case '{': ParseObject<parseFlags>(is, handler); break;
-            case '[': ParseArray <parseFlags>(is, handler); break;
+            case 'N':
+            case 'n': ParseNullOrNaN<parseFlags>(is, handler); break;
+            case 't': ParseTrue     <parseFlags>(is, handler); break;
+            case 'f': ParseFalse    <parseFlags>(is, handler); break;
+            case '"': ParseString   <parseFlags>(is, handler); break;
+            case '{': ParseObject   <parseFlags>(is, handler); break;
+            case '[': ParseArray    <parseFlags>(is, handler); break;
             default :
                       ParseNumber<parseFlags>(is, handler);
                       break;

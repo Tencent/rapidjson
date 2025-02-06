@@ -27,3 +27,6 @@ DartConfiguration.tcl
 
 # Files created by OS
 *.DS_Store
+
+# VS Code files
+.vscode
