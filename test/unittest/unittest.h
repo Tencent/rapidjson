@@ -54,6 +54,7 @@
 #ifdef __clang__
 // All TEST() macro generated this warning, disable globally
 #pragma GCC diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 #endif
 
 template <typename Ch>
