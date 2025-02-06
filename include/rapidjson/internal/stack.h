@@ -129,6 +129,7 @@ public:
     RAPIDJSON_FORCEINLINE T* PushUnsafe(size_t count = 1) {
         RAPIDJSON_ASSERT(stackTop_);
         RAPIDJSON_ASSERT(static_cast<std::ptrdiff_t>(sizeof(T) * count) <= (stackEnd_ - stackTop_));
+        memset(stackTop_, 0, sizeof(T));
         T* ret = reinterpret_cast<T*>(stackTop_);
         stackTop_ += sizeof(T) * count;
         return ret;
