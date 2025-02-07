@@ -152,6 +152,53 @@ inline char* WriteExponent(int K, char* buffer) {
 }
 
 inline char* Prettify(char* buffer, int length, int k, int maxDecimalPlaces) {
+
+	const int sig = 10;
+
+	if( length > sig ){
+
+		k += (length - sig);
+
+		/*		
+		// round away from zero
+
+		if( buffer[sig] >= '5' ){
+			for( int i = sig-1; i >= 0; i-- ){
+				buffer[i]++;
+				if( buffer[i] > '9' ) buffer[i] = '0';
+				else break;
+			}
+		}
+		*/
+
+		// banker's rounding 
+		// NOTE: this relies on the property that ascii '0' == 48
+
+		if( buffer[sig] >= '5' ){
+			for( int i = sig-1; i >= 0 && (buffer[i] % 2); i-- ){
+				buffer[i]++;
+				if( buffer[i] > '9' ) buffer[i] = '0';
+				else break;
+			}
+		}
+
+		// check for special case of 999999999... rounded up
+
+		if( buffer[0] == '0' ){
+			buffer[0] = '1';
+			length = 1;
+			k += (sig); // * 10
+		}
+		else {
+			length = sig;
+			for( int i = sig-1; i > 0 && buffer[i] == '0'; i--, length--, k++ );
+		}
+		
+		buffer[length] = 0;
+
+	}
+
+
     const int kk = length + k;  // 10^(kk-1) <= v < 10^kk
 
     if (0 <= k && kk <= 21) {
