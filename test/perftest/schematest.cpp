@@ -205,11 +205,13 @@ TEST_F(Schema, TestSuite) {
     for (int i = 0; i < trialCount; i++) {
         for (TestSuiteList::const_iterator itr = testSuites.begin(); itr != testSuites.end(); ++itr) {
             const TestSuite& ts = **itr;
-            GenericSchemaValidator<SchemaDocument, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> >  validator(*ts.schema, &validatorAllocator);
-            for (DocumentList::const_iterator testItr = ts.tests.begin(); testItr != ts.tests.end(); ++testItr) {
-                validator.Reset();
-                (*testItr)->Accept(validator);
-                testCount++;
+            {
+                GenericSchemaValidator<SchemaDocument, BaseReaderHandler<UTF8<> >, MemoryPoolAllocator<> >  validator(*ts.schema, &validatorAllocator);
+                for (DocumentList::const_iterator testItr = ts.tests.begin(); testItr != ts.tests.end(); ++testItr) {
+                    validator.Reset();
+                    (*testItr)->Accept(validator);
+                    testCount++;
+                }
             }
             validatorAllocator.Clear();
         }
