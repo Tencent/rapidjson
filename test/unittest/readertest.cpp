@@ -246,6 +246,7 @@ static void TestParseDouble() {
     TEST_DOUBLE(fullPrecision, "1.00000000001e-2147483638", 0.0);
     TEST_DOUBLE(fullPrecision, "0.017976931348623157e+310", 1.7976931348623157e+308); // Max double in another form
     TEST_DOUBLE(fullPrecision, "128.74836467836484838364836483643636483648e-336", 0.0); // Issue #1251
+    TEST_DOUBLE(fullPrecision, "0.184467440737095516159", 0.184467440737095516159); // decimal part is 10 * (2^64 - 1) + 9
 
     // Since
     // abs((2^-1022 - 2^-1074) - 2.2250738585072012e-308) = 3.109754131239141401123495768877590405345064751974375599... x 10^-324
@@ -983,6 +984,24 @@ TEST(Reader, ParseString_Error) {
             else
                 streamPos = 3; // 0xF5 - 0xFF
             TEST_STRING_ERROR(kParseErrorStringInvalidEncoding, e, 2u, streamPos);
+        }
+    }
+
+    // 3.6 Lonely start characters near the end of the input
+    {
+        char e[] = { '\"', 0, '\"', '\0' };
+        for (unsigned c = 0xC0u; c <= 0xFFu; c++) {
+            e[1] = static_cast<char>(c);
+            unsigned streamPos;
+            if (c <= 0xC1u)
+                streamPos = 2; // 0xC0 - 0xC1
+            else if (c <= 0xDFu)
+                streamPos = 3; // 0xC2 - 0xDF
+            else if (c <= 0xF4u)
+                streamPos = 4; // 0xE0 - 0xF4
+            else
+                streamPos = 2; // 0xF5 - 0xFF
+            TEST_STRING_ERROR(kParseErrorStringInvalidEncoding, e, 1u, streamPos);
         }
     }
 
@@ -2338,6 +2357,9 @@ TEST(Reader, ParseNanAndInfinity) {
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-nan", 1u);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "NAN", 1u);
     TEST_NAN_INF_ERROR(kParseErrorValueInvalid, "-Infinty", 6u);
+    TEST_NAN_INF_ERROR(kParseErrorDocumentRootNotSingular, "NaN.2e2", 3u);
+    TEST_NAN_INF_ERROR(kParseErrorDocumentRootNotSingular, "Inf.2", 3u);
+    TEST_NAN_INF_ERROR(kParseErrorDocumentRootNotSingular, "-InfE2", 4u);
 
 #undef TEST_NAN_INF_ERROR
 #undef TEST_NAN_INF

@@ -48,7 +48,6 @@ TEST(Uri, DefaultConstructor) {
     EXPECT_TRUE(u.GetStringLength() == 0);
 }
 
-
 TEST(Uri, Parse) {
     typedef GenericUri<Value, MemoryPoolAllocator<> > UriType;
     MemoryPoolAllocator<CrtAllocator> allocator;
@@ -66,21 +65,8 @@ TEST(Uri, Parse) {
     u.Get(w, allocator);
     EXPECT_TRUE(*w.GetString() == *v.GetString());
 
-#if RAPIDJSON_HAS_STDSTRING
-    typedef std::basic_string<Value::Ch> String;
-    String str = "http://auth/path/xxx?query#frag";
-    const UriType uri = UriType(str);
-    EXPECT_TRUE(UriType::GetScheme(uri) == "http:");
-    EXPECT_TRUE(UriType::GetAuth(uri) == "//auth");
-    EXPECT_TRUE(UriType::GetPath(uri) == "/path/xxx");
-    EXPECT_TRUE(UriType::GetBase(uri) == "http://auth/path/xxx?query");
-    EXPECT_TRUE(UriType::GetQuery(uri) == "?query");
-    EXPECT_TRUE(UriType::GetFrag(uri) == "#frag");
-    EXPECT_TRUE(UriType::Get(uri) == str);
-#endif
-
     v.SetString("urn:uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f", allocator);
-    u = UriType(v);
+    u = UriType(v, &allocator);
     EXPECT_TRUE(StrCmp(u.GetSchemeString(), "urn:") == 0);
     EXPECT_TRUE(u.GetAuthStringLength() == 0);
     EXPECT_TRUE(StrCmp(u.GetPathString(), "uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f") == 0);
@@ -91,7 +77,7 @@ TEST(Uri, Parse) {
     EXPECT_TRUE(*w.GetString() == *v.GetString());
 
     v.SetString("", allocator);
-    u = UriType(v);
+    u = UriType(v, &allocator);
     EXPECT_TRUE(u.GetSchemeStringLength() == 0);
     EXPECT_TRUE(u.GetAuthStringLength() == 0);
     EXPECT_TRUE(u.GetPathStringLength() == 0);
@@ -100,7 +86,7 @@ TEST(Uri, Parse) {
     EXPECT_TRUE(u.GetFragStringLength() == 0);
 
     v.SetString("http://auth/", allocator);
-    u = UriType(v);
+    u = UriType(v, &allocator);
     EXPECT_TRUE(StrCmp(u.GetSchemeString(), "http:") == 0);
     EXPECT_TRUE(StrCmp(u.GetAuthString(), "//auth") == 0);
     EXPECT_TRUE(StrCmp(u.GetPathString(), "/") == 0);
@@ -162,12 +148,11 @@ TEST(Uri, Parse) {
     EXPECT_TRUE(u.GetFragStringLength() == len);
 
     // Incomplete auth treated as path
-    str = "http:/";
-    const UriType u2 = UriType(str);
-    EXPECT_TRUE(StrCmp(u2.GetSchemeString(), "http:") == 0);
-    EXPECT_TRUE(u2.GetAuthStringLength() == 0);
-    EXPECT_TRUE(StrCmp(u2.GetPathString(), "/") == 0);
-    EXPECT_TRUE(StrCmp(u2.GetBaseString(), "http:/") == 0);
+    u = UriType("http:/");
+    EXPECT_TRUE(StrCmp(u.GetSchemeString(), "http:") == 0);
+    EXPECT_TRUE(u.GetAuthStringLength() == 0);
+    EXPECT_TRUE(StrCmp(u.GetPathString(), "/") == 0);
+    EXPECT_TRUE(StrCmp(u.GetBaseString(), "http:/") == 0);
 }
 
 TEST(Uri, Parse_UTF16) {
@@ -188,21 +173,8 @@ TEST(Uri, Parse_UTF16) {
     u.Get(w, allocator);
     EXPECT_TRUE(*w.GetString() == *v.GetString());
 
-#if RAPIDJSON_HAS_STDSTRING
-    typedef std::basic_string<Value16::Ch> String;
-    String str = L"http://auth/path/xxx?query#frag";
-    const UriType uri = UriType(str);
-    EXPECT_TRUE(UriType::GetScheme(uri) == L"http:");
-    EXPECT_TRUE(UriType::GetAuth(uri) == L"//auth");
-    EXPECT_TRUE(UriType::GetPath(uri) == L"/path/xxx");
-    EXPECT_TRUE(UriType::GetBase(uri) == L"http://auth/path/xxx?query");
-    EXPECT_TRUE(UriType::GetQuery(uri) == L"?query");
-    EXPECT_TRUE(UriType::GetFrag(uri) == L"#frag");
-    EXPECT_TRUE(UriType::Get(uri) == str);
-#endif
-
     v.SetString(L"urn:uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f", allocator);
-    u = UriType(v);
+    u = UriType(v, &allocator);
     EXPECT_TRUE(StrCmp(u.GetSchemeString(), L"urn:") == 0);
     EXPECT_TRUE(u.GetAuthStringLength() == 0);
     EXPECT_TRUE(StrCmp(u.GetPathString(), L"uuid:ee564b8a-7a87-4125-8c96-e9f123d6766f") == 0);
@@ -213,7 +185,7 @@ TEST(Uri, Parse_UTF16) {
     EXPECT_TRUE(*w.GetString() == *v.GetString());
 
     v.SetString(L"", allocator);
-    u = UriType(v);
+    u = UriType(v, &allocator);
     EXPECT_TRUE(u.GetSchemeStringLength() == 0);
     EXPECT_TRUE(u.GetAuthStringLength() == 0);
     EXPECT_TRUE(u.GetPathStringLength() == 0);
@@ -222,7 +194,7 @@ TEST(Uri, Parse_UTF16) {
     EXPECT_TRUE(u.GetFragStringLength() == 0);
 
     v.SetString(L"http://auth/", allocator);
-    u = UriType(v);
+    u = UriType(v, &allocator);
     EXPECT_TRUE(StrCmp(u.GetSchemeString(), L"http:") == 0);
     EXPECT_TRUE(StrCmp(u.GetAuthString(), L"//auth") == 0);
     EXPECT_TRUE(StrCmp(u.GetPathString(), L"/") == 0);
@@ -290,6 +262,41 @@ TEST(Uri, Parse_UTF16) {
     EXPECT_TRUE(StrCmp(u.GetPathString(), L"/") == 0);
     EXPECT_TRUE(StrCmp(u.GetBaseString(), L"http:/") == 0);
 }
+
+#if RAPIDJSON_HAS_STDSTRING
+TEST(Uri, Parse_Std) {
+    typedef GenericUri<Value, MemoryPoolAllocator<> > UriType;
+    MemoryPoolAllocator<CrtAllocator> allocator;
+    typedef std::basic_string<Value::Ch> String;
+
+    String str = "http://auth/path/xxx?query#frag";
+    const UriType uri = UriType(str, &allocator);
+    EXPECT_TRUE(UriType::GetScheme(uri) == "http:");
+    EXPECT_TRUE(UriType::GetAuth(uri) == "//auth");
+    EXPECT_TRUE(UriType::GetPath(uri) == "/path/xxx");
+    EXPECT_TRUE(UriType::GetBase(uri) == "http://auth/path/xxx?query");
+    EXPECT_TRUE(UriType::GetQuery(uri) == "?query");
+    EXPECT_TRUE(UriType::GetFrag(uri) == "#frag");
+    EXPECT_TRUE(UriType::Get(uri) == str);
+}
+
+TEST(Uri, Parse_UTF16_Std) {
+    typedef GenericValue<UTF16<> > Value16;
+    typedef GenericUri<Value16, MemoryPoolAllocator<> > UriType;
+    MemoryPoolAllocator<CrtAllocator> allocator;
+    typedef std::basic_string<Value16::Ch> String;
+
+    String str = L"http://auth/path/xxx?query#frag";
+    const UriType uri = UriType(str, &allocator);
+    EXPECT_TRUE(UriType::GetScheme(uri) == L"http:");
+    EXPECT_TRUE(UriType::GetAuth(uri) == L"//auth");
+    EXPECT_TRUE(UriType::GetPath(uri) == L"/path/xxx");
+    EXPECT_TRUE(UriType::GetBase(uri) == L"http://auth/path/xxx?query");
+    EXPECT_TRUE(UriType::GetQuery(uri) == L"?query");
+    EXPECT_TRUE(UriType::GetFrag(uri) == L"#frag");
+    EXPECT_TRUE(UriType::Get(uri) == str);
+}
+#endif
 
 TEST(Uri, CopyConstructor) {
     typedef GenericUri<Value> UriType;

@@ -615,7 +615,7 @@ public:
         RAPIDJSON_ASSERT(regex_.IsValid());
         if (!allocator_)
             ownAllocator_ = allocator_ = RAPIDJSON_NEW(Allocator)();
-        stateSet_ = static_cast<unsigned*>(allocator_->Malloc(GetStateSetSize()));
+        stateSet_ = static_cast<uint32_t*>(allocator_->Malloc(GetStateSetSize()));
         state0_.template Reserve<SizeType>(regex_.stateCount_);
         state1_.template Reserve<SizeType>(regex_.stateCount_);
     }

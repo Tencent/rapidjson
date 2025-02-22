@@ -77,7 +77,7 @@ static void TestFileStream() {
     }
 
     fp = fopen(filename, "r");
-	ASSERT_TRUE( fp != NULL );
+    ASSERT_TRUE( fp != NULL );
     for (const char* p = s; *p; p++)
         EXPECT_EQ(*p, static_cast<char>(fgetc(fp)));
     fclose(fp);

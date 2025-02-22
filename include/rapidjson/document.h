@@ -1033,7 +1033,7 @@ public:
                 return false;           
             for (ConstMemberIterator lhsMemberItr = MemberBegin(); lhsMemberItr != MemberEnd(); ++lhsMemberItr) {
                 typename RhsType::ConstMemberIterator rhsMemberItr = rhs.FindMember(lhsMemberItr->name);
-                if (rhsMemberItr == rhs.MemberEnd() || lhsMemberItr->value != rhsMemberItr->value)
+                if (rhsMemberItr == rhs.MemberEnd() || (!(lhsMemberItr->value == rhsMemberItr->value)))
                     return false;
             }
             return true;
@@ -1042,7 +1042,7 @@ public:
             if (data_.a.size != rhs.data_.a.size)
                 return false;
             for (SizeType i = 0; i < data_.a.size; i++)
-                if ((*this)[i] != rhs[i])
+                if (!((*this)[i] == rhs[i]))
                     return false;
             return true;
 
@@ -1078,6 +1078,7 @@ public:
     */
     template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::OrExpr<internal::IsPointer<T>,internal::IsGenericValue<T> >), (bool)) operator==(const T& rhs) const { return *this == GenericValue(rhs); }
 
+#ifndef __cpp_impl_three_way_comparison
     //! Not-equal-to operator
     /*! \return !(*this == rhs)
      */
@@ -1092,7 +1093,6 @@ public:
      */
     template <typename T> RAPIDJSON_DISABLEIF_RETURN((internal::IsGenericValue<T>), (bool)) operator!=(const T& rhs) const { return !(*this == rhs); }
 
-#ifndef __cpp_impl_three_way_comparison
     //! Equal-to operator with arbitrary types (symmetric version)
     /*! \return (rhs == lhs)
      */
@@ -2445,13 +2445,14 @@ private:
             data_.f.flags = kShortStringFlag;
             data_.ss.SetLength(s.length);
             str = data_.ss.str;
+            std::memmove(str, s, s.length * sizeof(Ch));
         } else {
             data_.f.flags = kCopyStringFlag;
             data_.s.length = s.length;
             str = static_cast<Ch *>(allocator.Malloc((s.length + 1) * sizeof(Ch)));
             SetStringPointer(str);
+            std::memcpy(str, s, s.length * sizeof(Ch));
         }
-        std::memcpy(str, s, s.length * sizeof(Ch));
         str[s.length] = '\0';
     }
 

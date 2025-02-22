@@ -49,10 +49,12 @@ using namespace rapidjson_simd;
 #define SIMD_SUFFIX(name) name
 #endif
 
+#define SIMD_SIZE_ALIGN(n) ((size_t(n) + 15) & ~size_t(15))
+
 template <typename StreamType>
 void TestSkipWhitespace() {
     for (size_t step = 1; step < 32; step++) {
-        char buffer[1025];
+        char buffer[SIMD_SIZE_ALIGN(1025)];
         for (size_t i = 0; i < 1024; i++)
             buffer[i] = " \t\r\n"[i % 4];
         for (size_t i = 0; i < 1024; i += step)
@@ -79,7 +81,7 @@ TEST(SIMD, SIMD_SUFFIX(SkipWhitespace)) {
 
 TEST(SIMD, SIMD_SUFFIX(SkipWhitespace_EncodedMemoryStream)) {
     for (size_t step = 1; step < 32; step++) {
-        char buffer[1024];
+        char buffer[SIMD_SIZE_ALIGN(1024)];
         for (size_t i = 0; i < 1024; i++)
             buffer[i] = " \t\r\n"[i % 4];
         for (size_t i = 0; i < 1024; i += step)
@@ -107,8 +109,8 @@ struct ScanCopyUnescapedStringHandler : BaseReaderHandler<UTF8<>, ScanCopyUnesca
 
 template <unsigned parseFlags, typename StreamType>
 void TestScanCopyUnescapedString() {
-    char buffer[1024u + 5 + 32];
-    char backup[1024u + 5 + 32];
+    char buffer[SIMD_SIZE_ALIGN(1024u + 5 + 32)];
+    char backup[SIMD_SIZE_ALIGN(1024u + 5 + 32)];
 
     // Test "ABCDABCD...\\"
     for (size_t offset = 0; offset < 32; offset++) {
@@ -165,7 +167,7 @@ TEST(SIMD, SIMD_SUFFIX(ScanCopyUnescapedString)) {
 }
 
 TEST(SIMD, SIMD_SUFFIX(ScanWriteUnescapedString)) {
-    char buffer[2048 + 1 + 32];
+    char buffer[SIMD_SIZE_ALIGN(2048 + 1 + 32)];
     for (size_t offset = 0; offset < 32; offset++) {
         for (size_t step = 0; step < 1024; step++) {
             char* s = buffer + offset;

@@ -24,7 +24,15 @@ if (sd.Parse(schemaJson).HasParseError()) {
     // the schema is not a valid JSON.
     // ...       
 }
+
 SchemaDocument schema(sd); // Compile a Document to SchemaDocument
+if (!schema.GetError().ObjectEmpty()) {
+    // there was a problem compiling the schema
+    StringBuffer sb;
+    Writer<StringBuffer> w(sb);
+    schema.GetError().Accept(w);
+    printf("Invalid schema: %s\n", sb.GetString());
+}
 // sd is no longer needed here.
 
 Document d;

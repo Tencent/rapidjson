@@ -41,7 +41,8 @@ static std::string GetString(const ValueType& val) {
     s << "false";
   else if (val.IsFloat())
     s << val.GetFloat();
-  return s.str();}
+  return s.str();
+}
 
 // Create the error message for a named error
 // The error object can either be empty or contain at least member properties:
