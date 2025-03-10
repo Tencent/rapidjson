@@ -7,8 +7,10 @@
     "include": "include"
   },
   "examples": "example/*/*.cpp",
-  "repository":
-  {
+  "build":{
+    "srcFilter": "-<thirdparty/gtest/**>"
+  },
+  "repository":{
     "type": "git",
     "url": "https://github.com/Tencent/rapidjson"
   }
