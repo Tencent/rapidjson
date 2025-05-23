@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
+cmake_minimum_required(VERSION 3.5...4.0)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules)
 
@@ -20,8 +20,6 @@ SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 option(RAPIDJSON_BUILD_DOC "Build rapidjson documentation." ON)
 option(RAPIDJSON_BUILD_EXAMPLES "Build rapidjson examples." ON)
 option(RAPIDJSON_BUILD_TESTS "Build rapidjson perftests and unittests." ON)
-option(RAPIDJSON_BUILD_THIRDPARTY_GTEST
-    "Use gtest installation in `thirdparty/gtest` by default if available" OFF)
 
 option(RAPIDJSON_BUILD_CXX11 "Build rapidjson with C++11" ON)
 option(RAPIDJSON_BUILD_CXX17 "Build rapidjson with C++17" OFF)
@@ -144,9 +142,11 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "XL")
 endif()
 
 #add extra search paths for libraries and includes
-SET(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The directory the headers are installed in")
-SET(LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib" CACHE STRING "Directory where lib will install")
-SET(DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}" CACHE PATH "Path to the documentation")
+include(GNUInstallDirs)
+
+SET(INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}" CACHE PATH "The directory the headers are installed in")
+SET(LIB_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE STRING "Directory where lib will install")
+SET(DOC_INSTALL_DIR "${CMAKE_INSTALL_DOCDIR}" CACHE PATH "Path to the documentation")
 
 IF(UNIX OR CYGWIN)
     SET(_CMAKE_INSTALL_DIR "${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}")
@@ -154,8 +154,6 @@ ELSEIF(WIN32)
     SET(_CMAKE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/cmake")
 ENDIF()
 SET(CMAKE_INSTALL_DIR "${_CMAKE_INSTALL_DIR}" CACHE PATH "The directory cmake files are installed in")
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 if(RAPIDJSON_BUILD_DOC)
     add_subdirectory(doc)
@@ -170,6 +168,7 @@ if(RAPIDJSON_BUILD_EXAMPLES)
 endif()
 
 if(RAPIDJSON_BUILD_TESTS)
+    enable_testing()
     if(MSVC11)
         # required for VS2012 due to missing support for variadic templates
         add_definitions(-D_VARIADIC_MAX=10)
@@ -195,7 +194,10 @@ install(FILES readme.md
 # Add an interface target to export it
 add_library(RapidJSON INTERFACE)
 
-target_include_directories(RapidJSON INTERFACE $<INSTALL_INTERFACE:include>)
+target_include_directories(RapidJSON INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
+)
 
 install(DIRECTORY include/rapidjson
     DESTINATION "${INCLUDE_INSTALL_DIR}"
@@ -214,44 +216,25 @@ install(DIRECTORY example/
 # ===============================
 
 ################################################################################
-# Export package for use from the build tree
-EXPORT( PACKAGE ${PROJECT_NAME} )
-
-# Create the RapidJSONConfig.cmake file for other cmake projects.
-# ... for the build tree
-SET( CONFIG_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-SET( CONFIG_DIR ${CMAKE_CURRENT_BINARY_DIR})
-SET( ${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_SOURCE_DIR}/include" )
-
-INCLUDE(CMakePackageConfigHelpers)
-CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake @ONLY )
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}ConfigVersion.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake @ONLY)
-
-# ... for the install tree
-SET( CMAKECONFIG_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME} )
-FILE( RELATIVE_PATH REL_INCLUDE_DIR
-    "${CMAKECONFIG_INSTALL_DIR}"
-    "${CMAKE_INSTALL_PREFIX}/include" )
-
-SET( ${PROJECT_NAME}_INCLUDE_DIR "\${${PROJECT_NAME}_CMAKE_DIR}/${REL_INCLUDE_DIR}" )
-SET( CONFIG_SOURCE_DIR )
-SET( CONFIG_DIR )
-CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}Config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake @ONLY )
-
-INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
-        DESTINATION ${CMAKECONFIG_INSTALL_DIR} )
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(${PROJECT_NAME}ConfigVersion.cmake
+    COMPATIBILITY AnyNewerVersion
+)
+configure_package_config_file(
+    ${PROJECT_NAME}Config.cmake.in
+    ${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_DIR}
+)
 
 # Install files
-IF(CMAKE_INSTALL_DIR)
-    INSTALL(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-        DESTINATION "${CMAKE_INSTALL_DIR}"
-        COMPONENT dev)
-
-    INSTALL(TARGETS RapidJSON EXPORT RapidJSON-targets)
-    INSTALL(EXPORT RapidJSON-targets DESTINATION ${CMAKE_INSTALL_DIR})
-ENDIF()
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_DIR}
+    COMPONENT dev
+)
+install(TARGETS RapidJSON EXPORT RapidJSON-targets)
+export(TARGETS RapidJSON
+    FILE RapidJSON-targets.cmake
+)
+install(EXPORT RapidJSON-targets DESTINATION ${CMAKE_INSTALL_DIR})

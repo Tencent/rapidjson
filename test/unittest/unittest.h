@@ -44,7 +44,7 @@
 #pragma GCC diagnostic ignored "-Weffc++"
 #endif
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include <stdexcept>
 
 #if defined(__clang__) || defined(__GNUC__) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6))
