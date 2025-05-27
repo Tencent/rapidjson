@@ -551,8 +551,8 @@ inline bool Writer<StringBuffer>::WriteUint64(uint64_t u) {
 template<>
 inline bool Writer<StringBuffer>::WriteDouble(double d) {
     if (internal::Double(d).IsNanOrInf()) {
-        // Note: This code path can only be reached if (RAPIDJSON_WRITE_DEFAULT_FLAGS & kWriteNanAndInfFlag).
-        if (!(kWriteDefaultFlags & kWriteNanAndInfFlag))
+        // Note: This code path can only be reached if (RAPIDJSON_WRITE_DEFAULT_FLAGS & (kWriteNanAndInfFlag | kWriteNanAndInfNullFlag)).
+        if (!(kWriteDefaultFlags & kWriteNanAndInfFlag) && !(kWriteDefaultFlags & kWriteNanAndInfNullFlag))
             return false;
         if (kWriteDefaultFlags & kWriteNanAndInfNullFlag) {
             PutReserve(*os_, 4);
