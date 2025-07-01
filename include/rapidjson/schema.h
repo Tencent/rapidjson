@@ -353,7 +353,11 @@ public:
     }
 
     bool String(const Ch* str, SizeType len, bool) {
-        WriteBuffer(kStringType, str, len * sizeof(Ch));
+        if (len == 0) {
+            WriteType(kStringType);
+        } else {
+            WriteBuffer(kStringType, str, len * sizeof(Ch));
+        }
         return true;
     }
 
@@ -397,18 +401,26 @@ private:
         double d;
     };
 
-    bool WriteType(Type type) { return WriteBuffer(type, 0, 0); }
-    
-    bool WriteNumber(const Number& n) { return WriteBuffer(kNumberType, &n, sizeof(n)); }
-    
-    bool WriteBuffer(Type type, const void* data, size_t len) {
-        // FNV-1a from http://isthe.com/chongo/tech/comp/fnv/
+    bool WriteType(Type type) {
         uint64_t h = Hash(RAPIDJSON_UINT64_C2(0xcbf29ce4, 0x84222325), type);
-        const unsigned char* d = static_cast<const unsigned char*>(data);
-        for (size_t i = 0; i < len; i++)
-            h = Hash(h, d[i]);
         *stack_.template Push<uint64_t>() = h;
         return true;
+    }
+    
+    bool WriteNumber(const Number& n) { return WriteBuffer(kNumberType, &n, sizeof(n)); }
+
+    bool WriteBuffer(Type type, const void* data, size_t len) {
+        // FNV-1a from http://isthe.com/chongo/tech/comp/fnv/
+        if (data != NULL && len != 0) {
+            uint64_t h = Hash(RAPIDJSON_UINT64_C2(0xcbf29ce4, 0x84222325), type);
+            const unsigned char* d = static_cast<const unsigned char*>(data);
+            for (size_t i = 0; i < len; i++)
+                h = Hash(h, d[i]);
+            *stack_.template Push<uint64_t>() = h;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     static uint64_t Hash(uint64_t h, uint64_t d) {
