@@ -1484,7 +1484,7 @@ private:
         bool minus = Consume(s, '-');
 
         // Parse int: zero / ( digit1-9 *DIGIT )
-        unsigned i = 0;
+        uint32_t i = 0;
         uint64_t i64 = 0;
         bool use64bit = false;
         int significandDigit = 0;
@@ -1493,7 +1493,7 @@ private:
             s.TakePush();
         }
         else if (RAPIDJSON_LIKELY(s.Peek() >= '1' && s.Peek() <= '9')) {
-            i = static_cast<unsigned>(s.TakePush() - '0');
+            i = static_cast<uint32_t>(s.TakePush() - '0');
 
             if (minus)
                 while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
@@ -1504,7 +1504,7 @@ private:
                             break;
                         }
                     }
-                    i = i * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                    i = i * 10 + static_cast<uint32_t>(s.TakePush() - '0');
                     significandDigit++;
                 }
             else
@@ -1516,7 +1516,7 @@ private:
                             break;
                         }
                     }
-                    i = i * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                    i = i * 10 + static_cast<uint32_t>(s.TakePush() - '0');
                     significandDigit++;
                 }
         }
