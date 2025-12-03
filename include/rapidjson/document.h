@@ -1693,7 +1693,8 @@ public:
     */
     GenericValue& Reserve(SizeType newCapacity, Allocator &allocator) {
         RAPIDJSON_ASSERT(IsArray());
-        if (newCapacity > data_.a.capacity) {
+        if (newCapacity > data_.a.capacity && (newCapacity <= (std::numeric_limits<SizeType>::max)() / sizeof(GenericValue))
+            && (newCapacity <= PTRDIFF_MAX / sizeof(GenericValue))) {
             SetElementsPointer(reinterpret_cast<GenericValue*>(allocator.Realloc(GetElementsPointer(), data_.a.capacity * sizeof(GenericValue), newCapacity * sizeof(GenericValue))));
             data_.a.capacity = newCapacity;
         }

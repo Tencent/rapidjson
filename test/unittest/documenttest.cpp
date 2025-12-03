@@ -413,6 +413,59 @@ TEST(Document, UTF16_Document) {
     EXPECT_EQ(0, memcmp(L"Wed Oct 30 17:13:20 +0000 2012", s.GetString(), (s.GetStringLength() + 1) * sizeof(wchar_t)));
 }
 
+// Issue 1993:    Potential integer overflow in GenericValue::Reserve
+TEST(Document, Reserve) {
+    GenericDocument<UTF8<>, CrtAllocator> json1;
+    json1.SetArray();
+    CrtAllocator s_CrtAllocator;
+
+    SizeType newCapacityNormal = 10;
+    json1.Reserve(newCapacityNormal, s_CrtAllocator);
+    EXPECT_EQ(newCapacityNormal, json1.Capacity());
+
+    SizeType newCapacityNormalBigger = 20;
+    json1.Reserve(newCapacityNormalBigger, s_CrtAllocator);
+    EXPECT_EQ(newCapacityNormalBigger, json1.Capacity());
+
+    SizeType newCapacityNormalSmaller = 15;
+    json1.Reserve(newCapacityNormalSmaller, s_CrtAllocator);
+    EXPECT_EQ(newCapacityNormalBigger, json1.Capacity());
+
+#if !RAPIDJSON_64BIT
+    // Create another document for enough space
+    GenericDocument<UTF8<>, CrtAllocator> json2;
+    json2.SetArray();
+
+    // PTRDIFF_MAX if bigger than (std::numeric_limits<SizeType>::max)() in 64BIT environment
+    SizeType newCapacityBoundary = PTRDIFF_MAX / sizeof(GenericValue<UTF8<>>);
+    json2.Reserve(newCapacityBoundary, s_CrtAllocator);
+    EXPECT_EQ(newCapacityBoundary, json2.Capacity());
+#endif
+
+    // Create another document for enough space
+    GenericDocument<UTF8<>, CrtAllocator> json3;
+    json3.SetArray();
+#if !RAPIDJSON_64BIT
+    SizeType oldCapacity = json3.Capacity();
+#endif
+
+    SizeType newCapacityMaxSize = (std::numeric_limits<SizeType>::max)() / sizeof(GenericValue<UTF8<>>);
+    json3.Reserve(newCapacityMaxSize, s_CrtAllocator);
+#if RAPIDJSON_64BIT
+    EXPECT_EQ(newCapacityMaxSize, json3.Capacity());
+#else
+    EXPECT_EQ(oldCapacity, json3.Capacity());
+#endif
+
+    SizeType newCapacityLarge = (std::numeric_limits<SizeType>::max)();
+    json3.Reserve(newCapacityLarge, s_CrtAllocator);
+#if RAPIDJSON_64BIT
+    EXPECT_EQ(newCapacityMaxSize, json3.Capacity());
+#else
+    EXPECT_EQ(oldCapacity, json3.Capacity());
+#endif
+}
+
 #if RAPIDJSON_HAS_CXX11_RVALUE_REFS
 
 #if 0 // Many old compiler does not support these. Turn it off temporaily.
