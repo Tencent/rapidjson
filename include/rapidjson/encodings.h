@@ -313,10 +313,14 @@ struct UTF16 {
         }
         else if (c <= 0xDBFF) {
             *codepoint = (static_cast<unsigned>(c) & 0x3FF) << 10;
-            c = is.Take();
+            c = is.Peek();
+            if (c < 0xDC00 || c> 0xDFFF) {
+                return false;
+            }
+            is.Take();
             *codepoint |= (static_cast<unsigned>(c) & 0x3FF);
             *codepoint += 0x10000;
-            return c >= 0xDC00 && c <= 0xDFFF;
+            return true;
         }
         return false;
     }
