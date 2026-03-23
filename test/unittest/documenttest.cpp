@@ -15,6 +15,7 @@
 #include "unittest.h"
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
+#include "rapidjson/prettywriter.h"
 #include "rapidjson/filereadstream.h"
 #include "rapidjson/encodedstream.h"
 #include "rapidjson/stringbuffer.h"
@@ -668,6 +669,168 @@ TYPED_TEST(DocumentMove, MoveAssignmentStack) {
 //  Document d2;
 //  d1 = d2;
 //}
+
+TEST(Document, RawNumberRoundtrip) {
+    // Parse with kParseNumbersAsStringsFlag, then serialize back
+    // Numbers should survive the DOM roundtrip without gaining quotes
+    const char* json = "{\"age\":27,\"pi\":3.14159,\"name\":\"test\"}";
+
+    Document d;
+    d.Parse<kParseNumbersAsStringsFlag>(json);
+    EXPECT_FALSE(d.HasParseError());
+
+    // Verify values are stored as strings internally
+    EXPECT_TRUE(d["age"].IsString());
+    EXPECT_STREQ("27", d["age"].GetString());
+    EXPECT_TRUE(d["pi"].IsString());
+    EXPECT_STREQ("3.14159", d["pi"].GetString());
+    EXPECT_TRUE(d["name"].IsString());
+    EXPECT_STREQ("test", d["name"].GetString());
+
+    // Serialize back via Writer
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    d.Accept(writer);
+
+    // Numbers should NOT be quoted, but actual strings should be
+    EXPECT_STREQ("{\"age\":27,\"pi\":3.14159,\"name\":\"test\"}", buffer.GetString());
+}
+
+TEST(Document, RawNumberRoundtrip_Array) {
+    const char* json = "[1, 2.5, \"hello\", 100]";
+
+    Document d;
+    d.Parse<kParseNumbersAsStringsFlag>(json);
+    EXPECT_FALSE(d.HasParseError());
+
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    d.Accept(writer);
+
+    EXPECT_STREQ("[1,2.5,\"hello\",100]", buffer.GetString());
+}
+
+TEST(Document, RawNumberRoundtrip_PrettyWriter) {
+    const char* json = "{\"value\":42}";
+
+    Document d;
+    d.Parse<kParseNumbersAsStringsFlag>(json);
+    EXPECT_FALSE(d.HasParseError());
+
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    d.Accept(writer);
+
+    // Should contain unquoted 42
+    const char* s = buffer.GetString();
+    EXPECT_TRUE(strstr(s, ": 42") != NULL);
+    // Should NOT contain "42"
+    EXPECT_TRUE(strstr(s, ": \"42\"") == NULL);
+}
+
+TEST(Document, RawNumberRoundtrip_Precision) {
+    // Numbers that would lose precision if converted to double
+    const char* json = "{\"big\":12345678901234567890,\"pi\":3.141592653589793238,\"tiny\":1e-14,\"tiny2\":0.00000000000001}";
+
+    Document d;
+    d.Parse<kParseNumbersAsStringsFlag>(json);
+    EXPECT_FALSE(d.HasParseError());
+
+    // Verify stored as strings internally
+    EXPECT_TRUE(d["big"].IsString());
+    EXPECT_STREQ("12345678901234567890", d["big"].GetString());
+    EXPECT_STREQ("3.141592653589793238", d["pi"].GetString());
+    EXPECT_STREQ("1e-14", d["tiny"].GetString());
+    EXPECT_STREQ("0.00000000000001", d["tiny2"].GetString());
+
+    // Roundtrip must preserve exact text
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    d.Accept(writer);
+
+    EXPECT_STREQ("{\"big\":12345678901234567890,\"pi\":3.141592653589793238,\"tiny\":1e-14,\"tiny2\":0.00000000000001}", buffer.GetString());
+}
+
+TEST(Document, RawNumberRoundtrip_NumberFormats) {
+    // Test all valid JSON number notations survive roundtrip exactly
+    const char* json =
+        "{"
+        "\"int\":42,"
+        "\"neg\":-17,"
+        "\"zero\":0,"
+        "\"frac\":3.14,"
+        "\"neg_frac\":-0.5,"
+        "\"exp_lower\":1e10,"
+        "\"exp_upper\":1E10,"
+        "\"exp_plus\":1e+10,"
+        "\"exp_neg\":1e-10,"
+        "\"exp_frac\":1.5e3,"
+        "\"exp_neg_frac\":2.99792458e+8,"
+        "\"huge_int\":99999999999999999999,"
+        "\"huge_neg\":-99999999999999999999,"
+        "\"huge_exp\":1e308,"
+        "\"tiny_exp\":1e-308,"
+        "\"tiny_frac\":0.000000000000000001,"
+        "\"max_digits\":1.7976931348623157e+308,"
+        "\"leading_zero_frac\":0.123"
+        "}";
+
+    Document d;
+    d.Parse<kParseNumbersAsStringsFlag>(json);
+    EXPECT_FALSE(d.HasParseError());
+
+    // Verify each value stored as exact text
+    EXPECT_STREQ("42", d["int"].GetString());
+    EXPECT_STREQ("-17", d["neg"].GetString());
+    EXPECT_STREQ("0", d["zero"].GetString());
+    EXPECT_STREQ("3.14", d["frac"].GetString());
+    EXPECT_STREQ("-0.5", d["neg_frac"].GetString());
+    EXPECT_STREQ("1e10", d["exp_lower"].GetString());
+    EXPECT_STREQ("1E10", d["exp_upper"].GetString());
+    EXPECT_STREQ("1e+10", d["exp_plus"].GetString());
+    EXPECT_STREQ("1e-10", d["exp_neg"].GetString());
+    EXPECT_STREQ("1.5e3", d["exp_frac"].GetString());
+    EXPECT_STREQ("2.99792458e+8", d["exp_neg_frac"].GetString());
+    EXPECT_STREQ("99999999999999999999", d["huge_int"].GetString());
+    EXPECT_STREQ("-99999999999999999999", d["huge_neg"].GetString());
+    EXPECT_STREQ("1e308", d["huge_exp"].GetString());
+    EXPECT_STREQ("1e-308", d["tiny_exp"].GetString());
+    EXPECT_STREQ("0.000000000000000001", d["tiny_frac"].GetString());
+    EXPECT_STREQ("1.7976931348623157e+308", d["max_digits"].GetString());
+    EXPECT_STREQ("0.123", d["leading_zero_frac"].GetString());
+
+    // Full roundtrip
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    d.Accept(writer);
+
+    // All numbers must appear unquoted and with exact original text
+    const char* result = buffer.GetString();
+    EXPECT_TRUE(strstr(result, ":42,") != NULL);
+    EXPECT_TRUE(strstr(result, ":-17,") != NULL);
+    EXPECT_TRUE(strstr(result, ":0,") != NULL);
+    EXPECT_TRUE(strstr(result, ":3.14,") != NULL);
+    EXPECT_TRUE(strstr(result, ":-0.5,") != NULL);
+    EXPECT_TRUE(strstr(result, ":1e10,") != NULL);
+    EXPECT_TRUE(strstr(result, ":1E10,") != NULL);
+    EXPECT_TRUE(strstr(result, ":1e+10,") != NULL);
+    EXPECT_TRUE(strstr(result, ":1e-10,") != NULL);
+    EXPECT_TRUE(strstr(result, ":1.5e3,") != NULL);
+    EXPECT_TRUE(strstr(result, ":2.99792458e+8,") != NULL);
+    EXPECT_TRUE(strstr(result, ":99999999999999999999,") != NULL);
+    EXPECT_TRUE(strstr(result, ":-99999999999999999999,") != NULL);
+    EXPECT_TRUE(strstr(result, ":1e308,") != NULL);
+    EXPECT_TRUE(strstr(result, ":1e-308,") != NULL);
+    EXPECT_TRUE(strstr(result, ":0.000000000000000001,") != NULL);
+    EXPECT_TRUE(strstr(result, ":1.7976931348623157e+308,") != NULL);
+    EXPECT_TRUE(strstr(result, ":0.123}") != NULL);
+
+    // None should be quoted
+    EXPECT_TRUE(strstr(result, ":\"42\"") == NULL);
+    EXPECT_TRUE(strstr(result, ":\"-17\"") == NULL);
+    EXPECT_TRUE(strstr(result, ":\"1e10\"") == NULL);
+    EXPECT_TRUE(strstr(result, ":\"99999999999999999999\"") == NULL);
+}
 
 #ifdef __clang__
 RAPIDJSON_DIAG_POP

@@ -1972,6 +1972,8 @@ public:
             return handler.EndArray(data_.a.size);
     
         case kStringType:
+            if (data_.f.flags & kRawNumberFlag)
+                return handler.RawNumber(GetString(), GetStringLength(), (data_.f.flags & kCopyFlag) != 0);
             return handler.String(GetString(), GetStringLength(), (data_.f.flags & kCopyFlag) != 0);
     
         default:
@@ -1999,6 +2001,7 @@ private:
         kStringFlag     = 0x0400,
         kCopyFlag       = 0x0800,
         kInlineStrFlag  = 0x1000,
+        kRawNumberFlag  = 0x2000,
 
         // Initial flags of different types.
         kNullFlag = kNullType,
@@ -2831,6 +2834,7 @@ public:
             new (stack_.template Push<ValueType>()) ValueType(str, length, GetAllocator());
         else
             new (stack_.template Push<ValueType>()) ValueType(str, length);
+        stack_.template Top<ValueType>()->data_.f.flags |= ValueType::kRawNumberFlag;
         return true;
     }
 

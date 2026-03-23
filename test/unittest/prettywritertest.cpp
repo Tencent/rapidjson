@@ -368,6 +368,25 @@ TEST(PrettyWriter, Issue_1336) {
     EXPECT_TRUE(writer.IsComplete());
 }
 
+TEST(PrettyWriter, RawNumber_NoQuotes) {
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    writer.StartObject();
+    writer.Key("pi");
+    writer.RawNumber("3.14159", 7);
+    writer.Key("answer");
+    writer.RawNumber("42", 2);
+    writer.Key("label");
+    writer.String("test");
+    writer.EndObject();
+    EXPECT_TRUE(writer.IsComplete());
+    // Verify numbers are not quoted
+    const char* s = buffer.GetString();
+    EXPECT_TRUE(strstr(s, ": 3.14159") != NULL);
+    EXPECT_TRUE(strstr(s, ": 42") != NULL);
+    EXPECT_TRUE(strstr(s, ": \"test\"") != NULL);
+}
+
 #ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
