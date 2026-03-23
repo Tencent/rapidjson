@@ -155,6 +155,7 @@ enum ParseFlag {
     kParseTrailingCommasFlag = 128, //!< Allow trailing commas at the end of objects and arrays.
     kParseNanAndInfFlag = 256,      //!< Allow parsing NaN, Inf, Infinity, -Inf and -Infinity as doubles.
     kParseEscapedApostropheFlag = 512,  //!< Allow escaped apostrophe in strings.
+    kParseRawStringsFlag = 1024,         //!< Pass raw (unescaped) strings to RawString/RawKey handler.
     kParseDefaultFlags = RAPIDJSON_PARSE_DEFAULT_FLAGS  //!< Default parse flags. Can be customized by defining RAPIDJSON_PARSE_DEFAULT_FLAGS
 };
 
@@ -179,8 +180,12 @@ concept Handler {
     /// enabled via kParseNumbersAsStringsFlag, string is not null-terminated (use length)
     bool RawNumber(const Ch* str, SizeType length, bool copy);
     bool String(const Ch* str, SizeType length, bool copy);
+    /// enabled via kParseRawStringsFlag, contains raw content between quotes (with original escapes)
+    bool RawString(const Ch* str, SizeType length, bool copy);
     bool StartObject();
     bool Key(const Ch* str, SizeType length, bool copy);
+    /// enabled via kParseRawStringsFlag, contains raw content between quotes (with original escapes)
+    bool RawKey(const Ch* str, SizeType length, bool copy);
     bool EndObject(SizeType memberCount);
     bool StartArray();
     bool EndArray(SizeType elementCount);
@@ -211,8 +216,12 @@ struct BaseReaderHandler {
     /// enabled via kParseNumbersAsStringsFlag, string is not null-terminated (use length)
     bool RawNumber(const Ch* str, SizeType len, bool copy) { return static_cast<Override&>(*this).String(str, len, copy); }
     bool String(const Ch*, SizeType, bool) { return static_cast<Override&>(*this).Default(); }
+    /// enabled via kParseRawStringsFlag, raw content between quotes (original escapes preserved)
+    bool RawString(const Ch* str, SizeType len, bool copy) { return static_cast<Override&>(*this).String(str, len, copy); }
     bool StartObject() { return static_cast<Override&>(*this).Default(); }
     bool Key(const Ch* str, SizeType len, bool copy) { return static_cast<Override&>(*this).String(str, len, copy); }
+    /// enabled via kParseRawStringsFlag, raw content between quotes (original escapes preserved)
+    bool RawKey(const Ch* str, SizeType len, bool copy) { return static_cast<Override&>(*this).Key(str, len, copy); }
     bool EndObject(SizeType) { return static_cast<Override&>(*this).Default(); }
     bool StartArray() { return static_cast<Override&>(*this).Default(); }
     bool EndArray(SizeType) { return static_cast<Override&>(*this).Default(); }
@@ -954,6 +963,29 @@ private:
         SizeType length_;
     };
 
+    // Dispatch string event to handler - normal (non-raw) path
+    template<typename InputStream, typename Handler>
+    bool DispatchStringEvent(InputStream& /*s*/, Handler& handler,
+                             StackStream<typename TargetEncoding::Ch>& stackStream,
+                             bool isKey, size_t /*rawStart*/,
+                             internal::FalseType /*rawStrings*/) {
+        SizeType length = static_cast<SizeType>(stackStream.Length()) - 1;
+        const typename TargetEncoding::Ch* const str = stackStream.Pop();
+        return (isKey ? handler.Key(str, length, true) : handler.String(str, length, true));
+    }
+
+    // Dispatch string event to handler - raw string path
+    template<typename InputStream, typename Handler>
+    bool DispatchStringEvent(InputStream& s, Handler& handler,
+                             StackStream<typename TargetEncoding::Ch>& stackStream,
+                             bool isKey, size_t rawStart,
+                             internal::TrueType /*rawStrings*/) {
+        const size_t rawLen = s.Tell() - 1 - rawStart;
+        const typename SourceEncoding::Ch* rawStr = reinterpret_cast<const typename SourceEncoding::Ch*>(s.head_) + rawStart;
+        stackStream.Pop();  // discard decoded string from stack
+        return (isKey ? handler.RawKey(rawStr, SizeType(rawLen), false) : handler.RawString(rawStr, SizeType(rawLen), false));
+    }
+
     // Parse string and generate String event. Different code paths for kParseInsituFlag.
     template<unsigned parseFlags, typename InputStream, typename Handler>
     void ParseString(InputStream& is, Handler& handler, bool isKey = false) {
@@ -962,6 +994,9 @@ private:
 
         RAPIDJSON_ASSERT(s.Peek() == '\"');
         s.Take();  // Skip '\"'
+
+        // Capture raw string start position (after the opening quote)
+        const size_t rawStart = (parseFlags & kParseRawStringsFlag) ? s.Tell() : 0;
 
         bool success = false;
         if (parseFlags & kParseInsituFlag) {
@@ -977,9 +1012,9 @@ private:
             StackStream<typename TargetEncoding::Ch> stackStream(stack_);
             ParseStringToStream<parseFlags, SourceEncoding, TargetEncoding>(s, stackStream);
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
-            SizeType length = static_cast<SizeType>(stackStream.Length()) - 1;
-            const typename TargetEncoding::Ch* const str = stackStream.Pop();
-            success = (isKey ? handler.Key(str, length, true) : handler.String(str, length, true));
+
+            success = DispatchStringEvent(s, handler, stackStream, isKey, rawStart,
+                                          internal::BoolType<(parseFlags & kParseRawStringsFlag) != 0>());
         }
         if (RAPIDJSON_UNLIKELY(!success))
             RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell());

@@ -623,6 +623,64 @@ TEST(Writer, MoveCtor) {
 }
 #endif
 
+// ---------------------------------------------------------------------------
+// Writer RawString / RawKey tests
+// ---------------------------------------------------------------------------
+
+TEST(Writer, RawString) {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    writer.StartObject();
+    writer.Key("key", 3);
+    writer.RawString("\\u003Cscript\\u003E", 18);
+    writer.EndObject();
+    EXPECT_TRUE(writer.IsComplete());
+    EXPECT_STREQ("{\"key\":\"\\u003Cscript\\u003E\"}", buffer.GetString());
+}
+
+TEST(Writer, RawKey) {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    writer.StartObject();
+    writer.RawKey("\\u006B\\u0065\\u0079", 18);
+    writer.String("value", 5);
+    writer.EndObject();
+    EXPECT_TRUE(writer.IsComplete());
+    EXPECT_STREQ("{\"\\u006B\\u0065\\u0079\":\"value\"}", buffer.GetString());
+}
+
+TEST(Writer, RawString_EscapedSlash) {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    writer.StartObject();
+    writer.Key("date", 4);
+    writer.RawString("\\/Date(123)\\/", 13);
+    writer.EndObject();
+    EXPECT_TRUE(writer.IsComplete());
+    EXPECT_STREQ("{\"date\":\"\\/Date(123)\\/\"}", buffer.GetString());
+}
+
+TEST(Writer, RawString_EmptyString) {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    writer.StartArray();
+    writer.RawString("", 0);
+    writer.EndArray();
+    EXPECT_TRUE(writer.IsComplete());
+    EXPECT_STREQ("[\"\"]", buffer.GetString());
+}
+
+TEST(Writer, RawString_RoundTrip) {
+    // Parse with kParseRawStringsFlag, write back - output should match input
+    const char* json = "{\"a\":\"\\u003Cb\\u003E\",\"c\":\"\\/path\\/\"}";
+    StringBuffer sb;
+    Writer<StringBuffer> writer(sb);
+    Reader reader;
+    StringStream ss(json);
+    EXPECT_TRUE(reader.Parse<kParseRawStringsFlag | kParseNumbersAsStringsFlag>(ss, writer));
+    EXPECT_STREQ(json, sb.GetString());
+}
+
 #ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif

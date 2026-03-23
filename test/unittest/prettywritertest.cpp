@@ -368,6 +368,48 @@ TEST(PrettyWriter, Issue_1336) {
     EXPECT_TRUE(writer.IsComplete());
 }
 
+TEST(PrettyWriter, RawString) {
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    writer.SetIndent(' ', 2);
+    writer.StartObject();
+    writer.Key("key");
+    writer.RawString("\\u003Cscript\\u003E", 18);
+    writer.EndObject();
+    EXPECT_TRUE(writer.IsComplete());
+    const char* s = buffer.GetString();
+    EXPECT_TRUE(strstr(s, ": \"\\u003Cscript\\u003E\"") != NULL);
+}
+
+TEST(PrettyWriter, RawKey) {
+    StringBuffer buffer;
+    PrettyWriter<StringBuffer> writer(buffer);
+    writer.SetIndent(' ', 2);
+    writer.StartObject();
+    writer.RawKey("\\u006B\\u0065\\u0079", 18);
+    writer.String("value");
+    writer.EndObject();
+    EXPECT_TRUE(writer.IsComplete());
+    const char* s = buffer.GetString();
+    EXPECT_TRUE(strstr(s, "\"\\u006B\\u0065\\u0079\"") != NULL);
+    EXPECT_TRUE(strstr(s, ": \"value\"") != NULL);
+}
+
+TEST(PrettyWriter, RawString_RoundTrip) {
+    // Parse with kParseRawStringsFlag → PrettyWriter → verify escapes preserved
+    const char* json = "{\"tag\":\"\\u003Cb\\u003E\",\"date\":\"\\/Date(123)\\/\"}";
+    StringBuffer sb;
+    PrettyWriter<StringBuffer> writer(sb);
+    writer.SetIndent(' ', 2);
+    Reader reader;
+    StringStream ss(json);
+    EXPECT_TRUE(reader.Parse<kParseRawStringsFlag | kParseNumbersAsStringsFlag>(ss, writer));
+    const char* s = sb.GetString();
+    // Verify escapes are preserved in the pretty-printed output
+    EXPECT_TRUE(strstr(s, "\"\\u003Cb\\u003E\"") != NULL);
+    EXPECT_TRUE(strstr(s, "\"\\/Date(123)\\/\"") != NULL);
+}
+
 #ifdef __clang__
 RAPIDJSON_DIAG_POP
 #endif
