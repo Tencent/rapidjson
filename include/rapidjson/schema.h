@@ -729,7 +729,7 @@ public:
                         std::memset(properties_[sourceIndex].dependencies, 0, sizeof(bool)* propertyCount_);
                         for (ConstValueIterator targetItr = itr->value.Begin(); targetItr != itr->value.End(); ++targetItr) {
                             SizeType targetIndex;
-                            if (FindPropertyIndex(*targetItr, &targetIndex))
+                            if (targetItr->IsString() && FindPropertyIndex(*targetItr, &targetIndex))
                                 properties_[sourceIndex].dependencies[targetIndex] = true;
                         }
                     }
