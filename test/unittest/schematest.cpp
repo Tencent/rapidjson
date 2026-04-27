@@ -3573,6 +3573,38 @@ TEST(SchemaValidator, NullableFalse) {
         "}}");
 }
 
+TEST(SchemaValidator, UniqueItemsDoubleOutOfIntRangeUB) {
+    Document sd;
+    sd.Parse("{\"type\":\"array\",\"uniqueItems\":true}");
+    ASSERT_FALSE(sd.HasParseError());
+    SchemaDocument schema(sd);
+
+    // Large positive doubles well outside uint64_t range (~1.8e19 max)
+    {
+        SchemaValidator v(schema);
+        Document doc;
+        doc.Parse("[1e33, 2e33]");
+        ASSERT_FALSE(doc.HasParseError());
+        EXPECT_TRUE(doc.Accept(v));  // unique — must not crash or misidentify
+    }
+    {
+        SchemaValidator v(schema);
+        Document doc;
+        doc.Parse("[1e33, 1e33]");
+        ASSERT_FALSE(doc.HasParseError());
+        EXPECT_FALSE(doc.Accept(v));  // duplicates
+    }
+
+    // Large negative doubles outside int64_t range (~-9.2e18 min)
+    {
+        SchemaValidator v(schema);
+        Document doc;
+        doc.Parse("[-1e33, -2e33]");
+        ASSERT_FALSE(doc.HasParseError());
+        EXPECT_TRUE(doc.Accept(v));  // unique
+    }
+}
+
 #if defined(_MSC_VER) || defined(__clang__)
 RAPIDJSON_DIAG_POP
 #endif

@@ -341,8 +341,14 @@ public:
     bool Uint64(uint64_t u) { Number n; n.u.u = u; n.d = static_cast<double>(u); return WriteNumber(n); }
     bool Double(double d) {
         Number n;
-        if (d < 0) n.u.i = static_cast<int64_t>(d);
-        else       n.u.u = static_cast<uint64_t>(d);
+        if (d < 0)
+            // INT64_MIN (-2^63) is exactly representable as double; cast is UB outside that range
+            n.u.i = d >= static_cast<double>((std::numeric_limits<int64_t>::min)())
+                    ? static_cast<int64_t>(d) : 0;
+        else
+            // 2^64 is exactly representable as double; any d in [0, 2^64) fits in uint64_t
+            n.u.u = d < 18446744073709551616.0
+                    ? static_cast<uint64_t>(d) : 0;
         n.d = d;
         return WriteNumber(n);
     }
