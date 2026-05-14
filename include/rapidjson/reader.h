@@ -1497,6 +1497,9 @@ private:
 
             if (minus)
                 while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
+                    i = i * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                    significandDigit++;
+                    
                     if (RAPIDJSON_UNLIKELY(i >= 214748364)) { // 2^31 = 2147483648
                         if (RAPIDJSON_LIKELY(i != 214748364 || s.Peek() > '8')) {
                             i64 = i;
@@ -1504,11 +1507,12 @@ private:
                             break;
                         }
                     }
-                    i = i * 10 + static_cast<unsigned>(s.TakePush() - '0');
-                    significandDigit++;
                 }
             else
                 while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
+                    i = i * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                    significandDigit++;
+                    
                     if (RAPIDJSON_UNLIKELY(i >= 429496729)) { // 2^32 - 1 = 4294967295
                         if (RAPIDJSON_LIKELY(i != 429496729 || s.Peek() > '5')) {
                             i64 = i;
@@ -1516,8 +1520,6 @@ private:
                             break;
                         }
                     }
-                    i = i * 10 + static_cast<unsigned>(s.TakePush() - '0');
-                    significandDigit++;
                 }
         }
         // Parse NaN or Infinity here
