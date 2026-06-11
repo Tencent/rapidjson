@@ -285,8 +285,17 @@
 // RAPIDJSON_64BIT
 
 //! Whether using 64-bit architecture
+#ifndef RAPIDJSON_RISCV
+#if defined(__riscv)
+#define RAPIDJSON_RISCV 1
+#else
+#define RAPIDJSON_RISCV 0
+#endif
+#endif // RAPIDJSON_RISCV
+
 #ifndef RAPIDJSON_64BIT
-#if defined(__LP64__) || (defined(__x86_64__) && defined(__ILP32__)) || defined(_WIN64) || defined(__EMSCRIPTEN__)
+#if (RAPIDJSON_RISCV == 1 && defined(__riscv_xlen) && (__riscv_xlen == 64)) \
+    || defined(__LP64__) || (defined(__x86_64__) && defined(__ILP32__)) || defined(_WIN64) || defined(__EMSCRIPTEN__)
 #define RAPIDJSON_64BIT 1
 #else
 #define RAPIDJSON_64BIT 0
@@ -332,7 +341,9 @@
     \c GenericValue uses this optimization to reduce its size form 24 bytes to 16 bytes in 64-bit architecture.
 */
 #ifndef RAPIDJSON_48BITPOINTER_OPTIMIZATION
-#if defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64)
+#if RAPIDJSON_RISCV == 1
+#define RAPIDJSON_48BITPOINTER_OPTIMIZATION 0
+#elif defined(__amd64__) || defined(__amd64) || defined(__x86_64__) || defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64)
 #define RAPIDJSON_48BITPOINTER_OPTIMIZATION 1
 #else
 #define RAPIDJSON_48BITPOINTER_OPTIMIZATION 0
