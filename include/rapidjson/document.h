@@ -255,6 +255,9 @@ public:
 
     Iterator& operator+=(DifferenceType n) { ptr_+=n; return *this; }
     Iterator& operator-=(DifferenceType n) { ptr_-=n; return *this; }
+
+    friend Iterator operator+(DifferenceType n, const Iterator& i) { return Iterator(n+i.ptr_); }
+    friend Iterator operator-(DifferenceType n, const Iterator& i) { return Iterator(n-i.ptr_); }
     //@}
 
     //! @name relations
