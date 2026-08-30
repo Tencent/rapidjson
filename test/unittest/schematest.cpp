@@ -536,6 +536,19 @@ TEST(SchemaValidator, String_Pattern_Invalid) {
     VALIDATE_(s, "\"a\"", true, false);
     VALIDATE_(s, "\"aa\"", true, false);
 }
+
+TEST(SchemaValidator, Issue2373) {
+    // Malformed pattern used to trip an assertion (or read past the operand
+    // stack in release builds) in GenericRegex::Eval()'s kConcatenation case,
+    // rather than being reported as an invalid pattern like other malformed
+    // regexes are.
+    Document sd;
+    sd.Parse("{\"pattern\":\"^s(}}}|)}}}}}}}}+\"}");
+    SchemaDocument s(sd);
+    SCHEMAERROR(s, "{\"RegexInvalid\":{\"errorCode\":9,\"instanceRef\":\"#/pattern\",\"value\":\"^s(}}}|)}}}}}}}}+\"}}");
+
+    VALIDATE_(s, "\"hello\"", true, false);
+}
 #endif
 
 TEST(SchemaValidator, Integer) {

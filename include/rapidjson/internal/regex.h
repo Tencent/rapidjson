@@ -354,14 +354,14 @@ private:
     bool Eval(Stack<Allocator>& operandStack, Operator op) {
         switch (op) {
             case kConcatenation:
-                RAPIDJSON_ASSERT(operandStack.GetSize() >= sizeof(Frag) * 2);
-                {
+                if (operandStack.GetSize() >= sizeof(Frag) * 2) {
                     Frag e2 = *operandStack.template Pop<Frag>(1);
                     Frag e1 = *operandStack.template Pop<Frag>(1);
                     Patch(e1.out, e2.start);
                     *operandStack.template Push<Frag>() = Frag(e1.start, e2.out, Min(e1.minIndex, e2.minIndex));
+                    return true;
                 }
-                return true;
+                return false;
 
             case kAlternation:
                 if (operandStack.GetSize() >= sizeof(Frag) * 2) {
