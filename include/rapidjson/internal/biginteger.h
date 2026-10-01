@@ -19,7 +19,7 @@
 
 #if defined(_MSC_VER) && !defined(__INTEL_COMPILER) && defined(_M_AMD64)
 #include <intrin.h> // for _umul128
-#if !defined(_ARM64EC_)
+#if !defined(_M_ARM64EC)
 #pragma intrinsic(_umul128)
 #else
 #pragma comment(lib,"softintrin")
