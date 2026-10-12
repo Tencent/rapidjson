@@ -929,18 +929,33 @@ private:
     public:
         typedef CharType Ch;
 
-        StackStream(internal::Stack<StackAllocator>& stack) : stack_(stack), length_(0) {}
+        StackStream(internal::Stack<StackAllocator>& stack) : stack_(stack), length_(0), failed_(false), scratch_() {}
         RAPIDJSON_FORCEINLINE void Put(Ch c) {
-            *stack_.template Push<Ch>() = c;
+            Ch* p = stack_.template TryPush<Ch>();
+            if (RAPIDJSON_UNLIKELY(!p)) {
+                failed_ = true; // Allocation failed: the character is dropped.
+                return;
+            }
+            *p = c;
             ++length_;
         }
 
         RAPIDJSON_FORCEINLINE void* Push(SizeType count) {
+            void* p = stack_.template TryPush<Ch>(count);
+            if (RAPIDJSON_UNLIKELY(!p)) {
+                // Allocation failed: the caller still writes count characters, let it write them to scratch_.
+                failed_ = true;
+                RAPIDJSON_ASSERT(count * sizeof(Ch) <= sizeof(scratch_));
+                return scratch_;
+            }
             length_ += count;
-            return stack_.template Push<Ch>(count);
+            return p;
         }
 
         size_t Length() const { return length_; }
+
+        //! True if a character could not be stored because an allocation failed.
+        bool Failed() const { return failed_; }
 
         Ch* Pop() {
             return stack_.template Pop<Ch>(length_);
@@ -952,6 +967,8 @@ private:
 
         internal::Stack<StackAllocator>& stack_;
         SizeType length_;
+        bool failed_;
+        char scratch_[16]; // Push() is only called with count <= 16 (SIMD string scanning).
     };
 
     // Parse string and generate String event. Different code paths for kParseInsituFlag.
@@ -979,6 +996,8 @@ private:
             RAPIDJSON_PARSE_ERROR_EARLY_RETURN_VOID;
             SizeType length = static_cast<SizeType>(stackStream.Length()) - 1;
             const typename TargetEncoding::Ch* const str = stackStream.Pop();
+            if (RAPIDJSON_UNLIKELY(stackStream.Failed()))
+                RAPIDJSON_PARSE_ERROR(kParseErrorTermination, s.Tell()); // Allocation failed: string is truncated.
             success = (isKey ? handler.Key(str, length, true) : handler.String(str, length, true));
         }
         if (RAPIDJSON_UNLIKELY(!success))
@@ -1422,6 +1441,7 @@ private:
         size_t Tell() { return is.Tell(); }
         size_t Length() { return 0; }
         const StackCharacter* Pop() { return 0; }
+        bool Failed() const { return false; }
 
     protected:
         NumberStream& operator=(const NumberStream&);
@@ -1450,6 +1470,8 @@ private:
             stackStream.Put('\0');
             return stackStream.Pop();
         }
+
+        bool Failed() const { return stackStream.Failed(); }
 
     private:
         StackStream<StackCharacter> stackStream;
@@ -1702,12 +1724,16 @@ private:
                 dstStream.Put('\0');
                 const typename TargetEncoding::Ch* str = dstStream.Pop();
                 const SizeType length = static_cast<SizeType>(dstStream.Length()) - 1;
+                if (RAPIDJSON_UNLIKELY(s.Failed() || dstStream.Failed()))
+                    RAPIDJSON_PARSE_ERROR(kParseErrorTermination, startOffset); // Allocation failed: number is truncated.
                 cont = handler.RawNumber(str, SizeType(length), true);
             }
         }
         else {
            size_t length = s.Length();
            const NumberCharacter* decimal = s.Pop();  // Pop stack no matter if it will be used or not.
+           if (RAPIDJSON_UNLIKELY(s.Failed()))
+               RAPIDJSON_PARSE_ERROR(kParseErrorTermination, startOffset); // Allocation failed: number is truncated.
 
            if (useDouble) {
                int p = exp + expFrac;
@@ -2025,10 +2051,14 @@ private:
                 n = IterativeParsingElementState;
             else if (src == IterativeParsingKeyValueDelimiterState)
                 n = IterativeParsingMemberValueState;
-            // Push current state.
-            *stack_.template Push<SizeType>(1) = n;
-            // Initialize and push the member/element count.
-            *stack_.template Push<SizeType>(1) = 0;
+            // Push current state and the member/element count (initially 0).
+            SizeType* frame = stack_.template TryPush<SizeType>(2);
+            if (RAPIDJSON_UNLIKELY(!frame)) {
+                RAPIDJSON_PARSE_ERROR_NORETURN(kParseErrorTermination, is.Tell()); // Allocation failed.
+                return IterativeParsingErrorState;
+            }
+            frame[0] = n;
+            frame[1] = 0;
             // Call handler
             bool hr = (dst == IterativeParsingObjectInitialState) ? handler.StartObject() : handler.StartArray();
             // On handler short circuits the parsing.

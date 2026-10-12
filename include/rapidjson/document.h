@@ -2399,23 +2399,36 @@ private:
     }
 
     // Initialize this value as array with initial data, without calling destructor.
-    void SetArrayRaw(GenericValue* values, SizeType count, Allocator& allocator) {
+    //! \return false if allocation failed. The value is then an empty array and \c values are not taken.
+    bool SetArrayRaw(GenericValue* values, SizeType count, Allocator& allocator) {
         data_.f.flags = kArrayFlag;
+        bool success = true;
+        GenericValue* e = 0;
         if (count) {
-            GenericValue* e = static_cast<GenericValue*>(allocator.Malloc(count * sizeof(GenericValue)));
-            SetElementsPointer(e);
-            std::memcpy(static_cast<void*>(e), values, count * sizeof(GenericValue));
+            e = static_cast<GenericValue*>(allocator.Malloc(count * sizeof(GenericValue)));
+            if (e)
+                std::memcpy(static_cast<void*>(e), values, count * sizeof(GenericValue));
+            else {
+                count = 0;
+                success = false;
+            }
         }
-        else
-            SetElementsPointer(0);
+        SetElementsPointer(e);
         data_.a.size = data_.a.capacity = count;
+        return success;
     }
 
     //! Initialize this value as object with initial data, without calling destructor.
-    void SetObjectRaw(Member* members, SizeType count, Allocator& allocator) {
+    //! \return false if allocation failed. The value is then an empty object and \c members are not taken.
+    bool SetObjectRaw(Member* members, SizeType count, Allocator& allocator) {
         data_.f.flags = kObjectFlag;
+        bool success = true;
+        Member* m = count ? DoAllocMembers(count, allocator) : 0;
+        if (count && !m) {
+            count = 0;
+            success = false;
+        }
         if (count) {
-            Member* m = DoAllocMembers(count, allocator);
             SetMembersPointer(m);
             std::memcpy(static_cast<void*>(m), members, count * sizeof(Member));
 #if RAPIDJSON_USE_MEMBERSMAP
@@ -2429,6 +2442,7 @@ private:
         else
             SetMembersPointer(0);
         data_.o.size = data_.o.capacity = count;
+        return success;
     }
 
     //! Initialize this value as constant string, without calling destructor.
@@ -2439,7 +2453,8 @@ private:
     }
 
     //! Initialize this value as copy string with initial data, without calling destructor.
-    void SetStringRaw(StringRefType s, Allocator& allocator) {
+    //! \return false if allocation failed. The value is then an empty string.
+    bool SetStringRaw(StringRefType s, Allocator& allocator) {
         Ch* str = 0;
         if (ShortString::Usable(s.length)) {
             data_.f.flags = kShortStringFlag;
@@ -2447,13 +2462,20 @@ private:
             str = data_.ss.str;
             std::memmove(str, s, s.length * sizeof(Ch));
         } else {
+            str = static_cast<Ch *>(allocator.Malloc((s.length + 1) * sizeof(Ch)));
+            if (!str) {
+                data_.f.flags = kShortStringFlag;
+                data_.ss.SetLength(0);
+                data_.ss.str[0] = '\0';
+                return false;
+            }
             data_.f.flags = kCopyStringFlag;
             data_.s.length = s.length;
-            str = static_cast<Ch *>(allocator.Malloc((s.length + 1) * sizeof(Ch)));
             SetStringPointer(str);
             std::memcpy(str, s, s.length * sizeof(Ch));
         }
         str[s.length] = '\0';
+        return true;
     }
 
     //! Assignment without calling destructor
@@ -2818,45 +2840,51 @@ private:
 
 public:
     // Implementation of Handler
-    bool Null() { new (stack_.template Push<ValueType>()) ValueType(); return true; }
-    bool Bool(bool b) { new (stack_.template Push<ValueType>()) ValueType(b); return true; }
-    bool Int(int i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
-    bool Uint(unsigned i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
-    bool Int64(int64_t i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
-    bool Uint64(uint64_t i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
-    bool Double(double d) { new (stack_.template Push<ValueType>()) ValueType(d); return true; }
+    // A handler returns false when an allocation fails, which ends the parse with kParseErrorTermination.
+    bool Null() { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(); return true; }
+    bool Bool(bool b) { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(b); return true; }
+    bool Int(int i) { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(i); return true; }
+    bool Uint(unsigned i) { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(i); return true; }
+    bool Int64(int64_t i) { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(i); return true; }
+    bool Uint64(uint64_t i) { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(i); return true; }
+    bool Double(double d) { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(d); return true; }
 
     bool RawNumber(const Ch* str, SizeType length, bool copy) { 
-        if (copy) 
-            new (stack_.template Push<ValueType>()) ValueType(str, length, GetAllocator());
-        else
-            new (stack_.template Push<ValueType>()) ValueType(str, length);
-        return true;
+        return String(str, length, copy);
     }
 
     bool String(const Ch* str, SizeType length, bool copy) { 
+        ValueType* v = stack_.template TryPush<ValueType>();
+        if (!v)
+            return false;
+        new (v) ValueType();
         if (copy) 
-            new (stack_.template Push<ValueType>()) ValueType(str, length, GetAllocator());
-        else
-            new (stack_.template Push<ValueType>()) ValueType(str, length);
+            return v->SetStringRaw(StringRef(str, length), GetAllocator());
+        v->SetStringRaw(StringRef(str, length));
         return true;
     }
 
-    bool StartObject() { new (stack_.template Push<ValueType>()) ValueType(kObjectType); return true; }
+    bool StartObject() { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(kObjectType); return true; }
     
     bool Key(const Ch* str, SizeType length, bool copy) { return String(str, length, copy); }
 
     bool EndObject(SizeType memberCount) {
         typename ValueType::Member* members = stack_.template Pop<typename ValueType::Member>(memberCount);
-        stack_.template Top<ValueType>()->SetObjectRaw(members, memberCount, GetAllocator());
+        if (!stack_.template Top<ValueType>()->SetObjectRaw(members, memberCount, GetAllocator())) {
+            stack_.template PushUnsafe<typename ValueType::Member>(memberCount); // Keep the members on the stack, ClearStack() destroys them.
+            return false;
+        }
         return true;
     }
 
-    bool StartArray() { new (stack_.template Push<ValueType>()) ValueType(kArrayType); return true; }
+    bool StartArray() { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(kArrayType); return true; }
     
     bool EndArray(SizeType elementCount) {
         ValueType* elements = stack_.template Pop<ValueType>(elementCount);
-        stack_.template Top<ValueType>()->SetArrayRaw(elements, elementCount, GetAllocator());
+        if (!stack_.template Top<ValueType>()->SetArrayRaw(elements, elementCount, GetAllocator())) {
+            stack_.template PushUnsafe<ValueType>(elementCount); // Keep the elements on the stack, ClearStack() destroys them.
+            return false;
+        }
         return true;
     }
 
