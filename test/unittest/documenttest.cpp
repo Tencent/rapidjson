@@ -505,6 +505,51 @@ TEST(Document, AllocationFailureWhileParsingDoesNotLeak) {
     }
 }
 
+TEST(Document, UserBufferExhaustedWhileBuilding) {
+    typedef MemoryPoolAllocator<NullAllocator> AllocatorType;
+    typedef GenericValue<UTF8<>, AllocatorType> ValueType;
+    char valueBuffer[1024];
+    AllocatorType allocator(valueBuffer, sizeof(valueBuffer));
+
+    ValueType a(kArrayType);
+    for (int i = 0; i < 1000; i++) {
+        ValueType v(i);
+        SizeType size = a.Size();
+        a.PushBack(v, allocator);
+        if (a.Size() == size)
+            EXPECT_EQ(i, v.GetInt()); // Not taken.
+        else
+            EXPECT_TRUE(v.IsNull());
+    }
+    EXPECT_GT(a.Size(), 0u);
+    EXPECT_LT(a.Size(), 1000u);
+    EXPECT_LE(a.Size(), a.Capacity());
+    for (SizeType i = 0; i < a.Size(); i++)
+        EXPECT_EQ(static_cast<int>(i), a[i].GetInt());
+
+    ValueType o(kObjectType);
+    for (int i = 0; i < 1000; i++)
+        o.AddMember("k", i, allocator);
+    EXPECT_LE(o.MemberCount(), o.MemberCapacity());
+    o.MemberReserve(100000, allocator);
+    EXPECT_LT(o.MemberCapacity(), 100000u);
+    a.Reserve(100000, allocator);
+    EXPECT_LT(a.Capacity(), 100000u);
+
+    std::string s(2000, 'x');
+    ValueType v(s.c_str(), static_cast<SizeType>(s.size()), allocator);
+    EXPECT_TRUE(v.IsString());
+    EXPECT_EQ(0u, v.GetStringLength());
+    EXPECT_STREQ("", v.GetString());
+
+    ValueType arrayCopy(a, allocator);
+    EXPECT_TRUE(arrayCopy.IsArray());
+    EXPECT_EQ(0u, arrayCopy.Size());
+    ValueType objectCopy(o, allocator);
+    EXPECT_TRUE(objectCopy.IsObject());
+    EXPECT_EQ(0u, objectCopy.MemberCount());
+}
+
 // Issue 226: Value of string type should not point to NULL
 TEST(Document, AssertAcceptInvalidNameType) {
     Document doc;

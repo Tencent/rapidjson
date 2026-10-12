@@ -747,6 +747,8 @@ public:
         case kArrayType: {
                 SizeType count = rhs.data_.a.size;
                 GenericValue* le = reinterpret_cast<GenericValue*>(allocator.Malloc(count * sizeof(GenericValue)));
+                if (!le)
+                    count = 0; // Allocation failed: copy as empty array.
                 const GenericValue<Encoding,SourceAllocator>* re = rhs.GetElementsPointer();
                 for (SizeType i = 0; i < count; i++)
                     new (&le[i]) GenericValue(re[i], allocator, copyConstStrings);
@@ -1280,6 +1282,7 @@ public:
     /*! \param newCapacity  The capacity that the object at least need to have.
         \param allocator    Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
         \return The value itself for fluent API.
+        \note If the allocator fails, the capacity is left unchanged.
         \note Linear time complexity.
     */
     GenericValue& MemberReserve(SizeType newCapacity, Allocator &allocator) {
@@ -1380,6 +1383,7 @@ public:
         \param allocator    Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
         \return The value itself for fluent API.
         \note The ownership of \c name and \c value will be transferred to this object on success.
+        \note If the allocator fails, the object, \c name and \c value are left unchanged.
         \pre  IsObject() && name.IsString()
         \post name.IsNull() && value.IsNull()
         \note Amortized Constant time complexity.
@@ -1689,13 +1693,17 @@ public:
     /*! \param newCapacity  The capacity that the array at least need to have.
         \param allocator    Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
         \return The value itself for fluent API.
+        \note If the allocator fails, the capacity is left unchanged.
         \note Linear time complexity.
     */
     GenericValue& Reserve(SizeType newCapacity, Allocator &allocator) {
         RAPIDJSON_ASSERT(IsArray());
         if (newCapacity > data_.a.capacity) {
-            SetElementsPointer(reinterpret_cast<GenericValue*>(allocator.Realloc(GetElementsPointer(), data_.a.capacity * sizeof(GenericValue), newCapacity * sizeof(GenericValue))));
-            data_.a.capacity = newCapacity;
+            GenericValue* e = reinterpret_cast<GenericValue*>(allocator.Realloc(GetElementsPointer(), data_.a.capacity * sizeof(GenericValue), newCapacity * sizeof(GenericValue)));
+            if (e) { // Allocation failed: keep the old elements and capacity.
+                SetElementsPointer(e);
+                data_.a.capacity = newCapacity;
+            }
         }
         return *this;
     }
@@ -1707,6 +1715,7 @@ public:
         \post value.IsNull() == true
         \return The value itself for fluent API.
         \note The ownership of \c value will be transferred to this array on success.
+        \note If the allocator fails, the array and \c value are left unchanged.
         \note If the number of elements to be appended is known, calls Reserve() once first may be more efficient.
         \note Amortized constant time complexity.
     */
@@ -1714,6 +1723,8 @@ public:
         RAPIDJSON_ASSERT(IsArray());
         if (data_.a.size >= data_.a.capacity)
             Reserve(data_.a.capacity == 0 ? kDefaultArrayCapacity : (data_.a.capacity + (data_.a.capacity + 1) / 2), allocator);
+        if (RAPIDJSON_UNLIKELY(data_.a.size >= data_.a.capacity))
+            return *this; // Allocation failed.
         GetElementsPointer()[data_.a.size++].RawAssign(value);
         return *this;
     }
@@ -2273,8 +2284,10 @@ private:
         ObjectData& o = data_.o;
         if (newCapacity > o.capacity) {
             Member* newMembers = Realloc<Member>(allocator, GetMembersPointer(), o.capacity, newCapacity);
-            RAPIDJSON_SETPOINTER(Member, o.members, newMembers);
-            o.capacity = newCapacity;
+            if (newMembers) { // Allocation failed: keep the old members and capacity.
+                RAPIDJSON_SETPOINTER(Member, o.members, newMembers);
+                o.capacity = newCapacity;
+            }
         }
     }
 
@@ -2305,6 +2318,8 @@ private:
         ObjectData& o = data_.o;
         if (o.size >= o.capacity)
             DoReserveMembers(o.capacity ? (o.capacity + (o.capacity + 1) / 2) : kDefaultObjectCapacity, allocator);
+        if (RAPIDJSON_UNLIKELY(o.size >= o.capacity))
+            return; // Allocation failed.
         Member* members = GetMembersPointer();
         Member* m = members + o.size;
         m->name.RawAssign(name);
@@ -2382,6 +2397,11 @@ private:
         data_.f.flags = kObjectFlag;
         SizeType count = rhs.data_.o.size;
         Member* lm = DoAllocMembers(count, allocator);
+        if (!lm) { // Allocation failed: copy as empty object.
+            data_.o.size = data_.o.capacity = 0;
+            SetMembersPointer(0);
+            return;
+        }
         const typename GenericValue<Encoding,SourceAllocator>::Member* rm = rhs.GetMembersPointer();
 #if RAPIDJSON_USE_MEMBERSMAP
         Map* &map = GetMap(lm);

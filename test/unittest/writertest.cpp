@@ -19,6 +19,7 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/memorybuffer.h"
+#include <cstring>
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
@@ -50,6 +51,76 @@ TEST(Writer, Compact) {
         EXPECT_STREQ(json, buffer.GetString()); \
         EXPECT_TRUE(writer.IsComplete()); \
     }
+
+namespace {
+// Base allocator that always fails, so MemoryPoolAllocator is limited to its user buffer.
+class WriterNullAllocator {
+public:
+    static const bool kNeedFree = false;
+    void* Malloc(size_t) { return 0; }
+    void* Realloc(void*, size_t, size_t) { return 0; }
+    static void Free(void*) {}
+};
+typedef MemoryPoolAllocator<WriterNullAllocator> BoundedAllocator;
+} // namespace
+
+TEST(Writer, OutputBufferExhausted) {
+    typedef GenericStringBuffer<UTF8<>, BoundedAllocator> BufferType;
+    char buffer[1024];
+    BoundedAllocator allocator(buffer, sizeof(buffer));
+    BufferType sb(&allocator, 64);
+    Writer<BufferType> writer(sb);
+    const std::string s(100, 'x');
+    writer.StartArray();
+    for (int i = 0; i < 100; i++) {
+        writer.String(s.c_str(), static_cast<SizeType>(s.size()));
+        writer.Int(i);
+        writer.Double(i + 0.5);
+    }
+    writer.EndArray();
+    EXPECT_TRUE(sb.Overflowed());
+    EXPECT_LE(allocator.Size(), sizeof(buffer));
+    EXPECT_EQ(sb.GetLength(), std::strlen(sb.GetString()));
+    EXPECT_EQ(0, std::strncmp("[\"xxx", sb.GetString(), 5));
+
+    EXPECT_TRUE(0 == sb.Push(10));
+    PutN(sb, 'x', 10);
+    sb.Put('x');
+    sb.Clear();
+    EXPECT_FALSE(sb.Overflowed());
+    EXPECT_STREQ("", sb.GetString());
+}
+
+TEST(Writer, MemoryBufferExhausted) {
+    typedef GenericMemoryBuffer<BoundedAllocator> BufferType;
+    char buffer[256];
+    BoundedAllocator allocator(buffer, sizeof(buffer));
+    BufferType mb(&allocator, 64);
+    for (int i = 0; i < 1000; i++)
+        mb.Put('x');
+    PutN(mb, 'y', 1000);
+    EXPECT_TRUE(mb.Overflowed());
+    EXPECT_TRUE(0 == mb.Push(1));
+    EXPECT_LE(mb.GetSize(), sizeof(buffer));
+    EXPECT_LE(allocator.Size(), sizeof(buffer));
+}
+
+TEST(Writer, LevelStackExhausted) {
+    char buffer[256];
+    BoundedAllocator allocator(buffer, sizeof(buffer));
+    StringBuffer sb;
+    Writer<StringBuffer, UTF8<>, UTF8<>, BoundedAllocator> writer(sb, &allocator, 16);
+    bool ok = true;
+    int depth = 0;
+    while (ok && depth < 1000) {
+        ok = (depth % 2) ? writer.StartObject() : writer.StartArray();
+        if (ok && depth % 2)
+            ok = writer.Key("k");
+        ++depth;
+    }
+    EXPECT_FALSE(ok);
+    EXPECT_LT(depth, 1000);
+}
 
 TEST(Writer, Root) {
     TEST_ROUNDTRIP("null");
