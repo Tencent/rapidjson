@@ -125,6 +125,24 @@ public:
         return PushUnsafe<T>(count);
     }
 
+    //! Reserve like Reserve(), but report whether it succeeded.
+    /*! When the allocator fails, the stack is left unchanged and false is returned. */
+    template<typename T>
+    RAPIDJSON_FORCEINLINE bool TryReserve(size_t count = 1) {
+        if (RAPIDJSON_UNLIKELY(static_cast<std::ptrdiff_t>(sizeof(T) * count) > (stackEnd_ - stackTop_)))
+            return TryExpand<T>(count);
+        return true;
+    }
+
+    //! Push like Push(), but return NULL instead when the allocator fails.
+    /*! The stack is left unchanged in that case. */
+    template<typename T>
+    RAPIDJSON_FORCEINLINE T* TryPush(size_t count = 1) {
+        if (RAPIDJSON_UNLIKELY(!TryReserve<T>(count)))
+            return 0;
+        return PushUnsafe<T>(count);
+    }
+
     template<typename T>
     RAPIDJSON_FORCEINLINE T* PushUnsafe(size_t count = 1) {
         RAPIDJSON_ASSERT(stackTop_);
@@ -181,6 +199,24 @@ public:
 private:
     template<typename T>
     void Expand(size_t count) {
+        Resize(ExpandedCapacity<T>(count));
+    }
+
+    template<typename T>
+    bool TryExpand(size_t count) {
+        const size_t newCapacity = ExpandedCapacity<T>(count);
+        char* newStack = static_cast<char*>(allocator_->Realloc(stack_, GetCapacity(), newCapacity));
+        if (!newStack)
+            return false; // Allocation failed: keep the old stack.
+        const size_t size = GetSize();  // Backup the current size
+        stack_ = newStack;
+        stackTop_ = stack_ + size;
+        stackEnd_ = stack_ + newCapacity;
+        return true;
+    }
+
+    template<typename T>
+    size_t ExpandedCapacity(size_t count) {
         // Only expand the capacity if the current stack exists. Otherwise just create a stack with initial capacity.
         size_t newCapacity;
         if (stack_ == 0) {
@@ -194,8 +230,7 @@ private:
         size_t newSize = GetSize() + sizeof(T) * count;
         if (newCapacity < newSize)
             newCapacity = newSize;
-
-        Resize(newCapacity);
+        return newCapacity;
     }
 
     void Resize(size_t newCapacity) {
