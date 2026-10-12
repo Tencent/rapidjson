@@ -122,7 +122,10 @@ public:
 
     bool StartObject() {
         PrettyPrefix(kObjectType);
-        new (Base::level_stack_.template Push<typename Base::Level>()) typename Base::Level(false);
+        typename Base::Level* level = Base::level_stack_.template TryPush<typename Base::Level>();
+        if (RAPIDJSON_UNLIKELY(!level))
+            return false; // Allocation failed.
+        new (level) typename Base::Level(false);
         return Base::WriteStartObject();
     }
 
@@ -156,7 +159,10 @@ public:
 
     bool StartArray() {
         PrettyPrefix(kArrayType);
-        new (Base::level_stack_.template Push<typename Base::Level>()) typename Base::Level(true);
+        typename Base::Level* level = Base::level_stack_.template TryPush<typename Base::Level>();
+        if (RAPIDJSON_UNLIKELY(!level))
+            return false; // Allocation failed.
+        new (level) typename Base::Level(true);
         return Base::WriteStartArray();
     }
 

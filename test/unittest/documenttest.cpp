@@ -20,6 +20,8 @@
 #include "rapidjson/stringbuffer.h"
 #include <sstream>
 #include <algorithm>
+#include <cstdlib>
+#include <vector>
 
 #ifdef __clang__
 RAPIDJSON_DIAG_PUSH
@@ -384,6 +386,168 @@ TEST(Document, UserBuffer) {
     // Cover MemoryPoolAllocator::Capacity()
     EXPECT_LE(valueAllocator.Size(), valueAllocator.Capacity());
     EXPECT_LE(parseAllocator.Size(), parseAllocator.Capacity());
+}
+
+// Base allocator that always fails, so MemoryPoolAllocator is limited to its user buffer.
+class NullAllocator {
+public:
+    static const bool kNeedFree = false;
+    void* Malloc(size_t) { return 0; }
+    void* Realloc(void*, size_t, size_t) { return 0; }
+    static void Free(void*) {}
+};
+
+template <unsigned parseFlags>
+static ParseErrorCode ParseInUserBuffers(const std::string& json, size_t valueBufferSize, size_t parseBufferSize) {
+    typedef MemoryPoolAllocator<NullAllocator> AllocatorType;
+    typedef GenericDocument<UTF8<>, AllocatorType, AllocatorType> DocumentType;
+    std::vector<char> valueBuffer(valueBufferSize);
+    std::vector<char> parseBuffer(parseBufferSize);
+    AllocatorType valueAllocator(&valueBuffer[0], valueBuffer.size());
+    AllocatorType parseAllocator(&parseBuffer[0], parseBuffer.size());
+    DocumentType doc(&valueAllocator, parseBuffer.size() / 2, &parseAllocator);
+    doc.template Parse<parseFlags>(json.c_str());
+    EXPECT_LE(valueAllocator.Size(), valueBuffer.size());
+    EXPECT_LE(parseAllocator.Size(), parseBuffer.size());
+    return doc.GetParseError();
+}
+
+TEST(Document, UserBufferExhaustedWhileParsing) {
+    std::string manyValues("[");
+    for (int i = 0; i < 500; i++)
+        manyValues += (i ? ",{\"a\":1}" : "{\"a\":1}");
+    manyValues += "]";
+
+    std::string longString("[\"");
+    longString.append(2000, 'x');
+    longString += "\"]";
+
+    std::string longNumber("[1.");
+    longNumber.append(2000, '1');
+    longNumber += "]";
+
+    // Parse stack too small.
+    EXPECT_EQ(kParseErrorTermination, ParseInUserBuffers<kParseDefaultFlags>(manyValues, 65536, 1024));
+    EXPECT_EQ(kParseErrorTermination, ParseInUserBuffers<kParseIterativeFlag>(manyValues, 65536, 1024));
+    EXPECT_EQ(kParseErrorTermination, ParseInUserBuffers<kParseDefaultFlags>(longString, 65536, 1024));
+    EXPECT_EQ(kParseErrorTermination, ParseInUserBuffers<kParseFullPrecisionFlag>(longNumber, 65536, 1024));
+    EXPECT_EQ(kParseErrorTermination, ParseInUserBuffers<kParseNumbersAsStringsFlag>(longNumber, 65536, 1024));
+
+    // Value pool too small.
+    EXPECT_EQ(kParseErrorTermination, ParseInUserBuffers<kParseDefaultFlags>(manyValues, 1024, 65536));
+    EXPECT_EQ(kParseErrorTermination, ParseInUserBuffers<kParseDefaultFlags>(longString, 1024, 65536));
+    EXPECT_EQ(kParseErrorTermination, ParseInUserBuffers<kParseNumbersAsStringsFlag>(longNumber, 1024, 65536));
+
+    // Enough room.
+    EXPECT_EQ(kParseErrorNone, ParseInUserBuffers<kParseDefaultFlags>(manyValues, 65536, 65536));
+    EXPECT_EQ(kParseErrorNone, ParseInUserBuffers<kParseDefaultFlags>(longString, 65536, 65536));
+}
+
+// Allocator that fails once its budget is used up and counts live allocations.
+class BudgetAllocator {
+public:
+    static const bool kNeedFree = true;
+    static size_t budget;
+    static int live;
+    void* Malloc(size_t size) {
+        if (size == 0)
+            return 0;
+        if (size > budget)
+            return 0;
+        budget -= size;
+        ++live;
+        return std::malloc(size);
+    }
+    void* Realloc(void* originalPtr, size_t originalSize, size_t newSize) {
+        if (newSize == 0) {
+            Free(originalPtr);
+            return 0;
+        }
+        if (newSize > originalSize && newSize - originalSize > budget)
+            return 0;
+        void* p = std::realloc(originalPtr, newSize);
+        if (p) {
+            if (!originalPtr)
+                ++live;
+            if (newSize > originalSize)
+                budget -= newSize - originalSize;
+        }
+        return p;
+    }
+    static void Free(void* ptr) {
+        if (ptr)
+            --live;
+        std::free(ptr);
+    }
+};
+size_t BudgetAllocator::budget = 0;
+int BudgetAllocator::live = 0;
+
+TEST(Document, AllocationFailureWhileParsingDoesNotLeak) {
+    typedef GenericDocument<UTF8<>, BudgetAllocator, BudgetAllocator> DocumentType;
+    std::string json("{\"a\":[");
+    for (int i = 0; i < 100; i++)
+        json += (i ? ",\"a string that is too long for a short string\"" : "\"a string that is too long for a short string\"");
+    json += "],\"b\":{\"c\":\"another string that is too long for a short string\"}}";
+
+    // Fail at every point of the parse, from the first allocation on.
+    for (size_t budget = 0; budget < 32768; budget += 97) {
+        BudgetAllocator::budget = budget;
+        {
+            DocumentType doc;
+            doc.Parse(json.c_str());
+            if (doc.HasParseError())
+                EXPECT_EQ(kParseErrorTermination, doc.GetParseError());
+            else
+                EXPECT_EQ(100u, doc["a"].Size());
+        }
+        EXPECT_EQ(0, BudgetAllocator::live);
+    }
+}
+
+TEST(Document, UserBufferExhaustedWhileBuilding) {
+    typedef MemoryPoolAllocator<NullAllocator> AllocatorType;
+    typedef GenericValue<UTF8<>, AllocatorType> ValueType;
+    char valueBuffer[1024];
+    AllocatorType allocator(valueBuffer, sizeof(valueBuffer));
+
+    ValueType a(kArrayType);
+    for (int i = 0; i < 1000; i++) {
+        ValueType v(i);
+        SizeType size = a.Size();
+        a.PushBack(v, allocator);
+        if (a.Size() == size)
+            EXPECT_EQ(i, v.GetInt()); // Not taken.
+        else
+            EXPECT_TRUE(v.IsNull());
+    }
+    EXPECT_GT(a.Size(), 0u);
+    EXPECT_LT(a.Size(), 1000u);
+    EXPECT_LE(a.Size(), a.Capacity());
+    for (SizeType i = 0; i < a.Size(); i++)
+        EXPECT_EQ(static_cast<int>(i), a[i].GetInt());
+
+    ValueType o(kObjectType);
+    for (int i = 0; i < 1000; i++)
+        o.AddMember("k", i, allocator);
+    EXPECT_LE(o.MemberCount(), o.MemberCapacity());
+    o.MemberReserve(100000, allocator);
+    EXPECT_LT(o.MemberCapacity(), 100000u);
+    a.Reserve(100000, allocator);
+    EXPECT_LT(a.Capacity(), 100000u);
+
+    std::string s(2000, 'x');
+    ValueType v(s.c_str(), static_cast<SizeType>(s.size()), allocator);
+    EXPECT_TRUE(v.IsString());
+    EXPECT_EQ(0u, v.GetStringLength());
+    EXPECT_STREQ("", v.GetString());
+
+    ValueType arrayCopy(a, allocator);
+    EXPECT_TRUE(arrayCopy.IsArray());
+    EXPECT_EQ(0u, arrayCopy.Size());
+    ValueType objectCopy(o, allocator);
+    EXPECT_TRUE(objectCopy.IsObject());
+    EXPECT_EQ(0u, objectCopy.MemberCount());
 }
 
 // Issue 226: Value of string type should not point to NULL

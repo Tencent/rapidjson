@@ -37,15 +37,27 @@ template <typename Allocator = CrtAllocator>
 struct GenericMemoryBuffer {
     typedef char Ch; // byte
 
-    GenericMemoryBuffer(Allocator* allocator = 0, size_t capacity = kDefaultCapacity) : stack_(allocator, capacity) {}
+    GenericMemoryBuffer(Allocator* allocator = 0, size_t capacity = kDefaultCapacity) : stack_(allocator, capacity), overflowed_(false) {}
 
-    void Put(Ch c) { *stack_.template Push<Ch>() = c; }
+    void Put(Ch c) { if (Ch* p = Push(1)) *p = c; }
     void Flush() {}
 
-    void Clear() { stack_.Clear(); }
+    void Clear() { stack_.Clear(); overflowed_ = false; }
     void ShrinkToFit() { stack_.ShrinkToFit(); }
-    Ch* Push(size_t count) { return stack_.template Push<Ch>(count); }
+
+    //! Append \c count bytes and return them for writing.
+    /*! \return NULL if the allocation fails. Overflowed() is then true. */
+    Ch* Push(size_t count) {
+        Ch* p = RAPIDJSON_LIKELY(!overflowed_) ? stack_.template TryPush<Ch>(count) : 0;
+        if (RAPIDJSON_UNLIKELY(!p))
+            overflowed_ = true;
+        return p;
+    }
     void Pop(size_t count) { stack_.template Pop<Ch>(count); }
+
+    //! True if an allocation failed since construction or the last Clear().
+    /*! The content is then incomplete: bytes put after the failure were dropped. */
+    bool Overflowed() const { return overflowed_; }
 
     const Ch* GetBuffer() const {
         return stack_.template Bottom<Ch>();
@@ -55,6 +67,7 @@ struct GenericMemoryBuffer {
 
     static const size_t kDefaultCapacity = 256;
     mutable internal::Stack<Allocator> stack_;
+    bool overflowed_;
 };
 
 typedef GenericMemoryBuffer<> MemoryBuffer;
@@ -62,7 +75,8 @@ typedef GenericMemoryBuffer<> MemoryBuffer;
 //! Implement specialized version of PutN() with memset() for better performance.
 template<>
 inline void PutN(MemoryBuffer& memoryBuffer, char c, size_t n) {
-    std::memset(memoryBuffer.stack_.Push<char>(n), c, n * sizeof(c));
+    if (char* p = memoryBuffer.Push(n))
+        std::memset(p, c, n * sizeof(c));
 }
 
 RAPIDJSON_NAMESPACE_END
