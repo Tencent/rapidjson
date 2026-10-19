@@ -2867,7 +2867,8 @@ private:
     GenericDocument& operator=(const GenericDocument&);
 
     void ClearStack() {
-        if (Allocator::kNeedFree)
+        if (Allocator::kNeedFree || (RAPIDJSON_USE_MEMBERSMAP+0 &&
+                                     internal::IsRefCounted<Allocator>::Value))
             while (stack_.GetSize() > 0)    // Here assumes all elements in stack array are GenericValue (Member is actually 2 GenericValue objects)
                 (stack_.template Pop<ValueType>(1))->~ValueType();
         else
