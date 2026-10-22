@@ -334,6 +334,33 @@ TEST(EncodingsTest, UTF8) {
     }
 }
 
+TEST(EncodingsTest, UTF8Truncated) {
+    // A sequence truncated by the NUL terminator must fail instead of reading
+    // past the end of the stream.
+    {
+        StringStream is("\xC2");
+        unsigned codepoint = 0;
+        EXPECT_FALSE(UTF8<>::Decode(is, &codepoint));
+    }
+    {
+        StringStream is("\xE0\xA0");
+        unsigned codepoint = 0;
+        EXPECT_FALSE(UTF8<>::Decode(is, &codepoint));
+    }
+    {
+        StringStream is("\xF0\x9D\x84");
+        unsigned codepoint = 0;
+        EXPECT_FALSE(UTF8<>::Decode(is, &codepoint));
+    }
+    {
+        StringStream is("a\xF0");
+        unsigned codepoint = 0;
+        EXPECT_TRUE(UTF8<>::Decode(is, &codepoint));
+        EXPECT_EQ(static_cast<unsigned>('a'), codepoint);
+        EXPECT_FALSE(UTF8<>::Decode(is, &codepoint));
+    }
+}
+
 TEST(EncodingsTest, UTF16) {
     GenericStringBuffer<UTF16<> > os, os2;
     GenericStringBuffer<UTF8<> > utf8os;

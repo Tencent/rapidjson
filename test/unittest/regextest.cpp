@@ -636,4 +636,22 @@ TEST(Regex, Issue583) {
     ASSERT_TRUE(re.IsValid());
 }
 
+TEST(Regex, TruncatedUTF8) {
+    // A pattern ending with an incomplete UTF-8 sequence is parsed as if the
+    // input ended at the terminator, without reading past it.
+    Regex re1("a\xF0");
+    ASSERT_TRUE(re1.IsValid());
+    RegexSearch rs1(re1);
+    EXPECT_TRUE(rs1.Match("a"));
+    EXPECT_FALSE(rs1.Match("ab"));
+
+    Regex re2("ab\xE2\x82");
+    ASSERT_TRUE(re2.IsValid());
+    RegexSearch rs2(re2);
+    EXPECT_TRUE(rs2.Match("ab"));
+
+    Regex re3("\xF0");
+    EXPECT_FALSE(re3.IsValid());
+}
+
 #undef EURO
