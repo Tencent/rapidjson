@@ -25,6 +25,44 @@
 #include <type_traits>
 #endif
 
+///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_ASAN
+
+//! Whether MemoryPoolAllocator annotates its chunks for AddressSanitizer.
+/*! \ingroup RAPIDJSON_CONFIG
+    Enabled automatically when compiling with \c -fsanitize=address.
+
+    The chunks of a MemoryPoolAllocator are single allocations of the base
+    allocator, so AddressSanitizer cannot see an overflow from one block into
+    the next one. With annotations on, unused chunk space is poisoned and a
+    poisoned redzone is kept in front of each block, so such an overflow is
+    reported as use-after-poison. Size() does not count the redzones.
+
+    Define \c RAPIDJSON_ASAN to 0 to disable, e.g. when mixing instrumented
+    and non-instrumented translation units.
+*/
+#ifndef RAPIDJSON_ASAN
+#if defined(__SANITIZE_ADDRESS__)
+#define RAPIDJSON_ASAN 1
+#elif defined(__has_feature)
+#if __has_feature(address_sanitizer)
+#define RAPIDJSON_ASAN 1
+#endif
+#endif
+#endif
+#ifndef RAPIDJSON_ASAN
+#define RAPIDJSON_ASAN 0
+#endif
+
+#if RAPIDJSON_ASAN
+#include <sanitizer/asan_interface.h>
+#define RAPIDJSON_ASAN_POISON(p, n) __asan_poison_memory_region((p), (n))
+#define RAPIDJSON_ASAN_UNPOISON(p, n) __asan_unpoison_memory_region((p), (n))
+#else
+#define RAPIDJSON_ASAN_POISON(p, n) ((void)0)
+#define RAPIDJSON_ASAN_UNPOISON(p, n) ((void)0)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -142,6 +180,9 @@ class MemoryPoolAllocator {
         BaseAllocator* ownBaseAllocator; //!< base allocator created by this object.
         size_t refcount;
         bool ownBuffer;
+#if RAPIDJSON_ASAN
+        size_t redzoneSize; //!< Bytes of the chunks used by redzones, excluded from Size().
+#endif
     };
 
     static const size_t SIZEOF_SHARED_DATA = RAPIDJSON_ALIGN(sizeof(SharedData));
@@ -157,6 +198,9 @@ class MemoryPoolAllocator {
     }
 
     static const size_t kDefaultChunkCapacity = RAPIDJSON_ALLOCATOR_DEFAULT_CHUNK_CAPACITY; //!< Default chunk capacity.
+#if RAPIDJSON_ASAN
+    static const size_t kRedzoneSize = RAPIDJSON_ALIGN(16); //!< Poisoned gap in front of each block.
+#endif
 
 public:
     static const bool kNeedFree = false;    //!< Tell users that no need to call Free() with this allocator. (concept Allocator)
@@ -186,6 +230,9 @@ public:
         shared_->chunkHead->next = 0;
         shared_->ownBuffer = true;
         shared_->refcount = 1;
+#if RAPIDJSON_ASAN
+        shared_->redzoneSize = 0;
+#endif
     }
 
     //! Constructor with user-supplied buffer.
@@ -211,6 +258,10 @@ public:
         shared_->ownBaseAllocator = 0;
         shared_->ownBuffer = false;
         shared_->refcount = 1;
+#if RAPIDJSON_ASAN
+        shared_->redzoneSize = 0;
+#endif
+        RAPIDJSON_ASAN_POISON(GetChunkBuffer(shared_), shared_->chunkHead->capacity);
     }
 
     MemoryPoolAllocator(const MemoryPoolAllocator& rhs) RAPIDJSON_NOEXCEPT :
@@ -266,6 +317,7 @@ public:
             return;
         }
         Clear();
+        RAPIDJSON_ASAN_UNPOISON(GetChunkBuffer(shared_), shared_->chunkHead->capacity);
         BaseAllocator *a = shared_->ownBaseAllocator;
         if (shared_->ownBuffer) {
             baseAllocator_->Free(shared_);
@@ -282,9 +334,14 @@ public:
                 break;
             }
             shared_->chunkHead = c->next;
+            RAPIDJSON_ASAN_UNPOISON(reinterpret_cast<uint8_t*>(c) + SIZEOF_CHUNK_HEADER, c->capacity);
             baseAllocator_->Free(c);
         }
         shared_->chunkHead->size = 0;
+#if RAPIDJSON_ASAN
+        shared_->redzoneSize = 0;
+#endif
+        RAPIDJSON_ASAN_POISON(GetChunkBuffer(shared_), shared_->chunkHead->capacity);
     }
 
     //! Computes the total capacity of allocated memory chunks.
@@ -306,6 +363,9 @@ public:
         size_t size = 0;
         for (ChunkHeader* c = shared_->chunkHead; c != 0; c = c->next)
             size += c->size;
+#if RAPIDJSON_ASAN
+        size -= shared_->redzoneSize;
+#endif
         return size;
     }
 
@@ -324,12 +384,21 @@ public:
             return NULL;
 
         size = RAPIDJSON_ALIGN(size);
+#if RAPIDJSON_ASAN
+        // Skip a (poisoned) redzone, so that the block is not adjacent to the previous one.
+        if (RAPIDJSON_UNLIKELY(shared_->chunkHead->size + kRedzoneSize + size > shared_->chunkHead->capacity))
+            if (!AddChunk(chunk_capacity_ > kRedzoneSize + size ? chunk_capacity_ : kRedzoneSize + size))
+                return NULL;
+        shared_->chunkHead->size += kRedzoneSize;
+        shared_->redzoneSize += kRedzoneSize;
+#endif
         if (RAPIDJSON_UNLIKELY(shared_->chunkHead->size + size > shared_->chunkHead->capacity))
             if (!AddChunk(chunk_capacity_ > size ? chunk_capacity_ : size))
                 return NULL;
 
         void *buffer = GetChunkBuffer(shared_) + shared_->chunkHead->size;
         shared_->chunkHead->size += size;
+        RAPIDJSON_ASAN_UNPOISON(buffer, size);
         return buffer;
     }
 
@@ -354,6 +423,7 @@ public:
             size_t increment = static_cast<size_t>(newSize - originalSize);
             if (shared_->chunkHead->size + increment <= shared_->chunkHead->capacity) {
                 shared_->chunkHead->size += increment;
+                RAPIDJSON_ASAN_UNPOISON(static_cast<uint8_t*>(originalPtr) + originalSize, increment);
                 return originalPtr;
             }
         }
@@ -395,6 +465,7 @@ private:
             chunk->size = 0;
             chunk->next = shared_->chunkHead;
             shared_->chunkHead = chunk;
+            RAPIDJSON_ASAN_POISON(GetChunkBuffer(shared_), capacity);
             return true;
         }
         else
