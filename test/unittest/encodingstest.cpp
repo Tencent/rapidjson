@@ -335,29 +335,46 @@ TEST(EncodingsTest, UTF8) {
 }
 
 TEST(EncodingsTest, UTF8Truncated) {
-    // A sequence truncated by the NUL terminator must fail instead of reading
-    // past the end of the stream.
-    {
-        StringStream is("\xC2");
-        unsigned codepoint = 0;
-        EXPECT_FALSE(UTF8<>::Decode(is, &codepoint));
+    // A multibyte sequence cut short by the terminator must be rejected without
+    // consuming a byte past it.  Tell() is the observable that proves this:
+    // before the fix Decode() kept taking continuation bytes from beyond the
+    // terminator, so the stream advanced past the end of the input.
+    //
+    // The terminator can only stand in for a continuation byte, so a sequence
+    // only over-reads when it ends on a lead byte.  Cases that keep a partial
+    // continuation byte ("\xE0\xA0", "\xF0\x9D\x84") reach the terminator at a
+    // legitimate position and were never affected; they are kept to pin down
+    // the value accumulated on the failing path.
+    struct Truncated {
+        const char* input;
+        size_t length;      // strlen(input); the terminator sits one byte past it
+        unsigned codepoint; // partial value, discarded when the sequence fails
+    };
+    static const Truncated cases[] = {
+        { "\xC2",         1, 0x80    }, // wants 1 continuation byte, got none
+        { "\xE0",         1, 0x0     }, // wants 2: read 1 byte past the end
+        { "\xF0",         1, 0x0     }, // wants 3: read 2 bytes past the end
+        { "\xE0\xA0",     2, 0x800   },
+        { "\xF0\x9D\x84", 3, 0x1D100 }
+    };
+    for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
+        StringStream is(cases[i].input);
+        unsigned codepoint = 0xFFFFFFFF;
+        EXPECT_FALSE(UTF8<>::Decode(is, &codepoint)) << "case " << i;
+        EXPECT_EQ(cases[i].codepoint, codepoint) << "case " << i;
+        EXPECT_EQ(cases[i].length + 1, static_cast<size_t>(is.Tell())) << "case " << i;
     }
+
     {
-        StringStream is("\xE0\xA0");
-        unsigned codepoint = 0;
-        EXPECT_FALSE(UTF8<>::Decode(is, &codepoint));
-    }
-    {
-        StringStream is("\xF0\x9D\x84");
-        unsigned codepoint = 0;
-        EXPECT_FALSE(UTF8<>::Decode(is, &codepoint));
-    }
-    {
+        // A valid character followed by a truncated sequence: the character is
+        // decoded, then the truncated byte must fail without over-reading.
         StringStream is("a\xF0");
         unsigned codepoint = 0;
         EXPECT_TRUE(UTF8<>::Decode(is, &codepoint));
         EXPECT_EQ(static_cast<unsigned>('a'), codepoint);
+        EXPECT_EQ(1u, static_cast<unsigned>(is.Tell()));
         EXPECT_FALSE(UTF8<>::Decode(is, &codepoint));
+        EXPECT_EQ(3u, static_cast<unsigned>(is.Tell()));
     }
 }
 

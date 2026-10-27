@@ -637,8 +637,12 @@ TEST(Regex, Issue583) {
 }
 
 TEST(Regex, TruncatedUTF8) {
-    // A pattern ending with an incomplete UTF-8 sequence is parsed as if the
-    // input ended at the terminator, without reading past it.
+    // A pattern ending with an incomplete UTF-8 sequence is treated as if the
+    // input ended at the terminator: the partial sequence is dropped and the
+    // preceding part of the pattern still matches.  GenericRegex() builds its
+    // own stream from the const Ch*, so this test cannot observe the stream
+    // position; the over-read itself is covered by
+    // EncodingsTest.UTF8Truncated, which asserts Tell().
     Regex re1("a\xF0");
     ASSERT_TRUE(re1.IsValid());
     RegexSearch rs1(re1);
