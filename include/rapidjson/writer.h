@@ -208,6 +208,19 @@ public:
         return EndValue(WriteString(str, length));
     }
 
+    //! Write a raw string value (content between quotes, with original escapes preserved).
+    /*! \param str Raw string content (not null-terminated, use length).
+        \param length Length of the raw string.
+        \param copy Not used.
+        \return Whether it is succeed.
+    */
+    bool RawString(const Ch* str, SizeType length, bool copy = false) {
+        RAPIDJSON_ASSERT(str != 0);
+        (void)copy;
+        Prefix(kStringType);
+        return EndValue(WriteRawString(str, length));
+    }
+
 #if RAPIDJSON_HAS_STDSTRING
     bool String(const std::basic_string<Ch>& str) {
         return String(str.data(), SizeType(str.size()));
@@ -221,6 +234,8 @@ public:
     }
 
     bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy); }
+
+    bool RawKey(const Ch* str, SizeType length, bool copy = false) { return RawString(str, length, copy); }
 
 #if RAPIDJSON_HAS_STDSTRING
     bool Key(const std::basic_string<Ch>& str)
@@ -473,6 +488,16 @@ protected:
                 Transcoder<SourceEncoding, TargetEncoding>::TranscodeUnsafe(is, *os_))))
                 return false;
         }
+        return true;
+    }
+
+    //! Write a raw string (content between quotes with original escapes preserved).
+    bool WriteRawString(const Ch* str, size_t length) {
+        PutReserve(*os_, length + 2);  // +2 for surrounding quotes
+        PutUnsafe(*os_, '\"');
+        for (size_t i = 0; i < length; ++i)
+            PutUnsafe(*os_, str[i]);
+        PutUnsafe(*os_, '\"');
         return true;
     }
 

@@ -114,6 +114,13 @@ public:
         return Base::EndValue(Base::WriteString(str, length));
     }
 
+    bool RawString(const Ch* str, SizeType length, bool copy = false) {
+        RAPIDJSON_ASSERT(str != 0);
+        (void)copy;
+        PrettyPrefix(kStringType);
+        return Base::EndValue(Base::WriteRawString(str, length));
+    }
+
 #if RAPIDJSON_HAS_STDSTRING
     bool String(const std::basic_string<Ch>& str) {
         return String(str.data(), SizeType(str.size()));
@@ -127,6 +134,8 @@ public:
     }
 
     bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy); }
+
+    bool RawKey(const Ch* str, SizeType length, bool copy = false) { return RawString(str, length, copy); }
 
 #if RAPIDJSON_HAS_STDSTRING
     bool Key(const std::basic_string<Ch>& str) {
