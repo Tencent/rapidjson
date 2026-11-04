@@ -568,6 +568,31 @@ TEST(Writer, RawValue) {
     EXPECT_STREQ("{\"a\":1,\"raw\":[\"Hello\\nWorld\", 123.456]}", buffer.GetString());
 }
 
+TEST(Writer, RawNumber_NoQuotes) {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    writer.StartArray();
+    const char number[] = "3.14159";
+    writer.RawNumber(number, 4);
+    writer.RawNumber(number, static_cast<SizeType>(strlen(number)));
+    writer.EndArray();
+    EXPECT_TRUE(writer.IsComplete());
+    EXPECT_STREQ("[3.14,3.14159]", buffer.GetString());
+}
+
+TEST(Writer, RawNumber_InObject) {
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    writer.StartObject();
+    writer.Key("value");
+    writer.RawNumber("42", 2);
+    writer.Key("name");
+    writer.String("test");
+    writer.EndObject();
+    EXPECT_TRUE(writer.IsComplete());
+    EXPECT_STREQ("{\"value\":42,\"name\":\"test\"}", buffer.GetString());
+}
+
 TEST(Write, RawValue_Issue1152) {
     {
         GenericStringBuffer<UTF32<> > sb;
