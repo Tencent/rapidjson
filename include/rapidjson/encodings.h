@@ -144,7 +144,9 @@ struct UTF8 {
 
     template <typename InputStream>
     static bool Decode(InputStream& is, unsigned* codepoint) {
-#define RAPIDJSON_COPY() c = is.Take(); *codepoint = (*codepoint << 6) | (static_cast<unsigned char>(c) & 0x3Fu)
+// Stop at the NUL terminator, as UTF8<>::Validate() does: taking another
+// continuation byte would read past the end of a null-terminated stream.
+#define RAPIDJSON_COPY() if (c != '\0') { c = is.Take(); *codepoint = (*codepoint << 6) | (static_cast<unsigned char>(c) & 0x3Fu); }
 #define RAPIDJSON_TRANS(mask) result &= ((GetRange(static_cast<unsigned char>(c)) & mask) != 0)
 #define RAPIDJSON_TAIL() RAPIDJSON_COPY(); RAPIDJSON_TRANS(0x70)
         typename InputStream::Ch c = is.Take();
