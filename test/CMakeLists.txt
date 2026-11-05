@@ -17,4 +17,11 @@ IF(GTESTSRC_FOUND)
     add_subdirectory(perftest)
     add_subdirectory(unittest)
 
+ELSE(GTESTSRC_FOUND)
+    find_package(GTest 1.12.1 REQUIRED)
+
+    add_custom_target(tests ALL)
+    add_subdirectory(perftest)
+    add_subdirectory(unittest)
+
 ENDIF(GTESTSRC_FOUND)

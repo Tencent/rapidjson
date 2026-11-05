@@ -7,6 +7,9 @@ set(PERFTEST_SOURCES
 
 add_executable(perftest ${PERFTEST_SOURCES})
 target_link_libraries(perftest ${TEST_LIBRARIES})
+if(TARGET GTest::gtest)
+    target_link_libraries(perftest GTest::gtest GTest::gmock)
+endif()
 
 add_dependencies(tests perftest)
 
