@@ -42,7 +42,9 @@ endif(CCACHE_FOUND)
 
 set_property(DIRECTORY PROPERTY COMPILE_OPTIONS ${EXTRA_CXX_FLAGS})
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=deprecated-declarations")
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # If the user is running a newer version of Clang that includes the
     # -Wdouble-promotion, we will ignore that warning.
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 3.7)
@@ -51,6 +53,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-double-promotion")
         endif()
     endif()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=deprecated-declarations")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     # Force to always compile with /W4
     if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
