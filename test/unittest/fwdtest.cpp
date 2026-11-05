@@ -86,6 +86,10 @@ struct Foo {
     SchemaValidator* schemavalidator;
 
     // char buffer[16];
+
+private:
+    Foo(const Foo&);
+    Foo& operator=(const Foo&);
 };
 
 // Using type definitions here.
