@@ -945,7 +945,7 @@ public:
     */
     GenericValue& operator=(StringRefType str) RAPIDJSON_NOEXCEPT {
         GenericValue s(str);
-        return *this = s;
+        return *this = std::move(s);
     }
 
     //! Assignment with primitive types.
@@ -964,7 +964,7 @@ public:
     RAPIDJSON_DISABLEIF_RETURN((internal::IsPointer<T>), (GenericValue&))
     operator=(T value) {
         GenericValue v(value);
-        return *this = v;
+        return *this = std::move(v);
     }
 
     //! Deep-copy assignment from Value
@@ -1670,7 +1670,11 @@ public:
         RAPIDJSON_ASSERT(index < data_.a.size);
         return GetElementsPointer()[index];
     }
-    const GenericValue& operator[](SizeType index) const { return const_cast<GenericValue&>(*this)[index]; }
+    const GenericValue& operator[](SizeType index) const {
+        RAPIDJSON_ASSERT(IsArray());
+        RAPIDJSON_ASSERT(index < data_.a.size);
+        return const_cast<GenericValue&>(*this)[index];
+    }
 
     //! Element iterator
     /*! \pre IsArray() == true */
@@ -2912,7 +2916,7 @@ public:
 
     GenericArray(const GenericArray& rhs) : value_(rhs.value_) {}
     GenericArray& operator=(const GenericArray& rhs) { value_ = rhs.value_; return *this; }
-    ~GenericArray() {}
+    ~GenericArray() = default;
 
     operator ValueType&() const { return value_; }
     SizeType Size() const { return value_.Size(); }
@@ -2968,7 +2972,7 @@ public:
 
     GenericObject(const GenericObject& rhs) : value_(rhs.value_) {}
     GenericObject& operator=(const GenericObject& rhs) { value_ = rhs.value_; return *this; }
-    ~GenericObject() {}
+    ~GenericObject() = default;
 
     operator ValueType&() const { return value_; }
     SizeType MemberCount() const { return value_.MemberCount(); }

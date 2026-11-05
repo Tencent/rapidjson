@@ -551,7 +551,7 @@ public:
                     typename ValueType::MemberIterator m = v->FindMember(kIdValue);
                     if (m != v->MemberEnd() && (m->value).IsString()) {
                         UriType here = UriType(m->value, allocator).Resolve(base, allocator);
-                        base = here;
+                        base = std::move(here);
                     }
                     m = v->FindMember(GenericValue<EncodingType>(GenericStringRef<Ch>(t->name, t->length)));
                     if (m == v->MemberEnd())

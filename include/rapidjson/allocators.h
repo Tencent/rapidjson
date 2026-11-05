@@ -502,8 +502,7 @@ public:
         baseAllocator_(baseAllocator)
     { }
 
-    ~StdAllocator() RAPIDJSON_NOEXCEPT
-    { }
+    ~StdAllocator() RAPIDJSON_NOEXCEPT = default;
 
     template<typename U>
     struct rebind {
@@ -666,8 +665,7 @@ public:
         baseAllocator_(baseAllocator)
     { }
 
-    ~StdAllocator() RAPIDJSON_NOEXCEPT
-    { }
+    ~StdAllocator() RAPIDJSON_NOEXCEPT = default;
 
     template<typename U>
     struct rebind {
