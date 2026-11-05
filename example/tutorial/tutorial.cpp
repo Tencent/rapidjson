@@ -4,6 +4,7 @@
 #include "rapidjson/document.h"     // rapidjson's DOM-style API
 #include "rapidjson/prettywriter.h" // for stringify JSON
 #include <cstdio>
+#include <string>
 
 using namespace rapidjson;
 using namespace std;
@@ -121,17 +122,16 @@ int main(int, char*[]) {
     // This version of SetString() needs an allocator, which means it will allocate a new buffer and copy the the string into the buffer.
     Value author;
     {
-        char buffer2[10];
-        int len = sprintf(buffer2, "%s %s", "Milo", "Yip");  // synthetic example of dynamically created string.
+        std::string buffer2 = std::string("Milo") + " " + "Yip";  // synthetic example of dynamically created string.
 
-        author.SetString(buffer2, static_cast<SizeType>(len), document.GetAllocator());
+        author.SetString(buffer2.c_str(), static_cast<SizeType>(buffer2.size()), document.GetAllocator());
         // Shorter but slower version:
         // document["hello"].SetString(buffer, document.GetAllocator());
 
         // Constructor version: 
         // Value author(buffer, len, document.GetAllocator());
         // Value author(buffer, document.GetAllocator());
-        memset(buffer2, 0, sizeof(buffer2)); // For demonstration purpose.
+        buffer2.clear(); // For demonstration purpose.
     }
     // Variable 'buffer' is unusable now but 'author' has already made a copy.
     document.AddMember("author", author, document.GetAllocator());

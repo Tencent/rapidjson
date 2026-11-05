@@ -25,7 +25,9 @@
 // __SSE2__ and __SSE4_2__ are recognized by gcc, clang, and the Intel compiler.
 // We use -march=native with gmake to enable -msse2 and -msse4.2, if supported.
 // Likewise, __ARM_NEON is used to detect Neon.
-#if defined(__SSE4_2__)
+#if defined(__riscv)
+// RISC-V validation builds must not inherit host x86/ARM SIMD feature macros.
+#elif defined(__SSE4_2__)
 #  define RAPIDJSON_SSE42
 #elif defined(__SSE2__)
 #  define RAPIDJSON_SSE2
