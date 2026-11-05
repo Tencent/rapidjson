@@ -84,9 +84,13 @@ class CrtAllocator {
 public:
     static const bool kNeedFree = true;
     void* Malloc(size_t size) { 
-        if (size) //  behavior of malloc(0) is implementation defined.
-            return RAPIDJSON_MALLOC(size);
-        else
+        if (size) { //  behavior of malloc(0) is implementation defined.
+            void* ptr = RAPIDJSON_MALLOC(size);
+            if (!ptr) {
+                 RAPIDJSON_OUT_OF_MEMORY();
+            }
+            return ptr;
+        } else
             return NULL; // standardize to returning NULL.
     }
     void* Realloc(void* originalPtr, size_t originalSize, size_t newSize) {
@@ -95,7 +99,12 @@ public:
             RAPIDJSON_FREE(originalPtr);
             return NULL;
         }
-        return RAPIDJSON_REALLOC(originalPtr, newSize);
+        void* ptr = RAPIDJSON_REALLOC(originalPtr, newSize);
+        if (!ptr) {
+            RAPIDJSON_FREE(originalPtr);
+            RAPIDJSON_OUT_OF_MEMORY();
+        }
+        return ptr;
     }
     static void Free(void *ptr) RAPIDJSON_NOEXCEPT { RAPIDJSON_FREE(ptr); }
 
