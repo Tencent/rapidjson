@@ -47,6 +47,11 @@ RAPIDJSON_DIAG_PUSH
 RAPIDJSON_DIAG_OFF(4127) // conditional expression is constant
 #endif
 
+#ifdef __GNUC__
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(type-limits)
+#endif
+
 RAPIDJSON_NAMESPACE_BEGIN
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -715,6 +720,11 @@ inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, siz
 RAPIDJSON_NAMESPACE_END
 
 #if defined(_MSC_VER) || defined(__clang__)
+RAPIDJSON_DIAG_POP
+#endif
+
+
+#ifdef __GNUC__
 RAPIDJSON_DIAG_POP
 #endif
 
