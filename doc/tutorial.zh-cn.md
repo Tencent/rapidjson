@@ -456,7 +456,7 @@ Object 是键值对的集合。每个键必须为 String。要修改 Object，�
 以下是一个例子。
 
 ~~~~~~~~~~cpp
-Value contact(kObject);
+Value contact(kObjectType);
 contact.AddMember("name", "Milo", document.GetAllocator());
 contact.AddMember("married", true, document.GetAllocator());
 ~~~~~~~~~~
