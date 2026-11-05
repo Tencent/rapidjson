@@ -1573,7 +1573,7 @@ TEST(Value, ObjectHelperRangeFor) {
     Value x(kObjectType);
 
     for (int i = 0; i < 10; i++) {
-        char name[10];
+        char name[12];
         Value n(name, static_cast<SizeType>(sprintf(name, "%d", i)), allocator);
         x.AddMember(n, i, allocator);
     }
