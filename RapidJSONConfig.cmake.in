@@ -4,11 +4,11 @@ include ("${CMAKE_CURRENT_LIST_DIR}/RapidJSON-targets.cmake")
 
 ################################################################################
 # RapidJSON source dir
-set( RapidJSON_SOURCE_DIR "@CONFIG_SOURCE_DIR@")
+set( RapidJSON_SOURCE_DIR "RapidJSON_SOURCE_DIR-NOTFOUND")
 
 ################################################################################
 # RapidJSON build dir
-set( RapidJSON_DIR "@CONFIG_DIR@")
+set( RapidJSON_DIR "RapidJSON_DIR-NOTFOUND")
 
 ################################################################################
 # Compute paths
