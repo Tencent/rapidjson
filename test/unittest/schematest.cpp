@@ -2110,10 +2110,7 @@ TEST(SchemaValidator, ValidateMetaSchema_UTF16) {
 template <typename SchemaDocumentType = SchemaDocument>
 class RemoteSchemaDocumentProvider : public IGenericRemoteSchemaDocumentProvider<SchemaDocumentType> {
 public:
-    RemoteSchemaDocumentProvider() : 
-        documentAllocator_(documentBuffer_, sizeof(documentBuffer_)), 
-        schemaAllocator_(schemaBuffer_, sizeof(schemaBuffer_)) 
-    {
+    RemoteSchemaDocumentProvider() {
         const char* filenames[kCount] = {
             "jsonschema/remotes/integer.json",
             "jsonschema/remotes/subSchemas.json",
@@ -2176,8 +2173,6 @@ private:
     SchemaDocumentType* sd_[kCount];
     typename DocumentType::AllocatorType documentAllocator_;
     typename SchemaDocumentType::AllocatorType schemaAllocator_;
-    char documentBuffer_[16384];
-    char schemaBuffer_[128u * 1024];
 };
 
 TEST(SchemaValidator, TestSuite) {
