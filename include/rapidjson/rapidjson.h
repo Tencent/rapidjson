@@ -181,6 +181,23 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
+// RAPIDJSON_ITERATIVE_DESTRUCTOR
+
+/*! \def RAPIDJSON_ITERATIVE_DESTRUCTOR
+    \ingroup RAPIDJSON_CONFIG
+    \brief Enable RapidJSON support for iterative object descruction
+
+    By defining this preprocessor symbol to \c 1, \ref rapidjson::GenericValue object
+    is guaranteed to be destroyed iteratively, a trade off with a slightly slower
+    destruction time and a potentially much less stack usage.
+
+    \hideinitializer
+*/
+#ifndef RAPIDJSON_ITERATIVE_DESTRUCTOR
+#define RAPIDJSON_ITERATIVE_DESTRUCTOR 0 // not by default
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // RAPIDJSON_NO_INT64DEFINE
 
 /*! \def RAPIDJSON_NO_INT64DEFINE
