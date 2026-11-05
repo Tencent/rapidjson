@@ -40,10 +40,12 @@ inline SizeType StrLen(const char* s) {
     return SizeType(std::strlen(s));
 }
 
+#if RAPIDJSON_HAS_WCHAR_FUNCTIONS
 template <>
 inline SizeType StrLen(const wchar_t* s) {
     return SizeType(std::wcslen(s));
 }
+#endif
 
 //! Custom strcmpn() which works on different character types.
 /*! \tparam Ch Character type (e.g. char, wchar_t, short)
