@@ -180,28 +180,28 @@ public:
     */
     //@{
 
-    bool Null()                 { Prefix(kNullType);   return EndValue(WriteNull()); }
-    bool Bool(bool b)           { Prefix(b ? kTrueType : kFalseType); return EndValue(WriteBool(b)); }
-    bool Int(int i)             { Prefix(kNumberType); return EndValue(WriteInt(i)); }
-    bool Uint(unsigned u)       { Prefix(kNumberType); return EndValue(WriteUint(u)); }
-    bool Int64(int64_t i64)     { Prefix(kNumberType); return EndValue(WriteInt64(i64)); }
-    bool Uint64(uint64_t u64)   { Prefix(kNumberType); return EndValue(WriteUint64(u64)); }
+    virtual bool Null()                 { Prefix(kNullType);   return EndValue(WriteNull()); }
+    virtual bool Bool(bool b)           { Prefix(b ? kTrueType : kFalseType); return EndValue(WriteBool(b)); }
+    virtual bool Int(int i)             { Prefix(kNumberType); return EndValue(WriteInt(i)); }
+    virtual bool Uint(unsigned u)       { Prefix(kNumberType); return EndValue(WriteUint(u)); }
+    virtual bool Int64(int64_t i64)     { Prefix(kNumberType); return EndValue(WriteInt64(i64)); }
+    virtual bool Uint64(uint64_t u64)   { Prefix(kNumberType); return EndValue(WriteUint64(u64)); }
 
     //! Writes the given \c double value to the stream
     /*!
         \param d The value to be written.
         \return Whether it is succeed.
     */
-    bool Double(double d)       { Prefix(kNumberType); return EndValue(WriteDouble(d)); }
+    virtual bool Double(double d)       { Prefix(kNumberType); return EndValue(WriteDouble(d)); }
 
-    bool RawNumber(const Ch* str, SizeType length, bool copy = false) {
+    virtual bool RawNumber(const Ch* str, SizeType length, bool copy = false) {
         RAPIDJSON_ASSERT(str != 0);
         (void)copy;
         Prefix(kNumberType);
         return EndValue(WriteString(str, length));
     }
 
-    bool String(const Ch* str, SizeType length, bool copy = false) {
+    virtual bool String(const Ch* str, SizeType length, bool copy = false) {
         RAPIDJSON_ASSERT(str != 0);
         (void)copy;
         Prefix(kStringType);
@@ -209,27 +209,27 @@ public:
     }
 
 #if RAPIDJSON_HAS_STDSTRING
-    bool String(const std::basic_string<Ch>& str) {
+    virtual bool String(const std::basic_string<Ch>& str) {
         return String(str.data(), SizeType(str.size()));
     }
 #endif
 
-    bool StartObject() {
+    virtual bool StartObject() {
         Prefix(kObjectType);
         new (level_stack_.template Push<Level>()) Level(false);
         return WriteStartObject();
     }
 
-    bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy); }
+    virtual bool Key(const Ch* str, SizeType length, bool copy = false) { return String(str, length, copy); }
 
 #if RAPIDJSON_HAS_STDSTRING
-    bool Key(const std::basic_string<Ch>& str)
+    virtual bool Key(const std::basic_string<Ch>& str)
     {
       return Key(str.data(), SizeType(str.size()));
     }
 #endif
 
-    bool EndObject(SizeType memberCount = 0) {
+    virtual bool EndObject(SizeType memberCount = 0) {
         (void)memberCount;
         RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level)); // not inside an Object
         RAPIDJSON_ASSERT(!level_stack_.template Top<Level>()->inArray); // currently inside an Array, not Object
@@ -238,13 +238,13 @@ public:
         return EndValue(WriteEndObject());
     }
 
-    bool StartArray() {
+    virtual bool StartArray() {
         Prefix(kArrayType);
         new (level_stack_.template Push<Level>()) Level(true);
         return WriteStartArray();
     }
 
-    bool EndArray(SizeType elementCount = 0) {
+    virtual bool EndArray(SizeType elementCount = 0) {
         (void)elementCount;
         RAPIDJSON_ASSERT(level_stack_.GetSize() >= sizeof(Level));
         RAPIDJSON_ASSERT(level_stack_.template Top<Level>()->inArray);
@@ -257,8 +257,8 @@ public:
     //@{
 
     //! Simpler but slower overload.
-    bool String(const Ch* const& str) { return String(str, internal::StrLen(str)); }
-    bool Key(const Ch* const& str) { return Key(str, internal::StrLen(str)); }
+    virtual bool String(const Ch* const& str) { return String(str, internal::StrLen(str)); }
+    virtual bool Key(const Ch* const& str) { return Key(str, internal::StrLen(str)); }
     
     //@}
 
@@ -270,7 +270,7 @@ public:
         \param length Length of the json.
         \param type Type of the root of json.
     */
-    bool RawValue(const Ch* json, size_t length, Type type) {
+    virtual bool RawValue(const Ch* json, size_t length, Type type) {
         RAPIDJSON_ASSERT(json != 0);
         Prefix(type);
         return EndValue(WriteRawValue(json, length));
