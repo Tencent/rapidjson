@@ -182,10 +182,11 @@ inline bool StrtodDiyFp(const Ch* decimals, int dLen, int dExp, double* result) 
 
     const int effectiveSignificandSize = Double::EffectiveSignificandSize(64 + v.e);
     int precisionSize = 64 - effectiveSignificandSize;
-    if (precisionSize + kUlpShift >= 64) {
-        int scaleExp = (precisionSize + kUlpShift) - 63;
+    const int precisionSizeShifted = precisionSize + kUlpShift;
+    if (precisionSizeShifted >= 64) {
+        const int scaleExp = precisionSizeShifted - 63;
         v.f >>= scaleExp;
-        v.e += scaleExp; 
+        v.e += scaleExp;
         error = (error >> scaleExp) + 1 + kUlp;
         precisionSize -= scaleExp;
     }
@@ -193,7 +194,9 @@ inline bool StrtodDiyFp(const Ch* decimals, int dLen, int dExp, double* result) 
     DiyFp rounded(v.f >> precisionSize, v.e + precisionSize);
     const uint64_t precisionBits = (v.f & ((uint64_t(1) << precisionSize) - 1)) * kUlp;
     const uint64_t halfWay = (uint64_t(1) << (precisionSize - 1)) * kUlp;
-    if (precisionBits >= halfWay + static_cast<unsigned>(error)) {
+    const uint64_t upperBound = halfWay + static_cast<unsigned>(error);
+    const uint64_t lowerBound = halfWay - static_cast<unsigned>(error);
+    if (precisionBits >= upperBound) {
         rounded.f++;
         if (rounded.f & (DiyFp::kDpHiddenBit << 1)) { // rounding overflows mantissa (issue #340)
             rounded.f >>= 1;
@@ -203,7 +206,7 @@ inline bool StrtodDiyFp(const Ch* decimals, int dLen, int dExp, double* result) 
 
     *result = rounded.ToDouble();
 
-    return halfWay - static_cast<unsigned>(error) >= precisionBits || precisionBits >= halfWay + static_cast<unsigned>(error);
+    return lowerBound >= precisionBits || precisionBits >= upperBound;
 }
 
 template<typename Ch>
