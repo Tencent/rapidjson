@@ -200,8 +200,12 @@
 #include "msinttypes/inttypes.h"
 #else
 // Other compilers should have this.
+// Borland's Clang derived compiler have many of these declared in stdlib.h and including
+// these causes compilation errors
+#ifndef __BORLANDC__
 #include <stdint.h>
 #include <inttypes.h>
+#endif
 #endif
 //!@endcond
 #ifdef RAPIDJSON_DOXYGEN_RUNNING
