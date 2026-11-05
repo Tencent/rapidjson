@@ -1601,6 +1601,11 @@ private:
                         break;
                     else {
                         i64 = i64 * 10 + static_cast<unsigned>(s.TakePush() - '0');
+                        // Guard against 2^31 fraction digits underflowing expFrac (issue #2391).
+                        // The later `308 - expFrac` and `(expFrac + 2147483639)/10` maxExp
+                        // computations would also overflow. Reject pathological input early.
+                        if (RAPIDJSON_UNLIKELY(expFrac <= (std::numeric_limits<int>::min)() + 500))
+                            RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, startOffset);
                         --expFrac;
                         if (i64 != 0)
                             significandDigit++;
@@ -1618,6 +1623,9 @@ private:
             while (RAPIDJSON_LIKELY(s.Peek() >= '0' && s.Peek() <= '9')) {
                 if (significandDigit < 17) {
                     d = d * 10.0 + (s.TakePush() - '0');
+                    // Guard against 2^31 fraction digits underflowing expFrac (issue #2391).
+                    if (RAPIDJSON_UNLIKELY(expFrac <= (std::numeric_limits<int>::min)() + 500))
+                        RAPIDJSON_PARSE_ERROR(kParseErrorNumberTooBig, startOffset);
                     --expFrac;
                     if (RAPIDJSON_LIKELY(d > 0.0))
                         significandDigit++;
