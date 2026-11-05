@@ -3573,6 +3573,18 @@ TEST(SchemaValidator, NullableFalse) {
         "}}");
 }
 
+TEST(SchemaValidator, DependenciesNonStringArrayElementCrash) {
+    Document sd;
+    sd.Parse("{\"properties\":{\"a\":{}},\"dependencies\":{\"a\":[0,2]}}");
+    ASSERT_FALSE(sd.HasParseError());
+    SchemaDocument schema(sd);  // must not crash
+    SchemaValidator validator(schema);
+    Document doc;
+    doc.Parse("{\"a\":1}");
+    ASSERT_FALSE(doc.HasParseError());
+    doc.Accept(validator);  // result doesn't matter — must not crash
+}
+
 #if defined(_MSC_VER) || defined(__clang__)
 RAPIDJSON_DIAG_POP
 #endif
