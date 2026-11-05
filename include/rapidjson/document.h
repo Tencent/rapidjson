@@ -747,6 +747,8 @@ public:
         case kArrayType: {
                 SizeType count = rhs.data_.a.size;
                 GenericValue* le = reinterpret_cast<GenericValue*>(allocator.Malloc(count * sizeof(GenericValue)));
+                if (!le)
+                    count = 0; // Allocation failed: copy as empty array.
                 const GenericValue<Encoding,SourceAllocator>* re = rhs.GetElementsPointer();
                 for (SizeType i = 0; i < count; i++)
                     new (&le[i]) GenericValue(re[i], allocator, copyConstStrings);
@@ -1280,6 +1282,7 @@ public:
     /*! \param newCapacity  The capacity that the object at least need to have.
         \param allocator    Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
         \return The value itself for fluent API.
+        \note If the allocator fails, the capacity is left unchanged.
         \note Linear time complexity.
     */
     GenericValue& MemberReserve(SizeType newCapacity, Allocator &allocator) {
@@ -1380,6 +1383,7 @@ public:
         \param allocator    Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
         \return The value itself for fluent API.
         \note The ownership of \c name and \c value will be transferred to this object on success.
+        \note If the allocator fails, the object, \c name and \c value are left unchanged.
         \pre  IsObject() && name.IsString()
         \post name.IsNull() && value.IsNull()
         \note Amortized Constant time complexity.
@@ -1689,13 +1693,17 @@ public:
     /*! \param newCapacity  The capacity that the array at least need to have.
         \param allocator    Allocator for reallocating memory. It must be the same one as used before. Commonly use GenericDocument::GetAllocator().
         \return The value itself for fluent API.
+        \note If the allocator fails, the capacity is left unchanged.
         \note Linear time complexity.
     */
     GenericValue& Reserve(SizeType newCapacity, Allocator &allocator) {
         RAPIDJSON_ASSERT(IsArray());
         if (newCapacity > data_.a.capacity) {
-            SetElementsPointer(reinterpret_cast<GenericValue*>(allocator.Realloc(GetElementsPointer(), data_.a.capacity * sizeof(GenericValue), newCapacity * sizeof(GenericValue))));
-            data_.a.capacity = newCapacity;
+            GenericValue* e = reinterpret_cast<GenericValue*>(allocator.Realloc(GetElementsPointer(), data_.a.capacity * sizeof(GenericValue), newCapacity * sizeof(GenericValue)));
+            if (e) { // Allocation failed: keep the old elements and capacity.
+                SetElementsPointer(e);
+                data_.a.capacity = newCapacity;
+            }
         }
         return *this;
     }
@@ -1707,6 +1715,7 @@ public:
         \post value.IsNull() == true
         \return The value itself for fluent API.
         \note The ownership of \c value will be transferred to this array on success.
+        \note If the allocator fails, the array and \c value are left unchanged.
         \note If the number of elements to be appended is known, calls Reserve() once first may be more efficient.
         \note Amortized constant time complexity.
     */
@@ -1714,6 +1723,8 @@ public:
         RAPIDJSON_ASSERT(IsArray());
         if (data_.a.size >= data_.a.capacity)
             Reserve(data_.a.capacity == 0 ? kDefaultArrayCapacity : (data_.a.capacity + (data_.a.capacity + 1) / 2), allocator);
+        if (RAPIDJSON_UNLIKELY(data_.a.size >= data_.a.capacity))
+            return *this; // Allocation failed.
         GetElementsPointer()[data_.a.size++].RawAssign(value);
         return *this;
     }
@@ -2273,8 +2284,10 @@ private:
         ObjectData& o = data_.o;
         if (newCapacity > o.capacity) {
             Member* newMembers = Realloc<Member>(allocator, GetMembersPointer(), o.capacity, newCapacity);
-            RAPIDJSON_SETPOINTER(Member, o.members, newMembers);
-            o.capacity = newCapacity;
+            if (newMembers) { // Allocation failed: keep the old members and capacity.
+                RAPIDJSON_SETPOINTER(Member, o.members, newMembers);
+                o.capacity = newCapacity;
+            }
         }
     }
 
@@ -2305,6 +2318,8 @@ private:
         ObjectData& o = data_.o;
         if (o.size >= o.capacity)
             DoReserveMembers(o.capacity ? (o.capacity + (o.capacity + 1) / 2) : kDefaultObjectCapacity, allocator);
+        if (RAPIDJSON_UNLIKELY(o.size >= o.capacity))
+            return; // Allocation failed.
         Member* members = GetMembersPointer();
         Member* m = members + o.size;
         m->name.RawAssign(name);
@@ -2382,6 +2397,11 @@ private:
         data_.f.flags = kObjectFlag;
         SizeType count = rhs.data_.o.size;
         Member* lm = DoAllocMembers(count, allocator);
+        if (!lm) { // Allocation failed: copy as empty object.
+            data_.o.size = data_.o.capacity = 0;
+            SetMembersPointer(0);
+            return;
+        }
         const typename GenericValue<Encoding,SourceAllocator>::Member* rm = rhs.GetMembersPointer();
 #if RAPIDJSON_USE_MEMBERSMAP
         Map* &map = GetMap(lm);
@@ -2399,23 +2419,36 @@ private:
     }
 
     // Initialize this value as array with initial data, without calling destructor.
-    void SetArrayRaw(GenericValue* values, SizeType count, Allocator& allocator) {
+    //! \return false if allocation failed. The value is then an empty array and \c values are not taken.
+    bool SetArrayRaw(GenericValue* values, SizeType count, Allocator& allocator) {
         data_.f.flags = kArrayFlag;
+        bool success = true;
+        GenericValue* e = 0;
         if (count) {
-            GenericValue* e = static_cast<GenericValue*>(allocator.Malloc(count * sizeof(GenericValue)));
-            SetElementsPointer(e);
-            std::memcpy(static_cast<void*>(e), values, count * sizeof(GenericValue));
+            e = static_cast<GenericValue*>(allocator.Malloc(count * sizeof(GenericValue)));
+            if (e)
+                std::memcpy(static_cast<void*>(e), values, count * sizeof(GenericValue));
+            else {
+                count = 0;
+                success = false;
+            }
         }
-        else
-            SetElementsPointer(0);
+        SetElementsPointer(e);
         data_.a.size = data_.a.capacity = count;
+        return success;
     }
 
     //! Initialize this value as object with initial data, without calling destructor.
-    void SetObjectRaw(Member* members, SizeType count, Allocator& allocator) {
+    //! \return false if allocation failed. The value is then an empty object and \c members are not taken.
+    bool SetObjectRaw(Member* members, SizeType count, Allocator& allocator) {
         data_.f.flags = kObjectFlag;
+        bool success = true;
+        Member* m = count ? DoAllocMembers(count, allocator) : 0;
+        if (count && !m) {
+            count = 0;
+            success = false;
+        }
         if (count) {
-            Member* m = DoAllocMembers(count, allocator);
             SetMembersPointer(m);
             std::memcpy(static_cast<void*>(m), members, count * sizeof(Member));
 #if RAPIDJSON_USE_MEMBERSMAP
@@ -2429,6 +2462,7 @@ private:
         else
             SetMembersPointer(0);
         data_.o.size = data_.o.capacity = count;
+        return success;
     }
 
     //! Initialize this value as constant string, without calling destructor.
@@ -2439,7 +2473,8 @@ private:
     }
 
     //! Initialize this value as copy string with initial data, without calling destructor.
-    void SetStringRaw(StringRefType s, Allocator& allocator) {
+    //! \return false if allocation failed. The value is then an empty string.
+    bool SetStringRaw(StringRefType s, Allocator& allocator) {
         Ch* str = 0;
         if (ShortString::Usable(s.length)) {
             data_.f.flags = kShortStringFlag;
@@ -2447,13 +2482,20 @@ private:
             str = data_.ss.str;
             std::memmove(str, s, s.length * sizeof(Ch));
         } else {
+            str = static_cast<Ch *>(allocator.Malloc((s.length + 1) * sizeof(Ch)));
+            if (!str) {
+                data_.f.flags = kShortStringFlag;
+                data_.ss.SetLength(0);
+                data_.ss.str[0] = '\0';
+                return false;
+            }
             data_.f.flags = kCopyStringFlag;
             data_.s.length = s.length;
-            str = static_cast<Ch *>(allocator.Malloc((s.length + 1) * sizeof(Ch)));
             SetStringPointer(str);
             std::memcpy(str, s, s.length * sizeof(Ch));
         }
         str[s.length] = '\0';
+        return true;
     }
 
     //! Assignment without calling destructor
@@ -2818,45 +2860,51 @@ private:
 
 public:
     // Implementation of Handler
-    bool Null() { new (stack_.template Push<ValueType>()) ValueType(); return true; }
-    bool Bool(bool b) { new (stack_.template Push<ValueType>()) ValueType(b); return true; }
-    bool Int(int i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
-    bool Uint(unsigned i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
-    bool Int64(int64_t i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
-    bool Uint64(uint64_t i) { new (stack_.template Push<ValueType>()) ValueType(i); return true; }
-    bool Double(double d) { new (stack_.template Push<ValueType>()) ValueType(d); return true; }
+    // A handler returns false when an allocation fails, which ends the parse with kParseErrorTermination.
+    bool Null() { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(); return true; }
+    bool Bool(bool b) { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(b); return true; }
+    bool Int(int i) { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(i); return true; }
+    bool Uint(unsigned i) { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(i); return true; }
+    bool Int64(int64_t i) { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(i); return true; }
+    bool Uint64(uint64_t i) { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(i); return true; }
+    bool Double(double d) { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(d); return true; }
 
     bool RawNumber(const Ch* str, SizeType length, bool copy) { 
-        if (copy) 
-            new (stack_.template Push<ValueType>()) ValueType(str, length, GetAllocator());
-        else
-            new (stack_.template Push<ValueType>()) ValueType(str, length);
-        return true;
+        return String(str, length, copy);
     }
 
     bool String(const Ch* str, SizeType length, bool copy) { 
+        ValueType* v = stack_.template TryPush<ValueType>();
+        if (!v)
+            return false;
+        new (v) ValueType();
         if (copy) 
-            new (stack_.template Push<ValueType>()) ValueType(str, length, GetAllocator());
-        else
-            new (stack_.template Push<ValueType>()) ValueType(str, length);
+            return v->SetStringRaw(StringRef(str, length), GetAllocator());
+        v->SetStringRaw(StringRef(str, length));
         return true;
     }
 
-    bool StartObject() { new (stack_.template Push<ValueType>()) ValueType(kObjectType); return true; }
+    bool StartObject() { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(kObjectType); return true; }
     
     bool Key(const Ch* str, SizeType length, bool copy) { return String(str, length, copy); }
 
     bool EndObject(SizeType memberCount) {
         typename ValueType::Member* members = stack_.template Pop<typename ValueType::Member>(memberCount);
-        stack_.template Top<ValueType>()->SetObjectRaw(members, memberCount, GetAllocator());
+        if (!stack_.template Top<ValueType>()->SetObjectRaw(members, memberCount, GetAllocator())) {
+            stack_.template PushUnsafe<typename ValueType::Member>(memberCount); // Keep the members on the stack, ClearStack() destroys them.
+            return false;
+        }
         return true;
     }
 
-    bool StartArray() { new (stack_.template Push<ValueType>()) ValueType(kArrayType); return true; }
+    bool StartArray() { ValueType* v = stack_.template TryPush<ValueType>(); if (!v) return false; new (v) ValueType(kArrayType); return true; }
     
     bool EndArray(SizeType elementCount) {
         ValueType* elements = stack_.template Pop<ValueType>(elementCount);
-        stack_.template Top<ValueType>()->SetArrayRaw(elements, elementCount, GetAllocator());
+        if (!stack_.template Top<ValueType>()->SetArrayRaw(elements, elementCount, GetAllocator())) {
+            stack_.template PushUnsafe<ValueType>(elementCount); // Keep the elements on the stack, ClearStack() destroys them.
+            return false;
+        }
         return true;
     }
 
