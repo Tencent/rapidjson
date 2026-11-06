@@ -919,6 +919,17 @@ private:
         return !((c >= '0' && c <= '9') || (c >= 'A' && c <='Z') || (c >= 'a' && c <= 'z') || c == '-' || c == '.' || c == '_' || c =='~');
     }
 
+    //! Check whether a character may appear as is in a URI fragment.
+    /*!
+        According to RFC 3986 3.5 Fragment: unreserved characters, sub-delims, ':', '@' and '?'.
+        '/' is also allowed, but separates the tokens of a pointer.
+        \param c The character (code unit) to be tested.
+    */
+    bool IsUriFragmentChar(Ch c) const {
+        return !NeedPercentEncode(c) || c == '!' || c == '$' || c == '&' || c == '\'' || c == '(' || c == ')' ||
+            c == '*' || c == '+' || c == ',' || c == ';' || c == '=' || c == ':' || c == '@' || c == '?';
+    }
+
     //! Parse a JSON String or its URI fragment representation into tokens.
 #ifndef __clang__ // -Wdocumentation
     /*!
@@ -988,7 +999,7 @@ private:
                             continue;
                         }
                     }
-                    else if (NeedPercentEncode(c)) {
+                    else if (!IsUriFragmentChar(c)) {
                         parseErrorCode_ = kPointerParseErrorCharacterMustPercentEncode;
                         goto error;
                     }

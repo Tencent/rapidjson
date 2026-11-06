@@ -401,6 +401,29 @@ TEST(SchemaValidator, Ref) {
     VALIDATE(s, "{\"shipping_address\": {\"street_address\": \"1600 Pennsylvania Avenue NW\", \"city\": \"Washington\", \"state\": \"DC\"}, \"billing_address\": {\"street_address\": \"1st Street SE\", \"city\": \"Washington\", \"state\": \"DC\"} }", true);
 }
 
+TEST(SchemaValidator, Ref_Defs) {
+    Document sd;
+    sd.Parse(
+        "{"
+        "  \"$defs\": {"
+        "    \"inner\": {"
+        "      \"type\": \"object\","
+        "      \"required\": [\"num\"]"
+        "    }"
+        "  },"
+        "  \"items\": { \"$ref\": \"#/$defs/inner\" }"
+        "}");
+    SchemaDocument s(sd);
+
+    VALIDATE(s, "[{\"num\": 1}]", true);
+    INVALIDATE(s, "[{}]", "/$defs/inner", "required", "/0",
+        "{ \"required\": {"
+        "    \"missing\": [\"num\"],"
+        "    \"errorCode\": 15,"
+        "    \"instanceRef\": \"#/0\", \"schemaRef\": \"#/%24defs/inner\""
+        "}}");
+}
+
 TEST(SchemaValidator, Ref_AllOf) {
     Document sd;
     sd.Parse(
@@ -3393,9 +3416,9 @@ TEST(SchemaValidator, Schema_RefNoRemoteSchema) {
 TEST(SchemaValidator, Schema_RefPointerInvalid) {
     typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
     Document sd;
-    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"#/&&&&&\"}}}");
+    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"#/^^^^^\"}}}");
     SchemaDocumentType s(sd);
-    SCHEMAERROR(s, "{\"RefPointerInvalid\":{\"errorCode\":4,\"instanceRef\":\"#/properties/myInt\",\"value\":\"#/&&&&&\",\"offset\":2}}");
+    SCHEMAERROR(s, "{\"RefPointerInvalid\":{\"errorCode\":4,\"instanceRef\":\"#/properties/myInt\",\"value\":\"#/^^^^^\",\"offset\":2}}");
 }
 
 // $ref is remote and pointer is invalid
@@ -3403,9 +3426,9 @@ TEST(SchemaValidator, Schema_RefPointerInvalidRemote) {
     typedef GenericSchemaDocument<Value, MemoryPoolAllocator<> > SchemaDocumentType;
     RemoteSchemaDocumentProvider<SchemaDocumentType> provider;
     Document sd;
-    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"/subSchemas.json#/abc&&&&&\"}}}");
+    sd.Parse("{\"type\": \"object\", \"properties\": {\"myInt\": {\"$ref\": \"/subSchemas.json#/abc^^^^^\"}}}");
     SchemaDocumentType s(sd, "http://localhost:1234/xxxx", 26, &provider);
-    SCHEMAERROR(s, "{\"RefPointerInvalid\":{\"errorCode\":4,\"instanceRef\":\"#/properties/myInt\",\"value\":\"#/abc&&&&&\",\"offset\":5}}");
+    SCHEMAERROR(s, "{\"RefPointerInvalid\":{\"errorCode\":4,\"instanceRef\":\"#/properties/myInt\",\"value\":\"#/abc^^^^^\",\"offset\":5}}");
 }
 
 // $ref is unknown non-pointer
