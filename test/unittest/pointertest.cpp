@@ -276,6 +276,20 @@ TEST(Pointer, Parse_URIFragment) {
     }
 
     {
+        // RFC 3986 allows sub-delims, ':', '@' and '?' in a fragment as is
+        Pointer p("#/$defs/!$&'()*+,;=:@?");
+        ASSERT_TRUE(p.IsValid());
+        EXPECT_EQ(2u, p.GetTokenCount());
+        EXPECT_STREQ("$defs", p.GetTokens()[0].name);
+        EXPECT_STREQ("!$&'()*+,;=:@?", p.GetTokens()[1].name);
+
+        // Stringify keeps percent-encoding them
+        StringBuffer s;
+        EXPECT_TRUE(Pointer("#/$defs").StringifyUriFragment(s));
+        EXPECT_STREQ("#/%24defs", s.GetString());
+    }
+
+    {
         // Valid index
         Pointer p("#/123");
         EXPECT_TRUE(p.IsValid());
@@ -398,6 +412,17 @@ TEST(Pointer, Parse_URIFragment) {
         EXPECT_FALSE(p.IsValid());
         EXPECT_EQ(kPointerParseErrorCharacterMustPercentEncode, p.GetParseErrorCode());
         EXPECT_EQ(2u, p.GetParseErrorOffset());
+    }
+
+    {
+        // kPointerParseErrorCharacterMustPercentEncode (not allowed by RFC 3986)
+        static const char* const sources[] = { "#/\"", "#/<", "#/>", "#/[", "#/\\", "#/]", "#/^", "#/`", "#/{", "#/|", "#/}" };
+        for (size_t i = 0; i < sizeof(sources) / sizeof(sources[0]); i++) {
+            Pointer p(sources[i]);
+            EXPECT_FALSE(p.IsValid());
+            EXPECT_EQ(kPointerParseErrorCharacterMustPercentEncode, p.GetParseErrorCode());
+            EXPECT_EQ(2u, p.GetParseErrorOffset());
+        }
     }
 }
 
