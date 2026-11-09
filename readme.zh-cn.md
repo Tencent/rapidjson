@@ -150,3 +150,10 @@ int main() {
   * [parsebyparts](https://github.com/Tencent/rapidjson/blob/master/example/parsebyparts/parsebyparts.cpp): 这例子中的 `AsyncDocumentParser` 类使用 C++ 线程来逐段解析 JSON。
   * [filterkey](https://github.com/Tencent/rapidjson/blob/master/example/filterkey/filterkey.cpp): 移取使用者指定的键值的命令行工具。
   * [filterkeydom](https://github.com/Tencent/rapidjson/blob/master/example/filterkey/filterkey.cpp): 如上的工具，但展示如何使用生成器（generator）去填充一个 `Document`。
+
+
+## 注意事项
+
+* RVV 加速
+  * 在支持 V 扩展的 RISC-V 平台上，可利用向量指令加速解析。编译时需同时指定 `-march=rv64gcv` 与 `-DRAPIDJSON_RVV`（要求 GCC >= 13 或 Clang >= 17）。
+  * 若未定义 `RAPIDJSON_RVV`，即使以 `-march=rv64gcv` 编译，也会退回标量实现（库本身不会自动检测向量扩展）。

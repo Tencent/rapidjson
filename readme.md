@@ -208,3 +208,9 @@ under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
 CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 specific language governing permissions and limitations under the License.
 ```
+
+## Notes
+
+* RVV acceleration
+  * On RISC-V platforms with the V extension, parsing can be accelerated with vector instructions. Compile with both `-march=rv64gcv` and `-DRAPIDJSON_RVV` (requires GCC >= 13 or Clang >= 17).
+  * If `RAPIDJSON_RVV` is not defined, the library falls back to the scalar implementation even when compiled with `-march=rv64gcv` (the vector extension is not auto-detected by the library).
