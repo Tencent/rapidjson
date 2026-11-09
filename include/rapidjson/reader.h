@@ -498,7 +498,64 @@ inline const char *SkipWhitespace_SIMD(const char* p, const char* end) {
     return SkipWhitespace(p, end);
 }
 
-#endif // RAPIDJSON_NEON
+#elif defined(RAPIDJSON_RVV)
+
+//! Skip whitespace with RISC-V Vector instructions, testing 32 8-byte characters at once.
+inline const char *SkipWhitespace_SIMD(const char* p) {
+    // Fast return for single non-whitespace
+    if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
+        ++p;
+    else
+        return p;
+
+    // 32-byte align to the next boundary
+    const char* nextAligned = reinterpret_cast<const char*>((reinterpret_cast<size_t>(p) + 31) & static_cast<size_t>(~31));
+    while (p != nextAligned)
+        if (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t')
+            ++p;
+        else
+            return p;
+
+    for (;; p += 32) {
+        const vuint8m2_t s = __riscv_vle8_v_u8m2(reinterpret_cast<const uint8_t*>(p), 32);
+        vbool4_t m = __riscv_vmseq_vx_u8m2_b4(s, static_cast<uint8_t>(' '), 32);
+        m = __riscv_vmor_mm_b4(m, __riscv_vmseq_vx_u8m2_b4(s, static_cast<uint8_t>('\n'), 32), 32);
+        m = __riscv_vmor_mm_b4(m, __riscv_vmseq_vx_u8m2_b4(s, static_cast<uint8_t>('\r'), 32), 32);
+        m = __riscv_vmor_mm_b4(m, __riscv_vmseq_vx_u8m2_b4(s, static_cast<uint8_t>('\t'), 32), 32);
+
+        m = __riscv_vmnot_m_b4(m, 32);            // Non-whitespace mask
+        const long idx = __riscv_vfirst_m_b4(m, 32);
+        if (idx >= 0)    // some of characters is non-whitespace
+            return p + idx;
+    }
+}
+
+inline const char *SkipWhitespace_SIMD(const char* p, const char* end) {
+    // Fast return for single non-whitespace
+    if (p != end && (*p == ' ' || *p == '\n' || *p == '\r' || *p == '\t'))
+        ++p;
+    else
+        return p;
+
+    const size_t vl2 = __riscv_vsetvlmax_e8m2();
+    for (; p <= end - vl2; ) {
+        const vuint8m2_t s = __riscv_vle8_v_u8m2(reinterpret_cast<const uint8_t*>(p), vl2);
+        vbool4_t m = __riscv_vmseq_vx_u8m2_b4(s, static_cast<uint8_t>(' '), vl2);
+        m = __riscv_vmor_mm_b4(m, __riscv_vmseq_vx_u8m2_b4(s, static_cast<uint8_t>('\n'), vl2), vl2);
+        m = __riscv_vmor_mm_b4(m, __riscv_vmseq_vx_u8m2_b4(s, static_cast<uint8_t>('\r'), vl2), vl2);
+        m = __riscv_vmor_mm_b4(m, __riscv_vmseq_vx_u8m2_b4(s, static_cast<uint8_t>('\t'), vl2), vl2);
+
+        m = __riscv_vmnot_m_b4(m, vl2);            // Non-whitespace mask
+        const long idx = __riscv_vfirst_m_b4(m, vl2);
+        if (idx >= 0)
+            return p + idx;
+        p += vl2;
+    }
+
+    return SkipWhitespace(p, end);
+}
+
+#endif // RAPIDJSON_RVV
 
 #ifdef RAPIDJSON_SIMD
 //! Template function specialization for InsituStringStream

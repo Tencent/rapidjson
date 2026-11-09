@@ -23,6 +23,8 @@
 #  define RAPIDJSON_SSE2
 #elif defined(__ARM_NEON)
 #  define RAPIDJSON_NEON
+#elif defined(__riscv_v_intrinsic)
+#  define RAPIDJSON_RVV
 #endif
 
 #define RAPIDJSON_NAMESPACE rapidjson_simd
@@ -45,6 +47,8 @@ using namespace rapidjson_simd;
 #define SIMD_SUFFIX(name) name##_SSE42
 #elif defined(RAPIDJSON_NEON)
 #define SIMD_SUFFIX(name) name##_NEON
+#elif defined(RAPIDJSON_RVV)
+#define SIMD_SUFFIX(name) name##_RVV
 #else
 #define SIMD_SUFFIX(name) name
 #endif

@@ -34,6 +34,8 @@
 #define SIMD_SUFFIX(name) name##_SSE42
 #elif defined(RAPIDJSON_NEON)
 #define SIMD_SUFFIX(name) name##_NEON
+#elif defined(RAPIDJSON_RVV)
+#define SIMD_SUFFIX(name) name##_RVV
 #else
 #define SIMD_SUFFIX(name) name
 #endif
