@@ -115,7 +115,7 @@ public:
     template<typename T>
     RAPIDJSON_FORCEINLINE void Reserve(size_t count = 1) {
          // Expand the stack if needed
-        if (RAPIDJSON_UNLIKELY(static_cast<std::ptrdiff_t>(sizeof(T) * count) > (stackEnd_ - stackTop_)))
+        if (RAPIDJSON_UNLIKELY(stack_ == 0 || static_cast<std::ptrdiff_t>(sizeof(T) * count) > (stackEnd_ - stackTop_)))
             Expand<T>(count);
     }
 
@@ -175,8 +175,8 @@ public:
     }
 
     bool Empty() const { return stackTop_ == stack_; }
-    size_t GetSize() const { return static_cast<size_t>(stackTop_ - stack_); }
-    size_t GetCapacity() const { return static_cast<size_t>(stackEnd_ - stack_); }
+    size_t GetSize() const { return stack_ ? static_cast<size_t>(stackTop_ - stack_) : 0; }
+    size_t GetCapacity() const { return stack_ ? static_cast<size_t>(stackEnd_ - stack_) : 0; }
 
 private:
     template<typename T>
