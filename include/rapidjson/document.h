@@ -436,6 +436,9 @@ private:
 };
 
 template<typename CharType>
+#if defined(__cpp_inline_variables)
+inline
+#endif
 const CharType GenericStringRef<CharType>::emptyString[] = { CharType() };
 
 //! Mark a character pointer as constant string
