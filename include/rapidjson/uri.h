@@ -82,6 +82,10 @@ public:
         if (this != &rhs) {
             // Do not delete ownAllocator
             Free();
+            if (rhs.uri_ == 0) {
+                uri_ = base_ = scheme_ = auth_ = path_ = query_ = frag_ = 0;
+                return *this;
+            }
             Allocate(rhs.GetStringLength());
             auth_ = CopyPart(scheme_, rhs.scheme_, rhs.GetSchemeStringLength());
             path_ = CopyPart(auth_, rhs.auth_, rhs.GetAuthStringLength());

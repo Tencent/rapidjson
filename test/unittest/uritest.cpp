@@ -308,6 +308,19 @@ TEST(Uri, CopyConstructor) {
     EXPECT_NE(&u.GetAllocator(), &u2.GetAllocator());
 }
 
+TEST(Uri, CopyDefaultConstructed) {
+    typedef GenericUri<Value> UriType;
+    UriType empty;
+    UriType copied(empty);
+    EXPECT_TRUE(copied.GetString() == 0);
+    EXPECT_TRUE(copied == empty);
+
+    UriType assigned("http://example.com/path");
+    assigned = empty;
+    EXPECT_TRUE(assigned.GetString() == 0);
+    EXPECT_TRUE(assigned == empty);
+}
+
 TEST(Uri, Assignment) {
     typedef GenericUri<Value> UriType;
     CrtAllocator allocator;
