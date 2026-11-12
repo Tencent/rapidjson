@@ -216,6 +216,32 @@ TEST(SIMD, SIMD_SUFFIX(ScanWriteUnescapedString)) {
             EXPECT_EQ('\0', *q++);
         }
     }
+
+    // Multi-byte UTF-8 (>= 0x80) inside the vector body must pass through
+    // unescaped: requires the SIMD control-char predicate to compare unsigned.
+    const char* utf8 = "\xE4\xB8\xAD\xE6\x96\x87";    // 中文
+    char utf8buffer[SIMD_SIZE_ALIGN(128)];
+    char* up = utf8buffer;
+    for (size_t i = 0; i < 32; i++)
+        *up++ = "ABCD"[i % 4];
+    for (const char* q = utf8; *q; q++)
+        *up++ = *q;
+    for (size_t i = 0; i < 32; i++)
+        *up++ = "ABCD"[i % 4];
+
+    StringBuffer sb;
+    Writer<StringBuffer> writer(sb);
+    writer.String(utf8buffer, SizeType(70));
+    const char* r = sb.GetString();
+    EXPECT_EQ('\"', *r++);
+    for (size_t i = 0; i < 32; i++)
+        EXPECT_EQ("ABCD"[i % 4], *r++);
+    for (const char* q = utf8; *q; q++)
+        EXPECT_EQ(*q, *r++);
+    for (size_t i = 0; i < 32; i++)
+        EXPECT_EQ("ABCD"[i % 4], *r++);
+    EXPECT_EQ('\"', *r++);
+    EXPECT_EQ('\0', *r++);
 }
 
 #ifdef __GNUC__
