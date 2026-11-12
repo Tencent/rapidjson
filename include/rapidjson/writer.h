@@ -35,6 +35,8 @@
 #include <emmintrin.h>
 #elif defined(RAPIDJSON_NEON)
 #include <arm_neon.h>
+#elif defined(RAPIDJSON_RVV)
+#include <riscv_vector.h>
 #endif
 
 #ifdef __clang__
@@ -395,9 +397,9 @@ protected:
         };
 
         if (TargetEncoding::supportUnicode)
-            PutReserve(*os_, 2 + static_cast<size_t>(length) * 6); // "\uxxxx..."
+            PutReserve(*os_, 2 + length * 6); // "\uxxxx..."
         else
-            PutReserve(*os_, 2 + static_cast<size_t>(length) * 12);  // "\uxxxx\uyyyy..."
+            PutReserve(*os_, 2 + length * 12);  // "\uxxxx\uyyyy..."
 
         PutUnsafe(*os_, '\"');
         GenericStringStream<SourceEncoding> is(str);
@@ -710,7 +712,42 @@ inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, siz
     is.src_ = p;
     return RAPIDJSON_LIKELY(is.Tell() < length);
 }
-#endif // RAPIDJSON_NEON
+
+#elif defined(RAPIDJSON_RVV)
+template<>
+inline bool Writer<StringBuffer>::ScanWriteUnescapedString(StringStream& is, size_t length) {
+    if (!RAPIDJSON_LIKELY(is.Tell() < length))
+        return false;
+
+    const char* p = is.src_;
+    const char* end = is.head_ + length;
+    // vl is capped to the remaining byte count, so every load stays within
+    // [p, end) without alignment handling or a scalar tail.
+
+    while (p != end) {
+        const size_t vl = __riscv_vsetvl_e8m2(static_cast<size_t>(end - p));
+        const vuint8m2_t s = __riscv_vle8_v_u8m2(reinterpret_cast<const uint8_t*>(p), vl);
+        vbool4_t x = __riscv_vmseq_vx_u8m2_b4(s, static_cast<uint8_t>('"'), vl);
+        x = __riscv_vmor_mm_b4(x, __riscv_vmseq_vx_u8m2_b4(s, static_cast<uint8_t>('\\'), vl), vl);
+        x = __riscv_vmor_mm_b4(x, __riscv_vmsltu_vx_u8m2_b4(s, static_cast<uint8_t>(0x20), vl), vl);
+
+        const long len = __riscv_vfirst_m_b4(x, vl);
+        if (RAPIDJSON_UNLIKELY(len >= 0)) {   // some of characters is escaped
+            char* q = reinterpret_cast<char*>(os_->PushUnsafe(static_cast<SizeType>(len)));
+            for (long i = 0; i < len; i++)
+                q[i] = p[i];
+
+            p += len;
+            break;
+        }
+        __riscv_vse8_v_u8m2(reinterpret_cast<uint8_t*>(os_->PushUnsafe(vl)), s, vl);
+        p += vl;
+    }
+
+    is.src_ = p;
+    return RAPIDJSON_LIKELY(is.Tell() < length);
+}
+#endif // RAPIDJSON_RVV
 
 RAPIDJSON_NAMESPACE_END
 
