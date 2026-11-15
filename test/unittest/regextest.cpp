@@ -622,6 +622,12 @@ TEST(Regex, Invalid) {
     TEST_INVALID("[^]");
     TEST_INVALID("[\\a]");
     TEST_INVALID("\\a");
+    // Malformed patterns that underflow the operand stack (only guarded by
+    // RAPIDJSON_ASSERT, which is compiled out in release builds).
+    TEST_INVALID("a()");
+    TEST_INVALID("ab(|c)d");
+    TEST_INVALID("^s(}}}|)}}}}}}}}+");
+    TEST_INVALID("{2}");
 
 #undef TEST_INVALID
 }
