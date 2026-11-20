@@ -334,6 +334,33 @@ TEST(EncodingsTest, UTF8) {
     }
 }
 
+// A truncated sequence at the end of the input must stop at the terminator instead of reading past it (issue #2427).
+namespace {
+// Counts the bytes Decode pulls, so a read past the terminator is visible as a position the test can assert on.
+class CountingStringStream {
+public:
+    typedef char Ch;
+
+    explicit CountingStringStream(const char* str) : src_(str), tell_(0) {}
+
+    Ch Take() { ++tell_; return *src_++; }
+    size_t Tell() const { return tell_; }
+
+private:
+    const char* src_;
+    size_t tell_;
+};
+} // namespace
+
+TEST(EncodingsTest, UTF8DecodeTruncated) {
+    // 0xF0 promises three continuation bytes; only the terminator follows.
+    CountingStringStream is("\xF0");
+    unsigned codepoint = 0;
+
+    EXPECT_FALSE(UTF8<>::Decode(is, &codepoint));
+    EXPECT_EQ(2u, is.Tell());   // The lead byte and the terminator, and nothing after them.
+}
+
 TEST(EncodingsTest, UTF16) {
     GenericStringBuffer<UTF16<> > os, os2;
     GenericStringBuffer<UTF8<> > utf8os;
